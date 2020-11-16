@@ -16,7 +16,13 @@
  * @fileoverview Unit tests for RefresherExplorationConfirmationModalController.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Refresher Exploration Confirmation Modal Controller', function() {
+  importAllAngularServices();
+
   var $flushPendingTasks = null;
   var $scope = null;
   var $uibModalInstance = null;

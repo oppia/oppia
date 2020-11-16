@@ -30,29 +30,25 @@ import python_utils
     [models.NAMES.base_model, models.NAMES.skill])
 
 
+class SkillSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            skill_models.SkillSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class SkillModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillModel class."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             skill_models.SkillModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
-    def test_has_reference_to_user_id(self):
-        self.save_new_skill('skill_id', 'owner_id', description='description')
-        self.assertTrue(
-            skill_models.SkillModel.has_reference_to_user_id('owner_id'))
-        self.assertFalse(
-            skill_models.SkillModel.has_reference_to_user_id('x_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Tests the SkillCommitLogEntryModel class."""
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            skill_models.SkillCommitLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_has_reference_to_user_id(self):
         commit = skill_models.SkillCommitLogEntryModel.create(
@@ -60,6 +56,7 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False
         )
         commit.skill_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             skill_models.SkillCommitLogEntryModel
@@ -75,11 +72,7 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             skill_models.SkillSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            skill_models.SkillSummaryModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_fetch_page(self):
         skill_models.SkillSummaryModel(

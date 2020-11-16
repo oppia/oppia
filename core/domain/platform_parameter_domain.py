@@ -39,17 +39,15 @@ ALLOWED_SERVER_MODES = [
     SERVER_MODES.dev, SERVER_MODES.test, SERVER_MODES.prod]
 ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
-ALLOWED_CLIENT_TYPES = ['Web', 'Android']
-ALLOWED_BROWSER_TYPES = ['Chrome', 'Edge', 'Safari', 'Firefox', 'Unknown']
-
-# The ordering of elements in ALLOWED_APP_VERSION_FLAVOR implies the ordering
-# of corresponding flavors, which is used in app_version_flavor filter for order
-# comparison, with following ordering: 'test' < 'alpha' < 'beta' < 'release'.
-ALLOWED_APP_VERSION_FLAVOR = ['test', 'alpha', 'beta', 'release']
+ALLOWED_CLIENT_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES
+ALLOWED_BROWSER_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES
+ALLOWED_APP_VERSION_FLAVORS = (
+    constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS)
 
 APP_VERSION_WITH_HASH_REGEXP = re.compile(
-    r'^(\d+(?:\.\d+)*)(?:-[a-z0-9]+(?:-(.+))?)?$')
-APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(r'^(\d+(?:\.\d+)*)$')
+    constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP)
+APP_VERSION_WITHOUT_HASH_REGEXP = re.compile(
+    constants.PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP)
 
 
 class PlatformParameterChange(change_domain.BaseChange):
@@ -130,13 +128,29 @@ class EvaluationContext(python_utils.OBJECT):
         """
         return self._server_mode
 
-    def validate(self):
-        """Validates the EvaluationContext domain object."""
-        if self._client_type not in ALLOWED_CLIENT_TYPES:
-            raise utils.ValidationError(
-                'Invalid client type \'%s\', must be one of %s.' % (
-                    self._client_type, ALLOWED_CLIENT_TYPES))
+    @property
+    def is_valid(self):
+        """Returns whether this context object is valid for evaluating
+        parameters. An invalid context object usually indicates that one of the
+        object's required fields is missing or an unexpected value. Note that
+        objects which are not valid will still pass validation. This method
+        should return true and validate() should not raise an exception before
+        using this object for platform evaluation.
 
+        Returns:
+            bool. Whether this context object can be used for evaluating
+            parameters.
+        """
+        return (
+            self._client_type is not None and
+            self._client_type in ALLOWED_CLIENT_TYPES and
+            self._user_locale is not None and
+            self._user_locale in ALLOWED_USER_LOCALES)
+
+    def validate(self):
+        """Validates the EvaluationContext domain object, raising an exception
+        if the object is in an irrecoverable error state.
+        """
         if (
                 self._browser_type is not None and
                 self._browser_type not in ALLOWED_BROWSER_TYPES):
@@ -152,16 +166,11 @@ class EvaluationContext(python_utils.OBJECT):
                         self._app_version, APP_VERSION_WITH_HASH_REGEXP))
             elif (
                     match.group(2) is not None and
-                    match.group(2) not in ALLOWED_APP_VERSION_FLAVOR):
+                    match.group(2) not in ALLOWED_APP_VERSION_FLAVORS):
                 raise utils.ValidationError(
                     'Invalid version flavor \'%s\', must be one of %s if'
                     ' specified.' % (
-                        match.group(2), ALLOWED_APP_VERSION_FLAVOR))
-
-        if self._user_locale not in ALLOWED_USER_LOCALES:
-            raise utils.ValidationError(
-                'Invalid user locale \'%s\', must be one of %s.' % (
-                    self._user_locale, ALLOWED_USER_LOCALES))
+                        match.group(2), ALLOWED_APP_VERSION_FLAVORS))
 
         if self._server_mode not in ALLOWED_SERVER_MODES:
             raise utils.ValidationError(
@@ -315,10 +324,10 @@ class PlatformParameterFilter(python_utils.OBJECT):
                             client_type, ALLOWED_CLIENT_TYPES))
         elif self._type == 'app_version_flavor':
             for _, flavor in self._conditions:
-                if flavor not in ALLOWED_APP_VERSION_FLAVOR:
+                if flavor not in ALLOWED_APP_VERSION_FLAVORS:
                     raise utils.ValidationError(
                         'Invalid app version flavor \'%s\', must be one of'
-                        ' %s.' % (flavor, ALLOWED_APP_VERSION_FLAVOR))
+                        ' %s.' % (flavor, ALLOWED_APP_VERSION_FLAVORS))
         elif self._type == 'app_version':
             for _, version in self._conditions:
                 if not APP_VERSION_WITHOUT_HASH_REGEXP.match(version):
@@ -393,8 +402,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
         smaller.
 
         Args:
-            version_a: str. The version string (e.g. '1.0.0.0').
-            version_b: str. The version string (e.g. '1.0.0.0').
+            version_a: str. The version string (e.g. '1.0.0').
+            version_b: str. The version string (e.g. '1.0.0').
 
         Returns:
             bool. True if the first version is smaller.
@@ -464,8 +473,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
             bool. True if the first flavor is smaller.
         """
         return (
-            ALLOWED_APP_VERSION_FLAVOR.index(flavor_a) <
-            ALLOWED_APP_VERSION_FLAVOR.index(flavor_b)
+            ALLOWED_APP_VERSION_FLAVORS.index(flavor_a) <
+            ALLOWED_APP_VERSION_FLAVORS.index(flavor_b)
         )
 
 
@@ -695,15 +704,21 @@ class PlatformParameter(python_utils.OBJECT):
         """Evaluates the value of the platform parameter in the given context.
         The value of first matched rule is returned as the result.
 
+        Note that if the provided context is in an invalid state (e.g. its
+        is_valid property returns false) then this parameter will defer to its
+        default value since it may not be safe to partially evaluate the
+        parameter for an unrecognized or partially recognized context.
+
         Args:
             context: EvaluationContext. The context for evaluation.
 
         Returns:
             *. The evaluate result of the platform parameter.
         """
-        for rule in self._rules:
-            if rule.evaluate(context):
-                return rule.value_when_matched
+        if context.is_valid:
+            for rule in self._rules:
+                if rule.evaluate(context):
+                    return rule.value_when_matched
         return self._default_value
 
     def to_dict(self):

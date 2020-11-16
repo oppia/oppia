@@ -20,16 +20,10 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -41,8 +35,6 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
-import { ParamMetadataObjectFactory } from
-  'domain/exploration/ParamMetadataObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -68,8 +60,7 @@ import { SolutionObjectFactory } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 
-// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Exploration editor tab component', function() {
   var ctrl;
@@ -92,12 +83,7 @@ describe('Exploration editor tab component', function() {
 
   var mockRefreshStateEditorEventEmitter = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(function() {
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
@@ -111,17 +97,9 @@ describe('Exploration editor tab component', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      TestBed.get(AnswerClassificationResultObjectFactory));
-    $provide.value(
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
     $provide.value(
       'AnswerStatsObjectFactory', TestBed.get(AnswerStatsObjectFactory));
-    $provide.value(
-      'ClassifierObjectFactory', TestBed.get(ClassifierObjectFactory));
-    $provide.value(
-      'ExplorationDraftObjectFactory',
-      TestBed.get(ExplorationDraftObjectFactory));
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
     $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
@@ -133,8 +111,6 @@ describe('Exploration editor tab component', function() {
       'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
     $provide.value(
       'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
-    $provide.value(
-      'ParamMetadataObjectFactory', TestBed.get(ParamMetadataObjectFactory));
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       TestBed.get(RecordedVoiceoversObjectFactory));

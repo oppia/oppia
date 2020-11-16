@@ -26,12 +26,11 @@ import json
 import logging
 import traceback
 
+from core.domain import taskqueue_services
 from core.platform import models
 import python_utils
 import utils
 
-from google.appengine.api import app_identity
-from google.appengine.ext import ndb
 from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
@@ -42,7 +41,9 @@ from pipeline import pipeline
 
 (base_models, job_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job])
-taskqueue_services = models.Registry.import_taskqueue_services()
+
+app_identity_services = models.Registry.import_app_identity_services()
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
@@ -135,7 +136,9 @@ class BaseJobManager(python_utils.OBJECT):
                 str. The unique job id.
             """
             job_id = job_models.JobModel.get_new_id(cls.__name__)
-            job_models.JobModel(id=job_id, job_type=cls.__name__).put()
+            model = job_models.JobModel(id=job_id, job_type=cls.__name__)
+            model.update_timestamps()
+            model.put()
             return job_id
 
         return transaction_services.run_in_transaction(_create_new_job)
@@ -162,16 +165,14 @@ class BaseJobManager(python_utils.OBJECT):
         cls._require_correct_job_type(model.job_type)
 
         # Enqueue the job.
-        cls._pre_enqueue_hook(job_id)
         cls._real_enqueue(
             job_id, queue_name, additional_job_params, shard_count)
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
         model.additional_job_params = additional_job_params
+        model.update_timestamps()
         model.put()
-
-        cls._post_enqueue_hook(job_id)
 
     @classmethod
     def register_start(cls, job_id, metadata=None):
@@ -191,9 +192,8 @@ class BaseJobManager(python_utils.OBJECT):
         model.metadata = metadata
         model.status_code = STATUS_CODE_STARTED
         model.time_started_msec = utils.get_current_time_in_millisecs()
+        model.update_timestamps()
         model.put()
-
-        cls._post_start_hook(job_id)
 
     @classmethod
     def register_completion(
@@ -220,6 +220,7 @@ class BaseJobManager(python_utils.OBJECT):
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.output = cls._compress_output_list(
             output_list, _max_output_len_chars)
+        model.update_timestamps()
         model.put()
 
         cls._post_completed_hook(job_id)
@@ -290,6 +291,7 @@ class BaseJobManager(python_utils.OBJECT):
         model.status_code = STATUS_CODE_FAILED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.error = error
+        model.update_timestamps()
         model.put()
 
         cls._post_failure_hook(job_id)
@@ -316,6 +318,7 @@ class BaseJobManager(python_utils.OBJECT):
         model.status_code = STATUS_CODE_CANCELED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.error = cancel_message
+        model.update_timestamps()
         model.put()
 
         cls._post_cancel_hook(job_id, cancel_message)
@@ -510,40 +513,12 @@ class BaseJobManager(python_utils.OBJECT):
                 'Invalid job type %s for class %s' % (job_type, cls.__name__))
 
     @classmethod
-    def _pre_enqueue_hook(cls, job_id):
-        """A hook or a callback function triggered before enqueuing a job.
-
-        Args:
-            job_id: str. The unique ID of the job which is to be enqueued.
-        """
-        pass
-
-    @classmethod
-    def _post_enqueue_hook(cls, job_id):
-        """A hook or a callback function triggered after enqueuing a job.
-
-        Args:
-            job_id: str. The unique ID of the job which was enqueued.
-        """
-        pass
-
-    @classmethod
     def _pre_start_hook(cls, job_id):
         """A hook or a callback function triggered before marking a job
         as started.
 
         Args:
             job_id: str. The unique ID of the job to be marked as started.
-        """
-        pass
-
-    @classmethod
-    def _post_start_hook(cls, job_id):
-        """A hook or a callback function triggered after marking a job as
-        started.
-
-        Args:
-            job_id: str. The unique ID of the job marked as started.
         """
         pass
 
@@ -589,77 +564,6 @@ class BaseJobManager(python_utils.OBJECT):
             cancel_message: str. The message to be displayed after cancellation.
         """
         pass
-
-
-class BaseDeferredJobManager(BaseJobManager):
-    """Base class to run a job/method as deferred task. These tasks will be
-    pushed to the default taskqueue.
-    """
-
-    @classmethod
-    def _run(cls, additional_job_params):
-        """Function that performs the main business logic of the job.
-
-        Args:
-            additional_job_params: dict(str : *). Additional parameters on jobs.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def _run_job(cls, job_id, additional_job_params):
-        """Starts the job.
-
-        Args:
-            job_id: str. The ID of the job to run.
-            additional_job_params: dict(str : *). Additional parameters on job.
-
-        Raises:
-            PermanentTaskFailure. No further work can be scheduled.
-        """
-        logging.info(
-            'Job %s started at %s' %
-            (job_id, utils.get_current_time_in_millisecs()))
-        cls.register_start(job_id)
-
-        try:
-            result = cls._run(additional_job_params)
-        except Exception as e:
-            logging.error(traceback.format_exc())
-            logging.error(
-                'Job %s failed at %s' %
-                (job_id, utils.get_current_time_in_millisecs()))
-            cls.register_failure(
-                job_id, '%s\n%s'
-                % (python_utils.UNICODE(e), traceback.format_exc()))
-            raise taskqueue_services.PermanentTaskFailure(
-                'Task failed: %s\n%s'
-                % (python_utils.UNICODE(e), traceback.format_exc()))
-
-        # Note that the job may have been canceled after it started and before
-        # it reached this stage. This will result in an exception when the
-        # validity of the status code transition is checked.
-        cls.register_completion(job_id, [result])
-        logging.info(
-            'Job %s completed at %s' %
-            (job_id, utils.get_current_time_in_millisecs()))
-
-    @classmethod
-    def _real_enqueue(
-            cls, job_id, queue_name, additional_job_params, unused_shard_count):
-        """Puts the job in the task queue.
-
-        Args:
-            job_id: str. The ID of the job to enqueue.
-            queue_name: str. The queue name the job should be run in. See
-                core.platform.taskqueue.gae_taskqueue_services for supported
-                values.
-            additional_job_params: dict(str : *) or None. Additional params to
-                pass into the job's _run() method.
-            unused_shard_count: int. Number of shards used for the job.
-        """
-        taskqueue_services.defer(
-            cls._run_job, queue_name,
-            job_id, additional_job_params)
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
@@ -876,7 +780,8 @@ class BaseMapReduceJobManager(BaseJobManager):
             },
             'reducer_params': {
                 'output_writer': {
-                    'bucket_name': app_identity.get_default_gcs_bucket_name(),
+                    'bucket_name': (
+                        app_identity_services.get_default_gcs_bucket_name()),
                     'content_type': 'text/plain',
                     'naming_format': 'mrdata/$name/$id/output-$num',
                 }
@@ -908,7 +813,13 @@ class BaseMapReduceJobManager(BaseJobManager):
             cancel_message: str. The message to be displayed before
                 cancellation.
         """
+        super(BaseMapReduceJobManager, cls)._pre_cancel_hook(
+            job_id, cancel_message)
         metadata = cls.get_metadata(job_id)
+        if metadata is None:
+            # This indicates that the job has been queued but not started by the
+            # MapReduceJobPipeline.
+            return
         root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
         pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
@@ -1107,6 +1018,9 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         Args:
             job_id: str. The unique ID of the job marked as completed.
         """
+        super(
+            BaseMapReduceJobManagerForContinuousComputations,
+            cls)._post_completed_hook(job_id)
         cls._get_continuous_computation_class().on_batch_job_completion()
 
     @classmethod
@@ -1118,6 +1032,9 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             job_id: str. The unique ID of the job marked as cancelled.
             cancel_message: str. The message to be displayed after cancellation.
         """
+        super(
+            BaseMapReduceJobManagerForContinuousComputations,
+            cls)._post_cancel_hook(job_id, cancel_message)
         cls._get_continuous_computation_class().on_batch_job_canceled()
 
     @classmethod
@@ -1128,6 +1045,9 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         Args:
             job_id: str. The unique ID of the job marked as failed.
         """
+        super(
+            BaseMapReduceJobManagerForContinuousComputations,
+            cls)._post_failure_hook(job_id)
         cls._get_continuous_computation_class().on_batch_job_failure()
 
 
@@ -1148,7 +1068,8 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     relevant layer prefix gets appended.
     """
 
-    realtime_layer = ndb.IntegerProperty(required=True, choices=[0, 1])
+    realtime_layer = (
+        datastore_services.IntegerProperty(required=True, choices=[0, 1]))
 
     @classmethod
     def get_realtime_id(cls, layer_index, raw_entity_id):
@@ -1177,7 +1098,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         """
         query = cls.query().filter(cls.realtime_layer == layer_index).filter(
             cls.created_on < latest_created_on_datetime)
-        ndb.delete_multi(query.iter(keys_only=True))
+        datastore_services.delete_multi(query.iter(keys_only=True))
 
     @classmethod
     def _is_valid_realtime_id(cls, realtime_id):
@@ -1219,23 +1140,20 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
             BaseRealtimeDatastoreClassForContinuousComputations, cls
         ).get(entity_id, strict=strict)
 
-    def put(self):
-        """Stores the current realtime layer entity into the database.
+    def _pre_put_hook(self):
+        """Operations to perform just before the model is `put` into storage.
 
         Raises:
             Exception. The current instance has an invalid realtime layer id.
-
-        Returns:
-            realtime_layer. The realtime layer entity.
         """
+        super(
+            BaseRealtimeDatastoreClassForContinuousComputations, self
+        )._pre_put_hook()
         if (self.realtime_layer is None or
                 python_utils.UNICODE(self.realtime_layer) != self.id[0]):
             raise Exception(
                 'Realtime layer %s does not match realtime id %s' %
                 (self.realtime_layer, self.id))
-
-        return super(
-            BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
 class BaseContinuousComputationManager(python_utils.OBJECT):
@@ -1372,6 +1290,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             if cc_model is None:
                 cc_model = job_models.ContinuousComputationModel(
                     id=cls.__name__)
+                cc_model.update_timestamps()
                 cc_model.put()
 
             return cc_model.active_realtime_layer_index
@@ -1426,6 +1345,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                 cls.__name__)
             cc_model.active_realtime_layer_index = (
                 1 - cc_model.active_realtime_layer_index)
+            cc_model.update_timestamps()
             cc_model.put()
 
         transaction_services.run_in_transaction(
@@ -1477,6 +1397,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
                 cc_model.status_code = (
                     job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
+                cc_model.update_timestamps()
                 cc_model.put()
 
             return cc_model.status_code
@@ -1520,6 +1441,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             cc_model.status_code = (
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
             cc_model.last_started_msec = utils.get_current_time_in_millisecs()
+            cc_model.update_timestamps()
             cc_model.put()
 
         transaction_services.run_in_transaction(
@@ -1556,6 +1478,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
             cc_model.status_code = new_status_code
             cc_model.last_stopped_msec = utils.get_current_time_in_millisecs()
+            cc_model.update_timestamps()
             cc_model.put()
 
         transaction_services.run_in_transaction(
@@ -1612,6 +1535,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             """
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
             cc_model.last_finished_msec = utils.get_current_time_in_millisecs()
+            cc_model.update_timestamps()
             cc_model.put()
 
         transaction_services.run_in_transaction(
@@ -1658,10 +1582,10 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
 
 def _get_job_dict_from_job_model(model):
-    """Converts an ndb.Model representing a job to a dict.
+    """Converts a Model representing a job to a dict.
 
     Args:
-        model: ndb.Model. The model to extract job info from.
+        model: datastore_services.Model. The model to extract job info from.
 
     Returns:
         dict. The dict contains the following keys:
@@ -1839,6 +1763,6 @@ def get_continuous_computations_info(cc_classes):
 
 
 ABSTRACT_BASE_CLASSES = frozenset([
-    BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager,
+    BaseJobManager, BaseMapReduceJobManager,
     BaseMapReduceOneOffJobManager,
     BaseMapReduceJobManagerForContinuousComputations])

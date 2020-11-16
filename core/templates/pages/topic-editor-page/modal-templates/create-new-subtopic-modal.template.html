@@ -8,9 +8,9 @@
     <div class="modal-body new-subtopic-editor protractor-test-new-subtopic-editor">
       <div class="create-new-subtopic-input-field">
         <div>
-          <strong>Title</strong>
+          <strong>Title*</strong>
         </div>
-        <input class="form-control oppia-new-subtopic-editable-field protractor-test-new-subtopic-title-field"
+        <input class="form-control oppia-new-subtopic-editable-field protractor-test-new-subtopic-title-field required"
                placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
                ng-model="$ctrl.subtopicTitle" ng-change="$ctrl.resetErrorMsg()" maxlength="<[$ctrl.MAX_CHARS_IN_SUBTOPIC_TITLE]>" autofocus>
         <span class="oppia-input-box-subtitle">
@@ -23,7 +23,7 @@
         </span>
       </div>
       <div>
-        <strong>Enter the url fragment for the subtopic</strong>
+        <strong>Enter the url fragment for the subtopic*</strong>
       </div>
       <input class="form-control oppia-new-subtopic-editable-field protractor-test-new-subtopic-url-fragment-field"
              ng-class="{'is-invalid': $ctrl.editableUrlFragment && (!$ctrl.isUrlFragmentValid() || $ctrl.subtopicUrlFragmentExists)}"
@@ -42,7 +42,7 @@
 
       <div class="create-new-subtopic-input-field create-new-subtopic-content">
         <div>
-          <strong>Explanation of the subtopic</strong>
+          <strong>Explanation of the subtopic*</strong>
         </div>
         <div class="description-editor" ng-if="$ctrl.schemaEditorIsShown">
           <div class="oppia-editor-card-body" >
@@ -62,7 +62,7 @@
       </div>
 
       <div class="thumbnail-editor create-new-subtopic-input-field">
-        <strong>Thubmnail Image</strong>
+        <strong>Thubmnail Image*</strong>
         <thumbnail-uploader filename="$ctrl.editableThumbnailFilename"
                             update-filename="$ctrl.updateSubtopicThumbnailFilename"
                             bg-color="$ctrl.editableThumbnailBgColor"
@@ -119,6 +119,7 @@
       border: 0;
       border-radius: 0;
       height: 100vh;
+      overflow: auto;
     }
     .create-new-subtopic .modal-header {
       align-items: center;
@@ -136,8 +137,8 @@
       display: block;
       font-size: 20px;
     }
-    .create-new-subtopic .thumbnail-editor {
-      height: auto;
+    .create-new-subtopic .ng-touched.ng-empty.required {
+     outline: 1px solid #F00;
     }
   }
 </style>

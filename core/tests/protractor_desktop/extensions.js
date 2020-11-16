@@ -16,11 +16,14 @@
  * @fileoverview End-to-end tests for rich-text components and interactions.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
+var action = require('../protractor_utils/action.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -40,9 +43,8 @@ describe('rich-text components', function() {
   });
 
   it('should display correctly', async function() {
-    await users.createUser(
+    await users.createAndLoginUser(
       'user@richTextComponents.com', 'userRichTextComponents');
-    await users.login('user@richTextComponents.com');
 
     await workflow.createExploration();
 
@@ -146,8 +148,9 @@ describe('Interactions', function() {
         var confirmDeleteResponseButton = element(by.css(
           '.protractor-test-confirm-delete-response'));
         if (await deleteResponseButton.isPresent()) {
-          await deleteResponseButton.click();
-          await confirmDeleteResponseButton.click();
+          await action.click('Delete Response button', deleteResponseButton);
+          await action.click(
+            'Confirm Delete Response button', confirmDeleteResponseButton);
         }
 
         await explorationEditorMainTab.addResponse.apply(
@@ -179,9 +182,13 @@ describe('Interactions', function() {
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
           '.protractor-test-close-help-card-button'));
+        var helpCard = element(
+          by.css('.protractor-test-conversation-skin-help-card'));
         var isPresent = await clearHelpcardButton.isPresent();
         if (isPresent) {
-          await clearHelpcardButton.click();
+          await action.click('Clear Helper Button', clearHelpcardButton);
+          await waitFor.invisibilityOf(
+            helpCard, 'Help Card takes too long to disappear.');
         }
 
         for (var j = 0; j < test.correctAnswers.length; j++) {

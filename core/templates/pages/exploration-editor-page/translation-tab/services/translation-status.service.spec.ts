@@ -20,14 +20,8 @@
 // translation-status.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
@@ -56,6 +50,11 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
@@ -71,6 +70,9 @@ require(
   'state-written-translations.service.ts');
 
 describe('Translation status service', function() {
+  beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', {
       getAllVoiceoverLanguageCodes: function() {
@@ -79,15 +81,9 @@ describe('Translation status service', function() {
     });
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
-      'AnswerClassificationResultObjectFactory',
-      new AnswerClassificationResultObjectFactory());
-    $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
         new RuleObjectFactory()));
-    $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
@@ -105,8 +101,7 @@ describe('Translation status service', function() {
     $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
-      'StateClassifierMappingService', new StateClassifierMappingService(
-        new ClassifierObjectFactory()));
+      'StateClassifierMappingService', new StateClassifierMappingService());
     $provide.value(
       'StateEditorService', new StateEditorService(
         new SolutionValidityService()));

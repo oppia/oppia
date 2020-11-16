@@ -29,15 +29,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { PredictionResult, PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
+import { PredictionResult } from 'domain/classifier/prediction-result.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SVMPredictionService {
-  constructor(
-      private predictionResultObjectFactory: PredictionResultObjectFactory) {}
+  constructor() {}
   kernel(
       kernelParams: KernelParams, supportVectors: number[][],
       input: number[]): number[] {
@@ -250,7 +248,7 @@ export class SVMPredictionService {
     }
 
     var predictedLabel = classes[maxProbIdx];
-    var prediction = this.predictionResultObjectFactory.createNew(
+    var prediction = new PredictionResult(
       predictedLabel, probabilities[maxProbIdx]);
     return prediction;
   }

@@ -35,6 +35,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -1019,13 +1020,21 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
                     exp_id, 'invalid_state_name'),
                 expected_status_int=404)
 
+        self.assertEqual(len(observed_log_messages), 3)
         self.assertEqual(
-            observed_log_messages,
+            observed_log_messages[:2],
             [
                 'Could not find state: invalid_state_name',
                 'Available states: [u\'Introduction\']'
             ]
         )
+        # The last log message is the traceback for an Exception. It cannot be
+        # exactly compared to a static string because the traceback includes
+        # filepaths which will vary depending on the machine that runs the
+        # test. So the starting portion of the traceback that will remain
+        # constant is matched instead.
+        self.assertTrue(
+            'Traceback (most recent call last):' in observed_log_messages[2])
 
         self.logout()
 
@@ -1722,6 +1731,26 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             response['error'],
             'Sorry, we could not find the specified user.')
 
+    def test_put_with_deleted_user_raises_error(self):
+        wipeout_service.pre_delete_user(self.viewer_id)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'exp_id'
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        csrf_token = self.get_new_csrf_token()
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'new_member_username': self.VIEWER_USERNAME},
+            csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Sorry, we could not find the specified user.')
+
     def test_make_private_exploration_viewable(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
@@ -1961,7 +1990,8 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                 'Thanks!<br>'
                 '%s (Oppia moderator)<br><br>'
                 'You can change your email preferences via the '
-                '<a href="https://www.example.com">Preferences</a> page.' % (
+                '<a href="http://localhost:8181/preferences">Preferences</a> '
+                'page.' % (
                     self.EDITOR_USERNAME,
                     new_email_body,
                     self.MODERATOR_USERNAME)))
@@ -2113,6 +2143,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID, 1)
         exp_issues_model.unresolved_issues[1]['is_valid'] = False
+        exp_issues_model.update_timestamps()
         exp_issues_model.put()
 
         response = self.get_json(
@@ -2389,6 +2420,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         exp_user_data.draft_change_list_exp_version = 20
+        exp_user_data.update_timestamps()
         exp_user_data.put()
         response = self.get_json(
             '/createhandler/data/%s' % self.EXP_ID2,

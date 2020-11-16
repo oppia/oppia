@@ -34,25 +34,22 @@ import feconf
     [models.NAMES.base_model, models.NAMES.collection, models.NAMES.user])
 
 
+class CollectionSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            collection_models.CollectionSnapshotContentModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class CollectionModelUnitTest(test_utils.GenericTestBase):
     """Test the CollectionModel class."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             collection_models.CollectionModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        collection = collection_domain.Collection.create_default_collection(
-            'id', title='A title',
-            category='A Category', objective='An Objective')
-        collection_services.save_new_collection('committer_id', collection)
-        self.assertTrue(
-            collection_models.CollectionModel
-            .has_reference_to_user_id('committer_id'))
-        self.assertFalse(
-            collection_models.CollectionModel
-            .has_reference_to_user_id('x_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_collection_count(self):
         collection = collection_domain.Collection.create_default_collection(
@@ -63,6 +60,48 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         num_collections = (
             collection_models.CollectionModel.get_collection_count())
         self.assertEqual(num_collections, 1)
+
+
+class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    COLLECTION_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_COMMITTER = 'id_committer'
+
+    def test_get_deletion_policy_is_locally_pseudonymize(self):
+        self.assertEqual(
+            collection_models.CollectionRightsSnapshotContentModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+
+    def test_has_reference_to_user_id(self):
+        collection_models.CollectionRightsModel(
+            id=self.COLLECTION_ID_1,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[self.USER_ID_1],
+            voice_artist_ids=[self.USER_ID_1],
+            viewer_ids=[self.USER_ID_2],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.1
+        ).save(
+            self.USER_ID_COMMITTER, 'Created new collection right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}])
+
+        self.assertTrue(
+            collection_models.CollectionRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            collection_models.CollectionRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_2))
+        self.assertFalse(
+            collection_models.CollectionRightsSnapshotContentModel
+            .has_reference_to_user_id(self.USER_ID_COMMITTER))
+        self.assertFalse(
+            collection_models.CollectionRightsSnapshotContentModel
+            .has_reference_to_user_id('x_id'))
 
 
 class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
@@ -88,13 +127,11 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         super(CollectionRightsModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id='gae_1_id',
             email='some@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
-            gae_id='gae_2_id',
             email='some_other@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
@@ -158,7 +195,8 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             collection_models.CollectionRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
@@ -171,9 +209,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             self.assertTrue(
                 collection_models.CollectionRightsModel
                 .has_reference_to_user_id(self.USER_ID_4))
-            self.assertTrue(
-                collection_models.CollectionRightsModel
-                .has_reference_to_user_id(self.USER_ID_COMMITTER))
             self.assertFalse(
                 collection_models.CollectionRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
@@ -344,6 +379,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.COLLECTION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
         with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
@@ -369,6 +405,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
                     self.COLLECTION_ID_1, 1))
         )
         snapshot_model.content = broken_dict
+        snapshot_model.update_timestamps()
         snapshot_model.put()
         with self.allow_revert_swap, self.allowed_commands_swap:
             collection_models.CollectionRightsModel.revert(
@@ -390,13 +427,15 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             collection_models.CollectionCommitLogEntryModel
             .get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         commit = collection_models.CollectionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.collection_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             collection_models.CollectionCommitLogEntryModel
@@ -414,7 +453,9 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PUBLIC, False)
         private_commit.collection_id = 'a'
         public_commit.collection_id = 'b'
+        private_commit.update_timestamps()
         private_commit.put()
+        public_commit.update_timestamps()
         public_commit.put()
         commits = (
             collection_models.CollectionCommitLogEntryModel
@@ -444,7 +485,9 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         # CollectionModel._trusted_commit().
         private_commit.collection_id = 'a'
         public_commit.collection_id = 'b'
+        private_commit.update_timestamps()
         private_commit.put()
+        public_commit.update_timestamps()
         public_commit.put()
 
         max_age = datetime.timedelta(hours=1)
@@ -473,13 +516,11 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         super(CollectionSummaryModelUnitTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1_NEW,
-            gae_id='gae_1_id',
             email='some@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2_NEW,
-            gae_id='gae_2_id',
             email='some_other@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
@@ -487,7 +528,8 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             collection_models.CollectionSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     def test_has_reference_to_user_id(self):
         collection_models.CollectionSummaryModel(
@@ -539,6 +581,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        public_collection_summary_model.update_timestamps()
         public_collection_summary_model.put()
 
         private_collection_summary_model = (
@@ -561,6 +604,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        private_collection_summary_model.update_timestamps()
         private_collection_summary_model.put()
         collection_summary_models = (
             collection_models.CollectionSummaryModel.get_non_private())
@@ -587,6 +631,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        viewable_collection_summary_model.update_timestamps()
         viewable_collection_summary_model.put()
 
         unviewable_collection_summary_model = (
@@ -609,6 +654,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        unviewable_collection_summary_model.update_timestamps()
         unviewable_collection_summary_model.put()
         collection_summary_models = (
             collection_models.CollectionSummaryModel
@@ -637,6 +683,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        editable_collection_summary_model.update_timestamps()
         editable_collection_summary_model.put()
 
         uneditable_collection_summary_model = (
@@ -659,6 +706,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 collection_model_last_updated=None,
                 collection_model_created_on=None,
             ))
+        uneditable_collection_summary_model.update_timestamps()
         uneditable_collection_summary_model.put()
         collection_summary_models = (
             collection_models.CollectionSummaryModel

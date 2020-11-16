@@ -44,6 +44,9 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.

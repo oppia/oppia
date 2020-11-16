@@ -21,9 +21,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
-from google.appengine.ext import ndb
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+
+datastore_services = models.Registry.import_datastore_services()
 
 TOPIC_SIMILARITIES_ID = 'topics'
 
@@ -36,15 +36,20 @@ class ExplorationRecommendationsModel(
     """
 
     # Ids of recommended explorations.
-    recommended_exploration_ids = ndb.StringProperty(
+    recommended_exploration_ids = datastore_services.StringProperty(
         repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration recommendations are deleted only if the corresponding
-        exploration is not public.
+        """ExplorationRecommendationsModel doesn't contain any data directly
+        corresponding to a user.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -53,20 +58,6 @@ class ExplorationRecommendationsModel(
             'recommended_exploration_ids':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """ExplorationRecommendationsModel doesn't reference any user_id
-        directly.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data
-                should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
 
 class TopicSimilaritiesModel(base_models.BaseModel):
@@ -82,7 +73,7 @@ class TopicSimilaritiesModel(base_models.BaseModel):
     change in the future.
     """
 
-    content = ndb.JsonProperty(required=True)
+    content = datastore_services.JsonProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -90,6 +81,11 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         codebase.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

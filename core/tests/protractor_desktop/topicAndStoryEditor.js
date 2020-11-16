@@ -93,7 +93,8 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
     await topicsAndSkillsDashboardPage.filterSkillsByStatus(
       Constants.SKILL_STATUS_UNASSIGNED);
-    await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopic(0, 0);
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill 1', 'Topic 1');
 
     await topicEditorPage.get(topicId);
     await topicEditorPage.moveToQuestionsTab();
@@ -104,7 +105,7 @@ describe('Topic editor functionality', function() {
       'TextInput', 'Placeholder', 5);
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
-      'FuzzyEquals', 'correct');
+      'FuzzyEquals', ['correct']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
     await explorationEditorMainTab.addHint('Hint 1');
@@ -174,15 +175,15 @@ describe('Topic editor functionality', function() {
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
         Constants.SKILL_STATUS_UNASSIGNED);
-      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-        0, TOPIC_NAME);
+      await topicsAndSkillsDashboardPage.assignSkillToTopic(
+        'Skill 3', TOPIC_NAME);
 
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToSkillsTab();
       await topicsAndSkillsDashboardPage.filterSkillsByStatus(
         Constants.SKILL_STATUS_UNASSIGNED);
-      await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-        0, TOPIC_NAME);
+      await topicsAndSkillsDashboardPage.assignSkillToTopic(
+        'Skill 2', TOPIC_NAME);
 
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);

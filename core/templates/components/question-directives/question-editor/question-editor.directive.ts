@@ -91,6 +91,8 @@ angular.module('oppia').directive('questionEditor', [
             StateEditorService.setStateNames([]);
             StateEditorService.setCorrectnessFeedbackEnabled(true);
             StateEditorService.setInQuestionMode(true);
+            StateEditorService.setInapplicableSkillMisconceptionIds(
+              ctrl.question.getInapplicableSkillMisconceptionIds());
             SolutionValidityService.init(['question']);
             var stateData = ctrl.questionStateData;
             stateData.interaction.defaultOutcome.setDestination(null);
@@ -170,6 +172,14 @@ angular.module('oppia').directive('questionEditor', [
               StateEditorService.setInteractionHints(
                 angular.copy(displayedValue));
             });
+          };
+
+          ctrl.saveInapplicableSkillMisconceptionIds = function(
+              displayedValue) {
+            StateEditorService.setInapplicableSkillMisconceptionIds(
+              angular.copy(displayedValue));
+            QuestionUpdateService.setQuestionInapplicableSkillMisconceptionIds(
+              ctrl.question, displayedValue);
           };
 
           ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(

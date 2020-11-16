@@ -26,23 +26,24 @@ from core.platform import models
 import python_utils
 
 (
-    activity_models, audit_models,
-    classifier_models, collection_models,
-    config_models, email_models, exp_models,
-    feedback_models, improvements_models, job_models,
-    opportunity_models, question_models,
+    activity_models, audit_models, classifier_models,
+    collection_models, config_models, email_models,
+    exp_models, feedback_models, improvements_models,
+    job_models, opportunity_models, question_models,
     recommendations_models, skill_models, stats_models,
-    story_models, suggestion_models, topic_models,
-    user_models,) = (
-        models.Registry.import_models([
-            models.NAMES.activity, models.NAMES.audit,
-            models.NAMES.classifier, models.NAMES.collection,
-            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.improvements, models.NAMES.job,
-            models.NAMES.opportunity, models.NAMES.question,
-            models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.statistics, models.NAMES.story,
-            models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user]))
+    story_models, subtopic_models, suggestion_models,
+    topic_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.activity, models.NAMES.audit, models.NAMES.classifier,
+    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
+    models.NAMES.job, models.NAMES.opportunity, models.NAMES.question,
+    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
+])
+
+VALIDATION_STATUS_SUCCESS = 'fully-validated'
 
 
 class ProdValidationAuditOneOffJobMetaClass(type):
@@ -90,46 +91,50 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
     @staticmethod
     def map(model_instance):
         """Implements a map function which defers to a pre-defined validator."""
+        model_name = model_instance.__class__.__name__
+        validator_cls_name = '%sValidator' % model_name
+        # Module name for models is of the form:
+        # 'core.storage.<model-type>.gae_models'.
+        # Module name for validators is of the form:
+        # 'core.domain.<model-type>_validators'.
+        # So, we extract the module name for models to obtain the module name
+        # for validators. There is no extra test required to verify that models
+        # and validators have names defined based on model-type since if they
+        # don't the validators test will automatically fail based on the import
+        # we perform here for validators.
+        model_module_name = model_instance.__module__
+        model_type = model_module_name.split('.')[2]
+        validator_module_name = '%s_validators' % model_type
+        # TODO(#10415): This try catch is required until all the validators are
+        # refactored. Remove the try catch block once #10415 is fixed.
+        try:
+            validator_module = importlib.import_module(
+                'core.domain.%s' % validator_module_name)
+        except ImportError:
+            validator_module = importlib.import_module(
+                'core.domain.prod_validators')
+        validator = getattr(validator_module, validator_cls_name)
         if not model_instance.deleted:
-            model_name = model_instance.__class__.__name__
-            validator_cls_name = '%sValidator' % model_name
-            # Module name for models is of the form:
-            # 'core.storgae.<model-type>.gae_models'.
-            # Module name for validators is of the form:
-            # 'core.domain.<model-type>_validators'.
-            # So, we extract the module name for models to obtain the module
-            # name for validators. There is no extra test required to verify
-            # that models and validators have names defined based on model-type
-            # since if they don't the validators test will automatically fail
-            # based on the import we perform here for validators.
-            model_module_name = model_instance.__module__
-            model_type = model_module_name.split('.')[2]
-            validator_module_name = '%s_validators' % model_type
-            # TODO(#10415): This try catch is required until all
-            # the validators are refactored. Remove the try catch block
-            # once #10415 is fixed.
-            try:
-                validator_module = importlib.import_module(
-                    'core.domain.%s' % validator_module_name)
-            except ImportError:
-                validator_module = importlib.import_module(
-                    'core.domain.prod_validators')
-            validator = getattr(validator_module, validator_cls_name)
             validator.validate(model_instance)
-            if len(validator.errors) > 0:
-                for error_key, error_val in validator.errors.items():
-                    yield (
-                        'failed validation check for %s of %s' % (
-                            error_key, model_name),
-                        (',').join(set(error_val)))
-            else:
+        else:
+            validator.validate_deleted(model_instance)
+
+        if len(validator.errors) > 0:
+            for error_key, error_list in validator.errors.items():
+                error_message = (
+                    ((',').join(set(error_list))).encode(encoding='utf-8'))
                 yield (
-                    'fully-validated %s' % model_name, 1)
+                    'failed validation check for %s of %s' % (
+                        error_key, model_name),
+                    python_utils.convert_to_bytes(error_message)
+                )
+        else:
+            yield ('%s %s' % (VALIDATION_STATUS_SUCCESS, model_name), 1)
 
     @staticmethod
     def reduce(key, values):
         """Yields number of fully validated models or the failure messages."""
-        if 'fully-validated' in key:
+        if VALIDATION_STATUS_SUCCESS in key:
             yield (key, len(values))
         else:
             yield (key, values)
@@ -167,13 +172,13 @@ class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [classifier_models.ClassifierTrainingJobModel]
 
 
-class StateTrainingJobsMappingModelAuditOneOffJob(
+class TrainingJobExplorationMappingModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
-    """Job that audits and validates StateTrainingJobsMappingModel."""
+    """Job that audits and validates TrainingJobExplorationMappingModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [classifier_models.StateTrainingJobsMappingModel]
+        return [classifier_models.TrainingJobExplorationMappingModel]
 
 
 class CollectionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -328,6 +333,23 @@ class ExplorationSnapshotMetadataModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationSnapshotMetadataModel]
+
+    @staticmethod
+    def reduce(key, values):
+        """Yields the number of fully validated models or the failure messages.
+        By default, this method only yields a maximum of 10 errors if there are
+        multiple errors of the same type.
+
+        Note: This behaviour can be overriden in any subclass if more errors
+        need to be yielded. To do so, just change the yield statement to
+        yield all values instead of the first 10.
+        """
+        if VALIDATION_STATUS_SUCCESS in key:
+            yield (key, len(values))
+        else:
+            # Just yield ten errors of each error type since the list of errors
+            # for this model is quite large.
+            yield (key, values[:10])
 
 
 class ExplorationSnapshotContentModelAuditOneOffJob(
@@ -609,6 +631,15 @@ class GeneralVoiceoverApplicationModelAuditOneOffJob(
         return [suggestion_models.GeneralVoiceoverApplicationModel]
 
 
+class CommunityContributionStatsModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates CommunityContributionStatsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.CommunityContributionStatsModel]
+
+
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates TopicModel."""
 
@@ -680,7 +711,7 @@ class SubtopicPageModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [topic_models.SubtopicPageModel]
+        return [subtopic_models.SubtopicPageModel]
 
 
 class SubtopicPageSnapshotMetadataModelAuditOneOffJob(
@@ -689,7 +720,8 @@ class SubtopicPageSnapshotMetadataModelAuditOneOffJob(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [topic_models.SubtopicPageSnapshotMetadataModel]
+        return [
+            subtopic_models.SubtopicPageSnapshotMetadataModel]
 
 
 class SubtopicPageSnapshotContentModelAuditOneOffJob(
@@ -698,7 +730,8 @@ class SubtopicPageSnapshotContentModelAuditOneOffJob(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [topic_models.SubtopicPageSnapshotContentModel]
+        return [
+            subtopic_models.SubtopicPageSnapshotContentModel]
 
 
 class SubtopicPageCommitLogEntryModelAuditOneOffJob(
@@ -707,7 +740,8 @@ class SubtopicPageCommitLogEntryModelAuditOneOffJob(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [topic_models.SubtopicPageCommitLogEntryModel]
+        return [
+            subtopic_models.SubtopicPageCommitLogEntryModel]
 
 
 class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -732,7 +766,12 @@ class UserNormalizedNameAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        if len(values) > 1:
+        # If normalized name is not set, we do not compare it with normalized
+        # names for other users. It is not mandatory to set the normalized
+        # user names in UserSettingsModel since some users who have logged in
+        # but not completed the sign-up process may not have a username
+        # specified yet.
+        if key != 'None' and len(values) > 1:
             yield (
                 'failed validation check for normalized username check of '
                 'UserSettingsModel',
@@ -813,7 +852,12 @@ class UserRecentChangesBatchModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
 
 class UserStatsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates UserStatsModel."""
+    """Job that audits and validates UserStatsModel.
+
+    NOTE TO DEVELOPERS: This job is expected to take a very long time to
+    run since it iterates over weekly creator stats for validation which
+    is a very large list.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -893,6 +937,22 @@ class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.PendingDeletionRequestModel]
 
 
+class DeletedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates DeletedUserModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.DeletedUserModel]
+
+
+class DeletedUsernameModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates DeletedUsernameModels."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.DeletedUsernameModel]
+
+
 class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates TaskEntryModel."""
 
@@ -923,6 +983,14 @@ class UserAuthDetailsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserAuthDetailsModel]
+
+
+class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserIdentifiersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserIdentifiersModel]
 
 
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):

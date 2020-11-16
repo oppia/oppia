@@ -20,7 +20,7 @@
 // NOTE: all editors for objects that are used as parameters in a rule must
 // implement a setValue() function to which a single argument can be sent
 // that will completely determine the object.
-
+var forms = require(process.cwd() + '/core/tests/protractor_utils/forms.js');
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
@@ -179,6 +179,19 @@ var ParameterNameEditor = function(elem) {
   };
 };
 
+var RatioExpressionEditor = function(elem) {
+  return {
+    setValue: async function(value) {
+      await elem.element(by.tagName('input')).clear();
+      await elem.element(by.tagName('input')).sendKeys(value);
+    },
+    expectValueToBe: async function(expectedValue) {
+      var value = await elem.element(by.tagName('input')).getAttribute('value');
+      expect(value).toEqual(expectedValue);
+    }
+  };
+};
+
 var SanitizedUrlEditor = function(elem) {
   return {
     setValue: async function(text) {
@@ -188,6 +201,20 @@ var SanitizedUrlEditor = function(elem) {
     expectValueToBe: async function(expectedValue) {
       var value = await elem.element(by.tagName('input')).getAttribute('value');
       expect(value).toEqual(expectedValue);
+    }
+  };
+};
+
+var SetOfNormalizedStringEditor = function(elem) {
+  return {
+    setValue: async function(normalizedStrings) {
+      // Clear all entries.
+      await forms.ListEditor(elem).setLength(0);
+      for (let i = 0; i < normalizedStrings.length; i++) {
+        const normalizedStringEditor = await forms.ListEditor(elem).addItem(
+          'NormalizedString');
+        await normalizedStringEditor.setValue(normalizedStrings[i]);
+      }
     }
   };
 };
@@ -231,7 +258,9 @@ var OBJECT_EDITORS = {
   NumericExpression: MathEditor,
   ParameterName: ParameterNameEditor,
   PositionOfTerms: ParameterNameEditor,
+  RatioExpression: RatioExpressionEditor,
   SanitizedUrl: SanitizedUrlEditor,
+  SetOfNormalizedString: SetOfNormalizedStringEditor,
   SkillSelector: SkillSelector,
   UnicodeString: UnicodeStringEditor
 };
@@ -247,6 +276,7 @@ exports.NonnegativeIntEditor = NonnegativeIntEditor;
 exports.NormalizedStringEditor = NormalizedStringEditor;
 exports.NumberWithUnitsEditor = NumberWithUnitsEditor;
 exports.ParameterNameEditor = ParameterNameEditor;
+exports.RatioExpressionEditor = RatioExpressionEditor;
 exports.SanitizedUrlEditor = SanitizedUrlEditor;
 exports.SkillSelector = SkillSelector;
 exports.UnicodeStringEditor = UnicodeStringEditor;

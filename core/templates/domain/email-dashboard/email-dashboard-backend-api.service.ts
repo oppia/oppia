@@ -22,14 +22,12 @@ import { Injectable } from '@angular/core';
 
 import {
   EmailDashboardQueryResults,
-  EmailDashboardQueryResultsBackendDict,
-  EmailDashboardQueryResultsObjectFactory
-} from 'domain/email-dashboard/email-dashboard-query-results-object.factory';
+  EmailDashboardQueryResultsBackendDict
+} from 'domain/email-dashboard/email-dashboard-query-results.model';
 import {
   EmailDashboardQuery,
   EmailDashboardQueryBackendDict,
-  EmailDashboardQueryObjectFactory
-} from 'domain/email-dashboard/email-dashboard-query-object.factory';
+} from 'domain/email-dashboard/email-dashboard-query.model';
 
 export interface QueryData {
   hasNotLoggedInForNDays: string;
@@ -48,12 +46,9 @@ export class EmailDashboardBackendApiService {
   QUERY_STATUS_CHECK_URL: string = '/querystatuscheck';
 
   constructor(
-    private http: HttpClient,
-    private queryResultsObjectFactory:
-    EmailDashboardQueryResultsObjectFactory,
-    private queryObjectFactory: EmailDashboardQueryObjectFactory) {}
+    private http: HttpClient) {}
 
-  fetchQueriesPage(
+  async fetchQueriesPageAsync(
       pageSize: number, cursor: string): Promise<EmailDashboardQueryResults> {
     // Here 'cursor' property is optional because it is present only if this
     // function is called with a non-null value to 'cursor' arg.
@@ -73,7 +68,7 @@ export class EmailDashboardBackendApiService {
           params: params
         }).toPromise().then(data => {
         let emailDashboardQueryResultsObject = (
-          this.queryResultsObjectFactory.createFromBackendDict(data));
+          EmailDashboardQueryResults.createFromBackendDict(data));
         resolve(emailDashboardQueryResultsObject);
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -81,7 +76,7 @@ export class EmailDashboardBackendApiService {
     });
   }
 
-  fetchQuery(queryId: string): Promise<EmailDashboardQuery> {
+  async fetchQueryAsync(queryId: string): Promise<EmailDashboardQuery> {
     return new Promise((resolve, reject) => {
       this.http.get<EmailDashboardQueryBackendDict>(
         this.QUERY_STATUS_CHECK_URL, {
@@ -89,7 +84,7 @@ export class EmailDashboardBackendApiService {
             query_id: queryId
           }
         }).toPromise().then(data => {
-        let queryObject = this.queryObjectFactory.createFromBackendDict(data);
+        let queryObject = EmailDashboardQuery.createFromBackendDict(data);
         resolve(queryObject);
       }, errorResponse => {
         reject(errorResponse.error.error);
@@ -97,7 +92,7 @@ export class EmailDashboardBackendApiService {
     });
   }
 
-  submitQuery(data: QueryData): Promise<EmailDashboardQuery> {
+  async submitQueryAsync(data: QueryData): Promise<EmailDashboardQuery> {
     const postData = {
       has_not_logged_in_for_n_days: data.hasNotLoggedInForNDays,
       inactive_in_last_n_days: data.inactiveInLastNDays,
@@ -111,7 +106,7 @@ export class EmailDashboardBackendApiService {
       this.http.post<EmailDashboardQueryBackendDict>(
         this.QUERY_DATA_URL, {
           data: postData}).toPromise().then(data => {
-        let queryObject = this.queryObjectFactory.createFromBackendDict(data);
+        let queryObject = EmailDashboardQuery.createFromBackendDict(data);
         resolve(queryObject);
       }, errorResponse => {
         reject(errorResponse.error.error);

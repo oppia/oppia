@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core import jobs_registry
 from core.domain import base_model_validators
 from core.domain import prod_validation_jobs_one_off
@@ -39,6 +41,22 @@ class MockSnapshotModel(base_models.BaseModel):
 
 class MockBaseModelValidator(base_model_validators.BaseModelValidator):
     pass
+
+
+class MockModelValidatorWithInvalidValidationType(
+        base_model_validators.BaseModelValidator):
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, unused_item):
+        return MockModel()
+
+    @classmethod
+    def _get_domain_object_validation_type(cls, unused_item):
+        return 'Invalid'
 
 
 class MockSummaryModelValidator(
@@ -91,27 +109,28 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
-        self.item = MockModel(id='mockmodel')
-        self.item.put()
+        self.invalid_model = MockModel(id='mockmodel')
+        self.invalid_model.update_timestamps()
+        self.invalid_model.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             r'The _get_external_id_relationships\(\) method is missing from the'
             ' derived class. It should be implemented in the derived class.'):
-            MockBaseModelValidator().validate(self.item)
+            MockBaseModelValidator().validate(self.invalid_model)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             r'The _get_external_model_properties\(\) method is missing from the'
             ' derived class. It should be implemented in the derived class.'):
-            MockSummaryModelValidator().validate(self.item)
+            MockSummaryModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
         with self.assertRaisesRegexp(
             Exception, 'External model name should be specified'):
-            MockSnapshotContentModelValidator().validate(self.item)
+            MockSnapshotContentModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
         with self.assertRaisesRegexp(
@@ -119,6 +138,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             r'The _get_change_domain_class\(\) method is missing from the '
             'derived class. It should be implemented in the derived class.'):
             snapshot_model = MockSnapshotModel(id='mockmodel')
+            snapshot_model.update_timestamps()
             snapshot_model.put()
             MockSnapshotMetadataModelValidator().validate(snapshot_model)
 
@@ -133,7 +153,39 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
                 job_id = job_class.create_new()
                 job_class.enqueue(job_id)
 
+    def test_error_is_raised_with_invalid_validation_type_for_domain_objects(
+            self):
+        MockModelValidatorWithInvalidValidationType.validate(self.invalid_model)
+        expected_errors = {
+            'domain object check': [
+                'Entity id mockmodel: Entity fails domain validation with '
+                'the error Invalid validation type for domain object: Invalid']}
+        self.assertEqual(
+            MockModelValidatorWithInvalidValidationType.errors, expected_errors)
+
     def test_no_error_is_raised_for_base_user_model(self):
         user = MockModel(id='12345')
+        user.update_timestamps()
         user.put()
         MockBaseUserModelValidator().validate(user)
+
+    def test_validate_deleted_reports_error_for_old_deleted_model(self):
+        year_ago = datetime.datetime.utcnow() - datetime.timedelta(weeks=52)
+        model = MockModel(
+            id='123',
+            deleted=True,
+            last_updated=year_ago
+        )
+        model.update_timestamps(update_last_updated_time=False)
+        model.put()
+        validator = MockBaseUserModelValidator()
+        validator.validate_deleted(model)
+        self.assertEqual(
+            validator.errors,
+            {
+                'entity stale check': [
+                    'Entity id 123: model marked as '
+                    'deleted is older than 8 weeks'
+                ]
+            }
+        )

@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.  // Angular 8.
+// Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Suggestion Review Modal Controller', function() {

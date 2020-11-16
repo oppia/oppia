@@ -16,9 +16,6 @@
  * @fileoverview Directive for hint and solution buttons.
  */
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 require(
@@ -48,19 +45,17 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
         'hint-and-solution-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'ContextService', 'ExplorationPlayerStateService',
+        '$rootScope', 'ContextService', 'ExplorationPlayerStateService',
         'HintAndSolutionModalService', 'HintsAndSolutionManagerService',
         'PlayerPositionService', 'PlayerTranscriptService',
         'StatsReportingService',
         function(
-            ContextService, ExplorationPlayerStateService,
+            $rootScope, ContextService, ExplorationPlayerStateService,
             HintAndSolutionModalService, HintsAndSolutionManagerService,
             PlayerPositionService, PlayerTranscriptService,
             StatsReportingService) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
-          StatsReportingService = (
-            OppiaAngularRootComponent.statsReportingService);
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           var resetLocalHintsArray = function() {
             ctrl.hintIndexes = [];
@@ -163,6 +158,10 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
                   }
                 }
               )
+            );
+            ctrl.directiveSubscriptions.add(
+              HintsAndSolutionManagerService.onTimeoutElapsed$.subscribe(
+                () => $rootScope.$apply())
             );
           };
           ctrl.$onDestroy = function() {

@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { map } from 'rxjs/operators';
 
 interface ProfileDict {
-  'profile_picture_data_url_for_username': string;
+  'profile_picture_data_url_for_username': string | null;
 }
 
 @Injectable({
@@ -34,7 +34,7 @@ export class ProfileLinkImageBackendApiService {
     private http: HttpClient
   ) {}
 
-  fetchProfilePictureData(profileImageUrl: string): Promise<string> {
+  async fetchProfilePictureDataAsync(profileImageUrl: string): Promise<string> {
     return this.http.get<ProfileDict>(profileImageUrl).pipe(
       // A URL encoded base64 image is treated as unsafe by Angular. This is
       // because angular's security doesn't allow anything outside the following
@@ -42,8 +42,15 @@ export class ProfileLinkImageBackendApiService {
       // "data:image/png;base64,". But URL encoded data contains "%" (%2B for
       // "+" and "%3D" for ="). Hence the image is decoded here to conform to
       // the security restrictions imposed by angular.
-      map(response => decodeURIComponent(
-        response.profile_picture_data_url_for_username))).toPromise();
+      // TODO(#10463): Remove the 'replace newlines' logic after moving
+      // profile pictures to GCS.
+      map(response => {
+        return (
+          response.profile_picture_data_url_for_username &&
+          decodeURIComponent(
+            response.profile_picture_data_url_for_username
+          ).replace(/\n/g, ''));
+      })).toPromise();
   }
 }
 

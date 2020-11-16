@@ -393,15 +393,38 @@ def _run_pip_command(cmd_parts):
         raise Exception('Error installing package')
 
 
+def pip_install_to_system(package, version):
+    """Installs third party libraries with pip to the user's system.
+
+    Note: These libraries are installed to the user's default system-wide
+    'site-packages' folder, not to a local Oppia third-party directory. This is
+    ONLY required in very specific cases where the development server scripts
+    require default libraries. (When running another python script using
+    the shell, the call stack that is instantiated for that python script cannot
+    be edited by us; therefore, we have no control over which system paths, the
+    script visits when it looks for libraries and can only install those
+    necessary libraries to the default system path.)
+
+    In general, please DO NOT use this method when installing packages required
+    for oppia. Use pip_install instead.
+
+    Args:
+        package: str. The package name.
+        version: str. The package version.
+    """
+    _run_pip_command([
+        'install', '%s==%s' % (package, version)])
+
+
 def pip_install(
         package, version, install_path, upgrade=False, no_dependencies=False):
-    """Installs third party libraries with pip.
+    """Installs third party libraries with pip to a specific path.
 
     Args:
         package: str. The package name.
         version: str. The package version.
         install_path: str. The installation path for the package.
-        upgrade: bool. Whether call the pip with --upgrade flag.
+        upgrade: bool. Whether to call pip with the --upgrade flag.
         no_dependencies: bool. Whether call the pip with --no-dependencies flag.
     """
     additional_pip_args = []

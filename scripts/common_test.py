@@ -30,12 +30,11 @@ import subprocess
 import sys
 import tempfile
 
+import constants
 from core.tests import test_utils
 
 import psutil
 import python_utils
-import release_constants
-
 
 from . import common
 
@@ -364,76 +363,6 @@ class CommonTests(test_utils.GenericTestBase):
             'ERROR: This script can only be run from the "test" branch.'):
             common.verify_current_branch_name('test')
 
-    def test_ensure_release_scripts_folder_exists_with_invalid_access(self):
-        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
-        def mock_isdir(unused_dirpath):
-            return False
-        def mock_chdir(unused_dirpath):
-            pass
-        def mock_popen(unused_cmd, stdin, stdout, stderr):  # pylint: disable=unused-argument
-            return process
-        def mock_communicate(unused_self):
-            return ('Output', 'Invalid')
-        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
-        chdir_swap = self.swap(os, 'chdir', mock_chdir)
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        communicate_swap = self.swap(
-            subprocess.Popen, 'communicate', mock_communicate)
-        with isdir_swap, chdir_swap, popen_swap, communicate_swap:
-            with self.assertRaisesRegexp(
-                Exception, (
-                    'You need SSH access to GitHub. See the '
-                    '"Check your SSH access" section here and follow the '
-                    'instructions: '
-                    'https://help.github.com/articles/'
-                    'error-repository-not-found/#check-your-ssh-access')):
-                common.ensure_release_scripts_folder_exists_and_is_up_to_date()
-
-    def test_ensure_release_scripts_folder_exists_with_valid_access(self):
-        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
-        def mock_isdir(unused_dirpath):
-            return False
-        def mock_chdir(unused_dirpath):
-            pass
-        def mock_popen(unused_cmd, stdin, stdout, stderr):  # pylint: disable=unused-argument
-            return process
-        def mock_communicate(unused_self):
-            return ('Output', 'You\'ve successfully authenticated!')
-        def mock_check_call(unused_cmd_tokens):
-            pass
-        def mock_verify_local_repo_is_clean():
-            pass
-        def mock_verify_current_branch_name(unused_branch_name):
-            pass
-        def mock_get_remote_alias(unused_url):
-            return 'remote'
-        def mock_ask_user_to_confirm(unused_msg):
-            pass
-        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
-        chdir_swap = self.swap(os, 'chdir', mock_chdir)
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        communicate_swap = self.swap(
-            subprocess.Popen, 'communicate', mock_communicate)
-        check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call)
-        verify_local_repo_swap = self.swap(
-            common, 'verify_local_repo_is_clean',
-            mock_verify_local_repo_is_clean)
-        verify_current_branch_name_swap = self.swap(
-            common, 'verify_current_branch_name',
-            mock_verify_current_branch_name)
-        get_remote_alias_swap = self.swap(
-            common, 'get_remote_alias', mock_get_remote_alias)
-        ask_user_swap = self.swap(
-            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
-        with isdir_swap, chdir_swap, popen_swap, communicate_swap:
-            with check_call_swap, verify_local_repo_swap, ask_user_swap:
-                with verify_current_branch_name_swap, get_remote_alias_swap:
-                    (
-                        common
-                        .ensure_release_scripts_folder_exists_and_is_up_to_date(
-                            ))
-
     def test_is_port_open(self):
         self.assertFalse(common.is_port_open(4444))
 
@@ -590,24 +519,28 @@ class CommonTests(test_utils.GenericTestBase):
             self):
         mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
+        label_for_released_prs = (
+            constants.release_constants.LABEL_FOR_RELEASED_PRS)
+        label_for_current_release_prs = (
+            constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
         pull1 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+                    {'name': label_for_released_prs},
+                    {'name': label_for_current_release_prs}]},
             completed='')
         pull2 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+                    {'name': label_for_released_prs},
+                    {'name': label_for_current_release_prs}]},
             completed='')
         label = github.Label.Label(
             requester='', headers='',
             attributes={
-                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+                'name': label_for_current_release_prs},
             completed='')
         def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             return [pull1, pull2]
@@ -627,23 +560,27 @@ class CommonTests(test_utils.GenericTestBase):
             requester='', headers='', attributes={}, completed='')
         def mock_open_tab(unused_url):
             pass
+        label_for_released_prs = (
+            constants.release_constants.LABEL_FOR_RELEASED_PRS)
+        label_for_current_release_prs = (
+            constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
         pull1 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+                    {'name': label_for_current_release_prs}]},
             completed='')
         pull2 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
-                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+                    {'name': label_for_released_prs},
+                    {'name': label_for_current_release_prs}]},
             completed='')
         label = github.Label.Label(
             requester='', headers='',
             attributes={
-                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+                'name': label_for_current_release_prs},
             completed='')
         def mock_get_issues(unused_self, state, labels):  # pylint: disable=unused-argument
             return [pull1, pull2]
@@ -663,7 +600,7 @@ class CommonTests(test_utils.GenericTestBase):
                     'have a \'%s\' label. Please ensure that '
                     'they are released before release summary '
                     'generation.') % (
-                        release_constants.LABEL_FOR_RELEASED_PRS)):
+                        constants.release_constants.LABEL_FOR_RELEASED_PRS)):
                 common.check_prs_for_current_release_are_released(mock_repo)
 
     def test_kill_processes_based_on_regex(self):
@@ -904,3 +841,9 @@ class CommonTests(test_utils.GenericTestBase):
             common.start_redis_server()
 
         self.assertTrue(check_function_calls['os_remove_is_called'])
+
+    def test_fix_third_party_imports_correctly_sets_up_imports(self):
+        common.fix_third_party_imports()
+        # Asserts that imports from problematic modules do not error.
+        from google.cloud import tasks_v2 # pylint: disable=unused-variable
+        from google.appengine.api import app_identity # pylint: disable=unused-variable

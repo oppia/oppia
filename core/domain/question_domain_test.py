@@ -291,7 +291,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question = question_domain.Question(
             'question_id', question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
-            ['skillId-123'])
+            ['skillId12345-123'])
 
     def test_to_and_from_dict(self):
         """Test to verify to_dict and from_dict methods
@@ -390,13 +390,25 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'Expected inapplicable_skill_misconception_ids to be a list of '
             'strings, received 123')
 
+    def test_validate_invalid_format_of_inapplicable_skill_misconception_ids(
+            self):
+        """Test to verify that the validation fails when
+        inapplicable_skill_misconception_ids value is an invalid format i.e.
+        it is not of the form <skill-id>-<misconception-id>.
+        """
+        self.question.inapplicable_skill_misconception_ids = ['abc', 'def']
+        self._assert_validation_error(
+            r'Expected inapplicable_skill_misconception_ids to be a list '
+            r'of strings of the format <skill_id>-<misconception_id>, '
+            r'received \[u\'abc\', u\'def\'\]')
+
     def test_validate_duplicate_inapplicable_skill_misconception_ids_list(
             self):
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids list is has duplicate values.
         """
         self.question.inapplicable_skill_misconception_ids = [
-            'skill-1', 'skill-1']
+            'skillid12345-1', 'skillid12345-1']
         self._assert_validation_error(
             'inapplicable_skill_misconception_ids has duplicate values')
 
@@ -489,7 +501,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         of the Question domain object.
         """
         self.assertEqual(
-            ['skillId-123'],
+            ['skillId12345-123'],
             self.question.inapplicable_skill_misconception_ids)
         self.question.update_inapplicable_skill_misconception_ids(
             ['skillid-misconceptionid'])

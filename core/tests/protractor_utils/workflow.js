@@ -178,7 +178,7 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language) {
+    title, category, objective, language, correctnessFeedbackIsEnabled) {
   await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -198,6 +198,9 @@ var createAndPublishTwoCardExploration = async function(
   await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
+  }
+  if (correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.enableCorrectnessFeedback();
   }
   await explorationEditorPage.saveChanges();
   await publishExploration();
@@ -269,8 +272,8 @@ var createSkillAndAssignTopic = async function(
   await topicsAndSkillsDashboardPage.navigateToSkillsTab();
   await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
   await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
-  await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-    0, topicName);
+  await topicsAndSkillsDashboardPage.assignSkillToTopic(
+    skillDescription, topicName);
 };
 
 var getImageSource = async function(customImageElement) {

@@ -23,6 +23,7 @@ import collections
 import datetime
 import re
 
+from core.domain import cron_services
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -53,12 +54,18 @@ ERROR_CATEGORY_PROPERTY_FETCH_CHECK = 'fetch properties'
 ERROR_CATEGORY_RATED_ON_CHECK = 'rated on check'
 ERROR_CATEGORY_RATINGS_CHECK = 'ratings check'
 ERROR_CATEGORY_REFERENCE_CHECK = 'reference check'
+ERROR_CATEGORY_AUTHOR_CHECK = 'author check'
 ERROR_CATEGORY_REVIEWER_CHECK = 'reviewer check'
 ERROR_CATEGORY_STATE_NAME_CHECK = 'state name check'
 ERROR_CATEGORY_SUMMARY_CHECK = 'summary check'
 ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
 ERROR_CATEGORY_TYPE_CHECK = 'type check'
 ERROR_CATEGORY_VERSION_CHECK = 'version check'
+ERROR_CATEGORY_STALE_CHECK = 'stale check'
+
+VALIDATION_MODE_NEUTRAL = 'neutral'
+VALIDATION_MODE_STRICT = 'strict'
+VALIDATION_MODE_NON_STRICT = 'non-strict'
 
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
@@ -93,7 +100,7 @@ class ExternalModelReference(python_utils.OBJECT):
         Args:
             model_class: ClassObject. The model class.
             model_id: str. The id of the model.
-            model_instance: ndb.Model. The gae model object.
+            model_instance: datastore_services.Model. The gae model object.
         """
         self.model_class = model_class
         self.model_id = model_id
@@ -131,7 +138,7 @@ class BaseModelValidator(python_utils.OBJECT):
         This method can be overridden by subclasses, if needed.
 
         Args:
-            unused_item: ndb.Model. Entity to validate.
+            unused_item: datastore_services.Model. Entity to validate.
 
         Returns:
             str. A regex pattern to be followed by the model id.
@@ -144,7 +151,7 @@ class BaseModelValidator(python_utils.OBJECT):
         the model.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         regex_string = cls._get_model_id_regex(item)
         if not re.compile(regex_string).match(item.id):
@@ -160,7 +167,7 @@ class BaseModelValidator(python_utils.OBJECT):
         This method can be overridden by subclasses, if needed.
 
         Args:
-            unused_item: ndb.Model. Entity to validate.
+            unused_item: datastore_services.Model. Entity to validate.
 
         Returns:
             *. A domain object to validate.
@@ -168,20 +175,50 @@ class BaseModelValidator(python_utils.OBJECT):
         return None
 
     @classmethod
+    def _get_domain_object_validation_type(cls, unused_item):
+        """Returns the type of domain object validation to be performed.
+
+        Some of the storage models support a strict/non strict mode depending
+        on whether the model is published or not. Currently the models which
+        provide this feature are collection, exploration and topic models.
+
+        Other models do not support any strict/non strict validation. So,
+        this function returns neutral mode in the base class. It can be
+        overridden by subclasses to enable strict/non strict mode, if needed.
+
+        Args:
+            unused_item: datastore_services.Model. Entity to validate.
+
+        Returns:
+            str. The type of validation mode: neutral, strict or non strict.
+        """
+        return VALIDATION_MODE_NEUTRAL
+
+    @classmethod
     def _validate_model_domain_object_instances(cls, item):
         """Checks that model instance passes the validation of the domain
         object for model.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         try:
-            model_domain_object_instance = (
+            domain_object = (
                 cls._get_model_domain_object_instance(item))
-            if model_domain_object_instance is None:
+            if domain_object is None:
                 # No domain object exists for this storage model class.
                 return
-            model_domain_object_instance.validate()
+            validation_type = cls._get_domain_object_validation_type(item)
+            if validation_type == VALIDATION_MODE_NEUTRAL:
+                domain_object.validate()
+            elif validation_type == VALIDATION_MODE_STRICT:
+                domain_object.validate(strict=True)
+            elif validation_type == VALIDATION_MODE_NON_STRICT:
+                domain_object.validate(strict=False)
+            else:
+                raise Exception(
+                    'Invalid validation type for domain object: %s' % (
+                        validation_type))
         except Exception as e:
             cls._add_error(
                 ERROR_CATEGORY_DOMAIN_OBJECT_CHECK,
@@ -195,7 +232,7 @@ class BaseModelValidator(python_utils.OBJECT):
         This should be implemented by subclasses.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
 
         Returns:
             list(ExternalModelFetcherDetails). A list whose values are
@@ -215,7 +252,7 @@ class BaseModelValidator(python_utils.OBJECT):
         to valid instances.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         for field_name, external_model_references in (
                 cls.field_name_to_external_model_references.items()):
@@ -228,8 +265,8 @@ class BaseModelValidator(python_utils.OBJECT):
                     cls._add_error(
                         '%s %s' % (field_name, ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s having'
-                        ' value %s, expect model %s with id %s but it doesn\'t'
-                        ' exist' % (
+                        ' value %s, expected model %s with id %s but it '
+                        'doesn\'t exist' % (
                             item.id, field_name, model_id,
                             model_class.__name__, model_id))
 
@@ -240,7 +277,7 @@ class BaseModelValidator(python_utils.OBJECT):
         This should be called before we call other _validate methods.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         multiple_models_ids_to_fetch = {}
 
@@ -271,9 +308,14 @@ class BaseModelValidator(python_utils.OBJECT):
         model.created_on <= model.last_updated <= current time.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
-        if item.created_on > item.last_updated:
+        # We add a tolerance of 1 second because, for some models, created_on
+        # and last_updated are the same time, and occur within milliseconds of
+        # each other. In such cases, created_on might end up being very slightly
+        # greater than last_updated.
+        if item.created_on > (
+                item.last_updated + datetime.timedelta(seconds=1)):
             cls._add_error(
                 ERROR_CATEGORY_TIME_FIELD_CHECK,
                 'Entity id %s: The created_on field has a value %s which '
@@ -322,7 +364,7 @@ class BaseModelValidator(python_utils.OBJECT):
         _validate functions.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         cls.errors.clear()
         cls.field_name_to_external_model_references.clear()
@@ -338,6 +380,30 @@ class BaseModelValidator(python_utils.OBJECT):
 
         for func in cls._get_external_instance_custom_validation_functions():
             func(item, cls.field_name_to_external_model_references)
+
+    @classmethod
+    def validate_deleted(cls, item):
+        """Validate that the models marked as deleted are hard-deleted after
+        eight weeks.
+
+        Args:
+            item: datastore_services.Model. Entity to validate.
+        """
+        cls.errors.clear()
+        date_now = datetime.datetime.utcnow()
+        date_before_which_models_should_be_deleted = (
+            date_now -
+            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED
+        )
+        period_to_hard_delete_models_in_days = (
+            cron_services.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+        if item.last_updated < date_before_which_models_should_be_deleted:
+            cls._add_error(
+                'entity %s' % ERROR_CATEGORY_STALE_CHECK,
+                'Entity id %s: model marked as deleted is older than %s weeks'
+                % (item.id, python_utils.divide(
+                    period_to_hard_delete_models_in_days, 7))
+            )
 
 
 class BaseSummaryModelValidator(BaseModelValidator):
@@ -372,7 +438,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
         properties of the external model.
 
         Args:
-            item: ndb.Model. BaseSummaryModel to validate.
+            item: datastore_services.Model. BaseSummaryModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -407,7 +473,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
                             external_model_field_key,
                             ERROR_CATEGORY_FIELD_CHECK),
                         'Entity id %s: based on field %s having value %s, '
-                        'expect model %s with id %s but it doesn\'t'
+                        'expected model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, external_model_field_key,
                             model_id, model_class.__name__, model_id))
@@ -436,7 +502,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
         all _validate functions.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         super(BaseSummaryModelValidator, cls).validate(item)
 
@@ -471,7 +537,8 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
         has a version greater than or equal to the version in item.id.
 
         Args:
-            item: ndb.Model. BaseSnapshotContentModel to validate.
+            item: datastore_services.Model. BaseSnapshotContentModel to
+                validate.
             field_name_to_external_model_references:
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -511,7 +578,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
                 cls._add_error(
                     '%s_ids %s' % (key_to_fetch, ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field %s_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, key_to_fetch, model_id,
                         model_class.__name__, model_id))
@@ -534,7 +601,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
         all _validate functions.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         super(BaseSnapshotContentModelValidator, cls).validate(item)
 
@@ -552,7 +619,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         """Validates that commit type is valid.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         if item.commit_type not in (
                 base_models.VersionedModel.COMMIT_TYPE_CHOICES):
@@ -568,7 +635,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         This should be implemented by subclasses.
 
         Args:
-            unused_item: ndb.Model. Entity to validate.
+            unused_item: datastore_services.Model. Entity to validate.
 
         Returns:
             change_domain.BaseChange. A domain object class for the
@@ -586,7 +653,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         """Validates schema of commit commands in commit_cmds dict.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         change_domain_object = cls._get_change_domain_class(item)
         if change_domain_object is None:
@@ -619,7 +686,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         _validate functions.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         super(BaseSnapshotMetadataModelValidator, cls).validate(item)
 
@@ -637,7 +704,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         """Validates that post_commit_status is either public or private.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         if item.post_commit_status not in [
                 feconf.POST_COMMIT_STATUS_PUBLIC,
@@ -652,7 +719,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         """Validates that post_commit_status is only public.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         if item.post_commit_status != feconf.POST_COMMIT_STATUS_PUBLIC:
             cls._add_error(
@@ -666,7 +733,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         post_commit_status is private.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         if item.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE and (
                 not item.post_commit_is_private):
@@ -688,7 +755,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         all _validate functions.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            item: datastore_services.Model. Entity to validate.
         """
         super(BaseCommitLogEntryModelValidator, cls).validate(item)
 
@@ -713,7 +780,7 @@ class BaseUserModelValidator(BaseModelValidator):
         """Validates that explorations for model are public.
 
         Args:
-            item: ndb.Model. BaseUserModel to validate.
+            item: datastore_services.Model. BaseUserModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -742,7 +809,7 @@ class BaseUserModelValidator(BaseModelValidator):
                 cls._add_error(
                     'exploration_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -763,7 +830,7 @@ class BaseUserModelValidator(BaseModelValidator):
         """Validates that collections for model are public.
 
         Args:
-            item: ndb.Model. BaseUserModel to validate.
+            item: datastore_services.Model. BaseUserModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -792,7 +859,7 @@ class BaseUserModelValidator(BaseModelValidator):
                 cls._add_error(
                     'collection_ids %s' % ERROR_CATEGORY_FIELD_CHECK,
                     'Entity id %s: based on field collection_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -822,7 +889,7 @@ class BaseUserModelValidator(BaseModelValidator):
         This can be overridden by subclasses, if needed.
 
         Args:
-            unused_item: ndb.Model. BaseUserModel to validate.
+            unused_item: datastore_services.Model. BaseUserModel to validate.
 
         Returns:
             list(tuple(str, str, list, str, list)). A list of tuple which
@@ -838,7 +905,7 @@ class BaseUserModelValidator(BaseModelValidator):
         are different in item and external model.
 
         Args:
-            item: ndb.Model. BaseUserModel to validate.
+            item: datastore_services.Model. BaseUserModel to validate.
         """
         common_properties = (
             cls._get_common_properties_of_external_model_which_should_not_match(

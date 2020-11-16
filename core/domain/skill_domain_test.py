@@ -491,6 +491,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_domain.Skill.deserialize(
                 self.skill.serialize()).to_dict())
 
+    def test_generate_skill_misconception_id(self):
+        """Checks that skill misconception id is generated correctly."""
+        self.assertEqual(
+            self.skill.generate_skill_misconception_id(0),
+            '%s-%d' % (self.skill.id, 0))
+        self.assertEqual(
+            self.skill.generate_skill_misconception_id(1),
+            '%s-%d' % (self.skill.id, 1))
+
 
 class SkillChangeTests(test_utils.GenericTestBase):
 

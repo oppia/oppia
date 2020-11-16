@@ -31,7 +31,7 @@ from core.platform import models
 import feconf
 import utils
 
-current_user_services = models.Registry.import_current_user_services()
+datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration
 ])
@@ -116,8 +116,7 @@ def _update_exploration_summary(activity_rights):
     """
     # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
-    exp_services.update_exploration_summary(
-        activity_rights.id, None)
+    exp_services.regenerate_exploration_summary(activity_rights.id, None)
 
 
 def _update_collection_summary(activity_rights):
@@ -132,8 +131,7 @@ def _update_collection_summary(activity_rights):
     """
 
     from core.domain import collection_services
-    collection_services.update_collection_summary(
-        activity_rights.id, None)
+    collection_services.regenerate_collection_summary(activity_rights.id, None)
 
 
 def _update_activity_summary(activity_type, activity_rights):
@@ -256,6 +254,65 @@ def get_multiple_exploration_rights_by_ids(exp_ids):
                     model, constants.ACTIVITY_TYPE_EXPLORATION))
 
     return exp_models_list
+
+
+def _get_activity_rights_where_user_is_owner(activity_type, user_id):
+    """Returns a list of activity rights where the user is the owner.
+
+    Args:
+        activity_type: str. The type of activity. Possible values:
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ActivityRights). List of domain objects where the user has some
+        role.
+    """
+    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+        rights_model_class = exp_models.ExplorationRightsModel
+    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+        rights_model_class = collection_models.CollectionRightsModel
+
+    activity_rights_models = rights_model_class.query(
+        datastore_services.any_of(
+            rights_model_class.owner_ids == user_id
+        )
+    ).fetch()
+    return [
+        get_activity_rights_from_model(activity_rights_model, activity_type)
+        for activity_rights_model in activity_rights_models
+    ]
+
+
+def get_exploration_rights_where_user_is_owner(user_id):
+    """Returns a list of exploration rights where the user is the owner.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ActivityRights). List of domain objects where the user is
+        the owner.
+    """
+    return _get_activity_rights_where_user_is_owner(
+        constants.ACTIVITY_TYPE_EXPLORATION, user_id
+    )
+
+
+def get_collection_rights_where_user_is_owner(user_id):
+    """Returns a list of collection rights where the user is the owner.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ActivityRights). List of domain objects where the user is
+        the owner.
+    """
+    return _get_activity_rights_where_user_is_owner(
+        constants.ACTIVITY_TYPE_COLLECTION, user_id
+    )
 
 
 def is_exploration_private(exploration_id):
@@ -762,7 +819,7 @@ def _assign_role(
     else:
         raise Exception('Invalid role: %s' % new_role)
 
-    commit_message = 'Changed role of %s from %s to %s' % (
+    commit_message = rights_domain.ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE % (
         assignee_username, old_role, new_role)
     commit_cmds = [{
         'cmd': rights_domain.CMD_CHANGE_ROLE,
@@ -774,6 +831,72 @@ def _assign_role(
     _save_activity_rights(
         committer_id, activity_rights, activity_type,
         commit_message, commit_cmds)
+    _update_activity_summary(activity_type, activity_rights)
+
+
+def _deassign_role(committer, removed_user_id, activity_id, activity_type):
+    """Deassigns given user from their current role in the activity.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        removed_user_id: str. ID of the user who is being deassigned from
+            the activity.
+        activity_id: str. ID of the activity.
+        activity_type: str. The type of activity. Possible values:
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION.
+
+    Raises:
+        Exception. UnauthorizedUserException: Could not deassign role.
+        Exception. This user does not have any role for the given activity.
+    """
+    committer_id = committer.user_id
+    activity_rights = _get_activity_rights(activity_type, activity_id)
+
+    if not check_can_modify_activity_roles(committer, activity_rights):
+        logging.error(
+            'User %s tried to remove user %s from an activity %s '
+            'but was refused permission.' % (
+                committer_id, removed_user_id, activity_id))
+        raise Exception(
+            'UnauthorizedUserException: Could not deassign role.')
+
+    if activity_rights.is_owner(removed_user_id):
+        old_role = rights_domain.ROLE_OWNER
+        activity_rights.owner_ids.remove(removed_user_id)
+    elif activity_rights.is_editor(removed_user_id):
+        old_role = rights_domain.ROLE_EDITOR
+        activity_rights.editor_ids.remove(removed_user_id)
+    elif activity_rights.is_voice_artist(removed_user_id):
+        old_role = rights_domain.ROLE_VOICE_ARTIST
+        activity_rights.voice_artist_ids.remove(removed_user_id)
+    elif activity_rights.is_viewer(removed_user_id):
+        old_role = rights_domain.ROLE_VIEWER
+        activity_rights.viewer_ids.remove(removed_user_id)
+    else:
+        raise Exception(
+            'This user does not have any role in %s with ID %s'
+            % (activity_type, activity_id))
+
+    assignee_username = user_services.get_usernames(removed_user_id)[0]
+    if assignee_username is None:
+        assignee_username = 'ANONYMOUS'
+    commit_message = 'Remove %s from role %s for %s' % (
+        assignee_username, old_role, activity_type)
+    commit_cmds = [{
+        'cmd': rights_domain.CMD_REMOVE_ROLE,
+        'removed_user_id': removed_user_id,
+        'old_role': old_role,
+    }]
+
+    _save_activity_rights(
+        committer_id,
+        activity_rights,
+        activity_type,
+        commit_message,
+        commit_cmds
+    )
     _update_activity_summary(activity_type, activity_rights)
 
 
@@ -954,6 +1077,31 @@ def assign_role_for_exploration(
             assignee_id, exploration_id)
 
 
+def deassign_role_for_exploration(committer, exploration_id, removed_user_id):
+    """Deassigns a user from a given exploration.
+
+    The caller should ensure that assignee_id corresponds to a valid user in
+    the system.
+
+    Args:
+        committer: UserActionsInfo. The UserActionsInfo object for the
+            committer.
+        exploration_id: str. ID of the exploration.
+        removed_user_id: str. ID of the user whom is being deassigned from
+            the exploration.
+
+    Raises:
+        Exception. This could potentially throw an exception from
+            _deassign_role.
+    """
+    _deassign_role(
+        committer,
+        removed_user_id,
+        exploration_id,
+        constants.ACTIVITY_TYPE_EXPLORATION
+    )
+
+
 def release_ownership_of_exploration(committer, exploration_id):
     """Releases ownership of the given exploration to the community.
 
@@ -1082,6 +1230,31 @@ def assign_role_for_collection(
     if new_role in [rights_domain.ROLE_OWNER, rights_domain.ROLE_EDITOR]:
         subscription_services.subscribe_to_collection(
             assignee_id, collection_id)
+
+
+def deassign_role_for_collection(committer, collection_id, removed_user_id):
+    """Deassigns a user from a given collection.
+
+    The caller should ensure that assignee_id corresponds to a valid user in
+    the system.
+
+    Args:
+        committer: UserActionsInfo. The UserActionsInfo object for the
+            committer.
+        collection_id: str. ID of the collection.
+        removed_user_id: str. ID of the user whom is being deassigned from
+            the exploration.
+
+    Raises:
+        Exception. This could potentially throw an exception from
+            _deassign_role.
+    """
+    _deassign_role(
+        committer,
+        removed_user_id,
+        collection_id,
+        constants.ACTIVITY_TYPE_COLLECTION
+    )
 
 
 def release_ownership_of_collection(committer, collection_id):

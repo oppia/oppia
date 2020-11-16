@@ -22,16 +22,14 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
-import { EmailDashboardQueryObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-object.factory';
-import { EmailDashboardQueryResultsObjectFactory } from
-  'domain/email-dashboard/email-dashboard-query-results-object.factory';
+import { EmailDashboardQuery } from
+  'domain/email-dashboard/email-dashboard-query.model';
+import { EmailDashboardQueryResults } from
+  'domain/email-dashboard/email-dashboard-query-results.model';
 
 describe('Email dashboard backend api service', () => {
   let httpTestingController: HttpTestingController;
   let edbas: EmailDashboardBackendApiService;
-  let edqof: EmailDashboardQueryObjectFactory;
-  let edqrof: EmailDashboardQueryResultsObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -40,8 +38,6 @@ describe('Email dashboard backend api service', () => {
 
     httpTestingController = TestBed.get(HttpTestingController);
     edbas = TestBed.get(EmailDashboardBackendApiService);
-    edqof = TestBed.get(EmailDashboardQueryObjectFactory);
-    edqrof = TestBed.get(EmailDashboardQueryResultsObjectFactory);
   });
 
   afterEach(() => {
@@ -62,9 +58,10 @@ describe('Email dashboard backend api service', () => {
       ]
     };
 
-    let expectedObject = edqrof.createFromBackendDict(backendResponse);
+    let expectedObject = EmailDashboardQueryResults.createFromBackendDict(
+      backendResponse);
 
-    edbas.fetchQueriesPage(10, 'test').then((queryResults) => {
+    edbas.fetchQueriesPageAsync(10, 'test').then((queryResults) => {
       expect(queryResults).toEqual(expectedObject);
     });
 
@@ -81,7 +78,7 @@ describe('Email dashboard backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      edbas.fetchQueriesPage(10, 'test').then(
+      edbas.fetchQueriesPageAsync(10, 'test').then(
         successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -111,9 +108,10 @@ describe('Email dashboard backend api service', () => {
       }
     };
 
-    let expectedObject = edqof.createFromBackendDict(backendResponse);
+    let expectedObject = EmailDashboardQuery.createFromBackendDict(
+      backendResponse);
 
-    edbas.fetchQuery('q1').then((query) => {
+    edbas.fetchQueryAsync('q1').then((query) => {
       expect(query).toEqual(expectedObject);
     });
 
@@ -130,7 +128,7 @@ describe('Email dashboard backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      edbas.fetchQuery('q1').then(successHandler, failHandler);
+      edbas.fetchQueryAsync('q1').then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         req => (/.*?querystatuscheck?.*/g).test(req.url));
@@ -168,9 +166,10 @@ describe('Email dashboard backend api service', () => {
       }
     };
 
-    let expectedObject = edqof.createFromBackendDict(backendResponse);
+    let expectedObject = EmailDashboardQuery.createFromBackendDict(
+      backendResponse);
 
-    edbas.submitQuery(postData).then((query) => {
+    edbas.submitQueryAsync(postData).then((query) => {
       expect(query).toEqual(expectedObject);
     });
 
@@ -196,7 +195,7 @@ describe('Email dashboard backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      edbas.submitQuery(postData).then(successHandler, failHandler);
+      edbas.submitQueryAsync(postData).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));

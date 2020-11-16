@@ -24,8 +24,8 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import stats_jobs_continuous
+from core.domain import taskqueue_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -104,11 +104,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesMRJobManager)
             job_id = job_class.start_computation()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
         # A successful job should output nothing.
@@ -174,7 +174,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 exp_id, exp_version, first_state_name, 'session1')
             self._record_start(
                 exp_id, exp_version, first_state_name, 'session2')
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             # Add some answers.
             event_services.AnswerSubmissionEventHandler.record(
@@ -199,11 +199,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'AnswerFrequencies'
@@ -279,7 +279,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             self._record_start(
                 exp_id, exp_version, first_state_name, 'session1')
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
             # Add an answer.
             event_services.AnswerSubmissionEventHandler.record(
@@ -295,11 +295,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # There should be no job output corresponding to all versions since
@@ -377,11 +377,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'AnswerFrequencies'
@@ -437,11 +437,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Extract the output from the job.
@@ -540,11 +540,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
@@ -636,11 +636,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
@@ -785,11 +785,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
@@ -904,11 +904,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Retrieve outputs for all of the computations running on this
@@ -969,9 +969,9 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator
                 .start_computation())
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
             self.assertEqual(
-                self.count_jobs_in_taskqueue(
+                self.count_jobs_in_mapreduce_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)

@@ -16,10 +16,7 @@
  * @fileoverview Unit tests for TrainingModalController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Training Modal Controller', function() {
   var $rootScope = null;
@@ -33,6 +30,9 @@ describe('Training Modal Controller', function() {
   var InteractionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationDataService', {
       explorationId: 0,
@@ -40,12 +40,7 @@ describe('Training Modal Controller', function() {
       discardDraft: function() {}
     });
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     StateEditorService = $injector.get('StateEditorService');
@@ -193,7 +188,7 @@ describe('Training Modal Controller', function() {
 
       it('should exit training modal', function() {
         $scope.exitTrainer();
-        expect($uibModalInstance.dismiss).toHaveBeenCalled();
+        expect($uibModalInstance.close).toHaveBeenCalled();
       });
     });
 
@@ -347,7 +342,7 @@ describe('Training Modal Controller', function() {
 
     it('should exit training modal', function() {
       $scope.exitTrainer();
-      expect($uibModalInstance.dismiss).toHaveBeenCalled();
+      expect($uibModalInstance.close).toHaveBeenCalled();
     });
   });
 
@@ -485,7 +480,7 @@ describe('Training Modal Controller', function() {
 
       it('should exit training modal', function() {
         $scope.exitTrainer();
-        expect($uibModalInstance.dismiss).toHaveBeenCalled();
+        expect($uibModalInstance.close).toHaveBeenCalled();
       });
     });
 });

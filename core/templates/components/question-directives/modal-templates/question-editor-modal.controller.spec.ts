@@ -32,6 +32,7 @@ describe('Question Editor Modal Controller', function() {
   let QuestionUndoRedoService = null;
   let ShortSkillSummaryObjectFactory = null;
   let StateEditorService = null;
+  importAllAngularServices();
 
   const associatedSkillSummariesDict = [{
     id: '1',
