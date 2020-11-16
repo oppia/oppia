@@ -228,6 +228,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
                   showMarkAllAudioAsNeedingUpdateModalIfRequired: () =>
                     $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired
                 },
+                keyboard: false,
                 backdrop: 'static',
                 windowClass: 'customize-interaction-modal',
                 controller: 'CustomizeInteractionModalController'
