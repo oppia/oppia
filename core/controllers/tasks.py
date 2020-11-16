@@ -204,8 +204,8 @@ class DeferredTasksHandler(base.BaseHandler):
             raise Exception(
                 'The function id, %s, is not valid.' %
                 python_utils.convert_to_bytes(payload['fn_identifier']))
-        self.render_json({})
 
         deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
             payload['fn_identifier']]
         deferred_task_function(*payload['args'], **payload['kwargs'])
+        self.render_json({})
