@@ -625,6 +625,11 @@ def require_valid_name(name, name_type, allow_empty=False):
 
     # This check is needed because state names are used in URLs and as ids
     # for statistics.
+    if name == '':
+        raise ValidationError(
+            'The length of %s should be between 1 and 50 '
+            'characters; received %s' % (name_type, name))
+
     if name[0] in string.whitespace or name[-1] in string.whitespace:
         raise ValidationError(
             'Names should not start or end with whitespace.')

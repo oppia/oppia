@@ -2901,7 +2901,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             '[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]')
 
         full_error_list = []
-        for i in python_utils.RANGE(21):
+        for i in python_utils.RANGE(20):
             full_error_list.append(
                 'Entity id 0-%s: based on field exploration_ids having '
                 'value 0, expected model ExplorationModel with id 0 but '
