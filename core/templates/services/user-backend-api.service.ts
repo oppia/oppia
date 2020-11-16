@@ -20,11 +20,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
-import { UserInfo, UserInfoBackendDict } from
-  'domain/user/user-info.model.ts';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service.ts';
+import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 interface SubscriptionSummary {
