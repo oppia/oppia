@@ -80,7 +80,8 @@ var ExplorationEditorSettingsTab = function() {
   this.expectAvailableFirstStatesToBe = async function(names) {
     var options = await initialStateSelect.all(by.tagName('option'))
       .map(async function(elem) {
-        await waitFor.visibilityOf(elem, 'Element taking too long to appear');
+        await waitFor.visibilityOf(
+          elem, 'Element ' + elem + ' taking too long to appear');
         return await elem.getText();
       });
     expect(options.sort()).toEqual(names.sort());
