@@ -48,7 +48,7 @@
   </md-button>
 </div>
 
-<div class="image-click-container" ng-if="!$ctrl.isLoadingIndicatorShown && !$ctrl.isTryAgainShown">
+<div class="image-click-container" ng-if="!$ctrl.isLoadingIndicatorShown && !$ctrl.isTryAgainShown" ng-style="$ctrl.containerStyle">
   <img ng-src="<[$ctrl.imageUrl]>"
        class="oppia-image-click-img"
        ng-click="$ctrl.onClickImage($event)"
