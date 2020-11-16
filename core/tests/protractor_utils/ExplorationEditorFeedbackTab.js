@@ -17,6 +17,7 @@
  * use in Protractor tests.
  */
 
+var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
 var ExplorationEditorFeedbackTab = function() {
@@ -61,10 +62,8 @@ var ExplorationEditorFeedbackTab = function() {
       suggestionDescription));
     expect(await matchingRow.isDisplayed()).toBe(true);
     await matchingRow.click();
-    await waitFor.elementToBeClickable(
-      viewSuggestionButton, '\'View suggestion\' button not clickable.');
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
-    await viewSuggestionButton.click();
+    await action.click('View suggestion button', viewSuggestionButton);
     expect(await acceptSuggestionButton.isDisplayed()).toBe(true);
     await suggestionCommitMessageInput.sendKeys('Commit message');
     await acceptSuggestionButton.click();
@@ -122,10 +121,8 @@ var ExplorationEditorFeedbackTab = function() {
       suggestionDescription));
     expect(await matchingRow.isDisplayed()).toBe(true);
     await matchingRow.click();
-    await waitFor.elementToBeClickable(
-      viewSuggestionButton, '\'View suggestion\' button not clickable.');
     expect(await viewSuggestionButton.isDisplayed()).toBe(true);
-    await viewSuggestionButton.click();
+    await action.click('View suggestion button', viewSuggestionButton);
     expect(await rejectSuggestionButton.isDisplayed()).toBe(true);
     await suggestionReviewMessageInput.sendKeys('Review message');
     await rejectSuggestionButton.click();
@@ -171,7 +168,8 @@ var ExplorationEditorFeedbackTab = function() {
     await waitFor.textToBePresentInElement(
       feedbackStatusElement,
       feedbackStatus,
-      `Expected ${feedbackStatusElement.getText()} to be ${feedbackStatus}`);
+      `Expected ${await feedbackStatusElement.getText()} ` +
+      `to be ${feedbackStatus}`);
   };
 };
 
