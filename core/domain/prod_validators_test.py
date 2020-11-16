@@ -63,7 +63,7 @@ datastore_services = models.Registry.import_datastore_services()
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-(   
+(
     collection_models,
     config_models, email_models, exp_models,
     feedback_models, job_models,
