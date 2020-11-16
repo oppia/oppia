@@ -155,6 +155,16 @@ describe('Preferences', function() {
         'http://localhost:9001/learner-dashboard');
     });
 
+  it('should navigate to account deletion page',
+    async function() {
+      await users.createUser('delete@page.com', 'deletePage');
+      await users.login('delete@page.com');
+      await preferencesPage.get();
+      await preferencesPage.clickDeleteAccountButton();
+      expect(await browser.getCurrentUrl()).toEqual(
+        'http://localhost:9001/delete-account');
+    });
+
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
     await users.logout();

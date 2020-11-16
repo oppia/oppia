@@ -639,7 +639,7 @@ def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
         strict: bool. Whether to fail noisily if one or more user IDs don't
             exist in the datastore. Defaults to False.
         include_marked_deleted: bool. Whether to included users that are being
-            deleted. This should be deleted only for retrieving the usernames.
+            deleted. This should be used only for retrieving the usernames.
 
     Returns:
         list(UserSettings|None). The UserSettings domain objects corresponding
