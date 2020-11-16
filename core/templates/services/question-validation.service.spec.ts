@@ -18,15 +18,10 @@
 
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
-import { QuestionObjectFactory } from
-  'domain/question/QuestionObjectFactory.ts';
-import { QuestionValidationService } from
-  'services/question-validation.service.ts';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory.ts';
+import { QuestionValidationService } from 'services/question-validation.service.ts';
 
 describe('Question Validation Service', () => {
   let questionValidationService: QuestionValidationService = null;
@@ -188,7 +183,7 @@ describe('Question Validation Service', () => {
   }));
 
   it('should return true if validation is successful', fakeAsync(() => {
-    var question = questionObjectFactory.createFromBackendDict(
+    const question = questionObjectFactory.createFromBackendDict(
       mockQuestionDict);
     spyOn(stateEditorService, 'isCurrentSolutionValid').and.returnValue(true);
     flushMicrotasks();

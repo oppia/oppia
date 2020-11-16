@@ -19,11 +19,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { StateEditorService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Question } from
-  'domain/question/QuestionObjectFactory.ts';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { Question } from 'domain/question/QuestionObjectFactory.ts';
 
 @Injectable({
   providedIn: 'root'
