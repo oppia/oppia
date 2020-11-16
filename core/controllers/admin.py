@@ -277,6 +277,7 @@ class AdminHandler(base.BaseHandler):
                     '%s.' % (self.user_id, feature_name, new_rule_dicts))
             self.render_json(result)
         except Exception as e:
+            logging.error('[ADMIN] %s', e)
             self.render_json({'error': python_utils.UNICODE(e)})
             raise
 
@@ -752,9 +753,15 @@ class DataExtractionQueryHandler(base.BaseHandler):
         exp_id = self.request.get('exp_id')
         try:
             exp_version = int(self.request.get('exp_version'))
-            exploration = exp_fetchers.get_exploration_by_id(
-                exp_id, version=exp_version)
-        except Exception:
+        except ValueError:
+            raise self.InvalidInputException(
+                'Version %s cannot be converted to int.'
+                % self.request.get('exp_version')
+            )
+
+        exploration = exp_fetchers.get_exploration_by_id(
+            exp_id, strict=False, version=exp_version)
+        if exploration is None:
             raise self.InvalidInputException(
                 'Entity for exploration with id %s and version %s not found.'
                 % (exp_id, self.request.get('exp_version')))

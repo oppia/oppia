@@ -134,10 +134,7 @@ class TrainedClassifierHandler(base.BaseHandler):
             email_manager.send_job_failure_email(job_id)
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
-        try:
-            classifier_services.store_classifier_data(job_id, classifier_data)
-        except Exception as e:
-            raise self.InternalErrorException(e)
+        classifier_services.store_classifier_data(job_id, classifier_data)
 
         # Update status of the training job to 'COMPLETE'.
         classifier_services.mark_training_job_complete(job_id)
