@@ -244,8 +244,9 @@ describe('Preferences Controller', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve(newPicture)
     });
-    spyOn(UserBackendApiService, 'setProfileImageDataUrlAsync')
-      .and.returnValue($q.resolve());
+    spyOn(
+      UserBackendApiService, 'setProfileImageDataUrlAsync'
+    ).and.returnValue($q.resolve());
 
     ctrl.showEditProfilePictureModal();
     $rootScope.$apply();
