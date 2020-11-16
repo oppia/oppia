@@ -1244,7 +1244,7 @@ PROFILE_USER_PIN_LENGTH = 3
 
 MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 
-# The is the maximum wait time for the task queue HTTP request. If the request
+# This is the maximum wait time for the task queue HTTP request. If the request
 # takes longer than this value, an exception is raised. The default value
 # of 5 seconds is too short and must be avoided because it can cause events
 # to go unrecorded.
