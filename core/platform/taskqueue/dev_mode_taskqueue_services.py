@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 
 from core.platform.taskqueue import cloud_tasks_emulator
+import feconf
 
 import requests
 
