@@ -45,6 +45,9 @@ export class AttributionGuideComponent implements OnInit {
     this.iframed = this.urlService.isIframed();
     this.generateAttibutionIsAllowed = (
       this.attributionService.isGenerateAttributionAllowed());
+    if (this.generateAttibutionIsAllowed) {
+      this.attributionService.init();
+    }
   }
 
   getAttributionModalStatus(): boolean {

@@ -404,8 +404,7 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
 
 
 class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the gae_user_id from the UserSettingsModel.
-    """
+    """Job that deletes the gae_user_id from the UserSettingsModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -697,3 +696,106 @@ class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class UserAuthDetailsModelAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits whether there are UserAuthDetailsModels with the same
+    gae_id field.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(UserAuthDetailsModelAuditOneOffJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserAuthDetailsModel]
+
+    @staticmethod
+    def map(model):
+        number_of_models_with_same_gae_id = (
+            user_models.UserAuthDetailsModel.query(
+                user_models.UserAuthDetailsModel.gae_id == model.gae_id
+            ).count()
+        )
+
+        if number_of_models_with_same_gae_id > 1:
+            yield ('FAILURE', model.id)
+        else:
+            yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class GenerateUserIdentifiersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that creates UserIdentifiersModel for each UserAuthDetailsModel."""
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(GenerateUserIdentifiersModelOneOffJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserAuthDetailsModel]
+
+    @staticmethod
+    def map(model):
+        user_models.UserIdentifiersModel(
+            id=model.gae_id,
+            user_id=model.id,
+            deleted=model.deleted
+        ).put()
+        yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class UniqueHashedNormalizedUsernameAuditJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks that the hashed normalized usernames are unique."""
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(UniqueHashedNormalizedUsernameAuditJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model):
+        if model.normalized_username is None:
+            yield ('SUCCESS USERNAME NONE', 1)
+        else:
+            yield (
+                utils.convert_to_hash(
+                    model.normalized_username,
+                    user_models.DeletedUsernameModel.ID_LENGTH
+                ),
+                model.normalized_username
+            )
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS USERNAME NONE':
+            yield (key, len(values))
+            return
+
+        if len(values) != 1:
+            yield ('FAILURE', values)
