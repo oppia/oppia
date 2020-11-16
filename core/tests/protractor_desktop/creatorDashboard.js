@@ -52,7 +52,7 @@ describe('Creator dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('should display correct stats on dashboard', async function() {
+  fit('should display correct stats on dashboard', async function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     // Create required users.
     await users.createUser(

@@ -407,11 +407,16 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 realtime_class(
                     id=realtime_model_id, average_ratings=rating,
                     num_ratings=1, realtime_layer=active_realtime_layer).put()
+                logging.error('created new realtime class')
             else:
+                logging.error('updating existing realtime class')
                 num_ratings = model.num_ratings
                 average_ratings = model.average_ratings
+                logging.error('before num_ratings: %d' % num_ratings)
                 num_ratings += 1
                 if average_ratings is not None:
+                    logging.error(
+                        'average_ratings exists: %f' % average_ratings)
                     sum_of_ratings = (
                         average_ratings * (num_ratings - 1) + rating)
                     if old_rating is not None:
@@ -420,10 +425,12 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     model.average_ratings = python_utils.divide(
                         sum_of_ratings, float(num_ratings))
                 else:
+                    logging.error('average_ratings is None')
                     model.average_ratings = rating
                 model.num_ratings = num_ratings
                 model.update_timestamps()
                 model.put()
+                logging.error('after num_ratings: %d' % num_ratings)
 
         def _increment_total_plays_count(user_id):
             """Increments the total plays count of the exploration in the
@@ -446,8 +453,12 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.update_timestamps()
                 model.put()
 
+        logging.error('_handle_incoming_event called')
+        logging.error('exp_id is %s' % exp_id)
         exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
         if exp_summary:
+            logging.error('exp_summary.owner_ids')
+            logging.error(exp_summary.owner_ids)
             for user_id in exp_summary.owner_ids:
                 if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
                     transaction_services.run_in_transaction(
@@ -481,29 +492,44 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         average_ratings = None
 
         sum_of_ratings = 0
+        logging.error('get_dashboard_stats called')
 
         mr_model = user_models.UserStatsModel.get(user_id, strict=False)
         if mr_model is not None:
+            logging.error('mr_model is not None')
             total_plays += mr_model.total_plays
             num_ratings += mr_model.num_ratings
             if mr_model.average_ratings is not None:
+                logging.error('mr_model.average_ratings is not None')
+                logging.error(
+                    'mr.average_ratings: %f' % mr_model.average_ratings)
                 sum_of_ratings += (
                     mr_model.average_ratings * mr_model.num_ratings)
+            logging.error('mr.total_plays: %d' % total_plays)
+            logging.error('mr.num_ratings: %d' % num_ratings)
+            logging.error('mr.sum_of_ratings: %f' % sum_of_ratings)
 
         realtime_model = cls._get_realtime_datastore_class().get(
             cls.get_active_realtime_layer_id(user_id), strict=False)
 
         if realtime_model is not None:
+            logging.error('realtime_model is not None')
             total_plays += realtime_model.total_plays
             num_ratings += realtime_model.num_ratings
             if realtime_model.average_ratings is not None:
+                logging.error('realtime_model.average_ratings is not None')
+                logging.error(
+                    'realtime_model.average_ratings: %f'
+                    % realtime_model.average_ratings)
                 sum_of_ratings += (
                     realtime_model.average_ratings * realtime_model.num_ratings)
+                logging.error('rt.total_plays: %d' % total_plays)
+                logging.error('rt.num_ratings: %d' % num_ratings)
+                logging.error('rt.sum_of_ratings: %f' % sum_of_ratings)
 
         if num_ratings > 0:
             average_ratings = python_utils.divide(
                 sum_of_ratings, float(num_ratings))
-        logging.error('get_dashboard_stats called')
         logging.error(
             'average ratings is None' if average_ratings is None
             else 'average rating: %f' % average_ratings)
