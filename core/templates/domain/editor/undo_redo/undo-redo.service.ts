@@ -26,7 +26,7 @@ const undoRedoServiceFactory = (): BaseUndoRedo => {
 
 class UndoRedoService extends BaseUndoRedo {}
 
-export const provide = {
+export const undoRedoServiceProvider = {
   provide: UndoRedoService, useFactory: undoRedoServiceFactory};
 
 // TODO(#7222): Remove the following lines after all the files have been
