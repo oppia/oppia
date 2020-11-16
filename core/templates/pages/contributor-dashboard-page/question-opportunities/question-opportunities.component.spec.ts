@@ -140,9 +140,9 @@ describe('Question opportunities component', function() {
   it('should open requires login modal when trying to select a question and' +
     ' a skill difficulty and user is not logged', function() {
     spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve(
-        {isLoggedIn: () => false
-        }));
+      $q.resolve({
+        isLoggedIn: () => false
+      }));
     ctrl.$onInit();
     $rootScope.$apply();
 
@@ -160,9 +160,9 @@ describe('Question opportunities component', function() {
     ' on suggesting question button', function() {
     spyOn($uibModal, 'open').and.callThrough();
     spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
-      $q.resolve(
-        {isLoggedIn: () => true
-        }));
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
     ctrl.$onInit();
     $rootScope.$apply();
 
@@ -202,9 +202,9 @@ describe('Question opportunities component', function() {
     function() {
       var openSpy = spyOn($uibModal, 'open');
       spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
-        $q.resolve(
-          {isLoggedIn: () => true
-          }));
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
       ctrl.$onInit();
       $rootScope.$apply();
       alertsService.clearWarnings();

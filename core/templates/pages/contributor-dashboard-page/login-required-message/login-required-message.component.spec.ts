@@ -41,8 +41,8 @@ describe('Login required message component', function() {
   }));
 
   beforeEach(angular.mock.module('oppia', $provide => {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+    const ugs = new UpgradedServices();
+    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
