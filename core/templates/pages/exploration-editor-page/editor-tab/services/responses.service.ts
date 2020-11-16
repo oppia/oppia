@@ -234,7 +234,7 @@ export class ResponsesService {
     this._activeRuleIndex = 0;
   }
 
-  getAnswerGroups(): string {
+  getAnswerGroups(): AnswerGroup {
     return angular.copy(this._answerGroups);
   }
 
@@ -246,7 +246,7 @@ export class ResponsesService {
     return this._answerGroups.length;
   }
 
-  getDefaultOutcome(): string {
+  getDefaultOutcome(): Outcome {
     return angular.copy(this._defaultOutcome);
   }
 
@@ -254,7 +254,7 @@ export class ResponsesService {
     return angular.copy(this._confirmedUnclassifiedAnswers);
   }
 
-  getAnswerChoices(): string {
+  getAnswerChoices(): AnswerChoice {
     return angular.copy(this._answerChoices);
   }
 
@@ -330,11 +330,14 @@ export class ResponsesService {
   }
 
   updateAnswerGroup(
-      index: number, updates: AnswerGroup, callback: void): void {
+      // eslint-disable-next-line max-len
+      index: number, updates: Outcome, callback: (value: Outcome) => void)
+      : void {
     this._updateAnswerGroup(index, updates, callback);
   }
 
-  deleteAnswerGroup(index: number, callback: (value: Outcome) => void): void {
+  deleteAnswerGroup(index: number, callback: (value: AnswerGroup) => void)
+  : void {
     this._answerGroupsMemento = angular.copy(this._answerGroups);
     this._answerGroups.splice(index, 1);
     this._activeAnswerGroupIndex = -1;
@@ -353,6 +356,8 @@ export class ResponsesService {
       updates: Outcome,
       callback: (value: Outcome) => void
   ): void {
+    // eslint-disable-next-line quotes
+    // eslint-disable-next-line no-console
     const outcome = this._defaultOutcome;
     if (updates.hasOwnProperty('feedback')) {
       outcome.feedback = updates.feedback;
