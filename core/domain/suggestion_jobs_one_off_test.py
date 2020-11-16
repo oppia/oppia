@@ -170,7 +170,9 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
         expected_output = [
             u'[u\'POST_MIGRATION_VALIDATION_FALIURE\', '
             '[u"(\'suggestion456\', '
-            'ValidationError(u\'language_code cannot be None\',))"]]']
+            'ValidationError(u\'Expected language_code '
+            'to be en, received None\',))"]]'
+        ]
         self._run_job_and_verify_output(expected_output)
 
     def test_migration_job_yields_no_output_for_non_question_suggestion(self):
