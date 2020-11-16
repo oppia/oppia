@@ -2216,6 +2216,31 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             class_names, set(job_class.MODEL_NAMES_TO_PROPERTIES.keys()))
 
+    def test_deleted_exp_rights_model(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public',
+            deleted=True
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        expected_output = [
+            [
+                'Missing Parent Model-No changes-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                1
+            ]
+        ]
+
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+
     def test_add_missing_exp_rights_commit_logs(self):
         exp_rights = exp_models.ExplorationRightsModel(
             id=self.EXP_ID,
