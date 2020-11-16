@@ -134,6 +134,8 @@ import { QuestionSummaryForOneSkillObjectFactory } from 'domain/question/Questio
 import { QuestionSummaryObjectFactory } from 'domain/question/QuestionSummaryObjectFactory';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service.ts';
+import { QuestionValidationService } from 'services/question-validation.service';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
 import { ReviewTestObjectFactory } from 'domain/review_test/review-test-object.factory';
@@ -612,6 +614,8 @@ export const angularServices: [string, unknown][] = [
   ['ProfileSummaryObjectFactory', ProfileSummaryObjectFactory],
   ['PythonProgramTokenizer', PythonProgramTokenizer],
   ['QuestionBackendApiService', QuestionBackendApiService],
+  ['QuestionValidationService', QuestionValidationService],
+  ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionSummaryForOneSkillObjectFactory',
     QuestionSummaryForOneSkillObjectFactory],
   ['QuestionSummaryObjectFactory', QuestionSummaryObjectFactory],

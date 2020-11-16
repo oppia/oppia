@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for QuestionSuggestionReviewModalController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.  // Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Suggestion Review Modal Controller', function() {
+  importAllAngularServices();
+
   let $scope = null;
   let $uibModalInstance = null;
   let QuestionObjectFactory = null;
@@ -34,13 +35,6 @@ describe('Question Suggestion Review Modal Controller', function() {
   const questionHeader = 'Question header';
   const reviewable = true;
   const skillDifficulty = 0.3;
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
   describe('when skill rubrics is specified', function() {
     const skillRubrics = [{

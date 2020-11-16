@@ -1,4 +1,3 @@
-
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,13 @@
  * @fileoverview Unit tests for QuestionSuggestionService.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Question Suggestion Service', function() {
+  importAllAngularServices();
+
   let $httpBackend = null;
   let $q = null;
   let CsrfTokenService = null;
