@@ -26,9 +26,6 @@ import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { AlertsService } from 'services/alerts.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
@@ -36,7 +33,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question opportunities component', function() {
   importAllAngularServices();
-  
+
   var ctrl = null;
   var $q = null;
   var $rootScope = null;
@@ -48,7 +45,6 @@ describe('Question opportunities component', function() {
   var userService = null;
 
   var opportunitiesArray = [];
-  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({

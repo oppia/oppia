@@ -22,7 +22,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Question Editor Modal Controller', function() {
   importAllAngularServices();
-  
+
   let $q = null;
   let $scope = null;
   let $uibModal = null;
@@ -32,7 +32,6 @@ describe('Question Editor Modal Controller', function() {
   let QuestionUndoRedoService = null;
   let ShortSkillSummaryObjectFactory = null;
   let StateEditorService = null;
-  importAllAngularServices();
 
   const associatedSkillSummariesDict = [{
     id: '1',

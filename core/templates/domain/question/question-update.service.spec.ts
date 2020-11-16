@@ -42,9 +42,6 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
@@ -61,7 +58,7 @@ require(
 
 describe('Question update service', function() {
   importAllAngularServices();
-  
+
   var QuestionUpdateService = null;
   var QuestionObjectFactory = null;
   var QuestionUndoRedoService = null;
@@ -72,7 +69,6 @@ describe('Question update service', function() {
   var expectedOutputStateDict = null;
   var expectedOutputState = null;
   var sampleQuestionBackendObject = null;
-  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
