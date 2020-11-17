@@ -5,7 +5,7 @@
       <span class="oppia-icon-accessibility-label">Facebook</span>
     </a>
   </div>
-  <div class="fx-main-center fx-cross-center padding-0-2" style="height: 28px;">
+  <div class="fx-main-center fx-cross-center padding-0-2 twit">
     <a title="Twitter" class="fx-main-center fx-cross-start" [href]="getUrl('twitter')"  (click)="registerShareEvent('twitter')" target="_window">
       <i class="oppia-share-icons fab fa-twitter-square" [ngClass] = "smallFont ? 'font-small' : 'font-big'" ></i>
       <span class="oppia-icon-accessibility-label">Twitter</span>
@@ -18,7 +18,7 @@
   </div>
   <div *ngIf="shareType === 'exploration'" title="Embed this Exploration" class="fx-main-center fx-cross-center padding-0-2">
     <a class="fx-main-center fx-cross-center" (click)="showEmbedExplorationModal()" tabindex="0">
-      <i class="material-icons md-48 embed-link share-icons" [ngClass] = "smallFont ? 'font-small' : 'font-big'" style="align-content: center;">&#xE86F;</i>
+      <i class="material-icons md-48 embed-link share-icons" [ngClass] = "smallFont ? 'font-small' : 'font-big'">&#xE86F;</i>
       <span class="oppia-icon-accessibility-label">Embed this Exploration</span>
     </a>
   </div>
@@ -68,7 +68,7 @@
   }
 
   .oppia-sharing-links .share-option-img {
-    border-radius: 5px;
+    border-radius: 3.5px;
     margin: 0;
     max-width: 32px;
   }
@@ -107,16 +107,16 @@
     font-size: 18px;
   }
   i.material-icons.md-48.embed-link.share-icons {
-    margin-top: 1px;
     height: 28px;
+    margin-top: 1px;
     width: 28px;
   }
   .oppia-sharing-links .share-option-img.font-big {
-    margin-top: 1px;
     height: 28px;
+    margin-top: 1px;
     width: 28px;
 }
-.oppia-sharing-links .share-option-img {
-    border-radius: 3.5px;
+.fx-main-center.fx-cross-center.padding-0-2.twit {
+height: 28px;
 }
 </style>
