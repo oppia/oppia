@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,47 +16,45 @@
  * @fileoverview Unit test for the Translation tab active content id service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require(
-  'pages/exploration-editor-page/translation-tab/services/' +
-  'translation-tab-active-content-id.service.ts');
+import { StateRecordedVoiceoversService } from
+// eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { TranslationTabActiveContentIdService } from
+// eslint-disable-next-line max-len
+  'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 
-describe('Translation tab active content id service', function() {
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('StateRecordedVoiceoversService', {
-      displayed: {
-        getAllContentId: function() {
-          return ['content', 'feedback_1'];
-        }
-      }
-    });
-  }));
-  var ttacis = null;
+class MockRecordedVoiceovers {
+  getAllContentId() {
+    return ['content', 'feedback_1'];
+  }
+}
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ttacis = $injector.get('TranslationTabActiveContentIdService');
-  }));
+describe('TranslationTabActiveContentIdService', () => {
+  let stateVoiceService: StateRecordedVoiceoversService;
+  let contentIdService: TranslationTabActiveContentIdService;
+
+  let mockRecordedVoiceOvers: MockRecordedVoiceovers;
+
+  beforeEach(() => {
+    stateVoiceService = TestBed.get(StateRecordedVoiceoversService);
+    contentIdService = TestBed.get(TranslationTabActiveContentIdService);
+
+    mockRecordedVoiceOvers = new MockRecordedVoiceovers();
+
+    spyOnProperty(stateVoiceService, 'displayed')
+      .and.returnValue(mockRecordedVoiceOvers);
+  });
 
   it('should correctly set and get active content id', function() {
-    expect(ttacis.getActiveContentId()).toBeNull();
-    ttacis.setActiveContent('content', 'html');
-    expect(ttacis.getActiveContentId()).toBe('content');
+    contentIdService.setActiveContent('content', 'html');
+    expect(contentIdService.getActiveContentId()).toBe('content');
   });
 
-  it('should throw error on setting invalid content id', function() {
-    expect(function() {
-      ttacis.setActiveContent('feedback_2', 'html');
-    }).toThrowError(
-      'Invalid active content id: feedback_2');
+  it('should throw error on setting invalid content id', () => {
+    expect(() => { contentIdService.setActiveContent('feedback_2', 'html')})
+    .toThrowError('Invalid active content id: feedback_2');
   });
+
 });

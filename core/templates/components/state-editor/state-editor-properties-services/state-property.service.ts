@@ -44,7 +44,7 @@ export class StatePropertyService<StatePropertyType> {
   // The name of the setter method in ExplorationStatesService for this
   // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
   setterMethodKey: string;
-  displayed: StatePropertyType;
+  _displayed: StatePropertyType;
   stateName: string;
   savedMemento: StatePropertyType;
 
@@ -52,6 +52,10 @@ export class StatePropertyService<StatePropertyType> {
     private alertsService: AlertsService,
     private utilsService: UtilsService) {
     this.setterMethodKey = null;
+  }
+
+  get displayed() {
+    return this._displayed;
   }
 
   init(stateName: string, value: StatePropertyType): void {
