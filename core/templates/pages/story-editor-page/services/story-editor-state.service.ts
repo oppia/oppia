@@ -21,7 +21,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { Story, StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
