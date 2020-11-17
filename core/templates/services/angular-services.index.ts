@@ -306,6 +306,7 @@ import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { TranslationTabActiveContentIdService } from
+// eslint-disable-next-line max-len
   'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 
 export const angularServices: [string, unknown][] = [
@@ -607,7 +608,8 @@ export const angularServices: [string, unknown][] = [
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslateService', TranslateService],
   ['TranslationsBackendApiService', TranslationsBackendApiService],
-  ['TranslationTabActiveContentIdService', TranslationTabActiveContentIdService],
+  ['TranslationTabActiveContentIdService',
+    TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TruncatePipe', TruncatePipe],
   ['UnitsObjectFactory', UnitsObjectFactory],

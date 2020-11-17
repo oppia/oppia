@@ -23,21 +23,19 @@ import { EventEmitter } from '@angular/core';
 import { StateRecordedVoiceoversService } from
 // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import { RecordedVoiceovers } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class TranslationTabActiveContentIdService {
-
   private activeContentId: string = null;
   private activeDataFormat: string = null;
   private _activeContentIdChangedEventEmitter = new EventEmitter();
 
   constructor(
     private stateVoiceService: StateRecordedVoiceoversService) {}
-  
+
   getActiveContentId(): string {
     return this.activeContentId;
   }
@@ -46,21 +44,20 @@ export class TranslationTabActiveContentIdService {
     return this.activeDataFormat;
   }
 
-  setActiveContent(contentId: string, dataFormat: string) {
+  setActiveContent(contentId: string, dataFormat: string): void {
     let allContentIds: string[];
     allContentIds = this.stateVoiceService.displayed.getAllContentId();
-      if (allContentIds.indexOf(contentId) === -1) {
-        throw new Error('Invalid active content id: ' + contentId);
-      }
+    if (allContentIds.indexOf(contentId) === -1) {
+      throw new Error('Invalid active content id: ' + contentId);
+    }
     this.activeContentId = contentId;
     this.activeDataFormat = dataFormat;
     this._activeContentIdChangedEventEmitter.emit(dataFormat);
   }
 
-  get onActiveContentIdChanged() {
+  get onActiveContentIdChanged(): EventEmitter {
     return this._activeContentIdChangedEventEmitter;
   }
-
 }
 angular.module('oppia').factory(
   'TranslationTabActiveContentIdService',

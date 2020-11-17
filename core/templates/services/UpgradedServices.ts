@@ -511,6 +511,7 @@ import { TopicViewerBackendApiService } from
 import { TranslationsBackendApiService } from
   'services/translations-backend-api.service';
 import { TranslationTabActiveContentIdService } from
+// eslint-disable-next-line max-len
   'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from

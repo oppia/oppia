@@ -54,7 +54,7 @@ export class StatePropertyService<StatePropertyType> {
     this.setterMethodKey = null;
   }
 
-  get displayed() {
+  get displayed(): StatePropertyType {
     return this._displayed;
   }
 

@@ -53,8 +53,8 @@ describe('TranslationTabActiveContentIdService', () => {
   });
 
   it('should throw error on setting invalid content id', () => {
-    expect(() => { contentIdService.setActiveContent('feedback_2', 'html')})
-    .toThrowError('Invalid active content id: feedback_2');
+    expect(() => {
+      contentIdService.setActiveContent('feedback_2', 'html')
+    }).toThrowError('Invalid active content id: feedback_2');
   });
-
 });
