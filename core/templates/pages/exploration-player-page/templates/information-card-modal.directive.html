@@ -55,7 +55,7 @@
       </ul>
     </ul>
 
-    <div ng-if="!explorationIsPrivate" class="oppia-info-card-bottom-row" layout="row">
+    <div ng-if="!explorationIsPrivate" class="oppia-info-card-bottom-row">
       <div flex="40">
         <md-content layout="row">
           <div class="oppia-info-card-tag-icon">
@@ -107,5 +107,18 @@
   .oppia-info-card-content .oppia-contributors-icon {
     cursor: default;
     margin-right: 5px;
+  }
+  .oppia-info-card-content p{
+    padding-bottom: 8px;
+    line-height: 1.5;
+  }
+  .oppia-info-card-bottom-row{
+    line-height: 1.5;
+  }
+  .flex-40{
+    padding-bottom: 2%;
+  }
+  .oppia-info-card-content .card-metrics li .far{
+    margin-right:0;
   }
 </style>
