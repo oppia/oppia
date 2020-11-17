@@ -35,7 +35,7 @@ import { SubtopicPageObjectFactory } from
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
@@ -171,12 +171,7 @@ describe('Topic editor state service', function() {
           new SubtitledHtmlObjectFactory())));
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));

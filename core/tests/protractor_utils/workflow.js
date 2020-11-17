@@ -37,6 +37,14 @@ var canAddRolesToUsers = async function() {
   return await element(by.css('.protractor-test-save-role')).isEnabled();
 };
 
+// Check if exploration is community owned.
+var isExplorationCommunityOwned = async function() {
+  return await element(
+    by.css('.protractor-test-is-community-owned')
+  ).isPresent();
+};
+
+
 // Check if the warning message is visible when the title is ''.
 var checkForAddTitleWarning = async function() {
   return await element(
@@ -178,7 +186,7 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language) {
+    title, category, objective, language, correctnessFeedbackIsEnabled) {
   await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -198,6 +206,9 @@ var createAndPublishTwoCardExploration = async function(
   await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
+  }
+  if (correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.enableCorrectnessFeedback();
   }
   await explorationEditorPage.saveChanges();
   await publishExploration();
@@ -332,6 +343,7 @@ exports.createExplorationAsAdmin = createExplorationAsAdmin;
 exports.createAndPublishTwoCardExploration = createAndPublishTwoCardExploration;
 
 exports.canAddRolesToUsers = canAddRolesToUsers;
+exports.isExplorationCommunityOwned = isExplorationCommunityOwned;
 exports.checkForAddTitleWarning = checkForAddTitleWarning;
 exports.triggerTitleOnBlurEvent = triggerTitleOnBlurEvent;
 exports.openEditRolesForm = openEditRolesForm;

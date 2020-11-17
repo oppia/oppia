@@ -183,6 +183,11 @@ class TopicModel(base_models.VersionedModel):
             cls.url_fragment == url_fragment).filter(
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -236,6 +241,11 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the topic id and version number.
         """
         return 'topic-%s-%s' % (topic_id, version)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -313,6 +323,11 @@ class TopicSummaryModel(base_models.BaseModel):
         to a user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -491,6 +506,16 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.update_timestamps()
         snapshot_metadata_model.put()
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance shared across users since multiple
+        users contribute to topics and their rights.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+
     @classmethod
     def get_export_policy(cls):
         """Model contains user data."""
@@ -498,6 +523,15 @@ class TopicRightsModel(base_models.VersionedModel):
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
             'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'manager_ids': 'managed_topic_ids'
+        }
 
     @classmethod
     def export_data(cls, user_id):
