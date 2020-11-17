@@ -66,7 +66,7 @@ export class StatePropertyService<StatePropertyType> {
     this.stateName = stateName;
     // The current value of the property (which may not have been saved to
     // the frontend yet). In general, this will be bound directly to the UI.
-    this.displayed = cloneDeep(value);
+    this._displayed = cloneDeep(value);
     // The previous (saved-in-the-frontend) value of the property. Here,
     // 'saved' means that this is the latest value of the property as
     // determined by the frontend change list.
@@ -96,7 +96,7 @@ export class StatePropertyService<StatePropertyType> {
       throw new Error('State property setter method key cannot be null.');
     }
 
-    this.displayed = this._normalize(this.displayed);
+    this._displayed = this._normalize(this.displayed);
     if (!this._isValid(this.displayed) || !this.hasChanged()) {
       this.restoreFromMemento();
       return;
@@ -113,7 +113,7 @@ export class StatePropertyService<StatePropertyType> {
 
   // Reverts the displayed value to the saved memento.
   restoreFromMemento(): void {
-    this.displayed = cloneDeep(this.savedMemento);
+    this._displayed = cloneDeep(this.savedMemento);
   }
 }
 
