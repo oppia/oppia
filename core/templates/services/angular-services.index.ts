@@ -305,6 +305,8 @@ import { TranslationsBackendApiService } from 'services/translations-backend-api
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+import { TranslationTabActiveContentIdService } from
+  'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -605,6 +607,7 @@ export const angularServices: [string, unknown][] = [
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslateService', TranslateService],
   ['TranslationsBackendApiService', TranslationsBackendApiService],
+  ['TranslationTabActiveContentIdService', TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TruncatePipe', TruncatePipe],
   ['UnitsObjectFactory', UnitsObjectFactory],

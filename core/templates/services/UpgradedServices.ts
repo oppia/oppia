@@ -510,6 +510,8 @@ import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TranslationsBackendApiService } from
   'services/translations-backend-api.service';
+import { TranslationTabActiveContentIdService } from
+  'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
