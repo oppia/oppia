@@ -1221,6 +1221,9 @@ export class UpgradedServices {
       new TopicViewerBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['TranslationTabActiveContentIdService'] =
+      new TranslationTabActiveContentIdService(
+        upgradedServices['StateRecordedVoiceoversService']);
     upgradedServices['TranslationsBackendApiService'] =
       new TranslationsBackendApiService(
         upgradedServices['HttpClient']);
