@@ -173,7 +173,7 @@ angular.module('oppia').directive('explorationSummaryTile', [
               $scope.isRefresherExploration = (
                 $scope.getParentExplorationIds().length > 0);
             }
-            
+
             if (!$scope.mobileCutoffPx) {
               $scope.mobileCutoffPx = 0;
             }
