@@ -53,6 +53,7 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+import { PromoBarComponent } from './common-layout-directives/common-elements/promo-bar.component';
 
 
 @NgModule({
@@ -68,6 +69,7 @@ import { ProfileLinkTextComponent } from
     LoadingDotsComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    PromoBarComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
     StorySummaryTileDirective,
@@ -82,6 +84,7 @@ import { ProfileLinkTextComponent } from
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
+    PromoBarComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
