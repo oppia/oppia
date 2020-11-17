@@ -47,6 +47,9 @@ GRAVATAR_SIZE_PX = 150
 DEFAULT_IDENTICON_DATA_URL = (
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEwAAABMCAYAAADHl1ErAAAAAXNSR0IArs4c6QAADhtJREFUeAHtXHlwVdUZ/859jyxmIQESyCaglC0iAgkJIntrIpvKphSwY2ttxbFOp9R/cGGqdhykLaMVO2OtoyRSCEKNEpYKyBIVQ1iNkBhNMCtb8shiQpJ3b7/fTW7m5uUlecu9L4nTM5Pce8895zvf93vnnPud833fEdQLKXb5jsC6%2BuZERZbHKaSMYRbGKERxgpQQUkSIIigEbAmFavlfrUKiVhCVcFa%2BIJEvJOlCcNCAnNKMFQ0o58vEfPgmhS5Mn0ot8n2KIs8lIZJJUfy8almIJqbxhRDSIbJKe2s%2BXvWlV/RcrGwqYGGp20bI1LyaeVmjKMrodp4EycGBAy6MjgsrSxozqG7O5GgxcVREeEigNDAwwBpmsUiRKGu3y1caGltstQ3yjbOFV6sPnypXTuRXBReU2GLqGprHkUKSRlMIUcD3WyUakGbbt7JYyzf6agpgYfe9O8kui/U8nB7UhJIkUTljwrBTTz449mZKUlyCEBTnjTCKQiX7T5ScfGP3Rf9j5ysny7IyTKXHPwYP690WSXnZtvcXp71pw1ldQwELm59%2BlyzbX%2BbeNL%2Btscb4EYOyNz2ZWD99wtAFnGdxxoQBefbs85f3rHsjJyivuGo60wsATe51WZJkWW/LWnXGgDZUEoYAFr58x0B7beOLPHGv5XnFIpGoS0mKOfze%2Bpmj/f2smNR9lm42teQ/8vLRgv0nyuZwVwtm1Ows5BZLSMBz1RkrbnjLiNeAhaWmPWgn%2BxYeejwkRMu9idH7tm%2BYE8/z0EhvmfOmPs9/RQ9tOJx3IKc8lUixkqBKC1nW2vat3u0NXY8Bi1%2B%2Bw6%2BktnETD7%2BnwEB4iP/pL/5xf03U4IBZ3jBkdN2K641Hkn/7YWh17c1JoM3D9PW4kIB1eRkrmjxpyyPAeK4aLttbPuAhOIU5aHpm1cTMZ1ffuRT8eMKED%2BooL6Wd%2B2Bj%2BtnFUGeYyVzJYl3Kc9sld9t2W8Dw%2BWkTWuz2fdxQ9ACr9P3Jfy7%2BZuSw0HnuNtwb5Ysqaw4mPJb5k%2BYW%2BVZuv9xqsaRWZ60%2B7w4vbgEWnrJ1hp3kTO5ZYUPCAnK%2B3bYiitWDWHca7O2yrI6U3r5yR8U1W2MiC2%2BzkLS4ev%2BaY67y1a749VQBYLUIZT/AGhUTduS7f68Y39/AgozgGbxDBsgCmSBbT/Jr710CDMMQPYvHf2DC2Mj9p95efA8TCNKI9MNrEGSALJAJskFGV%2BTocUhigrfbWz5jYtH4VdrAMksBdYVnI8vYJ/8q83hhmW0WEy23WKx39/Qh6LaHQXXA1xBgYc5isBL4/scCFoC3QCbIBhkhK2TGi65St4CpeharDvgaYoJnIv15GHaFQRBkg4w8p02BzF0VRH6XgEGDV5VS1rOgOvTHCb47wfXvIBtkhE4JmSG7/r3%2B3ilg6toQyx1OUEr7i56lF8zde8gIWVEPSz1g4IyGU8CwkMbaEMudNg3eWd0fXR5khcyQXcXAiYSdAMMWDY/ltVhIY23IdXr8kjqh21%2BzRKvMogUYAAtHQToBhv0sbNFg16GvLaQdmTfjGTJDdmCgYuHQSIfe07pTSqewn3V9z6qrvb1F48Crzx6xNTR4QXoE9tN4c2%2ByfufWqudC3VbmAYzNPwZrkf6dL%2B4LSm5Q9vkrVH79B6qs%2BoH8B1goatAtNCIqmOZOiabw4G5VJMNYREdhDD7ae6J0USsmtEwj3t7DYLCwK83f8WbbzauZP7/kq53SxiY7vfmfC5R24Fv6prTrDVEWgqbfEUlPLY2nlKkxGv%2BmXbFzG7H4/eE8g/tZyO92zbDSPoe1WncUgT14X4G189NimvjobnrhX6e6BQuo8DCho2crafnzB2n%2BMwe4PL5H5iVgACx4wEltli%2B1sXbA%2BGkNcmCwUN%2BY%2BI%2B3WOjZt3Lpl68cpQoefu6m4%2Bcqae7TWfTfk%2BXuVnWrvA4LFRtUVockjKxKc8sJmMJsWWsiON/U9eJvNmXTtk%2B%2BdYt5Z4WZX0p/bjYtmBbn7LURefaw%2BVuvwoQnBliTYCxu7WFskQb1WROjcvliKlibM/IMAQv8siD0643H6etiGx7NSBbYUlXCbRipgKnme859Ysl4jwwDrnKaV2SjDe%2B0tu9qnZ7KsQWch/YxVpt6KunZexieUVPDSIJjCC86k3lwyikJ0di%2BMS09/3au2iuMbuDr4mpKN2CIO%2BMLVnpgA4yAlVRX1ziV4fODrwOv2k2bDM4UVvEkXeaMJ0PyXn3/nCF0HIkAE2ADjICVpChiLArBMcSxsJHPmdmXjCTXiVZRRS19VVTdKd%2BIDA0bYCW1%2BWcRvGiMIN4Vjb1flHb1yrD8rM9LDKOlJ6RhA6ww6au%2BD3A50hcy%2Bt5sRRP8FpSYo8zqsBnDPax13oJ/ltEgafSqam5SU7NdezTtWsHrTzOShg2wYtWP3SQ5wZnNjMZA80Z9s1mkO9CtMakdDRtgJcGnFK3C869D6wY%2BRISp7loGUnROKtKkdtqxYawkzQGXdwNUN0nnrHiXGxxoJf40e0fEhdpRg29xoZT7RTRsgJV%2B8e0%2BJTdqJIwd4kZpz4pOGWN%2BG5Lq2s38wQHXMzZdq2XiAlllgP2%2BaH6yOX4xGjbAinejlVq0CG9l10T3rNT99wwnf96KMyvNuHMoDR0UaAr5dmwYK1YrhAoYXLtNaa2N6DAW5vFF6qLClGZeeHSyKXRBVMMGWLFaoUZYEPzgTWuxjfC6lROI/RgMb2bZ7JGUaOIcqWEDrDDp50MCBA0YLokDQRgx0p%2BdTezH4PDG88dxI8LotaeneU7AhZo6bPK5hwkVMERYuFDX6yLT2JDx99/fTVY2anibYiOCaPuGuayydDB%2BeUu2U30NG2AlCaFcRAmEo3QqaVLGynm30a6X5sHz2uMWksZH0pHXF9CIYeb/zho2CAqTgoMDvoTXCmJ3EI7isQRuVpw9KYqytyykhxk8qASuJoD84mNTKGvjveSLFQQwUeOaGCNE0Flqvs5o8b/9gZ8xwyMmj404NComZJyrzHtbLjTIjxZNv1X9C/S30pXqRrLVdd4lh7EjOX4oPfHAOHrzD9Np9l1RZMHnygeJ45kOZXxaPJ6byr6WueotdfAjhI73rGdu2ZXnn5oY7QM2OjZxx8hw%2BvPjCepf2bUfqJz/Llc1qHpb1OBAiosMpoFB5i%2BtOnLV%2BoTgL9ypYYZ8bZ0tOd6QmuUNbCiFMoN9GPM0TCbeXYoZcgvhr48kOyLlVF6AESf1UwV7G88jBbC/ISqsjzDb62wAC9UmydhoAaz6b/tWcIgQul7ntI8woMNCxQZstQOGSFYeqQriDeGI0Ud47jU2gIEae8kmtlZsWllpB6zNO2UXZwcg3rDXOO0jDbdhEIDoXs1zB6y1A4YHhP3iiuBMOJXh3tfJzuZ/qBbfX65nR5UGqmto8TUL2OoqAgZoWMNEY6KTMhOa%2Bt4ehCDfmxjz8c4X5y3UChp5hVk/j63Vpwuu0zdlNVTIrkuFfC1hkOobO%2B//Qw8LD/an26JDaFRsKI2KCWU76kCaOi6CoHYYnZY9d/DjAzllC/lDmFWz75EFevqdFmGIkbbL9hREsiI40yg/11wGhxex9PlXV%2BjEhatUU99ZQdUzpr%2BH08n1mkb1L%2BfiVf0rGs5Lo2nxkXT3HUPZ0S7WawAhsxrFy6HPwKJDY/zQqYehAPey1%2BDgDxfsSxkPwZPYaTmU7S7BPWDXkWLafayYLlWaaidW2cASK5nBWzJzOD3AG5YebCgqw5dvP4PoXab1Oveu3znK5xQIOPW31DZchL/6M6vv2sn%2B68scK3b1jDlo%2B6Hv6G878ij/e1M3cbtiQc3HML4vKZbWrbyTpowe3G1Z7SVH7e7cmHZmGXePSmtI4FhnQfVOAQMBNfhdse/CwvzsO/cf6ykapKlZpq0HCmlzxlc%2B6U2akK5c2XJNf3x4At3D29hdJUTrTnz0wxlwOrEIy5Kugum7BAyEtaGJwKVrH63mrSDn0besEdNTmz9XJ%2B6uGOoL%2BbAr/OXJJIoM77jryx%2Bh0iGL0mSENnc1FDX%2BO6gVWqZ2RfQ9I5oLQgj75fxO/q%2BvpJ9TnXTxlevr6cPjlyj5iUx2bb%2BsZ7UesqlgsayQWf/S8b7bHobC3QWYrv3rZ%2BwuXuhIs88/Y4v8vfWz4BvrdoBpj4BBejWE2W4/yupTGMJ%2BD21O/emf3j1t2bTNrYD8PgWkv7/FflvUwE8uFFelMAg2i8Uy05UTBlwCTAWtLUieJ8XA2MiQIxXX6xNYI%2B6XC3Wep%2Br5xz/Jsszij1qDVREprp4s4DJgGmjaMQzcUA5bgaNkRTbH3GxSf5SEVMoxRBUMlrnHMIB//ArounxbjgZZuWWtSzlokmyGkwWv4Bm8QwZ1GLpxZgUYcquHaRLgQ6A/SobJ4IiGpeyc7RE9ja55V/aKEOID5s/3R8loQjkeVsTzwmmeF2oYuFlamT5xFeII/4qh3LMmgR/oWT4/rEgPhONxWEKifUJW4mWikfpyvr5nBbNIkUQeD8BU7lm9fxyWHgDHA9fYQlzHg/0w/6qjuZzqdKwvb/J9PveiAl4Hz%2BE5q%2B8duKYXHjHSjkf6sXkqWyEZK4QFLIQ51iihWrr2CJKCeE6fzm2pax8Grm8e6acHDffth0YSLdF9CCoZvFye55okRU7gIetV1AkPuRJZSCfZUdefezJMYf3v0MhOwHVzLKlQxAWSRJlQlDr%2BzrPcUjjbGwbyBB2mCKH62/K7KwywjWM8b5CQq%2BH9x%2B%2BCSVZiFKH8eI4ldQQOz4jJ/P/Bt86QcSFPPVqZA50Qu4NwFK7i3tHK7HEEJ5reOFr5fwkK97jkk8ywAAAAAElFTkSuQmCC')  # pylint: disable=line-too-long
 
+LABEL_FOR_USER_BEING_DELETED = '[User being deleted]'
+USERNAME_FOR_USER_BEING_DELETED = 'UserBeingDeleted'
+
 
 class UserSettings(python_utils.OBJECT):
     """Value object representing a user's settings.
@@ -97,7 +100,7 @@ class UserSettings(python_utils.OBJECT):
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
             preferred_audio_language_code=None, pin=None, display_alias=None,
-            deleted=False):
+            deleted=False, created_on=None):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -140,6 +143,7 @@ class UserSettings(python_utils.OBJECT):
                 web because we don't use it there.
             deleted: bool. Whether the user has requested removal of their
                 account.
+            created_on: datetime.datetime. When the user was created on.
         """
         self.user_id = user_id
         self.email = email
@@ -167,6 +171,7 @@ class UserSettings(python_utils.OBJECT):
         self.pin = pin
         self.display_alias = display_alias
         self.deleted = deleted
+        self.created_on = created_on
 
     def validate(self):
         """Checks that the user_id, email, role, pin and display_alias
@@ -314,7 +319,8 @@ class UserSettings(python_utils.OBJECT):
                 self.preferred_audio_language_code),
             'pin': self.pin,
             'display_alias': self.display_alias,
-            'deleted': self.deleted
+            'deleted': self.deleted,
+            'created_on': self.created_on
         }
 
     @property
@@ -406,10 +412,11 @@ class UserAuthDetails(python_utils.OBJECT):
         gae_id: str. The ID of the user retrieved from GAE.
         parent_user_id: str or None. For profile users, the user ID of the full
             user associated with that profile. None for full users.
+        deleted: bool. Whether the user is marked as deleted and will be fully
+            deleted soon.
     """
 
-    def __init__(
-            self, user_id, gae_id, parent_user_id=None, deleted=False):
+    def __init__(self, user_id, gae_id, parent_user_id=None, deleted=False):
         """Constructs a UserAuthDetails domain object.
 
         Args:
@@ -463,6 +470,62 @@ class UserAuthDetails(python_utils.OBJECT):
             raise utils.ValidationError(
                 'The parent user ID and gae_id cannot be None together '
                 'for a user.')
+
+    def is_full_user(self):
+        """Whether the user is a full user (not a profile user).
+
+        Returns:
+            bool. True if user is full user, False otherwise.
+        """
+        return self.gae_id is not None
+
+
+class UserIdentifiers(python_utils.OBJECT):
+    """Value object representing a user's identification details.
+
+    Attributes:
+        user_id: str. The unique ID of the user.
+        gae_id: str. The ID of the user retrieved from GAE.
+        deleted: bool. Whether the user is marked as deleted and will be fully
+            deleted soon.
+    """
+
+    def __init__(self, gae_id, user_id, deleted=False):
+        """Constructs a UserIdentifiers domain object.
+
+        Args:
+            gae_id: str. The ID of the user retrieved from GAE.
+            user_id: str. The unique ID of the user.
+            deleted: bool. Whether the user has requested removal of their
+                account.
+        """
+        self.gae_id = gae_id
+        self.user_id = user_id
+        self.deleted = deleted
+
+    def validate(self):
+        """Checks that user_id and gae_id fields of this UserIdentifiers domain
+        object are valid.
+
+        Raises:
+            ValidationError. The user_id is not str.
+            ValidationError. The gae_id is not str.
+        """
+        if not isinstance(self.user_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % self.user_id)
+        if not self.user_id:
+            raise utils.ValidationError('No user id specified.')
+        if not is_user_id_valid(self.user_id):
+            raise utils.ValidationError('The user ID is in a wrong format.')
+
+        if not self.gae_id:
+            raise utils.ValidationError('No GAE id specified.')
+        if not isinstance(self.gae_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected gae_id to be a string, received %s' %
+                self.gae_id
+            )
 
 
 def is_user_id_valid(user_id):
@@ -531,24 +594,6 @@ def get_email_from_user_id(user_id):
     return user_settings.email
 
 
-def get_email_from_username(username):
-    """Gets the email for a given username.
-
-    Args:
-        username: str. Identifiable username to display in the UI.
-
-    Returns:
-        str or None. If the user with given username does not exist,
-        return None. Otherwise return the corresponding user_email.
-    """
-    user_model = user_models.UserSettingsModel.get_by_normalized_username(
-        UserSettings.normalize_username(username))
-    if user_model is None:
-        return None
-    else:
-        return user_model.email
-
-
 def get_user_id_from_username(username):
     """Gets the user_id for a given username.
 
@@ -585,7 +630,7 @@ def get_user_settings_from_username(username):
         return get_user_settings(user_model.id)
 
 
-def get_users_settings(user_ids, strict=False):
+def get_users_settings(user_ids, strict=False, include_marked_deleted=False):
     """Gets domain objects representing the settings for the given user_ids.
 
     Args:
@@ -593,6 +638,8 @@ def get_users_settings(user_ids, strict=False):
             domain objects for.
         strict: bool. Whether to fail noisily if one or more user IDs don't
             exist in the datastore. Defaults to False.
+        include_marked_deleted: bool. Whether to included users that are being
+            deleted. This should be used only for retrieving the usernames.
 
     Returns:
         list(UserSettings|None). The UserSettings domain objects corresponding
@@ -602,7 +649,8 @@ def get_users_settings(user_ids, strict=False):
     Raises:
         Exception. When strict mode is enabled and some user is not found.
     """
-    user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
+    user_settings_models = user_models.UserSettingsModel.get_multi(
+        user_ids, include_deleted=include_marked_deleted)
     if strict:
         for user_id, user_settings_model in python_utils.ZIP(
                 user_ids, user_settings_models):
@@ -619,6 +667,8 @@ def get_users_settings(user_ids, strict=False):
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:
+            if model is not None and model.deleted:
+                model.username = USERNAME_FOR_USER_BEING_DELETED
             result.append(
                 _get_user_settings_from_model(model)
                 if model is not None else None
@@ -723,11 +773,24 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     Raises:
         Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_auth_details_model = user_models.UserAuthDetailsModel.get_by_auth_id(
-        feconf.AUTH_METHOD_GAE, gae_id)
-    if user_auth_details_model is not None:
+    user_id = None
+    user_identifiers_model = (
+        user_models.UserIdentifiersModel.get(gae_id, strict=False))
+    # If the UserIdentifiersModels are not yet generated use
+    # UserAuthDetailsModel as the backup for retrieving the user_id.
+    # TODO(#11140): Remove this after we run the migration job.
+    if user_identifiers_model is None:
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.AUTH_METHOD_GAE, gae_id))
+        if user_auth_details_model is not None:
+            user_id = user_auth_details_model.id
+    else:
+        user_id = user_identifiers_model.user_id
+
+    if user_id is not None:
         user_settings = _get_user_settings_from_model(
-            user_models.UserSettingsModel.get_by_id(user_auth_details_model.id))
+            user_models.UserSettingsModel.get_by_id(user_id))
         return user_settings
     elif strict:
         logging.error('Could not find user with id %s' % gae_id)
@@ -1117,7 +1180,8 @@ def _get_user_settings_from_model(user_settings_model):
             user_settings_model.preferred_audio_language_code),
         pin=user_settings_model.pin,
         display_alias=user_settings_model.display_alias,
-        deleted=user_settings_model.deleted
+        deleted=user_settings_model.deleted,
+        created_on=user_settings_model.created_on
     )
 
 
@@ -1208,7 +1272,8 @@ def create_new_user(gae_id, email):
     Raises:
         Exception. A user with the given gae_id already exists.
     """
-    def _create_new_user_transactional(user_settings, user_auth_details):
+    def _create_new_user_transactional(
+            user_settings, user_auth_details, user_identifiers):
         """Save user models for new users as a transaction.
 
         Args:
@@ -1216,8 +1281,11 @@ def create_new_user(gae_id, email):
                 corresponding to the newly created user.
             user_auth_details: UserAuthDetails. The user auth details domain
                 object corresponding to the newly created user.
+            user_identifiers: UserIdentifiers. The user GAE ID to user ID domain
+                object corresponding to the newly created user.
         """
         _save_user_auth_details(user_auth_details)
+        _save_user_identifiers(user_identifiers)
         _save_user_settings(user_settings)
         create_user_contributions(user_settings.user_id, [], [])
 
@@ -1230,9 +1298,12 @@ def create_new_user(gae_id, email):
     user_settings = UserSettings(
         user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
-    user_auth_details = UserAuthDetails(user_id, gae_id)
     transaction_services.run_in_transaction(
-        _create_new_user_transactional, user_settings, user_auth_details)
+        _create_new_user_transactional,
+        user_settings,
+        UserAuthDetails(user_id, gae_id),
+        UserIdentifiers(gae_id, user_id)
+    )
     return user_settings
 
 
@@ -1290,8 +1361,7 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
         )
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 
-        user_auth_details = UserAuthDetails(
-            user_id, None, parent_user_id)
+        user_auth_details = UserAuthDetails(user_id, None, parent_user_id)
 
         # Each new profile user must be written to the datastore first and
         # because if we convert it into a batch write request, then calling
@@ -1411,6 +1481,35 @@ def _save_user_auth_details(user_auth_details):
         model.put()
 
 
+def _save_user_identifiers(user_identifiers):
+    """Puts the user identifiers object to the datastore.
+
+    Args:
+        user_identifiers: UserIdentifiers. The user identifiers domain object to
+            be saved.
+    """
+    user_identifiers.validate()
+
+    user_auth_details_dict = {
+        'user_id': user_identifiers.user_id,
+        'deleted': user_identifiers.deleted
+    }
+
+    # If user auth details entry with the given user_id does not exist, create
+    # a new one.
+    user_auth_details_model = user_models.UserIdentifiersModel.get_by_id(
+        user_identifiers.gae_id)
+    if user_auth_details_model is not None:
+        user_auth_details_model.populate(**user_auth_details_dict)
+    else:
+        user_auth_details_dict['id'] = user_identifiers.gae_id
+        user_auth_details_model = (
+            user_models.UserIdentifiersModel(**user_auth_details_dict))
+
+    user_auth_details_model.update_timestamps()
+    user_auth_details_model.put()
+
+
 def get_multiple_user_auth_details(user_ids):
     """Gets domain objects representing the auth details
     for the given user_ids.
@@ -1477,6 +1576,22 @@ def _get_user_auth_details_from_model(user_auth_details_model):
     )
 
 
+def _get_user_identifiers_from_model(user_identifiers_model):
+    """Transform UserIdentifiersModel to domain object.
+
+    Args:
+        user_identifiers_model: UserIdentifiersModel. The model to be converted.
+
+    Returns:
+        UserIdentifiers. Domain object for the user identifiers.
+    """
+    return UserIdentifiers(
+        gae_id=user_identifiers_model.id,
+        user_id=user_identifiers_model.user_id,
+        deleted=user_identifiers_model.deleted
+    )
+
+
 def get_pseudonymous_username(pseudonymous_id):
     """Get the username from pseudonymous ID.
 
@@ -1515,7 +1630,8 @@ def get_usernames(user_ids, strict=False):
     Returns:
         list(str|None). Containing usernames based on given user_ids.
         If a user_id does not exist, the corresponding entry in the
-        returned list is None.
+        returned list is None. Can also return username of pseudonymized user
+        or a temporary username of user that is being deleted.
     """
     usernames = [None] * len(user_ids)
     non_system_user_indices = []
@@ -1530,11 +1646,13 @@ def get_usernames(user_ids, strict=False):
             non_system_user_ids.append(user_id)
 
     non_system_users_settings = get_users_settings(
-        non_system_user_ids, strict=strict)
+        non_system_user_ids, strict=strict, include_marked_deleted=True)
 
     for index, user_settings in enumerate(non_system_users_settings):
         if user_settings:
-            usernames[non_system_user_indices[index]] = user_settings.username
+            usernames[non_system_user_indices[index]] = (
+                user_settings.username
+            )
 
     return usernames
 
@@ -1758,32 +1876,60 @@ def mark_user_for_deletion(user_id):
     )
     user_auth_details.deleted = True
     _save_user_auth_details(user_auth_details)
+    if user_auth_details.is_full_user():
+        user_identifiers = _get_user_identifiers_from_model(
+            user_models.UserIdentifiersModel.get_by_user_id(user_id)
+        )
+        user_identifiers.deleted = True
+        _save_user_identifiers(user_identifiers)
 
 
-def get_human_readable_user_ids(user_ids):
+def save_deleted_username(normalized_username):
+    """Save the username of deleted user.
+
+    Args:
+        normalized_username: str. Normalized version of the username to be
+            saved.
+    """
+    hashed_normalized_username = utils.convert_to_hash(
+        normalized_username, user_models.DeletedUsernameModel.ID_LENGTH
+    )
+    deleted_user_model = (
+        user_models.DeletedUsernameModel(id=hashed_normalized_username))
+    deleted_user_model.update_timestamps()
+    deleted_user_model.put()
+
+
+def get_human_readable_user_ids(user_ids, strict=True):
     """Converts the given ids to usernames, or truncated email addresses.
     Requires all users to be known.
 
     Args:
         user_ids: list(str). The list of user_ids to get UserSettings domain
             objects for.
+        strict: bool. Whether to fail noisily if no user with the given
+            id exists in the datastore. Defaults to True.
 
     Returns:
         list(str). List of usernames corresponding to given user_ids. If
         username does not exist, the corresponding entry in the returned
-        list is the user's truncated email address.
+        list is the user's truncated email address. If the user is scheduled to
+        be deleted USER_IDENTIFICATION_FOR_USER_BEING_DELETED is returned.
 
     Raises:
         Exception. At least one of the user_ids does not correspond to a valid
             UserSettingsModel.
     """
-    users_settings = get_users_settings(user_ids)
+    users_settings = get_users_settings(user_ids, include_marked_deleted=True)
     usernames = []
     for ind, user_settings in enumerate(users_settings):
         if user_settings is None:
-            logging.error('User id %s not known in list of user_ids %s' % (
-                user_ids[ind], user_ids))
-            raise Exception('User not found.')
+            if strict:
+                logging.error('User id %s not known in list of user_ids %s' % (
+                    user_ids[ind], user_ids))
+                raise Exception('User not found.')
+        elif user_settings.deleted:
+            usernames.append(LABEL_FOR_USER_BEING_DELETED)
         elif user_settings.username:
             usernames.append(user_settings.username)
         else:
