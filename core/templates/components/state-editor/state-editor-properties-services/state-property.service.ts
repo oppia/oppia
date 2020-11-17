@@ -44,7 +44,7 @@ export class StatePropertyService<StatePropertyType> {
   // The name of the setter method in ExplorationStatesService for this
   // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
   setterMethodKey: string;
-  _displayed: StatePropertyType;
+  private _displayed: StatePropertyType;
   stateName: string;
   savedMemento: StatePropertyType;
 
@@ -54,8 +54,12 @@ export class StatePropertyService<StatePropertyType> {
     this.setterMethodKey = null;
   }
 
-  get displayed(): StatePropertyType {
+  public get displayed() {
     return this._displayed;
+  }
+
+  public set displayed(theDisplayed: StatePropertyType) {
+    this._displayed = theDisplayed;
   }
 
   init(stateName: string, value: StatePropertyType): void {
@@ -66,7 +70,7 @@ export class StatePropertyService<StatePropertyType> {
     this.stateName = stateName;
     // The current value of the property (which may not have been saved to
     // the frontend yet). In general, this will be bound directly to the UI.
-    this._displayed = cloneDeep(value);
+    this.displayed = cloneDeep(value);
     // The previous (saved-in-the-frontend) value of the property. Here,
     // 'saved' means that this is the latest value of the property as
     // determined by the frontend change list.
@@ -96,7 +100,7 @@ export class StatePropertyService<StatePropertyType> {
       throw new Error('State property setter method key cannot be null.');
     }
 
-    this._displayed = this._normalize(this.displayed);
+    this.displayed = this._normalize(this.displayed);
     if (!this._isValid(this.displayed) || !this.hasChanged()) {
       this.restoreFromMemento();
       return;
@@ -113,7 +117,7 @@ export class StatePropertyService<StatePropertyType> {
 
   // Reverts the displayed value to the saved memento.
   restoreFromMemento(): void {
-    this._displayed = cloneDeep(this.savedMemento);
+    this.displayed = cloneDeep(this.savedMemento);
   }
 }
 
