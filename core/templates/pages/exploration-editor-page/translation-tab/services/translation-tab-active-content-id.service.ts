@@ -31,8 +31,8 @@ import { RecordedVoiceovers } from
 })
 export class TranslationTabActiveContentIdService {
 
-  private activeContentId: string;
-  private activeDataFormat: string;
+  private activeContentId: string = null;
+  private activeDataFormat: string = null;
   private _activeContentIdChangedEventEmitter = new EventEmitter();
 
   constructor(
