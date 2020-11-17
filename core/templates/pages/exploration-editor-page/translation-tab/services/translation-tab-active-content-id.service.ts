@@ -55,7 +55,7 @@ export class TranslationTabActiveContentIdService {
     this._activeContentIdChangedEventEmitter.emit(dataFormat);
   }
 
-  get onActiveContentIdChanged(): EventEmitter {
+  get onActiveContentIdChanged() {
     return this._activeContentIdChangedEventEmitter;
   }
 }
