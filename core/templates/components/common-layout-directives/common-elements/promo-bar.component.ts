@@ -33,8 +33,8 @@ export class PromoBarComponent implements OnInit {
   promoIsVisible: boolean;
   promoBarIsEnabled: boolean;
   promoBarMessage: string;
-  
-  constructor (
+
+  constructor(
     private promoBarBackendApiService: PromoBarBackendApiService,
     private windowRef: WindowRef,
   ) {}
@@ -46,22 +46,23 @@ export class PromoBarComponent implements OnInit {
         this.promoBarMessage = promoBar.promoBarMessage;
       });
 
-      this.promoIsVisible = !this.isPromoDismissed();
-  };
+    this.promoIsVisible = !this.isPromoDismissed();
+  }
 
   isPromoDismissed(): boolean {
     if (!this.isSessionStorageAvailable()) {
       return false;
     }
-    return !!angular.fromJson(this.windowRef.nativeWindow.sessionStorage.promoIsDismissed);
+    return !!angular.fromJson(
+      this.windowRef.nativeWindow.sessionStorage.promoIsDismissed);
   }
 
   setPromoDismissed(promoIsDismissed: boolean): boolean {
     if (!this.isSessionStorageAvailable()) {
       return false;
     }
-    this.windowRef.nativeWindow.sessionStorage.promoIsDismissed = angular.toJson(
-      promoIsDismissed);
+    this.windowRef.nativeWindow.sessionStorage.promoIsDismissed =
+      angular.toJson(promoIsDismissed);
   }
 
   isSessionStorageAvailable(): boolean {
@@ -76,7 +77,7 @@ export class PromoBarComponent implements OnInit {
     }
   }
 
-  dismissPromo() {
+  dismissPromo(): void {
     this.promoIsVisible = false;
     this.setPromoDismissed(true);
   }
