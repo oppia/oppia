@@ -350,7 +350,6 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en',
             },
             {
                 'server_mode': FEATURE_STAGES.dev,

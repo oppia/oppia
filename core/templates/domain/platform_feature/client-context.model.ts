@@ -19,7 +19,6 @@
 export interface ClientContextBackendDict {
   'client_type': string;
   'browser_type': string;
-  'user_locale': string;
 }
 
 /**
@@ -29,19 +28,16 @@ export interface ClientContextBackendDict {
 export class ClientContext {
   readonly clientType: string;
   readonly browserType: string;
-  readonly userLocale: string;
 
   constructor(
-      clientType: string, browserType: string, userLocale: string) {
+      clientType: string, browserType: string) {
     this.clientType = clientType;
     this.browserType = browserType;
-    this.userLocale = userLocale;
   }
 
   static create(
-      clientType: string, browserType: string, userLocale: string
-  ): ClientContext {
-    return new ClientContext(clientType, browserType, userLocale);
+      clientType: string, browserType: string): ClientContext {
+    return new ClientContext(clientType, browserType);
   }
 
   /**
@@ -54,7 +50,6 @@ export class ClientContext {
     return {
       client_type: this.clientType,
       browser_type: this.browserType,
-      user_locale: this.userLocale,
     };
   }
 }

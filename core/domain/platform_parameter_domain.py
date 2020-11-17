@@ -33,8 +33,6 @@ SERVER_MODES = utils.create_enum('dev', 'test', 'prod') # pylint: disable=invali
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
 DATA_TYPES = utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
 
-ALLOWED_USER_LOCALES = [
-    lang_dict['id'] for lang_dict in constants.SUPPORTED_SITE_LANGUAGES]
 ALLOWED_SERVER_MODES = [
     SERVER_MODES.dev, SERVER_MODES.test, SERVER_MODES.prod]
 ALLOWED_FEATURE_STAGES = [
@@ -70,12 +68,10 @@ class EvaluationContext(python_utils.OBJECT):
     """Domain object representing the context for parameter evaluation."""
 
     def __init__(
-            self, client_type, browser_type,
-            app_version, user_locale, server_mode):
+            self, client_type, browser_type, app_version, server_mode):
         self._client_type = client_type
         self._browser_type = browser_type
         self._app_version = app_version
-        self._user_locale = user_locale
         self._server_mode = server_mode
 
     @property
@@ -108,17 +104,6 @@ class EvaluationContext(python_utils.OBJECT):
         return self._app_version
 
     @property
-    def user_locale(self):
-        """Returns client locale.
-
-        Returns:
-            str. The client locale, e.g. 'en', 'es', 'ar'. This must be the id
-            of a supported language specified in SUPPORTED_SITE_LANGUAGES in
-            constants.ts.
-        """
-        return self._user_locale
-
-    @property
     def server_mode(self):
         """Returns the server mode of Oppia.
 
@@ -143,9 +128,7 @@ class EvaluationContext(python_utils.OBJECT):
         """
         return (
             self._client_type is not None and
-            self._client_type in ALLOWED_CLIENT_TYPES and
-            self._user_locale is not None and
-            self._user_locale in ALLOWED_USER_LOCALES)
+            self._client_type in ALLOWED_CLIENT_TYPES)
 
     def validate(self):
         """Validates the EvaluationContext domain object, raising an exception
@@ -194,7 +177,6 @@ class EvaluationContext(python_utils.OBJECT):
             client_context_dict.get('client_type'),
             client_context_dict.get('browser_type'),
             client_context_dict.get('app_version'),
-            client_context_dict.get('user_locale'),
             server_context_dict.get('server_mode'),
         )
 
@@ -203,13 +185,12 @@ class PlatformParameterFilter(python_utils.OBJECT):
     """Domain object for filters in platform parameters."""
 
     SUPPORTED_FILTER_TYPES = [
-        'server_mode', 'user_locale', 'client_type', 'browser_type',
-        'app_version', 'app_version_flavor',
+        'server_mode', 'client_type', 'browser_type', 'app_version',
+        'app_version_flavor',
     ]
 
     SUPPORTED_OP_FOR_FILTERS = {
         'server_mode': ['='],
-        'user_locale': ['='],
         'client_type': ['='],
         'browser_type': ['='],
         'app_version_flavor': ['=', '<', '<=', '>', '>='],
@@ -276,8 +257,6 @@ class PlatformParameterFilter(python_utils.OBJECT):
         matched = False
         if self._type == 'server_mode' and op == '=':
             matched = context.server_mode == value
-        elif self._type == 'user_locale' and op == '=':
-            matched = context.user_locale == value
         elif self._type == 'client_type' and op == '=':
             matched = context.client_type == value
         elif self._type == 'browser_type' and op == '=':
@@ -310,12 +289,6 @@ class PlatformParameterFilter(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'Invalid server mode \'%s\', must be one of %s.' % (
                             mode, ALLOWED_SERVER_MODES))
-        elif self._type == 'user_locale':
-            for _, locale in self._conditions:
-                if locale not in ALLOWED_USER_LOCALES:
-                    raise utils.ValidationError(
-                        'Invalid user locale \'%s\', must be one of %s.' % (
-                            locale, ALLOWED_USER_LOCALES))
         elif self._type == 'client_type':
             for _, client_type in self._conditions:
                 if client_type not in ALLOWED_CLIENT_TYPES:

@@ -93,7 +93,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -102,7 +101,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
         self.assertEqual(context.client_type, 'Android')
         self.assertEqual(context.browser_type, None)
         self.assertEqual(context.app_version, '1.0.0')
-        self.assertEqual(context.user_locale, 'en')
         self.assertEqual(context.server_mode, 'dev')
 
     def test_is_valid_with_invalid_client_type_returns_false(self):
@@ -111,21 +109,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'client_type': 'invalid',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
-            },
-            {
-                'server_mode': 'dev',
-            },
-        )
-        self.assertFalse(context.is_valid)
-
-    def test_is_valid_with_invalid_user_locale_returns_false(self):
-        context = parameter_domain.EvaluationContext.from_dict(
-            {
-                'client_type': 'Android',
-                'browser_type': None,
-                'app_version': '1.0.0',
-                'user_locale': 'invalid',
             },
             {
                 'server_mode': 'dev',
@@ -139,7 +122,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -152,7 +134,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             {
                 'client_type': 'Web',
                 'browser_type': 'Chrome',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -165,7 +146,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             {
                 'client_type': 'Backend',
                 'app_version': '3.0.0',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -179,7 +159,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -193,7 +172,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'client_type': 'invalid',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -208,7 +186,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'client_type': 'Web',
                 'browser_type': 'Invalid',
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -224,7 +201,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': 'a.a.a',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -241,7 +217,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0.0',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -257,7 +232,6 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0-abcedef-invalid',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -267,28 +241,12 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid version flavor \'invalid\''):
             context.validate()
 
-    def test_validate_with_invalid_user_locale_does_not_raise_exception(self):
-        context = parameter_domain.EvaluationContext.from_dict(
-            {
-                'client_type': 'Android',
-                'browser_type': None,
-                'app_version': '1.0.0',
-                'user_locale': 'invalid',
-            },
-            {
-                'server_mode': 'dev',
-            },
-        )
-        # No exception should be raised since invalid user locales are ignored.
-        context.validate()
-
     def test_validate_with_invalid_server_mode_raises_exception(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'invalid',
@@ -304,7 +262,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
     def _create_example_context(
             self, client_type='Android', browser_type=None, app_version='1.2.3',
-            user_locale='en', mode='dev'):
+            mode='dev'):
         """Creates and returns an EvaluationContext using the given
         arguments.
         """
@@ -313,7 +271,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 'client_type': client_type,
                 'browser_type': browser_type,
                 'app_version': app_version,
-                'user_locale': user_locale,
             },
             {
                 'server_mode': mode,
@@ -382,24 +339,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
 
         prod_context = self._create_example_context(mode='prod')
         self.assertFalse(filter_domain.evaluate(prod_context))
-
-    def test_evaluate_en_user_locale_filter_with_en_locale_returns_true(self):
-        filter_dict = {'type': 'user_locale', 'conditions': [('=', 'en')]}
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-
-        en_context = self._create_example_context(user_locale='en')
-        self.assertTrue(filter_domain.evaluate(en_context))
-
-    def test_evaluate_en_user_locale_filter_with_zh_locale_returns_false(self):
-        filter_dict = {'type': 'user_locale', 'conditions': [('=', 'en')]}
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(filter_dict))
-
-        zh_context = self._create_example_context(user_locale='zh-hans')
-        self.assertFalse(filter_domain.evaluate(zh_context))
 
     def test_eval_backend_client_filter_with_backend_client_returns_true(self):
         filter_dict = {'type': 'client_type', 'conditions': [('=', 'Backend')]}
@@ -1177,16 +1116,6 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid server mode \'invalid\''):
             filter_domain.validate()
 
-    def test_validate_filter_with_invalid_user_locale_raises_exception(self):
-        filter_domain = (
-            parameter_domain
-            .PlatformParameterFilter.from_dict(
-                {'type': 'user_locale', 'conditions': [('=', 'invalid')]}
-            ))
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid user locale \'invalid\''):
-            filter_domain.validate()
-
     def test_validate_filter_with_invalid_client_type_raises_exception(self):
         filter_domain = (
             parameter_domain
@@ -1290,7 +1219,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
             {
                 'filters': [
                     {'type': 'app_version', 'conditions': [('=', '1.2.3')]},
-                    {'type': 'user_locale', 'conditions': [('=', 'en')]},
+                    {'type': 'client_type', 'conditions': [('=', 'Android')]},
                 ],
                 'value_when_matched': 'matched_val',
             },
@@ -1300,7 +1229,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -1313,7 +1241,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
             {
                 'filters': [
                     {'type': 'app_version', 'conditions': [('=', '1.2.3')]},
-                    {'type': 'user_locale', 'conditions': [('=', 'en-UK')]},
+                    {'type': 'client_type', 'conditions': [('=', 'Web')]},
                 ],
                 'value_when_matched': 'matched_val',
             },
@@ -1323,7 +1251,6 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -1663,7 +1590,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -1699,7 +1625,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'prod',
@@ -1735,7 +1660,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'client_type': 'invalid',
                 'browser_type': None,
                 'app_version': '1.2.3',
-                'user_locale': 'en',
             },
             {
                 'server_mode': 'dev',
@@ -1768,78 +1692,6 @@ class PlatformParameterTests(test_utils.GenericTestBase):
 
         dev_context = parameter_domain.EvaluationContext.from_dict(
             {
-                'browser_type': None,
-                'app_version': '1.2.3',
-                'user_locale': 'en',
-            },
-            {
-                'server_mode': 'dev',
-            },
-        )
-        self.assertEqual(parameter.evaluate(dev_context), '111')
-
-    def test_evaluate_matching_feature_invalid_user_locale_returns_def(self):
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': 'for test',
-            'data_type': 'string',
-            'rules': [
-                {
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
-                        }
-                    ],
-                    'value_when_matched': '222'
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '111',
-            'is_feature': False,
-            'feature_stage': None,
-        })
-
-        dev_context = parameter_domain.EvaluationContext.from_dict(
-            {
-                'client_type': 'Android',
-                'browser_type': None,
-                'app_version': '1.2.3',
-                'user_locale': 'invalid',
-            },
-            {
-                'server_mode': 'dev',
-            },
-        )
-        self.assertEqual(parameter.evaluate(dev_context), '111')
-
-    def test_evaluate_matching_feature_missing_user_locale_returns_def(self):
-        parameter = parameter_domain.PlatformParameter.from_dict({
-            'name': 'parameter_a',
-            'description': 'for test',
-            'data_type': 'string',
-            'rules': [
-                {
-                    'filters': [
-                        {
-                            'type': 'server_mode',
-                            'conditions': [('=', 'dev')]
-                        }
-                    ],
-                    'value_when_matched': '222'
-                }
-            ],
-            'rule_schema_version': (
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            'default_value': '111',
-            'is_feature': False,
-            'feature_stage': None,
-        })
-
-        dev_context = parameter_domain.EvaluationContext.from_dict(
-            {
-                'client_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
             },
