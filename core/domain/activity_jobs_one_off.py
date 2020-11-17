@@ -704,8 +704,12 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('Found commit log model-%s' % class_name, 1)
             return
 
-        if parent_model is None or parent_model.deleted:
+        if parent_model is None:
             yield ('Missing Parent Model-No changes-%s' % class_name, 1)
+            return
+
+        if parent_model.deleted:
+            yield ('Deleted Parent Model-No changes-%s' % class_name, 1)
             return
 
         commit_log_model = model_properties['commit_log_model_class'](

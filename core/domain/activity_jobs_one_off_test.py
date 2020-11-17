@@ -2232,7 +2232,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'Missing Parent Model-No changes-' +
+                'Deleted Parent Model-No changes-' +
                 'ExplorationRightsSnapshotMetadataModel',
                 1
             ]
