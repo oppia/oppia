@@ -201,8 +201,6 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
-      - webpack_build:
-          target_env: "prod"
       - run:
           name: Run e2e publication test
           command: |
@@ -236,8 +234,6 @@ jobs:
       - run:
           name: Set up python by installing protobuf and enum
           command: pip install enum34==1.1.10 protobuf==3.13.0
-      - webpack_build:
-          target_env: "prod"
       - run:
           name: Run e2e users test
           command: |
