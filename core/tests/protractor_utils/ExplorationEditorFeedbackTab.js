@@ -65,7 +65,6 @@ var ExplorationEditorFeedbackTab = function() {
       suggestionDescription));
     expect(await matchingRow.isDisplayed()).toBe(true);
     await matchingRow.click();
-    expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await action.click('View suggestion button', viewSuggestionButton);
     expect(await acceptSuggestionButton.isDisplayed()).toBe(true);
     await suggestionCommitMessageInput.sendKeys('Commit message');
@@ -127,7 +126,6 @@ var ExplorationEditorFeedbackTab = function() {
       suggestionDescription));
     expect(await matchingRow.isDisplayed()).toBe(true);
     await matchingRow.click();
-    expect(await viewSuggestionButton.isDisplayed()).toBe(true);
     await action.click('View suggestion button', viewSuggestionButton);
     expect(await rejectSuggestionButton.isDisplayed()).toBe(true);
     await suggestionReviewMessageInput.sendKeys('Review message');
