@@ -54,11 +54,11 @@ export class StatePropertyService<StatePropertyType> {
     this.setterMethodKey = null;
   }
 
-  public get displayed() {
+  get displayed() {
     return this._displayed;
   }
 
-  public set displayed(theDisplayed: StatePropertyType) {
+  set displayed(theDisplayed: StatePropertyType) {
     this._displayed = theDisplayed;
   }
 
