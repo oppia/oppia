@@ -112,17 +112,17 @@ commands:
             equal: [ "prod", << parameters.target_env >> ]
           steps:
             - run:
-              name: Builds Javascript files (prod mode)
-              command: |
-                python -m scripts.run_e2e_tests --deparallelize_terser --prod_env --build-only
+                name: Builds Javascript files (prod mode)
+                command: |
+                  python -m scripts.run_e2e_tests --deparallelize_terser --prod_env --build-only
       - when:
           condition:
             equal: [ "dev", << parameters.target_env >> ]
           steps:
             - run:
-              name: Builds Javascript files (dev mode)
-              command: |
-                python -m scripts.run_e2e_tests --deparallelize_terser --build-only
+                name: Builds Javascript files (dev mode)
+                command: |
+                  python -m scripts.run_e2e_tests --deparallelize_terser --build-only
 
 jobs:
   setup_and_typescript_tests:
