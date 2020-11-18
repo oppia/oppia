@@ -45,7 +45,8 @@ export class TranslationsBackendApiService {
 
   async loadTranslationFileAsync(url: string): Promise<Object> {
     return this.http.get<TranslationsDict>(
-      this.urlInterpolationService.getStaticAssetUrl(url), { observe: 'response' }).toPromise();
+      this.urlInterpolationService
+        .getStaticAssetUrl(url), { observe: 'response' }).toPromise();
   }
 }
 
