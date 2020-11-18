@@ -271,10 +271,10 @@ export class PlatformFeatureService {
    * client information.
    */
   private generateClientContext(): ClientContext {
-    const clientType = 'Web';
+    const platformType = 'Web';
     const browserType = this.browserCheckerService.detectBrowserType();
 
-    return ClientContext.create(clientType, browserType);
+    return ClientContext.create(platformType, browserType);
   }
 
   /**

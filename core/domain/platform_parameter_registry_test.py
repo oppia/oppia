@@ -347,7 +347,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
     def test_evaluate_all_parameters(self):
         context = parameter_domain.EvaluationContext.from_dict(
             {
-                'client_type': 'Android',
+                'platform_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.2.3',
             },

@@ -36,7 +36,7 @@ class PlatformFeaturesEvaluationHandler(base.BaseHandler):
         the given client information.
         """
         context_dict = {
-            'client_type': self.request.get('client_type', None),
+            'platform_type': self.request.get('platform_type', None),
             'browser_type': self.request.get('browser_type', None),
             'app_version': self.request.get('app_version', None),
         }

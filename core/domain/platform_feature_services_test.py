@@ -116,7 +116,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client(
                 {
-                    'client_type': 'Android',
+                    'platform_type': 'Android',
                     'browser_type': None,
                     'app_version': '1.0.0',
                 }
@@ -124,7 +124,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             self.assertEqual(
                 context.server_mode,
                 platform_parameter_domain.FEATURE_STAGES.dev)
-            self.assertEqual(context.client_type, 'Android')
+            self.assertEqual(context.platform_type, 'Android')
             self.assertEqual(context.browser_type, None)
             self.assertEqual(context.app_version, '1.0.0')
 
@@ -140,7 +140,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_values_in_dev_returns_correct_values(self):
         with self.swap(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client({
-                'client_type': 'Android',
+                'platform_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
             })
@@ -155,7 +155,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_values_in_prod_returns_correct_values(self):
         with self.swap(constants, 'DEV_MODE', False):
             context = feature_services.create_evaluation_context_for_client({
-                'client_type': 'Android',
+                'platform_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
             })
@@ -205,7 +205,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                             ],
                         },
                         {
-                            'type': 'client_type',
+                            'type': 'platform_type',
                             'conditions': [
                                 [
                                     '=',

@@ -23,7 +23,7 @@ describe('Client Context Model', () => {
   it('should create an instance.', () => {
     const context = ClientContext.create('Web', 'Chrome');
 
-    expect(context.clientType).toEqual('Web');
+    expect(context.platformType).toEqual('Web');
     expect(context.browserType).toEqual('Chrome');
   });
 
@@ -31,7 +31,7 @@ describe('Client Context Model', () => {
     const context = ClientContext.create('Web', 'Chrome');
 
     expect(context.toBackendDict()).toEqual({
-      client_type: 'Web',
+      platform_type: 'Web',
       browser_type: 'Chrome',
     });
   });

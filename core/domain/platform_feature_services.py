@@ -165,7 +165,7 @@ def _create_evaluation_context_for_server():
     """
     return platform_parameter_domain.EvaluationContext.from_dict(
         {
-            'client_type': 'Backend',
+            'platform_type': 'Backend',
             'app_version': None,
         },
         {
