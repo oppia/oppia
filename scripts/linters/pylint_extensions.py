@@ -1884,8 +1884,8 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
         """
         line_number = node.lineno + len(node.doc.split('\n')) + 1
         if line_number != node.body[0].lineno:
-            self.add_message(
-                'blank-line-below-function-definition', node=node)
+            #self.add_message(
+                #'blank-line-below-function-definition', node=node)
 
 
 def register(linter):
