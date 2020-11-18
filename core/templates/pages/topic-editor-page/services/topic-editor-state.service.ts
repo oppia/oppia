@@ -210,6 +210,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           topicId).then(function(newBackendTopicRightsObject) {
           _updateTopicRights(newBackendTopicRightsObject);
           _topicIsLoading = false;
+          $rootScope.$applyAsync();
         }, function(error) {
           AlertsService.addWarning(
             error ||
