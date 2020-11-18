@@ -129,9 +129,9 @@ def _update_collection_summary(activity_rights):
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
-
     from core.domain import collection_services
-    collection_services.regenerate_collection_summary(activity_rights.id, None)
+    collection_services.regenerate_collection_summary_and_contributors_summary(
+        activity_rights.id)
 
 
 def _update_activity_summary(activity_type, activity_rights):

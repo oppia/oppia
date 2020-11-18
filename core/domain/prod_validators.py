@@ -4015,5 +4015,10 @@ class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
                 'user_settings_ids',
                 user_models.UserSettingsModel,
                 [item.user_id]
+            ),
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_auth_details_ids',
+                user_models.UserAuthDetailsModel,
+                [item.user_id]
             )
         ]
