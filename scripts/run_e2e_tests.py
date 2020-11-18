@@ -561,6 +561,7 @@ def get_flaky_tests_data_from_sheets(sheet):
     """
     sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
     if sheet_id is None:
+        print_color_message('FLAKY_E2E_TEST_SHEET_ID value not found.')
         return {}
     flaky_tests_dict = collections.defaultdict(
         lambda: collections.defaultdict(list))
@@ -611,6 +612,7 @@ def _get_flaky_test_log_sheet():
     """Authenticate and return sheet object for google spreadsheet."""
     google_auth_decode_password = os.getenv('GOOGLE_AUTH_DECODE_PASSWORD')
     if google_auth_decode_password is None:
+        print_color_message('GOOGLE_AUTH_DECODE_PASSWORD value not found.')
         return []
 
     with python_utils.open_file(
