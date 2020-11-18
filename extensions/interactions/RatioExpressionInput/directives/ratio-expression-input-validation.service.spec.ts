@@ -129,21 +129,16 @@ describe('RatioExpressionInputValidationService', () => {
     });
 
     // The second rule will never get matched.
-    answerGroups[0].rules = [isEquivalent, isEquivalentNonSimplified];
+    answerGroups[0].rules = [isEquivalentNonSimplified, isEquivalent];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' provided input is not in its simplest form.'
-    }, {
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
       ' it is preceded by a \'IsEquivalent\' rule with a matching' +
       ' input.'
-    }
-    ]);
+    }]);
 
     let equalFourTerms = rof.createFromBackendDict({
       rule_type: 'Equals',
