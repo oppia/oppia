@@ -1298,7 +1298,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
-            expected_args=[(True, 'error')])
+            expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
@@ -1423,7 +1423,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
-            expected_args=[(True, 'error')])
+            expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
@@ -1601,7 +1601,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
-            expected_args=[(True, 'error')])
+            expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
@@ -1730,7 +1730,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         start_google_app_engine_server_swap = self.swap_with_checks(
             run_e2e_tests, 'start_google_app_engine_server',
             mock_start_google_app_engine_server,
-            expected_args=[(True, 'error')])
+            expected_args=[(True, 'critical')])
         wait_swap = self.swap_with_checks(
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open,
