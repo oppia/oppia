@@ -126,6 +126,14 @@ describe('Interactions', function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
     await workflow.createExploration();
+
+    var dismissWelcomeModalButton = element(
+      by.css('.protractor-test-dismiss-welcome-modal'));
+    await waitFor.elementToBeClickable(
+      dismissWelcomeModalButton,
+      'Welcome modal is taking too long to appear');
+    await explorationEditorMainTab.exitTutorial();
+
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
