@@ -43,6 +43,8 @@ class PendingDeletionRequestUnitTests(test_utils.GenericTestBase):
         self.assertEqual(default_pending_deletion.user_id, self.user_id_a)
         self.assertEqual(default_pending_deletion.email, 'a@example.com')
         self.assertEqual(default_pending_deletion.role, self.role)
+        self.assertIsNone(
+            default_pending_deletion.normalized_long_term_username)
         self.assertEqual(default_pending_deletion.deletion_complete, False)
         self.assertEqual(
             default_pending_deletion.pseudonymizable_entity_mappings, {})
