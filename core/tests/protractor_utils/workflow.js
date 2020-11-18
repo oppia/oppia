@@ -93,6 +93,8 @@ var createExplorationAndStartTutorial = async function() {
       'createExplorationButton takes too long to be clickable.');
     await createExplorationButton.click();
   }
+
+  await browser.sleep(5000);
 };
 
 /**
