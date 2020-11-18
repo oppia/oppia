@@ -48,7 +48,7 @@ require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 
 angular.module('oppia').controller('CustomizeInteractionModalController', [
-  '$controller', '$injector', '$scope', '$uibModalInstance',
+  '$controller', '$injector', '$scope', '$uibModal', '$uibModalInstance',
   'EditorFirstTimeEventsService',
   'InteractionDetailsCacheService', 'InteractionObjectFactory',
   'StateCustomizationArgsService', 'StateEditorService',
@@ -60,7 +60,7 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
   'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
   'INTERACTION_SPECS',
   function(
-      $controller, $injector, $scope, $uibModalInstance,
+      $controller, $injector, $scope, $uibModal, $uibModalInstance,
       EditorFirstTimeEventsService,
       InteractionDetailsCacheService, InteractionObjectFactory,
       StateCustomizationArgsService, StateEditorService,
@@ -233,6 +233,27 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
       } else {
         return warningMessages.join(' ');
       }
+    };
+
+    $scope.cancelWithConfirm = function() {
+      // Do nothing if the confirmation modal is already open.
+      if ($('.modal-title').text().includes('Confirmation Required')) {
+        return;
+      }
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration-editor-page/modal-templates/' +
+          'confirm-leave-modal.template.html'),
+        backdrop: 'static',
+        keyboard: false,
+        controller: 'ConfirmOrCancelModalController'
+      }).result.then(function() {
+        $scope.cancel();
+      }, function() {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
     };
 
     /**
