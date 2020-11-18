@@ -25,6 +25,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { UserBackendApiService } from 'services/user-backend-api.service.ts';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Translation opportunities component', function() {
   var ctrl = null;
@@ -38,6 +39,8 @@ describe('Translation opportunities component', function() {
 
   var opportunitiesArray = [];
   var activeLanguageChangedEmitter = new EventEmitter();
+
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
