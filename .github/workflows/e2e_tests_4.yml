@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e:
+  e2e_group_4:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:

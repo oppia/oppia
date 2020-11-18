@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e:
+  e2e_group_5:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -45,4 +45,3 @@ jobs:
       - name: Run Embedding E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="embedding" --prod_env
-

@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e:
+  e2e_group_1:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -39,9 +39,9 @@ jobs:
       - name: Run Exploration Translation Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationTranslationTab" --prod_env
-      - name: Run Learner Dashboard E2E Test
-        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env
       - name: Run Classroom Page E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="classroomPage" --prod_env
+      - name: Run Core Editor And Player E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="coreEditorAndPlayerFeatures" --prod_env
