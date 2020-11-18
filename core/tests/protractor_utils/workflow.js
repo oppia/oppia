@@ -31,6 +31,8 @@ var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
   '.protractor-thumbnail-reset-button'));
+var stateNameInput = element(
+  by.css('.protractor-test-state-name-input'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -94,7 +96,8 @@ var createExplorationAndStartTutorial = async function() {
     await createExplorationButton.click();
   }
 
-  await browser.sleep(5000);
+  await waitFor.visibilityOf(
+    stateNameInput, 'State name input takes too long to appear.');
 };
 
 /**

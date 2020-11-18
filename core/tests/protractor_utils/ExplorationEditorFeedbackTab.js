@@ -57,6 +57,8 @@ var ExplorationEditorFeedbackTab = function() {
    * Workflows
    */
   this.acceptSuggestion = async function(suggestionDescription) {
+    await waitFor.visibilityOf(
+      suggestionRowClassName, 'Suggestion row takes too long to appear');
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
@@ -116,6 +118,8 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.rejectSuggestion = async function(suggestionDescription) {
+    await waitFor.visibilityOf(
+      suggestionRowClassName, 'Suggestion row takes too long to appear');
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
