@@ -60,12 +60,10 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.NEW_USER_1_ID,
-            gae_id='gae_1_id',
             email='some@email.com'
         ).put()
         user_models.UserSettingsModel(
             id=self.NEW_USER_2_ID,
-            gae_id='gae_2_id',
             email='some_other@email.com'
         ).put()
 
@@ -461,9 +459,15 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         user_data = feedback_models.GeneralFeedbackThreadUserModel.export_data(
             self.USER_ID_A)
         expected_data = {
-            self.THREAD_ID_A: self.MESSAGE_IDS_READ_IN_THREAD_A,
-            self.THREAD_ID_B: self.MESSAGE_IDS_READ_IN_THREAD_B,
-            self.THREAD_ID_C: self.MESSAGE_IDS_READ_IN_THREAD_C
+            self.THREAD_ID_A: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_IN_THREAD_A
+            },
+            self.THREAD_ID_B: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_IN_THREAD_B
+            },
+            self.THREAD_ID_C: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_IN_THREAD_C
+            }
         }
         self.assertDictEqual(expected_data, user_data)
 
@@ -480,12 +484,7 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            feedback_models.FeedbackAnalyticsModel
-            .has_reference_to_user_id('id_x'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):

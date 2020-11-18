@@ -19,9 +19,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import copy
+import imghdr
 
 from core import jobs
 from core.domain import exp_fetchers
+from core.domain import image_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -78,49 +80,6 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
-
-
-# TODO(#10178): Remove the following migration job once we have verified
-# that UserAuthDetailsModels exists for every user.
-class PopulateUserAuthDetailsModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for creating and populating UserAuthDetailsModel for
-    all registered users.
-    """
-
-    @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        """Marks a job as queued and adds it to a queue for processing."""
-        super(PopulateUserAuthDetailsModelOneOffJob, cls).enqueue(
-            job_id, shard_count=64)
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function for this job."""
-
-        # Assumptions:
-        # 1) We are only having full users in the database, and no
-        #    profile users (For profiles we need to do a role check also and
-        #    ensure the gae_id attribute is None for them).
-        # 2) This migration assumes that, once a gae_id is assigned to a user,
-        #    it cannot be updated. Currently, there is no way to do so, but the
-        #    migration job would need modifications if it has to work in such a
-        #    setting in future.
-
-        user_models.UserAuthDetailsModel(
-            id=item.id,
-            gae_id=item.gae_id,
-            deleted=item.deleted
-        ).put()
-        yield ('SUCCESS - Created UserAuthDetails model', 1)
-
-    @staticmethod
-    def reduce(key, user_counter):
-        yield (key, len(user_counter))
 
 
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -445,8 +404,7 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
 
 
 class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the gae_user_id from the UserSettingsModel.
-    """
+    """Job that deletes the gae_user_id from the UserSettingsModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -461,6 +419,39 @@ class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             del user_settings_model._properties['gae_user_id']  # pylint: disable=protected-access
             if 'gae_user_id' in user_settings_model._values:  # pylint: disable=protected-access
                 del user_settings_model._values['gae_user_id']  # pylint: disable=protected-access
+            user_settings_model.update_timestamps(
+                update_last_updated_time=False)
+            user_settings_model.put()
+            yield (
+                'SUCCESS_REMOVED - UserSettingsModel', user_settings_model.id)
+        else:
+            yield (
+                'SUCCESS_ALREADY_REMOVED - UserSettingsModel',
+                user_settings_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
+class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes the gae_id from the UserSettingsModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_settings_model):
+        # This is the only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'gae_id' in user_settings_model._properties:  # pylint: disable=protected-access
+            del user_settings_model._properties['gae_id']  # pylint: disable=protected-access
+            if 'gae_id' in user_settings_model._values:  # pylint: disable=protected-access
+                del user_settings_model._values['gae_id']  # pylint: disable=protected-access
             user_settings_model.update_timestamps(
                 update_last_updated_time=False)
             user_settings_model.put()
@@ -635,3 +626,176 @@ class CleanUpUserContributionsModelOneOffJob(
     def reduce(key, values):
         values.sort()
         yield (key, values)
+
+
+class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that verifies various aspects of profile_picture_data_url in the
+    UserSettingsModel.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(ProfilePictureAuditOneOffJob, cls).enqueue(job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model):  # pylint: disable=too-many-return-statements
+        if model.deleted:
+            yield ('SUCCESS - DELETED', model.username)
+            return
+
+        if model.username is None:
+            yield ('SUCCESS - NOT REGISTERED', model.username)
+            return
+
+        if model.profile_picture_data_url is None:
+            yield ('FAILURE - MISSING PROFILE PICTURE', model.username)
+            return
+
+        try:
+            profile_picture_binary = utils.convert_png_data_url_to_binary(
+                model.profile_picture_data_url)
+        except Exception:
+            yield ('FAILURE - INVALID PROFILE PICTURE DATA URL', model.username)
+            return
+
+        if imghdr.what(None, h=profile_picture_binary) != 'png':
+            yield ('FAILURE - PROFILE PICTURE NOT PNG', model.username)
+            return
+
+        try:
+            # Load the image to retrieve dimensions for later verification.
+            height, width = image_services.get_image_dimensions(
+                profile_picture_binary)
+        except Exception:
+            yield ('FAILURE - CANNOT LOAD PROFILE PICTURE', model.username)
+            return
+
+        if (
+                height != user_services.GRAVATAR_SIZE_PX or
+                width != user_services.GRAVATAR_SIZE_PX
+        ):
+            yield (
+                'FAILURE - PROFILE PICTURE NON STANDARD DIMENSIONS - %s,%s' % (
+                    height, width
+                ),
+                model.username
+            )
+            return
+
+        yield ('SUCCESS', model.username)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class UserAuthDetailsModelAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits whether there are UserAuthDetailsModels with the same
+    gae_id field.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(UserAuthDetailsModelAuditOneOffJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserAuthDetailsModel]
+
+    @staticmethod
+    def map(model):
+        number_of_models_with_same_gae_id = (
+            user_models.UserAuthDetailsModel.query(
+                user_models.UserAuthDetailsModel.gae_id == model.gae_id
+            ).count()
+        )
+
+        if number_of_models_with_same_gae_id > 1:
+            yield ('FAILURE', model.id)
+        else:
+            yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class GenerateUserIdentifiersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that creates UserIdentifiersModel for each UserAuthDetailsModel."""
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(GenerateUserIdentifiersModelOneOffJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserAuthDetailsModel]
+
+    @staticmethod
+    def map(model):
+        user_models.UserIdentifiersModel(
+            id=model.gae_id,
+            user_id=model.id,
+            deleted=model.deleted
+        ).put()
+        yield ('SUCCESS', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class UniqueHashedNormalizedUsernameAuditJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks that the hashed normalized usernames are unique."""
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(UniqueHashedNormalizedUsernameAuditJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model):
+        if model.normalized_username is None:
+            yield ('SUCCESS USERNAME NONE', 1)
+        else:
+            yield (
+                utils.convert_to_hash(
+                    model.normalized_username,
+                    user_models.DeletedUsernameModel.ID_LENGTH
+                ),
+                model.normalized_username
+            )
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS USERNAME NONE':
+            yield (key, len(values))
+            return
+
+        if len(values) != 1:
+            yield ('FAILURE', values)

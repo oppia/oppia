@@ -35,16 +35,6 @@ describe('Classroom data model', () => {
       uncategorized_skill_count: 5,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA'
-    }, {
-      id: 'topic2',
-      name: 'Topic name 2',
-      description: 'Topic description 2',
-      canonical_story_count: 3,
-      subtopic_count: 2,
-      total_skill_count: 10,
-      uncategorized_skill_count: 3,
-      thumbnail_filename: 'image2.svg',
-      thumbnail_bg_color: '#C6DCDA'
     }];
   });
 
@@ -57,7 +47,5 @@ describe('Classroom data model', () => {
     expect(classroomData.getTopicListIntro()).toEqual('Topics Covered');
     expect(classroomData.getTopicSummaries()[0]).toEqual(
       TopicSummary.createFromBackendDict(topicSummaryDicts[0]));
-    expect(classroomData.getTopicSummaries()[1]).toEqual(
-      TopicSummary.createFromBackendDict(topicSummaryDicts[1]));
   });
 });

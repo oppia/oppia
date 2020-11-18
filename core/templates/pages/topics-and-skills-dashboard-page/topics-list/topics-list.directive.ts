@@ -48,12 +48,12 @@ angular.module('oppia').directive('topicsList', [
         '/pages/topics-and-skills-dashboard-page/topics-list/' +
         'topics-list.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'EditableTopicBackendApiService',
         'TopicsAndSkillsDashboardBackendApiService',
         'UrlInterpolationService',
         function(
-            $scope, $uibModal, AlertsService,
+            $rootScope, $scope, $uibModal, AlertsService,
             EditableTopicBackendApiService,
             TopicsAndSkillsDashboardBackendApiService,
             UrlInterpolationService) {
@@ -124,6 +124,7 @@ angular.module('oppia').directive('topicsList', [
                 function(status) {
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
+                  $rootScope.$applyAsync();
                 },
                 function(error) {
                   AlertsService.addWarning(

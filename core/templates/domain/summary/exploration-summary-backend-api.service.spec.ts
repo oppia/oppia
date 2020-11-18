@@ -15,96 +15,120 @@
 /**
  * @fileoverview Unit tests for ExplorationSummaryBackendApiService.
  */
-import { UpgradedServices } from 'services/UpgradedServices';
 
-require('domain/summary/exploration-summary-backend-api.service.ts');
-require('services/csrf-token.service.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-describe('Exploration Summary Backend Api Service', function() {
-  var ExplorationSummaryBackendApiService = null;
-  var $httpBackend = null;
-  var $rootScope = null;
-  var CsrfService = null;
-  var AlertsService = null;
+import { ExplorationSummaryBackendApiService } from
+  'domain/summary/exploration-summary-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    ExplorationSummaryBackendApiService = $injector.get(
-      'ExplorationSummaryBackendApiService');
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
-    $rootScope = $injector.get('$rootScope');
-    AlertsService = $injector.get('AlertsService');
+describe('Exploration Summary Backend Api Service', () => {
+  let explorationSummaryBackendApiService:
+    ExplorationSummaryBackendApiService = null;
+  let httpTestingController: HttpTestingController = null;
+  let csrfService: CsrfTokenService = null;
+  let alertsService: AlertsService = null;
+  let successHandler = null;
+  let failHandler = null;
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
     });
-  }));
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    explorationSummaryBackendApiService = TestBed.get(
+      ExplorationSummaryBackendApiService
+    );
+    csrfService = TestBed.get(CsrfTokenService);
+    alertsService = TestBed.get(AlertsService);
+    httpTestingController = TestBed.get(
+      HttpTestingController
+    );
+
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('simple-csrf-token');
+    });
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should not load public exploration summaries from backend when' +
-    ' exploration id is not valid', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    var explorationIds = ['#', null, '1'];
-    var alertSpy = spyOn(AlertsService, 'addWarning').and.callThrough();
+  ' exploration id is not valid', fakeAsync(() => {
+    const explorationIds = ['#', null, '1'];
+    const alertSpy = spyOn(alertsService, 'addWarning').and.callThrough();
 
-    ExplorationSummaryBackendApiService.loadPublicExplorationSummaries(
+    explorationSummaryBackendApiService.loadPublicExplorationSummaries(
       explorationIds).then(successHandler, failHandler);
-    $rootScope.$apply();
+
+    flushMicrotasks();
 
     expect(alertSpy).toHaveBeenCalledWith(
       'Please enter a valid exploration ID.');
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith([null, null, null]);
-  });
+  }));
 
-  it('should load public exploration summaries from backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var explorationIds = ['0', '1', '2'];
-      var sampleResults = [{
-        title: 'Title 1',
-        category: 'Category 1',
-        status: 'public',
-        language_code: 'en'
-      }];
+  it('should use reject handler when server throws and error',
+    fakeAsync(() => {
+      const explorationIds = ['12'];
+      const requestUrl = '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+      '&' + 'include_private_explorations=false';
 
-      var requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-        '&' + 'include_private_explorations=false';
+      explorationSummaryBackendApiService.loadPublicExplorationSummaries(
+        explorationIds).then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {error: 'Error Communicating with Server'},
+        {status: 400, statusText: ''}
+      );
+      flushMicrotasks();
 
-      $httpBackend.expect('GET', requestUrl).respond({
-        summaries: sampleResults
-      });
-      ExplorationSummaryBackendApiService
-        .loadPublicExplorationSummaries(explorationIds)
-        .then(successHandler, failHandler);
-      $httpBackend.flush();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error Communicating with Server');
+    }));
 
-      expect(successHandler).toHaveBeenCalledWith(sampleResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    });
+  it('should load public exploration summaries from backend', fakeAsync(()=> {
+    const explorationIds = ['0', '1', '2'];
+    const sampleResults = [{
+      title: 'Title 1',
+      category: 'Category 1',
+      status: 'public',
+      language_code: 'en'
+    }];
+
+    const requestUrl = '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+      '&' + 'include_private_explorations=false';
+
+    explorationSummaryBackendApiService
+      .loadPublicExplorationSummaries(explorationIds)
+      .then(successHandler, failHandler);
+
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
   it('should load public and private exploration summaries from backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var explorationIds = ['0', '1', '2'];
-      var sampleResults = [{
+    fakeAsync(() => {
+      const explorationIds = ['0', '1', '2'];
+      const sampleResults = [{
         title: 'Title 1',
         category: 'Category 1',
         status: 'public',
@@ -116,65 +140,71 @@ describe('Exploration Summary Backend Api Service', function() {
         language_code: 'en'
       }];
 
-      var requestUrl = '/explorationsummarieshandler/data?' +
+      const requestUrl = '/explorationsummarieshandler/data?' +
         'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
         '&' + 'include_private_explorations=true';
 
-      $httpBackend.expect('GET', requestUrl).respond({
-        summaries: sampleResults
-      });
-      ExplorationSummaryBackendApiService
+
+      explorationSummaryBackendApiService
         .loadPublicAndPrivateExplorationSummaries(explorationIds).then(
           successHandler, failHandler);
-      $httpBackend.flush();
+
+      const req = httpTestingController.expectOne(requestUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleResults);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(sampleResults);
       expect(failHandler).not.toHaveBeenCalled();
-    });
+    }));
 
   it('should use reject handler when loading public exploration summaries' +
-    ' from backend returns null', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    var explorationIds = ['0', '1', '2'];
+    ' from backend returns null', fakeAsync(() => {
+    const explorationIds = ['0', '1', '2'];
 
-    var requestUrl = '/explorationsummarieshandler/data?' +
+    const requestUrl = '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
       '&' + 'include_private_explorations=false';
 
-    $httpBackend.expect('GET', requestUrl).respond({
-      summaries: null
-    });
-    ExplorationSummaryBackendApiService
+    explorationSummaryBackendApiService
       .loadPublicExplorationSummaries(explorationIds)
       .then(successHandler, failHandler);
-    $httpBackend.flush();
+
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(null);
+
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
-      Error(
-        'Summaries fetched are null for explorationIds: ' + explorationIds));
-  });
+      'Summaries fetched are null for explorationIds: ' + explorationIds);
+  }));
 
   it('should use reject handler when loading public exploration summaries' +
-    ' from backend fails', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    var explorationIds = ['0', '1', '2'];
-    var errorMessage = 'Error on loading public exploration summaries.';
+    ' from backend fails', fakeAsync(() => {
+    const explorationIds = ['0', '1', '2'];
+    const errorMessage = 'Error on loading public exploration summaries.';
 
-    var requestUrl = '/explorationsummarieshandler/data?' +
+    const requestUrl = '/explorationsummarieshandler/data?' +
       'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
       '&' + 'include_private_explorations=false';
 
-    $httpBackend.expect('GET', requestUrl).respond(
-      500, errorMessage);
-    ExplorationSummaryBackendApiService
+    explorationSummaryBackendApiService
       .loadPublicExplorationSummaries(explorationIds)
       .then(successHandler, failHandler);
-    $httpBackend.flush();
+
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      { error: errorMessage },
+      { status: 500, statusText: ''}
+    );
+
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(errorMessage);
-  });
+  }));
 });

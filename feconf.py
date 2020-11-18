@@ -213,7 +213,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 39
+CURRENT_STATE_SCHEMA_VERSION = 40
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -1241,3 +1241,12 @@ USER_ID_LENGTH = 36
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5
 PROFILE_USER_PIN_LENGTH = 3
+
+MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
+
+# This is the maximum wait time for the task queue HTTP request. If the request
+# takes longer than this value, an exception is raised. The default value
+# of 5 seconds is too short and must be avoided because it can cause events
+# to go unrecorded.
+# https://cloud.google.com/appengine/docs/standard/python/outbound-requests#request_timeouts
+DEFAULT_TASKQUEUE_TIMEOUT_SECONDS = 30
