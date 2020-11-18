@@ -222,7 +222,9 @@ def run_user_deletion_completion(pending_deletion_request):
     Returns:
         str. The outcome of the verification.
     """
-
+    # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
+    # for the user. The verification will be done in the next run of
+    # FullyCompleteUserDeletionOneOffJob.
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request.user_id):
