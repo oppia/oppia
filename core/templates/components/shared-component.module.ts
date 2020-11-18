@@ -99,6 +99,7 @@ import { PromoBarComponent } from './common-layout-directives/common-elements/pr
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    PromoBarComponent,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
