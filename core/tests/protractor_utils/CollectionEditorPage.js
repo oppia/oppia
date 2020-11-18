@@ -160,8 +160,7 @@ var CollectionEditorPage = function() {
     await action.click(
       'Editor Category Drop Down', editorCategoryDropdown.first());
     var test = await browser.driver.switchTo().activeElement();
-    await action.sendKeys(
-      'Category Item', test, category + '\n');
+    await action.sendKeys('Category Item', test, category + '\n');
   };
 
   // Saves changes and publishes collection.
