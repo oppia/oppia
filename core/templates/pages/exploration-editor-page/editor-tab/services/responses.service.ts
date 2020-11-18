@@ -28,14 +28,20 @@ import { AlertsService } from 'services/alerts.service';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
-import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { AnswerChoice, StateEditorService } from
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
+import {
+  AnswerChoice,
+  StateEditorService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
+} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 require(
@@ -46,18 +52,18 @@ require(
   providedIn: 'root',
 })
 export class ResponsesService {
-  private _answerGroupsMemento = null;
-  private _defaultOutcomeMemento = null;
-  private _confirmedUnclassifiedAnswersMemento = null;
+  private _answerGroupsMemento: AnswerGroup[] = null;
+  private _defaultOutcomeMemento: Outcome = null;
+  private _confirmedUnclassifiedAnswersMemento: InteractionAnswer[] = null;
   // Represents the current selected answer group, starting at index 0. If the
   // index equal to the number of answer groups (answerGroups.length), then it
   // is referring to the default outcome.
-  private _activeAnswerGroupIndex = null;
-  private _activeRuleIndex = -1;
+  private _activeAnswerGroupIndex: number = null;
+  private _activeRuleIndex: number = -1;
   private _answerGroups = null;
-  private _defaultOutcome = null;
-  private _confirmedUnclassifiedAnswers = null;
-  private _answerChoices = null;
+  private _defaultOutcome: Outcome = null;
+  private _confirmedUnclassifiedAnswers: InteractionAnswer[] = null;
+  private _answerChoices: AnswerChoice[] = null;
   private _answerGroupsChangedEventEmitter = new EventEmitter();
   private _initializeAnswerGroupsEventEmitter = new EventEmitter();
 
@@ -238,7 +244,7 @@ export class ResponsesService {
     return angular.copy(this._answerGroups);
   }
 
-  getAnswerGroup(index: number): string {
+  getAnswerGroup(index: number): AnswerGroup {
     return angular.copy(this._answerGroups[index]);
   }
 
@@ -250,11 +256,11 @@ export class ResponsesService {
     return angular.copy(this._defaultOutcome);
   }
 
-  getConfirmedUnclassifiedAnswers(): string {
+  getConfirmedUnclassifiedAnswers(): InteractionAnswer[] {
     return angular.copy(this._confirmedUnclassifiedAnswers);
   }
 
-  getAnswerChoices(): AnswerChoice {
+  getAnswerChoices(): AnswerChoice[] {
     return angular.copy(this._answerChoices);
   }
 
@@ -268,7 +274,7 @@ export class ResponsesService {
 
   onInteractionIdChanged(
       newInteractionId: string,
-      callback: (value: Outcome, value2: Outcome) => void
+      callback: (value: AnswerGroup[], value2: Outcome) => void
   ): void {
     if (this.answerGroupsCacheService.contains(newInteractionId)) {
       this._answerGroups = this.answerGroupsCacheService.get(newInteractionId);
@@ -330,14 +336,17 @@ export class ResponsesService {
   }
 
   updateAnswerGroup(
-      // eslint-disable-next-line max-len
-      index: number, updates: Outcome, callback: (value: Outcome) => void)
-      : void {
+      index: number,
+      updates: Outcome,
+      callback: (value: AnswerGroup[]) => void
+  ): void {
     this._updateAnswerGroup(index, updates, callback);
   }
 
-  deleteAnswerGroup(index: number, callback: (value: AnswerGroup) => void)
-  : void {
+  deleteAnswerGroup(
+      index: number,
+      callback: (value: AnswerGroup[]) => void
+  ): void {
     this._answerGroupsMemento = angular.copy(this._answerGroups);
     this._answerGroups.splice(index, 1);
     this._activeAnswerGroupIndex = -1;
@@ -537,7 +546,7 @@ export class ResponsesService {
   save(
       newAnswerGroups: AnswerGroup[],
       defaultOutcome: Outcome,
-      callback: (value: Outcome, value2: Outcome) => void
+      callback: (value: AnswerGroup[], value2: Outcome) => void
   ): void {
     this._saveAnswerGroups(newAnswerGroups);
     this._saveDefaultOutcome(defaultOutcome);

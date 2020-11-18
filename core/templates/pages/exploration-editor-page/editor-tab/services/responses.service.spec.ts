@@ -39,7 +39,7 @@ describe('Responses Service', () => {
   let interactionObjectFactory: InteractionObjectFactory = null;
   let outcomeObjectFactory: OutcomeObjectFactory = null;
   let stateEditorService: StateEditorService = null;
-  // Let alertsService: AlertsService = null;
+  let alertsService: AlertsService = null;
   let stateInteractionIdService: StateInteractionIdService = null;
   let answerGroupsCacheService: AnswerGroupsCacheService = null;
   let answerGroupObjectFactory: AnswerGroupObjectFactory = null;
@@ -67,7 +67,7 @@ describe('Responses Service', () => {
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
-    // AlertsService = TestBed.get(AlertsService);
+    alertsService = TestBed.get(AlertsService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     answerGroupsCacheService = TestBed.get(AnswerGroupsCacheService);
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
@@ -212,7 +212,7 @@ describe('Responses Service', () => {
 
   it('should update default outcome', () => {
     // eslint-disable-next-line max-len
-    // Let addInfoMessageSpy = spyOn(alertsService, 'addInfoMessage');
+    let addInfoMessageSpy = spyOn(alertsService, 'addInfoMessage');
 
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
@@ -231,9 +231,9 @@ describe('Responses Service', () => {
     var callbackSpy = jasmine.createSpy('callback');
     responsesService.updateDefaultOutcome(updatedDefaultOutcome, callbackSpy);
 
-    // Expect(addInfoMessageSpy).toHaveBeenCalledWith(
-    //   'The current solution does not lead to another card.'
-    // );
+    expect(addInfoMessageSpy).toHaveBeenCalledWith(
+      'The current solution does not lead to another card.'
+    );
     expect(callbackSpy).toHaveBeenCalledWith(updatedDefaultOutcome);
     expect(responsesService.getDefaultOutcome()).toEqual(updatedDefaultOutcome);
   });
@@ -262,7 +262,7 @@ describe('Responses Service', () => {
         toBackendDict: jasmine.createSpy('toBackendDict'),
         setDestination: jasmine.createSpy('setDestination'),
         hasNonemptyFeedback: jasmine.createSpy('hasNonemptyFeedback'),
-        isConfusing: jasmine.createSpy('isConfusing'),
+        isConfusing: jasmine.createSpy('isConfusing')
       },
       trainingData: 'This is training data text',
       taggedSkillMisconceptionId: '',
@@ -317,11 +317,11 @@ describe('Responses Service', () => {
         isConfusing: jasmine.createSpy('isConfusing'),
       },
       taggedSkillMisconceptionId: '',
-      // Feedback: 'This is a new feedback text',
-      // dest: 'State',
-      // refresherExplorationId: '',
-      // missingPrerequisiteSkillId: '',
-      // labelledAsCorrect: false,
+      feedback: 'This is a new feedback text',
+      dest: 'State',
+      refresherExplorationId: '',
+      missingPrerequisiteSkillId: '',
+      labelledAsCorrect: false,
       trainingData: 'This is training data text',
     };
     var callbackSpy = jasmine.createSpy('callback');
@@ -707,8 +707,7 @@ describe('Responses Service', () => {
             val: 'c',
             label: ''
           },
-        ],
-        // Function () {}
+        ]
       );
 
       var newAnswerChoices = [
@@ -725,10 +724,10 @@ describe('Responses Service', () => {
           label: ''
         },
       ];
-      // Var callbackSpy = jasmine.createSpy('callback');
+      var callbackSpy = jasmine.createSpy('callback');
       responsesService.updateAnswerChoices(newAnswerChoices);
 
-      // Expect(callbackSpy).not.toHaveBeenCalled();
+      expect(callbackSpy).not.toHaveBeenCalled();
       expect(responsesService.getAnswerGroup(0)).toEqual(
         interactionDataWithRules.answerGroups[0]
       );
@@ -835,10 +834,10 @@ describe('Responses Service', () => {
   );
 
   it('should save new answer group and default outcome', () => {
-    // Var addInfoMessageSpy = spyOn(
-    //   alertsService,
-    //   'addInfoMessage'
-    // ).and.callThrough();
+    var addInfoMessageSpy = spyOn(
+      alertsService,
+      'addInfoMessage'
+    ).and.callThrough();
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
     stateEditorService.setActiveStateName('Hola');
@@ -866,10 +865,10 @@ describe('Responses Service', () => {
       callbackSpy
     );
 
-    // Expect(addInfoMessageSpy).toHaveBeenCalledTimes(2);
-    // expect(addInfoMessageSpy).toHaveBeenCalledWith(
-    //   'The solution is now valid!'
-    // );
+    expect(addInfoMessageSpy).toHaveBeenCalledTimes(2);
+    expect(addInfoMessageSpy).toHaveBeenCalledWith(
+      'The solution is now valid!'
+    );
     expect(responsesService.getDefaultOutcome()).toEqual(updatedDefaultOutcome);
     expect(responsesService.getAnswerGroups()).toEqual(updatedAnswerGroups);
     expect(responsesService.getAnswerGroup(0)).toEqual(updatedAnswerGroups[0]);
@@ -880,10 +879,10 @@ describe('Responses Service', () => {
   });
 
   it('should save new answer group and default outcome twice', () => {
-    // Var addInfoMessageSpy = spyOn(
-    //   alertsService,
-    //   'addInfoMessage'
-    // ).and.callThrough();
+    var addInfoMessageSpy = spyOn(
+      alertsService,
+      'addInfoMessage'
+    ).and.callThrough();
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
     stateEditorService.setActiveStateName('Hola');
@@ -926,9 +925,9 @@ describe('Responses Service', () => {
       callbackSpy
     );
 
-    // Expect(addInfoMessageSpy).toHaveBeenCalledWith(
-    //   'The current solution is no longer valid.'
-    // );
+    expect(addInfoMessageSpy).toHaveBeenCalledWith(
+      'The current solution is no longer valid.'
+    );
     expect(responsesService.getDefaultOutcome()).toEqual(updatedDefaultOutcome);
     expect(responsesService.getAnswerGroups()).toEqual(updatedAnswerGroups);
     expect(responsesService.getAnswerGroup(0)).toEqual(updatedAnswerGroups[0]);
