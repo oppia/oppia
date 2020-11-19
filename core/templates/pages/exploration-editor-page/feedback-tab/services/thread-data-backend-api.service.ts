@@ -253,8 +253,19 @@ export class ThreadDataBackendApiService {
       text: newMessage
     }).toPromise().then((response: ThreadMessages) => {
       if (updatedStatus) {
-        this.openThreadsCount += (
-          (newStatus === ExplorationEditorPageConstants.STATUS_OPEN) ? 1 : -1);
+        let key: number = 0;
+        if (newStatus === ExplorationEditorPageConstants.STATUS_OPEN) {
+          this.openThreadsCount++;
+          key++;
+        } else {
+          if (oldStatus === ExplorationEditorPageConstants.STATUS_OPEN) {
+            key++;
+          }
+          if (key !== 0) {
+            this.openThreadsCount--;
+            key--;
+          }
+        }
       }
       thread.status = newStatus;
       let threadMessageBackendDicts = response.messages;
