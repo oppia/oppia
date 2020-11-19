@@ -175,17 +175,22 @@ var ExplorationPlayerPage = function() {
   };
 
   this.viewHint = async function() {
+    var until = protractor.ExpectedConditions;
+    const WAIT_FOR_FIRST_HINT_MSEC = 60000;
     // We need to wait some time for the solution to activate.
-    await waitFor.elementToBeClickable(
-      viewHintButton, '"View Hint" button takes too long to be clickable');
+    await browser.wait(
+      until.elementToBeClickable(viewHintButton), WAIT_FOR_FIRST_HINT_MSEC,
+      '"View Hint" button takes too long to be clickable');
     await viewHintButton.click();
     await clickGotItButton();
   };
 
   this.viewSolution = async function() {
+    var until = protractor.ExpectedConditions;
+    const WAIT_FOR_SUBSEQUENT_HINTS = 30000;
     // We need to wait some time for the solution to activate.
-    await waitFor.elementToBeClickable(
-      viewSolutionButton,
+    await browser.wait(
+      until.elementToBeClickable(viewSolutionButton), WAIT_FOR_SUBSEQUENT_HINTS,
       '"View Solution" button takes too long to be clickable');
     await viewSolutionButton.click();
     await waitFor.elementToBeClickable(
