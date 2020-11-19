@@ -102,5 +102,8 @@ describe('Validators service', () => {
     expect(vs.isValidStateName('', null)).toBe(false);
     expect(vs.isValidStateName(
       'A state name with invalid character x', null)).toBe(false);
+    expect(vs.isValidStateName(
+      'A state name that is toooooooooooooooooooooooo long', true))
+      .toBe(false);
   });
 });

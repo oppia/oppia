@@ -86,6 +86,14 @@ export class ValidatorsService {
       return false;
     }
 
+    if (input.length > 50) {
+      if (showWarnings) {
+        this.alerts.addWarning(
+          'Card names should be at most 50 characters long.');
+      }
+      return false;
+    }
+
     return true;
   }
   isNonempty(input: string, showWarnings: boolean): boolean {

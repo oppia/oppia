@@ -214,6 +214,12 @@ describe('State Name Editor component', function() {
     ctrl.$onDestroy();
   });
 
+  it('should not save state name when it is longer than 50 characters',
+    function() {
+      expect(ctrl.saveStateName(
+        'babababababababababababababababababababababababababab')).toBe(false);
+    });
+
   it('should not save state names when it contains invalid characteres',
     function() {
       stateEditorService.setActiveStateName('Third State');
@@ -268,6 +274,10 @@ describe('State Name Editor component', function() {
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
     expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
 
+    // Long state names will not save.
+    ctrl.saveStateName(
+      'This state name is too long to be saved. Try to be brief next time.'
+    );
     expect(stateEditorService.getActiveStateName()).toEqual('Third State');
     expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
 
