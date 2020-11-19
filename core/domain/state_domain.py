@@ -85,19 +85,21 @@ class AnswerGroup(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, answer_group_dict):
+    def from_dict(cls, answer_group_dict, interaction_id):
         """Return a AnswerGroup domain object from a dict.
 
         Args:
             answer_group_dict: dict. The dict representation of AnswerGroup
                 object.
+            interaction_id: str. The interaction id of the interaction.
 
         Returns:
             AnswerGroup. The corresponding AnswerGroup domain object.
         """
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
-            [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
+            [RuleSpec.from_dict(rs, interaction_id)
+                for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
         )
@@ -528,7 +530,7 @@ class InteractionInstance(python_utils.OBJECT):
         return cls(
             interaction_dict['id'],
             customization_args,
-            [AnswerGroup.from_dict(h)
+            [AnswerGroup.from_dict(h, interaction_dict['id'])
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
             interaction_dict['confirmed_unclassified_answers'],
@@ -1956,24 +1958,56 @@ class RuleSpec(python_utils.OBJECT):
         Returns:
             dict. A dict, mapping all fields of RuleSpec instance.
         """
+        rule_inputs_dict = {}
+        for rule_input_name in self.inputs:
+            rule_input = self.inputs[rule_input_name]
+            if (
+                    isinstance(rule_input, SubtitledSetOfNormalizedString) or
+                    isinstance(rule_input, SubtitledSetOfUnicodeString)):
+                rule_inputs_dict[rule_input_name] = rule_input.to_dict()
+            else: 
+                rule_inputs_dict[rule_input_name] = rule_input
+
         return {
             'rule_type': self.rule_type,
-            'inputs': self.inputs,
+            'inputs': rule_inputs_dict,
         }
 
     @classmethod
-    def from_dict(cls, rulespec_dict):
+    def from_dict(cls, rulespec_dict, interaction_id):
         """Return a RuleSpec domain object from a dict.
 
         Args:
             rulespec_dict: dict. The dict representation of RuleSpec object.
-
+            interaction_id: str. The interaction id of the interaction.
         Returns:
             RuleSpec. The corresponding RuleSpec domain object.
         """
+        rule_inputs_dict = rulespec_dict['inputs']
+        rule_type = rulespec_dict['rule_type']
+
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            interaction_id)
+        inputs_name_and_types = (
+            re.findall(r'{{([a-z])\|([^}]*)}',
+            interaction.rules_dict[rule_type]['description']))
+
+        rule_inputs = {}
+        for input_name, input_type in inputs_name_and_types:
+            if input_type == 'SubtitledSetOfNormalizedString':
+                rule_inputs[input_name] = (
+                    SubtitledSetOfNormalizedString.from_dict(
+                        rule_inputs_dict[input_name]))
+            elif input_type == 'SubtitledSetOfUnicodeString':
+                rule_inputs[input_name] = (
+                    SubtitledSetOfUnicodeString.from_dict(
+                        rule_inputs_dict[input_name]))
+            else:
+                rule_inputs[input_name] = rule_inputs_dict[input_name]
+
         return cls(
-            rulespec_dict['rule_type'],
-            rulespec_dict['inputs']
+            rule_type,
+            rule_inputs
         )
 
     def validate(self, rule_params_list, exp_param_specs_dict):
@@ -2045,7 +2079,22 @@ class RuleSpec(python_utils.OBJECT):
             else:
                 # Otherwise, a simple parameter value needs to be normalizable
                 # by the parameter object in order to be valid.
-                param_obj.normalize(param_value)
+                isSubtitledSetOfNormalizedString = isinstance(
+                    param_value, SubtitledSetOfNormalizedString)
+                isSubtitledSetOfUnicodeString = isinstance(
+                    param_value, SubtitledSetOfUnicodeString)
+                if isSubtitledSetOfNormalizedString:
+                    self.inputs[param_name] = (
+                        SubtitledSetOfNormalizedString.from_dict(
+                            param_obj.normalize(param_value.to_dict())
+                        ))
+                elif isSubtitledSetOfUnicodeString:
+                    self.inputs[param_name] = (
+                        SubtitledSetOfUnicodeString.from_dict(
+                            param_obj.normalize(param_value.to_dict())
+                        ))
+                else:
+                    param_obj.normalize(param_value)
 
     @staticmethod
     def convert_html_in_rule_spec(rule_spec_dict, conversion_fn):
@@ -2510,6 +2559,19 @@ class State(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % feedback_content_id)
             content_id_list.append(feedback_content_id)
+
+            for rule_spec in answer_group.rule_specs:
+                for input_name in rule_spec.inputs:
+                    rule_input = rule_spec.inputs[input_name]
+
+                    isSubtitledSetOfNoormalizedString = isinstance(
+                        rule_input, SubtitledSetOfNormalizedString)
+                    isSubtitledSetOfUnicodeString = isinstance(
+                        rule_input, SubtitledSetOfUnicodeString)
+                    if (isSubtitledSetOfNoormalizedString or
+                            isSubtitledSetOfUnicodeString):
+                        content_id_list.append(rule_input.content_id)
+
         if self.interaction.default_outcome:
             default_outcome_content_id = (
                 self.interaction.default_outcome.feedback.content_id)
@@ -2851,9 +2913,24 @@ class State(python_utils.OBJECT):
                 % answer_groups_list)
 
         interaction_answer_groups = []
+        new_content_id_list = []
         old_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
+
+        for answer_group in self.interaction.answer_groups:
+            for rule_spec in answer_group.rule_specs:
+                for input_name in rule_spec.inputs:
+                    rule_input = rule_spec.inputs[input_name]
+                    isSubtitledSetOfNormalizedString = isinstance(
+                        rule_input, SubtitledSetOfNormalizedString)
+                    isSubtitledSetOfUnicodeString = isinstance(
+                        rule_input, SubtitledSetOfUnicodeString)
+                    if (
+                            isSubtitledSetOfNormalizedString or
+                            isSubtitledSetOfUnicodeString):
+                        old_content_id_list.append(rule_input.content_id)
+        
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
@@ -2870,7 +2947,7 @@ class State(python_utils.OBJECT):
             interaction_answer_groups.append(answer_group)
 
             for rule_dict in rule_specs_list:
-                rule_spec = RuleSpec.from_dict(rule_dict)
+                rule_spec = RuleSpec.from_dict(rule_dict, self.interaction.id)
 
                 # Normalize and store the rule params.
                 rule_inputs = rule_spec.inputs
@@ -2890,18 +2967,39 @@ class State(python_utils.OBJECT):
                         # referred to exist and have the correct types.
                         normalized_param = value
                     else:
+                        isSubtitledSetOfNormalizedString = isinstance(
+                            value, SubtitledSetOfNormalizedString)
+                        isSubtitledSetOfUnicodeString = isinstance(
+                            value, SubtitledSetOfUnicodeString)
+                        
+                        if (
+                                isSubtitledSetOfNormalizedString or
+                                isSubtitledSetOfUnicodeString):
+                            new_content_id_list.append(value.content_id)
+                            value = value.to_dict()
+
                         try:
                             normalized_param = param_type.normalize(value)
                         except Exception:
                             raise Exception(
                                 '%s has the wrong type. It should be a %s.' %
                                 (value, param_type.__name__))
+
+                        if isSubtitledSetOfNormalizedString:
+                            normalized_param = (
+                                SubtitledSetOfNormalizedString.from_dict(
+                                    normalized_param))
+                        if isSubtitledSetOfUnicodeString:
+                            normalized_param = (
+                                isSubtitledSetOfUnicodeString.from_dict(
+                                    normalized_param))
+
                     rule_inputs[param_name] = normalized_param
 
                 answer_group.rule_specs.append(rule_spec)
         self.interaction.answer_groups = interaction_answer_groups
 
-        new_content_id_list = [
+        new_content_id_list += [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
         self._update_content_ids_in_assets(

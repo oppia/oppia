@@ -342,18 +342,62 @@ class NormalizedString(BaseObject):
     }
 
 
-class SetOfNormalizedString(BaseObject):
-    """Class for sets of NormalizedStrings."""
+class SubtitledSetOfUnicodeString(BaseObject):
+    """Class for subtitled sets of unicode strings."""
 
-    description = (
-        'A set (a list with unique elements) of whitespace-collapsed strings.')
-    default_value = []
+    description = """A dictionary with properties "content_id" and 
+        "unicode_str_set", the latter being a set (a list with unique 
+        elements) of unicode strings."""
 
     SCHEMA = {
-        'type': 'list',
-        'items': NormalizedString.SCHEMA,
-        'validators': [{
-            'id': 'is_uniquified'
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': {
+                # The default content id is none. However, it should be
+                # populated before being saved (SubtitledSetOfUnicodeString
+                # in state_domain has validation checks for this).
+                'type': 'unicode_or_none'
+            }
+        }, {
+            'name': 'unicode_str_set',
+            'schema': {
+                'type': 'list',
+                'items': UnicodeString.SCHEMA,
+                'validators': [{
+                    'id': 'is_uniquified'
+                }]
+            }
+        }]
+    }
+
+
+class SubtitledSetOfNormalizedString(BaseObject):
+    """Class for subtitled sets of NormalizedStrings."""
+
+    description = """A dictionary with properties "content_id" and 
+        "normalized_str_set", the latter being a set (a list with unique 
+        elements) of whitespace-collapsed strings."""
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'content_id',
+            'schema': {
+                # The default content id is none. However, it should be
+                # populated before being saved (SubtitledSetOfNormalizedString
+                # in state_domain has validation checks for this).
+                'type': 'unicode_or_none'
+            }
+        }, {
+            'name': 'normalized_str_set',
+            'schema': {
+                'type': 'list',
+                'items': NormalizedString.SCHEMA,
+                'validators': [{
+                    'id': 'is_uniquified'
+                }]
+            }
         }]
     }
 

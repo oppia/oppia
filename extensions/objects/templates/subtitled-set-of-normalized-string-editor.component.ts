@@ -13,14 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for list of normalized string editor.
+ * @fileoverview Directive for subtitled set of normalized string editor.
  */
 
-angular.module('oppia').component('setOfNormalizedStringEditor', {
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+
+angular.module('oppia').component('subtitledSetOfNormalizedStringEditor', {
   bindings: {
     value: '='
   },
-  template: require('./list-editor.directive.html'),
+  // eslint-disable-next-line max-len
+  template: require('./subtitled-set-of-normalized-string-editor.component.html'),
   controller: [function() {
     var ctrl = this;
     ctrl.$onInit = function() {
@@ -33,10 +37,7 @@ angular.module('oppia').component('setOfNormalizedStringEditor', {
           id: 'is_uniquified'
         }]
       };
-
-      if (!ctrl.value) {
-        ctrl.value = [];
-      }
+      console.log(ctrl.value);
     };
   }]
 });

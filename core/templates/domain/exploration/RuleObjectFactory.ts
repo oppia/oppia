@@ -21,6 +21,14 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
+import {
+  SubtitledSetOfNormalizedString, SubtitledSetOfNormalizedStringBackendDict,
+  SubtitledSetOfNormalizedStringObjectFactory
+} from 'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import {
+  SubtitledSetOfUnicodeString, SubtitledSetOfUnicodeStringBackendDict,
+  SubtitledSetOfUnicodeStringObjectFactory
+} from 'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 
 export interface RuleBackendDict {
   'inputs': RuleInputs;
@@ -40,9 +48,25 @@ export class Rule {
     this.inputs = inputs;
   }
   toBackendDict(): RuleBackendDict {
+    let inputsDict = {};
+
+    Object.keys(this.inputs).forEach(ruleName => {
+      if (this.inputs instanceof SubtitledSetOfNormalizedString) {
+        inputsDict[ruleName] = (
+          <SubtitledSetOfNormalizedString> this.inputs[ruleName]
+        ).toBackendDict();
+      } else if (this.inputs instanceof SubtitledSetOfUnicodeString) {
+        inputsDict[ruleName] = (
+          <SubtitledSetOfUnicodeString> this.inputs[ruleName]
+        ).toBackendDict();
+      } else {
+        inputsDict[ruleName] = this.inputs[ruleName];
+      }
+    });
+
     return {
       rule_type: this.type,
-      inputs: this.inputs
+      inputs: inputsDict
     };
   }
 }
@@ -51,12 +75,62 @@ export class Rule {
   providedIn: 'root'
 })
 export class RuleObjectFactory {
+  constructor(
+      private subtitledSetOfNormalizedStringObjectFactory:
+        SubtitledSetOfNormalizedStringObjectFactory,
+      private subtitledSetOfUnicodeStringObjectFactory:
+        SubtitledSetOfUnicodeStringObjectFactory
+  ) {}
+
   createNew(type: string, inputs: RuleInputs): Rule {
-    return new Rule(type, inputs);
+    let ruleInputs = {};
+
+    Object.keys(inputs).forEach(ruleName => {
+      if ('content_id' in inputs[ruleName]) {
+        if ('normalized_str_set' in inputs[ruleName]) {
+          ruleInputs[ruleName] = (
+            this.subtitledSetOfNormalizedStringObjectFactory
+              .createFromBackendDict(
+                <SubtitledSetOfNormalizedStringBackendDict> inputs[ruleName])
+          );
+        } else if ('unicode_str_set' in inputs[ruleName]) {
+          ruleInputs[ruleName] = (
+            this.subtitledSetOfUnicodeStringObjectFactory
+              .createFromBackendDict(
+                <SubtitledSetOfUnicodeStringBackendDict> inputs[ruleName])
+          );
+        }
+      } else {
+        ruleInputs[ruleName] = inputs[ruleName];
+      }
+    });
+    console.log('here', ruleInputs);
+
+    return new Rule(type, ruleInputs);
   }
 
   createFromBackendDict(ruleDict: RuleBackendDict): Rule {
-    return new Rule(ruleDict.rule_type, ruleDict.inputs);
+    let inputs = {};
+
+    Object.keys(ruleDict).forEach(ruleName => {
+      if ('content_id' in ruleDict[ruleName]) {
+        if ('normalized_str_set' in ruleDict[ruleName]) {
+          inputs[ruleName] = (
+            this.subtitledSetOfNormalizedStringObjectFactory
+              .createFromBackendDict(ruleDict[ruleName])
+          );
+        } else if ('unicode_str_set' in ruleDict[ruleName]) {
+          inputs[ruleName] = (
+            this.subtitledSetOfUnicodeStringObjectFactory
+              .createFromBackendDict(ruleDict[ruleName])
+          );
+        }
+      } else {
+        inputs[ruleName] = ruleDict[ruleName];
+      }
+    });
+
+    return new Rule(ruleDict.rule_type, inputs);
   }
 }
 

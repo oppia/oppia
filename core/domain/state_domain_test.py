@@ -398,7 +398,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'content_id': 'ri_Equals',
+                        'normalized_str_set': ['Test']
+                    }
                 },
                 'rule_type': 'Equals'
             }],
@@ -1081,7 +1084,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'content_id': 'ri_Equals',
+                        'normalized_str_set': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -1243,7 +1249,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'content_id': 'ri_Equals',
+                        'normalized_str_set': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -3156,7 +3165,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'content_id': 'ri_Equals',
+                        'normalized_str_set': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -3572,7 +3584,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected rule_inputs to be a dict'):
+            Exception, 'list indices must be integers, not unicode'):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)
 
@@ -3616,7 +3628,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[]]
+                    'x': {
+                        'content_id': 'ri_Equals',
+                        'normalized_str_set': [[]]
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -3627,7 +3642,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '[[]] has the wrong type. It should be a SetOfNormalizedString.'
+                'Invalid content unicode: []'
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
@@ -3657,7 +3672,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'content_id': 'ri_Equals',
+                        'normalized_str_set': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],

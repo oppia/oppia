@@ -16,6 +16,7 @@
  * @fileoverview Type definiitions for Rule inputs.
  */
 
+import { SubtitledSetOfNormalizedString } from 'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
 import {
   FractionAnswer,
   NumberWithUnitsAnswer,
@@ -227,7 +228,7 @@ export interface SetInputRuleInputs {
 }
 
 export interface TextInputRuleInputs {
-  x: string[];
+  x: SubtitledSetOfNormalizedString;
 }
 
 export type InteractionRuleInputs = (

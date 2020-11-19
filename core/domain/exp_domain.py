@@ -652,7 +652,7 @@ class Exploration(python_utils.OBJECT):
 
             idict = sdict['interaction']
             interaction_answer_groups = [
-                state_domain.AnswerGroup.from_dict(group)
+                state_domain.AnswerGroup.from_dict(group, idict['id'])
                 for group in idict['answer_groups']]
 
             default_outcome = (
@@ -2990,6 +2990,89 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v40_dict_to_v41_dict(cls, states_dict):
+        """Converts from version 40 to 41. Version 41 adds
+        SubtitledSetOfUnicodeString and SubtitledSetOfNormalizedString
+        objects to RuleSpec domain objects to allow for translations.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        class ContentIdCounter(python_utils.OBJECT):
+            """This helper class is used to keep track of
+            next_content_id_index and new_content_ids, and provides a
+            function to generate new content_ids.
+            """
+
+            def __init__(self, next_content_id_index):
+                """Initializes a ContentIdCounter object.
+
+                Args:
+                    next_content_id_index: int. The next content id index.
+                """
+                self.new_content_ids = []
+                self.next_content_id_index = next_content_id_index
+
+            def generate_content_id(self, content_id_prefix):
+                """Generate a new content_id from the prefix provided and
+                the next content id index.
+
+                Args:
+                    content_id_prefix: str. The prefix of the content_id.
+
+                Returns:
+                    str. The generated content_id.
+                """
+                content_id = '%s%i' % (
+                    content_id_prefix,
+                    self.next_content_id_index)
+                self.next_content_id_index += 1
+                self.new_content_ids.append(content_id)
+                return content_id
+
+        for state_dict in states_dict.values():
+            # Only TextInput and SetInput have translatable rule inputs.
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id != 'TextInput' and interaction_id != 'SetInput':
+                continue
+
+            content_id_counter = ContentIdCounter(
+                state_dict['next_content_id_index'])
+            answer_group_dicts = state_dict['interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    content_id = content_id_counter.generate_content_id(
+                        'ri_%s_' % rule_spec_dict['rule_type'])
+                    if interaction_id == 'TextInput':
+                        # Convert to SubtitledSetOfNormalizedString
+                        rule_spec_dict['inputs']['x'] = {
+                            'content_id': content_id,
+                            'normalized_str_set': rule_spec_dict['inputs']['x']
+                        }
+                    elif interaction_id == 'SetInput':
+                        # Convert to SubtitledSetOfUnicodeString
+                        rule_spec_dict['inputs']['x'] = {
+                            'content_id': content_id,
+                            'unicode_str_set': rule_spec_dict['inputs']['x']
+                        }
+            state_dict['next_content_id_index'] = (
+                content_id_counter.next_content_id_index)
+            for new_content_id in content_id_counter.new_content_ids:
+                state_dict[
+                    'written_translations'][
+                        'translations_mapping'][new_content_id] = {}
+                state_dict[
+                    'recorded_voiceovers'][
+                        'voiceovers_mapping'][new_content_id] = {}
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -3024,7 +3107,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 45
+    CURRENT_EXP_SCHEMA_VERSION = 46
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4058,17 +4141,39 @@ class Exploration(python_utils.OBJECT):
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v43.
+                with schema version v44.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v44.
+            following schema version v45.
         """
         exploration_dict['schema_version'] = 45
 
         exploration_dict['states'] = cls._convert_states_v39_dict_to_v40_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 40
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v45_dict_to_v46_dict(cls, exploration_dict):
+        """Converts a v45 exploration dict into a v46 exploration dict.
+        Adds SubtitledSetOfUnicodeString and SubtitledSetOfNormalizedString
+        objects to RuleSpec domain objects to allow for translations.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v45.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v46.
+        """
+        exploration_dict['schema_version'] = 46
+
+        exploration_dict['states'] = cls._convert_states_v40_dict_to_v41_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 41
 
         return exploration_dict
 
@@ -4329,6 +4434,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v44_dict_to_v45_dict(
                 exploration_dict)
             exploration_schema_version = 45
+
+        if exploration_schema_version == 45:
+            exploration_dict = cls._convert_v45_dict_to_v46_dict(
+                exploration_dict)
+            exploration_schema_version = 46
 
         return (exploration_dict, initial_schema_version)
 

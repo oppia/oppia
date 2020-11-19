@@ -779,10 +779,10 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "StartsWith": "starts with at least one of {{x|SetOfNormalizedString}}",
-      "Contains": "contains at least one of {{x|SetOfNormalizedString}}",
-      "Equals": "is equal to at least one of {{x|SetOfNormalizedString}}, without taking case into account",
-      "FuzzyEquals": "is equal to at least one of {{x|SetOfNormalizedString}}, misspelled by at most one character"
+      "StartsWith": "starts with at least one of {{x|SubtitledSetOfNormalizedString}}",
+      "Contains": "contains at least one of {{x|SubtitledSetOfNormalizedString}}",
+      "Equals": "is equal to at least one of {{x|SubtitledSetOfNormalizedString}}, without taking case into account",
+      "FuzzyEquals": "is equal to at least one of {{x|SubtitledSetOfNormalizedString}}, misspelled by at most one character"
     }
   },
   "InteractiveMap": {

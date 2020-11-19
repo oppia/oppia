@@ -364,7 +364,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': None
-            })
+            }, 'TextInput')
         ]
 
         self._assert_validation_error(
