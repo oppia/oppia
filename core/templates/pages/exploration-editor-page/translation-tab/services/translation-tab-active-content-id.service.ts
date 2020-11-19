@@ -54,7 +54,7 @@ export class TranslationTabActiveContentIdService {
     this.activeDataFormat = dataFormat;
     this._activeContentIdChangedEventEmitter.emit(dataFormat);
   }
-
+ // eslint-disable-next-line consistent-return
   get onActiveContentIdChanged() {
     return this._activeContentIdChangedEventEmitter;
   }
