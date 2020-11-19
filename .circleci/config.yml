@@ -102,6 +102,9 @@ commands:
             fi
 
   webpack_build:
+    # This step represents the build process. It is meant to help developers
+    # detect build related issues in the config file. It does not affect
+    # performance.
     description: "Build Javascript files"
     parameters:
       target_env:
