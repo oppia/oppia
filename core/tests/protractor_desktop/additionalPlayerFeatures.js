@@ -467,6 +467,7 @@ describe('Full exploration editor', function() {
     await users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
     await workflow.createExploration();
+
     await explorationEditorMainTab.setContent(
       await forms.toRichText('You should recommend this exploration'));
     await explorationEditorMainTab.setInteraction('EndExploration');

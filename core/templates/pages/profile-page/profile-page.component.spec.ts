@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 // TODO(#7222): Remove the following block of unnecessary imports once
-// thread-data.service.ts is upgraded to Angular 8.
+// thread-data-backend-api.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 import { ProfilePageBackendApiService } from
   './profile-page-backend-api.service';
