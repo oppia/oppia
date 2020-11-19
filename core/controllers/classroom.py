@@ -26,15 +26,6 @@ from core.domain import topic_services
 import feconf
 
 
-class DefaultClassroomRedirectHandler(base.BaseHandler):
-    """Redirects to the default classroom page."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
-
-
 class ClassroomPage(base.BaseHandler):
     """Renders the classroom page."""
 
@@ -96,3 +87,12 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
             'classroom_promos_are_enabled': (
                 config_domain.CLASSROOM_PROMOS_ARE_ENABLED.value)
         })
+
+
+class DefaultClassroomRedirectPage(base.BaseHandler):
+    """Redirects to the default classroom page."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)

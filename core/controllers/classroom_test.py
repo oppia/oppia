@@ -34,7 +34,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
 
-class DefaultClassroomRedirectHandlerTests(BaseClassroomControllerTests):
+class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
 
     def test_redirect_to_default_classroom(self):
         response = self.get_html_response('/learn', expected_status_int=302)
