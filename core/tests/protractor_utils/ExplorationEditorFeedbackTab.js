@@ -105,7 +105,7 @@ var ExplorationEditorFeedbackTab = function() {
     var rowCount = await rows.count();
     for (var i = 0; i < rowCount; i++) {
       var row = await rows.get(i);
-      await action.click('suggestionRow at row index ' + i, row);
+      await action.click(`suggestionRow at row index ${i}`, row);
       await waitFor.visibilityOf(
         explorationFeedback, 'Feedback message text is not visible');
       var message = await explorationFeedback.getText();
