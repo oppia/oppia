@@ -55,9 +55,7 @@ export class TranslationTabActiveContentIdService {
     this._activeContentIdChangedEventEmitter.emit(dataFormat);
   }
  // eslint-disable-next-line consistent-return
-  get onActiveContentIdChanged() {
-    return this._activeContentIdChangedEventEmitter;
-  }
+  get onActiveContentIdChanged() { return this._activeContentIdChangedEventEmitter; }
 }
 angular.module('oppia').factory(
   'TranslationTabActiveContentIdService',
