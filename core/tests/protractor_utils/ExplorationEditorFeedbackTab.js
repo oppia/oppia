@@ -153,8 +153,8 @@ var ExplorationEditorFeedbackTab = function() {
       'Feedback Response Text Area',
       feedbackResponseTextArea, feedbackResponse);
     await action.click('Feedback Status Dropdow', feedbackStatusDropdown);
-    var optionLabelFeedbackStatus =
-      element(by.css(`option[label="${feedbackStatus}"]`));
+    var optionLabelFeedbackStatus = (
+      element(by.css(`option[label="${feedbackStatus}"]`)));
     await action.click(
       'Option[label = "feedback status"', optionLabelFeedbackStatus);
     await action.click(
