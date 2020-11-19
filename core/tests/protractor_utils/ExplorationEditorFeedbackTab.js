@@ -132,8 +132,8 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.selectLatestFeedbackThread = async function() {
-    var suggestionRowFirst =
-      element.all(by.css(suggestionRowClassName)).first();
+    var suggestionRowFirst = (
+      element.all(by.css(suggestionRowClassName)).first());
     await action.click(
       'Suggestion Row First', suggestionRowFirst);
   };
