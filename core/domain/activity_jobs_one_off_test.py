@@ -2227,7 +2227,8 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             id='%s-1' % self.EXP_ID,
             committer_id=self.albert_id,
             commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            deleted=True
         ).put()
 
         expected_output = [
@@ -2239,6 +2240,37 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
         ]
 
         actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_mark_exp_rights_snapshot_model_deleted(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public',
+            deleted=True
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+        ).put()
+
+        expected_output = [
+            [
+                'SUCCESS-Marked Snapshot model deleted-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                ['exp_id0-1']
+            ]
+        ]
+
+        actual_output = self._run_one_off_job()
+
+        snapshot_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                '%s-%s' % (self.EXP_ID, 1)))
+
+        self.assertTrue(snapshot_model.deleted)
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_add_missing_exp_rights_commit_logs(self):
@@ -2274,7 +2306,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'Added missing commit log model-' +
+                'SUCCESS-Added missing commit log model-' +
                 'ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ]
@@ -2345,7 +2377,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'Added missing commit log model-' +
+                'SUCCESS-Added missing commit log model-' +
                 'QuestionSnapshotMetadataModel',
                 ['question_id0-1']
             ]
@@ -2383,7 +2415,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'Added missing commit log model-' +
+                'SUCCESS-Added missing commit log model-' +
                 'SkillSnapshotMetadataModel',
                 ['skill_id0-1']
             ]

@@ -709,8 +709,18 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         if parent_model.deleted:
-            yield ('Deleted Parent Model-No changes-%s' % class_name, 1)
-            return
+            if snapshot_model.deleted:
+                yield ('Deleted Parent Model-No changes-%s' % class_name, 1)
+                return
+            else:
+                snapshot_model.deleted = True
+                snapshot_model.update_timestamps(
+                    update_last_updated_time=False)
+                snapshot_model.put()
+                yield (
+                    'SUCCESS-Marked Snapshot model deleted-%s' % (
+                        class_name), snapshot_model.id)
+                return
 
         commit_log_model = model_properties['commit_log_model_class'](
             id=commit_log_id,
@@ -734,13 +744,13 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
         commit_log_model.update_timestamps(update_last_updated_time=False)
         commit_log_model.put()
         yield (
-            'Added missing commit log model-%s' % class_name,
+            'SUCCESS-Added missing commit log model-%s' % class_name,
             snapshot_model.id)
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        if key.startswith('Added missing commit log model'):
+        if key.startswith('SUCCESS'):
             yield (key, values)
         else:
             yield (key, len(values))
