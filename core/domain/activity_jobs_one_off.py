@@ -24,11 +24,14 @@ from core import jobs
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import search_services
+from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
+import feconf
 import python_utils
 
 (
@@ -650,20 +653,22 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             'commit_log_model_class': (
                 question_models.QuestionCommitLogEntryModel),
             'id_string_format': 'question-%s-%s',
-            'id_field': 'question_id'
+            'id_field': 'question_id',
+            'delete_method': question_services.delete_question
         },
         'SkillSnapshotMetadataModel': {
             'parent_model_class': skill_models.SkillModel,
             'commit_log_model_class': skill_models.SkillCommitLogEntryModel,
             'id_string_format': 'skill-%s-%s',
-            'id_field': 'skill_id'
+            'id_field': 'skill_id',
+            'delete_method': skill_services.delete_skill
         },
         'ExplorationRightsSnapshotMetadataModel': {
             'parent_model_class': exp_models.ExplorationRightsModel,
             'commit_log_model_class': exp_models.ExplorationCommitLogEntryModel,
             'id_string_format': 'rights-%s-%s',
-            'id_field': 'exploration_id'
-
+            'id_field': 'exploration_id',
+            'delete_method': exp_services.delete_exploration
         }
     }
     # "Public" is the default value for post_commit_status for the
@@ -709,18 +714,14 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         if parent_model.deleted:
-            if snapshot_model.deleted:
-                yield ('Deleted Parent Model-No changes-%s' % class_name, 1)
-                return
-            else:
-                snapshot_model.deleted = True
-                snapshot_model.update_timestamps(
-                    update_last_updated_time=False)
-                snapshot_model.put()
-                yield (
-                    'SUCCESS-Marked Snapshot model deleted-%s' % (
-                        class_name), snapshot_model.id)
-                return
+            model_properties['delete_method'](
+                feconf.SYSTEM_COMMITTER_ID, parent_model.id,
+                force_deletion=True)
+            yield (
+                'SUCCESS-Parent model marked deleted-' +
+                'Deleted all related models-%s' % (
+                    class_name), snapshot_model.id)
+            return
 
         commit_log_model = model_properties['commit_log_model_class'](
             id=commit_log_id,

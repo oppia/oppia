@@ -2216,36 +2216,11 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             class_names, set(job_class.MODEL_NAMES_TO_PROPERTIES.keys()))
 
-    def test_deleted_exp_rights_model(self):
+    def test_delete_exp_rights_related_models(self):
         exp_rights = exp_models.ExplorationRightsModel(
             id=self.EXP_ID,
             status='public',
-            deleted=True
-        )
-        base_models.BaseModel.put_multi([exp_rights])
-        exp_models.ExplorationRightsSnapshotMetadataModel(
-            id='%s-1' % self.EXP_ID,
-            committer_id=self.albert_id,
-            commit_type='edit',
-            commit_cmds=self.DUMMY_COMMIT_CMDS,
-            deleted=True
-        ).put()
-
-        expected_output = [
-            [
-                'Deleted Parent Model-No changes-' +
-                'ExplorationRightsSnapshotMetadataModel',
-                1
-            ]
-        ]
-
-        actual_output = self._run_one_off_job()
-        self.assertItemsEqual(expected_output, actual_output)
-
-    def test_mark_exp_rights_snapshot_model_deleted(self):
-        exp_rights = exp_models.ExplorationRightsModel(
-            id=self.EXP_ID,
-            status='public',
+            version=1,
             deleted=True
         )
         base_models.BaseModel.put_multi([exp_rights])
@@ -2258,19 +2233,22 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
 
         expected_output = [
             [
-                'SUCCESS-Marked Snapshot model deleted-' +
-                'ExplorationRightsSnapshotMetadataModel',
+                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'related models-ExplorationRightsSnapshotMetadataModel',
                 ['exp_id0-1']
             ]
         ]
 
         actual_output = self._run_one_off_job()
 
+        parent_model = exp_models.ExplorationRightsModel.get_by_id(
+            self.EXP_ID)
         snapshot_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
                 '%s-%s' % (self.EXP_ID, 1)))
 
-        self.assertTrue(snapshot_model.deleted)
+        self.assertIsNone(parent_model)
+        self.assertIsNone(snapshot_model)
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_add_missing_exp_rights_commit_logs(self):
