@@ -360,8 +360,6 @@ import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { ResponsesService } from
-  'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { ReviewTestBackendApiService } from
   'domain/review_test/review-test-backend-api.service';
 import { ReviewTestEngineService } from
@@ -1305,16 +1303,6 @@ export class UpgradedServices {
       upgradedServices['ComputeGraphService'],
       upgradedServices['ContextService'],
       upgradedServices['ExtractImageFilenamesFromStateService']);
-    upgradedServices['ResponsesService'] = new ResponsesService(
-      upgradedServices['AlertsService'],
-      upgradedServices['AnswerGroupsCacheService'],
-      upgradedServices['LoggerService'],
-      upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['StateEditorService'],
-      upgradedServices['StateInteractionIdService'],
-      upgradedServices['StateSolutionService'],
-      upgradedServices['SolutionValidityService'],
-      upgradedServices['SolutionVerificationService']);
     upgradedServices['SubtopicViewerBackendApiService'] =
       new SubtopicViewerBackendApiService(
         upgradedServices['HttpClient'],

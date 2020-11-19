@@ -17,6 +17,8 @@
  * answer groups.
  */
 
+import { cloneDeep } from 'lodash';
+
 import { EventEmitter } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
@@ -44,6 +46,7 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
 @Injectable({
   providedIn: 'root',
 })
@@ -79,32 +82,33 @@ export class ResponsesService {
     // This checks if the solution is valid once a rule has been changed or
     // added.
     const currentInteractionId = this.stateInteractionIdService.savedMemento;
-    const interactionCanHaveSolution =
+    const interactionCanHaveSolution = (
       currentInteractionId &&
-      INTERACTION_SPECS[currentInteractionId].can_have_solution;
-    const solutionExists =
+      INTERACTION_SPECS[currentInteractionId].can_have_solution);
+    const solutionExists = (
       this.stateSolutionService.savedMemento &&
-      this.stateSolutionService.savedMemento.correctAnswer !== null;
+      this.stateSolutionService.savedMemento.correctAnswer !== null);
 
     if (interactionCanHaveSolution && solutionExists) {
       const interaction = this.stateEditorService.getInteraction();
 
-      interaction.answerGroups = angular.copy(this._answerGroups);
-      interaction.defaultOutcome = angular.copy(this._defaultOutcome);
+      interaction.answerGroups = cloneDeep(this._answerGroups);
+      interaction.defaultOutcome = cloneDeep(this._defaultOutcome);
       const solutionIsValid = this.solutionVerificationService.verifySolution(
         this.stateEditorService.getActiveStateName(),
         interaction,
         this.stateSolutionService.savedMemento.correctAnswer
       );
 
-      const solutionWasPreviouslyValid =
+      const solutionWasPreviouslyValid = (
         this.solutionValidityService.isSolutionValid(
           this.stateEditorService.getActiveStateName()
-        );
+        ));
       this.solutionValidityService.updateValidity(
         this.stateEditorService.getActiveStateName(),
         solutionIsValid
       );
+
       if (solutionIsValid && !solutionWasPreviouslyValid) {
         this.alertsService.addInfoMessage(
           ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_VALID);
@@ -131,7 +135,7 @@ export class ResponsesService {
       this._answerGroups = newAnswerGroups;
       this._answerGroupsChangedEventEmitter.emit();
       this._verifySolution();
-      this._answerGroupsMemento = angular.copy(newAnswerGroups);
+      this._answerGroupsMemento = cloneDeep(newAnswerGroups);
     }
   };
 
@@ -143,8 +147,8 @@ export class ResponsesService {
         answerGroup.rules = updates.rules;
       }
       if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
-        answerGroup.taggedSkillMisconceptionId =
-          updates.taggedSkillMisconceptionId;
+        answerGroup.taggedSkillMisconceptionId = (
+          updates.taggedSkillMisconceptionId);
       }
       if (updates.hasOwnProperty('feedback')) {
         answerGroup.outcome.feedback = updates.feedback;
@@ -153,12 +157,12 @@ export class ResponsesService {
         answerGroup.outcome.dest = updates.dest;
       }
       if (updates.hasOwnProperty('refresherExplorationId')) {
-        answerGroup.outcome.refresherExplorationId =
-          updates.refresherExplorationId;
+        answerGroup.outcome.refresherExplorationId = (
+          updates.refresherExplorationId);
       }
       if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
-        answerGroup.outcome.missingPrerequisiteSkillId =
-          updates.missingPrerequisiteSkillId;
+        answerGroup.outcome.missingPrerequisiteSkillId = (
+          updates.missingPrerequisiteSkillId);
       }
       if (updates.hasOwnProperty('labelledAsCorrect')) {
         answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
@@ -182,7 +186,7 @@ export class ResponsesService {
     if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
       this._defaultOutcome = newDefaultOutcome;
       this._verifySolution();
-      this._defaultOutcomeMemento = angular.copy(newDefaultOutcome);
+      this._defaultOutcomeMemento = cloneDeep(newDefaultOutcome);
     }
   };
 
@@ -199,14 +203,14 @@ export class ResponsesService {
     ) {
       this._confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
-      this._confirmedUnclassifiedAnswersMemento = angular.copy(
-        newConfirmedUnclassifiedAnswers
+      this._confirmedUnclassifiedAnswersMemento = (
+        cloneDeep(newConfirmedUnclassifiedAnswers)
       );
     }
   };
 
   private _updateAnswerChoices = (newAnswerChoices) => {
-    const oldAnswerChoices = angular.copy(this._answerChoices);
+    const oldAnswerChoices = cloneDeep(this._answerChoices);
     this._answerChoices = newAnswerChoices;
     return oldAnswerChoices;
   };
@@ -216,9 +220,9 @@ export class ResponsesService {
   init(data: Interaction): void {
     this.answerGroupsCacheService.reset();
 
-    this._answerGroups = angular.copy(data.answerGroups);
-    this._defaultOutcome = angular.copy(data.defaultOutcome);
-    this._confirmedUnclassifiedAnswers = angular.copy(
+    this._answerGroups = cloneDeep(data.answerGroups);
+    this._defaultOutcome = cloneDeep(data.defaultOutcome);
+    this._confirmedUnclassifiedAnswers = cloneDeep(
       data.confirmedUnclassifiedAnswers
     );
     if (this.stateInteractionIdService.savedMemento !== null) {
@@ -228,32 +232,32 @@ export class ResponsesService {
       );
     }
 
-    this._answerGroupsMemento = angular.copy(this._answerGroups);
-    this._defaultOutcomeMemento = angular.copy(this._defaultOutcome);
-    this._confirmedUnclassifiedAnswersMemento = angular.copy(
+    this._answerGroupsMemento = cloneDeep(this._answerGroups);
+    this._defaultOutcomeMemento = cloneDeep(this._defaultOutcome);
+    this._confirmedUnclassifiedAnswersMemento = cloneDeep(
       this._confirmedUnclassifiedAnswers
     );
     this._activeAnswerGroupIndex = -1;
     this._activeRuleIndex = 0;
   }
   getAnswerGroups(): AnswerGroup[] {
-    return angular.copy(this._answerGroups);
+    return cloneDeep(this._answerGroups);
   }
 
   getAnswerGroup(index: number): AnswerGroup {
-    return angular.copy(this._answerGroups[index]);
+    return cloneDeep(this._answerGroups[index]);
   }
   getAnswerGroupCount(): number {
     return this._answerGroups.length;
   }
   getDefaultOutcome(): Outcome {
-    return angular.copy(this._defaultOutcome);
+    return cloneDeep(this._defaultOutcome);
   }
   getConfirmedUnclassifiedAnswers(): InteractionAnswer[] {
-    return angular.copy(this._confirmedUnclassifiedAnswers);
+    return cloneDeep(this._confirmedUnclassifiedAnswers);
   }
   getAnswerChoices(): AnswerChoice[] {
-    return angular.copy(this._answerChoices);
+    return cloneDeep(this._answerChoices);
   }
   getActiveRuleIndex(): number {
     return this._activeRuleIndex;
@@ -296,9 +300,9 @@ export class ResponsesService {
       this.answerGroupsCacheService.set(newInteractionId, this._answerGroups);
     }
 
-    this._answerGroupsMemento = angular.copy(this._answerGroups);
-    this._defaultOutcomeMemento = angular.copy(this._defaultOutcome);
-    this._confirmedUnclassifiedAnswersMemento = angular.copy(
+    this._answerGroupsMemento = cloneDeep(this._answerGroups);
+    this._defaultOutcomeMemento = cloneDeep(this._defaultOutcome);
+    this._confirmedUnclassifiedAnswersMemento = cloneDeep(
       this._confirmedUnclassifiedAnswers
     );
     this._activeAnswerGroupIndex = -1;
@@ -323,7 +327,7 @@ export class ResponsesService {
   }
   updateAnswerGroup(
       index: number,
-      updates: Outcome,
+      updates: AnswerGroup,
       callback: (value: AnswerGroup) => void
   ): void {
     this._updateAnswerGroup(index, updates, callback);
@@ -332,14 +336,14 @@ export class ResponsesService {
       index: number,
       callback: (value: AnswerGroup[]) => void
   ): void {
-    this._answerGroupsMemento = angular.copy(this._answerGroups);
+    this._answerGroupsMemento = cloneDeep(this._answerGroups);
     this._answerGroups.splice(index, 1);
     this._activeAnswerGroupIndex = -1;
     this._saveAnswerGroups(this._answerGroups);
     callback(this._answerGroupsMemento);
   }
   updateActiveAnswerGroup(
-      updates: Outcome,
+      updates: AnswerGroup,
       callback: (value: AnswerGroup) => void
   ): void {
     this._updateAnswerGroup(this._activeAnswerGroupIndex, updates, callback);
@@ -348,6 +352,8 @@ export class ResponsesService {
       updates: Outcome,
       callback: (value: Outcome) => void
   ): void {
+    console.log(updates, "====outcome")
+    console.log(callback, "====callback")
     const outcome = this._defaultOutcome;
     if (updates.hasOwnProperty('feedback')) {
       outcome.feedback = updates.feedback;
@@ -430,7 +436,7 @@ export class ResponsesService {
 
       let key, newInputValue;
       this._answerGroups.forEach((answerGroup, answerGroupIndex) => {
-        const newRules = angular.copy(answerGroup.rules);
+        const newRules = cloneDeep(answerGroup.rules);
         newRules.forEach((rule) => {
           for (key in rule.inputs) {
             newInputValue = [];
@@ -495,7 +501,7 @@ export class ResponsesService {
 
       if (anyChangesHappened) {
         this._answerGroups.forEach((answerGroup, answerGroupIndex) => {
-          const newRules = angular.copy(answerGroup.rules);
+          const newRules = cloneDeep(answerGroup.rules);
           newRules.forEach((rule) => {
             if (rule.type === 'HasElementXAtPositionY') {
               rule.inputs.x = newAnswerChoices[0].val;
