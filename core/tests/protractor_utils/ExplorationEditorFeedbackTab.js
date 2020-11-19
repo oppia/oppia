@@ -58,8 +58,8 @@ var ExplorationEditorFeedbackTab = function() {
    */
   this.acceptSuggestion = async function(suggestionDescription) {
     await waitFor.visibilityOf(
-      element(by.css(suggestionRowClassName),
-      'Suggestion row takes too long to appear'));
+      element(by.css(suggestionRowClassName)),
+      'Suggestion row takes too long to appear');
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
@@ -119,8 +119,8 @@ var ExplorationEditorFeedbackTab = function() {
 
   this.rejectSuggestion = async function(suggestionDescription) {
     await waitFor.visibilityOf(
-      element(by.css(suggestionRowClassName),
-      'Suggestion row takes too long to appear'));
+      element(by.css(suggestionRowClassName)),
+      'Suggestion row takes too long to appear');
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
