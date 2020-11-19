@@ -27,21 +27,24 @@ require(
   'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
-  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 require('services/editability.service.ts');
 require('services/suggestion-modal.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
-  '$log', '$uibModal', 'ExplorationDataService',
+  '$log', '$rootScope', '$uibModal', 'ExplorationDataService',
   'ExplorationStatesService', 'RouterService',
   'StateEditorRefreshService', 'StateObjectFactory',
-  'SuggestionModalService', 'ThreadDataService', 'UrlInterpolationService',
+  'SuggestionModalService', 'ThreadDataBackendApiService',
+  'UrlInterpolationService',
   function(
-      $log, $uibModal, ExplorationDataService,
+      $log, $rootScope, $uibModal, ExplorationDataService,
       ExplorationStatesService, RouterService,
       StateEditorRefreshService, StateObjectFactory,
-      SuggestionModalService, ThreadDataService, UrlInterpolationService) {
+      SuggestionModalService, ThreadDataBackendApiService,
+      UrlInterpolationService) {
     let showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
         setActiveThread = (threadId => {}), threadUibModalInstance = null) {
@@ -66,7 +69,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
         },
         controller: 'ExplorationEditorSuggestionModalController'
       }).result.then(result => {
-        return ThreadDataService.resolveSuggestionAsync(
+        return ThreadDataBackendApiService.resolveSuggestionAsync(
           activeThread, result.action, result.commitMessage,
           result.reviewMessage, result.audioUpdateRequired).then(
           () => {
@@ -92,6 +95,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               });
               StateEditorRefreshService.onRefreshStateEditor.emit();
             }
+            $rootScope.$apply();
           },
           () => $log.error('Error resolving suggestion'));
       },
