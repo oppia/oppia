@@ -34,6 +34,7 @@ import feconf
 import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+transaction_services = models.Registry.import_transaction_services()
 
 
 def _get_target_id_to_exploration_opportunity_dict(suggestions):
@@ -95,7 +96,12 @@ class SuggestionHandler(base.BaseHandler):
     @acl_decorators.can_suggest_changes
     def post(self):
         try:
-            suggestion = suggestion_services.create_suggestion(
+            # The create_suggestion method needs to be run in transaction as it
+            # generates multiple connected models (suggestion, feedback thread,
+            # feedback message etc.) and all these models needs to be created
+            # together, in a batch.
+            suggestion = transaction_services.run_in_transaction(
+                suggestion_services.create_suggestion,
                 self.payload.get('suggestion_type'),
                 self.payload.get('target_type'), self.payload.get('target_id'),
                 self.payload.get('target_version_at_submission'),

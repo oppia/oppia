@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import logging
 
 from constants import constants
@@ -175,6 +176,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     USER_1_USERNAME = 'username1'
     USER_2_EMAIL = 'some-other@email.com'
     USER_2_USERNAME = 'username2'
+    USER_3_EMAIL = 'other@email.com'
+    USER_3_USERNAME = 'username3'
 
     def setUp(self):
         super(WipeoutServicePreDeleteTests, self).setUp()
@@ -328,6 +331,31 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(pending_deletion_model)
 
+    def test_pre_delete_username_is_not_saved_for_user_younger_than_week(self):
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+
+        pending_deletion_request = (
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+        self.assertIsNone(
+            pending_deletion_request.normalized_long_term_username)
+
+    def test_pre_delete_username_is_saved_for_user_older_than_week(self):
+        date_10_days_ago = (
+            datetime.datetime.utcnow() - datetime.timedelta(days=10))
+        with self.mock_datetime_utcnow(date_10_days_ago):
+            self.signup(self.USER_3_EMAIL, self.USER_3_USERNAME)
+        user_3_id = self.get_user_id_from_email(self.USER_3_EMAIL)
+
+        wipeout_service.pre_delete_user(user_3_id)
+        self.process_and_flush_pending_tasks()
+
+        pending_deletion_request = (
+            wipeout_service.get_pending_deletion_request(user_3_id))
+        self.assertEqual(
+            pending_deletion_request.normalized_long_term_username,
+            self.USER_3_USERNAME)
+
     def test_pre_delete_user_with_activities_multiple_owners(self):
         user_services.update_user_role(
             self.user_1_id, feconf.ROLE_ID_COLLECTION_EDITOR)
@@ -476,7 +504,10 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(WipeoutServiceRunFunctionsTests, self).setUp()
-        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        date_10_days_ago = (
+            datetime.datetime.utcnow() - datetime.timedelta(days=10))
+        with self.mock_datetime_utcnow(date_10_days_ago):
+            self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
         self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
@@ -512,13 +543,16 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.assertIsNotNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
-    def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
+    def test_run_user_deletion_completion_with_user_properly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
         self.assertEqual(
             wipeout_service.run_user_deletion_completion(
                 self.pending_deletion_request),
             wipeout_domain.USER_VERIFICATION_SUCCESS
         )
+        self.assertIsNotNone(
+            user_models.DeletedUserModel.get_by_id(self.user_1_id))
+        self.assertTrue(user_services.is_username_taken(self.USER_1_USERNAME))
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id))
         self.assertIsNone(
@@ -526,7 +560,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
-    def test_run_user_deletion_completion_with_user_properly_deleted(self):
+    def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
         user_models.CompletedActivitiesModel(
