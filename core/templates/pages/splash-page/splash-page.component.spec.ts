@@ -88,7 +88,7 @@ describe('Splash Page', function() {
     ctrl.onClickBrowseLibraryButton();
     $timeout.flush(150);
 
-    expect(windowRefMock.nativeWindow.location).toBe('/community-library');
+    expect(windowRefMock.nativeWindow.location).toBe('/learn/math');
     expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
   });
 
