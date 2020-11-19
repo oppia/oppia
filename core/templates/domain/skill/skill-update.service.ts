@@ -287,7 +287,7 @@ export class SkillUpdateService {
     );
   }
 
-  addPrerequisiteSkill(skill: Skill, skillId: number): void {
+  addPrerequisiteSkill(skill: Skill, skillId: string): void {
     const params = {
       skill_id: skillId,
     };
@@ -300,7 +300,7 @@ export class SkillUpdateService {
     );
   }
 
-  deletePrerequisiteSkill(skill: Skill, skillId: number): void {
+  deletePrerequisiteSkill(skill: Skill, skillId: string): void {
     const params = {
       skill_id: skillId,
     };

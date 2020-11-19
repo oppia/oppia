@@ -18,105 +18,115 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { MisconceptionObjectFactory } from './MisconceptionObjectFactory';
-import SKILL_DIFFICULTIES from 'assets/constants';
+import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillUpdateService } from './skill-update.service';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { WorkedExampleObjectFactory } from './WorkedExampleObjectFactory';
+import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
 
-fdescribe('Skill update service', () => {
+describe('Skill update service', () => {
   let skillUpdateService: SkillUpdateService = null;
   let skillObjectFactory: SkillObjectFactory = null;
   let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
   let misconceptionObjectFactory: MisconceptionObjectFactory = null;
   let workedExampleObjectFactory: WorkedExampleObjectFactory = null;
   let undoRedoService: UndoRedoService = null;
-  let skillDifficulties = null;
 
   let skillDict = null;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        SkillUpdateService,
+        UndoRedoService,
+        MisconceptionObjectFactory,
+        SkillObjectFactory,
+        SubtitledHtmlObjectFactory,
+        WorkedExampleObjectFactory
+      ],
+    });
+
     skillUpdateService = TestBed.get(SkillUpdateService);
+    undoRedoService = TestBed.get(UndoRedoService);
+
+    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
     skillObjectFactory = TestBed.get(SkillObjectFactory);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
-    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
     workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
-    undoRedoService = TestBed.get(UndoRedoService);
-    skillDifficulties = TestBed.get(SKILL_DIFFICULTIES);
-  });
 
-  const misconceptionDict1 = {
-    id: '2',
-    name: 'test name',
-    notes: 'test notes',
-    feedback: 'test feedback',
-    must_be_addressed: true,
-  };
 
-  const misconceptionDict2 = {
-    id: '4',
-    name: 'test name',
-    notes: 'test notes',
-    feedback: 'test feedback',
-    must_be_addressed: true,
-  };
+    const misconceptionDict1 = {
+      id: '2',
+      name: 'test name',
+      notes: 'test notes',
+      feedback: 'test feedback',
+      must_be_addressed: true,
+    };
 
-  const rubricDict = {
-    difficulty: skillDifficulties[0],
-    explanations: ['explanation'],
-  };
+    const misconceptionDict2 = {
+      id: '4',
+      name: 'test name',
+      notes: 'test notes',
+      feedback: 'test feedback',
+      must_be_addressed: true,
+    };
 
-  const example1 = {
-    question: {
-      html: 'worked example question 1',
-      content_id: 'worked_example_q_1',
-    },
-    explanation: {
-      html: 'worked example explanation 1',
-      content_id: 'worked_example_e_1',
-    },
-  };
+    const rubricDict = {
+      difficulty: 'Easy',
+      explanations: ['explanation'],
+    };
 
-  const example2 = {
-    question: {
-      html: 'worked example question 2',
-      content_id: 'worked_example_q_2',
-    },
-    explanation: {
-      html: 'worked example explanation 2',
-      content_id: 'worked_example_e_2',
-    },
-  };
-
-  const skillContentsDict = {
-    explanation: {
-      html: 'test explanation',
-      content_id: 'explanation',
-    },
-    worked_examples: [example1, example2],
-    recorded_voiceovers: {
-      voiceovers_mapping: {
-        explanation: {},
-        worked_example_q_1: {},
-        worked_example_e_1: {},
-        worked_example_q_2: {},
-        worked_example_e_2: {},
+    const example1 = {
+      question: {
+        html: 'worked example question 1',
+        content_id: 'worked_example_q_1',
       },
-    },
-  };
+      explanation: {
+        html: 'worked example explanation 1',
+        content_id: 'worked_example_e_1',
+      },
+    };
 
-  skillDict = {
-    id: '1',
-    description: 'test description',
-    misconceptions: [misconceptionDict1, misconceptionDict2],
-    rubrics: [rubricDict],
-    skill_contents: skillContentsDict,
-    language_code: 'en',
-    version: 3,
-    prerequisite_skill_ids: ['skill_1'],
-  };
+    const example2 = {
+      question: {
+        html: 'worked example question 2',
+        content_id: 'worked_example_q_2',
+      },
+      explanation: {
+        html: 'worked example explanation 2',
+        content_id: 'worked_example_e_2',
+      },
+    };
+
+    const skillContentsDict = {
+      explanation: {
+        html: 'test explanation',
+        content_id: 'explanation',
+      },
+      worked_examples: [example1, example2],
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_q_1: {},
+          worked_example_e_1: {},
+          worked_example_q_2: {},
+          worked_example_e_2: {},
+        },
+      },
+    };
+
+    skillDict = {
+      id: '1',
+      description: 'test description',
+      misconceptions: [misconceptionDict1, misconceptionDict2],
+      rubrics: [rubricDict],
+      skill_contents: skillContentsDict,
+      language_code: 'en',
+      version: 3,
+      prerequisite_skill_ids: ['skill_1'],
+    };
+  });
 
   it('should set/unset the skill description', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
@@ -129,6 +139,7 @@ fdescribe('Skill update service', () => {
         new_value: 'new description',
       },
     ]);
+
     expect(skill.getDescription()).toEqual('new description');
     undoRedoService.undoChange(skill);
     expect(skill.getDescription()).toEqual('test description');
@@ -235,14 +246,14 @@ fdescribe('Skill update service', () => {
   it('should update a rubric', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.getRubrics().length).toEqual(1);
-    skillUpdateService.updateRubricForDifficulty(skill, skillDifficulties[0], [
+    skillUpdateService.updateRubricForDifficulty(skill, 'Easy', [
       'new explanation 1',
       'new explanation 2',
     ]);
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
         cmd: 'update_rubrics',
-        difficulty: skillDifficulties[0],
+        difficulty: 'Easy',
         explanations: ['new explanation 1', 'new explanation 2'],
       },
     ]);
