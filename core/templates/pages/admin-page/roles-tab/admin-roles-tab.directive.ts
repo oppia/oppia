@@ -361,8 +361,9 @@ angular.module('oppia').directive('adminRolesTab', [
           });
         };
 
-        ctrl.onViewContributorMethodChange = function() {
+        ctrl.clearReviewersData = function() {
           ctrl.contributionReviewersDataFetched = false;
+          ctrl.result = {};
         };
       }]
     };
