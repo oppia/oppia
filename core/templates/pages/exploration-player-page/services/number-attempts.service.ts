@@ -24,14 +24,31 @@ import { downgradeInjectable } from '@angular/upgrade/static';
   providedIn: 'root'
 })
 export class NumberAttemptsService {
+  /**
+   * Static type variable to store the number of attempts.
+   */
   static numberAttempts: number = 0;
 
+  /**
+   * Increments the static variable numberAttempts present in
+   * NumberAttemptsService class (the class in this file).
+   */
   submitAttempt(): void {
     NumberAttemptsService.numberAttempts++;
   }
+
+  /**
+   * Resets the static variable numberAttempts present in
+   * NumberAttemptsService class (the class in this file) back to 0.
+   */
   reset(): void {
     NumberAttemptsService.numberAttempts = 0;
   }
+
+  /**
+   * @returns {number} - The number of answer attempts by the learner
+   * within a card.
+   */
   getNumberAttempts(): number {
     return NumberAttemptsService.numberAttempts;
   }
