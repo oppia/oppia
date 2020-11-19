@@ -304,7 +304,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
-        """Returns whether or not a given normalized_username is taken.
+        """Returns whether or not a given normalized_username is taken or was
+        used by some deleted user.
 
         Args:
             normalized_username: str. The given user's normalized username.
@@ -312,8 +313,16 @@ class UserSettingsModel(base_models.BaseModel):
         Returns:
             bool. Whether the normalized_username has already been taken.
          """
-        return bool(cls.get_all().filter(
-            cls.normalized_username == normalized_username).get())
+        hashed_normalized_username = utils.convert_to_hash(
+            normalized_username, DeletedUsernameModel.ID_LENGTH)
+        return (
+            cls.query().filter(
+                cls.normalized_username == normalized_username
+            ).get() is not None
+            or DeletedUsernameModel.get(
+                hashed_normalized_username, strict=False
+            ) is not None
+        )
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
@@ -2507,6 +2516,11 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     # The email of the user.
     email = datastore_services.StringProperty(required=True, indexed=True)
+    # Normalized username of the deleted user. May be None in the cases when
+    # the user was deleted after a short time and thus the username wasn't that
+    # known on the Oppia site.
+    normalized_long_term_username = (
+        datastore_services.StringProperty(indexed=True))
     # Role of the user. Needed to decide which storage models have to be deleted
     # for it.
     role = datastore_services.StringProperty(required=True, indexed=True)
@@ -2557,6 +2571,8 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'normalized_long_term_username': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'deletion_complete': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'pseudonymizable_entity_mappings': (
                 base_models.EXPORT_POLICY.NOT_APPLICABLE),
@@ -2661,6 +2677,34 @@ class PseudonymizedUserModel(base_models.BaseModel):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
+
+
+class DeletedUsernameModel(base_models.BaseModel):
+    """Model for storing deleted username hashes. The username hash is stored
+    in the ID of this model.
+    """
+
+    ID_LENGTH = 32
+
+    @staticmethod
+    def get_deletion_policy():
+        """DeletedUserModel contains only hashes of usernames that were
+        deleted. The hashes are kept in order to prevent the reuse of usernames
+        of deleted users.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """DeletedUsernameModel contains only hashes of usernames that were
+        deleted.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{})
 
 
 class UserAuthDetailsModel(base_models.BaseModel):
@@ -2785,3 +2829,72 @@ class UserAuthDetailsModel(base_models.BaseModel):
             mapped to the queried parent_user_id.
         """
         return cls.query(cls.parent_user_id == parent_user_id).fetch()
+
+
+class UserIdentifiersModel(base_models.BaseModel):
+    """Stores the relation between GAE ID and user ID.
+
+    Instances of this class are keyed by GAE ID.
+    """
+
+    # The main user ID that is used in the datastore.
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information
+        relevant to one user account.
+        """
+        return base_models.DELETION_POLICY.DELETE_AT_END
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Currently, the model holds identifiers relevant only for backend that
+        should not be exported.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Currently, the model holds authentication details relevant only for
+        backend, and no exportable user data. It may contain user data in
+        the future.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserIdentifiersModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserIdentifiersModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any UserIdentifiersModel refers to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @classmethod
+    def get_by_user_id(cls, user_id):
+        """Fetch a entry by user ID.
+
+        Args:
+            user_id: str. The user ID.
+
+        Returns:
+            UserIdentifiersModel. The model with user_id field equal to user_id
+            argument.
+        """
+        return cls.query(cls.user_id == user_id).get()

@@ -57,15 +57,20 @@ var ExplorationEditorFeedbackTab = function() {
    * Workflows
    */
   this.acceptSuggestion = async function(suggestionDescription) {
+    await waitFor.visibilityOf(
+      element(by.css(suggestionRowClassName)),
+      'Suggestion row takes too long to appear');
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
+
     await action.click('Matching Row', matchingRow);
     await action.click('View Suggestion Button', viewSuggestionButton);
     await action.sendKeys(
       'Suggestion Commit Message Input',
       suggestionCommitMessageInput, 'Commit message');
     await action.click('Accept Suggestion Button', acceptSuggestionButton);
+
     await waitFor.invisibilityOf(
       acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
     await waitFor.pageToFullyLoad();
@@ -116,9 +121,13 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.rejectSuggestion = async function(suggestionDescription) {
+    await waitFor.visibilityOf(
+      element(by.css(suggestionRowClassName)),
+      'Suggestion row takes too long to appear');
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
+
     await action.click(
       'Matching Suggestion Row and feedback subject', matchingRow);
     await action.click('View Suggestion Button', viewSuggestionButton);
@@ -126,6 +135,7 @@ var ExplorationEditorFeedbackTab = function() {
       'Suggestion Review Message Input',
       suggestionReviewMessageInput, 'Review message');
     await action.click('Reject Suggestion Button', rejectSuggestionButton);
+
     await waitFor.invisibilityOf(
       acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
     await waitFor.pageToFullyLoad();
@@ -174,7 +184,11 @@ var ExplorationEditorFeedbackTab = function() {
       by.css('.protractor-test-oppia-feedback-status-name'));
     await waitFor.visibilityOf(
       feedbackStatusElement, 'Feedback status is not visible.');
-    expect(await feedbackStatusElement.getText()).toEqual(feedbackStatus);
+    await waitFor.textToBePresentInElement(
+      feedbackStatusElement,
+      feedbackStatus,
+      `Expected ${await feedbackStatusElement.getText()} ` +
+      `to be ${feedbackStatus}`);
   };
 };
 
