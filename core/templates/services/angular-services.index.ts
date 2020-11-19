@@ -132,6 +132,7 @@ import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { SubtopicPageContentsObjectFactory } from 'domain/topic/SubtopicPageContentsObjectFactory';
 import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactory';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
@@ -302,6 +303,7 @@ import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
 import { TranslationTabActiveModeService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import { TranslationsBackendApiService } from 'services/translations-backend-api.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
@@ -599,10 +601,12 @@ export const angularServices: [string, unknown][] = [
   ['ThreadStatusDisplayService', ThreadStatusDisplayService],
   ['TopicCreationBackendApiService', TopicCreationBackendApiService],
   ['TopicObjectFactory', TopicObjectFactory],
+  ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
   ['TopicsAndSkillsDashboardBackendApiService',
     TopicsAndSkillsDashboardBackendApiService],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
+  ['TranslationLanguageService', TranslationLanguageService],
   ['TranslateService', TranslateService],
   ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
