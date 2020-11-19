@@ -79,6 +79,7 @@ class MockSnapshotMetadataModelValidator(
         base_model_validators.BaseSnapshotMetadataModelValidator):
 
     EXTERNAL_MODEL_NAME = 'external model'
+
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [

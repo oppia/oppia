@@ -59,10 +59,6 @@ OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
-NPM_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.18.0', 'bin', 'npm')
-YARN_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.22.0', 'bin', 'yarn')
 FRONTEND_TEST_CMDS = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
 TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
