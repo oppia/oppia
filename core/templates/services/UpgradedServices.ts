@@ -131,6 +131,8 @@ import { EditableCollectionBackendApiService } from
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { EmailDashboardBackendApiService } from
   'domain/email-dashboard/email-dashboard-backend-api.service';
 import { EndExplorationRulesService } from
