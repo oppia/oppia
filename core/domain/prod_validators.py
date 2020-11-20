@@ -36,7 +36,6 @@ from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import skill_fetchers
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
