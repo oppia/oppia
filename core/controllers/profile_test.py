@@ -30,8 +30,11 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import main_cron
 import python_utils
 import utils
+
+import webtest
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -396,10 +399,11 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_user_not_setting_email_prefs_on_signup(self):
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'username': 'abc', 'agreed_to_terms': True},
+            {'username': self.EDITOR_USERNAME, 'agreed_to_terms': True},
             csrf_token=csrf_token)
 
         # The email update preference should be whatever the setting in feconf
@@ -432,11 +436,15 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_user_allowing_emails_on_signup(self):
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'username': 'abc', 'agreed_to_terms': True,
-             'can_receive_email_updates': True},
+            {
+                'username': self.EDITOR_USERNAME,
+                'agreed_to_terms': True,
+                'can_receive_email_updates': True
+            },
             csrf_token=csrf_token)
 
         # The email update preference should be True in all cases.
@@ -468,11 +476,15 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_user_disallowing_emails_on_signup(self):
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'username': 'abc', 'agreed_to_terms': True,
-             'can_receive_email_updates': False},
+            {
+                'username': self.EDITOR_USERNAME,
+                'agreed_to_terms': True,
+                'can_receive_email_updates': False
+            },
             csrf_token=csrf_token)
 
         # The email update preference should be False in all cases.
@@ -579,7 +591,7 @@ class SignupTests(test_utils.GenericTestBase):
 
     def test_signup_page_does_not_have_top_right_menu(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response(feconf.SIGNUP_URL)
+        response = self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         # Sign in can't be inside an html tag, but can appear inside js code.
         response.mustcontain(no=['Logout'])
         self.logout()
@@ -588,7 +600,8 @@ class SignupTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response(feconf.SIGNUP_URL)
+        response = self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+        self.get_html_response(feconf.SIGNUP_URL)
         response = self.get_html_response('/create/0', expected_status_int=302)
         self.assertIn('logout', response.headers['location'])
         self.assertIn('create', response.headers['location'])
@@ -598,12 +611,13 @@ class SignupTests(test_utils.GenericTestBase):
     def test_to_check_url_redirection_in_signup(self):
         """To validate the redirections from return_url."""
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         # Registering this user fully.
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'username': 'abc', 'agreed_to_terms': True},
+            {'username': self.EDITOR_USERNAME, 'agreed_to_terms': True},
             csrf_token=csrf_token)
 
         def strip_domain_from_location_header(url):
@@ -641,6 +655,7 @@ class SignupTests(test_utils.GenericTestBase):
 
     def test_accepting_terms_is_handled_correctly(self):
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         response_dict = self.post_json(
@@ -656,14 +671,14 @@ class SignupTests(test_utils.GenericTestBase):
 
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'agreed_to_terms': True, 'username': 'myusername'},
+            {'agreed_to_terms': True, 'username': self.EDITOR_USERNAME},
             csrf_token=csrf_token)
 
         self.logout()
 
     def test_username_is_handled_correctly(self):
         self.login(self.EDITOR_EMAIL)
-
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         response_dict = self.post_json(
@@ -700,35 +715,38 @@ class SignupTests(test_utils.GenericTestBase):
 
     def test_default_dashboard_for_new_users(self):
         self.login(self.EDITOR_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         # This user should have the creator dashboard as default.
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'agreed_to_terms': True, 'username': 'creatoruser',
+            {'agreed_to_terms': True, 'username': self.EDITOR_USERNAME,
              'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
              'can_receive_email_updates': None},
             csrf_token=csrf_token)
 
-        user_id = user_services.get_user_id_from_username('creatoruser')
+        user_id = user_services.get_user_id_from_username(self.EDITOR_USERNAME)
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(
             user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR)
 
         self.logout()
 
+        user_services.create_new_user(
+            self.get_gae_id_from_email(self.VIEWER_EMAIL), self.VIEWER_EMAIL)
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         # This user should have the learner dashboard as default.
         self.post_json(
             feconf.SIGNUP_DATA_URL,
-            {'agreed_to_terms': True, 'username': 'learneruser',
+            {'agreed_to_terms': True, 'username': self.VIEWER_USERNAME,
              'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
              'can_receive_email_updates': None},
             csrf_token=csrf_token)
 
-        user_id = user_services.get_user_id_from_username('learneruser')
+        user_id = user_services.get_user_id_from_username(self.VIEWER_USERNAME)
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(
             user_settings.default_dashboard, constants.DASHBOARD_TYPE_LEARNER)
@@ -737,6 +755,8 @@ class SignupTests(test_utils.GenericTestBase):
 
     def test_user_settings_of_non_existing_user(self):
         self.login(self.OWNER_EMAIL)
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+
         values_dict = {
             'can_send_emails': False,
             'has_agreed_to_latest_terms': False,
@@ -799,6 +819,75 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
             self.delete_json('/delete-account-handler', expected_status_int=404)
 
 
+class DeleteAccountTests(test_utils.GenericTestBase):
+    """Integration tests for the account deletion."""
+
+    def setUp(self):
+        super(DeleteAccountTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
+        self.enable_deletion_swap = (
+            self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True))
+        self.testapp_swap_1 = self.swap(
+            self, 'testapp', webtest.TestApp(main_cron.app))
+        self.testapp_swap_2 = self.swap(
+            self, 'testapp', webtest.TestApp(main_cron.app))
+
+    def _run_account_deletion(self):
+        """Execute complete deletion for the user that is logged in."""
+        with self.enable_deletion_swap:
+            data = self.delete_json('/delete-account-handler')
+            self.assertEqual(data, {'success': True})
+
+        self.logout()
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        with self.testapp_swap_1:
+            self.get_html_response('/cron/users/user_deletion')
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        with self.testapp_swap_2:
+            self.get_html_response('/cron/users/fully_complete_user_deletion')
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.logout()
+
+    def test_delete_account_without_activities(self):
+        self._run_account_deletion()
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.editor_id))
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.editor_id))
+        self.assertIsNotNone(
+            user_models.DeletedUserModel.get_by_id(self.editor_id))
+
+    def test_new_signup_after_deleting_account(self):
+        self._run_account_deletion()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        self.assertNotEqual(
+            self.editor_id, self.get_user_id_from_email(self.EDITOR_EMAIL))
+
+    def test_delete_account_with_activities(self):
+        self.save_new_valid_collection('col_id', self.editor_id)
+        self.save_new_valid_exploration('exp_id', self.editor_id)
+        self.save_new_topic('topic_id', self.editor_id)
+        self.save_new_skill('skill_id', self.editor_id)
+        self.save_new_story('story_id', self.editor_id, 'topic_id')
+        self.save_new_subtopic('subtopic_id', self.editor_id, 'topic_id')
+
+        self._run_account_deletion()
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.editor_id))
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.editor_id))
+        self.assertIsNotNone(
+            user_models.DeletedUserModel.get_by_id(self.editor_id))
+
+
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
     GENERIC_DATE = datetime.datetime(2019, 5, 20)
     GENERIC_EPOCH = utils.get_time_in_millisecs(GENERIC_DATE)
@@ -824,7 +913,6 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         user_settings.validate()
         user_models.UserSettingsModel(
             id=user_settings.user_id,
-            gae_id=user_settings.gae_id,
             email=user_settings.email,
             role=user_settings.role,
             username=user_settings.username,
@@ -909,6 +997,8 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
     def test_username_check(self):
         self.signup('abc@example.com', 'abc')
 
+        user_services.create_new_user(
+            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 

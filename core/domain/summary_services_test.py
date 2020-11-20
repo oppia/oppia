@@ -178,6 +178,16 @@ class ExplorationDisplayableSummariesTest(
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
 
+    def test_get_human_readable_contributors_summary_with_deleted_user(self):
+        contributors_summary = {self.albert_id: 10}
+        user_services.mark_user_for_deletion(self.albert_id)
+        self.assertEqual(
+            {'[User being deleted]': {'num_commits': 10}},
+            summary_services.get_human_readable_contributors_summary(
+                contributors_summary
+            )
+        )
+
     def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
         # EXP_ID_1 -- private exploration owned by Albert.

@@ -35,7 +35,12 @@ class ConfigPropertySnapshotMetadataModel(
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """ConfigPropertySnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class ConfigPropertyModel(base_models.VersionedModel):
@@ -54,6 +59,11 @@ class ConfigPropertyModel(base_models.VersionedModel):
     def get_deletion_policy():
         """ConfigPropertyModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -77,7 +87,12 @@ class PlatformParameterSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content for a platform parameter snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """PlatformParameterSnapshotContentModel doesn't contain any data
+        directly corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class PlatformParameterModel(base_models.VersionedModel):
@@ -98,6 +113,11 @@ class PlatformParameterModel(base_models.VersionedModel):
     def get_deletion_policy():
         """PlatformParameterModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

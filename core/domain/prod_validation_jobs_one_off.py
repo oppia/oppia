@@ -43,6 +43,8 @@ import python_utils
     models.NAMES.topic, models.NAMES.user
 ])
 
+VALIDATION_STATUS_SUCCESS = 'fully-validated'
+
 
 class ProdValidationAuditOneOffJobMetaClass(type):
     """Type class for audit one off jobs. Registers classes inheriting from
@@ -89,46 +91,50 @@ class ProdValidationAuditOneOffJob( # pylint: disable=inherit-non-class
     @staticmethod
     def map(model_instance):
         """Implements a map function which defers to a pre-defined validator."""
+        model_name = model_instance.__class__.__name__
+        validator_cls_name = '%sValidator' % model_name
+        # Module name for models is of the form:
+        # 'core.storage.<model-type>.gae_models'.
+        # Module name for validators is of the form:
+        # 'core.domain.<model-type>_validators'.
+        # So, we extract the module name for models to obtain the module name
+        # for validators. There is no extra test required to verify that models
+        # and validators have names defined based on model-type since if they
+        # don't the validators test will automatically fail based on the import
+        # we perform here for validators.
+        model_module_name = model_instance.__module__
+        model_type = model_module_name.split('.')[2]
+        validator_module_name = '%s_validators' % model_type
+        # TODO(#10415): This try catch is required until all the validators are
+        # refactored. Remove the try catch block once #10415 is fixed.
+        try:
+            validator_module = importlib.import_module(
+                'core.domain.%s' % validator_module_name)
+        except ImportError:
+            validator_module = importlib.import_module(
+                'core.domain.prod_validators')
+        validator = getattr(validator_module, validator_cls_name)
         if not model_instance.deleted:
-            model_name = model_instance.__class__.__name__
-            validator_cls_name = '%sValidator' % model_name
-            # Module name for models is of the form:
-            # 'core.storgae.<model-type>.gae_models'.
-            # Module name for validators is of the form:
-            # 'core.domain.<model-type>_validators'.
-            # So, we extract the module name for models to obtain the module
-            # name for validators. There is no extra test required to verify
-            # that models and validators have names defined based on model-type
-            # since if they don't the validators test will automatically fail
-            # based on the import we perform here for validators.
-            model_module_name = model_instance.__module__
-            model_type = model_module_name.split('.')[2]
-            validator_module_name = '%s_validators' % model_type
-            # TODO(#10415): This try catch is required until all
-            # the validators are refactored. Remove the try catch block
-            # once #10415 is fixed.
-            try:
-                validator_module = importlib.import_module(
-                    'core.domain.%s' % validator_module_name)
-            except ImportError:
-                validator_module = importlib.import_module(
-                    'core.domain.prod_validators')
-            validator = getattr(validator_module, validator_cls_name)
             validator.validate(model_instance)
-            if len(validator.errors) > 0:
-                for error_key, error_val in validator.errors.items():
-                    yield (
-                        'failed validation check for %s of %s' % (
-                            error_key, model_name),
-                        (',').join(set(error_val)))
-            else:
+        else:
+            validator.validate_deleted(model_instance)
+
+        if len(validator.errors) > 0:
+            for error_key, error_list in validator.errors.items():
+                error_message = (
+                    ((',').join(set(error_list))).encode(encoding='utf-8'))
                 yield (
-                    'fully-validated %s' % model_name, 1)
+                    'failed validation check for %s of %s' % (
+                        error_key, model_name),
+                    python_utils.convert_to_bytes(error_message)
+                )
+        else:
+            yield ('%s %s' % (VALIDATION_STATUS_SUCCESS, model_name), 1)
 
     @staticmethod
     def reduce(key, values):
         """Yields number of fully validated models or the failure messages."""
-        if 'fully-validated' in key:
+        if VALIDATION_STATUS_SUCCESS in key:
             yield (key, len(values))
         else:
             yield (key, values)
@@ -327,6 +333,23 @@ class ExplorationSnapshotMetadataModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationSnapshotMetadataModel]
+
+    @staticmethod
+    def reduce(key, values):
+        """Yields the number of fully validated models or the failure messages.
+        By default, this method only yields a maximum of 10 errors if there are
+        multiple errors of the same type.
+
+        Note: This behaviour can be overriden in any subclass if more errors
+        need to be yielded. To do so, just change the yield statement to
+        yield all values instead of the first 10.
+        """
+        if VALIDATION_STATUS_SUCCESS in key:
+            yield (key, len(values))
+        else:
+            # Just yield ten errors of each error type since the list of errors
+            # for this model is quite large.
+            yield (key, values[:10])
 
 
 class ExplorationSnapshotContentModelAuditOneOffJob(
@@ -922,6 +945,14 @@ class DeletedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.DeletedUserModel]
 
 
+class DeletedUsernameModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates DeletedUsernameModels."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.DeletedUsernameModel]
+
+
 class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates TaskEntryModel."""
 
@@ -952,6 +983,14 @@ class UserAuthDetailsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserAuthDetailsModel]
+
+
+class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserIdentifiersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserIdentifiersModel]
 
 
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):

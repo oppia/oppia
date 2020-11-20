@@ -285,6 +285,7 @@ class FailingAdditionJobManager(jobs.BaseMapReduceJobManager):
     def _post_failure_hook(cls, job_id):
         model = MockSumModel.get_by_id(SUM_MODEL_ID)
         model.failed = True
+        model.update_timestamps()
         model.put()
 
 
@@ -361,7 +362,7 @@ class ParamNameTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'MapReduce task to URL .+ failed')
+            Exception, 'MapReduce task failed: Task<.*>')
 
         with assert_raises_regexp_context_manager:
             self.process_and_flush_pending_mapreduce_tasks()

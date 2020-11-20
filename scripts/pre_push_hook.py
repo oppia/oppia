@@ -59,10 +59,6 @@ OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
-NPM_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.18.0', 'bin', 'npm')
-YARN_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.22.0', 'bin', 'yarn')
 FRONTEND_TEST_CMDS = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
 TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
@@ -200,6 +196,31 @@ def git_diff_name_status(left, right, diff_filter=''):
         raise ValueError(err)
 
 
+def get_merge_base(branch, other_branch):
+    """Returns the most-recent commit shared by both branches. Order doesn't
+    matter.
+
+    The commit returned is the same one used on GitHub's UI for comparing pull
+    requests.
+
+    Args:
+        branch: str. A branch name or commit hash.
+        other_branch: str. A branch name or commit hash.
+
+    Returns:
+        str. The common commit hash shared by both branches.
+
+    Raises:
+        ValueError. An error occurred in the git command.
+    """
+    merge_base, err = start_subprocess_for_result(
+        ['git', 'merge-base', branch, other_branch])
+    if err:
+        raise ValueError(err)
+    else:
+        return merge_base.strip()
+
+
 def compare_to_remote(remote, local_branch, remote_branch=None):
     """Compare local with remote branch with git diff.
 
@@ -220,7 +241,10 @@ def compare_to_remote(remote, local_branch, remote_branch=None):
     git_remote = '%s/%s' % (remote, remote_branch)
     # Ensure that references to the remote branches exist on the local machine.
     start_subprocess_for_result(['git', 'pull', remote])
-    return git_diff_name_status(git_remote, local_branch)
+    # Only compare differences to the merge base of the local and remote
+    # branches (what GitHub shows in the files tab of pull requests).
+    return git_diff_name_status(
+        get_merge_base(git_remote, local_branch), local_branch)
 
 
 def extract_files_to_lint(file_diffs):

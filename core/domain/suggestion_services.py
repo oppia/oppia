@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import heapq
 import re
 
+from constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -115,8 +116,12 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        change['question_dict']['language_code'] = (
+            constants.DEFAULT_LANGUAGE_CODE)
+        change['question_dict']['question_state_data_schema_version'] = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         # The language code of the question, used for querying purposes.
-        language_code = change['question_dict']['language_code']
+        language_code = constants.DEFAULT_LANGUAGE_CODE
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
@@ -289,9 +294,11 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
 
-    suggestion_models.GeneralSuggestionModel.put_multi(
+    suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
         suggestion_models_to_update,
         update_last_updated_time=update_last_updated_time)
+    suggestion_models.GeneralSuggestionModel.put_multi(
+        suggestion_models_to_update)
 
 
 def get_commit_message_for_suggestion(author_username, commit_message):
@@ -875,6 +882,35 @@ def get_submitted_suggestions(user_id, suggestion_type):
     ])
 
 
+def get_info_about_suggestions_waiting_too_long_for_review():
+    """Gets the information about the suggestions that have been waiting longer
+    than suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days
+    for a review on the Contributor Dashboard. There can be information about at
+    most suggestion_models.MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN suggestions.
+    The information about the suggestions are returned in descending order by
+    the suggestion's review wait time.
+
+    Returns:
+        list(ReviewableSuggestionEmailContentInfo). A list of reviewable
+        suggestion email content info objects that represent suggestions that
+        have been waiting too long for a review. Each object contains the type
+        of the suggestion, the language of the suggestion, the suggestion
+        content (question/translation), and the date that the suggestion was
+        submitted for review. The objects are sorted in descending order based
+        on review wait time.
+    """
+    suggestions_waiting_too_long_for_review = [
+        get_suggestion_from_model(suggestion_model) for suggestion_model in (
+            suggestion_models.GeneralSuggestionModel
+            .get_suggestions_waiting_too_long_for_review())
+    ]
+    return [
+        create_reviewable_suggestion_email_info_from_suggestion(
+            suggestion) for suggestion in
+        suggestions_waiting_too_long_for_review
+    ]
+
+
 def get_user_proficiency_from_model(user_proficiency_model):
     """Converts the given UserContributionProficiencyModel to a
     UserContributionProficiency domain object.
@@ -914,6 +950,7 @@ def _update_user_proficiency(user_proficiency):
             user_proficiency.onboarding_email_sent
         )
 
+        user_proficiency_model.update_timestamps()
         user_proficiency_model.put()
 
     else:
@@ -1111,6 +1148,42 @@ def get_community_contribution_stats():
         community_contribution_stats_model)
 
 
+def get_suggestion_types_that_need_reviewers():
+    """Uses the community contribution stats to determine which suggestion
+    types need more reviewers. Suggestion types need more reviewers if the
+    number of suggestions in that type divided by the number of reviewers is
+    greater than config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+
+    Returns:
+        dict. A dictionary that uses the presence of its keys to indicate which
+        suggestion types need more reviewers. The possible key values are the
+        suggestion types listed in
+        suggestion_models.CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES. The dictionary
+        values for each suggestion type are the following:
+        - for question suggestions the value is an empty set
+        - for translation suggestions the value is a nonempty set containing the
+            language codes of the translation suggestions that need more
+            reviewers.
+    """
+    suggestion_types_needing_reviewers = {}
+    stats = get_community_contribution_stats()
+
+    language_codes_that_need_reviewers = (
+        stats.get_translation_language_codes_that_need_reviewers()
+    )
+    if len(language_codes_that_need_reviewers) != 0:
+        suggestion_types_needing_reviewers[
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT] = (
+                language_codes_that_need_reviewers
+            )
+
+    if stats.are_question_reviewers_needed():
+        suggestion_types_needing_reviewers[
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION] = {}
+
+    return suggestion_types_needing_reviewers
+
+
 def _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount):
     """Updates the community contribution stats counts associated with the given
@@ -1149,6 +1222,7 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
     stats = create_community_contribution_stats_from_model(stats_model)
     stats.validate()
 
+    stats_model.update_timestamps()
     stats_model.put()
 
 

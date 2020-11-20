@@ -31,15 +31,17 @@ import { AdminTaskManagerService } from
   'pages/admin-page/services/admin-task-manager.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import {
   PlatformParameterFilterType,
-  PlatformParameterFilterObjectFactory,
   PlatformParameterFilter,
-} from 'domain/platform_feature/platform-parameter-filter-object.factory';
+} from 'domain/platform_feature/platform-parameter-filter.model';
 import { PlatformParameter, FeatureStage } from
-  'domain/platform_feature/platform-parameter-object.factory';
-import { PlatformParameterRuleObjectFactory, PlatformParameterRule } from
-  'domain/platform_feature/platform-parameter-rule-object.factory';
+  'domain/platform_feature/platform-parameter.model';
+import { PlatformParameterRule } from
+  'domain/platform_feature/platform-parameter-rule.model';
 
 @Component({
   selector: 'admin-features-tab',
@@ -108,13 +110,13 @@ export class AdminFeaturesTabComponent implements OnInit {
   };
 
   private readonly defaultNewFilter: PlatformParameterFilter =
-    this.filterFactory.createFromBackendDict({
+    PlatformParameterFilter.createFromBackendDict({
       type: PlatformParameterFilterType.ServerMode,
       conditions: []
     });
 
   private readonly defaultNewRule: PlatformParameterRule =
-    this.ruleFactory.createFromBackendDict({
+    PlatformParameterRule.createFromBackendDict({
       filters: [this.defaultNewFilter.toBackendDict()],
       value_when_matched: false
     });
@@ -122,13 +124,15 @@ export class AdminFeaturesTabComponent implements OnInit {
   featureFlags: PlatformParameter[] = [];
   featureFlagNameToBackupMap: Map<string, PlatformParameter>;
 
+  isDummyApiEnabled: boolean = false;
+
   constructor(
     private windowRef: WindowRef,
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
     private apiService: PlatformFeatureAdminBackendApiService,
-    private ruleFactory: PlatformParameterRuleObjectFactory,
-    private filterFactory: PlatformParameterFilterObjectFactory,
+    private featureService: PlatformFeatureService,
+    private dummyApiService: PlatformFeatureDummyBackendApiService,
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
@@ -296,8 +300,19 @@ export class AdminFeaturesTabComponent implements OnInit {
     return issues;
   }
 
+  get isDummyFeatureEnabled(): boolean {
+    return this.featureService.status.DummyFeature.isEnabled;
+  }
+
+  async reloadDummyHandlerStatusAsync(): Promise<void> {
+    if (this.isDummyFeatureEnabled) {
+      this.isDummyApiEnabled = await this.dummyApiService.isHandlerEnabled();
+    }
+  }
+
   ngOnInit(): void {
     this.reloadFeatureFlagsAsync();
+    this.reloadDummyHandlerStatusAsync();
   }
 }
 
