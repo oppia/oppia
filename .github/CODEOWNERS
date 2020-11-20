@@ -110,13 +110,17 @@
 
 
 # Core documentation
+# TODO(#11220): Add @seanlip as codeowner after 2020-11-29.
 /AUTHORS @BenHenning
+# TODO(#11220): Add @seanlip as codeowner after 2020-11-29.
 /CHANGELOG @BenHenning
+# TODO(#11220): Add @seanlip as codeowner after 2020-11-29.
 /CONTRIBUTORS @BenHenning
 /LICENSE @BenHenning
 /NOTICE @BenHenning
 /core/templates/pages/about-page/ @DubeySandeep
-/core/templates/pages/about-page/about-page.component.html @BenHenning
+# TODO(#11220): Add @seanlip as codeowner after 2020-11-29.
+/core/templates/pages/about-page/about-page.constants.ts @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
 /core/templates/pages/privacy-page/privacy-page.mainpage.html @BenHenning
 /core/templates/pages/terms-page/ @DubeySandeep
