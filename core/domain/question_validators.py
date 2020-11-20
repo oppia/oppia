@@ -30,8 +30,15 @@ import python_utils
 import utils
 
 
-(base_models, question_models, skill_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.question, models.NAMES.skill, models.NAMES.user])
+(
+    base_models, exp_models,
+    question_models, skill_models,
+    story_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration,
+    models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.user
+])
 
 
 class QuestionModelValidator(base_model_validators.BaseModelValidator):

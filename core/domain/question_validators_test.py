@@ -1143,4 +1143,3 @@ class QuestionSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated QuestionSummaryModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-
