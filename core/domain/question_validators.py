@@ -25,10 +25,8 @@ from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_fetchers
 from core.platform import models
-
 import python_utils
 import utils
-
 
 (
     base_models, question_models,
