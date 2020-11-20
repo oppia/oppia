@@ -17,6 +17,7 @@
  * use in Protractor tests.
  */
 
+var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
 var ExplorationEditorFeedbackTab = function() {
@@ -56,13 +57,15 @@ var ExplorationEditorFeedbackTab = function() {
    * Workflows
    */
   this.acceptSuggestion = async function(suggestionDescription) {
+    await waitFor.visibilityOf(
+      element(by.css(suggestionRowClassName)),
+      'Suggestion row takes too long to appear');
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
     expect(await matchingRow.isDisplayed()).toBe(true);
     await matchingRow.click();
-    expect(await viewSuggestionButton.isDisplayed()).toBe(true);
-    await viewSuggestionButton.click();
+    await action.click('View suggestion button', viewSuggestionButton);
     expect(await acceptSuggestionButton.isDisplayed()).toBe(true);
     await suggestionCommitMessageInput.sendKeys('Commit message');
     await acceptSuggestionButton.click();
@@ -115,13 +118,15 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.rejectSuggestion = async function(suggestionDescription) {
+    await waitFor.visibilityOf(
+      element(by.css(suggestionRowClassName)),
+      'Suggestion row takes too long to appear');
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
     expect(await matchingRow.isDisplayed()).toBe(true);
     await matchingRow.click();
-    expect(await viewSuggestionButton.isDisplayed()).toBe(true);
-    await viewSuggestionButton.click();
+    await action.click('View suggestion button', viewSuggestionButton);
     expect(await rejectSuggestionButton.isDisplayed()).toBe(true);
     await suggestionReviewMessageInput.sendKeys('Review message');
     await rejectSuggestionButton.click();
@@ -164,7 +169,11 @@ var ExplorationEditorFeedbackTab = function() {
       by.css('.protractor-test-oppia-feedback-status-name'));
     await waitFor.visibilityOf(
       feedbackStatusElement, 'Feedback status is not visible.');
-    expect(await feedbackStatusElement.getText()).toEqual(feedbackStatus);
+    await waitFor.textToBePresentInElement(
+      feedbackStatusElement,
+      feedbackStatus,
+      `Expected ${await feedbackStatusElement.getText()} ` +
+      `to be ${feedbackStatus}`);
   };
 };
 
