@@ -64,13 +64,12 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env --skip-install
+          xvfb-run -a python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env 
           xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="additionalPlayerFeatures" --prod_env
         
 
   - id: e2e-core-editor-player-features
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
     volumes:
       - name: 'test'
         path: '/test'
@@ -79,11 +78,10 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env --skip-install
+          xvfb-run -a python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env 
     
   - id: e2e-creator-dashboard-improvements-tab
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
     volumes:
       - name: 'test'
         path: '/test'
@@ -92,12 +90,11 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="creatorDashboard" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --suite="creatorDashboard" --prod_env
           xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationImprovementsTab" --prod_env
     
   - id: e2e-exploration-statistics-translation-tab
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
     volumes:
       - name: 'test'
         path: '/test'
@@ -106,12 +103,11 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="explorationStatisticsTab" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationStatisticsTab" --prod_env
           xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationTranslationTab" --prod_env
   
   - id: e2e-exploration-feedback-history-tab
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
     volumes:
       - name: 'test'
         path: '/test'
@@ -120,12 +116,11 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="explorationFeedbackTab" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationFeedbackTab" --prod_env
           xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationHistoryTab" --prod_env
 
   - id: e2e-extensions
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
     volumes:
       - name: 'test'
         path: '/test'
@@ -134,11 +129,10 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="extensions" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --suite="extensions" --prod_env
 
   - id: e2e-learner-dashboard
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
     volumes:
       - name: 'test'
         path: '/test'
@@ -147,12 +141,11 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="learner" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --suite="learner" --prod_env
           xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env
 
   - id: e2e-skill-editor
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
     volumes:
       - name: 'test'
         path: '/test'
@@ -161,11 +154,10 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="skillEditor" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env
 
   - id: e2e-embedding
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
     volumes:
       - name: 'test'
         path: '/test'
@@ -174,4 +166,4 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="embedding" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --suite="embedding" --prod_env
