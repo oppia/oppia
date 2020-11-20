@@ -220,9 +220,9 @@
 # Google-app-engine configurations
 /appengine_config*.py @nithusha21
 /cron.yaml @nithusha21
-/index.yaml @BenHenning
-/queue.yaml @BenHenning
-/main_taskqueue.py @BenHenning
+/index.yaml @vojtechjelinek
+/queue.yaml @vojtechjelinek
+/main_taskqueue.py @vojtechjelinek
 
 
 # Global components and filters.
@@ -427,6 +427,7 @@
 /main_cron.py @nithusha21
 /main_mail.py @aks681
 /main.py @DubeySandeep @nithusha21
+# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
 /feconf.py @BenHenning @nithusha21
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
