@@ -161,7 +161,7 @@ var CollectionEditorPage = function() {
       'Editor Category Drop Down', editorCategoryDropdown.first());
     // Below line needs to be corrected under this issue
     // https://github.com/oppia/oppia/issues/10798 but it throws error
-    // "Failed cannot read property bind of undefined"on this change:-
+    // "Failed: Cannot read property 'bind' of undefined"on this change:-
     // await action.sendKeys('Category Item',
     // await browser.driver.switchTo().activeElement(),category + '\n');
     await browser.driver.switchTo().activeElement().sendKeys(category + '\n');
