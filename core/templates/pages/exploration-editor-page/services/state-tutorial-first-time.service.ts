@@ -20,13 +20,14 @@ import { EventEmitter } from '@angular/core';
 
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
-require('pages/exploration-editor-page/services/' +
+require(
+  'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time-backend-api.service.ts');
 
 angular.module('oppia').factory('StateTutorialFirstTimeService', [
-  'EditorFirstTimeEventsService', 'StateTutorialFirstTimeBackendApiService',
+  'EditorFirstTimeEventsService', 'StateTutorialEventRegistryBackendApiService',
   function(
-    EditorFirstTimeEventsService, StateTutorialFirstTimeBackendApiService) {
+    EditorFirstTimeEventsService, StateTutorialEventRegistryBackendApiService) {
     // Whether this is the first time the tutorial has been seen by this user.
     var _currentlyInEditorFirstVisit = true;
     var _currentlyInTranslationFirstVisit = true;
@@ -50,7 +51,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         if (_currentlyInEditorFirstVisit) {
           enterEditorForTheFirstTimeEventEmitter.emit();
           EditorFirstTimeEventsService.initRegisterEvents(expId);
-          StateTutorialFirstTimeBackendApiService
+          StateTutorialEventRegistryBackendApiService
           .recordEditorTutorialStartEvent(expId).then(
             null, function() {
               console.error(
@@ -79,7 +80,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         if (_currentlyInTranslationFirstVisit) {
           enterTranslationForTheFirstTimeEventEmitter.emit();
           EditorFirstTimeEventsService.initRegisterEvents(expId);
-          StateTutorialFirstTimeBackendApiService
+          StateTutorialEventRegistryBackendApiService
           .recordTranslationsTutorialStartEvent(expId).then(
             null, function() {
               console.error(

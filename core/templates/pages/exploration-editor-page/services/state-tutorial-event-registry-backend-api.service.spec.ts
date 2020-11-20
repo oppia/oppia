@@ -13,27 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for StateTutorialFirstTimeBackendApiService.
+ * @fileoverview Unit tests for StateTutorialEventRegistryBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { StateTutorialFirstTimeBackendApiService } from
-'./state-tutorial-first-time-backend-api.service';
+import { StateTutorialEventRegistryBackendApiService } from
+'./state-tutorial-event-registry-backend-api.servicevice';
 
-describe('StateTutorialFirstTimeService backend api service', () => {
-  let backendService: StateTutorialFirstTimeBackendApiService;
+describe('State tutorial first time backend api service', () => {
+  let backendApiService: StateTutorialEventRegistryBackendApiService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [StateTutorialFirstTimeBackendApiService]
+      providers: [StateTutorialEventRegistryBackendApiService]
     });
 
-    backendService = TestBed.get(StateTutorialFirstTimeBackendApiService);
+    backendApiService = TestBed.get(
+      StateTutorialEventRegistryBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -47,7 +48,7 @@ describe('StateTutorialFirstTimeService backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      backendService.recordEditorTutorialStartEvent('0')
+      backendApiService.recordEditorTutorialStartEvent('0')
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -68,7 +69,7 @@ describe('StateTutorialFirstTimeService backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      backendService.recordEditorTutorialStartEvent('0')
+      backendApiService.recordEditorTutorialStartEvent('0')
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -93,7 +94,7 @@ describe('StateTutorialFirstTimeService backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      backendService.recordTranslationsTutorialStartEvent('0')
+      backendApiService.recordTranslationsTutorialStartEvent('0')
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -115,7 +116,7 @@ describe('StateTutorialFirstTimeService backend api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      backendService.recordTranslationsTutorialStartEvent('0')
+      backendApiService.recordTranslationsTutorialStartEvent('0')
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(

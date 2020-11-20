@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview StateTutorialFirstTimeService backend api service.
+ * @fileoverview A backend API service to register tutorial events.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -27,7 +27,7 @@ import { UrlInterpolationService } from
 @Injectable({
   providedIn: 'root'
 })
-export class StateTutorialFirstTimeBackendApiService {
+export class StateTutorialEventRegistryBackendApiService {
 
   constructor(
       private http: HttpClient,
@@ -51,5 +51,5 @@ export class StateTutorialFirstTimeBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'StateTutorialFirstTimeBackendApiService',
-  downgradeInjectable(StateTutorialFirstTimeBackendApiService));
+  'StateTutorialEventRegistryBackendApiService',
+  downgradeInjectable(StateTutorialEventRegistryBackendApiService));
