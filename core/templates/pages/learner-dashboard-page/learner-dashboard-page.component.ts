@@ -330,14 +330,12 @@ angular.module('oppia').component('learnerDashboardPage', {
           ctrl.newMessage.text = null;
           var newMessageSummary = (
             FeedbackMessageSummary.createNewMessage(
-              ctrl.threadSummary.totalMessageCount, newMessage,
-              ctrl.username, ctrl.profilePictureUrl));
+              ctrl.threadSummary.totalMessageCount, newMessage, ctrl.username));
           ctrl.messageSummaries.push(newMessageSummary);
         });
       };
 
-      ctrl.showSuggestionModal = function(
-          newContent, oldContent, description) {
+      ctrl.showSuggestionModal = function(newContent, oldContent, description) {
         SuggestionModalForLearnerDashboardService.showSuggestionModal(
           'edit_exploration_state_content',
           {

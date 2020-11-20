@@ -38,14 +38,12 @@ export class FeedbackMessageSummary {
   currentContentHtml: string;
   description: string;
   authorUsername: string;
-  authorPictureUrl: string;
   createdOnMsecs: number;
 
   constructor(
       messageId: number, text: string, updatedStatus: string,
       suggestionHtml: string, currentContentHtml: string, description: string,
-      authorUsername: string, authorPictureUrl: string,
-      createdOnMsecs: number) {
+      authorUsername: string, createdOnMsecs: number) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -53,7 +51,6 @@ export class FeedbackMessageSummary {
     this.currentContentHtml = currentContentHtml;
     this.description = description;
     this.authorUsername = authorUsername;
-    this.authorPictureUrl = authorPictureUrl;
     this.createdOnMsecs = createdOnMsecs;
   }
 
@@ -62,19 +59,14 @@ export class FeedbackMessageSummary {
   ): FeedbackMessageSummary {
     // Date.now() returns number of milliseconds since 1970-01-01 UTC.
     let createdOnMsecs: number = new Date().getTime();
-    let authorPictureUrl = (
-      UrlInterpolationService.getProfilePictureUrl(authorUsername))
     return new FeedbackMessageSummary(
-      newMessageId, newMessageText, null, null, null, null, authorUsername,
-      authorPictureUrl, createdOnMsecs);
+      newMessageId, newMessageText, null, null, null, null,
+      authorUsername, createdOnMsecs);
   }
 
   static createFromBackendDict(
-      feedbackMessageSummaryBackendDict: FeedbackMessageSummaryBackendDict):
-      FeedbackMessageSummary {
-    let authorPictureUrl = (
-      UrlInterpolationService.getProfilePictureUrl(
-        feedbackMessageSummaryBackendDict.author_username))
+      feedbackMessageSummaryBackendDict: FeedbackMessageSummaryBackendDict
+  ): FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,
@@ -83,7 +75,7 @@ export class FeedbackMessageSummary {
       feedbackMessageSummaryBackendDict.current_content_html,
       feedbackMessageSummaryBackendDict.description,
       feedbackMessageSummaryBackendDict.author_username,
-      authorPictureUrl,
-      feedbackMessageSummaryBackendDict.created_on_msecs);
+      feedbackMessageSummaryBackendDict.created_on_msecs
+    );
   }
 }

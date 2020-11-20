@@ -259,7 +259,7 @@ class NewTopicHandler(base.BaseHandler):
 
         try:
             topic_domain.Topic.require_valid_name(name)
-        except:
+        except utils.ValidationError:
             raise self.InvalidInputException(
                 'Invalid topic name, received %s.' % name)
         new_topic_id = topic_services.get_new_topic_id()
@@ -321,7 +321,7 @@ class NewSkillHandler(base.BaseHandler):
             subtitled_html = (
                 state_domain.SubtitledHtml.from_dict(explanation_dict))
             subtitled_html.validate()
-        except:
+        except utils.ValidationError:
             raise self.InvalidInputException(
                 'Explanation should be a valid SubtitledHtml dict.')
 
