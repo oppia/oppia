@@ -22,7 +22,7 @@ require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
-  'state-tutorial-events-registry-backend-api.service.ts');
+  'state-tutorial-event-registry-backend-api.service.ts');
 
 angular.module('oppia').factory('StateTutorialFirstTimeService', [
   'EditorFirstTimeEventsService', 'StateTutorialEventRegistryBackendApiService',
