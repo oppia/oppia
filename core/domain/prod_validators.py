@@ -759,6 +759,19 @@ class ExplorationModelValidator(base_model_validators.BaseModelValidator):
                 snapshot_model_ids)]
 
 
+class ExplorationContextModelValidator(
+        base_model_validators.BaseModelValidator):
+    """Class for validating ExplorationContextModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.ExternalModelFetcherDetails(
+                'story_ids', story_models.StoryModel, [item.story_id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'exp_ids', exp_models.ExplorationModel, [item.id])]
+
+
 class ExplorationSnapshotMetadataModelValidator(
         base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationSnapshotMetadataModel."""

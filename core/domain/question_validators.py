@@ -31,13 +31,11 @@ import utils
 
 
 (
-    base_models, exp_models,
-    question_models, skill_models,
-    story_models, user_models
+    base_models, question_models,
+    skill_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration,
-    models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.user
+    models.NAMES.base_model, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.user
 ])
 
 
@@ -118,19 +116,6 @@ class QuestionModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [cls._validate_inapplicable_skill_misconception_ids]
-
-
-class ExplorationContextModelValidator(
-        base_model_validators.BaseModelValidator):
-    """Class for validating ExplorationContextModel."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'story_ids', story_models.StoryModel, [item.story_id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'exp_ids', exp_models.ExplorationModel, [item.id])]
 
 
 class QuestionSkillLinkModelValidator(base_model_validators.BaseModelValidator):
