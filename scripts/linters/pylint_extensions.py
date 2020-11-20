@@ -1375,7 +1375,6 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
-
         try:
             imported_module = node.do_import_module(node.modname)
         except astroid.AstroidBuildingException:
@@ -1460,7 +1459,6 @@ class FunctionArgsOrderChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node for a function or method
                 definition in the AST.
         """
-
         args_list = [args.name for args in node.args.args]
         if 'self' in args_list and args_list[0] != 'self':
             self.add_message('function-args-order-self', node=node)
@@ -1491,7 +1489,6 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.Import. Node for a import statement
                 in the AST.
         """
-
         modnode = node.root()
         names = [name for name, _ in node.names]
         # Checks import of domain layer in storage layer.
@@ -1519,7 +1516,6 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
-
         modnode = node.root()
         if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
             if 'core.domain' in node.modname:
@@ -1560,7 +1556,6 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-
         file_content = read_from_node(node)
         file_length = len(file_content)
 
@@ -1882,10 +1877,20 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
             node: astroid.nodes.FunctionDef. Node for a function definition
                 in the AST.
         """
-        line_number = node.lineno + len(node.doc.split('\n')) + 1
+        if node.doc is None:
+            line_number = node.lineno + 1
+        else:
+            line_number = node.lineno + len(node.doc.split('\n')) + 1
+        if node.args.args:
+            line_dif = (node.args.args[-1].lineno - node.lineno)
+            line_number += line_dif
+        while linecache.getline(
+                node.root().file, line_number).strip().startswith(b'#'):
+            line_number += 1
+
         if line_number != node.body[0].lineno:
-            #self.add_message(
-                #'blank-line-below-function-definition', node=node)
+            self.add_message(
+                'blank-line-below-function-definition', node=node)
 
 
 def register(linter):
