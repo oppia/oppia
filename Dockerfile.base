@@ -31,5 +31,3 @@ RUN export JAVA_HOME
 
 # Install xvfb
 RUN apt-get install -y xvfb
-
-
