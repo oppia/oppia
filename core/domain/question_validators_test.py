@@ -19,19 +19,20 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
-from core.platform import models
+import datetime
 
+from constants import constants
+
+from core.domain import prod_validation_jobs_one_off
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.platform import models
 from core.tests import test_utils
-from core.domain import prod_validation_jobs_one_off
 
-import python_utils
-import datetime
 import feconf
+import python_utils
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -429,7 +430,6 @@ class QuestionSkillLinkModelValidatorTests(test_utils.AuditJobsTestBase):
             ), u'[u\'fully-validated QuestionSkillLinkModel\', 3]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-
 
 
 class QuestionSnapshotMetadataModelValidatorTests(
