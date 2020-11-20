@@ -45,8 +45,7 @@
 
 
 # Android team
-# TODO(#11083): Revert owner to @BenHenning after 2020-11-15.
-/core/domain/android_validation_constants*.py @rt4914
+/core/domain/android_validation_constants*.py @BenHenning
 
 
 # Angular Migration team
@@ -146,8 +145,7 @@
 
 
 # Dev workflow team.
-# TODO(#11083): Re-add owner @BenHenning after 2020-11-15.
-/.circleci/ @U8NWXD @kevintab95 @vinitamurthi
+/.circleci/ @BenHenning @U8NWXD @kevintab95 @vinitamurthi
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /.eslintignore @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
@@ -164,8 +162,7 @@
 /.pylintrc @DubeySandeep @Hudda
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
 /.stylelintrc @DubeySandeep @Hudda
-# TODO(#11083): Re-add owner @BenHenning after 2020-11-15.
-/.travis.yml @vinitamurthi @U8NWXD @kevintab95
+/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 # TODO(#10619): Add @bansalnitish as owner after 2020-10-31
@@ -616,15 +613,14 @@
 
 
 # Dynamic Feature Gating project
-# TODO(#11083): Re-add owner @BenHenning after 2020-11-15 (to all patterns in this section).
-/core/controllers/platform_feature*.py @vinitamurthi
-/core/domain/platform_feature_services*.py @vinitamurthi
-/core/domain/platform_parameter*.py @vinitamurthi
-/core/platform_feature*.py @vinitamurthi
-/core/storage/config/ @vinitamurthi
-/core/templates/domain/platform_feature/ @vinitamurthi
-/core/templates/pages/admin-page/features-tab/ @vinitamurthi
-/core/templates/services/platform-feature*.ts @vinitamurthi
+/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
+/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
+/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
+/core/platform_feature*.py @BenHenning @vinitamurthi
+/core/storage/config/ @BenHenning @vinitamurthi
+/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
+/core/templates/pages/admin-page/features-tab/ @BenHenning @vinitamurthi
+/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
 
 
 # Frontend unit tests
@@ -679,5 +675,4 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-# TODO(#11083): Re-add owner @BenHenning after 2020-11-15.
-/.github/workflows/ @vinitamurthi
+/.github/workflows/ @BenHenning @vinitamurthi
