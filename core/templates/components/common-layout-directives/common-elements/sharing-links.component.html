@@ -18,7 +18,7 @@
   </div>
   <div *ngIf="shareType === 'exploration'" title="Embed this Exploration" class="fx-main-center fx-cross-center padding-0-2">
     <a class="fx-main-center fx-cross-center" (click)="showEmbedExplorationModal()" tabindex="0">
-      <i class="material-icons md-48 embed-link share-icons" [ngClass] = "smallFont ? 'font-small' : 'font-big'">&#xE86F;</i>
+      <i class="material-icons embed-link share-icons emb" [ngClass] = "smallFont ? 'font-small' : 'font-big'">&#xE86F;</i>
       <span class="oppia-icon-accessibility-label">Embed this Exploration</span>
     </a>
   </div>
@@ -106,17 +106,18 @@
   i.oppia-share-icons.font-small {
     font-size: 18px;
   }
-  i.material-icons.md-48.embed-link.share-icons {
+  i.material-icons.embed-link.share-icons.emb {
     height: 28px;
     margin-top: 1px;
     width: 28px;
+    font-size: 28px;
   }
   .oppia-sharing-links .share-option-img.font-big {
     height: 28.5px;
     margin-top: 1px;
     width: 28.5px;
-}
-.fx-main-center.fx-cross-center.padding-0-2.twit {
-height: 28px;
-}
+  }
+  .fx-main-center.fx-cross-center.padding-0-2.twit {
+  height: 28px;
+  }
 </style>
