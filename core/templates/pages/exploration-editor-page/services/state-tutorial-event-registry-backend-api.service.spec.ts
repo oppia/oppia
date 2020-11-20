@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateTutorialEventRegistryBackendApiService } from
-'./state-tutorial-event-registry-backend-api.servicevice';
+'./state-tutorial-event-registry-backend-api.service';
 
 describe('State tutorial first time backend api service', () => {
   let backendApiService: StateTutorialEventRegistryBackendApiService;
