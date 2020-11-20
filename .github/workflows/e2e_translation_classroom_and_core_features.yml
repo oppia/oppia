@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e_group_1:
+  e2e_translation_classroom_and_core_features:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
