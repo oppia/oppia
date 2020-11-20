@@ -159,7 +159,7 @@ var CollectionEditorPage = function() {
   this.setCategory = async function(category) {
     await action.click(
       'Editor Category Drop Down', editorCategoryDropdown.first());
-    // Below line needs to be corrected under this issue
+    // Below line needs to be corrected under this issue:
     // https://github.com/oppia/oppia/issues/10798 but it throws error
     // "Failed: Cannot read property 'bind' of undefined"on this change:-
     // await action.sendKeys('Category Item',
