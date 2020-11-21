@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for creator dashboard page component.
  */
 
+import { TestBed } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // creator-dashboard-page.component.ts is upgraded to Angular 8.
 import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';

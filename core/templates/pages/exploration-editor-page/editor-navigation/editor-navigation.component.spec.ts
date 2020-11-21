@@ -364,13 +364,8 @@ describe('Editor Navigation Component', function() {
       explorationImprovementsService = $injector.get(
         'ExplorationImprovementsService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
-<<<<<<< HEAD
-      threadDataService = $injector.get('ThreadDataService');
-=======
-      userService = $injector.get('UserService');
       threadDataBackendApiService = (
         $injector.get('ThreadDataBackendApiService'));
->>>>>>> upstream/develop
       stateTutorialFirstTimeService = (
         $injector.get('StateTutorialFirstTimeService'));
 
