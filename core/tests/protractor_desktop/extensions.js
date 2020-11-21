@@ -126,6 +126,7 @@ describe('Interactions', function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
     await workflow.createExploration();
+
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
@@ -212,7 +213,6 @@ describe('Interactions', function() {
     await users.createAndLoginUser(
       'explorationEditor@interactions.com', 'explorationEditor');
     await workflow.createExploration();
-
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'));

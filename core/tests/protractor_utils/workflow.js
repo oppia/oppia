@@ -31,6 +31,8 @@ var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
   '.protractor-thumbnail-reset-button'));
+var stateNameText = element(
+  by.css('.oppia-state-name-text'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -93,6 +95,9 @@ var createExplorationAndStartTutorial = async function() {
       'createExplorationButton takes too long to be clickable.');
     await createExplorationButton.click();
   }
+
+  await waitFor.visibilityOf(
+    stateNameText, 'State name text takes too long to appear.');
 };
 
 /**
