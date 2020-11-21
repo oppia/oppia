@@ -22,7 +22,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 
 const constants = require('constants.ts');
 
-fdescribe('Site Analytics Service', () => {
+describe('Site Analytics Service', () => {
   let sas = null;
   let ws = null;
   let gaSpy: jasmine.Spy = null;
