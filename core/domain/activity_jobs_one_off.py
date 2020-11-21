@@ -742,6 +742,9 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             rights_model = exp_models.ExplorationRightsModel.get_version(
                 model_id, version)
             commit_log_model.post_commit_status = rights_model.status
+        commit_log_model.post_commit_is_private = (
+            commit_log_model.post_commit_status == (
+                constants.ACTIVITY_STATUS_PRIVATE))
         commit_log_model.update_timestamps(update_last_updated_time=False)
         commit_log_model.put()
         yield (
