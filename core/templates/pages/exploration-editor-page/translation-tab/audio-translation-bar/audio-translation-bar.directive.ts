@@ -76,8 +76,8 @@ interface AudioTranslationBarCustomScope extends ng.IScope {
 }
 
 angular.module('oppia').directive('audioTranslationBar', [
-  '$rootScope', 'UrlInterpolationService', 'UserService',
-  'UserExplorationPermissionsService',
+  '$rootScope', 'UrlInterpolationService',
+  'UserExplorationPermissionsService', 'UserService',
   function(
       $rootScope, UrlInterpolationService, UserService,
       UserExplorationPermissionsService) {
