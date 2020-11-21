@@ -70,8 +70,8 @@ angular.module('oppia').component('questionOpportunities', {
     function(
         $rootScope, $uibModal, AlertsService, ContextService,
         ContributionOpportunitiesService, QuestionObjectFactory,
-        QuestionUndoRedoService, SiteAnalyticsService, UrlInterpolationService,
-        UserService, MAX_QUESTIONS_PER_SKILL) {
+        QuestionUndoRedoService, SiteAnalyticsService,
+        UrlInterpolationService, UserService, MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
       let userIsLoggedIn = false;
 

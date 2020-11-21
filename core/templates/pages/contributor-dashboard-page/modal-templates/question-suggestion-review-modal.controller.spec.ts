@@ -62,7 +62,8 @@ describe('Question Suggestion Review Modal Controller', function() {
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
-      spyOn(SiteAnalyticsService,
+      spyOn(
+        SiteAnalyticsService,
         'registerContributorDashboardViewSuggestionForReview');
       spyOnAllFunctions(SuggestionModalService);
 
@@ -163,14 +164,13 @@ describe('Question Suggestion Review Modal Controller', function() {
         expect($scope.skillRubricExplanations).toEqual(['explanation']);
       });
 
-    it('should register Contributor Dashboard view suggestion for review event'
-      + ' after controller is initialized',
-      function() {
-        expect(
-          // eslint-disable-next-line max-len
-          SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview)
-            .toHaveBeenCalledWith('Question');
-      });
+    it('should register Contributor Dashboard view suggestion for review' +
+      ' event after controller is initialized', function() {
+      expect(
+        // eslint-disable-next-line max-len
+        SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview)
+          .toHaveBeenCalledWith('Question');
+    });
 
     it('should reset validation error message when user updates question',
       function() {

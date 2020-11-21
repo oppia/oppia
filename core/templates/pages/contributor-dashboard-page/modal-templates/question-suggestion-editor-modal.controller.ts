@@ -42,9 +42,9 @@ angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
       $scope, $uibModal, $uibModalInstance, AlertsService,
       ContextService, ImageLocalStorageService,
       QuestionSuggestionService, QuestionUndoRedoService,
-      QuestionValidationService, SiteAnalyticsService, UrlInterpolationService,
-      question, questionId, questionStateData, skill, skillDifficulty,
-      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      QuestionValidationService, SiteAnalyticsService,
+      UrlInterpolationService, question, questionId, questionStateData,
+      skill, skillDifficulty, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     $scope.canEditQuestion = true;
     $scope.newQuestionIsBeingCreated = true;
     $scope.question = question;

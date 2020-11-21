@@ -389,11 +389,11 @@ describe('Site Analytics Service', () => {
     sas.registerContributorDashboardSuggestEvent(contributionType);
 
     expect(gaSpy).toHaveBeenCalledWith(
-      'send', 'event', 'ContributorDashboardSuggest', 'click', contributionType);
+      'send', 'event', 'ContributorDashboardSuggest', 'click',
+      contributionType);
   });
 
-  it('should register Contributor Dashboard submit suggestion event',
-      () => {
+  it('should register Contributor Dashboard submit suggestion event', () => {
     const contributionType = 'Translation';
     sas.registerContributorDashboardSubmitSuggestionEvent(contributionType);
 
@@ -402,8 +402,8 @@ describe('Site Analytics Service', () => {
       contributionType);
   });
 
-  it('should register Contributor Dashboard view suggestion for review event',
-      () => {
+  it('should register Contributor Dashboard view suggestion for review event'
+    , () => {
     const contributionType = 'Translation';
     sas.registerContributorDashboardViewSuggestionForReview(contributionType);
 
@@ -412,8 +412,7 @@ describe('Site Analytics Service', () => {
       contributionType);
   });
 
-  it('should register Contributor Dashboard accept suggestion event',
-      () => {
+  it('should register Contributor Dashboard accept suggestion event', () => {
     const contributionType = 'Translation';
     sas.registerContributorDashboardAcceptSuggestion(contributionType);
 
@@ -422,8 +421,7 @@ describe('Site Analytics Service', () => {
       contributionType);
   });
 
-  it('should register Contributor Dashboard reject suggestion event',
-      () => {
+  it('should register Contributor Dashboard reject suggestion event', () => {
     const contributionType = 'Translation';
     sas.registerContributorDashboardRejectSuggestion(contributionType);
 

@@ -198,7 +198,8 @@ describe('Question Suggestion Editor Modal Controller', function() {
 
     it('should register Contributor Dashboard submit suggestion event on' +
       ' submit', function() {
-      spyOn(SiteAnalyticsService,
+      spyOn(
+        SiteAnalyticsService,
         'registerContributorDashboardSubmitSuggestionEvent');
       $scope.done();
       expect(

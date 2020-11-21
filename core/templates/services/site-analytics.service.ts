@@ -232,22 +232,22 @@ export class SiteAnalyticsService {
       'ContributorDashboardSuggest', 'click', contributionType);
   }
   registerContributorDashboardSubmitSuggestionEvent(
-    contributionType: string): void {
-  this._sendEventToGoogleAnalytics(
-    'ContributorDashboardSubmitSuggestion', 'click', contributionType);
+  contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardSubmitSuggestion', 'click', contributionType);
   }
   registerContributorDashboardViewSuggestionForReview(
-    contributionType: string): void {
-  this._sendEventToGoogleAnalytics(
-    'ContributorDashboardViewSuggestionForReview', 'click', contributionType);
+  contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardViewSuggestionForReview', 'click', contributionType);
   }
   registerContributorDashboardAcceptSuggestion(contributionType: string): void {
-  this._sendEventToGoogleAnalytics(
-    'ContributorDashboardAcceptSuggestion', 'click', contributionType);
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardAcceptSuggestion', 'click', contributionType);
   }
   registerContributorDashboardRejectSuggestion(contributionType: string): void {
-  this._sendEventToGoogleAnalytics(
-    'ContributorDashboardRejectSuggestion', 'click', contributionType);
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardRejectSuggestion', 'click', contributionType);
   }
 }
 

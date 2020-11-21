@@ -185,24 +185,24 @@ describe('Translation opportunities component', function() {
   });
 
   it('should register Contributor Dashboard suggest event when clicking button',
-      function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
-    spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
-      .callFake((activeLanguage, callback) => {
-        callback(opportunitiesArray, false);
-      });
-    spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
-    ctrl.$onInit();
-    $scope.$apply();
+    function() {
+      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+        isLoggedIn: () => true
+      }));
+      spyOn(contributionOpportunitiesService, 'getTranslationOpportunities').and
+        .callFake((activeLanguage, callback) => {
+          callback(opportunitiesArray, false);
+        });
+      spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
+      ctrl.$onInit();
+      $scope.$apply();
 
-    spyOn($uibModal, 'open').and.callThrough();
-    ctrl.onClickButton('2');
+      spyOn($uibModal, 'open').and.callThrough();
+      ctrl.onClickButton('2');
 
-    expect(siteAnalyticsService.registerContributorDashboardSuggestEvent)
-      .toHaveBeenCalledWith('Translation');
-  });
+      expect(siteAnalyticsService.registerContributorDashboardSuggestEvent)
+        .toHaveBeenCalledWith('Translation');
+    });
 
   it('should close translation modal when clicking save', function() {
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({

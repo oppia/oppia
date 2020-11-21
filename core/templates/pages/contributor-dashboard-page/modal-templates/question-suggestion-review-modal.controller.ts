@@ -25,10 +25,10 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
   'misconceptionsBySkill', 'question', 'questionHeader', 'reviewable',
   'skillDifficulty', 'skillRubrics', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $scope, $uibModalInstance, SiteAnalyticsService, SuggestionModalService,
-      authorName, contentHtml, misconceptionsBySkill, question,
-      questionHeader, reviewable, skillDifficulty, skillRubrics,
-      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      $scope, $uibModalInstance, SiteAnalyticsService,
+      SuggestionModalService, authorName, contentHtml,
+      misconceptionsBySkill, question, questionHeader, reviewable,
+      skillDifficulty, skillRubrics, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
       const skillDifficultyFloatToLabel = invertMap(
         SKILL_DIFFICULTY_LABEL_TO_FLOAT);

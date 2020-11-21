@@ -31,7 +31,6 @@ describe('Contributions and review component', function() {
   var contributionAndReviewService = null;
   var csrfTokenService = null;
   var misconceptionObjectFactory = null;
-  var siteAnalyticsService = null;
   var skillBackendApiService = null;
   var skillObjectFactory = null;
   var userService = null;
@@ -49,7 +48,6 @@ describe('Contributions and review component', function() {
         'ContributionAndReviewService');
       userService = $injector.get('UserService');
       contextService = $injector.get('ContextService');
-      siteAnalyticsService = $injector.get('SiteAnalyticsService');
       skillBackendApiService = $injector.get('SkillBackendApiService');
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');

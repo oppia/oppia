@@ -33,6 +33,7 @@ angular.module('oppia').controller(
       $scope.reviewMessage = '';
 
       if (reviewable) {
+        // eslint-disable-next-line max-len
         SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview(
           'Translation');
       }
