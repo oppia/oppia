@@ -79,11 +79,11 @@ export class UserBackendApiService {
       return this.http.get<PreferencesBackendDict>(
         this.PROFILE_PICTURE_URL).toPromise().then(
         (backendDict) => {
-          if(backendDict.profile_picture_data_url) {
+          if (backendDict.profile_picture_data_url) {
             return backendDict.profile_picture_data_url;
           } else {
             return defaultUrl;
-           };
+          }
         });
     }
 
@@ -110,12 +110,12 @@ export class UserBackendApiService {
 
     getUserContributionRightsData():
       Promise<UserContributionRightsDataBackendDict> {
-          return this.http.get<UserContributionRightsDataBackendDict>(
-            this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise().then(
-            (backendDict) => {
-              return backendDict;
-            });
-        }
+      return this.http.get<UserContributionRightsDataBackendDict>(
+        this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise().then(
+        (backendDict) => {
+          return backendDict;
+        });
+    }
 }
 
 angular.module('oppia').factory(

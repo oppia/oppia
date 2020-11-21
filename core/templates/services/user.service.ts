@@ -67,21 +67,21 @@ export class UserService {
     private returnUrl = '';
 
     getUserInfoAsync(): Promise<UserInfo> {
-        if (this.urlService.getPathname() === '/signup') {
-          return new Promise((resolve, reject) => {
-            resolve(UserInfo.createDefault());
-          }
-        }
-        if (this.userInfo) {
-          return new Promise((resolve, reject) => {
-            resolve(this.userInfo);
-          }
-        }
-        return this.userBackendApiService.getUserInfoAsync().then(
-          (userInfo) => {
-              this.userInfo = userInfo;
-              return this.userInfo;
-            });;
+      if (this.urlService.getPathname() === '/signup') {
+        return new Promise((resolve, reject) => {
+          resolve(UserInfo.createDefault());
+        });
+      }
+      if (this.userInfo) {
+        return new Promise((resolve, reject) => {
+          resolve(this.userInfo);
+        });
+      }
+      return this.userBackendApiService.getUserInfoAsync().then(
+        (userInfo) => {
+          this.userInfo = userInfo;
+          return this.userInfo;
+        });
     }
 
     getProfileImageDataUrlAsync(): Promise<string> {
@@ -104,7 +104,7 @@ export class UserService {
     setProfileImageDataUrlAsync(
         newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
       return this.userBackendApiService.setProfileImageDataUrlAsync(
-          newProfileImageDataUrl);
+        newProfileImageDataUrl);
     }
 
     getLoginUrlAsync(): Promise<string> {
@@ -118,18 +118,18 @@ export class UserService {
     }
 
     getUserContributionRightsData():
-      Promise<UserContributionRightsDataBackendDict> {       
-        if (this.userContributionRightsInfo) {
-          return new Promise((resolve, reject) => {
-            resolve(this.userContributionRightsInfo);
-          }
-        }
-        return this.userBackendApiService.getUserContributionRightsData()
-          .then((userContributionRightsInfo) => {
-            this.userContributionRightsInfo = userContributionRightsInfo;
-            return this.userContributionRightsInfo;
-          });
+      Promise<UserContributionRightsDataBackendDict> {
+      if (this.userContributionRightsInfo) {
+        return new Promise((resolve, reject) => {
+          resolve(this.userContributionRightsInfo);
+        });
       }
+      return this.userBackendApiService.getUserContributionRightsData()
+        .then((userContributionRightsInfo) => {
+          this.userContributionRightsInfo = userContributionRightsInfo;
+          return this.userContributionRightsInfo;
+        });
+    }
 }
 
 angular.module('oppia').factory(

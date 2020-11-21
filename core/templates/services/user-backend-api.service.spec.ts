@@ -118,25 +118,13 @@ describe('User Backend Api Service', () => {
 
   it('should return image data', fakeAsync(() => {
     var requestUrl = '/preferenceshandler/profile_picture';
-    // Creating a test user for checking profile picture of user.
-    var sampleUserInfoBackendObject = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      email: 'test@test.com',
-      user_is_logged_in: true
-    };
-
     var defaultUrl = urlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.webp');
+      '/avatar/user_blue_72px.webp');
+
     userBackendApiService.getProfileImageDataUrlAsync(defaultUrl).then(
       (dataUrl) => {
         expect(dataUrl).toBe('image data');
-    });
+      });
 
     const req2 = httpTestingController.expectOne(requestUrl);
     expect(req2.request.method).toEqual('GET');
