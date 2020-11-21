@@ -133,7 +133,8 @@ require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
 require(
-  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -176,7 +177,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'ParamSpecsObjectFactory', 'RouterService', 'SiteAnalyticsService',
     'StateEditorRefreshService', 'StateEditorService',
     'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-    'ThreadDataService', 'UrlInterpolationService',
+    'ThreadDataBackendApiService', 'UrlInterpolationService',
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'WindowDimensionsService',
     function(
@@ -197,7 +198,7 @@ angular.module('oppia').component('explorationEditorPage', {
         ParamSpecsObjectFactory, RouterService, SiteAnalyticsService,
         StateEditorRefreshService, StateEditorService,
         StateTopAnswersStatsService, StateTutorialFirstTimeService,
-        ThreadDataService, UrlInterpolationService,
+        ThreadDataBackendApiService, UrlInterpolationService,
         UserEmailPreferencesService, UserExplorationPermissionsService,
         WindowDimensionsService) {
       var ctrl = this;
@@ -251,7 +252,7 @@ angular.module('oppia').component('explorationEditorPage', {
           }),
           ExplorationFeaturesBackendApiService.fetchExplorationFeatures(
             ContextService.getExplorationId()),
-          ThreadDataService.getOpenThreadsCountAsync()
+          ThreadDataBackendApiService.getOpenThreadsCountAsync()
         ]).then(async([explorationData, featuresData, openThreadsCount]) => {
           if (explorationData.exploration_is_linked_to_story) {
             ContextService.setExplorationIsLinkedToStory();
@@ -478,7 +479,7 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.selectHistoryTab = () => RouterService.navigateToHistoryTab();
       ctrl.selectFeedbackTab = () => RouterService.navigateToFeedbackTab();
       ctrl.getOpenThreadsCount = (
-        () => ThreadDataService.getOpenThreadsCount());
+        () => ThreadDataBackendApiService.getOpenThreadsCount());
       ctrl.showUserHelpModal = () => {
         var explorationId = ContextService.getExplorationId();
         SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
