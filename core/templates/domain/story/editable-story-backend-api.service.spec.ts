@@ -75,7 +75,9 @@ describe('Editable story backend API service', () => {
       skill_summaries: [{
         id: 'skill_1',
         description: 'Skill Description'
-      }]
+      }],
+      topic_url_fragment: 'topic-frag',
+      classroom_url_fragment: 'math'
     };
   });
   afterEach(() => {
@@ -97,11 +99,11 @@ describe('Editable story backend API service', () => {
 
       expect(successHandler).toHaveBeenCalledWith({
         story: sampleDataResults.story,
-        topic_name: sampleDataResults.topic_name,
-        story_is_published: true,
-        skill_summaries: sampleDataResults.skill_summaries,
-        topic_url_fragment: undefined,
-        classroom_url_fragment: undefined
+        topicName: sampleDataResults.topic_name,
+        storyIsPublished: true,
+        skillSummaries: sampleDataResults.skill_summaries,
+        topicUrlFragment: sampleDataResults.topic_url_fragment,
+        classroomUrlFragment: sampleDataResults.classroom_url_fragment
       });
       expect(failHandler).not.toHaveBeenCalled();
     }
