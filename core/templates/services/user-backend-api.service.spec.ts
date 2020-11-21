@@ -145,34 +145,6 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should return the default profile image path when user is not logged',
-    fakeAsync(() => {
-      // Creating a test user for checking profile picture of user.
-      const sampleUserInfoBackendObject = {
-        is_moderator: false,
-        is_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: true,
-        preferred_site_language_code: null,
-        username: 'tester',
-        email: 'test@test.com',
-        user_is_logged_in: false
-      };
-
-      var defaultUrl = urlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.webp');
-      userBackendApiService.getProfileImageDataUrlAsync(defaultUrl).then(
-        (dataUrl) => {
-          expect(dataUrl).toBe(defaultUrl);
-        });
-      const req = httpTestingController.expectOne('/userinfohandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleUserInfoBackendObject);
-
-      flushMicrotasks();
-    }));
-
   it('should return the login url', fakeAsync(() => {
     const loginUrl = '/login';
     const currentUrl = 'dummy';
