@@ -79,8 +79,8 @@ angular.module('oppia').directive('audioTranslationBar', [
   '$rootScope', 'UrlInterpolationService',
   'UserExplorationPermissionsService', 'UserService',
   function(
-      $rootScope, UrlInterpolationService, UserService,
-      UserExplorationPermissionsService) {
+      $rootScope, UrlInterpolationService,
+      UserExplorationPermissionsService, UserService) {
     return {
       restrict: 'E',
       scope: {
