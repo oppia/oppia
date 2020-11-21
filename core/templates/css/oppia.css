@@ -4395,8 +4395,9 @@ oppia-noninteractive-link {
   border-radius: 4px;
   -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
   box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  height: auto;
+  max-height: 125px;
   min-height: 80px;
+  overflow-y: scroll;
   padding: 8px;
   word-wrap: break-word;
 }
