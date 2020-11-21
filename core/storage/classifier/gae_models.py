@@ -74,6 +74,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """ClassifierTrainingJobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -161,6 +166,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             data_schema_version=data_schema_version
             )
 
+        training_job_instance.update_timestamps()
         training_job_instance.put()
         return instance_id
 
@@ -214,6 +220,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
             job_models.append(training_job_instance)
             job_ids.append(instance_id)
+        cls.update_timestamps_multi(job_models)
         cls.put_multi(job_models)
         return job_ids
 
@@ -240,6 +247,11 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     def get_deletion_policy():
         """TrainingJobExplorationMappingModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -319,6 +331,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
                 id=instance_id, exp_id=exp_id, exp_version=exp_version,
                 state_name=state_name, job_id=job_id)
 
+            mapping_instance.update_timestamps()
             mapping_instance.put()
             return instance_id
         raise Exception('A model with the same ID already exists.')
@@ -349,5 +362,6 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
             mapping_models.append(mapping_instance)
             mapping_ids.append(instance_id)
+        cls.update_timestamps_multi(mapping_models)
         cls.put_multi(mapping_models)
         return mapping_ids

@@ -44,7 +44,6 @@ require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
 
-require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 require('pages/Base.ts');
@@ -61,7 +60,6 @@ require('services/html-escaper.service.ts');
 require('services/id-generation.service.ts');
 require('services/interaction-rules-registry.service.ts');
 require('services/navigation.service.ts');
-require('services/promo-bar.service.ts');
 require('services/rte-helper.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-interaction-stats.service.ts');
@@ -120,12 +118,11 @@ angular.module('oppia').config([
       'ExplorationRecommendationsService', 'ExpressionEvaluatorService',
       'ExpressionParserService', 'ExpressionSyntaxTreeService',
       'ExtensionTagAssemblerService', 'ExtractImageFilenamesFromStateService',
-      'FeedbackMessageSummaryObjectFactory', 'FeedbackThreadObjectFactory',
+      'FeedbackThreadObjectFactory',
       'FeedbackThreadSummaryObjectFactory', 'FileDownloadRequestObjectFactory',
-      'FocusManagerService', 'GuestCollectionProgressObjectFactory',
-      'GuestCollectionProgressService', 'HtmlEscaperService',
-      'I18nLanguageCodeService', 'IdGenerationService',
-      'ImageFileObjectFactory', 'ImagePreloaderService', 'ImprovementsService',
+      'FocusManagerService', 'GuestCollectionProgressService',
+      'HtmlEscaperService', 'I18nLanguageCodeService', 'IdGenerationService',
+      'ImageFileObjectFactory', 'ImprovementsService',
       'InteractionObjectFactory', 'InteractionRulesRegistryService',
       'LanguageUtilService', 'LearnerAnswerDetailsBackendApiService',
       'LearnerDashboardBackendApiService', 'LearnerParamsService',
@@ -141,29 +138,28 @@ angular.module('oppia').config([
       'PredictionAlgorithmRegistryService', 'PretestQuestionBackendApiService',
       'ProfilePageBackendApiService', 'QuestionBackendApiService',
       'QuestionSummaryForOneSkillObjectFactory', 'QuestionSummaryObjectFactory',
-      'RatingComputationService', 'ReadOnlyCollectionBackendApiService',
+      'RatingComputationService',
       'ReadOnlySubtopicPageObjectFactory', 'ReviewTestBackendApiService',
       'RubricObjectFactory', 'SchemaDefaultValueService',
       'SchemaUndefinedLastElementService', 'SidebarStatusService',
       'SiteAnalyticsService', 'SkillObjectFactory',
-      'SkillRightsBackendApiService', 'SkillRightsObjectFactory',
-      'SolutionObjectFactory', 'SolutionValidityService',
-      'SpeechSynthesisChunkerService', 'StateCardObjectFactory',
-      'StateClassifierMappingService', 'StateEditorService',
-      'StateInteractionStatsService', 'StateObjectFactory',
-      'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
-      'StatesObjectFactory', 'StopwatchObjectFactory',
-      'StoryContentsObjectFactory', 'StoryObjectFactory',
-      'StorySummaryObjectFactory', 'StoryViewerBackendApiService',
-      'SubtopicObjectFactory', 'SubtopicPageContentsObjectFactory',
-      'SubtopicPageObjectFactory', 'SubtopicViewerBackendApiService',
-      'SuggestionThreadObjectFactory', 'SuggestionsService',
-      'TextInputRulesService', 'ThreadMessageObjectFactory',
-      'ThreadMessageSummaryObjectFactory', 'ThreadStatusDisplayService',
-      'TopicObjectFactory', 'TopicRightsObjectFactory',
-      'TopicViewerBackendApiService', 'TranslationLanguageService',
-      'UrlInterpolationService', 'UrlService',
-      'UserExplorationPermissionsService', 'UserInfoObjectFactory',
+      'SkillRightsBackendApiService', 'SolutionObjectFactory',
+      'SolutionValidityService', 'SpeechSynthesisChunkerService',
+      'StateCardObjectFactory', 'StateClassifierMappingService',
+      'StateEditorService', 'StateInteractionStatsService',
+      'StateObjectFactory', 'StateTopAnswersStatsBackendApiService',
+      'StateTopAnswersStatsService', 'StatesObjectFactory',
+      'StopwatchObjectFactory', 'StoryContentsObjectFactory',
+      'StoryObjectFactory', 'StorySummaryObjectFactory',
+      'StoryViewerBackendApiService', 'SubtopicObjectFactory',
+      'SubtopicPageContentsObjectFactory', 'SubtopicPageObjectFactory',
+      'SubtopicViewerBackendApiService', 'SuggestionThreadObjectFactory',
+      'SuggestionsService', 'TextInputRulesService',
+      'ThreadMessageObjectFactory', 'ThreadMessageSummaryObjectFactory',
+      'ThreadStatusDisplayService', 'TopicObjectFactory',
+      'TopicRightsObjectFactory', 'TopicViewerBackendApiService',
+      'TranslationLanguageService', 'UrlInterpolationService', 'UrlService',
+      'UserExplorationPermissionsService',
       'UtilsService', 'ValidatorsService', 'WindowDimensionsService',
       'WindowRef',
     ];

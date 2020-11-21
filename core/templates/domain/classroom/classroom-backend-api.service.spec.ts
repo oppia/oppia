@@ -83,7 +83,8 @@ describe('Classroom backend API service', function() {
     // Sample topic object returnable from the backend.
     sampleClassroomDataObject = (
       ClassroomData.createFromBackendData(
-        responseDictionaries.name, responseDictionaries.topic_summary_dicts,
+        responseDictionaries.name,
+        responseDictionaries.topic_summary_dicts,
         responseDictionaries.course_details,
         responseDictionaries.topic_list_intro));
   });

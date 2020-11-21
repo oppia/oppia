@@ -40,7 +40,12 @@ class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationSnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class ExplorationModel(base_models.VersionedModel):
@@ -110,8 +115,15 @@ class ExplorationModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration is deleted only if it is not public."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        """ExplorationModel doesn't contain any data directly corresponding
+        to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -136,19 +148,6 @@ class ExplorationModel(base_models.VersionedModel):
             'default_skin': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skin_customizations': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether ExplorationModel or its snapshots references the given
-        user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_exploration_count(cls):
@@ -186,6 +185,7 @@ class ExplorationModel(base_models.VersionedModel):
             commit_cmds, exp_rights.status, exp_rights.community_owned
         )
         exploration_commit_log.exploration_id = self.id
+        exploration_commit_log.update_timestamps()
         exploration_commit_log.put()
 
     @classmethod
@@ -225,6 +225,8 @@ class ExplorationModel(base_models.VersionedModel):
                 )
                 exploration_commit_log.exploration_id = model.id
                 commit_log_models.append(exploration_commit_log)
+            ExplorationCommitLogEntryModel.update_timestamps_multi(
+                commit_log_models)
             datastore_services.put_multi_async(commit_log_models)
 
 
@@ -239,10 +241,15 @@ class ExplorationContextModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration context should be kept if the story and exploration are
-        published.
+        """ExplorationContextModel doesn't contain any data directly
+        corresponding to a user.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -250,19 +257,6 @@ class ExplorationContextModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether ExplorationContextModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
 
 class ExplorationRightsSnapshotMetadataModel(
@@ -276,7 +270,35 @@ class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationRightsSnapshotContentModel contains data corresponding to
+        a user: inside the content field there are owner_ids, editor_ids,
+        voice_artist_ids, and viewer_ids fields.
+
+        The pseudonymization of this model is handled in the wipeout_service
+        in the _pseudonymize_activity_models_with_associated_rights_models(),
+        based on the content_user_ids field of the
+        ExplorationRightsSnapshotMetadataModel.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationRightsSnapshotContentModel references
+        the given user. The owner_ids, editor_ids, voice_artist_ids,
+        and viewer_ids fields are checked through content_user_ids field in
+        the ExplorationRightsSnapshotMetadataModel.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return ExplorationRightsSnapshotMetadataModel.query(
+            ExplorationRightsSnapshotMetadataModel.content_user_ids == user_id
+        ).get(keys_only=True) is not None
 
 
 class ExplorationRightsModel(base_models.VersionedModel):
@@ -328,10 +350,23 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration rights are deleted only if the corresponding exploration
-        is not public.
+        """ExplorationRightsModel contains data to pseudonymize/delete
+        corresponding to a user: viewer_ids, voice_artist_ids, editor_ids,
+        and owner_ids fields.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance shared across users since multiple
+        users contribute to an exploration and have varying rights.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     @classmethod
     def get_export_policy(cls):
@@ -346,8 +381,21 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            # DEPRECATED in v2.8.3., so translator_ids are not exported.
             'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'owner_ids': 'owned_exploration_ids',
+            'editor_ids': 'editable_exploration_ids',
+            'viewer_ids': 'viewable_exploration_ids',
+            'voice_artist_ids': 'voiced_exploration_ids'
+        }
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -516,6 +564,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
+        snapshot_metadata_model.update_timestamps()
         snapshot_metadata_model.put()
 
     @classmethod
@@ -568,10 +617,19 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration commit log is deleted only if the corresponding
-        exploration is not public.
+        """ExplorationCommitLogEntryModel contains data corresponding to a user
+        that requires pseudonymization/deletion: user_id field.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
+
+    @staticmethod
+    def get_model_association_to_user():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -742,10 +800,13 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration summary is deleted only if the corresponding exploration
-        is not public.
+        """ExpSummaryModel contains data to pseudonymize/delete corresponding
+        to a user: viewer_ids, voice_artist_ids, editor_ids, owner_ids,
+        contributor_ids, and contributors_summary fields.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return (
+            base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
+        )
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -860,6 +921,13 @@ class ExpSummaryModel(base_models.BaseModel):
         ).order(
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model data has already been exported as a part of the
+        ExplorationModel and thus does not need a separate export.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

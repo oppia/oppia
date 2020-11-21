@@ -57,6 +57,11 @@ import { AlertsService } from 'services/alerts.service';
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+
 require(
   'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');
@@ -93,6 +98,10 @@ describe('Audio translation bar directive', function() {
   var mockActiveContentIdChangedEventEmitter = new EventEmitter();
   var mockActiveLanguageChangedEventEmitter = new EventEmitter();
   var mockShowTranslationTabBusyModalEventEmitter = new EventEmitter();
+
+  beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(function() {

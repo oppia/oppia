@@ -12,28 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('domain/user/UserInfoObjectFactory.ts');
-require('services/contextual/url.service.ts');
 
 /**
  * @fileoverview Service for user data.
  */
+import { UserInfo } from 'domain/user/user-info.model';
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').factory('UserService', [
   '$http', '$q', '$window', 'UrlInterpolationService', 'UrlService',
-  'UserInfoObjectFactory', 'DEFAULT_PROFILE_IMAGE_PATH',
+  'DEFAULT_PROFILE_IMAGE_PATH',
   function(
       $http, $q, $window, UrlInterpolationService, UrlService,
-      UserInfoObjectFactory, DEFAULT_PROFILE_IMAGE_PATH) {
+      DEFAULT_PROFILE_IMAGE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
     var USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
 
     var userInfo = null;
     var userContributionRightsInfo = null;
+    var returnUrl = '';
 
     var getUserInfoAsync = function() {
       if (UrlService.getPathname() === '/signup') {
-        return $q.resolve(UserInfoObjectFactory.createDefault());
+        return $q.resolve(UserInfo.createDefault());
       }
       if (userInfo) {
         return $q.resolve(userInfo);
@@ -42,10 +43,10 @@ angular.module('oppia').factory('UserService', [
         '/userinfohandler'
       ).then(function(response) {
         if (response.data.user_is_logged_in) {
-          userInfo = UserInfoObjectFactory.createFromBackendDict(response.data);
+          userInfo = UserInfo.createFromBackendDict(response.data);
           return $q.resolve(userInfo);
         } else {
-          return $q.resolve(UserInfoObjectFactory.createDefault());
+          return $q.resolve(UserInfo.createDefault());
         }
       });
     };
@@ -76,9 +77,12 @@ angular.module('oppia').factory('UserService', [
           data: newProfileImageDataUrl
         });
       },
+      setReturnUrl: function(newReturnUrl) {
+        returnUrl = newReturnUrl;
+      },
       getLoginUrlAsync: function() {
         var urlParameters = {
-          current_url: $window.location.pathname
+          current_url: returnUrl || $window.location.pathname
         };
         return $http.get('/url_handler', {params: urlParameters}).then(
           function(response) {

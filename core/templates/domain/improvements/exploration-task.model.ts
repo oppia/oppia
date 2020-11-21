@@ -17,7 +17,7 @@
  */
 
 import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
-import { TaskEntryBackendDict } from 'domain/improvements/TaskEntryObjectFactory';
+import { TaskEntryBackendDict } from 'domain/improvements/task-entry.model';
 import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
 import {
   IneffectiveFeedbackLoopTask

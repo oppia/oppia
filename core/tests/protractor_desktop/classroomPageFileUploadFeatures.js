@@ -77,7 +77,9 @@ describe('Classroom page functionality', function() {
           await elem.setValue(topicId);
         });
       await classroomPage.get('math');
-      await classroomPage.expectNumberOfTopicsToBe(0);
+      // Even if the topic is unpublished, an unclickable tile is shown
+      // currently.
+      await classroomPage.expectNumberOfTopicsToBe(1);
       await topicsAndSkillsDashboardPage.get();
       (
         await
