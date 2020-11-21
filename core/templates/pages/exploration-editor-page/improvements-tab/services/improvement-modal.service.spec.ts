@@ -44,7 +44,7 @@ describe('Improvement Modal Service', function() {
         can_edit: true
       })
     });
-    $provide.value('UserBackendApiService', {
+    $provide.value('UserService', {
       getUserInfoAsync: () => $q.resolve({
         isLoggedIn: () => true
       })

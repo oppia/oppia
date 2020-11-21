@@ -23,7 +23,7 @@ require(
 require('components/concept-card/concept-card.directive.ts');
 require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').directive('skillsMasteryList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -38,10 +38,10 @@ angular.module('oppia').directive('skillsMasteryList', [
         '/components/skills-mastery-list/skills-mastery-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$uibModal', 'UserBackendApiService', 'MASTERY_COLORS',
+        '$rootScope', '$uibModal', 'UserService', 'MASTERY_COLORS',
         'MASTERY_CUTOFF',
         function(
-            $rootScope, $uibModal, UserBackendApiService, MASTERY_COLORS,
+            $rootScope, $uibModal, UserService, MASTERY_COLORS,
             MASTERY_CUTOFF) {
           var ctrl = this;
           ctrl.getMasteryPercentage = function(degreeOfMastery) {
@@ -87,7 +87,7 @@ angular.module('oppia').directive('skillsMasteryList', [
           };
           ctrl.$onInit = function() {
             ctrl.userIsLoggedIn = null;
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.

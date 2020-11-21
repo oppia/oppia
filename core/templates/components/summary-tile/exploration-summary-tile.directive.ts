@@ -25,7 +25,7 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/date-time-format.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
@@ -96,11 +96,11 @@ angular.module('oppia').directive('explorationSummaryTile', [
       },
       controller: [
         '$rootScope', '$scope', '$window', 'DateTimeFormatService',
-        'RatingComputationService', 'UrlService', 'UserBackendApiService',
+        'RatingComputationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ACTIVITY_TYPE_EXPLORATION',
         function(
             $rootScope, $scope, $window, DateTimeFormatService,
-            RatingComputationService, UrlService, UserBackendApiService,
+            RatingComputationService, UrlService, UserService,
             WindowDimensionsService, ACTIVITY_TYPE_EXPLORATION) {
           var ctrl = this;
           $scope.setHoverState = function(hoverState) {
@@ -180,7 +180,7 @@ angular.module('oppia').directive('explorationSummaryTile', [
           };
           ctrl.$onInit = function() {
             $scope.userIsLoggedIn = null;
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               $scope.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.

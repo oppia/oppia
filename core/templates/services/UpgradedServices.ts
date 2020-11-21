@@ -514,7 +514,7 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UtilsService } from 'services/utils.service';
@@ -1223,7 +1223,7 @@ export class UpgradedServices {
     upgradedServices['TranslationsBackendApiService'] =
       new TranslationsBackendApiService(
         upgradedServices['HttpClient']);
-    upgradedServices['UserBackendApiService'] = new UserBackendApiService(
+    upgradedServices['UserService'] = new UserService(
       upgradedServices['HttpClient'],
       upgradedServices['WindowRef'],
       upgradedServices['UrlInterpolationService'],

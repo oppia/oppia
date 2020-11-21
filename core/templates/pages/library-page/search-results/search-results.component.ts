@@ -23,7 +23,7 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require('services/search.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -31,10 +31,10 @@ angular.module('oppia').component('searchResults', {
   template: require('./search-results.component.html'),
   controller: [
     '$rootScope', '$timeout', '$window', 'LoaderService', 'SearchService',
-    'SiteAnalyticsService', 'UrlInterpolationService', 'UserBackendApiService',
+    'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
     function(
         $rootScope, $timeout, $window, LoaderService, SearchService,
-        SiteAnalyticsService, UrlInterpolationService, UserBackendApiService) {
+        SiteAnalyticsService, UrlInterpolationService, UserService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.getStaticImageUrl = function(imagePath) {
@@ -53,7 +53,7 @@ angular.module('oppia').component('searchResults', {
 
         ctrl.userIsLoggedIn = null;
         LoaderService.showLoadingScreen('Loading');
-        var userInfoPromise = UserBackendApiService.getUserInfoAsync();
+        var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           // TODO(#8521): Remove the use of $rootScope.$apply()

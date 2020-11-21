@@ -24,7 +24,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/editability.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 import { Subscription } from 'rxjs';
@@ -46,12 +46,12 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
       controller: [
         '$rootScope', '$scope', 'EditorFirstTimeEventsService',
         'FocusManagerService', 'StateEditorService', 'StateGraphLayoutService',
-        'UserBackendApiService', 'ENABLE_PREREQUISITE_SKILLS',
+        'UserService', 'ENABLE_PREREQUISITE_SKILLS',
         'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
             $rootScope, $scope, EditorFirstTimeEventsService,
             FocusManagerService, StateEditorService, StateGraphLayoutService,
-            UserBackendApiService, ENABLE_PREREQUISITE_SKILLS,
+            UserService, ENABLE_PREREQUISITE_SKILLS,
             EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -168,7 +168,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
               ENABLE_PREREQUISITE_SKILLS &&
               StateEditorService.isExplorationWhitelisted());
             ctrl.canEditRefresherExplorationId = null;
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               // We restrict editing of refresher exploration IDs to
               // admins/moderators for now, since the feature is still in
               // development.

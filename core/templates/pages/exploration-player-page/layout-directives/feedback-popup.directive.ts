@@ -19,7 +19,7 @@
 require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require('services/stateful/background-mask.service.ts');
 require('services/stateful/focus-manager.service.ts');
@@ -43,11 +43,11 @@ angular.module('oppia').directive('feedbackPopup', [
       controller: [
         '$element', '$http', '$log', '$rootScope', '$scope', '$timeout',
         'BackgroundMaskService', 'FocusManagerService',
-        'PlayerPositionService', 'UserBackendApiService',
+        'PlayerPositionService', 'UserService',
         'WindowDimensionsService', function(
             $element, $http, $log, $rootScope, $scope, $timeout,
             BackgroundMaskService, FocusManagerService,
-            PlayerPositionService, UserBackendApiService,
+            PlayerPositionService, UserService,
             WindowDimensionsService) {
           var ctrl = this;
           var feedbackUrl = (
@@ -134,7 +134,7 @@ angular.module('oppia').directive('feedbackPopup', [
             $scope.feedbackText = '';
             $scope.isSubmitterAnonymized = false;
             $scope.isLoggedIn = null;
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               $scope.isLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.

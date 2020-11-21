@@ -64,7 +64,7 @@ describe('Creator dashboard controller', () => {
   var suggestionsService = null;
   var SuggestionThreadObjectFactory = null;
   var ThreadMessageObjectFactory = null;
-  var UserBackendApiService = null;
+  var UserService = null;
   var userInfo = {
     canCreateCollections: () => true
   };
@@ -97,7 +97,7 @@ describe('Creator dashboard controller', () => {
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
     ThreadMessageObjectFactory = $injector.get('ThreadMessageObjectFactory');
-    UserBackendApiService = $injector.get('UserBackendApiService');
+    UserService = $injector.get('UserService');
 
     spyOn(CsrfService, 'getTokenAsync').and.returnValue(
       $q.resolve('sample-csrf-token'));
@@ -317,7 +317,7 @@ describe('Creator dashboard controller', () => {
               collectionSummary => CollectionSummary
                 .createFromBackendDict(collectionSummary))
           }));
-        spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
+        spyOn(UserService, 'getUserInfoAsync').and.returnValue(
           $q.resolve(userInfo));
 
         ctrl.$onInit();

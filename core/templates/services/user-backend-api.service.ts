@@ -19,11 +19,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
 import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 interface SubscriptionSummary {
   'creator_picture_data_url': string;
@@ -59,66 +55,38 @@ interface UserContributionRightsDataBackendDict {
 })
 export class UserBackendApiService {
   constructor(
-    private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService,
-    private windowRef: WindowRef
+    private http: HttpClient
   ) {}
 
+    private USER_INFO_URL = '/userinfohandler';
+    private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
     private PREFERENCES_DATA_URL = '/preferenceshandler/data';
     private USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
 
-    private userContributionRightsInfo = null;
-    private userInfo = null;
-    private returnUrl = '';
-
     getUserInfoAsync(): Promise<UserInfo> {
-      return new Promise((resolve, reject) => {
-        if (this.urlService.getPathname() === '/signup') {
-          return resolve(UserInfo.createDefault());
-        }
-        if (this.userInfo) {
-          return resolve(this.userInfo);
-        }
-        return this.http.get<UserInfoBackendDict>(
-          '/userinfohandler').toPromise().then(
-          (backendDict) => {
-            if (backendDict.user_is_logged_in) {
-              this.userInfo =
-                UserInfo.createFromBackendDict(
-                  backendDict);
-              return resolve(this.userInfo);
-            } else {
-              return resolve(
-                UserInfo.createDefault());
-            }
-          });
-      });
-    }
-    getProfileImageDataUrlAsync(): Promise<string> {
-      let profilePictureDataUrl = (
-        this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-      return this.getUserInfoAsync().then(
-        (userInfo) => {
-          if (userInfo.isLoggedIn()) {
-            return this.http.get<PreferencesBackendDict>(
-              '/preferenceshandler/profile_picture'
-            ).toPromise().then(
-              (backendDict) => {
-                if (backendDict.profile_picture_data_url) {
-                  profilePictureDataUrl =
-                    backendDict.profile_picture_data_url;
-                }
-                return profilePictureDataUrl;
-              });
+      return this.http.get<UserInfoBackendDict>(
+        this.USER_INFO_URL).toPromise().then(
+        (backendDict) => {
+          if (backendDict.user_is_logged_in) {
+            return UserInfo.createFromBackendDict(backendDict);
           } else {
-            return new Promise((resolve, reject) => {
-              resolve(profilePictureDataUrl);
-            });
+            return UserInfo.createDefault();
           }
         });
     }
+
+    getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
+      return this.http.get<PreferencesBackendDict>(
+        this.PROFILE_PICTURE_URL).toPromise().then(
+        (backendDict) => {
+          if(backendDict.profile_picture_data_url) {
+            return backendDict.profile_picture_data_url;
+          } else {
+            return defaultUrl;
+           };
+        });
+    }
+
     setProfileImageDataUrlAsync(
         newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
       const profileImageUpdateUrlData = {
@@ -128,10 +96,10 @@ export class UserBackendApiService {
       return this.http.put<PreferencesBackendDict>(
         this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();
     }
-    getLoginUrlAsync(): Promise<string> {
+
+    getLoginUrlAsync(currentUrl: string): Promise<string> {
       const urlParameters = {
-        current_url: this.returnUrl ||
-        this.windowRef.nativeWindow.location.pathname
+        current_url: currentUrl
       };
       return this.http.get<UrlBackendDict>(
         '/url_handler', { params: urlParameters }).toPromise().then(
@@ -139,24 +107,15 @@ export class UserBackendApiService {
           return backendDict.login_url;
         });
     }
-    setReturnUrl(newReturnUrl: string): void {
-      this.returnUrl = newReturnUrl;
-    }
+
     getUserContributionRightsData():
       Promise<UserContributionRightsDataBackendDict> {
-      return new Promise((resolve, reject) => {
-        if (this.userContributionRightsInfo) {
-          return resolve(this.userContributionRightsInfo);
-        } else {
           return this.http.get<UserContributionRightsDataBackendDict>(
             this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise().then(
             (backendDict) => {
-              this.userContributionRightsInfo = backendDict;
-              return resolve(this.userContributionRightsInfo);
+              return backendDict;
             });
         }
-      });
-    }
 }
 
 angular.module('oppia').factory(

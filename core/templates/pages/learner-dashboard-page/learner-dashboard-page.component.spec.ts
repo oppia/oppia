@@ -45,7 +45,7 @@ describe('Learner dashboard page', function() {
   var ExplorationObjectFactory = null;
   var LearnerDashboardBackendApiService = null;
   var SuggestionModalForLearnerDashboardService = null;
-  var UserBackendApiService = null;
+  var UserService = null;
 
   var profilePictureDataUrl = 'profile-picture-url';
   var userInfo = {
@@ -73,7 +73,7 @@ describe('Learner dashboard page', function() {
         'LearnerDashboardBackendApiService');
       SuggestionModalForLearnerDashboardService = $injector.get(
         'SuggestionModalForLearnerDashboardService');
-      UserBackendApiService = $injector.get('UserBackendApiService');
+      UserService = $injector.get('UserService');
 
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
@@ -226,9 +226,9 @@ describe('Learner dashboard page', function() {
           ));
       }
 
-      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync').and
+      spyOn(UserService, 'getProfileImageDataUrlAsync').and
         .returnValue($q.resolve(profilePictureDataUrl));
-      spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
+      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.resolve({
@@ -854,14 +854,14 @@ describe('Learner dashboard page', function() {
       CsrfTokenService = $injector.get('CsrfTokenService');
       LearnerDashboardBackendApiService = $injector.get(
         'LearnerDashboardBackendApiService');
-      UserBackendApiService = $injector.get('UserBackendApiService');
+      UserService = $injector.get('UserService');
 
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(UserBackendApiService, 'getProfileImageDataUrlAsync')
+      spyOn(UserService, 'getProfileImageDataUrlAsync')
         .and.returnValue($q.resolve(profilePictureDataUrl));
-      spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
+      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.reject({

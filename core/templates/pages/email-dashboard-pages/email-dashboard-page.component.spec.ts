@@ -27,7 +27,7 @@ describe('Email Dashboard Page', function() {
   var ctrl = null;
   var $q = null;
   var EmailDashboardDataService = null;
-  var UserBackendApiService = null;
+  var UserService = null;
   var LoaderService = null;
   var loadingMessage = null;
   var subscriptions = [];
@@ -44,7 +44,7 @@ describe('Email Dashboard Page', function() {
   importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     EmailDashboardDataService = $injector.get('EmailDashboardDataService');
-    UserBackendApiService = $injector.get('UserBackendApiService');
+    UserService = $injector.get('UserService');
     loadingMessage = '';
     LoaderService = $injector.get('LoaderService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
@@ -63,7 +63,7 @@ describe('Email Dashboard Page', function() {
     spyOn(EmailDashboardDataService, 'isPreviousPageAvailable').and.returnValue(
       true);
 
-    spyOn(UserBackendApiService, 'getUserInfoAsync').and.callFake(function() {
+    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
         getUsername: function() {
@@ -208,7 +208,7 @@ describe('Email Dashboard Page', function() {
       ctrl.$onInit();
       expect(loadingMessage).toBe('Loading');
       expect(ctrl.currentPageOfQueries).toEqual([]);
-      // For UserBackendApiService.
+      // For UserService.
       $scope.$apply();
       // For EmailDashboardDataService.
       $scope.$apply();

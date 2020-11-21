@@ -26,7 +26,7 @@ describe('Login required message component', function() {
   var $flushPendingTasks = null;
   var $q = null;
   var $scope = null;
-  var userBackendApiService = null;
+  var userService = null;
 
   var mockWindow = null;
 
@@ -51,7 +51,7 @@ describe('Login required message component', function() {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     var $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
-    userBackendApiService = $injector.get('UserBackendApiService');
+    userService = $injector.get('UserService');
 
     $scope = $rootScope.$new();
     ctrl = $componentController('loginRequiredMessage');
@@ -65,7 +65,7 @@ describe('Login required message component', function() {
     });
 
   it('should go to login url when login button is clicked', function() {
-    spyOn(userBackendApiService, 'getLoginUrlAsync').and.returnValue(
+    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       $q.resolve('login-url'));
 
     ctrl.onLoginButtonClicked();
@@ -77,7 +77,7 @@ describe('Login required message component', function() {
 
   it('should refresh page if login url is not provided when login button is' +
     ' clicked', function() {
-    spyOn(userBackendApiService, 'getLoginUrlAsync')
+    spyOn(userService, 'getLoginUrlAsync')
       .and.returnValue($q.resolve(null));
 
     ctrl.onLoginButtonClicked();

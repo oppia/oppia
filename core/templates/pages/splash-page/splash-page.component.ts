@@ -20,16 +20,16 @@ require('base-components/base-content.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
     '$rootScope', '$timeout', 'LoaderService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserBackendApiService', 'WindowRef',
+    'UrlInterpolationService', 'UserService', 'WindowRef',
     function(
         $rootScope, $timeout, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UserBackendApiService, WindowRef) {
+        UrlInterpolationService, UserService, WindowRef) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -66,7 +66,7 @@ angular.module('oppia').component('splashPage', {
       ctrl.$onInit = function() {
         ctrl.userIsLoggedIn = null;
         LoaderService.showLoadingScreen('Loading');
-        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+        UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
           // TODO(#8521): Remove the use of $rootScope.$apply()

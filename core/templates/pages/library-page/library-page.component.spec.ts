@@ -27,7 +27,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { of } from 'rxjs';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
 
 
 describe('Library controller', function() {
@@ -40,7 +40,7 @@ describe('Library controller', function() {
   var classroomBackendApiService = null;
   var csrfTokenService = null;
   var i18nLanguageCodeService = null;
-  var userBackendApiService = null;
+  var userService = null;
 
   var logErrorSpy = null;
   var mockWindow = null;
@@ -62,7 +62,7 @@ describe('Library controller', function() {
     $provide.value(
       'KeyboardShortcutService', TestBed.get(KeyboardShortcutService));
     $provide.value(
-      'UserBackendApiService', TestBed.get(UserBackendApiService));
+      'UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -94,14 +94,14 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userBackendApiService = $injector.get('UserBackendApiService');
+      userService = $injector.get('UserService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
       logErrorSpy = spyOn($log, 'error');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
         $q.resolve({
           isLoggedIn: () => true
         }));
@@ -360,14 +360,14 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userBackendApiService = $injector.get('UserBackendApiService');
+      userService = $injector.get('UserService');
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
       logErrorSpy = spyOn($log, 'error');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
         $q.resolve({
           isLoggedIn: () => false
         }));
@@ -470,12 +470,12 @@ describe('Library controller', function() {
       $q = $injector.get('$q');
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
-      userBackendApiService = $injector.get('UserBackendApiService');
+      userService = $injector.get('UserService');
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
         $q.resolve({
           isLoggedIn: () => true
         }));

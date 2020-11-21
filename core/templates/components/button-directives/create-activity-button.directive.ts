@@ -24,7 +24,7 @@ require('components/entity-creation-services/exploration-creation.service.ts');
 require('domain/utilities/browser-checker.service.ts');
 require('services/contextual/url.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -37,11 +37,11 @@ angular.module('oppia').directive('createActivityButton', [
       controller: [
         '$rootScope', '$timeout', '$uibModal', '$window',
         'ExplorationCreationService', 'SiteAnalyticsService',
-        'UrlService', 'UserBackendApiService', 'ALLOW_YAML_FILE_UPLOAD',
+        'UrlService', 'UserService', 'ALLOW_YAML_FILE_UPLOAD',
         function(
             $rootScope, $timeout, $uibModal, $window,
             ExplorationCreationService, SiteAnalyticsService,
-            UrlService, UserBackendApiService, ALLOW_YAML_FILE_UPLOAD) {
+            UrlService, UserService, ALLOW_YAML_FILE_UPLOAD) {
           var ctrl = this;
           ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent(
@@ -87,7 +87,7 @@ angular.module('oppia').directive('createActivityButton', [
 
             ctrl.canCreateCollections = null;
             ctrl.userIsLoggedIn = null;
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
             });

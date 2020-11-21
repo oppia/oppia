@@ -23,7 +23,7 @@ import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
 
 describe('Activity tiles infinity grid component', function() {
   var ctrl = null;
@@ -31,7 +31,7 @@ describe('Activity tiles infinity grid component', function() {
   var $rootScope = null;
   var $scope = null;
   var searchService = null;
-  var userBackendApiService = null;
+  var userService = null;
   var windowDimensionsService = null;
 
   var mockWindow = {
@@ -54,7 +54,7 @@ describe('Activity tiles infinity grid component', function() {
   });
 
   beforeEach(function() {
-    userBackendApiService = TestBed.get(UserBackendApiService);
+    userService = TestBed.get(UserService);
     windowDimensionsService = TestBed.get(WindowDimensionsService);
   });
 
@@ -69,7 +69,7 @@ describe('Activity tiles infinity grid component', function() {
 
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
       .returnValue(initialSearchResultsLoadedEmitter);
-    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => true
       }));

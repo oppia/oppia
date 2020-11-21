@@ -18,7 +18,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
@@ -37,8 +37,8 @@ angular.module('oppia').directive('adminNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/navbar/admin-navbar.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$rootScope', 'UserBackendApiService',
-        function($rootScope, UserBackendApiService) {
+      controller: ['$rootScope', 'UserService',
+        function($rootScope, UserService) {
           var ctrl = this;
           ctrl.showTab = function() {
             return AdminRouterService.showTab();
@@ -82,7 +82,7 @@ angular.module('oppia').directive('adminNavbar', [
 
           ctrl.$onInit = function() {
             ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-            UserBackendApiService.getProfileImageDataUrlAsync().then(
+            UserService.getProfileImageDataUrlAsync().then(
               function(dataUrl) {
                 ctrl.profilePictureDataUrl = dataUrl;
                 // TODO(#8521): Remove the use of $rootScope.$apply()
@@ -98,7 +98,7 @@ angular.module('oppia').directive('adminNavbar', [
             ctrl.isModerator = null;
             ctrl.isSuperAdmin = null;
             ctrl.profileUrl = '';
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
               ctrl.isModerator = userInfo.isModerator();
               ctrl.isSuperAdmin = userInfo.isSuperAdmin();

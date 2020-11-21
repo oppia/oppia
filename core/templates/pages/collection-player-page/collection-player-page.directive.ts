@@ -30,7 +30,7 @@ require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require('services/contextual/url.service.ts');
 
 angular.module('oppia').animation(
@@ -58,13 +58,13 @@ angular.module('oppia').directive('collectionPlayerPage', [
         '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
         'AlertsService', 'GuestCollectionProgressService', 'LoaderService',
         'PageTitleService', 'ReadOnlyCollectionBackendApiService',
-        'UrlInterpolationService', 'UrlService', 'UserBackendApiService',
+        'UrlInterpolationService', 'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
             $anchorScroll, $http, $location, $rootScope, $scope,
             AlertsService, GuestCollectionProgressService, LoaderService,
             PageTitleService, ReadOnlyCollectionBackendApiService,
-            UrlInterpolationService, UrlService, UserBackendApiService,
+            UrlInterpolationService, UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -316,7 +316,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                 var collectionAllowsGuestProgress = (
                   ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                     ctrl.collectionId) !== -1);
-                UserBackendApiService.getUserInfoAsync().then(
+                UserService.getUserInfoAsync().then(
                   function(userInfo) {
                     LoaderService.hideLoadingScreen();
                     ctrl.isLoggedIn = userInfo.isLoggedIn();

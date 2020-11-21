@@ -54,7 +54,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
 
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
@@ -88,7 +88,7 @@ describe('Audio translation bar directive', function() {
   var translationLanguageService = null;
   var translationTabActiveContentIdService = null;
   var userExplorationPermissionsService = null;
-  var userBackendApiService = null;
+  var userService = null;
   var voiceoverRecordingService = null;
 
   var stateName = 'State1';
@@ -152,7 +152,7 @@ describe('Audio translation bar directive', function() {
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
     $provide.value(
-      'UserBackendApiService', TestBed.get(UserBackendApiService));
+      'UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -748,9 +748,9 @@ describe('Audio translation bar directive', function() {
       $uibModal = $injector.get('$uibModal');
       userExplorationPermissionsService = $injector.get(
         'UserExplorationPermissionsService');
-      userBackendApiService = $injector.get('UserBackendApiService');
+      userService = $injector.get('UserService');
 
-      spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
         $q.resolve({
           isLoggedIn: () => true
         }));

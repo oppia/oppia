@@ -42,7 +42,7 @@ require(
 require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/local-storage.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 require(
   // eslint-disable-next-line max-len
@@ -53,12 +53,12 @@ angular.module('oppia').component('contributorDashboardPage', {
   controller: [
     '$rootScope', 'LanguageUtilService', 'LocalStorageService',
     'TranslationLanguageService', 'UrlInterpolationService',
-    'UserBackendApiService', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
+    'UserService', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
     'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
         $rootScope, LanguageUtilService, LocalStorageService,
         TranslationLanguageService, UrlInterpolationService,
-        UserBackendApiService, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
+        UserService, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
         DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
@@ -102,7 +102,7 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
 
-        UserBackendApiService.getProfileImageDataUrlAsync().then(
+        UserService.getProfileImageDataUrlAsync().then(
           function(dataUrl) {
             ctrl.profilePictureDataUrl = dataUrl;
             // TODO(#8521): Remove the use of $rootScope.$apply()
@@ -110,7 +110,7 @@ angular.module('oppia').component('contributorDashboardPage', {
             $rootScope.$applyAsync();
           });
 
-        UserBackendApiService.getUserContributionRightsData().then(
+        UserService.getUserContributionRightsData().then(
           function(userContributionRights) {
             ctrl.userCanReviewTranslationSuggestionsInLanguages = (
               getLanguageDescriptions(
@@ -136,7 +136,7 @@ angular.module('oppia').component('contributorDashboardPage', {
             $rootScope.$applyAsync();
           });
 
-        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+        UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userInfoIsLoading = false;
           if (userInfo.isLoggedIn()) {
             ctrl.userIsLoggedIn = true;

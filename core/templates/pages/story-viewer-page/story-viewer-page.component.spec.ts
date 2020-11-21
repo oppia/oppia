@@ -27,7 +27,7 @@ import { ReadOnlyStoryNode } from
 import { StoryNode } from 'domain/story/story-node.model';
 import { PageTitleService } from 'services/page-title.service';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
-import { UserBackendApiService } from 'services/user-backend-api.service.ts';
+import { UserService } from 'services/user.service.ts';
 
 describe('Story Viewer Page component', function() {
   var ctrl = null;
@@ -37,7 +37,7 @@ describe('Story Viewer Page component', function() {
   var assetsBackendApiService = null;
   var storyViewerBackendApiService = null;
   var urlService = null;
-  var userBackendApiService = null;
+  var userService = null;
   var mockWindow = null;
   var storyPlaythrough = null;
 
@@ -62,7 +62,7 @@ describe('Story Viewer Page component', function() {
     };
 
     $provide.value('$window', mockWindow);
-    $provide.value('UserBackendApiService', TestBed.get(UserBackendApiService));
+    $provide.value('UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -71,7 +71,7 @@ describe('Story Viewer Page component', function() {
     alertsService = $injector.get('AlertsService');
     assetsBackendApiService = $injector.get('AssetsBackendApiService');
     urlService = $injector.get('UrlService');
-    userBackendApiService = $injector.get('UserBackendApiService');
+    userService = $injector.get('UserService');
 
     spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and
       .returnValue('thumbnail-url');
@@ -81,11 +81,11 @@ describe('Story Viewer Page component', function() {
       'clasroom_1');
     spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
       'story_1');
-    spyOn(userBackendApiService, 'getUserInfoAsync')
+    spyOn(userService, 'getUserInfoAsync')
       .and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
-    spyOn(userBackendApiService, 'getLoginUrlAsync')
+    spyOn(userService, 'getLoginUrlAsync')
       .and.returnValue($q.resolve('/home'));
 
 

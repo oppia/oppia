@@ -18,17 +18,17 @@
 
 require('components/entity-creation-services/collection-creation.service.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').controller('CreateActivityModalController', [
   '$rootScope', '$scope', '$uibModalInstance', 'CollectionCreationService',
   'ExplorationCreationService', 'UrlInterpolationService',
-  'UserBackendApiService', function(
+  'UserService', function(
       $rootScope, $scope, $uibModalInstance, CollectionCreationService,
       ExplorationCreationService, UrlInterpolationService,
-      UserBackendApiService) {
-    UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+      UserService) {
+    UserService.getUserInfoAsync().then(function(userInfo) {
       $scope.canCreateCollections = (
         userInfo.canCreateCollections());
       // TODO(#8521): Remove the use of $rootScope.$apply()

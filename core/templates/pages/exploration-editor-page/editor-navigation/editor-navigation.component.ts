@@ -29,7 +29,7 @@ require('pages/exploration-editor-page/services/router.service.ts');
 require('services/context.service.ts');
 require('services/exploration-improvements.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -47,7 +47,7 @@ angular.module('oppia').component('editorNavigation', {
     'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
     'StateTutorialFirstTimeService',
-    'ThreadDataService', 'UrlInterpolationService', 'UserBackendApiService',
+    'ThreadDataService', 'UrlInterpolationService', 'UserService',
     'UserExplorationPermissionsService', 'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $timeout, $uibModal, ChangeListService,
@@ -56,7 +56,7 @@ angular.module('oppia').component('editorNavigation', {
         ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
         StateTutorialFirstTimeService,
-        ThreadDataService, UrlInterpolationService, UserBackendApiService,
+        ThreadDataService, UrlInterpolationService, UserService,
         UserExplorationPermissionsService, WindowDimensionsService) {
       this.directiveSubscriptions = new Subscription();
       $scope.showUserHelpModal = () => {
@@ -214,7 +214,7 @@ angular.module('oppia').component('editorNavigation', {
         $scope.isImprovementsTabEnabled = () => this.improvementsTabIsEnabled;
 
         this.userIsLoggedIn = false;
-        $q.when(UserBackendApiService.getUserInfoAsync())
+        $q.when(UserService.getUserInfoAsync())
           .then(userInfo => {
             this.userIsLoggedIn = userInfo.isLoggedIn();
             // TODO(#8521): Remove the use of $rootScope.$apply()

@@ -95,7 +95,7 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/messenger.service.ts');
 require('services/playthrough.service.ts');
 require('services/site-analytics.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
@@ -358,7 +358,7 @@ angular.module('oppia').directive('conversationSkin', [
         'RefresherExplorationConfirmationModalService',
         'SiteAnalyticsService', 'StateCardObjectFactory',
         'StatsReportingService', 'StoryViewerBackendApiService', 'UrlService',
-        'UserBackendApiService', 'WindowDimensionsService',
+        'UserService', 'WindowDimensionsService',
         'COMPONENT_NAME_FEEDBACK', 'CONTENT_FOCUS_LABEL_PREFIX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
@@ -387,7 +387,7 @@ angular.module('oppia').directive('conversationSkin', [
             RefresherExplorationConfirmationModalService,
             SiteAnalyticsService, StateCardObjectFactory,
             StatsReportingService, StoryViewerBackendApiService, UrlService,
-            UserBackendApiService, WindowDimensionsService,
+            UserService, WindowDimensionsService,
             COMPONENT_NAME_FEEDBACK, CONTENT_FOCUS_LABEL_PREFIX,
             CONTINUE_BUTTON_FOCUS_LABEL, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
@@ -785,7 +785,7 @@ angular.module('oppia').directive('conversationSkin', [
                       story_url_fragment: storyUrlFragment,
                       node_id: nodeId
                     });
-                  UserBackendApiService.setReturnUrl(loginRedirectUrl);
+                  UserService.setReturnUrl(loginRedirectUrl);
                 }
               } else {
                 ExplorationRecommendationsService.getRecommendedSummaryDicts(
@@ -1253,7 +1253,7 @@ angular.module('oppia').directive('conversationSkin', [
           };
 
           $scope.signIn = function() {
-            UserBackendApiService.getLoginUrlAsync().then(
+            UserService.getLoginUrlAsync().then(
               loginUrl => {
                 loginUrl ? $window.location = loginUrl : (
                   $window.location.reload());
@@ -1265,7 +1265,7 @@ angular.module('oppia').directive('conversationSkin', [
             $scope.isLoggedIn = null;
             $scope.storyNodeIdToAdd = null;
             $scope.inStoryMode = false;
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               $scope.isLoggedIn = userInfo.isLoggedIn();
             });
 

@@ -30,7 +30,7 @@ describe('Search Results component', function() {
   var $scope = null;
   var searchService = null;
   var siteAnalyticsService = null;
-  var userBackendApiService = null;
+  var userService = null;
 
   var mockWindow = {
     location: ''
@@ -58,11 +58,11 @@ describe('Search Results component', function() {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
     searchService = $injector.get('SearchService');
-    userBackendApiService = $injector.get('UserBackendApiService');
+    userService = $injector.get('UserService');
 
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
       .returnValue(initialSearchResultsLoadedEmitter);
-    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => true
       }));

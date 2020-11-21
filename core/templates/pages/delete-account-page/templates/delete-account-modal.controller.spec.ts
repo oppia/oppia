@@ -34,7 +34,7 @@ describe('Delete account modal', function() {
   var $q = null;
   var $scope = null;
   var $uibModalInstance = null;
-  var UserBackendApiService = null;
+  var UserService = null;
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
@@ -43,8 +43,8 @@ describe('Delete account modal', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
     $scope = $rootScope.$new();
-    UserBackendApiService = $injector.get('UserBackendApiService');
-    spyOn(UserBackendApiService, 'getUserInfoAsync').and.returnValue(
+    UserService = $injector.get('UserService');
+    spyOn(UserService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         getUsername: () => 'username'
       })

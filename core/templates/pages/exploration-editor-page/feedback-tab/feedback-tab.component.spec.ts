@@ -26,7 +26,7 @@ import { SuggestionThreadObjectFactory } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
 
 describe('Feedback Tab Component', function() {
   var ctrl = null;
@@ -41,7 +41,7 @@ describe('Feedback Tab Component', function() {
   var suggestionModalForExplorationEditorService = null;
   var suggestionThreadObjectFactory = null;
   var threadDataService = null;
-  var userBackendApiService = null;
+  var userService = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -65,7 +65,7 @@ describe('Feedback Tab Component', function() {
       'SuggestionModalService', TestBed.get(SuggestionModalService));
     $provide.value('RouterService', {});
     $provide.value(
-      'UserBackendApiService', TestBed.get(UserBackendApiService));
+      'UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -78,9 +78,9 @@ describe('Feedback Tab Component', function() {
     suggestionModalForExplorationEditorService = $injector.get(
       'SuggestionModalForExplorationEditorService');
     threadDataService = $injector.get('ThreadDataService');
-    userBackendApiService = $injector.get('UserBackendApiService');
+    userService = $injector.get('UserService');
 
-    spyOn(userBackendApiService, 'getUserInfoAsync').and.returnValue(
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         isLoggedIn: () => true
       }));

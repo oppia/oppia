@@ -17,20 +17,20 @@
  */
 
 require('services/site-analytics.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').component('loginRequiredMessage', {
   template: require('./login-required-message.component.html'),
   controller: [
     '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserBackendApiService',
+    'UrlInterpolationService', 'UserService',
     'OPPIA_AVATAR_LINK_URL', function(
         $rootScope, $timeout, $window, SiteAnalyticsService,
-        UrlInterpolationService, UserBackendApiService,
+        UrlInterpolationService, UserService,
         OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
       ctrl.onLoginButtonClicked = function() {
-        UserBackendApiService.getLoginUrlAsync().then(
+        UserService.getLoginUrlAsync().then(
           function(loginUrl) {
             if (loginUrl) {
               SiteAnalyticsService.registerStartLoginEvent('loginButton');

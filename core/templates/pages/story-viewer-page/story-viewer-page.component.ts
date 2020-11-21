@@ -37,19 +37,19 @@ require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/contextual/url.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').component('storyViewerPage', {
   template: require('./story-viewer-page.component.html'),
   controller: [
     '$rootScope', '$window', 'AlertsService', 'AssetsBackendApiService',
     'LoaderService', 'StoryViewerBackendApiService',
-    'UrlInterpolationService', 'UrlService', 'UserBackendApiService',
+    'UrlInterpolationService', 'UrlService', 'UserService',
     'ENTITY_TYPE', 'FATAL_ERROR_CODES',
     function(
         $rootScope, $window, AlertsService, AssetsBackendApiService,
         LoaderService, StoryViewerBackendApiService,
-        UrlInterpolationService, UrlService, UserBackendApiService,
+        UrlInterpolationService, UrlService, UserService,
         ENTITY_TYPE, FATAL_ERROR_CODES) {
       var ctrl = this;
 
@@ -107,7 +107,7 @@ angular.module('oppia').component('storyViewerPage', {
       };
 
       ctrl.signIn = function() {
-        UserBackendApiService.getLoginUrlAsync().then(
+        UserService.getLoginUrlAsync().then(
           loginUrl => {
             loginUrl ? $window.location = loginUrl : (
               $window.location.reload());
@@ -136,7 +136,7 @@ angular.module('oppia').component('storyViewerPage', {
       ctrl.$onInit = function() {
         ctrl.storyIsLoaded = false;
         ctrl.isLoggedIn = false;
-        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+        UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.isLoggedIn = userInfo.isLoggedIn();
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.

@@ -20,7 +20,7 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, Subscription } from 'rxjs';
-import { UserBackendApiService } from 'services/user-backend-api.service.ts';
+import { UserService } from 'services/user.service.ts';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
@@ -40,7 +40,7 @@ describe('Editor Navigation Component', function() {
   var explorationWarningsService = null;
   var stateTutorialFirstTimeService = null;
   var threadDataService = null;
-  var userBackendApiService = null;
+  var userService = null;
   var windowDimensionsService = null;
 
   var mockOpenPostTutorialHelpPopover = new EventEmitter();
@@ -71,7 +71,7 @@ describe('Editor Navigation Component', function() {
 
   beforeEach(function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
-    userBackendApiService = TestBed.get(UserBackendApiService);
+    userService = TestBed.get(UserService);
   });
 
   describe('when screen is large', function() {
@@ -99,7 +99,7 @@ describe('Editor Navigation Component', function() {
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(userBackendApiService, 'getUserInfoAsync').
+      spyOn(userService, 'getUserInfoAsync').
         and.returnValue(userInfo);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
@@ -371,7 +371,7 @@ describe('Editor Navigation Component', function() {
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(768);
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(userBackendApiService, 'getUserInfoAsync')
+      spyOn(userService, 'getUserInfoAsync')
         .and.returnValue(userInfo);
 
       spyOnProperty(

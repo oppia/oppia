@@ -37,7 +37,7 @@ require(
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
 require('services/editability.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -49,13 +49,13 @@ angular.module('oppia').component('feedbackTab', {
     'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
     'LoaderService', 'SuggestionModalForExplorationEditorService',
     'ThreadDataService', 'ThreadStatusDisplayService',
-    'UrlInterpolationService', 'UserBackendApiService',
+    'UrlInterpolationService', 'UserService',
     function(
         $q, $rootScope, $uibModal, AlertsService, ChangeListService,
         DateTimeFormatService, EditabilityService, ExplorationStatesService,
         LoaderService, SuggestionModalForExplorationEditorService,
         ThreadDataService, ThreadStatusDisplayService,
-        UrlInterpolationService, UserBackendApiService) {
+        UrlInterpolationService, UserService) {
       var ctrl = this;
 
       var _resetTmpMessageFields = function() {
@@ -225,7 +225,7 @@ angular.module('oppia').component('feedbackTab', {
         ctrl.clearActiveThread();
 
         return $q.all([
-          UserBackendApiService.getUserInfoAsync().then(
+          UserService.getUserInfoAsync().then(
             userInfo => ctrl.userIsLoggedIn = userInfo.isLoggedIn()),
           ctrl.fetchUpdatedThreads()
         ]).then(

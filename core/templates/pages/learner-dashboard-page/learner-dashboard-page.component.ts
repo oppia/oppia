@@ -42,7 +42,7 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/date-time-format.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 
@@ -54,7 +54,7 @@ angular.module('oppia').component('learnerDashboardPage', {
     'LearnerDashboardBackendApiService', 'LoaderService',
     'SuggestionModalForLearnerDashboardService',
     'ThreadStatusDisplayService', 'UrlInterpolationService',
-    'UserBackendApiService', 'ACTIVITY_TYPE_COLLECTION',
+    'UserService', 'ACTIVITY_TYPE_COLLECTION',
     'ACTIVITY_TYPE_EXPLORATION', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
     'FATAL_ERROR_CODES', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
     'LEARNER_DASHBOARD_SECTION_I18N_IDS',
@@ -66,7 +66,7 @@ angular.module('oppia').component('learnerDashboardPage', {
         LearnerDashboardBackendApiService, LoaderService,
         SuggestionModalForLearnerDashboardService,
         ThreadStatusDisplayService, UrlInterpolationService,
-        UserBackendApiService, ACTIVITY_TYPE_COLLECTION,
+        UserService, ACTIVITY_TYPE_COLLECTION,
         ACTIVITY_TYPE_EXPLORATION, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
         FATAL_ERROR_CODES, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
         LEARNER_DASHBOARD_SECTION_I18N_IDS,
@@ -436,7 +436,7 @@ angular.module('oppia').component('learnerDashboardPage', {
         };
         ctrl.PAGE_SIZE = 8;
         ctrl.Math = window.Math;
-        UserBackendApiService.getProfileImageDataUrlAsync().then(
+        UserService.getProfileImageDataUrlAsync().then(
           function(dataUrl) {
             ctrl.profilePictureDataUrl = dataUrl;
             // TODO(#8521): Remove the use of $rootScope.$apply()
@@ -446,7 +446,7 @@ angular.module('oppia').component('learnerDashboardPage', {
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.username = '';
-        var userInfoPromise = UserBackendApiService.getUserInfoAsync();
+        var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
           // TODO(#8521): Remove the use of $rootScope.$apply()

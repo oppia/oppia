@@ -117,7 +117,7 @@ require(
 
 require('domain/skill/skill-mastery-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 
@@ -143,7 +143,7 @@ angular.module('oppia').directive('questionPlayer', [
         '$location', '$rootScope', '$sanitize', '$sce', '$scope', '$uibModal',
         '$window', 'ExplorationPlayerStateService', 'PlayerPositionService',
         'QuestionPlayerStateService', 'SkillMasteryBackendApiService',
-        'UserBackendApiService', 'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM',
+        'UserService', 'COLORS_FOR_PASS_FAIL_MODE', 'HASH_PARAM',
         'MAX_MASTERY_GAIN_PER_QUESTION', 'MAX_MASTERY_LOSS_PER_QUESTION',
         'MAX_SCORE_PER_QUESTION', 'QUESTION_PLAYER_MODE', 'VIEW_HINT_PENALTY',
         'VIEW_HINT_PENALTY_FOR_MASTERY', 'WRONG_ANSWER_PENALTY',
@@ -152,7 +152,7 @@ angular.module('oppia').directive('questionPlayer', [
             $location, $rootScope, $sanitize, $sce, $scope, $uibModal,
             $window, ExplorationPlayerStateService, PlayerPositionService,
             QuestionPlayerStateService, SkillMasteryBackendApiService,
-            UserBackendApiService, COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM,
+            UserService, COLORS_FOR_PASS_FAIL_MODE, HASH_PARAM,
             MAX_MASTERY_GAIN_PER_QUESTION, MAX_MASTERY_LOSS_PER_QUESTION,
             MAX_SCORE_PER_QUESTION, QUESTION_PLAYER_MODE, VIEW_HINT_PENALTY,
             VIEW_HINT_PENALTY_FOR_MASTERY, WRONG_ANSWER_PENALTY,
@@ -576,7 +576,7 @@ angular.module('oppia').directive('questionPlayer', [
               }
             });
             ctrl.userIsLoggedIn = null;
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()

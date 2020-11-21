@@ -21,7 +21,7 @@ require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/date-time-format.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 
 require('components/summary-tile/collection-summary-tile.constants.ajs.ts');
 
@@ -50,10 +50,10 @@ angular.module('oppia').directive('collectionSummaryTile', [
         '/components/summary-tile/collection-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', 'DateTimeFormatService', 'UserBackendApiService',
+        '$rootScope', 'DateTimeFormatService', 'UserService',
         'ACTIVITY_TYPE_COLLECTION', 'COLLECTION_EDITOR_URL',
         'COLLECTION_VIEWER_URL', function(
-            $rootScope, DateTimeFormatService, UserBackendApiService,
+            $rootScope, DateTimeFormatService, UserService,
             ACTIVITY_TYPE_COLLECTION, COLLECTION_EDITOR_URL,
             COLLECTION_VIEWER_URL) {
           var ctrl = this;
@@ -87,7 +87,7 @@ angular.module('oppia').directive('collectionSummaryTile', [
           };
           ctrl.$onInit = function() {
             ctrl.userIsLoggedIn = null;
-            UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+            UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               // TODO(#8521): Remove the use of $rootScope.$apply()
               // once the controller is migrated to angular.

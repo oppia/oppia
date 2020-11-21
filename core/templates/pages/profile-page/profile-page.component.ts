@@ -28,7 +28,7 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/user-backend-api.service.ts');
+require('services/user.service.ts');
 require('services/date-time-format.service.ts');
 require('pages/profile-page/profile-page-backend-api.service');
 
@@ -36,10 +36,10 @@ angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
   controller: [
     '$log', '$rootScope', '$scope', 'DateTimeFormatService', 'LoaderService',
-    'UrlInterpolationService', 'UserBackendApiService', 'WindowRef',
+    'UrlInterpolationService', 'UserService', 'WindowRef',
     function(
         $log, $rootScope, $scope, DateTimeFormatService, LoaderService,
-        UrlInterpolationService, UserBackendApiService, WindowRef) {
+        UrlInterpolationService, UserService, WindowRef) {
       var ctrl = this;
       const ProfilePageBackendApiService = (
         OppiaAngularRootComponent.profilePageBackendApiService);
@@ -119,7 +119,7 @@ angular.module('oppia').component('profilePage', {
 
           ctrl.changeSubscriptionStatus = function() {
             if (ctrl.userNotLoggedIn) {
-              UserBackendApiService.getLoginUrlAsync().then(
+              UserService.getLoginUrlAsync().then(
                 function(loginUrl) {
                   if (loginUrl) {
                     WindowRef.nativeWindow.location.href = loginUrl;

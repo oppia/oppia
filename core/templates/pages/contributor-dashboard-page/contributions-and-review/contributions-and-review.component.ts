@@ -52,12 +52,12 @@ angular.module('oppia').component('contributionsAndReview', {
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionAndReviewService',
     'QuestionObjectFactory', 'SkillBackendApiService',
-    'UrlInterpolationService', 'UserBackendApiService', 'IMAGE_CONTEXT',
+    'UrlInterpolationService', 'UserService', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
         ContributionAndReviewService,
         QuestionObjectFactory, SkillBackendApiService,
-        UrlInterpolationService, UserBackendApiService, IMAGE_CONTEXT) {
+        UrlInterpolationService, UserService, IMAGE_CONTEXT) {
       var ctrl = this;
       var SUGGESTION_LABELS = {
         review: {
@@ -329,11 +329,11 @@ angular.module('oppia').component('contributionsAndReview', {
           }
         ];
 
-        UserBackendApiService.getUserInfoAsync().then(function(userInfo) {
+        UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           ctrl.userDetailsLoading = false;
           if (ctrl.userIsLoggedIn) {
-            UserBackendApiService.getUserContributionRightsData().then(
+            UserService.getUserContributionRightsData().then(
               function(userContributionRights) {
                 var userCanReviewTranslationSuggestionsInLanguages = (
                   userContributionRights
