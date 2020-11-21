@@ -286,6 +286,17 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             check_mock_function_calls['url_retrieve_is_called'])
         self.assertTrue(check_mock_function_calls['extractall_is_called'])
 
+    def test_proto_file_compilation(self):
+        with self.Popen_swap:
+            install_third_party_libs.compile_protobuf_files(['mock_path'])
+        self.assertTrue(self.check_function_calls['check_call_is_called'])
+
+    def test_proto_file_compilation_raises_exception_on_compile_errors(self):
+        with self.Popen_error_swap:
+            with self.assertRaisesRegexp(
+                Exception, 'Error compiling proto files at mock_path'):
+                install_third_party_libs.compile_protobuf_files(['mock_path'])
+
     def test_ensure_pip_library_is_installed(self):
         check_function_calls = {
             'pip_install_is_called': False

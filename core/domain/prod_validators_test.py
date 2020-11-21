@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import json
 import random
 
 from constants import constants
@@ -55,7 +54,6 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import feconf
-from proto import text_classifier_pb2
 import python_utils
 import utils
 
