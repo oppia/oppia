@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e:
+  e2e_history_statistics_tabs_and_extensions:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
@@ -36,12 +36,12 @@ jobs:
           sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
           sudo dpkg -i google-chrome.deb
           google-chrome --version
-      - name: Run Exploration Translation Tab E2E Test
+      - name: Run History Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationTranslationTab" --prod_env
-      - name: Run Learner Dashboard E2E Test
+        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="explorationHistoryTab" --prod_env
+      - name: Run Statistics Tab E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="learnerDashboard" --prod_env
-      - name: Run Classroom Page E2E Test
+        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="explorationStatisticsTab" --prod_env
+      - name: Run Extensions E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="classroomPage" --prod_env
+        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="extensions" --prod_env

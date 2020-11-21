@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,206 +16,204 @@
  * @fileoverview Unit tests for TopicRightsBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { TopicRightsBackendApiService } from
+  'domain/topic/topic-rights-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
-require('domain/topic/topic-rights-backend-api.service.ts');
-require('services/csrf-token.service.ts');
+describe('Topic rights backend API service', () => {
+  let topicRightsBackendApiService: TopicRightsBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let csrfService = null;
+  let successHandler = null;
+  let failHandler = null;
 
-describe('Topic rights backend API service', function() {
-  var TopicRightsBackendApiService = null;
-  var $rootScope = null;
-  var $httpBackend = null;
-  var CsrfService = null;
-  var topicId = '0';
+  let topicId = '0';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    TopicRightsBackendApiService = $injector.get(
-      'TopicRightsBackendApiService');
-    CsrfService = $injector.get('CsrfTokenService');
-    $rootScope = $injector.get('$rootScope');
-    $httpBackend = $injector.get('$httpBackend');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
     });
-  }));
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    topicRightsBackendApiService = TestBed.get(TopicRightsBackendApiService);
+
+    csrfService = TestBed.get(CsrfTokenService);
+    httpTestingController = TestBed.get(HttpTestingController);
+
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('simple-csrf-token');
+    });
   });
 
-  it('should fetch a topic rights', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
-    $httpBackend.expect('GET', '/rightshandler/get_topic_rights/' + topicId)
-      .respond(200);
-    TopicRightsBackendApiService.fetchTopicRights(topicId).then(
+  it('should fetch a topic rights', fakeAsync(() => {
+    topicRightsBackendApiService.fetchTopicRights(topicId).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+
+    const req = httpTestingController.expectOne(
+      '/rightshandler/get_topic_rights/' + topicId);
+    expect(req.request.method).toEqual('GET');
+    req.flush({}, {status: 200, statusText: ''});
+
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should not fetch a topic rights', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect('GET', '/rightshandler/get_topic_rights/' + topicId)
-      .respond(404);
-    TopicRightsBackendApiService.fetchTopicRights(topicId).then(
+  it('should not fetch a topic rights', fakeAsync(() => {
+    topicRightsBackendApiService.fetchTopicRights(topicId).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+
+    const req = httpTestingController.expectOne(
+      '/rightshandler/get_topic_rights/' + topicId);
+    expect(req.request.method).toEqual('GET');
+    req.flush({}, {status: 404, statusText: ''});
+
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
-  });
+  }));
 
-  it('should successfully publish and unpublish a topic', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/rightshandler/change_topic_status/0').respond(200);
-    TopicRightsBackendApiService.publishTopic(topicId).then(
+  it('should successfully publish and unpublish a topic', fakeAsync(() => {
+    topicRightsBackendApiService.publishTopic(topicId).then(
       successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
+
+    let req = httpTestingController.expectOne(
+      '/rightshandler/change_topic_status/0');
+    expect(req.request.method).toEqual('PUT');
+    req.flush({}, {status: 200, statusText: ''});
+
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
 
-    $httpBackend.expect(
-      'PUT', '/rightshandler/change_topic_status/0').respond(200);
-    TopicRightsBackendApiService.unpublishTopic(topicId).then(
+    topicRightsBackendApiService.unpublishTopic(topicId).then(
       successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
+
+    req = httpTestingController.expectOne(
+      '/rightshandler/change_topic_status/0');
+    expect(req.request.method).toEqual('PUT');
+    req.flush({}, {status: 200, statusText: ''});
+
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should call the provided fail handler on HTTP failure', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/rightshandler/change_topic_status/0').respond(
-      404, 'Topic doesn\'t not exist.');
-    TopicRightsBackendApiService.publishTopic(topicId).then(
+  it('should call the provided fail handler on HTTP failure', fakeAsync(() => {
+    topicRightsBackendApiService.publishTopic(topicId).then(
       successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
+
+    const req = httpTestingController.expectOne(
+      '/rightshandler/change_topic_status/0');
+    expect(req.request.method).toEqual('PUT');
+    req.flush(
+      {error: 'Topic doesn\'t not exist.'},
+      {status: 404, statusText: ''}
+    );
+
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
-  });
+  }));
 
-  it('should report an uncached topic rights after caching it', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+  it('should report an uncached topic rights after caching it',
+    fakeAsync(() => {
+      // The topic should not currently be cached.
+      expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
 
-    $httpBackend.expect(
-      'GET', '/rightshandler/get_topic_rights/0').respond(200, {
-      topic_id: 0,
-      topic_is_published: true,
-      manager_ids: ['user_id']
-    });
+      // A new topic should be fetched from the backend. Also,
+      // the returned topic should match the expected topic object.
+      topicRightsBackendApiService.loadTopicRights(topicId).then(
+        successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        '/rightshandler/get_topic_rights/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        topic_id: '0',
+        topic_is_published: true,
+        manager_ids: ['user_id']
+      }, {status: 200, statusText: ''});
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+      // It should now be cached.
+      expect(topicRightsBackendApiService.isCached(topicId)).toBe(true);
+    }));
+
+  it('should report a cached topic rights after caching it', fakeAsync(() => {
     // The topic should not currently be cached.
-    expect(TopicRightsBackendApiService.isCached(topicId)).toBe(false);
-
-    // A new topic should be fetched from the backend. Also,
-    // the returned topic should match the expected topic object.
-    TopicRightsBackendApiService.loadTopicRights(topicId).then(
-      successHandler, failHandler);
-
-    $httpBackend.flush();
-    $rootScope.$digest();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-    // It should now be cached.
-    expect(TopicRightsBackendApiService.isCached(topicId)).toBe(true);
-  });
-
-  it('should report a cached topic rights after caching it', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    // The topic should not currently be cached.
-    expect(TopicRightsBackendApiService.isCached(topicId)).toBe(false);
+    expect(topicRightsBackendApiService.isCached(topicId)).toBe(false);
 
     // Cache a topic rights object.
-    TopicRightsBackendApiService.cacheTopicRights(topicId, {
-      topic_id: 0,
+    topicRightsBackendApiService.cacheTopicRights(topicId, {
+      topic_id: '0',
       topic_is_published: true,
       manager_ids: ['user_id']
     });
 
     // It should now be cached.
-    expect(TopicRightsBackendApiService.isCached(topicId)).toBe(true);
+    expect(topicRightsBackendApiService.isCached(topicId)).toBe(true);
 
     // A new topic should not have been fetched from the backend. Also,
     // the returned topic should match the expected topic object.
-    TopicRightsBackendApiService.loadTopicRights(topicId).then(
+    topicRightsBackendApiService.loadTopicRights(topicId).then(
       successHandler, failHandler);
 
     // http://brianmcd.com/2014/03/27/a-tip-for-angular-unit-tests-with-promises.html
-    $rootScope.$digest();
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
-      topic_id: 0,
+      topic_id: '0',
       topic_is_published: true,
       manager_ids: ['user_id']
     });
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should send a topic rights mail', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/rightshandler/send_topic_publish_mail/' + topicId).respond(200);
-    TopicRightsBackendApiService.sendMail(topicId).then(
+  it('should send a topic rights mail', fakeAsync(() => {
+    topicRightsBackendApiService.sendMail(topicId, null).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    const req = httpTestingController.expectOne(
+      '/rightshandler/send_topic_publish_mail/' + topicId);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({}, {status: 200, statusText: ''});
+
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should handler error on sending topic rights mail', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/rightshandler/send_topic_publish_mail/' + topicId).respond(404);
-    TopicRightsBackendApiService.sendMail(topicId).then(
+  it('should handler error on sending topic rights mail', fakeAsync(() => {
+    topicRightsBackendApiService.sendMail(topicId, null).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+
+    const req = httpTestingController.expectOne(
+      '/rightshandler/send_topic_publish_mail/' + topicId);
+    expect(req.request.method).toEqual('PUT');
+    req.flush({}, {status: 404, statusText: ''});
+
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
-  });
+  }));
 });
