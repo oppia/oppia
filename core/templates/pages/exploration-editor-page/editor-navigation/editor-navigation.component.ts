@@ -19,7 +19,8 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require(
-  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/modal-templates/help-modal.controller.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
@@ -47,8 +48,9 @@ angular.module('oppia').component('editorNavigation', {
     'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
     'StateTutorialFirstTimeService',
-    'ThreadDataService', 'UrlInterpolationService', 'UserService',
-    'UserExplorationPermissionsService', 'WindowDimensionsService',
+    'ThreadDataBackendApiService', 'UrlInterpolationService',
+    'UserExplorationPermissionsService', 'UserService',
+    'WindowDimensionsService',
     function(
         $q, $rootScope, $scope, $timeout, $uibModal, ChangeListService,
         ContextService, EditabilityService,
@@ -56,8 +58,9 @@ angular.module('oppia').component('editorNavigation', {
         ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
         StateTutorialFirstTimeService,
-        ThreadDataService, UrlInterpolationService, UserService,
-        UserExplorationPermissionsService, WindowDimensionsService) {
+        ThreadDataBackendApiService, UrlInterpolationService,
+        UserExplorationPermissionsService, UserService,
+        WindowDimensionsService) {
       this.directiveSubscriptions = new Subscription();
       $scope.showUserHelpModal = () => {
         var explorationId = ContextService.getExplorationId();
@@ -165,7 +168,7 @@ angular.module('oppia').component('editorNavigation', {
       $scope.selectHistoryTab = () => RouterService.navigateToHistoryTab();
       $scope.selectFeedbackTab = () => RouterService.navigateToFeedbackTab();
       $scope.getOpenThreadsCount = (
-        () => ThreadDataService.getOpenThreadsCount());
+        () => ThreadDataBackendApiService.getOpenThreadsCount());
 
       this.$onInit = () => {
         $scope.ExplorationRightsService = ExplorationRightsService;

@@ -39,7 +39,7 @@ describe('Editor Navigation Component', function() {
   var explorationImprovementsService = null;
   var explorationWarningsService = null;
   var stateTutorialFirstTimeService = null;
-  var threadDataService = null;
+  var threadDataBackendApiService = null;
   var userService = null;
   var windowDimensionsService = null;
 
@@ -90,7 +90,8 @@ describe('Editor Navigation Component', function() {
       explorationImprovementsService = $injector.get(
         'ExplorationImprovementsService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
-      threadDataService = $injector.get('ThreadDataService');
+      threadDataBackendApiService = (
+        $injector.get('ThreadDataBackendApiService'));
       stateTutorialFirstTimeService = (
         $injector.get('StateTutorialFirstTimeService'));
 
@@ -333,7 +334,8 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should get open thread count', function() {
-      spyOn(threadDataService, 'getOpenThreadsCount').and.returnValue(5);
+      spyOn(
+        threadDataBackendApiService, 'getOpenThreadsCount').and.returnValue(5);
       expect($scope.getOpenThreadsCount()).toBe(5);
     });
 
@@ -362,7 +364,13 @@ describe('Editor Navigation Component', function() {
       explorationImprovementsService = $injector.get(
         'ExplorationImprovementsService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
+<<<<<<< HEAD
       threadDataService = $injector.get('ThreadDataService');
+=======
+      userService = $injector.get('UserService');
+      threadDataBackendApiService = (
+        $injector.get('ThreadDataBackendApiService'));
+>>>>>>> upstream/develop
       stateTutorialFirstTimeService = (
         $injector.get('StateTutorialFirstTimeService'));
 
