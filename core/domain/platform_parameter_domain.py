@@ -95,6 +95,8 @@ class EvaluationContext(python_utils.OBJECT):
 
     @property
     def app_version(self):
+        # TODO(#11208): Update the documentation below to reflect the change
+        # when the GAE app version is used for web & backend.
         """Returns client application version.
 
         Returns:

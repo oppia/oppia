@@ -29,14 +29,12 @@ export class ClientContext {
   readonly platformType: string;
   readonly browserType: string;
 
-  constructor(
-      platformType: string, browserType: string) {
+  constructor(platformType: string, browserType: string) {
     this.platformType = platformType;
     this.browserType = browserType;
   }
 
-  static create(
-      platformType: string, browserType: string): ClientContext {
+  static create(platformType: string, browserType: string): ClientContext {
     return new ClientContext(platformType, browserType);
   }
 

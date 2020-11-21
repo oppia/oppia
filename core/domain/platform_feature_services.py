@@ -163,6 +163,8 @@ def _create_evaluation_context_for_server():
     Returns:
         EvaluationContext. The context for evaluation.
     """
+    # TODO(#11208): Properly set app version below using GAE app version as
+    # part of the server & client context.
     return platform_parameter_domain.EvaluationContext.from_dict(
         {
             'platform_type': 'Backend',
