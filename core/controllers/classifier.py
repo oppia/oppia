@@ -87,14 +87,12 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
             email_manager.send_job_failure_email(job_id)
             raise self.InternalErrorException(
                 'The current status of the job cannot transition to COMPLETE.')
-        try:
-            classifier_data_proto = getattr(
-                payload_proto.job_result,
-                payload_proto.job_result.WhichOneof('classifier_frozen_model'))
-            classifier_services.store_classifier_data(
-                job_id, classifier_data_proto)
-        except Exception as e:
-            raise self.InternalErrorException(e)
+
+        classifier_data_proto = getattr(
+            payload_proto.job_result,
+            payload_proto.job_result.WhichOneof('classifier_frozen_model'))
+        classifier_services.store_classifier_data(
+            job_id, classifier_data_proto)
 
         # Update status of the training job to 'COMPLETE'.
         classifier_services.mark_training_job_complete(job_id)

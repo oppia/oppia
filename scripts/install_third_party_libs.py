@@ -120,12 +120,14 @@ def install_buf_and_protoc():
     """Installs buf and protoc for Linux or Darwin, depending upon the
     platform.
     """
-    if os.path.exists(BUF_DIR):
-        return
-
     buf_files = BUF_DARWIN_FILES if common.is_mac_os() else BUF_LINUX_FILES
     protoc_file = (
         PROTOC_DARWIN_FILE if common.is_mac_os() else PROTOC_LINUX_FILE)
+    buf_path = os.path.join(BUF_DIR, buf_files[0])
+    protoc_path = os.path.join(PROTOC_DIR, 'bin', 'protoc')
+
+    if os.path.isfile(buf_path) and os.path.isfile(protoc_path):
+        return
 
     common.ensure_directory_exists(BUF_DIR)
     for bin_file in buf_files:
@@ -139,9 +141,8 @@ def install_buf_and_protoc():
         os.remove(os.path.join(BUF_DIR, protoc_file))
     except Exception:
         raise Exception('Error installing protoc binary')
-    buf_path = os.path.join(BUF_DIR, buf_files[0])
     common.recursive_chmod(buf_path, 0o744)
-    common.recursive_chmod(os.path.join(PROTOC_DIR, 'bin', 'protoc'), 0o744)
+    common.recursive_chmod(protoc_path, 0o744)
 
 
 def compile_protobuf_files(proto_files_paths):
@@ -319,7 +320,7 @@ def main():
                 pass
 
     # Compile protobuf files.
-    python_utils.PRINT('Installing Buf and protoc binary.')
+    python_utils.PRINT('Installing buf and protoc binary.')
     install_buf_and_protoc()
     python_utils.PRINT('Compiling protobuf files.')
     compile_protobuf_files(PROTO_FILES_PATHS)
