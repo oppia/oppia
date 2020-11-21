@@ -46,7 +46,7 @@ export class NumberAttemptsService {
   }
 
   /**
-   * @returns {number} - The number of answer attempts by the learner
+   * @returns - The number of answer attempts by the learner
    * within a card.
    */
   getNumberAttempts(): number {
