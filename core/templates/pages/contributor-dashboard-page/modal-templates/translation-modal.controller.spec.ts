@@ -109,12 +109,13 @@ describe('Translation Modal Controller', function() {
     ' suggesting translated text',
   function() {
     $httpBackend.flush();
-    spyOn(SiteAnalyticsService,
+    spyOn(
+      SiteAnalyticsService,
       'registerContributorDashboardSubmitSuggestionEvent');
     $scope.suggestTranslatedText();
     expect(
       SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
-        .toHaveBeenCalledWith('Translation');
+      .toHaveBeenCalledWith('Translation');
   });
 
   it('should suggest more text to be translated when contributor finish' +

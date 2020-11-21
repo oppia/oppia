@@ -232,12 +232,12 @@ export class SiteAnalyticsService {
       'ContributorDashboardSuggest', 'click', contributionType);
   }
   registerContributorDashboardSubmitSuggestionEvent(
-  contributionType: string): void {
+      contributionType: string): void {
     this._sendEventToGoogleAnalytics(
       'ContributorDashboardSubmitSuggestion', 'click', contributionType);
   }
   registerContributorDashboardViewSuggestionForReview(
-  contributionType: string): void {
+      contributionType: string): void {
     this._sendEventToGoogleAnalytics(
       'ContributorDashboardViewSuggestionForReview', 'click', contributionType);
   }

@@ -169,7 +169,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect(
         // eslint-disable-next-line max-len
         SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview)
-          .toHaveBeenCalledWith('Question');
+        .toHaveBeenCalledWith('Question');
     });
 
     it('should reset validation error message when user updates question',
@@ -181,7 +181,8 @@ describe('Question Suggestion Review Modal Controller', function() {
 
     it('should accept suggestion in suggestion modal when clicking accept' +
       ' suggestion', function() {
-      spyOn(SiteAnalyticsService,
+      spyOn(
+        SiteAnalyticsService,
         'registerContributorDashboardAcceptSuggestion');
       $scope.reviewMessage = 'Review message example';
 
@@ -189,7 +190,7 @@ describe('Question Suggestion Review Modal Controller', function() {
 
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
-          .toHaveBeenCalledWith('Question');
+        .toHaveBeenCalledWith('Question');
       expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalledWith(
         $uibModalInstance, {
           action: 'accept',
@@ -200,7 +201,8 @@ describe('Question Suggestion Review Modal Controller', function() {
 
     it('should reject suggestion in suggestion modal when clicking reject' +
     ' suggestion button', function() {
-      spyOn(SiteAnalyticsService,
+      spyOn(
+        SiteAnalyticsService,
         'registerContributorDashboardRejectSuggestion');
       $scope.reviewMessage = 'Review message example';
 
@@ -208,7 +210,7 @@ describe('Question Suggestion Review Modal Controller', function() {
 
       expect(
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
-          .toHaveBeenCalledWith('Question');
+        .toHaveBeenCalledWith('Question');
       expect(SuggestionModalService.rejectSuggestion).toHaveBeenCalledWith(
         $uibModalInstance, {
           action: 'reject',

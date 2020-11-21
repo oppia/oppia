@@ -402,15 +402,15 @@ describe('Site Analytics Service', () => {
       contributionType);
   });
 
-  it('should register Contributor Dashboard view suggestion for review event'
-    , () => {
-    const contributionType = 'Translation';
-    sas.registerContributorDashboardViewSuggestionForReview(contributionType);
+  it('should register Contributor Dashboard view suggestion for review event',
+    () => {
+      const contributionType = 'Translation';
+      sas.registerContributorDashboardViewSuggestionForReview(contributionType);
 
-    expect(gaSpy).toHaveBeenCalledWith(
-      'send', 'event', 'ContributorDashboardViewSuggestionForReview', 'click',
-      contributionType);
-  });
+      expect(gaSpy).toHaveBeenCalledWith(
+        'send', 'event', 'ContributorDashboardViewSuggestionForReview', 'click',
+        contributionType);
+    });
 
   it('should register Contributor Dashboard accept suggestion event', () => {
     const contributionType = 'Translation';

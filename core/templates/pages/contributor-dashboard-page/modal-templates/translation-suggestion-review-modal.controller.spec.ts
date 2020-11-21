@@ -75,7 +75,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
     expect(
       // eslint-disable-next-line max-len
       SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview)
-        .toHaveBeenCalledWith('Translation');
+      .toHaveBeenCalledWith('Translation');
   });
 
   it('should accept suggestion in suggestion modal service when clicking on' +

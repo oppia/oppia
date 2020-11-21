@@ -204,7 +204,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $scope.done();
       expect(
         SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
-          .toHaveBeenCalledWith('Question');
+        .toHaveBeenCalledWith('Question');
     });
 
     it('should dismiss modal if there is no pending changes', function() {
