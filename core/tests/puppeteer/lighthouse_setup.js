@@ -34,7 +34,7 @@ var storyEditorUrl = 'Story editor not loaded';
 
 var usernameInput = '.protractor-test-username-input';
 var agreeToTermsCheckBox = '.protractor-test-agree-to-terms-checkbox';
-var registerUser = '.protractor-test-register-user';
+var registerUser = '.protractor-test-register-user:not([disabled])';
 var navbarToggle = '.oppia-navbar-dropdown-toggle';
 
 var createButtonSelector = '.protractor-test-create-activity';
