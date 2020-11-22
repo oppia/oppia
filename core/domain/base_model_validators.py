@@ -283,10 +283,22 @@ class BaseModelValidator(python_utils.OBJECT):
 
         for external_model_fetcher_details in (
                 cls._get_external_id_relationships(item)):
-            multiple_models_ids_to_fetch[
-                external_model_fetcher_details.field_name] = (
-                    external_model_fetcher_details.model_class,
-                    external_model_fetcher_details.model_ids)
+            if external_model_fetcher_details.field_name == 'committer_ids':
+                # Removing the system users from the list of committers in the
+                # SnapshotMetadataModel.
+                model_id_list = list(
+                    set(external_model_fetcher_details.model_ids) -
+                    set(feconf.SYSTEM_USERS.values()))
+                if len(model_id_list) != 0:
+                    multiple_models_ids_to_fetch[
+                        external_model_fetcher_details.field_name] = (
+                            external_model_fetcher_details.model_class,
+                            model_id_list)
+            else:
+                multiple_models_ids_to_fetch[
+                    external_model_fetcher_details.field_name] = (
+                        external_model_fetcher_details.model_class,
+                        external_model_fetcher_details.model_ids)
 
         fetched_model_instances_for_all_ids = (
             datastore_services.fetch_multiple_entities_by_ids_and_models(

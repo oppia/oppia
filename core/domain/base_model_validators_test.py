@@ -84,7 +84,9 @@ class MockSnapshotMetadataModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'external_model_ids', MockModel, [])]
+                'external_model_ids', MockModel, []),
+            base_model_validators.ExternalModelFetcherDetails(
+                'committer_ids', MockModel, ['OppiaMigrationBot', 'User-1'])]
 
 
 class MockBaseUserModelValidator(
