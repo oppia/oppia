@@ -27,7 +27,7 @@ interface SubscriptionSummary {
   'creator_impact': number;
 }
 
-interface PreferencesBackendDict {
+export interface PreferencesBackendDict {
   'preferred_language_codes': string;
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
@@ -46,7 +46,7 @@ interface LoginUrlResponseDict {
   'login_url': string;
 }
 
-interface UserContributionRightsDataBackendDict {
+export interface UserContributionRightsDataBackendDict {
   'can_review_translation_for_language_codes': boolean;
   'can_review_voiceover_for_language_codes': boolean;
   'can_review_questions': boolean;
