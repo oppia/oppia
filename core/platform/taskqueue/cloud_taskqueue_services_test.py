@@ -28,6 +28,7 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
+from google.api_core import retry as retry_lib
 from google.protobuf import timestamp_pb2
 
 
@@ -53,7 +54,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         task_name = 'task1'
 
         def mock_create_task(parent, task, retry=None):
-            self.assertIsNone(retry)
+            self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,
                 u'projects/dev-project-id/locations/us-central1/queues/queue')
@@ -92,8 +93,8 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(datetime_to_execute_task)
         task_name = 'task1'
-        def mock_create_task(parent, task, retry=None):
-            self.assertIsNone(retry)
+        def mock_create_task(parent, task, retry):
+            self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,
                 u'projects/dev-project-id/locations/us-central1/queues/queue')
