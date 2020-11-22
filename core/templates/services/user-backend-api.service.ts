@@ -59,7 +59,8 @@ export class UserBackendApiService {
     private USER_INFO_URL = '/userinfohandler';
     private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
     private PREFERENCES_DATA_URL = '/preferenceshandler/data';
-    private USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
+    private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
+      '/usercontributionrightsdatahandler');
 
     getUserInfoAsync(): Promise<UserInfo> {
       return this.http.get<UserInfoBackendDict>(
