@@ -54,9 +54,7 @@ interface UserContributionRightsDataBackendDict {
   providedIn: 'root'
 })
 export class UserBackendApiService {
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
     private USER_INFO_URL = '/userinfohandler';
     private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
