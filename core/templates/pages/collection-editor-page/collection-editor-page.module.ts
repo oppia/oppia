@@ -53,6 +53,8 @@ import { CollectionStatisticsTabComponent } from
   'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { provide as undoRedoServiceProvider } from
+  'domain/editor/undo_redo/undo-redo.service';
 
 @NgModule({
   imports: [
@@ -75,6 +77,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     CollectionStatisticsTabComponent,
   ],
   providers: [
+    undoRedoServiceProvider,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,

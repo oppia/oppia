@@ -45,9 +45,9 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { TestBed } from '@angular/core/testing';
 
 require('App.ts');
-require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/question-update.service.ts');
 require('domain/state/StateObjectFactory.ts');
