@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +17,18 @@
  * @fileoverview Service to handle the updating of a skill.
  */
 
+import { cloneDeep } from 'lodash';
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { Change } from 'domain/editor/undo_redo/change.model';
-import { Misconception } from './MisconceptionObjectFactory';
-import { Skill } from 'domain/skill/SkillObjectFactory.ts';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
-import { WorkedExample } from './WorkedExampleObjectFactory';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
 @Injectable({
   providedIn: 'root',
@@ -33,9 +37,9 @@ export class SkillUpdateService {
   constructor(private undoRedoService: UndoRedoService) {}
 
   private _applyChange = (skill, command, params, apply, reverse) => {
-    var changeDict = angular.copy(params);
+    const changeDict = cloneDeep(params);
     changeDict.cmd = command;
-    var changeObj = new Change(changeDict, apply, reverse);
+    const changeObj = new Change(changeDict, apply, reverse);
     this.undoRedoService.applyChange(changeObj, skill);
   };
 
@@ -52,8 +56,8 @@ export class SkillUpdateService {
       SkillDomainConstants.CMD_UPDATE_SKILL_PROPERTY,
       {
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
       },
       apply,
       reverse
@@ -71,11 +75,10 @@ export class SkillUpdateService {
   ) => {
     this._applyChange(
       skill,
-      SkillDomainConstants.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-      {
+      SkillDomainConstants.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY, {
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
         misconception_id: misconceptionId,
       },
       apply,
@@ -92,10 +95,9 @@ export class SkillUpdateService {
   ) => {
     this._applyChange(
       skill,
-      SkillDomainConstants.CMD_UPDATE_RUBRICS,
-      {
-        difficulty: angular.copy(difficulty),
-        explanations: angular.copy(explanations),
+      SkillDomainConstants.CMD_UPDATE_RUBRICS, {
+        difficulty: cloneDeep(difficulty),
+        explanations: cloneDeep(explanations),
       },
       apply,
       reverse
@@ -112,11 +114,10 @@ export class SkillUpdateService {
   ) => {
     this._applyChange(
       skill,
-      SkillDomainConstants.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
-      {
+      SkillDomainConstants.CMD_UPDATE_SKILL_CONTENTS_PROPERTY, {
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue),
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
       },
       apply,
       reverse
@@ -132,7 +133,7 @@ export class SkillUpdateService {
   };
 
   setSkillDescription(skill: Skill, newDescription: string): void {
-    const oldDescription = angular.copy(skill.getDescription());
+    const oldDescription = cloneDeep(skill.getDescription());
     this._applyPropertyChange(
       skill,
       SkillDomainConstants.SKILL_PROPERTY_DESCRIPTION,
@@ -146,28 +147,24 @@ export class SkillUpdateService {
     );
   }
 
-  setConceptCardExplanation(skill: Skill, newExplanation: WorkedExample): void {
+  setConceptCardExplanation(skill: Skill, newExplanation: SubtitledHtml): void {
     const oldExplanation = skill.getConceptCard().getExplanation();
+    console.log(oldExplanation, "=======oldExplanation")
     this._applySkillContentsPropertyChange(
       skill,
       SkillDomainConstants.SKILL_CONTENTS_PROPERTY_EXPLANATION,
       newExplanation.toBackendDict(),
       oldExplanation.toBackendDict(),
-      (changeDict, skill) => {
-        const explanation = newExplanation;
-        skill.getConceptCard().setExplanation(explanation);
-      },
-      (changeDict, skill) => {
-        skill.getConceptCard().setExplanation(oldExplanation);
-      }
+      (changeDict, skill) => skill.getConceptCard().setExplanation(newExplanation),
+      (changeDict, skill) => skill.getConceptCard().setExplanation(oldExplanation)
     );
   }
 
   addWorkedExample(skill: Skill, newWorkedExample: WorkedExample): void {
-    const oldWorkedExamples = angular.copy(
+    const oldWorkedExamples = cloneDeep(
       skill.getConceptCard().getWorkedExamples()
     );
-    const newWorkedExamples = angular.copy(oldWorkedExamples);
+    const newWorkedExamples = cloneDeep(oldWorkedExamples);
     newWorkedExamples.push(newWorkedExample);
     this._applySkillContentsPropertyChange(
       skill,
@@ -176,18 +173,16 @@ export class SkillUpdateService {
         return workedExample.toBackendDict();
       }),
       oldWorkedExamples.map((workedExample) => workedExample.toBackendDict()),
-      (changeDict, skill) =>
-        skill.getConceptCard().setWorkedExamples(newWorkedExamples),
-      (changeDict, skill) =>
-        skill.getConceptCard().setWorkedExamples(oldWorkedExamples)
+      (changeDict, skill) => skill.getConceptCard().setWorkedExamples(newWorkedExamples),
+      (changeDict, skill) => skill.getConceptCard().setWorkedExamples(oldWorkedExamples)
     );
   }
 
   deleteWorkedExample(skill: Skill, index: number): void {
-    const oldWorkedExamples = angular.copy(
+    const oldWorkedExamples = cloneDeep(
       skill.getConceptCard().getWorkedExamples()
     );
-    const newWorkedExamples = angular.copy(oldWorkedExamples);
+    const newWorkedExamples = cloneDeep(oldWorkedExamples);
     newWorkedExamples.splice(index, 1);
     this._applySkillContentsPropertyChange(
       skill,
@@ -198,10 +193,8 @@ export class SkillUpdateService {
       oldWorkedExamples.map((workedExample) => {
         return workedExample.toBackendDict();
       }),
-      (changeDict, skill) =>
-        skill.getConceptCard().setWorkedExamples(newWorkedExamples),
-      (changeDict, skill) =>
-        skill.getConceptCard().setWorkedExamples(oldWorkedExamples)
+      (changeDict, skill) => skill.getConceptCard().setWorkedExamples(newWorkedExamples),
+      (changeDict, skill) => skill.getConceptCard().setWorkedExamples(oldWorkedExamples)
     );
   }
 
@@ -211,10 +204,10 @@ export class SkillUpdateService {
       newWorkedExampleQuestionHtml: string,
       newWorkedExampleAnswerHtml: string
   ): void {
-    const oldWorkedExamples = angular.copy(
+    const oldWorkedExamples = cloneDeep(
       skill.getConceptCard().getWorkedExamples()
     );
-    const newWorkedExamples = angular.copy(oldWorkedExamples);
+    const newWorkedExamples = cloneDeep(oldWorkedExamples);
     newWorkedExamples[workedExampleIndex]
       .getQuestion()
       .setHtml(newWorkedExampleQuestionHtml);
@@ -230,10 +223,8 @@ export class SkillUpdateService {
       oldWorkedExamples.map((workedExample) => {
         return workedExample.toBackendDict();
       }),
-      (changeDict, skill) =>
-        skill.getConceptCard().setWorkedExamples(newWorkedExamples),
-      (changeDict, skill) =>
-        skill.getConceptCard().setWorkedExamples(oldWorkedExamples)
+      (changeDict, skill) => skill.getConceptCard().setWorkedExamples(newWorkedExamples),
+      (changeDict, skill) => skill.getConceptCard().setWorkedExamples(oldWorkedExamples)
     );
   }
 
@@ -248,10 +239,8 @@ export class SkillUpdateService {
       oldWorkedExamples.map((workedExample) => {
         return workedExample.toBackendDict();
       }),
-      (changeDict, skill) =>
-        skill.getConceptCard().setWorkedExamples(newWorkedExamples),
-      (changeDict, skill) =>
-        skill.getConceptCard().setWorkedExamples(oldWorkedExamples)
+      (changeDict, skill) => skill.getConceptCard().setWorkedExamples(newWorkedExamples),
+      (changeDict, skill) => skill.getConceptCard().setWorkedExamples(oldWorkedExamples)
     );
   }
 
@@ -264,12 +253,8 @@ export class SkillUpdateService {
       skill,
       SkillDomainConstants.CMD_ADD_SKILL_MISCONCEPTION,
       params,
-      (changeDict, skill) => {
-        skill.appendMisconception(newMisconception);
-      },
-      (changeDict, skill) => {
-        skill.deleteMisconception(misconceptionId);
-      }
+      (changeDict, skill) => skill.appendMisconception(newMisconception),
+      (changeDict, skill) => skill.deleteMisconception(misconceptionId)
     );
   }
 
@@ -327,8 +312,8 @@ export class SkillUpdateService {
         SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_NAME,
         newName,
         oldName,
-        (changeDict, skill) => misconception.setName(newName),
-        (changeDict, skill) => misconception.setName(oldName)
+        () => misconception.setName(newName),
+        () => misconception.setName(oldName)
       );
     }
   }
@@ -347,8 +332,8 @@ export class SkillUpdateService {
         SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED,
         newValue,
         oldValue,
-        (changeDict, skill) => misconception.setMustBeAddressed(newValue),
-        (changeDict, skill) => misconception.setMustBeAddressed(oldValue)
+        () => misconception.setMustBeAddressed(newValue),
+        () => misconception.setMustBeAddressed(oldValue)
       );
     }
   }
@@ -367,8 +352,8 @@ export class SkillUpdateService {
         SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
         newNotes,
         oldNotes,
-        (changeDict, skill) => misconception.setNotes(newNotes),
-        (changeDict, skill) => misconception.setNotes(oldNotes)
+        () => misconception.setNotes(newNotes),
+        () => misconception.setNotes(oldNotes)
       );
     }
   }
@@ -387,8 +372,8 @@ export class SkillUpdateService {
         SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
         newFeedback,
         oldFeedback,
-        (changeDict, skill) => misconception.setFeedback(newFeedback),
-        (changeDict, skill) => misconception.setFeedback(oldFeedback)
+        () => misconception.setFeedback(newFeedback),
+        () => misconception.setFeedback(oldFeedback)
       );
     }
   }
@@ -406,10 +391,8 @@ export class SkillUpdateService {
       skill,
       difficulty,
       explanations,
-      (changeDict, skill) =>
-        skill.updateRubricForDifficulty(difficulty, explanations),
-      (changeDict, skill) =>
-        skill.updateRubricForDifficulty(difficulty, oldExplanations)
+      (changeDict, skill) => skill.updateRubricForDifficulty(difficulty, explanations),
+      (changeDict, skill) => skill.updateRubricForDifficulty(difficulty, oldExplanations)
     );
   }
 }
