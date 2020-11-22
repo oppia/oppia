@@ -373,8 +373,11 @@ def _get_all_filepaths(input_path, input_filenames):
         all_filepaths = _get_changed_filepaths()
     all_filepaths = [
         filename for filename in all_filepaths if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in(
-            general_purpose_linter.EXCLUDED_PATHS))]
+        any(
+            fnmatch.fnmatch(filename, pattern) for pattern
+            in general_purpose_linter.EXCLUDED_PATHS
+        )
+    ]
     return all_filepaths
 
 
