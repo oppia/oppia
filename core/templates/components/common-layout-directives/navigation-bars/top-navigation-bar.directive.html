@@ -156,16 +156,9 @@
          ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
          ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
         <div class="oppia-navbar-profile-picture-container dropdown-toggle">
-          <span ng-if="$ctrl.profilePictureUrl">
-            <img ng-src="<[$ctrl.profilePictureUrl]>"
-                 class="oppia-navbar-profile-picture rounded-circle"
-                 alt="User Avatar">
-          </span>
-          <span ng-if="!$ctrl.profilePictureUrl">
-            <i class="material-icons md-40 oppia-user-avatar-icon">&#xE853;</i>
-            <span class="oppia-icon-accessibility-label">User Avatar</span>
-          </span>
-
+          <profile-picture class="oppia-navbar-profile-picture rounded-circle"
+                         [username]="$ctrl.username">
+          </profile-picture>
           <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="$ctrl.numUnseenNotifications > 0">
             <span class="oppia-navbar-dashboard-indicator-text">
               <[$ctrl.numUnseenNotifications]>
@@ -173,11 +166,6 @@
           </div>
 
           <div class="oppia-navbar-role-indicator" ng-if="$ctrl.isAdmin || $ctrl.isModerator">
-            <!--
-             "right: 4px;" is necessary here but not in moderator to prevent 'A'
-             from appearing off-center because 'A' is slightly thinner than 'M' in
-             this font.
-            -->
             <span ng-if="$ctrl.isAdmin" class="oppia-navbar-role-text oppia-admin-text protractor-test-admin-text">A</span>
             <span ng-if="$ctrl.isModerator && !$ctrl.isAdmin" class="oppia-navbar-role-text protract-test-moderator-text">M</span>
           </div>

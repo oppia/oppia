@@ -16,38 +16,22 @@
  * @fileoverview Directive for creating image links to a user's profile page.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { ProfileLinkImageBackendApiService } from
-  'components/profile-link-directives/profile-link-image-backend-api.service';
-
 @Component({
-  selector: 'profile-link-image',
-  templateUrl: './profile-link-image.component.html',
+  selector: 'profile-link-picture',
+  templateUrl: './profile-link-picture.component.html',
   styleUrls: []
 })
-export class ProfileLinkImageComponent implements OnInit {
+export class ProfileLinkPictureComponent {
   @Input() username: string;
-  profilePictureUrl: string;
-  constructor(
-    private profileLinkImageBackendApiService:
-      ProfileLinkImageBackendApiService,
-    private urlInterpolationService: UrlInterpolationService,
-  ) {}
+  constructor() {}
 
   isUsernameLinkable(): boolean {
     return !(['admin', 'OppiaMigrationBot'].includes(this.username));
   }
-
-  ngOnInit(): void {
-    this.profilePictureUrl = (
-      this.urlInterpolationService.getProfilePictureUrl(this.username))
-  }
 }
 
-angular.module('oppia').directive('profileLinkImage', downgradeComponent(
-  {component: ProfileLinkImageComponent}));
+angular.module('oppia').directive('profileLinkPicture', downgradeComponent(
+  {component: ProfileLinkPictureComponent}));

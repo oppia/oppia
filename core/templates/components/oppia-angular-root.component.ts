@@ -322,8 +322,6 @@ import { PlaythroughService } from 'services/playthrough.service';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
-import { ProfileLinkImageBackendApiService } from
-  'components/profile-link-directives/profile-link-image-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
@@ -678,7 +676,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static playthroughService: PlaythroughService;
   static predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   static pretestQuestionBackendApiService: PretestQuestionBackendApiService;
-  static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static pythonProgramTokenizer: PythonProgramTokenizer;
   static questionBackendApiService: QuestionBackendApiService;
@@ -973,7 +970,6 @@ private playthroughObjectFactory: PlaythroughObjectFactory,
 private playthroughService: PlaythroughService,
 private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
 private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
-private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
 private profilePageBackendApiService: ProfilePageBackendApiService,
 private pythonProgramTokenizer: PythonProgramTokenizer,
 private questionBackendApiService: QuestionBackendApiService,
@@ -1378,8 +1374,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.predictionAlgorithmRegistryService);
     OppiaAngularRootComponent.pretestQuestionBackendApiService = (
       this.pretestQuestionBackendApiService);
-    OppiaAngularRootComponent.profileLinkImageBackendApiService = (
-      this.profileLinkImageBackendApiService);
     OppiaAngularRootComponent.profilePageBackendApiService = (
       this.profilePageBackendApiService);
     OppiaAngularRootComponent.pythonProgramTokenizer = (

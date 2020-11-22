@@ -60,7 +60,7 @@ describe('EditProfilePictureModalController', function() {
         window.atob(dataBase64Mock), c => c.charCodeAt(0));
       var file = new File([arrayBuffer], 'filename.mp3');
 
-      spyOn(window, '$').withArgs('.oppia-profile-image-uploader').and
+      spyOn(window, '$').withArgs('.oppia-profile-picture-uploader').and
         .returnValue(element);
 
       $scope.onInvalidImageLoaded();

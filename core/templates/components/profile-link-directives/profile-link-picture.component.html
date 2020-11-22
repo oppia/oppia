@@ -1,0 +1,6 @@
+<a *ngIf="isUsernameLinkable()" [href]="'/profile/' + username">
+  <profile-picture [username]="username"></profile-picture>
+</a>
+
+<profile-picture *ngIf="!isUsernameLinkable()" [username]="username"></profile-picture>
+

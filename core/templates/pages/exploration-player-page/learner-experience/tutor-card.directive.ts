@@ -93,7 +93,7 @@ angular.module('oppia').directive('tutorCard', [
         'PlayerPositionService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'AUDIO_HIGHLIGHT_CSS_CLASS',
         'COMPONENT_NAME_CONTENT', 'CONTENT_FOCUS_LABEL_PREFIX',
-        'DEFAULT_PROFILE_IMAGE_PATH', 'OPPIA_AVATAR_LINK_URL',
+        'DEFAULT_PROFILE_PICTURE_PATH', 'OPPIA_AVATAR_LINK_URL',
         'TWO_CARD_THRESHOLD_PX',
         function(
             $anchorScroll, $location, $scope,
@@ -104,7 +104,7 @@ angular.module('oppia').directive('tutorCard', [
             PlayerPositionService, UrlService, UserService,
             WindowDimensionsService, AUDIO_HIGHLIGHT_CSS_CLASS,
             COMPONENT_NAME_CONTENT, CONTENT_FOCUS_LABEL_PREFIX,
-            DEFAULT_PROFILE_IMAGE_PATH, OPPIA_AVATAR_LINK_URL,
+            DEFAULT_PROFILE_PICTURE_PATH, OPPIA_AVATAR_LINK_URL,
             TWO_CARD_THRESHOLD_PX) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -237,7 +237,7 @@ angular.module('oppia').directive('tutorCard', [
             } else {
               $scope.profilePicture = (
                 UrlInterpolationService.getStaticImageUrl(
-                  DEFAULT_PROFILE_IMAGE_PATH));
+                  DEFAULT_PROFILE_PICTURE_PATH));
             }
 
             ctrl.directiveSubscriptions.add(

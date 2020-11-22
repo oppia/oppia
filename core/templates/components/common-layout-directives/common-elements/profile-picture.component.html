@@ -1,0 +1,9 @@
+<img [hidden]="!profilePictureLoaded"
+     [src]="profilePictureUrl"
+     (error)="setDefaultPicture()"
+     (load)="showPicture()"
+     alt="User profile picture">
+
+<mat-spinner *ngIf="!profilePictureLoaded"></mat-spinner>
+
+

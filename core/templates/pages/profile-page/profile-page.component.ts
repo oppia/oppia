@@ -46,9 +46,6 @@ angular.module('oppia').component('profilePage', {
       const RatingComputationService = (
         OppiaAngularRootComponent.ratingComputationService);
 
-      var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
-        .getStaticImageUrl('/general/no_profile_picture.png');
-
       ctrl.getLocaleDateString = function(millisSinceEpoch) {
         return DateTimeFormatService.getLocaleDateString(millisSinceEpoch);
       };
@@ -221,9 +218,6 @@ angular.module('oppia').component('profilePage', {
             data.editedExpSummaries.length);
           ctrl.subjectInterests = data.subjectInterests;
           ctrl.firstContributionMsec = data.firstContributionMsec;
-          ctrl.profilePictureUrl = (
-            UrlInterpolationService.getProfilePictureUrl(
-              data.usernameOfViewedProfile))
           LoaderService.hideLoadingScreen();
           $rootScope.$apply();
         });

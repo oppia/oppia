@@ -51,7 +51,7 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
     };
 
     $scope.onFileChanged = function(file) {
-      $('.oppia-profile-image-uploader').fadeOut(function() {
+      $('.oppia-profile-picture-uploader').fadeOut(function() {
         $scope.invalidImageWarningIsShown = false;
 
         var reader = new FileReader();
@@ -64,7 +64,7 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
         reader.readAsDataURL(file);
 
         $timeout(function() {
-          $('.oppia-profile-image-uploader').fadeIn();
+          $('.oppia-profile-picture-uploader').fadeIn();
         }, 100);
       });
     };

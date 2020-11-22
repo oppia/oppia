@@ -135,7 +135,7 @@ angular.module('oppia').constant(
 angular.module('oppia').constant('SITE_NAME', AppConstants.SITE_NAME);
 
 angular.module('oppia').constant(
-  'DEFAULT_PROFILE_IMAGE_PATH', AppConstants.DEFAULT_PROFILE_IMAGE_PATH);
+  'DEFAULT_PROFILE_PICTURE_PATH', AppConstants.DEFAULT_PROFILE_PICTURE_PATH);
 
 angular.module('oppia').constant('LOGOUT_URL', AppConstants.LOGOUT_URL);
 

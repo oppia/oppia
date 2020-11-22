@@ -21,10 +21,10 @@ require('services/contextual/url.service.ts');
 
 angular.module('oppia').factory('UserService', [
   '$http', '$q', '$window', 'UrlInterpolationService', 'UrlService',
-  'DEFAULT_PROFILE_IMAGE_PATH',
+  'DEFAULT_PROFILE_PICTURE_PATH',
   function(
       $http, $q, $window, UrlInterpolationService, UrlService,
-      DEFAULT_PROFILE_IMAGE_PATH) {
+      DEFAULT_PROFILE_PICTURE_PATH) {
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
     var USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
 
@@ -52,10 +52,10 @@ angular.module('oppia').factory('UserService', [
     };
 
     return {
-      setProfileImageBlobAsync: function(newProfileImageBlob) {
+      setprofilePictureBlobAsync: function(newprofilePictureBlob) {
         return $http.put(PREFERENCES_DATA_URL, {
           update_type: 'profile_picture_blob',
-          data: newProfileImageBlob
+          data: newprofilePictureBlob
         });
       },
       setReturnUrl: function(newReturnUrl) {

@@ -49,10 +49,13 @@ import { SocialButtonsComponent } from
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
-import { ProfileLinkImageComponent } from
-  'components/profile-link-directives/profile-link-image.component';
+import { ProfilePictureComponent } from
+    'components/common-layout-directives/common-elements/profile-picture.component';
+import { ProfileLinkPictureComponent } from
+  'components/profile-link-directives/profile-link-picture.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+
 
 
 @NgModule({
@@ -66,22 +69,28 @@ import { ProfileLinkTextComponent } from
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
-    ProfileLinkImageComponent,
+    ProfilePictureComponent,
+    ProfileLinkPictureComponent,
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe
+    TranslatePipe,
   ],
 
   entryComponents: [
     BackgroundBannerComponent,
     SharingLinksComponent,
-    SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    SkillMasteryViewerComponent,
+    AttributionGuideComponent,
+    LazyLoadingComponent,
+    LoadingDotsComponent,
+    SocialButtonsComponent,
+    ProfilePictureComponent,
+    ProfileLinkPictureComponent,
+    ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,

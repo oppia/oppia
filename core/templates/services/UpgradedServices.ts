@@ -336,8 +336,6 @@ import { PredictionAlgorithmRegistryService } from
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
-import { ProfileLinkImageBackendApiService } from
-  'components/profile-link-directives/profile-link-image-backend-api.service';
 import { ProfilePageBackendApiService } from
   'pages/profile-page/profile-page-backend-api.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
@@ -1086,9 +1084,6 @@ export class UpgradedServices {
       new ExplorationStatsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
-    upgradedServices['FeedbackMessageSummaryObjectFactory'] =
-      new FeedbackMessageSummaryObjectFactory(
-        upgradedServices['UrlInterpolationService']);
     upgradedServices['GenerateContentIdService'] =
      new GenerateContentIdService(
        upgradedServices['StateNextContentIdIndexService']);
@@ -1262,9 +1257,6 @@ export class UpgradedServices {
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],
         upgradedServices['TextInputPredictionService']);
-    upgradedServices['ProfileLinkImageBackendApiService'] =
-      new ProfileLinkImageBackendApiService(
-        upgradedServices['HttpClient']);
     upgradedServices['ReadOnlySubtopicPageObjectFactory'] =
       new ReadOnlySubtopicPageObjectFactory(
         upgradedServices['SubtopicPageContentsObjectFactory'],

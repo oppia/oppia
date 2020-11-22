@@ -39,8 +39,8 @@
         <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]></span>
         <li ng-repeat="name in contributorNames| limitTo: 2"
             tooltip="<[name]>" tooltip-placement="top">
-          <profile-link-image [username]="name">
-          </profile-link-image>
+          <profile-link-picture [username]="name">
+          </profile-link-picture>
         </li>
 
         <li ng-if="contributorNames.length > 2" class="oppia-contributors-more-circle"

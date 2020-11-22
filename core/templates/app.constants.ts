@@ -134,7 +134,7 @@ export const AppConstants = {
 
   SITE_NAME: 'Oppia.org',
 
-  DEFAULT_PROFILE_IMAGE_PATH: '/avatar/user_blue_72px.webp',
+  DEFAULT_PROFILE_PICTURE_PATH: '/avatar/user_blue_72px.webp',
 
   LOGOUT_URL: '/logout',
 

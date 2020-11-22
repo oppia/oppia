@@ -12,12 +12,9 @@
               </div>
             </div>
           </a>
-          <img ng-if="$ctrl.profileIsOfCurrentUser" ng-src="<[$ctrl.profilePictureUrl]>"
-               class="oppia-profile-picture-fullsize protractor-test-profile-current-user-photo"
-               alt="">
-          <img ng-if="!$ctrl.profileIsOfCurrentUser" ng-src="<[$ctrl.profilePictureUrl]>"
-               class="oppia-profile-picture-fullsize protractor-test-profile-other-user-photo"
-               alt="">
+          <profile-picture [username]="$ctrl.username.value"
+                           class="oppia-profile-picture-fullsize protractor-test-profile-current-user-photo">
+          </profile-picture>
         </div>
       </div>
 

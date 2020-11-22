@@ -272,8 +272,6 @@ angular.module('oppia').directive('topNavigationBar', [
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
               ctrl.username = userInfo.getUsername();
               if (ctrl.username) {
-                ctrl.profilePictureUrl = (
-                  UrlInterpolationService.getProfilePictureUrl(ctrl.username))
                 ctrl.profilePageUrl = UrlInterpolationService.interpolateUrl(
                   '/profile/<username>', {
                     username: ctrl.username

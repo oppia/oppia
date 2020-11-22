@@ -24,17 +24,9 @@
                  aria-label="Edit profile picture button">
             </div>
             <i class="material-icons oppia-editor-edit-icon oppia-editor-edit-icon-pos">&#xE254;</i>
-            <img ng-if="$ctrl.profilePictureUrl"
-                 ng-src="<[$ctrl.profilePictureUrl]>"
-                 class="img-thumbnail protractor-test-custom-photo"
-                 alt="Profile photo picture">
-            <picture ng-if="!$ctrl.profilePictureUrl">
-              <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.webp')]>">
-              <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>">
-              <img ng-src="<[$ctrl.getStaticImageUrl('/general/no_profile_picture.png')]>"
-                   class="img-thumbnail"
-                   alt="Empty profile picture">
-            </picture>
+            <profile-picture class="img-thumbnail protractor-test-custom-photo"
+                             [username]="$ctrl.username">
+            </profile-picture>
           </div>
         </div>
       </div>
@@ -99,7 +91,9 @@
                  ng-if="$ctrl.subscriptionList.length > 0"
                  ng-repeat="subscription in $ctrl.subscriptionList">
           <a class="oppia-subscription-profile-link" href="/profile/<[subscription.creator_username]>" rel="noopener" target="_blank">
-            <img ng-src="<[subscription.profilePictureUrl]>" class="oppia-subscription-card-profile-picture rounded-circle">
+            <profile-picture class="oppia-subscription-card-profile-picture rounded-circle"
+                             [username]="subscription.creator_username">
+            </profile-picture>
             <span class="oppia-subscription-card-summary">
               <div class="oppia-subscription-card-summary-text-container">
                 <strong class="protractor-test-subscription-name"

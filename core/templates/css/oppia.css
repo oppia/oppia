@@ -2712,13 +2712,21 @@ div#ng-curtain {
   border-top-right-radius: 0;
   margin-top: 0;
 }
+
 .oppia-navbar-profile-picture-container {
   margin-left: 10px;
   text-align: right;
 }
+
+.oppia-navbar-profile-picture-container::after {
+  vertical-align: 1em;
+}
+
 .oppia-navbar-profile-picture {
-  height: 32px;
-  width: 32px;
+  display: inline-block;
+  height: 34px;
+  width: 34px;
+  overflow: hidden;
 }
 
 .oppia-select {
@@ -3754,8 +3762,8 @@ oppia-noninteractive-link {
   width: 26px;
 }
 
-.oppia-activity-summary-tile .exploration-summary-avatars profile-link-image,
-.oppia-activity-summary-tile-mobile .exploration-summary-avatars profile-link-image {
+.oppia-activity-summary-tile .exploration-summary-avatars profile-link-picture,
+.oppia-activity-summary-tile-mobile .exploration-summary-avatars profile-link-picture {
   display: block;
   margin-bottom: 3px;
 }
