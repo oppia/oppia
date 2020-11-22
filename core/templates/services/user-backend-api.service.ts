@@ -57,24 +57,20 @@ export interface UserContributionRightsDataBackendDict {
   providedIn: 'root'
 })
 export class UserBackendApiService {
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
     private USER_INFO_URL = '/userinfohandler';
     private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
     private PREFERENCES_DATA_URL = '/preferenceshandler/data';
-    private USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
+    private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
+      '/usercontributionrightsdatahandler');
 
     getUserInfoAsync(): Promise<UserInfo> {
       return this.http.get<UserInfoBackendDict>(
         this.USER_INFO_URL).toPromise().then(
         (backendDict) => {
-          if (backendDict.user_is_logged_in) {
-            return UserInfo.createFromBackendDict(backendDict);
-          } else {
-            return UserInfo.createDefault();
-          }
+                   return backendDict.user_is_logged_in ? UserInfo.createFromBackendDict(
+            backendDict) : UserInfo.createDefault()
         });
     }
 
@@ -82,11 +78,7 @@ export class UserBackendApiService {
       return this.http.get<PreferencesBackendDict>(
         this.PROFILE_PICTURE_URL).toPromise().then(
         (backendDict) => {
-          if (backendDict.profile_picture_data_url) {
-            return backendDict.profile_picture_data_url;
-          } else {
-            return defaultUrl;
-          }
+          return backendDict.profile_picture_data_url || defaultUrl;
         });
     }
 
