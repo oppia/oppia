@@ -20,11 +20,9 @@ require('services/user.service.ts');
 
 angular.module('oppia').controller(
   'RegistrationSessionExpiredModalController', [
-    '$rootScope', '$scope', '$timeout', '$uibModalInstance', '$window',
-    'UserService',
+    '$scope', '$timeout', '$uibModalInstance', '$window', 'UserService',
     function(
-        $rootScope, $scope, $timeout, $uibModalInstance, $window,
-        UserService) {
+        $scope, $timeout, $uibModalInstance, $window, UserService) {
       $scope.continueRegistration = function() {
         UserService.getLoginUrlAsync().then(
           function(loginUrl) {

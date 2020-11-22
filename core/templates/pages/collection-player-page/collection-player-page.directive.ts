@@ -317,36 +317,36 @@ angular.module('oppia').directive('collectionPlayerPage', [
                   ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                     ctrl.collectionId) !== -1);
                 UserService.getUserInfoAsync().then(function(userInfo) {
-                    LoaderService.hideLoadingScreen();
-                    ctrl.isLoggedIn = userInfo.isLoggedIn();
-                    if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
-                        GuestCollectionProgressService
-                          .hasCompletedSomeExploration(ctrl.collectionId)) {
-                      var completedExplorationIds = (
-                        GuestCollectionProgressService
-                          .getCompletedExplorationIds(ctrl.collection));
-                      var nextExplorationId = (
-                        GuestCollectionProgressService.getNextExplorationId(
-                          ctrl.collection, completedExplorationIds));
-                      ctrl.collectionPlaythrough = (
-                        CollectionPlaythrough.create(
-                          nextExplorationId, completedExplorationIds));
-                    } else {
-                      ctrl.collectionPlaythrough = collection.getPlaythrough();
-                    }
-                    ctrl.nextExplorationId =
-                      ctrl.collectionPlaythrough.getNextExplorationId();
+                  LoaderService.hideLoadingScreen();
+                  ctrl.isLoggedIn = userInfo.isLoggedIn();
+                  if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
+                      GuestCollectionProgressService
+                        .hasCompletedSomeExploration(ctrl.collectionId)) {
+                    var completedExplorationIds = (
+                      GuestCollectionProgressService
+                        .getCompletedExplorationIds(ctrl.collection));
+                    var nextExplorationId = (
+                      GuestCollectionProgressService.getNextExplorationId(
+                        ctrl.collection, completedExplorationIds));
+                    ctrl.collectionPlaythrough = (
+                      CollectionPlaythrough.create(
+                        nextExplorationId, completedExplorationIds));
+                  } else {
+                    ctrl.collectionPlaythrough = collection.getPlaythrough();
+                  }
+                  ctrl.nextExplorationId =
+                    ctrl.collectionPlaythrough.getNextExplorationId();
 
-                    ctrl.isCompletedExploration = function(explorationId) {
-                      var completedExplorationIds = ctrl.collectionPlaythrough
-                        .getCompletedExplorationIds();
-                      return completedExplorationIds.indexOf(
-                        explorationId) > -1;
-                    };
-                    // TODO(#8521): Remove the use of $rootScope.$apply()
-                    // once the controller is migrated to angular.
-                    $rootScope.$applyAsync();
-                  });
+                  ctrl.isCompletedExploration = function(explorationId) {
+                    var completedExplorationIds = ctrl.collectionPlaythrough
+                      .getCompletedExplorationIds();
+                    return completedExplorationIds.indexOf(
+                      explorationId) > -1;
+                  };
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$applyAsync();
+                });
               },
               function() {
                 // TODO(bhenning): Handle not being able to load the collection.
