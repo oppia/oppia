@@ -391,7 +391,6 @@ import { SkillMasteryBackendApiService } from
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -511,7 +510,6 @@ import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TranslationsBackendApiService } from
   'services/translations-backend-api.service';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -826,8 +824,6 @@ export class UpgradedServices {
     upgradedServices['SetInputValidationService'] =
       new SetInputValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['SkillUpdateService'] =
-        new SkillUpdateService(upgradedServices['UndoRedoService']);
     upgradedServices['SkillCreationBackendApiService'] =
         new SkillCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['StateTopAnswersStatsObjectFactory'] =
@@ -985,7 +981,6 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['ShortSkillSummaryObjectFactory']);
-    upgradedServices['UndoRedoService'] = new UndoRedoService();
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
