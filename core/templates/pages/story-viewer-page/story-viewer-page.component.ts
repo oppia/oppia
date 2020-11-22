@@ -111,9 +111,6 @@ angular.module('oppia').component('storyViewerPage', {
           loginUrl => {
             loginUrl ? $window.location = loginUrl : (
               $window.location.reload());
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
           });
       };
 

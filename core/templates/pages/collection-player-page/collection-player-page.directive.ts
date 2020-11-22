@@ -316,8 +316,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                 var collectionAllowsGuestProgress = (
                   ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
                     ctrl.collectionId) !== -1);
-                UserService.getUserInfoAsync().then(
-                  function(userInfo) {
+                UserService.getUserInfoAsync().then(function(userInfo) {
                     LoaderService.hideLoadingScreen();
                     ctrl.isLoggedIn = userInfo.isLoggedIn();
                     if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&

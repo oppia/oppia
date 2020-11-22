@@ -607,6 +607,7 @@
 /core/controllers/profile*.py @vojtechjelinek
 /core/templates/domain/user/ @vojtechjelinek
 /core/templates/pages/profile-page/ @vojtechjelinek
+/core/templates/services/user.service*.ts @vojtechjelinek
 /core/templates/services/user-backend-api.service*.ts @vojtechjelinek
 
 

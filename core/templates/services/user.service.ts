@@ -25,32 +25,6 @@ import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 
-interface SubscriptionSummary {
-  'creator_picture_data_url': string;
-  'creator_username': string;
-  'creator_impact': number;
-}
-interface PreferencesBackendDict {
-  'preferred_language_codes': string;
-  'preferred_site_language_code': string;
-  'preferred_audio_language_code': string;
-  'profile_picture_data_url': string;
-  'default_dashboard': string;
-  'user_bio': string;
-  'subject_interests': string;
-  'can_receive_email_updates': boolean;
-  'can_receive_editor_role_email': boolean;
-  'can_receive_feedback_message_email': boolean;
-  'can_receive_subscription_email': boolean;
-  'subscription_list': SubscriptionSummary[];
-}
-interface UserContributionRightsDataBackendDict {
-  'can_review_translation_for_language_codes': boolean;
-  'can_review_voiceover_for_language_codes': boolean;
-  'can_review_questions': boolean;
-}
-
-
 @Injectable({
   providedIn: 'root'
 })

@@ -26,6 +26,7 @@ interface SubscriptionSummary {
   'creator_username': string;
   'creator_impact': number;
 }
+
 interface PreferencesBackendDict {
   'preferred_language_codes': string;
   'preferred_site_language_code': string;
@@ -40,9 +41,11 @@ interface PreferencesBackendDict {
   'can_receive_subscription_email': boolean;
   'subscription_list': SubscriptionSummary[];
 }
-interface UrlBackendDict {
+
+interface LoginUrlResponseDict {
   'login_url': string;
 }
+
 interface UserContributionRightsDataBackendDict {
   'can_review_translation_for_language_codes': boolean;
   'can_review_voiceover_for_language_codes': boolean;
@@ -101,7 +104,7 @@ export class UserBackendApiService {
       const urlParameters = {
         current_url: currentUrl
       };
-      return this.http.get<UrlBackendDict>(
+      return this.http.get<LoginUrlResponseDict>(
         '/url_handler', { params: urlParameters }).toPromise().then(
         (backendDict) => {
           return backendDict.login_url;
@@ -111,10 +114,7 @@ export class UserBackendApiService {
     getUserContributionRightsData():
       Promise<UserContributionRightsDataBackendDict> {
       return this.http.get<UserContributionRightsDataBackendDict>(
-        this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise().then(
-        (backendDict) => {
-          return backendDict;
-        });
+        this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
     }
 }
 

@@ -163,9 +163,6 @@ angular.module('oppia').component('preferencesPage', {
               // The reload is needed in order to update the profile picture
               // in the top-right corner.
               $window.location.reload();
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the controller is migrated to angular.
-              $rootScope.$applyAsync();
             });
         }, function() {
           // Note to developers:

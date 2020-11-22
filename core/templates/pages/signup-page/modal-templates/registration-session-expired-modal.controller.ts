@@ -35,9 +35,6 @@ angular.module('oppia').controller(
             } else {
               $window.location.reload();
             }
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
           }
         );
         $uibModalInstance.dismiss('cancel');

@@ -20,6 +20,7 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, Subscription } from 'rxjs';
+
 import { UserService } from 'services/user.service.ts';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
