@@ -226,7 +226,6 @@ describe('User Api Service', () => {
         expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
           '/avatar/user_blue_72px.webp'));
       });
-
       const req1 = httpTestingController.expectOne('/userinfohandler');
       expect(req1.request.method).toEqual('GET');
       req1.flush(sampleUserInfoBackendObject);
