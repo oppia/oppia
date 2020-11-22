@@ -18,6 +18,7 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+
 import { UserService } from 'services/user.service';
 
 require('pages/splash-page/splash-page.component.ts');
@@ -38,15 +39,13 @@ describe('Splash Page', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRefMock);
-  }));
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('WindowRef', windowRefMock);
     $provide.value('UserService', TestBed.get(UserService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
