@@ -66,11 +66,8 @@ export class UserBackendApiService {
       return this.http.get<UserInfoBackendDict>(
         this.USER_INFO_URL).toPromise().then(
         (backendDict) => {
-          if (backendDict.user_is_logged_in) {
-            return UserInfo.createFromBackendDict(backendDict);
-          } else {
-            return UserInfo.createDefault();
-          }
+                   return backendDict.user_is_logged_in ? UserInfo.createFromBackendDict(
+            backendDict) : UserInfo.createDefault()
         });
     }
 
