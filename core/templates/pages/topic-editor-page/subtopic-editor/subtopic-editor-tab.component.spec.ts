@@ -358,7 +358,7 @@ describe('Subtopic editor tab', function() {
 
   it('should redirect to topic editor if subtopic id is invalid', function() {
     var navigateSpy = spyOn(topicEditorRoutingService, 'navigateToMainTab');
-    location.go('#/subtopic_editor/99');
+    location.go('/subtopic_editor/99');
     ctrl.initEditor();
     expect(navigateSpy).toHaveBeenCalled();
   });

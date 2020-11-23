@@ -48,6 +48,7 @@ describe('Topic editor routing service', () => {
     });
     ters = TestBed.get(TopicEditorRoutingService);
     locat = TestBed.get(Location);
+    ters.inSpecMode = true;
   });
 
   it('should return the default active tab name', () => {
@@ -80,7 +81,7 @@ describe('Topic editor routing service', () => {
   it('should handle calls with unexpect paths', () => {
     expect(ters.getActiveTabName()).toEqual('main');
 
-    locat.go('#/');
+    locat.go('/');
     expect(ters.getActiveTabName()).toEqual('main');
 
     locat.go('#');

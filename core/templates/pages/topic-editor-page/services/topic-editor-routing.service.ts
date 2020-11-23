@@ -35,6 +35,12 @@ export class TopicEditorRoutingService {
   QUESTIONS_TAB: string = 'questions';
   lastTabVisited: string = 'main';
   lastSubtopicId: number = null;
+  //this variable checks whether the file is running
+  //in testing or in server. If running in testing mode the whole
+  //URL of the window is not used (ex-URL : /questions), which clashes with running 
+  //on the server where whole URL is used.
+  //(ex-URL : http://localhost:8181/topic_editor/6xposGcAZShX#/questions). 
+  inSpecMode: boolean = false;
 
   activeTabName: string = this.MAIN_TAB;
 
@@ -45,12 +51,13 @@ export class TopicEditorRoutingService {
     private windowRef: WindowRef) {
     this.currentPath = this.location.path();
     this.location.onUrlChange((newPath: string, state: unknown) => {
-      newPath = newPath.split('#')[1];
+      if (!this.inSpecMode) {
+        newPath = newPath.split('#')[1];
+      }
       if (newPath === '') {
         this.location.go(this.currentPath);
         return;
       }
-
       if (newPath === '/') {
         this.activeTabName = this.MAIN_TAB;
       } else if (newPath === '/questions') {
@@ -80,35 +87,35 @@ export class TopicEditorRoutingService {
 
   navigateToMainTab(): void {
     this.lastTabVisited = 'topic';
-    this.location.go('#/');
+    this.location.go('/');
   }
 
   navigateToSubtopicPreviewTab(subtopicId: string | number): void {
     this.lastTabVisited = 'subtopic';
     this.pageTitleService.setPageTitleForMobileView('Subtopic Preview');
-    this.location.go('#/subtopic_preview/' + subtopicId);
+    this.location.go('/subtopic_preview/' + subtopicId);
   }
 
   navigateToTopicPreviewTab(): void {
     this.lastTabVisited = 'topic';
     this.pageTitleService.setPageTitleForMobileView('Topic Preview');
-    this.location.go('#/topic_preview/');
+    this.location.go('/topic_preview/');
   }
 
   navigateToSubtopicEditorWithId(subtopicId: string | number): void {
     this.lastTabVisited = 'subtopic';
     this.pageTitleService.setPageTitleForMobileView('Subtopic Editor');
-    this.location.go('#/subtopic_editor/' + subtopicId);
+    this.location.go('/subtopic_editor/' + subtopicId);
   }
 
   navigateToQuestionsTab(): void {
     this.lastSubtopicId = this.getSubtopicIdFromUrl();
     this.pageTitleService.setPageTitleForMobileView('Question Editor');
-    this.location.go('#/questions');
+    this.location.go('/questions');
   }
 
   getSubtopicIdFromUrl(): number {
-    return parseInt(this.location.path().split('/')[3]);
+    return parseInt(this.location.path().split('/')[2]);
   }
 
   navigateToSkillEditorWithId(skillId: string): void {
