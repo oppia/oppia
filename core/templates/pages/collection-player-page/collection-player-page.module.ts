@@ -46,8 +46,6 @@ import { CollectionNodeListComponent } from
   'pages/collection-player-page/collection-node-list/collection-node-list.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { provide as undoRedoServiceProvider } from
-  'domain/editor/undo_redo/undo-redo.service';
 
 @NgModule({
   imports: [
@@ -68,7 +66,6 @@ import { provide as undoRedoServiceProvider } from
     CollectionNavbarComponent
   ],
   providers: [
-    undoRedoServiceProvider,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
