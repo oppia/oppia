@@ -81,12 +81,10 @@ describe('Story Viewer Page component', function() {
       'clasroom_1');
     spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
       'story_1');
-    spyOn(userService, 'getUserInfoAsync')
-      .and.returnValue($q.resolve({
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
         isLoggedIn: () => true
       }));
-    spyOn(userService, 'getLoginUrlAsync')
-      .and.returnValue($q.resolve('/home'));
+    spyOn(userService, 'getLoginUrlAsync').and.returnValue($q.resolve('/home'));
 
 
     ctrl = $componentController('storyViewerPage', {
