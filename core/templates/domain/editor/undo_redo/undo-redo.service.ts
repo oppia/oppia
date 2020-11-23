@@ -21,11 +21,6 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { BaseUndoRedo } from 'domain/editor/undo_redo/base-undo-redo.service';
 
-const undoRedoServiceFactory = (): BaseUndoRedo => {
-  var child = new BaseUndoRedo();
-  child.init();
-  return child;
-};
 @Injectable({
   providedIn: 'root'
 })
@@ -35,11 +30,5 @@ export class UndoRedoService extends BaseUndoRedo {
   }
 }
 
-export const provide = {
-  provide: UndoRedoService, useFactory: undoRedoServiceFactory};
-
-// TODO(#7222): Remove the following lines after all the files have been
-// migrated to Angular.
-angular.module('oppia').factory('UndoRedoService', [undoRedoServiceFactory]);
 angular.module('oppia').factory('UndoRedoService',
   downgradeInjectable(UndoRedoService));
