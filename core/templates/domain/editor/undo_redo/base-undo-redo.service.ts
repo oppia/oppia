@@ -32,6 +32,10 @@ export class BaseUndoRedo {
   private _undoneChanges: Change[] = [];
   _undoRedoChangeEventEmitter: EventEmitter<void> = new EventEmitter();
 
+  constructor() {
+    this.init();
+  }
+
   private _dispatchMutation(): void {
     this._undoRedoChangeEventEmitter.emit();
   }
