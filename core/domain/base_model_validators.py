@@ -28,6 +28,7 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 datastore_services = models.Registry.import_datastore_services()
@@ -72,7 +73,8 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
     """Value object providing the class and ids to fetch an external model."""
 
     def __init__(
-            self, field_name, model_class, model_ids):
+            self, field_name, model_class, model_ids,
+            allow_system_user_ids=False, allow_pseudonymous_ids=False):
         """Initializes an ExternalModelFetcherDetails domain object.
 
         Args:
@@ -84,10 +86,20 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
             model_class: ClassObject. The external model class.
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
+            allow_system_user_ids: bool. Whether to allow system user ids.
+            allow_pseudonymous_ids: bool. Whether to allow psuedo user ids.
         """
+        filtered_model_ids = model_ids
+        if allow_system_user_ids:
+            filtered_model_ids = list(
+                set(filtered_model_ids) - set(feconf.SYSTEM_USERS.values()))
+        if allow_pseudonymous_ids:
+            filtered_model_ids = [
+                i for i in filtered_model_ids if (
+                    not utils.is_pseudonymous_id(i))]
         self.field_name = field_name
         self.model_class = model_class
-        self.model_ids = model_ids
+        self.model_ids = filtered_model_ids
 
 
 class ExternalModelReference(python_utils.OBJECT):
@@ -283,22 +295,10 @@ class BaseModelValidator(python_utils.OBJECT):
 
         for external_model_fetcher_details in (
                 cls._get_external_id_relationships(item)):
-            if external_model_fetcher_details.field_name == 'committer_ids':
-                # Removing the system users from the list of committers in the
-                # SnapshotMetadataModel.
-                model_id_list = list(
-                    set(external_model_fetcher_details.model_ids) -
-                    set(feconf.SYSTEM_USERS.values()))
-                if len(model_id_list) != 0:
-                    multiple_models_ids_to_fetch[
-                        external_model_fetcher_details.field_name] = (
-                            external_model_fetcher_details.model_class,
-                            model_id_list)
-            else:
-                multiple_models_ids_to_fetch[
-                    external_model_fetcher_details.field_name] = (
-                        external_model_fetcher_details.model_class,
-                        external_model_fetcher_details.model_ids)
+            multiple_models_ids_to_fetch[
+                external_model_fetcher_details.field_name] = (
+                    external_model_fetcher_details.model_class,
+                    external_model_fetcher_details.model_ids)
 
         fetched_model_instances_for_all_ids = (
             datastore_services.fetch_multiple_entities_by_ids_and_models(

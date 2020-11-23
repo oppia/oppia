@@ -89,7 +89,7 @@ class StorySnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+                [item.committer_id], True, True)]
 
 
 class StorySnapshotContentModelValidator(
