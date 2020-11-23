@@ -35,11 +35,11 @@ export class TopicEditorRoutingService {
   QUESTIONS_TAB: string = 'questions';
   lastTabVisited: string = 'main';
   lastSubtopicId: number = null;
-  //this variable checks whether the file is running
-  //in testing or in server. If running in testing mode the whole
-  //URL of the window is not used (ex-URL : /questions), which clashes with running 
-  //on the server where whole URL is used.
-  //(ex-URL : http://localhost:8181/topic_editor/6xposGcAZShX#/questions). 
+  // This variable checks whether the file is running
+  // in testing or in server. If running in testing mode the whole
+  // URL of the window is not used (ex-URL : /questions),
+  // which clashes with running on the server where whole URL is used.
+  // (ex-URL : http://localhost:8181/topic_editor/6xposGcAZShX#/questions).
   inSpecMode: boolean = false;
 
   activeTabName: string = this.MAIN_TAB;
