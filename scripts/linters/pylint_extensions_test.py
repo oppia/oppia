@@ -2885,7 +2885,7 @@ class BlankLineBelowFunctionDefCheckerTest(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                def function_name():
+                def function_name(test):
                     \"\"\"
                     test
                     \"\"\"
@@ -2914,7 +2914,7 @@ class BlankLineBelowFunctionDefCheckerTest(unittest.TestCase):
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                def function_name():
+                def function_name(test):
                     \"\"\"
                     test
                     \"\"\"

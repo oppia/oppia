@@ -1887,10 +1887,10 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
         while linecache.getline(
                 node.root().file, line_number).strip().startswith(b'#'):
             line_number += 1
-
-        if line_number != node.body[0].lineno:
-            self.add_message(
-                'blank-line-below-function-definition', node=node)
+        if node.body:
+            if line_number != node.body[0].lineno:
+                self.add_message(
+                    'blank-line-below-function-definition', node=node)
 
 
 def register(linter):
