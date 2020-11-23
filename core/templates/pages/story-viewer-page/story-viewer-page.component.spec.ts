@@ -82,8 +82,8 @@ describe('Story Viewer Page component', function() {
     spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
       'story_1');
     spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      isLoggedIn: () => true
+    }));
     spyOn(userService, 'getLoginUrlAsync').and.returnValue($q.resolve('/home'));
 
 
