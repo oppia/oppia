@@ -682,8 +682,7 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        job_class = AddMissingCommitLogsJob
-        return job_class.SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS
+        return cls.SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS
 
     @staticmethod
     def map(snapshot_model):
