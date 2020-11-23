@@ -48,7 +48,7 @@ angular.module('oppia').component('splashPage', {
         return false;
       };
 
-      ctrl.onClickBrowseLibraryButton = function() {
+      ctrl.onClickBrowseLessonsButton = function() {
         SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
         $timeout(function() {
           WindowRef.nativeWindow.location = '/learn/math';
