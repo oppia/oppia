@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2019 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,12 +41,8 @@ datastore_services = models.Registry.import_datastore_services()
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-(
-    collection_models, exp_models, user_models
-) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration,
-    models.NAMES.user
-])
+(collection_models, exp_models, user_models) = models.Registry.import_models([
+    models.NAMES.collection, models.NAMES.exploration, models.NAMES.user])
 
 
 class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
