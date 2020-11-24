@@ -19,88 +19,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
 import itertools
-import re
 
-from constants import constants
 from core.domain import base_model_validators
-from core.domain import classifier_domain
-from core.domain import classifier_services
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import cron_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import learner_progress_services
-from core.domain import question_domain
-from core.domain import question_fetchers
-from core.domain import question_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import skill_fetchers
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import user_domain
-from core.domain import user_services
-from core.domain import voiceover_services
-from core.domain import wipeout_service
 from core.platform import models
-import feconf
-import python_utils
 import utils
 
-(
-    base_models, collection_models,
-    email_models, exp_models, feedback_models,
-    job_models, question_models, skill_models, story_models,
-    subtopic_models, suggestion_models, topic_models,
-    user_models
-) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.job, models.NAMES.question, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+job_models = models.Registry.import_models([models.NAMES.job])
 
-])
-
-ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
-ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
-    iter(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values())))
-ASSETS_PATH_REGEX = '/exploration/[A-Za-z0-9-_]{1,12}/assets/'
-IMAGE_PATH_REGEX = (
-    '%simage/[A-Za-z0-9-_]{1,}\\.(%s)' % (
-        ASSETS_PATH_REGEX, ('|').join(ALLOWED_IMAGE_EXTENSIONS)))
-AUDIO_PATH_REGEX = (
-    '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
-        ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
-USER_ID_REGEX = 'uid_[a-z]{32}'
-ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
-    'DashboardRecentUpdatesAggregator',
-    'ExplorationRecommendationsAggregator',
-    'FeedbackAnalyticsAggregator',
-    'InteractionAnswerSummariesAggregator',
-    'SearchRanker',
-    'StatisticsAggregator',
-    'UserImpactAggregator',
-    'UserStatsAggregator']
-TARGET_TYPE_TO_TARGET_MODEL = {
-    suggestion_models.TARGET_TYPE_EXPLORATION: (
-        exp_models.ExplorationModel),
-    suggestion_models.TARGET_TYPE_QUESTION: (
-        question_models.QuestionModel),
-    suggestion_models.TARGET_TYPE_SKILL: (
-        skill_models.SkillModel),
-    suggestion_models.TARGET_TYPE_TOPIC: (
-        topic_models.TopicModel)
-}
-VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
-    '%s\\.[A-Za-z0-9-_]{1,%s}' % (
-        suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
-    
 class JobModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating JobModels."""
 
