@@ -360,6 +360,11 @@ angular.module('oppia').directive('adminRolesTab', [
             $rootScope.$apply();
           });
         };
+
+        ctrl.clearReviewersData = function() {
+          ctrl.contributionReviewersDataFetched = false;
+          ctrl.result = {};
+        };
       }]
     };
   }
