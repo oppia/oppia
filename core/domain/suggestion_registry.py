@@ -394,7 +394,7 @@ class SuggestionEditStateContent(BaseSuggestion):
 
         # Suggestions of this type do not have an associated language code,
         # since they are not translation-related.
-        if self.language_code != None:
+        if self.language_code is not None:
             raise utils.ValidationError(
                 'Expected language_code to be None, received %s' % (
                     self.language_code))
