@@ -564,7 +564,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('ItemSelectionInput')
-        state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict_list(state_answer_groups))
+        state.update_interaction_answer_groups(
+            state_domain.AnswerGroup.from_dict_list(state_answer_groups))
         state.update_interaction_customization_args(
             state_customization_args_dict)
         state.update_next_content_id_index(4)
@@ -647,7 +648,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         state.update_interaction_id('ItemSelectionInput')
-        state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict_list(state_answer_groups))
+        state.update_interaction_answer_groups(
+            state_domain.AnswerGroup.from_dict_list(state_answer_groups))
         mock_html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
                 feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
@@ -760,7 +762,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('ItemSelectionInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
-        state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict_list(state_answer_groups))
+        state.update_interaction_answer_groups(
+            state_domain.AnswerGroup.from_dict_list(state_answer_groups))
 
         mock_html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
@@ -3664,7 +3667,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        exploration.init_state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict_list(answer_groups))
+        exploration.init_state.update_interaction_answer_groups(
+            state_domain.AnswerGroup.from_dict_list(answer_groups))
 
         with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
             (

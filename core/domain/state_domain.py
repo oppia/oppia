@@ -112,7 +112,7 @@ class AnswerGroup(python_utils.OBJECT):
         """Return a AnswerGroup list domain objects from a dict list.
 
         Args:
-            answer_group_dict_list: dict list. The dict list 
+            answer_group_dict_list: dict list. The dict list
                 representation of AnswerGroup list.
 
         Returns:
@@ -2726,7 +2726,7 @@ class State(python_utils.OBJECT):
         """Update the list of AnswerGroup in InteractionInstance domain object.
 
         Args:
-            answer_groups_list: List of AnswerGroup domain object.
+            answer_groups_list: list. List of AnswerGroup domain object.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(
