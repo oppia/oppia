@@ -120,6 +120,9 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
+    os.path.join(
+        _PARENT_DIR, 'oppia_tools',
+        'simple-crypt-%s' % common.SIMPLE_CRYPT_VERSION),
     common.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 
@@ -370,8 +373,11 @@ def _get_all_filepaths(input_path, input_filenames):
         all_filepaths = _get_changed_filepaths()
     all_filepaths = [
         filename for filename in all_filepaths if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in(
-            general_purpose_linter.EXCLUDED_PATHS))]
+        any(
+            fnmatch.fnmatch(filename, pattern) for pattern
+            in general_purpose_linter.EXCLUDED_PATHS
+        )
+    ]
     return all_filepaths
 
 
@@ -569,6 +575,7 @@ def main(args=None):
 
     errors_stacktrace = concurrent_task_utils.ALL_ERRORS
     if errors_stacktrace:
+        failed = True
         _print_errors_stacktrace(errors_stacktrace)
 
     if failed:

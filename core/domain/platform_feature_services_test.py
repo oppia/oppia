@@ -116,19 +116,17 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client(
                 {
-                    'client_type': 'Android',
+                    'platform_type': 'Android',
                     'browser_type': None,
                     'app_version': '1.0.0',
-                    'user_locale': 'en',
                 }
             )
             self.assertEqual(
                 context.server_mode,
                 platform_parameter_domain.FEATURE_STAGES.dev)
-            self.assertEqual(context.client_type, 'Android')
+            self.assertEqual(context.platform_type, 'Android')
             self.assertEqual(context.browser_type, None)
             self.assertEqual(context.app_version, '1.0.0')
-            self.assertEqual(context.user_locale, 'en')
 
     def test_get_all_feature_flag_dicts_returns_correct_dicts(self):
         expected_dicts = [
@@ -142,10 +140,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_values_in_dev_returns_correct_values(self):
         with self.swap(constants, 'DEV_MODE', True):
             context = feature_services.create_evaluation_context_for_client({
-                'client_type': 'Android',
+                'platform_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             })
             self.assertEqual(
                 feature_services.evaluate_all_feature_flag_values_for_client(
@@ -153,16 +150,14 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 {
                     self.dev_feature.name: True,
                     self.prod_feature.name: True,
-                }
-            )
+                })
 
     def test_get_all_feature_flag_values_in_prod_returns_correct_values(self):
         with self.swap(constants, 'DEV_MODE', False):
             context = feature_services.create_evaluation_context_for_client({
-                'client_type': 'Android',
+                'platform_type': 'Android',
                 'browser_type': None,
                 'app_version': '1.0.0',
-                'user_locale': 'en',
             })
             self.assertEqual(
                 feature_services.evaluate_all_feature_flag_values_for_client(
@@ -170,8 +165,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 {
                     self.dev_feature.name: False,
                     self.prod_feature.name: True,
-                }
-            )
+                })
 
     def test_evaluate_dev_feature_for_dev_server_returns_true(self):
         with self.swap(constants, 'DEV_MODE', True):
@@ -190,6 +184,40 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
 
     def test_evaluate_prod_feature_for_prod_server_returns_true(
             self):
+        with self.swap(constants, 'DEV_MODE', False):
+            self.assertTrue(
+                feature_services.is_feature_enabled(self.prod_feature.name))
+
+    def test_evaluate_feature_for_prod_server_matches_to_backend_filter(
+            self):
+        registry.Registry.update_platform_parameter(
+            self.prod_feature.name, self.user_id, 'edit rules',
+            [
+                {
+                    'filters': [
+                        {
+                            'type': 'server_mode',
+                            'conditions': [
+                                [
+                                    '=',
+                                    platform_parameter_domain.SERVER_MODES.prod
+                                ]
+                            ],
+                        },
+                        {
+                            'type': 'platform_type',
+                            'conditions': [
+                                [
+                                    '=',
+                                    'Backend'
+                                ]
+                            ],
+                        }
+                    ],
+                    'value_when_matched': True
+                }
+            ]
+        )
         with self.swap(constants, 'DEV_MODE', False):
             self.assertTrue(
                 feature_services.is_feature_enabled(self.prod_feature.name))
@@ -244,8 +272,8 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     {
                         'filters': [
                             {
-                                'type': 'user_locale',
-                                'conditions': [['=', 'en']]
+                                'type': 'app_version',
+                                'conditions': [['=', '1.2.3']]
                             }
                         ],
                         'value_when_matched': True

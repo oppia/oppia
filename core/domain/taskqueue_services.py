@@ -57,6 +57,7 @@ FUNCTION_ID_DISPATCH_EVENT = 'dispatch_event'
 FUNCTION_ID_UPDATE_STATS = 'update_stats'
 FUNCTION_ID_DELETE_EXPLORATIONS = 'delete_explorations'
 FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS = 'untag_deleted_misconceptions'
+FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS = 'remove_user_from_rights_models'
 
 
 def defer(fn_identifier, queue_name, *args, **kwargs):

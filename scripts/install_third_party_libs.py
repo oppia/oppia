@@ -145,7 +145,8 @@ def main():
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
+        ('simple-crypt', common.SIMPLE_CRYPT_VERSION, common.OPPIA_TOOLS_DIR),
+        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR)
     ]
 
     for package, version, path in local_pip_dependencies:

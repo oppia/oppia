@@ -17,8 +17,11 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Training Data Editor Panel Service', function() {
+  importAllAngularServices();
+
   var TrainingDataEditorPanelService = null;
   var $uibModal = null;
   var AlertsService = null;
