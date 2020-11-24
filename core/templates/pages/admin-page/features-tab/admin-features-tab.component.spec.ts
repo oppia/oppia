@@ -218,16 +218,16 @@ describe('Admin page feature tab', function() {
       expect(rule.filters.length).toBe(1);
 
       component.addNewFilter(rule);
-      rule.filters[1].type = PlatformParameterFilterType.UserLocale;
+      rule.filters[1].type = PlatformParameterFilterType.AppVersion;
 
       expect(rule.filters.length).toBe(2);
       // Original filter list: ['server_mode']
-      // Verifies it's ['server_mode', 'user_locale'] after adding a new filter
+      // Verifies it's ['server_mode', 'app_version'] after adding a new filter
       // to the end.
       expect(rule.filters[0].type)
         .toEqual(PlatformParameterFilterType.ServerMode);
       expect(rule.filters[1].type)
-        .toEqual(PlatformParameterFilterType.UserLocale);
+        .toEqual(PlatformParameterFilterType.AppVersion);
     });
   });
 
@@ -235,15 +235,15 @@ describe('Admin page feature tab', function() {
     it('should remove filter', () => {
       const rule = component.featureFlags[0].rules[0];
       component.addNewFilter(rule);
-      rule.filters[1].type = PlatformParameterFilterType.UserLocale;
+      rule.filters[1].type = PlatformParameterFilterType.AppVersion;
 
       component.removeFilter(rule, 0);
 
-      // Original filter list: ['server_mode', 'user_locale']
-      // Verifies it's ['user_locale'] after removing the first filter.
+      // Original filter list: ['server_mode', 'app_version']
+      // Verifies it's ['app_version'] after removing the first filter.
       expect(rule.filters.length).toBe(1);
       expect(rule.filters[0].type)
-        .toEqual(PlatformParameterFilterType.UserLocale);
+        .toEqual(PlatformParameterFilterType.AppVersion);
     });
   });
 
@@ -274,7 +274,7 @@ describe('Admin page feature tab', function() {
       component.removeCondition(filter, 0);
 
       // Original condition list: ['=dev', '=mock']
-      // Verifies it's ['user_locale'] after removing the first condition.
+      // Verifies it's ['=mock'] after removing the first condition.
       expect(filter.conditions.length).toBe(1);
       expect(filter.conditions[0]).toEqual(['=', 'mock']);
     });

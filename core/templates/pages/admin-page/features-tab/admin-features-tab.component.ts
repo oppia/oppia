@@ -81,14 +81,9 @@ export class AdminFeaturesTabComponent implements OnInit {
         }
       }
     },
-    [PlatformParameterFilterType.UserLocale]: {
-      displayName: 'User Locale',
-      options: AdminFeaturesTabConstants.ALLOWED_SITE_LANGUAGE_IDS,
-      operators: ['=']
-    },
-    [PlatformParameterFilterType.ClientType]: {
-      displayName: 'Client Type',
-      options: AdminFeaturesTabConstants.ALLOWED_CLIENT_TYPES,
+    [PlatformParameterFilterType.PlatformType]: {
+      displayName: 'Platform Type',
+      options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
       operators: ['=']
     },
     [PlatformParameterFilterType.BrowserType]: {

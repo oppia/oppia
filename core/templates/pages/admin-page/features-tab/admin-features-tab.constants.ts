@@ -26,8 +26,8 @@ export const AdminFeaturesTabConstants = {
     ServerMode.Dev, ServerMode.Test, ServerMode.Prod
   ].map(val => val.toString()),
 
-  ALLOWED_CLIENT_TYPES: <string[]>
-    constants.PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES,
+  ALLOWED_PLATFORM_TYPES: <string[]>
+    constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES,
 
   ALLOWED_BROWSER_TYPES: <string[]>
     constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES,
