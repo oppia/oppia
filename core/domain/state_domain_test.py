@@ -565,7 +565,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('ItemSelectionInput')
         state.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(state_answer_groups))
+            state_domain.AnswerGroup.from_dicts(state_answer_groups))
         state.update_interaction_customization_args(
             state_customization_args_dict)
         state.update_next_content_id_index(4)
@@ -649,7 +649,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state.update_interaction_id('ItemSelectionInput')
         state.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(state_answer_groups))
+            state_domain.AnswerGroup.from_dicts(state_answer_groups))
         mock_html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
                 feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
@@ -763,7 +763,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_customization_args(
             state_customization_args_dict)
         state.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(state_answer_groups))
+            state_domain.AnswerGroup.from_dicts(state_answer_groups))
 
         mock_html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
@@ -3577,7 +3577,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected rule_inputs to be a dict'):
             exploration.init_state.update_interaction_answer_groups(
-                state_domain.AnswerGroup.from_dict_list(answer_groups_list))
+                state_domain.AnswerGroup.from_dicts(answer_groups_list))
 
     def test_cannot_update_answer_groups_with_non_list_rule_specs(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -3601,7 +3601,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected answer group rule specs to be a list'):
             exploration.init_state.update_interaction_answer_groups(
-                state_domain.AnswerGroup.from_dict_list(answer_groups_list))
+                state_domain.AnswerGroup.from_dicts(answer_groups_list))
 
     def test_cannot_update_answer_groups_with_invalid_rule_input_value(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -3634,7 +3634,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
-                state_domain.AnswerGroup.from_dict_list(answer_groups_list))
+                state_domain.AnswerGroup.from_dicts(answer_groups_list))
 
     def test_validate_rule_spec(self):
         observed_log_messages = []
@@ -3668,7 +3668,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         exploration.init_state.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_groups))
+            state_domain.AnswerGroup.from_dicts(answer_groups))
 
         with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
             (

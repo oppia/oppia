@@ -108,24 +108,24 @@ class AnswerGroup(python_utils.OBJECT):
         )
 
     @classmethod
-    def from_dict_list(cls, answer_group_dict_list):
-        """Return a AnswerGroup list domain objects from a dict list.
+    def from_dicts(cls, answer_group_dicts):
+        """Creates a list of AnswerGroup dict into a list of objects.
 
         Args:
-            answer_group_dict_list: dict list. The dict list
-                representation of AnswerGroup list.
+            answer_group_dicts: list(dict). The list of dict representation
+                of AnswerGroup.
 
         Returns:
-            AnswerGroup list. The corresponding AnswerGroup domain object list.
+            list(AnswerGroup). The corresponding AnswerGroup domain object list.
         """
-        if not isinstance(answer_group_dict_list, list):
+        if not isinstance(answer_group_dicts, list):
             raise Exception(
                 'Expected interaction_answer_groups to be a list, received %s'
-                % answer_group_dict_list)
+                % answer_group_dicts)
 
         answer_groups = []
 
-        for answer_group_dict in answer_group_dict_list:
+        for answer_group_dict in answer_group_dicts:
             answer_groups.append(cls.from_dict(answer_group_dict))
 
         return answer_groups
@@ -2726,7 +2726,8 @@ class State(python_utils.OBJECT):
         """Update the list of AnswerGroup in InteractionInstance domain object.
 
         Args:
-            answer_groups_list: list. List of AnswerGroup domain object.
+            answer_groups_list: list(AnswerGroup). List of AnswerGroup
+            domain object.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(

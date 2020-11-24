@@ -218,7 +218,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list1))
+            state_domain.AnswerGroup.from_dicts(answer_group_list1))
         exp_services.save_new_exploration(self.albert_id, exploration)
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
 
@@ -240,7 +240,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_next_content_id_index(2)
         state2.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list2))
+            state_domain.AnswerGroup.from_dicts(answer_group_list2))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
         rights_manager.publish_exploration(owner, self.VALID_EXP_ID)
@@ -333,7 +333,7 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list))
+            state_domain.AnswerGroup.from_dicts(answer_group_list))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -408,7 +408,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list1))
+            state_domain.AnswerGroup.from_dicts(answer_group_list1))
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start MultipleChoiceInteractionOneOffJob job on sample exploration.
@@ -468,7 +468,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_next_content_id_index(4)
         state2.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list2))
+            state_domain.AnswerGroup.from_dicts(answer_group_list2))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -539,7 +539,7 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list))
+            state_domain.AnswerGroup.from_dicts(answer_group_list))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -621,7 +621,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list1))
+            state_domain.AnswerGroup.from_dicts(answer_group_list1))
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
@@ -680,7 +680,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_next_content_id_index(2)
         state2.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list2))
+            state_domain.AnswerGroup.from_dicts(answer_group_list2))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -755,7 +755,7 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_next_content_id_index(2)
         state1.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list))
+            state_domain.AnswerGroup.from_dicts(answer_group_list))
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 

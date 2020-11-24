@@ -1739,9 +1739,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'tagged_skill_misconception_id': None
         }]
         state2.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list2))
+            state_domain.AnswerGroup.from_dicts(answer_group_list2))
         state3.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict_list(answer_group_list3))
+            state_domain.AnswerGroup.from_dicts(answer_group_list3))
 
         filenames = (
             exp_services.get_image_filenames_from_exploration(exploration))
