@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
-import { Collection } from 'domain/collection/CollectionObjectFactory';
+import { Collection } from 'domain/collection/collection.model';
 
 @Injectable({
   providedIn: 'root'

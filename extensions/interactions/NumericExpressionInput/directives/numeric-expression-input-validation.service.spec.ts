@@ -29,6 +29,8 @@ import { Rule, RuleObjectFactory } from
   'domain/exploration/RuleObjectFactory';
 import { NumericExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory.ts';
 
 import { AppConstants } from 'app.constants';
 
@@ -68,7 +70,12 @@ describe('NumericExpressionInputValidationService', () => {
       missing_prerequisite_skill_id: null
     });
 
-    customizationArgs = {};
+    customizationArgs = {
+      placeholder: {
+        value: new SubtitledUnicode(
+          'Type an expression here, using only numbers.', 'ca_placeholder_0')
+      }
+    };
 
     isEquivalentTo = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',

@@ -75,12 +75,14 @@ angular.module('oppia').component('signupPage', {
         ctrl.blurredAtLeastOnce = true;
         ctrl.updateWarningText(username);
         if (!ctrl.warningI18nCode) {
+          ctrl.usernameCheckIsInProgress = true;
           $http.post('usernamehandler/data', {
             username: username
           }).then(function(response) {
             if (response.data.username_is_taken) {
               ctrl.warningI18nCode = 'I18N_SIGNUP_ERROR_USERNAME_TAKEN';
             }
+            ctrl.usernameCheckIsInProgress = false;
           });
         }
       };
@@ -169,8 +171,7 @@ angular.module('oppia').component('signupPage', {
           $window.location.href = decodeURIComponent(
             UrlService.getUrlParams().return_url);
         }, function(rejection) {
-          if (
-            rejection.data && rejection.data.status_code === 401) {
+          if (rejection.data && rejection.data.status_code === 401) {
             ctrl.showRegistrationSessionExpiredModal();
           }
           ctrl.submissionInProcess = false;
@@ -196,6 +197,7 @@ angular.module('oppia').component('signupPage', {
         ctrl.warningI18nCode = '';
         ctrl.siteName = SITE_NAME;
         ctrl.submissionInProcess = false;
+        ctrl.usernameCheckIsInProgress = false;
 
         $http.get(_SIGNUP_DATA_URL).then(function(response) {
           var data = response.data;

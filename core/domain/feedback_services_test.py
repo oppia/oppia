@@ -439,6 +439,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.update_timestamps()
             thread.put()
 
         _close_thread(threads_exp_1[0].id)
@@ -468,6 +469,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             original_author_id=self.user_id, subject='Feedback',
             status=feedback_models.STATUS_CHOICES_OPEN, message_count=0,
             has_suggestion=False)
+        thread_3.update_timestamps()
         thread_3.put()
         feedback_services.create_message(
             'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
@@ -1272,7 +1274,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi editor,\n'
@@ -1331,7 +1333,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi editor,\n'
@@ -1427,7 +1429,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -1476,7 +1478,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -1525,7 +1527,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body_message = (
             'Hi newuser,\n'
@@ -1551,7 +1553,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body_status = (
             'Hi newuser,\n'

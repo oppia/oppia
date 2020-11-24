@@ -18,22 +18,21 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
+import { NewlyCreatedTopic } from
+  'domain/topics_and_skills_dashboard/newly-created-topic.model';
+
 describe('Create new topic modal', function() {
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   var $scope = null;
   var $uibModalInstance = null;
-  var NewlyCreatedTopicObjectFactory = null;
   var ImageLocalStorageService = null;
   var TopicEditorStateService = null;
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -41,8 +40,6 @@ describe('Create new topic modal', function() {
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
-    NewlyCreatedTopicObjectFactory =
-        $injector.get('NewlyCreatedTopicObjectFactory');
     $scope = $rootScope.$new();
     ImageLocalStorageService = $injector.get('ImageLocalStorageService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
@@ -59,7 +56,7 @@ describe('Create new topic modal', function() {
 
 
   it('should check properties set after controller is initialized', function() {
-    var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
+    var newlyCreatedTopic = NewlyCreatedTopic.createDefault();
     expect($scope.newlyCreatedTopic).toEqual(newlyCreatedTopic);
     expect($scope.MAX_CHARS_IN_TOPIC_NAME).toEqual(39);
     expect($scope.MAX_CHARS_IN_TOPIC_DESCRIPTION).toEqual(240);
@@ -67,13 +64,13 @@ describe('Create new topic modal', function() {
   });
 
   it('should close modal with newlyCreatedTopic', function() {
-    var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
+    var newlyCreatedTopic = NewlyCreatedTopic.createDefault();
     $scope.save();
     expect($uibModalInstance.close).toHaveBeenCalledWith(newlyCreatedTopic);
   });
 
   it('should return whether the topic is valid', function() {
-    var newlyCreatedTopic = NewlyCreatedTopicObjectFactory.createDefault();
+    var newlyCreatedTopic = NewlyCreatedTopic.createDefault();
     expect($scope.isValid()).toEqual(false);
     newlyCreatedTopic.name = 'name';
     newlyCreatedTopic.urlFragment = 'url-fragment';

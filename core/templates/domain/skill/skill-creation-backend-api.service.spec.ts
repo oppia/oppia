@@ -68,7 +68,7 @@ describe('Skill creation backend api service', () => {
         filename: 'image.png',
         imageBlob: imageBlob
       };
-      skillCreationBackendApiService.createSkill(
+      skillCreationBackendApiService.createSkillAsync(
         'test-description', rubricDict, 'test_dictionary', ['test_id'],
         [imageData]
       ).then(successHandler);
@@ -90,7 +90,7 @@ describe('Skill creation backend api service', () => {
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
-      skillCreationBackendApiService.createSkill(
+      skillCreationBackendApiService.createSkillAsync(
         'test-description', rubricDict, 'test_dictionary', ['test_id'], []
       ).then(successHandler, failHandler);
       let errorResponse = new HttpErrorResponse({

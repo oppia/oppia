@@ -1143,7 +1143,7 @@ states:
     interaction:
       answer_groups:
       - outcome:
-          dest: Set Input
+          dest: Ratio Expression Input
           feedback:
             content_id: feedback_1
             html: <p>Yes, well done!</p>
@@ -1182,6 +1182,47 @@ states:
         refresher_exploration_id: null
       hints: []
       id: NumberWithUnits
+      solution: null
+    param_changes: []
+  Ratio Expression Input:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Write the equivalent ratio for half.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: Set Input
+          feedback:
+            content_id: feedback_1
+            html: <p>Yes, well done!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: [1, 2]
+          rule_type: IsEquivalent
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Ratio Expression Input
+        feedback:
+          content_id: default_outcome
+          html: <p>No, that's not right. The answer is 1:2 (or equivalent).</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: RatioExpressionInput
       solution: null
     param_changes: []
   Pencil Code Editor:

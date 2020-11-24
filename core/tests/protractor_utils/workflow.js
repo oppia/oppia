@@ -31,11 +31,21 @@ var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
   '.protractor-thumbnail-reset-button'));
+var stateNameText = element(
+  by.css('.oppia-state-name-text'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
   return await element(by.css('.protractor-test-save-role')).isEnabled();
 };
+
+// Check if exploration is community owned.
+var isExplorationCommunityOwned = async function() {
+  return await element(
+    by.css('.protractor-test-is-community-owned')
+  ).isPresent();
+};
+
 
 // Check if the warning message is visible when the title is ''.
 var checkForAddTitleWarning = async function() {
@@ -85,6 +95,9 @@ var createExplorationAndStartTutorial = async function() {
       'createExplorationButton takes too long to be clickable.');
     await createExplorationButton.click();
   }
+
+  await waitFor.visibilityOf(
+    stateNameText, 'State name text takes too long to appear.');
 };
 
 /**
@@ -178,7 +191,7 @@ var createAddExpDetailsAndPublishExp = async function(
 
 // Creates and publishes a exploration with two cards.
 var createAndPublishTwoCardExploration = async function(
-    title, category, objective, language) {
+    title, category, objective, language, correctnessFeedbackIsEnabled) {
   await createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -198,6 +211,9 @@ var createAndPublishTwoCardExploration = async function(
   await explorationEditorSettingsTab.setObjective(objective);
   if (language) {
     await explorationEditorSettingsTab.setLanguage(language);
+  }
+  if (correctnessFeedbackIsEnabled) {
+    await explorationEditorSettingsTab.enableCorrectnessFeedback();
   }
   await explorationEditorPage.saveChanges();
   await publishExploration();
@@ -269,8 +285,8 @@ var createSkillAndAssignTopic = async function(
   await topicsAndSkillsDashboardPage.navigateToSkillsTab();
   await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
   await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
-  await topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
-    0, topicName);
+  await topicsAndSkillsDashboardPage.assignSkillToTopic(
+    skillDescription, topicName);
 };
 
 var getImageSource = async function(customImageElement) {
@@ -332,6 +348,7 @@ exports.createExplorationAsAdmin = createExplorationAsAdmin;
 exports.createAndPublishTwoCardExploration = createAndPublishTwoCardExploration;
 
 exports.canAddRolesToUsers = canAddRolesToUsers;
+exports.isExplorationCommunityOwned = isExplorationCommunityOwned;
 exports.checkForAddTitleWarning = checkForAddTitleWarning;
 exports.triggerTitleOnBlurEvent = triggerTitleOnBlurEvent;
 exports.openEditRolesForm = openEditRolesForm;

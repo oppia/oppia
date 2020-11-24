@@ -24,10 +24,10 @@ from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
 (base_models, user_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -39,7 +39,12 @@ class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """TopicSnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class TopicModel(base_models.VersionedModel):
@@ -54,63 +59,61 @@ class TopicModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The name of the topic.
-    name = ndb.StringProperty(required=True, indexed=True)
+    name = datastore_services.StringProperty(required=True, indexed=True)
     # The canonical name of the topic, created by making `name` lowercase.
-    canonical_name = ndb.StringProperty(required=True, indexed=True)
+    canonical_name = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The abbreviated name of the topic.
-    abbreviated_name = ndb.StringProperty(indexed=True, default='')
+    abbreviated_name = (
+        datastore_services.StringProperty(indexed=True, default=''))
     # The thumbnail filename of the topic.
-    thumbnail_filename = ndb.StringProperty(indexed=True)
+    thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the topic.
-    thumbnail_bg_color = ndb.StringProperty(indexed=True)
+    thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     # The description of the topic.
-    description = ndb.TextProperty(indexed=False)
+    description = datastore_services.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that
     # are part of this topic.
-    canonical_story_references = ndb.JsonProperty(repeated=True, indexed=False)
+    canonical_story_references = (
+        datastore_services.JsonProperty(repeated=True, indexed=False))
     # This consists of the list of objects referencing additional stories that
     # are part of this topic.
-    additional_story_references = ndb.JsonProperty(repeated=True, indexed=False)
+    additional_story_references = (
+        datastore_services.JsonProperty(repeated=True, indexed=False))
     # The schema version for the story reference object on each of the above 2
     # lists.
-    story_reference_schema_version = ndb.IntegerProperty(
+    story_reference_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # This consists of the list of uncategorized skill ids that are not part of
     # any subtopic.
-    uncategorized_skill_ids = ndb.StringProperty(repeated=True, indexed=True)
+    uncategorized_skill_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
     # The list of subtopics that are part of the topic.
-    subtopics = ndb.JsonProperty(repeated=True, indexed=False)
+    subtopics = datastore_services.JsonProperty(repeated=True, indexed=False)
     # The schema version of the subtopic dict.
-    subtopic_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    subtopic_schema_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The id for the next subtopic.
-    next_subtopic_id = ndb.IntegerProperty(required=True)
+    next_subtopic_id = datastore_services.IntegerProperty(required=True)
     # The ISO 639-1 code for the language this topic is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The url fragment of the topic.
-    url_fragment = ndb.StringProperty(required=True, indexed=True)
+    url_fragment = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # Whether to show practice tab in the Topic viewer page.
-    practice_tab_is_displayed = ndb.BooleanProperty(
+    practice_tab_is_displayed = datastore_services.BooleanProperty(
         required=True, default=False)
     # The content of the meta tag in the Topic viewer page.
-    meta_tag_content = ndb.StringProperty(indexed=True)
+    meta_tag_content = datastore_services.StringProperty(
+        indexed=True, default='')
 
     @staticmethod
     def get_deletion_policy():
-        """Topic should be kept if it is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether TopicModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
+        """TopicModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -144,6 +147,7 @@ class TopicModel(base_models.VersionedModel):
             commit_message, commit_cmds, status, False
         )
         topic_commit_log_entry.topic_id = self.id
+        topic_commit_log_entry.update_timestamps()
         topic_commit_log_entry.put()
 
     @classmethod
@@ -178,6 +182,11 @@ class TopicModel(base_models.VersionedModel):
         return TopicModel.query().filter(
             cls.url_fragment == url_fragment).filter(
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -217,14 +226,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the topic being edited.
-    topic_id = ndb.StringProperty(indexed=True, required=True)
-
-    @staticmethod
-    def get_deletion_policy():
-        """Topic commit log is deleted only if the correspondingm topic is not
-        public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+    topic_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @classmethod
     def _get_instance_id(cls, topic_id, version):
@@ -239,6 +241,11 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the topic id and version number.
         """
         return 'topic-%s-%s' % (topic_id, version)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -265,58 +272,62 @@ class TopicSummaryModel(base_models.BaseModel):
     """
 
     # The name of the topic.
-    name = ndb.StringProperty(required=True, indexed=True)
+    name = datastore_services.StringProperty(required=True, indexed=True)
     # The canonical name of the topic, created by making `name` lowercase.
-    canonical_name = ndb.StringProperty(required=True, indexed=True)
+    canonical_name = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The ISO 639-1 code for the language this topic is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The description of the topic.
-    description = ndb.TextProperty(indexed=False)
+    description = datastore_services.TextProperty(indexed=False)
     # The url fragment of the topic.
-    url_fragment = ndb.StringProperty(required=True, indexed=True)
+    url_fragment = (
+        datastore_services.StringProperty(required=True, indexed=True))
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the
     # topic *summary* model was last updated).
-    topic_model_last_updated = ndb.DateTimeProperty(required=True, indexed=True)
+    topic_model_last_updated = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
     # Time when the topic model was created (not to be confused
     # with created_on, which is the time when the topic *summary*
     # model was created).
-    topic_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
+    topic_model_created_on = (
+        datastore_services.DateTimeProperty(required=True, indexed=True))
     # The number of canonical stories that are part of this topic.
-    canonical_story_count = ndb.IntegerProperty(required=True, indexed=True)
+    canonical_story_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The number of additional stories that are part of this topic.
-    additional_story_count = ndb.IntegerProperty(required=True, indexed=True)
+    additional_story_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The total number of skills in the topic (including those that are
     # uncategorized).
-    total_skill_count = ndb.IntegerProperty(required=True, indexed=True)
+    total_skill_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The number of skills that are not part of any subtopic.
-    uncategorized_skill_count = ndb.IntegerProperty(required=True, indexed=True)
+    uncategorized_skill_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The number of subtopics of the topic.
-    subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
+    subtopic_count = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
     # The thumbnail filename of the topic.
-    thumbnail_filename = ndb.StringProperty(indexed=True)
+    thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the topic.
-    thumbnail_bg_color = ndb.StringProperty(indexed=True)
-    version = ndb.IntegerProperty(required=True)
+    thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
+    version = datastore_services.IntegerProperty(required=True)
 
     @staticmethod
     def get_deletion_policy():
-        """Topic summary should be kept if associated topic is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether TopicSummaryModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
+        """TopicSummaryModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return False
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -351,7 +362,33 @@ class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """TopicRightsSnapshotContentModel contains data corresponding to
+        a user: inside the content field there is manager_ids field.
+
+        The pseudonymization of this model is handled in the wipeout_service
+        in the _pseudonymize_activity_models_with_associated_rights_models(),
+        based on the content_user_ids field of the
+        TopicRightsSnapshotMetadataModel.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether TopicRightsSnapshotContentModel references the given
+        user. The manager_ids field is checked through content_user_ids field in
+        the TopicRightsSnapshotMetadataModel.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return TopicRightsSnapshotMetadataModel.query(
+            TopicRightsSnapshotMetadataModel.content_user_ids == user_id
+        ).get(keys_only=True) is not None
 
 
 class TopicRightsModel(base_models.VersionedModel):
@@ -365,16 +402,18 @@ class TopicRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_ids of the managers of this topic.
-    manager_ids = ndb.StringProperty(indexed=True, repeated=True)
+    manager_ids = datastore_services.StringProperty(indexed=True, repeated=True)
 
     # Whether this topic is published.
-    topic_is_published = ndb.BooleanProperty(
+    topic_is_published = datastore_services.BooleanProperty(
         indexed=True, required=True, default=False)
 
     @staticmethod
     def get_deletion_policy():
-        """Topic rights should be kept if associated topic is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        """TopicRightsModel contains data to pseudonymize corresponding
+        to a user: manager_ids field.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -464,7 +503,18 @@ class TopicRightsModel(base_models.VersionedModel):
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
+        snapshot_metadata_model.update_timestamps()
         snapshot_metadata_model.put()
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as one instance shared across users since multiple
+        users contribute to topics and their rights.
+        """
+        return (
+            base_models
+            .MODEL_ASSOCIATION_TO_USER
+            .ONE_INSTANCE_SHARED_ACROSS_USERS)
 
     @classmethod
     def get_export_policy(cls):
@@ -473,6 +523,15 @@ class TopicRightsModel(base_models.VersionedModel):
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
             'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+    @classmethod
+    def get_field_name_mapping_to_takeout_keys(cls):
+        """Defines the mapping of field names to takeout keys since this model
+        is exported as one instance shared across users.
+        """
+        return {
+            'manager_ids': 'managed_topic_ids'
+        }
 
     @classmethod
     def export_data(cls, user_id):

@@ -66,7 +66,8 @@ class ExplorationOpportunitySummaryModelValidator(
         the exploration.
 
         Args:
-            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+            item: datastore_services.Model. ExplorationOpportunitySummaryModel
+                to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -91,7 +92,7 @@ class ExplorationOpportunitySummaryModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -115,7 +116,8 @@ class ExplorationOpportunitySummaryModelValidator(
         content available in the corresponding ExplorationModel.
 
         Args:
-            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+            item: datastore_services.Model. ExplorationOpportunitySummaryModel
+                to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -140,7 +142,7 @@ class ExplorationOpportunitySummaryModelValidator(
                     'exploration_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -162,7 +164,8 @@ class ExplorationOpportunitySummaryModelValidator(
         node of StoryModel.
 
         Args:
-            item: ndb.Model. ExplorationOpportunitySummaryModel to validate.
+            item: datastore_services.Model. ExplorationOpportunitySummaryModel
+                to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -187,7 +190,7 @@ class ExplorationOpportunitySummaryModelValidator(
                     'story_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field story_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue
@@ -255,7 +258,7 @@ class SkillOpportunityModelValidator(
         to the opportunity's skill.
 
         Args:
-            item: ndb.Model. SkillOpportunityModel to validate.
+            item: datastore_services.Model. SkillOpportunityModel to validate.
             field_name_to_external_model_references:
                 dict(str, (list(base_model_validators.ExternalModelReference))).
                 A dict keyed by field name. The field name represents
@@ -280,7 +283,7 @@ class SkillOpportunityModelValidator(
                     'skill_ids %s' % (
                         base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
                     'Entity id %s: based on field skill_ids having'
-                    ' value %s, expect model %s with id %s but it doesn\'t'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
                     ' exist' % (
                         item.id, model_id, model_class.__name__, model_id))
                 continue

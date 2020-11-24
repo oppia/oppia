@@ -20,20 +20,17 @@ import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
-import { StoryNodeObjectFactory } from 'domain/story/StoryNodeObjectFactory';
+import { StoryNode } from 'domain/story/story-node.model';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 
 describe('Read only topic object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
   let _sampleReadOnlyTopic: ReadOnlyTopic = null;
-  let storyNodeObjectFactory: StoryNodeObjectFactory = null;
 
   beforeEach(() => {
     readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
-      new StoryNodeObjectFactory(),
       new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()),
       new ShortSkillSummaryObjectFactory());
-    storyNodeObjectFactory = new StoryNodeObjectFactory();
 
     let nodeDict = {
       id: 'node_1',
@@ -148,7 +145,7 @@ describe('Read only topic object Factory', () => {
     expect(expectedStorySummary.getNodeTitles()).toEqual(['Chapter 1']);
     expect(expectedStorySummary.isNodeCompleted('Chapter 1')).toEqual(true);
     expect(expectedStorySummary.getPendingNodes()).toEqual([
-      storyNodeObjectFactory.createFromBackendDict({
+      StoryNode.createFromBackendDict({
         id: 'node_1',
         thumbnail_filename: 'image.png',
         title: 'Title 1',

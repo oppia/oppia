@@ -22,9 +22,9 @@ import { ContributionOpportunitiesBackendApiService } from
   'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationOpportunitySummaryObjectFactory } from
-  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { EventEmitter } from '@angular/core';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Translation opportunities component', function() {
   var ctrl = null;
@@ -33,19 +33,18 @@ describe('Translation opportunities component', function() {
   var $scope = null;
   var $uibModal = null;
   var contributionOpportunitiesService = null;
-  var explorationOpportunitySummaryObjectFactory = null;
   var translationLanguageService = null;
   var userService = null;
 
   var opportunitiesArray = [];
   var activeLanguageChangedEmitter = new EventEmitter();
 
+  importAllAngularServices();
+
   beforeEach(function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    explorationOpportunitySummaryObjectFactory = TestBed.get(
-      ExplorationOpportunitySummaryObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -70,7 +69,7 @@ describe('Translation opportunities component', function() {
       'en');
 
     opportunitiesArray = [
-      explorationOpportunitySummaryObjectFactory.createFromBackendDict({
+      ExplorationOpportunitySummary.createFromBackendDict({
         id: '1',
         topic_name: 'topic_1',
         story_title: 'Story title 1',
@@ -80,7 +79,7 @@ describe('Translation opportunities component', function() {
           en: 2
         }
       }),
-      explorationOpportunitySummaryObjectFactory.createFromBackendDict({
+      ExplorationOpportunitySummary.createFromBackendDict({
         id: '2',
         topic_name: 'topic_2',
         story_title: 'Story title 2',

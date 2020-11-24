@@ -26,11 +26,10 @@ from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
-import google.appengine.api.datastore_errors
-from google.appengine.ext import ndb
-
 (base_models, config_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.config])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
@@ -64,7 +63,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
     def test_indexing_fails(self):
         """Ensures the indexing does not work without the one-off-job."""
 
-        commit_message_swapped = ndb.TextProperty(indexed=False)
+        commit_message_swapped = datastore_services.TextProperty(indexed=False)
         index_swap = self.swap(
             base_models.BaseSnapshotMetadataModel, 'commit_message',
             commit_message_swapped)
@@ -83,7 +82,7 @@ class SnapshotMetadataCommitMsgMigrationOneOffJobTests(
 
             # Try a query on the unindexed field and observe failure.
             with self.assertRaisesRegexp(
-                google.appengine.api.datastore_errors.BadFilterError,
+                Exception,
                 'invalid filter: Cannot query for unindexed property None.'):
                 model_class.query(model_class.commit_message == 'test1')
 

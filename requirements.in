@@ -7,7 +7,12 @@ backports.functools-lru-cache==1.6.1
 beautifulSoup4==4.9.1
 bleach==3.1.5
 callbacks==0.3.0
+contextlib2==0.6.0.post1
 future==0.18.2
+google-api-python-client==1.11.0
+google-auth==1.21.1
+google-auth-httplib2==0.0.4
+google-auth-oauthlib==0.4.1
 GoogleAppEngineCloudStorageClient==1.9.22.1
 GoogleAppEngineMapReduce==1.9.22.0
 GoogleAppEnginePipeline==1.9.22.1
@@ -22,6 +27,7 @@ soupsieve==1.9.5
 webencodings==0.5.1
 redis==3.5.3
 requests==2.24.0
+requests-mock==1.5.2
 requests-toolbelt==0.9.1
 google-cloud-tasks==1.5.0
 googleapis_common_protos==1.52.0

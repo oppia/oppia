@@ -22,12 +22,10 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { StateInteractionStatsBackendApiService } from
   'domain/exploration/state-interaction-stats-backend-api.service';
-import { VisualizationInfoObjectFactory } from
-  'domain/exploration/visualization-info-object.factory';
+import { VisualizationInfo } from 'domain/exploration/visualization-info.model';
 
 describe('State interaction stats backend api service', () => {
   let sisbas: StateInteractionStatsBackendApiService;
-  let viof: VisualizationInfoObjectFactory;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
@@ -36,7 +34,6 @@ describe('State interaction stats backend api service', () => {
     });
 
     sisbas = TestBed.get(StateInteractionStatsBackendApiService);
-    viof = TestBed.get(VisualizationInfoObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -58,7 +55,7 @@ describe('State interaction stats backend api service', () => {
     };
 
     let expectedObjects = backendResposne.visualizations_info.map(
-      viof.createFromBackendDict);
+      VisualizationInfo.createFromBackendDict);
 
     sisbas.getStats('expId', 'Intro').then((vizInfo) => {
       expect(vizInfo).toEqual(expectedObjects);

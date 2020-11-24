@@ -28,17 +28,21 @@ import feconf
     [models.NAMES.base_model, models.NAMES.story])
 
 
+class StorySnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_deletion_policy_is_not_applicable(self):
+        self.assertEqual(
+            story_models.StorySnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+
 class StoryModelTest(test_utils.GenericTestBase):
     """Tests for Oppia story models."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             story_models.StoryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            story_models.StoryModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_story_model(self):
         """Method to test the StoryModel."""
@@ -96,16 +100,12 @@ class StoryModelTest(test_utils.GenericTestBase):
 class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the StoryCommitLogEntryModel class."""
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            story_models.StoryCommitLogEntryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
     def test_has_reference_to_user_id(self):
         commit = story_models.StoryCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.story_id = 'b'
+        commit.update_timestamps()
         commit.put()
         self.assertTrue(
             story_models.StoryCommitLogEntryModel
@@ -121,11 +121,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             story_models.StorySummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            story_models.StorySummaryModel.has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_story_summary_model(self):
         """Method to test the StorySummaryModel."""
@@ -142,6 +138,7 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             thumbnail_bg_color='#F8BF74',
             version=1,
             url_fragment='story-summary-frag')
+        story_summary_model.update_timestamps()
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
 

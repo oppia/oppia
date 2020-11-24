@@ -37,22 +37,19 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import isEqual from 'lodash/isEqual';
 
-import { ClientContext, ClientContextObjectFactory } from
-  'domain/platform_feature/client-context-object.factory';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import {
   FeatureNames,
   FeatureStatusSummary,
-  FeatureStatusSummaryObjectFactory,
   FeatureStatusChecker
-} from 'domain/platform_feature/feature-status-summary-object.factory';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+} from 'domain/platform_feature/feature-status-summary.model';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
+import { ClientContext } from 'domain/platform_feature/client-context.model';
 
 interface FeatureFlagsCacheItem {
   timestamp: number;
@@ -78,12 +75,8 @@ export class PlatformFeatureService {
   static _isSkipped = false;
 
   constructor(
-      private clientContextObjectFactory: ClientContextObjectFactory,
       private platformFeatureBackendApiService:
         PlatformFeatureBackendApiService,
-      private featureStatusSummaryObjectFactory:
-        FeatureStatusSummaryObjectFactory,
-      private i18nLanguageCodeService: I18nLanguageCodeService,
       private windowRef: WindowRef,
       private loggerService: LoggerService,
       private urlService: UrlService,
@@ -165,8 +158,8 @@ export class PlatformFeatureService {
       // erased, leading to the 'Registration session expired' error.
       if (this.urlService.getPathname() === '/signup') {
         PlatformFeatureService._isSkipped = true;
-        PlatformFeatureService.featureStatusSummary = this
-          .featureStatusSummaryObjectFactory.createDefault();
+        PlatformFeatureService.featureStatusSummary =
+          FeatureStatusSummary.createDefault();
         return;
       }
 
@@ -178,8 +171,8 @@ export class PlatformFeatureService {
         'Error during initialization of PlatformFeatureService: ' +
         `${err.message ? err.message : err}`);
       // If any error, just disable all features.
-      PlatformFeatureService.featureStatusSummary = this
-        .featureStatusSummaryObjectFactory.createDefault();
+      PlatformFeatureService.featureStatusSummary =
+        FeatureStatusSummary.createDefault();
       PlatformFeatureService._isInitializedWithError = true;
       this.clearSavedResults();
     }
@@ -228,7 +221,7 @@ export class PlatformFeatureService {
         timestamp: savedObj.timestamp,
         sessionId: savedObj.sessionId,
         featureStatusSummary: (
-          this.featureStatusSummaryObjectFactory.createFromBackendDict(
+          FeatureStatusSummary.createFromBackendDict(
             savedObj.featureStatusSummary))
       };
     }
@@ -278,13 +271,10 @@ export class PlatformFeatureService {
    * client information.
    */
   private generateClientContext(): ClientContext {
-    const clientType = 'Web';
+    const platformType = 'Web';
     const browserType = this.browserCheckerService.detectBrowserType();
-    const userLocale = (
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
 
-    return this.clientContextObjectFactory.create(
-      clientType, browserType, userLocale);
+    return ClientContext.create(platformType, browserType);
   }
 
   /**

@@ -26,11 +26,10 @@ import feconf
 import python_utils
 import utils
 
-from google.appengine.ext import ndb
-
 (base_models, skill_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill
 ])
+
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -43,7 +42,12 @@ class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """QuestionSnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class QuestionModel(base_models.VersionedModel):
@@ -57,14 +61,16 @@ class QuestionModel(base_models.VersionedModel):
     ALLOW_REVERT = True
 
     # An object representing the question state data.
-    question_state_data = ndb.JsonProperty(indexed=False, required=True)
+    question_state_data = (
+        datastore_services.JsonProperty(indexed=False, required=True))
     # The schema version for the question state data.
-    question_state_data_schema_version = ndb.IntegerProperty(
+    question_state_data_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The skill ids linked to this question.
-    linked_skill_ids = ndb.StringProperty(
+    linked_skill_ids = datastore_services.StringProperty(
         indexed=True, repeated=True)
     # The optional skill misconception ids marked as not relevant to the
     # question.
@@ -74,13 +80,20 @@ class QuestionModel(base_models.VersionedModel):
     # misconception id, this is because questions can have multiple skills
     # attached to it. Hence, the format for this field will be
     # <skill-id>-<misconceptionid>.
-    inapplicable_skill_misconception_ids = ndb.StringProperty(
+    inapplicable_skill_misconception_ids = datastore_services.StringProperty(
         indexed=True, repeated=True)
 
     @staticmethod
     def get_deletion_policy():
-        """Question should be kept but the creator should be anonymized."""
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        """QuestionModel doesn't contain any data directly corresponding to
+        a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -94,19 +107,6 @@ class QuestionModel(base_models.VersionedModel):
             'inapplicable_skill_misconception_ids':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether QuestionModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def _get_new_id(cls):
@@ -159,6 +159,7 @@ class QuestionModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
+        question_commit_log.update_timestamps()
         question_commit_log.put()
 
     @classmethod
@@ -204,6 +205,7 @@ class QuestionModel(base_models.VersionedModel):
             questions: list(Question). The list of question objects
                 to put into the datastore.
         """
+        cls.update_timestamps_multi(questions)
         cls.put_multi(questions)
 
 
@@ -214,11 +216,13 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     """
 
     # The ID of the question.
-    question_id = ndb.StringProperty(required=True, indexed=True)
+    question_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The ID of the skill to which the question is linked.
-    skill_id = ndb.StringProperty(required=True, indexed=True)
+    skill_id = datastore_services.StringProperty(required=True, indexed=True)
     # The difficulty of the skill.
-    skill_difficulty = ndb.FloatProperty(required=True, indexed=True)
+    skill_difficulty = (
+        datastore_services.FloatProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
@@ -226,6 +230,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         anonymized and are not deleted whe user is deleted.
         """
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -619,6 +628,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_skill_links: list(QuestionSkillLink). The list of
                 question skill link domain objects to put into the datastore.
         """
+        cls.update_timestamps_multi(question_skill_links)
         cls.put_multi(question_skill_links)
 
     @classmethod
@@ -642,14 +652,14 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the question being edited.
-    question_id = ndb.StringProperty(indexed=True, required=True)
+    question_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
-    def get_deletion_policy():
-        """Question commit log is deleted only if the corresponding collection
-        is not public.
+    def get_model_association_to_user():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -692,28 +702,39 @@ class QuestionSummaryModel(base_models.BaseModel):
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
-    question_model_last_updated = ndb.DateTimeProperty(
+    question_model_last_updated = datastore_services.DateTimeProperty(
         indexed=True, required=True)
     # Time when the question model was created (not to be confused
     # with created_on, which is the time when the question *summary*
     # model was created).
-    question_model_created_on = ndb.DateTimeProperty(
+    question_model_created_on = datastore_services.DateTimeProperty(
         indexed=True, required=True)
     # The html content for the question.
-    question_content = ndb.TextProperty(indexed=False, required=True)
+    question_content = (
+        datastore_services.TextProperty(indexed=False, required=True))
     # The ID of the interaction.
-    interaction_id = ndb.StringProperty(indexed=True, required=True)
+    interaction_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
     # The misconception ids addressed in the question. This includes
     # tagged misconceptions ids as well as inapplicable misconception
     # ids in the question.
-    misconception_ids = ndb.StringProperty(indexed=True, repeated=True)
+    misconception_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
 
     @staticmethod
     def get_deletion_policy():
-        """Question summary should be kept but the creator should be
-        anonymized.
+        """QuestionSummaryModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model data has already been exported as a part of the QuestionModel
+        export_data function, and thus a new export_data function does not
+        need to be defined here.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -730,17 +751,3 @@ class QuestionSummaryModel(base_models.BaseModel):
             'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether any existing QuestionSummaryModel refers to the given
-        user_id.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user_id.
-        """
-        return False

@@ -29,6 +29,13 @@ class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for running the user deletion."""
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We limit the number of shards to only one so that each user is deleted
+        # separately and there are no conflicts between the deletions.
+        super(UserDeletionOneOffJob, cls).enqueue(
+            job_id, shard_count=1)
+
+    @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [user_models.PendingDeletionRequestModel]
@@ -66,9 +73,6 @@ class FullyCompleteUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(pending_deletion_request_model):
         """Implements the map function for this job."""
-        # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
-        # for the user. The verification will be done in the next run of
-        # FullyCompleteUserDeletionOneOffJob.
         pending_deletion_request = wipeout_service.get_pending_deletion_request(
             pending_deletion_request_model.id)
         # The final status of the completion. Either 'NOT DELETED', 'SUCCESS',

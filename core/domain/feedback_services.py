@@ -33,11 +33,10 @@ from core.platform import models
 import feconf
 import python_utils
 
-from google.appengine.ext import ndb
-
 (feedback_models, email_models, suggestion_models) = (
     models.Registry.import_models(
         [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
+
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -93,6 +92,7 @@ def _create_models_for_thread_and_first_message(
     thread.subject = subject
     thread.has_suggestion = has_suggestion
     thread.message_count = 0
+    thread.update_timestamps()
     thread.put()
     create_message(
         thread_id, original_author_id, feedback_models.STATUS_CHOICES_OPEN,
@@ -257,6 +257,8 @@ def create_messages(
                     )
         if updated_subject:
             message_model.updated_subject = updated_subject
+    feedback_models.GeneralFeedbackMessageModel.update_timestamps_multi(
+        message_models)
     feedback_models.GeneralFeedbackMessageModel.put_multi(message_models)
 
     # Update the message data cache of the threads.
@@ -282,6 +284,8 @@ def create_messages(
                         updated_subject != thread_model.subject):
                     thread_model.subject = updated_subject
             new_statuses.append(thread_model.status)
+    feedback_models.GeneralFeedbackThreadModel.update_timestamps_multi(
+        thread_models)
     feedback_models.GeneralFeedbackThreadModel.put_multi(thread_models)
 
     # For each thread, we do a put on the suggestion linked (if it exists) to
@@ -301,6 +305,8 @@ def create_messages(
         # we need not update the suggestion.
         if suggestion_model:
             suggestion_models_to_update.append(suggestion_model)
+    suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
+        suggestion_models_to_update)
     suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_update)
 
@@ -333,7 +339,8 @@ def _get_threads_user_info_keys(thread_ids):
         thread_ids: list(str). The ids of the threads.
 
     Returns:
-        list(ndb.Keys). The keys of the feedback thread user model.
+        list(datastore_services.Key). The keys of the feedback thread user
+        model.
     """
     if thread_ids:
         return feedback_models.GeneralFeedbackThreadUserModel.query(
@@ -361,14 +368,17 @@ def delete_threads_for_multiple_entities(entity_type, entity_ids):
     for thread in threads:
         for message in get_messages(thread.id):
             model_keys.append(
-                ndb.Key(feedback_models.GeneralFeedbackMessageModel, message.id)
+                datastore_services.Key(
+                    feedback_models.GeneralFeedbackMessageModel, message.id)
             )
         model_keys.append(
-            ndb.Key(feedback_models.GeneralFeedbackThreadModel, thread.id)
+            datastore_services.Key(
+                feedback_models.GeneralFeedbackThreadModel, thread.id)
         )
         if thread.has_suggestion:
             model_keys.append(
-                ndb.Key(suggestion_models.GeneralSuggestionModel, thread.id)
+                datastore_services.Key(
+                    suggestion_models.GeneralSuggestionModel, thread.id)
             )
 
     model_keys += _get_threads_user_info_keys([thread.id for thread in threads])
@@ -376,10 +386,11 @@ def delete_threads_for_multiple_entities(entity_type, entity_ids):
     if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
         for entity_id in entity_ids:
             model_keys.append(
-                ndb.Key(feedback_models.FeedbackAnalyticsModel, entity_id)
+                datastore_services.Key(
+                    feedback_models.FeedbackAnalyticsModel, entity_id)
             )
 
-    ndb.delete_multi(model_keys)
+    datastore_services.delete_multi(model_keys)
 
 
 def update_messages_read_by_the_user(user_id, thread_id, message_ids):
@@ -398,6 +409,7 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
         feedback_models.GeneralFeedbackThreadUserModel.create(
             user_id, thread_id))
     feedback_thread_user_model.message_ids_read_by_user = message_ids
+    feedback_thread_user_model.update_timestamps()
     feedback_thread_user_model.put()
 
 
@@ -471,6 +483,8 @@ def add_message_ids_to_read_by_list(user_id, message_identifiers):
     # Update both the new and previously existing models in the datastore.
     current_feedback_thread_user_models.extend(
         new_feedback_thread_user_models)
+    feedback_models.GeneralFeedbackThreadUserModel.update_timestamps_multi(
+        current_feedback_thread_user_models)
     feedback_models.GeneralFeedbackThreadUserModel.put_multi(
         current_feedback_thread_user_models)
 
@@ -878,10 +892,12 @@ def _add_feedback_message_reference(user_id, reference):
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
     if model is not None:
         model.feedback_message_references.append(reference.to_dict())
+        model.update_timestamps()
         model.put()
     else:
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id, feedback_message_references=[reference.to_dict()])
+        model.update_timestamps()
         model.put()
         enqueue_feedback_message_batch_email_task(user_id)
 
@@ -900,6 +916,7 @@ def update_feedback_email_retries(user_id):
     if (time_since_buffered >
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS):
         model.retries += 1
+        model.update_timestamps()
         model.put()
 
 
@@ -923,6 +940,7 @@ def pop_feedback_message_references(user_id, num_references_to_pop):
         # the retries count will be incorrect.
         model = feedback_models.UnsentFeedbackEmailModel(
             id=user_id, feedback_message_references=remaining_references)
+        model.update_timestamps()
         model.put()
         enqueue_feedback_message_batch_email_task(user_id)
 
@@ -965,6 +983,7 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
         model.delete()
     else:
         model.feedback_message_references = updated_references
+        model.update_timestamps()
         model.put()
 
 
@@ -1137,3 +1156,21 @@ def _add_message_to_email_buffer(
         _send_instant_emails(
             other_recipient_ids, feedback_message_reference, exploration_id,
             has_suggestion)
+
+
+def delete_exploration_feedback_analytics(exp_ids):
+    """Deletes the FeedbackAnalyticsModel models corresponding to
+    the given exp_ids.
+
+    Args:
+        exp_ids: list(str). A list of exploration IDs whose feedback analytics
+            models are to be deleted.
+    """
+    feedback_analytics_models = (
+        feedback_models.FeedbackAnalyticsModel.get_multi(
+            exp_ids))
+    feedback_analytics_models_to_be_deleted = [
+        model for model in feedback_analytics_models
+        if model is not None]
+    feedback_models.FeedbackAnalyticsModel.delete_multi(
+        feedback_analytics_models_to_be_deleted)

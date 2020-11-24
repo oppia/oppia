@@ -487,6 +487,7 @@ var ExplorationEditorMainTab = function() {
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
   this.setContent = async function(richTextInstructions) {
+    this.exitTutorial();
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
@@ -630,6 +631,7 @@ var ExplorationEditorMainTab = function() {
       MathEquationInput: 'Math',
       NumericExpressionInput: 'Math',
       NumberWithUnits: 'Math',
+      RatioExpressionInput: 'Math',
       CodeRepl: 'Programming',
       PencilCodeEditor: 'Programming',
       MusicNotesInput: 'Music',
@@ -890,6 +892,7 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setStateName = async function(name) {
+    this.exitTutorial();
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover takes too long to disappear');
     await waitFor.elementToBeClickable(
