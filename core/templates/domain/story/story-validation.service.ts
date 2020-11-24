@@ -19,13 +19,12 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { StoryContents } from 'domain/story/StoryContentsObjectFactory'
+import { StoryContents } from 'domain/story/StoryContentsObjectFactory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StoryValidationService {
-
   /**
    * Validates the prerequisite skills in the story contents.
    *
@@ -76,8 +75,8 @@ export class StoryValidationService {
         destinationNode.getPrerequisiteSkillIds().forEach(
           (skillId: string) => {
             if (
-                topicRelevantSkills.includes(skillId) &&
-                !simulatedSkillIds.has(skillId)) {
+              topicRelevantSkills.includes(skillId) &&
+              !simulatedSkillIds.has(skillId)) {
               issues.push(
                 `The skill with id ${skillId} was specified as a ` +
                 `prerequisite for Chapter ${destinationNode.getTitle()} but ` +

@@ -527,7 +527,6 @@ class StoryContents(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected all chapter titles to be distinct.')
 
-
     def get_node_index(self, node_id):
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.

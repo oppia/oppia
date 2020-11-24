@@ -237,6 +237,15 @@ def does_story_exist_with_url_fragment(url_fragment):
 
 def validate_prerequisite_skills_in_story_contents(
         corresponding_topic_id, story_contents):
+    """Validates the prerequisites skills in the story contents.
+
+    Args:
+        corresponding_topic_id: str. The corresponding topic id of the story.
+        story_contents: StoryContents. The story contents.
+
+    Returns:
+        list(str). The validation error srtings.
+    """
     if len(story_contents.nodes) == 0:
         return
     # nodes_queue stores the pending nodes to visit in the story that
@@ -298,7 +307,6 @@ def validate_prerequisite_skills_in_story_contents(
                     ' but were not taught in any chapter before it.'
                     % destination_node.title)
             nodes_queue.append(node_id)
-
 
 
 def validate_explorations_for_story(exp_ids, raise_error):

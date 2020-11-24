@@ -95,8 +95,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
             if ($scope.validationIssues.length === 0 && nodes.length > 0) {
               let prerequisiteSkillValidationIssues = (
                 StoryValidationService
-                .validatePrerequisiteSkillsInStoryContents(
-                  skillIdsInTopic, $scope.story.getStoryContents()));
+                  .validatePrerequisiteSkillsInStoryContents(
+                    skillIdsInTopic, $scope.story.getStoryContents()));
               $scope.validationIssues = (
                 $scope.validationIssues.concat(
                   prerequisiteSkillValidationIssues));

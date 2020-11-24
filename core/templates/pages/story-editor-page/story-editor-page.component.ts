@@ -127,7 +127,7 @@ angular.module('oppia').component('storyEditorPage', {
         if (ctrl.validationIssues.length === 0 && nodes.length > 0) {
           let prerequisiteSkillValidationIssues = (
             StoryValidationService.validatePrerequisiteSkillsInStoryContents(
-              skillIdsInTopic ,ctrl.story.getStoryContents()));
+              skillIdsInTopic, ctrl.story.getStoryContents()));
           ctrl.validationIssues = (
             ctrl.validationIssues.concat(prerequisiteSkillValidationIssues));
         }

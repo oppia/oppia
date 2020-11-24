@@ -64,7 +64,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             abbreviated_name='topic-one', url_fragment='topic-one',
             description='A new topic',
             canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=['skill_4'], subtopics=[], next_subtopic_id=0)
+            uncategorized_skill_ids=['skill_4'], subtopics=[],
+            next_subtopic_id=0)
         self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
@@ -409,7 +410,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_string):
             story_services.validate_prerequisite_skills_in_story_contents(
                 self.story.corresponding_topic_id, self.story.story_contents)
-        
 
     def test_does_story_exist_with_url_fragment(self):
         story_id_1 = story_services.get_new_story_id()

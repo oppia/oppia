@@ -66,10 +66,10 @@ describe('Story Validation Service', () => {
       sampleStoryContentsBackendDict);
     let issues = svs.validatePrerequisiteSkillsInStoryContents(
       ['skill_3'], sampleStoryContents);
-    let expected_error_string = (
+    let expectedErrorString = (
       'The skill with id skill_3 was specified as a prerequisite for ' +
-      'Chapter Title 2 but was not taught in any chapter before it.')
-    expect(issues).toEqual([expected_error_string])
+      'Chapter Title 2 but was not taught in any chapter before it.');
+    expect(issues).toEqual([expectedErrorString]);
   });
 
   it('should report a validation error when the story graph has loops', () => {
@@ -120,7 +120,7 @@ describe('Story Validation Service', () => {
       sampleStoryContentsBackendDict);
     let issues = svs.validatePrerequisiteSkillsInStoryContents(
       [], sampleStoryContents);
-    let expected_error_string = 'Loops are not allowed in the node graph';
-    expect(issues).toEqual([expected_error_string])
+    let expectedErrorString = 'Loops are not allowed in the node graph';
+    expect(issues).toEqual([expectedErrorString]);
   });
 });
