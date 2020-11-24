@@ -32,7 +32,6 @@ require(
 require('pages/exploration-player-page/services/player-position.service.ts');
 
 import { Subscription } from 'rxjs';
-import { ServicesConstants } from 'services/services.constants';
 
 angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
   'AssetsBackendApiService', 'ContextService',
@@ -154,16 +153,6 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
                 }
               )
             );
-            ctrl.containerStyle = {
-              position: ''
-            };
-            if (
-              ContextService.getEditorTabContext() ===
-              ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR) {
-              ctrl.containerStyle = {
-                position: 'relative'
-              };
-            }
             ctrl.highlightRegionsOnHover = highlightRegionsOnHover;
             ctrl.filepath = imageAndRegions.imagePath;
             ctrl.imageUrl = '';
