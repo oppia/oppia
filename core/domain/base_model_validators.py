@@ -86,8 +86,10 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
             model_class: ClassObject. The external model class.
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
-            allow_system_user_ids: bool. Whether to allow system user ids.
-            allow_pseudonymous_ids: bool. Whether to allow psuedo user ids.
+            allow_system_user_ids: bool. Whether to allow system user IDs in
+                the model_ids.
+            allow_pseudonymous_ids: bool. Whether to allow pseudonymous user
+                IDs in the model_ids.
         """
         filtered_model_ids = model_ids
         if allow_system_user_ids:
@@ -95,8 +97,9 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
                 set(filtered_model_ids) - set(feconf.SYSTEM_USERS.values()))
         if allow_pseudonymous_ids:
             filtered_model_ids = [
-                i for i in filtered_model_ids if (
-                    not utils.is_pseudonymous_id(i))]
+                i for i in filtered_model_ids
+                if not utils.is_pseudonymous_id(i)
+            ]
         self.field_name = field_name
         self.model_class = model_class
         self.model_ids = filtered_model_ids

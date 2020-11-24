@@ -171,7 +171,10 @@ class CollectionSnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id], True, True)]
+                [item.committer_id],
+                allow_system_user_ids=True,
+                allow_pseudonymous_ids=True
+            )]
 
 
 class CollectionSnapshotContentModelValidator(
@@ -263,7 +266,9 @@ class CollectionRightsSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id],
-                True, True)]
+                allow_system_user_ids=True,
+                allow_pseudonymous_ids=True
+            )]
 
 
 class CollectionRightsSnapshotContentModelValidator(
@@ -541,7 +546,9 @@ class ExplorationSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id],
-                True, True)]
+                allow_system_user_ids=True,
+                allow_pseudonymous_ids=True
+            )]
 
 
 class ExplorationSnapshotContentModelValidator(
@@ -643,7 +650,9 @@ class ExplorationRightsSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id],
-                True, True)]
+                allow_system_user_ids=True,
+                allow_pseudonymous_ids=True
+            )]
 
 
 class ExplorationRightsSnapshotContentModelValidator(
@@ -1477,7 +1486,10 @@ class QuestionSnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id], True, True)]
+                [item.committer_id],
+                allow_system_user_ids=True,
+                allow_pseudonymous_ids=True
+            )]
 
 
 class QuestionSnapshotContentModelValidator(
@@ -2175,7 +2187,10 @@ class SubtopicPageSnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id], True, True)]
+                [item.committer_id],
+                allow_system_user_ids=True,
+                allow_pseudonymous_ids=True
+            )]
 
 
 class SubtopicPageSnapshotContentModelValidator(

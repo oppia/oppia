@@ -151,7 +151,8 @@ class PlatformParameterSnapshotMetadataModelValidator(
                 'committer_ids',
                 user_models.UserSettingsModel,
                 [item.committer_id],
-                True, True
+                allow_system_user_ids=True,
+                allow_pseudonymous_ids=True
             )
         ]
 
