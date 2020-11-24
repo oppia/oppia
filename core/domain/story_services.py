@@ -243,8 +243,10 @@ def validate_prerequisite_skills_in_story_contents(
         corresponding_topic_id: str. The corresponding topic id of the story.
         story_contents: StoryContents. The story contents.
 
-    Returns:
-        list(str). The validation error srtings.
+    Raises:
+        ValidationError. Expected prerequisite skills to have been acquired in
+            previous nodes.
+        ValidationError. Expected story to not contain loops.
     """
     if len(story_contents.nodes) == 0:
         return
