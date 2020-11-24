@@ -3282,7 +3282,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-splash-headers {
   position: relative;
-  margin-top: 20vh;
+  margin-top: 15vh;
   width: 45vw;
 }
 
@@ -3376,7 +3376,7 @@ md-card.preview-conversation-skin-supplemental-card {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 16px;
   margin-top: -20px;
-  min-width: 360px;
+  min-width: 250px;
   padding: 10px;
   text-transform: uppercase;
 }
