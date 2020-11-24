@@ -1475,7 +1475,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         state2.update_interaction_customization_args(
             customization_args_dict)
         state2.update_next_content_id_index(4)
-        state2.update_interaction_answer_groups([answer_group_dict])
+        state2.update_interaction_answer_groups([state_domain.AnswerGroup.from_dict(answer_group_dict)])
         state2.update_written_translations(
             state_domain.WrittenTranslations.from_dict(
                 written_translations_dict))
@@ -1780,7 +1780,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
         state2.update_interaction_customization_args(
             customization_args_dict)
         state2.update_next_content_id_index(4)
-        state2.update_interaction_answer_groups([answer_group_dict])
+        state2.update_interaction_answer_groups([state_domain.AnswerGroup.from_dict(answer_group_dict)])
         state2.update_written_translations(
             state_domain.WrittenTranslations.from_dict(
                 written_translations_dict))

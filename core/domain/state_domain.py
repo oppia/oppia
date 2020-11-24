@@ -95,12 +95,42 @@ class AnswerGroup(python_utils.OBJECT):
         Returns:
             AnswerGroup. The corresponding AnswerGroup domain object.
         """
+        if not isinstance(answer_group_dict['rule_specs'], list):
+            raise Exception(
+                'Expected answer group rule specs to be a list, '
+                'received %s' % answer_group_dict['rule_specs'])
+
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
         )
+
+
+    @classmethod
+    def from_dict_list(cls, answer_group_dict_list):
+        """Return a AnswerGroup list domain objects from a dict list.
+
+        Args:
+            answer_group_dict_list: dict list. The dict list 
+                representation of AnswerGroup list.
+
+        Returns:
+            AnswerGroup list. The corresponding AnswerGroup domain object list.
+        """
+        if not isinstance(answer_group_dict_list, list):
+            raise Exception(
+                'Expected interaction_answer_groups to be a list, received %s'
+                % answer_group_dict_list)
+
+        answer_groups = []
+
+        for answer_group_dict in answer_group_dict_list:
+            answer_groups.append( cls.from_dict(answer_group_dict))
+
+        return answer_groups
+
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -2698,8 +2728,7 @@ class State(python_utils.OBJECT):
         """Update the list of AnswerGroup in InteractionInstance domain object.
 
         Args:
-            answer_groups_list: list(dict). List of dicts that represent
-                AnswerGroup domain object.
+            answer_groups_list: List of AnswerGroup domain object.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(
@@ -2710,24 +2739,15 @@ class State(python_utils.OBJECT):
         old_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
+
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
-        for answer_group_dict in answer_groups_list:
-            rule_specs_list = answer_group_dict['rule_specs']
-            if not isinstance(rule_specs_list, list):
-                raise Exception(
-                    'Expected answer group rule specs to be a list, '
-                    'received %s' % rule_specs_list)
+        for answer_group in answer_groups_list:
+            rule_specs_list = answer_group.rule_specs
 
-            answer_group = AnswerGroup(
-                Outcome.from_dict(answer_group_dict['outcome']), [],
-                answer_group_dict['training_data'],
-                answer_group_dict['tagged_skill_misconception_id'])
             interaction_answer_groups.append(answer_group)
 
-            for rule_dict in rule_specs_list:
-                rule_spec = RuleSpec.from_dict(rule_dict)
-
+            for rule_spec in rule_specs_list:
                 # Normalize and store the rule params.
                 rule_inputs = rule_spec.inputs
                 if not isinstance(rule_inputs, dict):
@@ -2754,7 +2774,6 @@ class State(python_utils.OBJECT):
                                 (value, param_type.__name__))
                     rule_inputs[param_name] = normalized_param
 
-                answer_group.rule_specs.append(rule_spec)
         self.interaction.answer_groups = interaction_answer_groups
 
         new_content_id_list = [

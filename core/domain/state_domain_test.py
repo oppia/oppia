@@ -320,7 +320,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
         state.update_interaction_answer_groups(
-            [state_answer_group_dict])
+            [state_domain.AnswerGroup.from_dict(state_answer_group_dict)])
         state.update_written_translations(
             state_domain.WrittenTranslations.from_dict(
                 state_written_translations_dict))
@@ -446,7 +446,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('TextInput')
         state.update_interaction_customization_args(state_interaction_cust_args)
         state.update_interaction_answer_groups(
-            [state_answer_group_dict])
+            [state_domain.AnswerGroup.from_dict(state_answer_group_dict)])
         state.update_interaction_default_outcome(state_default_outcome)
         state.update_interaction_hints(state_hint_list)
         solution = state_domain.Solution.from_dict(
@@ -564,7 +564,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_content(
             state_domain.SubtitledHtml.from_dict(state_content_dict))
         state.update_interaction_id('ItemSelectionInput')
-        state.update_interaction_answer_groups(state_answer_groups)
+        state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict_list(state_answer_groups))
         state.update_interaction_customization_args(
             state_customization_args_dict)
         state.update_next_content_id_index(4)
@@ -647,7 +647,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         state.update_interaction_id('ItemSelectionInput')
-        state.update_interaction_answer_groups(state_answer_groups)
+        state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict_list(state_answer_groups))
         mock_html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
                 feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
@@ -760,7 +760,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_id('ItemSelectionInput')
         state.update_interaction_customization_args(
             state_customization_args_dict)
-        state.update_interaction_answer_groups(state_answer_groups)
+        state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict_list(state_answer_groups))
 
         mock_html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
@@ -1090,7 +1090,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_domain.AnswerGroup.from_dict(answer_group_dict)])
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         answer_group_dict['outcome']['feedback']['html'] = (
             '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
@@ -1098,7 +1098,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'quot;" alt-with-value="&amp;quot;&amp;quot;">'
             '</oppia-noninteractive-image></p>')
         init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_domain.AnswerGroup.from_dict(answer_group_dict)])
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         init_state.update_content(
@@ -1252,7 +1252,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_domain.AnswerGroup.from_dict(answer_group_dict)])
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
@@ -3165,7 +3165,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_answer_groups(
-            [answer_group_dict])
+            [state_domain.AnswerGroup.from_dict(answer_group_dict)])
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'feedback_1',
@@ -3574,7 +3574,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected rule_inputs to be a dict'):
             exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
+                state_domain.AnswerGroup.from_dict_list(answer_groups_list))
 
     def test_cannot_update_answer_groups_with_non_list_rule_specs(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -3598,7 +3598,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected answer group rule specs to be a list'):
             exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
+                state_domain.AnswerGroup.from_dict_list(answer_groups_list))
 
     def test_cannot_update_answer_groups_with_invalid_rule_input_value(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -3631,7 +3631,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
-                answer_groups_list)
+                state_domain.AnswerGroup.from_dict_list(answer_groups_list))
 
     def test_validate_rule_spec(self):
         observed_log_messages = []
@@ -3664,7 +3664,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        exploration.init_state.update_interaction_answer_groups(answer_groups)
+        exploration.init_state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict_list(answer_groups))
 
         with logging_swap, self.assertRaisesRegexp(KeyError, 'u\'x\''):
             (
