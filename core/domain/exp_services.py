@@ -385,7 +385,8 @@ def apply_change_list(exploration_id, change_list):
                         'Editing interaction handlers is no longer supported')
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    state.update_interaction_answer_groups(state_domain.AnswerGroup.from_dict_list(change.new_value))
+                    state.update_interaction_answer_groups(
+                        state_domain.AnswerGroup.from_dict_list(change.new_value))
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
                     new_outcome = None

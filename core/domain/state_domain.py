@@ -107,7 +107,6 @@ class AnswerGroup(python_utils.OBJECT):
             answer_group_dict['tagged_skill_misconception_id']
         )
 
-
     @classmethod
     def from_dict_list(cls, answer_group_dict_list):
         """Return a AnswerGroup list domain objects from a dict list.
@@ -127,10 +126,9 @@ class AnswerGroup(python_utils.OBJECT):
         answer_groups = []
 
         for answer_group_dict in answer_group_dict_list:
-            answer_groups.append( cls.from_dict(answer_group_dict))
+            answer_groups.append(cls.from_dict(answer_group_dict))
 
         return answer_groups
-
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
