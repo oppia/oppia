@@ -366,3 +366,85 @@ class MissingQuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                 question_models.QuestionCommitLogEntryModel.get_by_id(
                     'question-question_id-1'))
             self.assertIsNone(self.model_instance)
+
+
+class DeleteInvalidQuestionModelsOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    QUESTION_ID_1 = 'question_id_1'
+    QUESTION_ID_2 = 'question_id_2'
+
+    def setUp(self):
+        super(DeleteInvalidQuestionModelsOneOffJobTests, self).setUp()
+
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.skill_id = 'skill_id'
+        self.save_new_skill(
+            self.skill_id, self.albert_id, description='Skill Description')
+
+        self.question_1 = self.save_new_question(
+            self.QUESTION_ID_1, self.albert_id,
+            self._create_valid_question_data('ABC'), [self.skill_id])
+        self.question_2 = self.save_new_question(
+            self.QUESTION_ID_2, self.albert_id,
+            self._create_valid_question_data('DEF'), [self.skill_id])
+
+        self.commit_model_instance_1 = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-question_id_1-1'))
+
+        self.snapshot_content_model_instance_1 = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                'question_id_1-1'))
+
+        self.snapshot_metadata_model_instance_1 = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                'question_id_1-1'))
+
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_standard_operation(self):
+        job_class = question_jobs_one_off.DeleteInvalidQuestionModelsOneOffJob
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = job_class.get_output(job_id)
+        self.assertEqual(output, [])
+
+    def test_models_deleted_when_invalid_commit_models_encountered(self):
+        self.commit_model_instance_1.delete()
+        job_class = question_jobs_one_off.DeleteInvalidQuestionModelsOneOffJob
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = job_class.get_output(job_id)
+        self.assertEqual(
+            output, [
+                '[u\'QUESTION_MODELS_DELETED_FOR_ID\', [u\'question_id_1\']]'])
+        self.assertIsNone(
+            question_models.QuestionModel.get('question_id_1', strict=False))
+        self.assertIsNotNone(
+            question_models.QuestionModel.get('question_id_2', strict=False))
+
+    def test_models_deleted_when_invalid_snapshot_models_encountered(self):
+        self.snapshot_content_model_instance_1.delete()
+        self.snapshot_metadata_model_instance_1.delete()
+        job_class = question_jobs_one_off.DeleteInvalidQuestionModelsOneOffJob
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = job_class.get_output(job_id)
+        self.assertEqual(
+            output, [
+                '[u\'QUESTION_MODELS_DELETED_FOR_ID\', [u\'question_id_1\']]'])
+        self.assertIsNone(
+            question_models.QuestionModel.get('question_id_1', strict=False))
+        self.assertIsNotNone(
+            question_models.QuestionModel.get('question_id_2', strict=False))

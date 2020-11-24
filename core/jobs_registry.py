@@ -85,6 +85,7 @@ ONE_OFF_JOB_MANAGERS = [
         opportunity_jobs_one_off.
         RenameExplorationOpportunitySummaryModelPropertiesJob),
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
+    question_jobs_one_off.DeleteInvalidQuestionModelsOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
     question_jobs_one_off.MissingQuestionMigrationOneOffJob,

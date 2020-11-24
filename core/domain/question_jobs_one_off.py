@@ -27,6 +27,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.platform import models
 import feconf
+import python_utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
@@ -140,6 +141,67 @@ class RegenerateQuestionSummaryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 sum(ast.literal_eval(v) for v in values))])
         else:
             yield (key, values)
+
+
+class DeleteInvalidQuestionModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to delete invalid question models and its linked models.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
+                1, item.version + 1)]
+        commit_log_model_ids = [
+            'question-%s-%s'
+            % (item.id, version) for version in python_utils.RANGE(
+                1, item.version + 1)]
+
+        # In the Audit job, the version 1 model for the 3 models below were
+        # absent. So, if they are absent, delete all versions and the linked
+        # QuestionModel. (This issue does not exist anymore)
+        first_commit_log_model = (
+            question_models.QuestionCommitLogEntryModel.get(
+                commit_log_model_ids[0], strict=False))
+        first_snapshot_content_model = (
+            question_models.QuestionSnapshotContentModel.get(
+                snapshot_model_ids[0], strict=False))
+        first_snapshot_metadata_model = (
+            question_models.QuestionSnapshotMetadataModel.get(
+                snapshot_model_ids[0], strict=False))
+        if (
+                first_commit_log_model is None or
+                first_snapshot_content_model is None or
+                first_snapshot_metadata_model is None):
+            for entity_id in commit_log_model_ids:
+                model = question_models.QuestionCommitLogEntryModel.get(
+                    entity_id, strict=False)
+                if model is not None:
+                    model.delete()
+            for entity_id in snapshot_model_ids:
+                content_model = (
+                    question_models.QuestionSnapshotContentModel.get(
+                        entity_id, strict=False))
+                if content_model is not None:
+                    content_model.delete()
+                metadata_model = (
+                    question_models.QuestionSnapshotMetadataModel.get(
+                        entity_id, strict=False))
+                if metadata_model is not None:
+                    metadata_model.delete()
+            item.delete(None, None, force_deletion=True)
+            yield ('QUESTION_MODELS_DELETED_FOR_ID', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
 
 
 class MissingQuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
