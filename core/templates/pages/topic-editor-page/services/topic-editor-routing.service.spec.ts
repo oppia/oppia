@@ -84,7 +84,7 @@ describe('Topic editor routing service', () => {
     locat.go('/');
     expect(ters.getActiveTabName()).toEqual('main');
 
-    locat.go('#');
+    locat.go('');
     expect(ters.getActiveTabName()).toEqual('main');
   });
 
