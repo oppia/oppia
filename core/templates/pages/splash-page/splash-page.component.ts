@@ -98,12 +98,16 @@ angular.module('oppia').component('splashPage', {
         ctrl.userIsLoggedIn = null;
         ctrl.testimonialId = 0;
         LoaderService.showLoadingScreen('Loading');
-        document.getElementsByClassName(
-          'oppia-splash-section-five')[0].style.backgroundImage = (
+        Array.from(
+          document.getElementsByClassName(
+            'oppia-splash-section-five') as HTMLCollectionOf<HTMLElement>
+        )[0].style.backgroundImage = (
           'url(' + ctrl.getStaticImageUrl(
             '/splash/dsk_testimonial_background.png') + ')');
-        document.getElementsByClassName(
-          'oppia-splash-section-seven')[0].style.backgroundImage = (
+        Array.from(
+          document.getElementsByClassName(
+            'oppia-splash-section-seven') as HTMLCollectionOf<HTMLElement>
+        )[0].style.backgroundImage = (
           'url(' + ctrl.getStaticImageUrl(
             '/splash/dsk_community_background.png') + ')');
         UserService.getUserInfoAsync().then(function(userInfo) {
