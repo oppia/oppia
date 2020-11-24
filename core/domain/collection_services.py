@@ -977,8 +977,7 @@ def regenerate_collection_summary_with_new_contributor(
     """
     collection = get_collection_by_id(collection_id)
     collection_summary = compute_summary_of_collection(collection)
-    collection_summary = add_new_contributor_to_collection_summary(
-        collection_summary, contributor_id)
+    collection_summary.add_new_contributor(contributor_id)
     save_collection_summary(collection_summary)
 
 
@@ -992,7 +991,8 @@ def regenerate_collection_summary_and_contributors_summary(collection_id):
     """
     collection = get_collection_by_id(collection_id)
     collection_summary = compute_summary_of_collection(collection)
-    collection_summary = regenerate_contributors_summary(collection_summary)
+    collection_summary.contributors_summary = (
+        compute_collection_contributors_summary(collection_summary.id))
     save_collection_summary(collection_summary)
 
 
@@ -1026,48 +1026,6 @@ def compute_summary_of_collection(collection):
         collection_model_created_on, collection_model_last_updated
     )
 
-    return collection_summary
-
-
-def add_new_contributor_to_collection_summary(
-        collection_summary, contributor_id):
-    """Add a new contributor to the contributors summary in collection summary.
-
-    Args:
-        collection_summary: CollectionSummary. The collection summary.
-        contributor_id: str. ID of the contributor to be added to the collection
-            summary.
-
-    Returns:
-        CollectionSummary. The collection summary with new contributor added to
-            the contributors summary.
-    """
-    contributors_summary = (
-        collection_summary.contributors_summary if collection_summary else {})
-    if contributor_id not in constants.SYSTEM_USER_IDS:
-        contributors_summary[contributor_id] = (
-            contributors_summary.get(contributor_id, 0) + 1)
-
-    collection_summary.contributors_summary = contributors_summary
-    collection_summary.contributor_ids = list(contributors_summary.keys())
-
-    return collection_summary
-
-
-def regenerate_contributors_summary(collection_summary):
-    """Regenerate the contributors summary from the snapshots.
-
-    Args:
-        collection_summary: CollectionSummary. The collection summary.
-
-    Returns:
-        CollectionSummary. The collection summary with regenerated
-            contributors summary.
-    """
-    collection_summary.contributors_summary = (
-        compute_collection_contributors_summary(collection_summary.id))
-    collection_summary.contributor_ids = list(
-        collection_summary.contributors_summary.keys())
     return collection_summary
 
 
@@ -1126,7 +1084,7 @@ def save_collection_summary(collection_summary):
         'owner_ids': collection_summary.owner_ids,
         'editor_ids': collection_summary.editor_ids,
         'viewer_ids': collection_summary.viewer_ids,
-        'contributor_ids': collection_summary.contributor_ids,
+        'contributor_ids': list(collection_summary.contributors_summary.keys()),
         'contributors_summary': collection_summary.contributors_summary,
         'version': collection_summary.version,
         'node_count': collection_summary.node_count,
