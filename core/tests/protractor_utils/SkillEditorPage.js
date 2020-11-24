@@ -224,7 +224,8 @@ var SkillEditorPage = function() {
   };
 
   this.saveOrPublishSkill = async function(commitMessage) {
-    await action.click('Save or Publish Skill button', saveOrPublishSkillButton);
+    await action.click(
+      'Save or Publish Skill button', saveOrPublishSkillButton);
     await action.sendKeys('Commit message', commitMessageField, commitMessage);
     await action.click('Close save modal button', closeSaveModalButton);
     await waitFor.visibilityOfSuccessToast('Changes Saved.');
