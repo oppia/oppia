@@ -452,16 +452,17 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         return state
 
     def get_state_version_spans(
-            self, name, split_predicate, state_v1, *subsequent_versions):
+            self, name, state_equality_predicate, state_v1, *subsequent_versions):
         """Returns the state version spans for the given snapshots of a state.
 
         Args:
             name: str. The name of the state.
             state_v1: state_domain.State. The first version of the state.
-            split_predicate:
+            state_equality_predicate:
                 callable(state_domain.State, state_domain.State) -> bool | None.
-                Should return True when the two states should be split up. If
-                None, states will never be split up.
+                Returns True when two states are "equal". The predicate is used
+                to enforce invariant: all states in a span are equivalent.
+                If None, then states will always be equivalent to each other.
             *subsequent_versions: tuple(state_domain.State). The subsequent
                 versions of the state.
 
@@ -470,12 +471,15 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
             collection will have more than one element if a version of the state
             is incompatible with its previous version.
         """
-        distinct_spans = [exp_domain.StateVersionSpan(1, name, state_v1)]
+        distinct_spans = [
+            exp_domain.StateVersionSpan(
+                1, name, state_v1,
+                state_equality_predicate=state_equality_predicate),
+        ]
         nodiff = exp_domain.ExplorationVersionsDiff([])
         for version, state_snapshot in enumerate(subsequent_versions, start=2):
             span = distinct_spans[-1].extend_or_split(
-                version, name, state_snapshot, nodiff,
-                split_predicate=split_predicate)
+                version, name, state_snapshot, nodiff)
             if span is not distinct_spans[-1]:
                 distinct_spans.append(span)
         return distinct_spans
@@ -526,7 +530,7 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         ]
 
         spans = self.get_state_version_spans(
-            'A', lambda s1, s2: s1.interaction.id != s2.interaction.id,
+            'A', lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
 
         self.assertEqual(len(spans), 3)
@@ -562,7 +566,7 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         ]
 
         spans = self.get_state_version_spans(
-            'A', lambda s1, s2: s1.interaction.id != s2.interaction.id,
+            'A', lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
 
         self.assertEqual(len(spans), 3)
@@ -576,20 +580,31 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         self.assertEqual(spans[1].get_multi_version_names(2, 3), ['A'])
         self.assertEqual(spans[2].get_multi_version_names(3, 4), ['A'])
 
-    def test_get_multi_versions_accepts_pythonic_ranges(self):
+    def test_get_multi_versions(self):
         distinct_states = [
             self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
         (span,) = self.get_state_version_spans(
-            'A', lambda s1, s2: s1.interaction.id != s2.interaction.id,
+            'A', lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
 
-        self.assertEqual(span.get_multi_versions(0, 20), distinct_states[:19])
-        self.assertEqual(span.get_multi_versions(2, 7), distinct_states[1:6])
-        self.assertEqual(span.get_multi_versions(6, 7), distinct_states[5:6])
-        self.assertEqual(span.get_multi_version_names(0, 20), ['A', 'A', 'A'])
-        self.assertEqual(span.get_multi_version_names(2, 7), ['A', 'A'])
-        self.assertEqual(span.get_multi_version_names(6, 7), [])
+        self.assertEqual(span.get_multi_versions(1, 3), distinct_states[0:2])
+        self.assertEqual(span.get_multi_version_names(1, 3), ['A', 'A'])
+
+    def test_get_multi_versions_rejects_out_of_bounds_ranges(self):
+        distinct_states = [
+            self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
+
+        (span,) = self.get_state_version_spans(
+            'A', lambda s1, s2: s1.interaction.id == s2.interaction.id,
+            *distinct_states)
+
+        self.assertRaisesRegexp(
+            ValueError, 'out-of-bounds',
+            lambda: span.get_multi_versions(0, 20))
+        self.assertRaisesRegexp(
+            ValueError, 'out-of-bounds',
+            lambda: span.get_multi_version_names(0, 20))
 
     def test_extend_or_split_with_unexpected_version(self):
         (span,) = self.get_state_version_spans(
@@ -734,7 +749,7 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
 
         state_b_span = history.get_state_span(1, 'B')
 
-        self.assertEqual(state_b_span.get_multi_version_names(1, 3), ['B'])
+        self.assertEqual(state_b_span.get_multi_version_names(1, 2), ['B'])
         self.assertFalse(history.has_state_span(2, 'B'))
 
     def test_empty_inputs_raises_an_error(self):

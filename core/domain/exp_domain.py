@@ -475,14 +475,19 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
 
 
 class StateVersionSpan(python_utils.OBJECT):
-    """A consecutive span of versions in which a state kept its same structure.
+    """A consecutive span of versions in which a state remains "equivalent".
+
+    Equivalence between spans are defined using a user-defined predicate, passed
+    in to the constructor. By default, all states are equivalent to each other.
 
     Spans must be extended in increasing version-order. It is an error to extend
     a span with a version older than what it already contains; exceptions are
     raised to enforce this contract.
     """
 
-    def __init__(self, exp_version, state_name, state):
+    def __init__(
+            self, exp_version, state_name, state,
+            state_equality_predicate=None):
         """Initializes a span for the given version of an exploration's state.
 
         Args:
@@ -490,10 +495,23 @@ class StateVersionSpan(python_utils.OBJECT):
             state_name: str. The name of the state at the given version.
             state: state_domain.State. The structure of the state at the given
                 version.
+            state_equality_predicate:
+                callable(state_domain.State, state_domain.State) -> bool | None.
+                Returns True when two states are "equal". The predicate is used
+                to enforce invariant: all states in a span are equivalent.
+                If None, then states will always be equivalent to each other.
         """
         self._version_start, self._version_end = exp_version, exp_version + 1
         self._version_snapshots = (
             collections.OrderedDict({exp_version: (state_name, state)}))
+        self._state_equality_predicate = (
+            state_equality_predicate or
+            StateVersionSpan._default_state_equality_predicate)
+
+    @staticmethod
+    def _default_state_equality_predicate(unused_state1, unused_state2):
+        """Always returns True."""
+        return True
 
     def __iter__(self):
         """Returns an iterable over the snapshots held by the span."""
@@ -583,8 +601,7 @@ class StateVersionSpan(python_utils.OBJECT):
         ]
 
     def extend_or_split(
-            self, exp_version, state_name, state, exp_version_diff,
-            split_predicate=None):
+            self, exp_version, state_name, state, exp_version_diff):
         """Extends span to include the given state, unless it fails to pass the
         given split predicate, in which case a new span is created and returned.
 
@@ -594,10 +611,6 @@ class StateVersionSpan(python_utils.OBJECT):
             state: state_domain.State. State's representation at given version.
             exp_version_diff: ExplorationVersionsDiff. The changes since the
                 last exploration version.
-            split_predicate:
-                callable(state_domain.State, state_domain.State) -> bool | None.
-                Should return True when the two states should be split up. If
-                None, then the states will never be split up.
 
         Returns:
             StateVersionSpan. The span chosen to hold the state.
@@ -628,8 +641,10 @@ class StateVersionSpan(python_utils.OBJECT):
                     exp_version, prev_exp_version,
                     prev_state_name, prev_snapshot_state_name))
 
-        if split_predicate and split_predicate(prev_snapshot_state, state):
-            return StateVersionSpan(exp_version, state_name, state)
+        if not self._state_equality_predicate(prev_snapshot_state, state):
+            return StateVersionSpan(
+                exp_version, state_name, state,
+                state_equality_predicate=self._state_equality_predicate)
 
         self._version_snapshots[exp_version] = (state_name, state)
         self._version_end += 1
@@ -646,16 +661,18 @@ class StateVersionSpan(python_utils.OBJECT):
             list(tuple(str, state_domain.State)). State details corresponding to
             the given range of versions.
         """
-        version_range = python_utils.RANGE(
-            max(self._version_start, version_start),
-            min(self._version_end, version_end))
-        return [self[v] for v in version_range]
+        range_is_valid = (
+            version_start >= self._version_start and
+            version_end <= self._version_end)
+        if not range_is_valid:
+            raise ValueError('Requested version range is out-of-bounds')
+        return [self[v] for v in python_utils.RANGE(version_start, version_end)]
 
 
 class ExplorationStatesHistory(python_utils.OBJECT):
     """Organizes the history of changes made to each state of an exploration."""
 
-    def __init__(self, exps, exp_version_diffs, split_predicate=None):
+    def __init__(self, exps, exp_version_diffs, state_equality_predicate=None):
         """Constructs the exploration's state history.
 
         Args:
@@ -663,10 +680,11 @@ class ExplorationStatesHistory(python_utils.OBJECT):
                 by version. Items should begin at version 1 and contain no gaps.
             exp_version_diffs: list(ExplorationVersionsDiff). The specific
                 changes made to the exploration at each corresponding version.
-            split_predicate:
+            state_equality_predicate:
                 callable(state_domain.State, state_domain.State) -> bool | None.
-                Should return True when the two states should be split up. If
-                None, then the states will never be split up.
+                Returns True when two states are "equal". The predicate is used
+                to enforce invariant: all states in a span are equivalent.
+                If None, then states will always be equivalent to each other.
         """
         if not exps or not exp_version_diffs:
             raise ValueError('Inputs must be non-empty')
@@ -687,16 +705,16 @@ class ExplorationStatesHistory(python_utils.OBJECT):
             new_state_spans = dict()
             for state_name, state in exp.states.items():
                 if exp.version == 1 or state_name in diff.added_state_names:
-                    new_state_spans[state_name] = (
-                        StateVersionSpan(exp.version, state_name, state))
+                    new_state_spans[state_name] = StateVersionSpan(
+                        exp.version, state_name, state,
+                        state_equality_predicate=state_equality_predicate)
                 elif state_name not in diff.deleted_state_names:
                     prev_state_spans, prev_name = (
                         self._state_spans_history[-1],
                         diff.new_to_old_state_names.get(state_name, state_name))
                     new_state_spans[state_name] = (
                         prev_state_spans[prev_name].extend_or_split(
-                            exp.version, state_name, state, diff,
-                            split_predicate=split_predicate))
+                            exp.version, state_name, state, diff))
             self._state_spans_history.append(new_state_spans)
 
     def get_state_span(self, exp_version, state_name):
