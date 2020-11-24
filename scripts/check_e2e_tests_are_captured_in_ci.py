@@ -25,9 +25,8 @@ import re
 import python_utils
 import utils
 
-# These 4 test suites are not present in travis ci.
-# One is extra (ie. (full: [*.js])) and three other test suites are
-# are being run by CircleCI.
+# These test suites are not present in travis CI. One is extra
+# (ie. (full: [*.js])) and other test suites are being run by CircleCI.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'full', 'accessibility', 'adminPage', 'classroomPage',
     'classroomPageFileUploadFeatures', 'collections', 'contributorDashboard',
@@ -35,7 +34,7 @@ TEST_SUITES_NOT_RUN_ON_TRAVIS = [
     'navigation', 'playVoiceovers', 'preferences', 'profileFeatures',
     'profileMenu', 'publication', 'subscriptions', 'topicsAndSkillsDashboard',
     'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users',
-    'topicAndStoryViewer']
+    'topicAndStoryViewer', 'wipeout']
 
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')

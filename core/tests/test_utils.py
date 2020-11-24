@@ -70,10 +70,13 @@ from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 import webtest
 
-(exp_models, question_models, skill_models, story_models, topic_models,) = (
-    models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
-        models.NAMES.story, models.NAMES.topic]))
+(
+    exp_models, feedback_models, question_models, skill_models, story_models,
+    suggestion_models, topic_models,) = (
+        models.Registry.import_models([
+            models.NAMES.exploration, models.NAMES.feedback,
+            models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+            models.NAMES.suggestion, models.NAMES.topic]))
 
 current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -2258,6 +2261,51 @@ tags: []
         question_model.commit(
             owner_id, 'New question created',
             [{'cmd': question_domain.CMD_CREATE_NEW}])
+
+    def save_new_question_suggestion_with_state_data_schema_v27(
+            self, author_id, skill_id, suggestion_id=None,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Saves a new question suggestion with a default version 27 state data
+        dict.
+
+        This function should only be used for creating question suggestion in
+        tests involving migration of datastore question suggestions that use an
+        old state data schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating questions. This is because
+        the latter approach would result in an question with the *current* state
+        data schema version.
+        """
+        score_category = (
+            suggestion_models.SCORE_TYPE_QUESTION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + skill_id)
+        change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self.VERSION_27_STATE_DICT,
+                'question_state_data_schema_version': 27,
+                'language_code': language_code,
+                'linked_skill_ids': [skill_id],
+                'inapplicable_skill_misconception_ids': []
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        if suggestion_id is None:
+            suggestion_id = (
+                feedback_models.GeneralFeedbackThreadModel.
+                generate_new_thread_id(
+                    suggestion_models.TARGET_TYPE_SKILL, skill_id))
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            suggestion_models.STATUS_IN_REVIEW, author_id, None, change,
+            score_category, suggestion_id, language_code)
+
+        return suggestion_id
 
     def save_new_skill(
             self, skill_id, owner_id, description='description',
