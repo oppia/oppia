@@ -38,11 +38,11 @@ AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 CURRENT_PYTHON_BIN = sys.executable
 
 # Versions of libraries used in devflow.
-COVERAGE_VERSION = '5.1'
+COVERAGE_VERSION = '5.3'
 ESPRIMA_VERSION = '4.0.1'
 ISORT_VERSION = '4.3.21'
-PYCODESTYLE_VERSION = '2.5.0'
-PSUTIL_VERSION = '5.7.0'
+PYCODESTYLE_VERSION = '2.6.0'
+PSUTIL_VERSION = '5.7.3'
 PYLINT_VERSION = '1.9.5'
 PYLINT_QUOTES_VERSION = '0.1.8'
 PYGITHUB_VERSION = '1.45'
@@ -55,10 +55,10 @@ PROTOBUF_VERSION = '3.13.0'
 SETUPTOOLS_VERSION = '36.6.0'
 
 # Node version.
-NODE_VERSION = '12.16.2'
+NODE_VERSION = '14.15.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.4'
+YARN_VERSION = '1.22.10'
 
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'

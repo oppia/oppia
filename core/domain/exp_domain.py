@@ -2960,6 +2960,36 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v39_dict_to_v40_dict(cls, states_dict):
+        """Converts from version 39 to 40. Version 40 converts TextInput rule
+        inputs from NormalizedString to SetOfNormalizedString.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] != 'TextInput':
+                continue
+            answer_group_dicts = state_dict['interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                rule_type_to_inputs = collections.defaultdict(set)
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    rule_inputs = rule_spec_dict['inputs']['x']
+                    rule_type_to_inputs[rule_type].add(rule_inputs)
+                answer_group_dict['rule_specs'] = [{
+                    'rule_type': rule_type,
+                    'inputs': {'x': list(rule_type_to_inputs[rule_type])}
+                } for rule_type in rule_type_to_inputs]
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2994,7 +3024,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 44
+    CURRENT_EXP_SCHEMA_VERSION = 45
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4021,6 +4051,28 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v44_dict_to_v45_dict(cls, exploration_dict):
+        """Converts a v44 exploration dict into a v45 exploration dict.
+        Converts TextInput rule inputs from NormalizedString to
+        SetOfNormalizedString.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v43.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v44.
+        """
+        exploration_dict['schema_version'] = 45
+
+        exploration_dict['states'] = cls._convert_states_v39_dict_to_v40_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 40
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4273,6 +4325,11 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 44
 
+        if exploration_schema_version == 44:
+            exploration_dict = cls._convert_v44_dict_to_v45_dict(
+                exploration_dict)
+            exploration_schema_version = 45
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -4482,7 +4539,7 @@ class Exploration(python_utils.OBJECT):
             content_html = state.content.html
             interaction_html_list = (
                 state.interaction.get_all_html_content_strings())
-            html_list = html_list + [content_html] + interaction_html_list
+            html_list += [content_html] + interaction_html_list
 
         return html_list
 

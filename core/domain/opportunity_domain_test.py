@@ -53,8 +53,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                     'content_count': 5,
                     'incomplete_translation_language_codes': ['hi-en'],
                     'translation_counts': {},
-                    'need_voice_artist_in_language_codes': ['en'],
-                    'assigned_voice_artist_in_language_codes': ['hi']
+                    'language_codes_needing_voice_artists': ['en'],
+                    'language_codes_with_assigned_voice_artists': ['hi']
                 }))
         # Re-initializing this swap, so that we can use this in test method.
         self.mock_supported_audio_languages_context = self.swap(
@@ -72,8 +72,8 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'content_count': 5,
             'incomplete_translation_language_codes': ['hi-en', 'hi'],
             'translation_counts': {},
-            'need_voice_artist_in_language_codes': ['en'],
-            'assigned_voice_artist_in_language_codes': []
+            'language_codes_needing_voice_artists': ['en'],
+            'language_codes_with_assigned_voice_artists': []
         }
 
         with self.mock_supported_audio_languages_context:
@@ -182,25 +182,26 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
     def test_same_language_for_need_and_assigend_voice_artist_fails_validation(
             self):
         need_voice_artist_languages = (
-            self.valid_exp_opp_summary.need_voice_artist_in_language_codes)
+            self.valid_exp_opp_summary.language_codes_needing_voice_artists)
         assigned_voice_artist_languages = (
-            self.valid_exp_opp_summary.assigned_voice_artist_in_language_codes
-            )
+            self.valid_exp_opp_summary.
+            language_codes_with_assigned_voice_artists)
 
         self.assertTrue(
             set(need_voice_artist_languages).isdisjoint(
                 assigned_voice_artist_languages))
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.need_voice_artist_in_language_codes = [
+            self.valid_exp_opp_summary.language_codes_needing_voice_artists = [
                 'hi']
             valid_exp_opp_summary = self.valid_exp_opp_summary
-            valid_exp_opp_summary.assigned_voice_artist_in_language_codes = [
+            valid_exp_opp_summary.language_codes_with_assigned_voice_artists = [
                 'hi', 'en']
             need_voice_artist_languages = (
-                valid_exp_opp_summary.need_voice_artist_in_language_codes)
+                valid_exp_opp_summary.language_codes_needing_voice_artists)
             assigned_voice_artist_languages = (
-                valid_exp_opp_summary.assigned_voice_artist_in_language_codes)
+                valid_exp_opp_summary.
+                language_codes_with_assigned_voice_artists)
             self.assertFalse(
                 set(need_voice_artist_languages).isdisjoint(
                     assigned_voice_artist_languages))
@@ -305,45 +306,47 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def test_invalid_lang_code_in_need_voice_artist_languages_fails_validation(
             self):
-        self.valid_exp_opp_summary.need_voice_artist_in_language_codes = ['en']
+        self.valid_exp_opp_summary.language_codes_needing_voice_artists = ['en']
         with self.mock_supported_audio_languages_context:
             # Object with valid language code inside
-            # need_voice_artist_in_language_codes passes the validation.
+            # language_codes_needing_voice_artists passes the validation.
             self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.need_voice_artist_in_language_codes = [
+            self.valid_exp_opp_summary.language_codes_needing_voice_artists = [
                 'invalid_language_code']
             # Object with invalid language code inside
-            # need_voice_artist_in_language_codes fails the validation.
+            # language_codes_needing_voice_artists fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Invalid language_code: invalid_language_code')
 
     def test_invalid_lang_code_in_assigned_voice_artist_langs_fails_validation(
             self):
-        self.valid_exp_opp_summary.assigned_voice_artist_in_language_codes = [
-            'hi']
+        (
+            self.valid_exp_opp_summary.
+            language_codes_with_assigned_voice_artists) = ['hi']
         with self.mock_supported_audio_languages_context:
             # Object with valid language code inside
-            # assigned_voice_artist_in_language_codes passes the validation.
+            # language_codes_with_assigned_voice_artists passes the validation.
             self.valid_exp_opp_summary.validate()
             valid_exp_opp_summary = self.valid_exp_opp_summary
-            valid_exp_opp_summary.assigned_voice_artist_in_language_codes = [
+            valid_exp_opp_summary.language_codes_with_assigned_voice_artists = [
                 'invalid_language_code']
             # Object with invalid language code inside
-            # assigned_voice_artist_in_language_codes fails the validation.
+            # language_codes_with_assigned_voice_artists fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Invalid language_code: invalid_language_code')
 
     def test_all_languages_in_summary_equals_supported_languages(self):
-        self.valid_exp_opp_summary.assigned_voice_artist_in_language_codes = [
-            b'hi-en']
-        self.valid_exp_opp_summary.need_voice_artist_in_language_codes = ['hi']
+        (
+            self.valid_exp_opp_summary.
+            language_codes_with_assigned_voice_artists) = [b'hi-en']
+        self.valid_exp_opp_summary.language_codes_needing_voice_artists = ['hi']
         self.valid_exp_opp_summary.incomplete_translation_language_codes = [
             b'en']
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.need_voice_artist_in_language_codes = [
+            self.valid_exp_opp_summary.language_codes_needing_voice_artists = [
                 b'en']
             self._assert_validation_error(
                 self.valid_exp_opp_summary,

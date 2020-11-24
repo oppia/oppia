@@ -44,7 +44,6 @@ import {
   FeatureStatusSummary,
   FeatureStatusChecker
 } from 'domain/platform_feature/feature-status-summary.model';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -78,7 +77,6 @@ export class PlatformFeatureService {
   constructor(
       private platformFeatureBackendApiService:
         PlatformFeatureBackendApiService,
-      private i18nLanguageCodeService: I18nLanguageCodeService,
       private windowRef: WindowRef,
       private loggerService: LoggerService,
       private urlService: UrlService,
@@ -273,13 +271,10 @@ export class PlatformFeatureService {
    * client information.
    */
   private generateClientContext(): ClientContext {
-    const clientType = 'Web';
+    const platformType = 'Web';
     const browserType = this.browserCheckerService.detectBrowserType();
-    const userLocale = (
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
 
-    return ClientContext.create(
-      clientType, browserType, userLocale);
+    return ClientContext.create(platformType, browserType);
   }
 
   /**

@@ -16,38 +16,31 @@
  * @fileoverview Unit tests for Solution Verification Service.
  */
 
+import { TestBed } from '@angular/core/testing';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service.ts';
+import { StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service.ts';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service.ts';
+import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-
-require('App.ts');
-require('domain/exploration/SolutionObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
-  'solution-verification.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-customization-args.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service.ts');
 
-describe('Solution Verification Service', function() {
-  var ess, siis, scas, sof, svs, see;
-  var mockExplorationData;
+describe('Solution Verification Service', () => {
+  let ess, siis, scas, sof, svs, see;
+  let mockExplorationData, mockInteractionState;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', new AngularNameService());
-    $provide.constant('INTERACTION_SPECS', {
+  beforeEach(() => {
+    mockExplorationData = {
+      explorationId: 0,
+      autosaveChangeList: () => {}
+    };
+
+    mockInteractionState = {
       TextInput: {
         display_mode: 'inline',
         is_terminal: false
@@ -56,8 +49,21 @@ describe('Solution Verification Service', function() {
         display_mode: 'inline',
         is_terminal: true
       }
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: INTERACTION_SPECS, useValue: mockInteractionState }
+      ]
     });
-  }));
+
+    siis = TestBed.get(StateInteractionIdService);
+    scas = TestBed.get(StateCustomizationArgsService);
+    sof = TestBed.get(SolutionObjectFactory);
+    see = TestBed.get(StateEditorService);
+    svs = TestBed.get(SolutionVerificationService);
+  });
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -74,15 +80,10 @@ describe('Solution Verification Service', function() {
     });
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
-
+  // TODO(#11149): Replace $injector.get(...) to TestBed.get in following
+  // block when ExplorationStateService has been migrated to Angular 8.
   beforeEach(angular.mock.inject(function($injector) {
     ess = $injector.get('ExplorationStatesService');
-    siis = $injector.get('StateInteractionIdService');
-    scas = $injector.get('StateCustomizationArgsService');
-    sof = $injector.get('SolutionObjectFactory');
-    see = $injector.get('StateEditorService');
-    svs = $injector.get('SolutionVerificationService');
-
     ess.init({
       'First State': {
         content: {
@@ -113,7 +114,7 @@ describe('Solution Verification Service', function() {
             },
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: 'abc'}
+              inputs: {x: ['abc']}
             }],
           }],
           customization_args: {
@@ -218,7 +219,7 @@ describe('Solution Verification Service', function() {
     });
   }));
 
-  it('should verify a correct solution', function() {
+  it('should verify a correct solution', () => {
     var state = ess.getState('First State');
     siis.init(
       'First State', state.interaction.id, state.interaction, 'widget_id');
@@ -243,7 +244,7 @@ describe('Solution Verification Service', function() {
     ).toBe(true);
   });
 
-  it('should verify an incorrect solution', function() {
+  it('should verify an incorrect solution', () => {
     var state = ess.getState('First State');
     siis.init(
       'First State', state.interaction.id, state.interaction, 'widget_id');
