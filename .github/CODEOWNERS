@@ -148,27 +148,27 @@
 
 # Dev workflow team.
 /.circleci/ @BenHenning @U8NWXD @kevintab95 @vinitamurthi
-/.eslintignore @DubeySandeep @Hudda
-/.eslintrc @DubeySandeep @Hudda
-/.htmllintrc @DubeySandeep @Hudda
-/.coveragerc @DubeySandeep @Hudda
+/.eslintignore @DubeySandeep
+/.eslintrc @DubeySandeep
+/.htmllintrc @DubeySandeep
+/.coveragerc @DubeySandeep
 /.gitattributes @DubeySandeep
 /.gitignore @DubeySandeep
-/.isort.cfg @DubeySandeep @Hudda
-/.pylintrc @DubeySandeep @Hudda
-/.stylelintrc @DubeySandeep @Hudda
+/.isort.cfg @DubeySandeep
+/.pylintrc @DubeySandeep
+/.stylelintrc @DubeySandeep
 /.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
-/core/templates/css/.stylelintrc @DubeySandeep @Hudda
-/tox.ini @DubeySandeep @Hudda
+/core/templates/css/.stylelintrc @DubeySandeep
+/tox.ini @DubeySandeep
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @kevintab95 @DubeySandeep
 /scripts/check_frontend_coverage*.py @DubeySandeep @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @nishantwrp @DubeySandeep
-/scripts/linters/ @DubeySandeep @Hudda
+/scripts/linters/ @DubeySandeep
 /scripts/linters/ts_ignore_exceptions.json @nishantwrp
 /ubuntu_dockerfile @DubeySandeep
 
