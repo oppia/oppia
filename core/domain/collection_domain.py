@@ -1315,6 +1315,8 @@ class CollectionSummary(python_utils.OBJECT):
 
         if contributor_id not in constants.SYSTEM_USER_IDS:
             self.contributors_summary[contributor_id] = (
-                    self.contributors_summary.get(contributor_id, 0) + 1)
+                self.contributors_summary.get(contributor_id, 0) + 1)
 
         self.contributors_summary = contributors_summary
+        if contributor_id not in self.contributor_ids:
+            self.contributor_ids.append(contributor_id)
