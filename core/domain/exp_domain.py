@@ -508,11 +508,6 @@ class StateVersionSpan(python_utils.OBJECT):
             state_equality_predicate or
             StateVersionSpan._default_state_equality_predicate)
 
-    @staticmethod
-    def _default_state_equality_predicate(unused_state1, unused_state2):
-        """Always returns True."""
-        return True
-
     def __iter__(self):
         """Returns an iterable over the snapshots held by the span."""
         return iter(self._version_snapshots.items())
@@ -579,6 +574,9 @@ class StateVersionSpan(python_utils.OBJECT):
         Returns:
             list(state_domain.State). The states corresponding to the given
             range of versions.
+
+        Raises:
+            ValueError. The input range is out-of-bounds.
         """
         return [
             state
@@ -594,6 +592,9 @@ class StateVersionSpan(python_utils.OBJECT):
 
         Returns:
             list(str). The names corresponding to the given range of versions.
+
+        Raises:
+            ValueError. The input range is out-of-bounds.
         """
         return [
             name
@@ -660,6 +661,9 @@ class StateVersionSpan(python_utils.OBJECT):
         Returns:
             list(tuple(str, state_domain.State)). State details corresponding to
             the given range of versions.
+
+        Raises:
+            ValueError. The input range is out-of-bounds.
         """
         range_is_valid = (
             version_start >= self._version_start and
@@ -667,6 +671,11 @@ class StateVersionSpan(python_utils.OBJECT):
         if not range_is_valid:
             raise ValueError('Requested version range is out-of-bounds')
         return [self[v] for v in python_utils.RANGE(version_start, version_end)]
+
+    @staticmethod
+    def _default_state_equality_predicate(unused_state1, unused_state2):
+        """Always returns True."""
+        return True
 
 
 class ExplorationStatesHistory(python_utils.OBJECT):

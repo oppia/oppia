@@ -452,7 +452,8 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         return state
 
     def get_state_version_spans(
-            self, name, state_equality_predicate, state_v1, *subsequent_versions):
+            self, name, state_equality_predicate, state_v1,
+            *subsequent_versions):
         """Returns the state version spans for the given snapshots of a state.
 
         Args:
