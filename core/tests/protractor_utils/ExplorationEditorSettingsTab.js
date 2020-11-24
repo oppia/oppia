@@ -102,6 +102,8 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setCategory = async function(category) {
+    await waitFor.presenceOf(
+      explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
       await forms.AutocompleteDropdownEditor(explorationCategoryInput)
     ).setValue(category);
@@ -112,6 +114,8 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setLanguage = async function(language) {
+    await waitFor.presenceOf(
+      explorationLanguageInput, 'Language input takes too long to be visible.');
     await element(by.css('.protractor-test-exploration-language-select')).
       element(by.cssContainingText('option', language)).click();
   };
@@ -124,8 +128,9 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setTitle = async function(title) {
-    await explorationTitleInput.clear();
-    await explorationTitleInput.sendKeys(title);
+    await action.clear('Exploration title input', explorationTitleInput);
+    await action.sendKeys(
+      'Exploration title input', explorationTitleInput, title);
   };
 
   this.expectCategoryToBe = async function(category) {

@@ -224,14 +224,10 @@ var SkillEditorPage = function() {
   };
 
   this.saveOrPublishSkill = async function(commitMessage) {
-    await saveOrPublishSkillButton.click();
-
-    await commitMessageField.sendKeys(commitMessage);
-    await waitFor.elementToBeClickable(
-      closeSaveModalButton,
-      'Close save modal button takes too long to be clickable');
-    await closeSaveModalButton.click();
-    await waitFor.pageToFullyLoad();
+    await action.click('Save or Publish Skill button', saveOrPublishSkillButton);
+    await action.sendKeys('Commit message', commitMessageField, commitMessage);
+    await action.click('Close save modal button', closeSaveModalButton);
+    await waitFor.visibilityOfSuccessToast('Changes Saved.');
   };
 
   this.editConceptCard = async function(explanation) {
