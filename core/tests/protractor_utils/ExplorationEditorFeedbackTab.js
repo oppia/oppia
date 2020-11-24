@@ -63,14 +63,12 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-
     await action.click('Matching Row', matchingRow);
     await action.click('View Suggestion Button', viewSuggestionButton);
     await action.sendKeys(
       'Suggestion Commit Message Input',
       suggestionCommitMessageInput, 'Commit message');
     await action.click('Accept Suggestion Button', acceptSuggestionButton);
-
     await waitFor.invisibilityOf(
       acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
     await waitFor.pageToFullyLoad();
@@ -127,7 +125,6 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-
     await action.click(
       'Matching Suggestion Row and feedback subject', matchingRow);
     await action.click('View Suggestion Button', viewSuggestionButton);
@@ -135,7 +132,6 @@ var ExplorationEditorFeedbackTab = function() {
       'Suggestion Review Message Input',
       suggestionReviewMessageInput, 'Review message');
     await action.click('Reject Suggestion Button', rejectSuggestionButton);
-
     await waitFor.invisibilityOf(
       acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
     await waitFor.pageToFullyLoad();
