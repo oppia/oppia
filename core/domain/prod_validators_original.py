@@ -25,6 +25,8 @@ import re
 
 from constants import constants
 from core.domain import base_model_validators
+from core.domain import classifier_domain
+from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import cron_services
@@ -53,15 +55,16 @@ import utils
 (
     base_models, collection_models,
     email_models, exp_models, feedback_models,
-    question_models, skill_models, story_models,
+    job_models, question_models, skill_models, story_models,
     subtopic_models, suggestion_models, topic_models,
     user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection,
     models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.question, models.NAMES.skill,
+    models.NAMES.job, models.NAMES.question, models.NAMES.skill,
     models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+
 ])
 
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
@@ -97,6 +100,247 @@ TARGET_TYPE_TO_TARGET_MODEL = {
 VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
     '%s\\.[A-Za-z0-9-_]{1,%s}' % (
         suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
+
+
+class ClassifierTrainingJobModelValidator(
+        base_model_validators.BaseModelValidator):
+    """Class for validating ClassifierTrainingJobModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [exp_id].[random_hash]
+        regex_string = '^%s\\.[A-Za-z0-9-_]{1,%s}$' % (
+            item.exp_id, base_models.ID_LENGTH)
+        return regex_string
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return classifier_services.get_classifier_training_job_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.ExternalModelFetcherDetails(
+                'exploration_ids', exp_models.ExplorationModel, [item.exp_id])]
+
+    @classmethod
+    def _validate_exp_version(
+            cls, item, field_name_to_external_model_references):
+        """Validate that exp version is less than or equal to the version
+        of exploration corresponding to exp_id.
+
+        Args:
+            item: datastore_services.Model. ClassifierTrainingJobModel to
+                validate.
+            field_name_to_external_model_references:
+                dict(str, (list(base_model_validators.ExternalModelReference))).
+                A dict keyed by field name. The field name represents
+                a unique identifier provided by the storage
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
+                to the field_name. For examples, all the external Exploration
+                Models corresponding to a storage model can be associated
+                with the field name 'exp_ids'. This dict is used for
+                validation of External Model properties linked to the
+                storage model.
+        """
+        exp_model_references = (
+            field_name_to_external_model_references['exploration_ids'])
+
+        for exp_model_reference in exp_model_references:
+            exp_model = exp_model_reference.model_instance
+            if exp_model is None or exp_model.deleted:
+                model_class = exp_model_reference.model_class
+                model_id = exp_model_reference.model_id
+                cls._add_error(
+                    'exploration_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id))
+                continue
+            if item.exp_version > exp_model.version:
+                cls._add_error(
+                    'exp %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                    'Entity id %s: Exploration version %s in entity is greater '
+                    'than the version %s of exploration corresponding to '
+                    'exp_id %s' % (
+                        item.id, item.exp_version, exp_model.version,
+                        item.exp_id))
+
+    @classmethod
+    def _validate_state_name(
+            cls, item, field_name_to_external_model_references):
+        """Validate that state name is a valid state in the
+        exploration corresponding to exp_id.
+
+        Args:
+            item: datastore_services.Model. ClassifierTrainingJobModel to
+                validate.
+            field_name_to_external_model_references:
+                dict(str, (list(base_model_validators.ExternalModelReference))).
+                A dict keyed by field name. The field name represents
+                a unique identifier provided by the storage
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
+                to the field_name. For examples, all the external Exploration
+                Models corresponding to a storage model can be associated
+                with the field name 'exp_ids'. This dict is used for
+                validation of External Model properties linked to the
+                storage model.
+        """
+        exp_model_references = (
+            field_name_to_external_model_references['exploration_ids'])
+
+        for exp_model_reference in exp_model_references:
+            exp_model = exp_model_reference.model_instance
+            if exp_model is None or exp_model.deleted:
+                model_class = exp_model_reference.model_class
+                model_id = exp_model_reference.model_id
+                cls._add_error(
+                    'exploration_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id))
+                continue
+            if item.state_name not in exp_model.states.keys():
+                cls._add_error(
+                    base_model_validators.ERROR_CATEGORY_STATE_NAME_CHECK,
+                    'Entity id %s: State name %s in entity is not present '
+                    'in states of exploration corresponding to '
+                    'exp_id %s' % (
+                        item.id, item.state_name, item.exp_id))
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [
+            cls._validate_exp_version,
+            cls._validate_state_name]
+
+
+class TrainingJobExplorationMappingModelValidator(
+        base_model_validators.BaseModelValidator):
+    """Class for validating TrainingJobExplorationMappingModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [exp_id].[exp_version].[state_name]
+        regex_string = '^%s\\.%s\\.%s$' % (
+            item.exp_id, item.exp_version, item.state_name)
+        return regex_string
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return classifier_domain.TrainingJobExplorationMapping(
+            item.exp_id, item.exp_version, item.state_name, item.job_id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.ExternalModelFetcherDetails(
+                'exploration_ids', exp_models.ExplorationModel, [item.exp_id])]
+
+    @classmethod
+    def _validate_exp_version(
+            cls, item, field_name_to_external_model_references):
+        """Validate that exp version is less than or equal to the version
+        of exploration corresponding to exp_id.
+
+        Args:
+            item: datastore_services.Model. TrainingJobExplorationMappingModel
+                to validate.
+            field_name_to_external_model_references:
+                dict(str, (list(base_model_validators.ExternalModelReference))).
+                A dict keyed by field name. The field name represents
+                a unique identifier provided by the storage
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
+                to the field_name. For examples, all the external Exploration
+                Models corresponding to a storage model can be associated
+                with the field name 'exp_ids'. This dict is used for
+                validation of External Model properties linked to the
+                storage model.
+        """
+        exp_model_references = (
+            field_name_to_external_model_references['exploration_ids'])
+
+        for exp_model_reference in exp_model_references:
+            exp_model = exp_model_reference.model_instance
+            if exp_model is None or exp_model.deleted:
+                model_class = exp_model_reference.model_class
+                model_id = exp_model_reference.model_id
+                cls._add_error(
+                    'exploration_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id))
+                continue
+            if item.exp_version > exp_model.version:
+                cls._add_error(
+                    'exp %s' % (
+                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
+                    'Entity id %s: Exploration version %s in entity is greater '
+                    'than the version %s of exploration corresponding to '
+                    'exp_id %s' % (
+                        item.id, item.exp_version, exp_model.version,
+                        item.exp_id))
+
+    @classmethod
+    def _validate_state_name(
+            cls, item, field_name_to_external_model_references):
+        """Validate that state name is a valid state in the
+        exploration corresponding to exp_id.
+
+        Args:
+            item: datastore_services.Model. TrainingJobExplorationMappingbModel
+                to validate.
+            field_name_to_external_model_references:
+                dict(str, (list(base_model_validators.ExternalModelReference))).
+                A dict keyed by field name. The field name represents
+                a unique identifier provided by the storage
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
+                to the field_name. For examples, all the external Exploration
+                Models corresponding to a storage model can be associated
+                with the field name 'exp_ids'. This dict is used for
+                validation of External Model properties linked to the
+                storage model.
+        """
+        exp_model_references = (
+            field_name_to_external_model_references['exploration_ids'])
+
+        for exp_model_reference in exp_model_references:
+            exp_model = exp_model_reference.model_instance
+            if exp_model is None or exp_model.deleted:
+                model_class = exp_model_reference.model_class
+                model_id = exp_model_reference.model_id
+                cls._add_error(
+                    'exploration_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id))
+                continue
+            if item.state_name not in exp_model.states.keys():
+                cls._add_error(
+                    base_model_validators.ERROR_CATEGORY_STATE_NAME_CHECK,
+                    'Entity id %s: State name %s in entity is not present '
+                    'in states of exploration corresponding to '
+                    'exp_id %s' % (
+                        item.id, item.state_name, item.exp_id))
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [
+            cls._validate_exp_version,
+            cls._validate_state_name]
 
 
 class CollectionModelValidator(base_model_validators.BaseModelValidator):
@@ -1197,6 +1441,101 @@ class UnsentFeedbackEmailModelValidator(
     @classmethod
     def _get_custom_validation_functions(cls):
         return [cls._validate_entity_type_and_entity_id_feedback_reference]
+
+
+class JobModelValidator(base_model_validators.BaseModelValidator):
+    """Class for validating JobModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [job_type]-[current time]-[random int]
+        regex_string = '^%s-\\d*-\\d*$' % item.job_type
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _validate_time_fields(cls, item):
+        """Validate the time fields in entity.
+
+        Args:
+            item: datastore_services.Model. JobModel to validate.
+        """
+        if item.time_started_msec and (
+                item.time_queued_msec > item.time_started_msec):
+            cls._add_error(
+                'time queued check',
+                'Entity id %s: time queued %s is greater '
+                'than time started %s' % (
+                    item.id, item.time_queued_msec, item.time_started_msec))
+
+        if item.time_finished_msec and (
+                item.time_started_msec > item.time_finished_msec):
+            cls._add_error(
+                'time started check',
+                'Entity id %s: time started %s is greater '
+                'than time finished %s' % (
+                    item.id, item.time_started_msec, item.time_finished_msec))
+
+        current_time_msec = utils.get_current_time_in_millisecs()
+        if item.time_finished_msec > current_time_msec:
+            cls._add_error(
+                'time finished check',
+                'Entity id %s: time finished %s is greater '
+                'than the current time' % (
+                    item.id, item.time_finished_msec))
+
+    @classmethod
+    def _validate_error(cls, item):
+        """Validate error is not None only if status is not canceled
+        or failed.
+
+        Args:
+            item: datastore_services.Model. JobModel to validate.
+        """
+        if item.error and item.status_code not in [
+                job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
+            cls._add_error(
+                base_model_validators.ERROR_CATEGORY_ERROR_CHECK,
+                'Entity id %s: error: %s for job is not empty but '
+                'job status is %s' % (item.id, item.error, item.status_code))
+
+        if not item.error and item.status_code in [
+                job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
+            cls._add_error(
+                base_model_validators.ERROR_CATEGORY_ERROR_CHECK,
+                'Entity id %s: error for job is empty but '
+                'job status is %s' % (item.id, item.status_code))
+
+    @classmethod
+    def _validate_output(cls, item):
+        """Validate output for entity is present only if status is
+        completed.
+
+        Args:
+            item: datastore_services.Model. JobModel to validate.
+        """
+        if item.output and item.status_code != job_models.STATUS_CODE_COMPLETED:
+            cls._add_error(
+                base_model_validators.ERROR_CATEGORY_OUTPUT_CHECK,
+                'Entity id %s: output: %s for job is not empty but '
+                'job status is %s' % (item.id, item.output, item.status_code))
+
+        if item.output is None and (
+                item.status_code == job_models.STATUS_CODE_COMPLETED):
+            cls._add_error(
+                base_model_validators.ERROR_CATEGORY_OUTPUT_CHECK,
+                'Entity id %s: output for job is empty but '
+                'job status is %s' % (item.id, item.status_code))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_time_fields,
+            cls._validate_error,
+            cls._validate_output]
 
 
 class ContinuousComputationModelValidator(
