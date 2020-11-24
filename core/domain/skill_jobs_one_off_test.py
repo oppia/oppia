@@ -26,9 +26,11 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_jobs_one_off
 from core.domain import skill_services
+from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -374,6 +376,134 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'update_skill_property', 'new_value': 'Test description',
                 'old_value': '', 'property_name': 'description'
             }])
+
+
+class DeleteInvalidSkillCommitLogEntryModelOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    SKILL_ID = 'skill_id'
+
+    def setUp(self):
+        super(DeleteInvalidSkillCommitLogEntryModelOneOffJobTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        language_codes = ['ar', 'en', 'en']
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            'description %d' % i,
+            rubrics
+        ) for i in python_utils.RANGE(3)]
+
+        example_1 = skill_domain.WorkedExample(
+            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
+            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
+        )
+        skill_contents = skill_domain.SkillContents(
+            state_domain.SubtitledHtml(
+                '1', '<p>Explanation</p>'), [example_1],
+            state_domain.RecordedVoiceovers.from_dict({
+                'voiceovers_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            }),
+            state_domain.WrittenTranslations.from_dict({
+                'translations_mapping': {
+                    '1': {}, '2': {}, '3': {}
+                }
+            })
+        )
+        misconception_dict = {
+            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
+
+        misconception = skill_domain.Misconception.from_dict(
+            misconception_dict)
+
+        for index, skill in enumerate(skills):
+            skill.language_code = language_codes[index]
+            skill.skill_contents = skill_contents
+            skill.add_misconception(misconception)
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        self.model_instance_0 = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-0-1'))
+        self.model_instance_1 = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-1-1'))
+        self.model_instance_2 = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-2-1'))
+
+        self.process_and_flush_pending_mapreduce_tasks()
+
+    def test_standard_operation(self):
+        job_class = (
+            skill_jobs_one_off.DeleteInvalidSkillCommitLogEntryModelOneOffJob)
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = job_class.get_output(job_id)
+        self.assertEqual(output, ['[u\'ITEM_NOT_DELETED\', 3]'])
+
+    def test_model_deletion_with_private_post_commit_status(self):
+        self.model_instance_0.post_commit_status = 'private'
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+
+        job_class = (
+            skill_jobs_one_off.DeleteInvalidSkillCommitLogEntryModelOneOffJob)
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = job_class.get_output(job_id)
+        self.assertEqual(
+            output, ['[u\'ITEM_NOT_DELETED\', 2]', '[u\'ITEM_DELETED\', 1]'])
+        self.assertIsNone(
+            skill_models.SkillCommitLogEntryModel.get(
+                'skill-0-1', strict=False))
+
+    def test_rights_commit_log_model_deletion(self):
+        rights_model = (
+            skill_models.SkillCommitLogEntryModel(
+                id='rights-0-1',
+                user_id=self.owner_id,
+                commit_type='edit',
+                commit_message='msg',
+                commit_cmds=[{}],
+                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+                post_commit_is_private=False))
+        rights_model.skill_id = '0'
+        rights_model.update_timestamps()
+        rights_model.put()
+
+        job_class = (
+            skill_jobs_one_off.DeleteInvalidSkillCommitLogEntryModelOneOffJob)
+        job_id = job_class.create_new()
+        job_class.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        output = job_class.get_output(job_id)
+        self.assertEqual(
+            output, ['[u\'ITEM_NOT_DELETED\', 3]', '[u\'ITEM_DELETED\', 1]'])
 
 
 class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):

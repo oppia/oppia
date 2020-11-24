@@ -137,8 +137,8 @@ class SkillCommitLogEntryModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [skill/rights]-[skill_id]-[skill_version].
-        regex_string = '^(skill|rights)-%s-\\d+$' % (
+        # Valid id: [skill]-[skill_id]-[skill_version].
+        regex_string = '^(skill)-%s-\\d+$' % (
             item.skill_id)
 
         return regex_string

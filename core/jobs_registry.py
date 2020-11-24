@@ -91,6 +91,7 @@ ONE_OFF_JOB_MANAGERS = [
     recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.CleanUpExplorationRecommendationsOneOffJob,
+    skill_jobs_one_off.DeleteInvalidSkillCommitLogEntryModelOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
     skill_jobs_one_off.MissingSkillMigrationOneOffJob,

@@ -118,6 +118,31 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
+class DeleteInvalidSkillCommitLogEntryModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """This job is used to delete the invalid SkillCommitLogEntryModels.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillCommitLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        # Skills don't have a 'rights' model anymore, so all commit log entries
+        # with 'rights' should be deleted.
+        if item.id.startswith('rights') or item.post_commit_status == 'private':
+            item.delete()
+            yield ('ITEM_DELETED', 1)
+            return
+
+        yield ('ITEM_NOT_DELETED', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
 class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """This job is used to migrate the old commit cmds in skill commit log
     model to the latest cmd format.
