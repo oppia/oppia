@@ -109,6 +109,15 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([]);
   });
 
+  it('should be able to perform basic valid', () => {
+    // The second rule has a broader scope than first.
+    answerGroups[0].rules = [equals, isEquivalent];
+
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
   it('should catch redundancy of rules with matching inputs', () => {
     // The third rule will never get matched.
     answerGroups[0].rules = [equals, equals];
