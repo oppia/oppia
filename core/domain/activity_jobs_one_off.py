@@ -634,9 +634,10 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
 
 
-class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
+class AddMissingCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that adds the missing commit log entry model for the corresponding
-    snapshot models.
+    snapshot models. These commit log entry model were found missing on running
+    a validation job introduced in the PR #10770.
     """
 
     # This list consists of the snapshot models whose associated commit log
@@ -686,10 +687,10 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(snapshot_model):
-        job_class = AddMissingCommitLogsJob
-        class_name = snapshot_model.__class__.__name__
+        job_class = AddMissingCommitLogsOneOffJob
+        model_class_name = snapshot_model.__class__.__name__
         model_id, version_str = snapshot_model.id.rsplit('-', 1)
-        model_properties = job_class.MODEL_NAMES_TO_PROPERTIES[class_name]
+        model_properties = job_class.MODEL_NAMES_TO_PROPERTIES[model_class_name]
         version = int(version_str)
         commit_log_id = (
             model_properties['id_string_format'] % (model_id, version))
@@ -700,16 +701,16 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
 
         parent_model = (
             model_properties['parent_model_class'].get_by_id(model_id))
-        if class_name == 'ExplorationRightsSnapshotMetadataModel':
+        if model_class_name == 'ExplorationRightsSnapshotMetadataModel':
             if snapshot_model.commit_type in ['create', 'delete']:
                 commit_logs_should_exist = False
 
         if commit_log_model is not None or not commit_logs_should_exist:
-            yield ('Found commit log model-%s' % class_name, 1)
+            yield ('Found commit log model-%s' % model_class_name, 1)
             return
 
         if parent_model is None:
-            yield ('Missing Parent Model-No changes-%s' % class_name, 1)
+            yield ('Missing Parent Model-No changes-%s' % model_class_name, 1)
             return
 
         if parent_model.deleted:
@@ -719,7 +720,7 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
             yield (
                 'SUCCESS-Parent model marked deleted-' +
                 'Deleted all related models-%s' % (
-                    class_name), snapshot_model.id)
+                    model_class_name), snapshot_model.id)
             return
 
         commit_log_model = model_properties['commit_log_model_class'](
@@ -734,10 +735,12 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
         )
         setattr(
             commit_log_model, model_properties['id_field'], model_id)
-        if class_name in job_class.MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS:
+        if model_class_name in (
+                job_class.MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS):
             commit_log_model.post_commit_status = (
                 constants.ACTIVITY_STATUS_PUBLIC)
-        elif class_name in job_class.MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS:
+        elif model_class_name in (
+                job_class.MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS):
             rights_model = exp_models.ExplorationRightsModel.get_version(
                 model_id, version)
             commit_log_model.post_commit_status = rights_model.status
@@ -747,7 +750,7 @@ class AddMissingCommitLogsJob(jobs.BaseMapReduceOneOffJobManager):
         commit_log_model.update_timestamps(update_last_updated_time=False)
         commit_log_model.put()
         yield (
-            'SUCCESS-Added missing commit log model-%s' % class_name,
+            'SUCCESS-Added missing commit log model-%s' % model_class_name,
             snapshot_model.id)
 
     @staticmethod

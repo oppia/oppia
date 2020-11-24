@@ -2139,7 +2139,7 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(expected_output, actual_output)
 
 
-class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
+class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
 
@@ -2170,7 +2170,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
     ]
 
     def setUp(self):
-        super(AddMissingCommitLogsJobTests, self).setUp()
+        super(AddMissingCommitLogsOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -2179,15 +2179,15 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_class = activity_jobs_one_off.AddMissingCommitLogsJob
+        job_class = activity_jobs_one_off.AddMissingCommitLogsOneOffJob
         job_id = job_class.create_new()
-        activity_jobs_one_off.AddMissingCommitLogsJob.enqueue(job_id)
+        activity_jobs_one_off.AddMissingCommitLogsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
-            activity_jobs_one_off.AddMissingCommitLogsJob
+            activity_jobs_one_off.AddMissingCommitLogsOneOffJob
             .get_output(job_id))
 
         eval_output = [
@@ -2196,7 +2196,7 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
         return eval_output
 
     def test_validate_model_names_list(self):
-        job_class = activity_jobs_one_off.AddMissingCommitLogsJob
+        job_class = activity_jobs_one_off.AddMissingCommitLogsOneOffJob
         class_names = {
             cls.__name__ for cls in (
                 job_class.SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS)}
@@ -2263,7 +2263,6 @@ class AddMissingCommitLogsJobTests(test_utils.GenericTestBase):
             'editor_ids': self.albert_id,
             'voice_artist_ids': self.albert_id,
             'viewer_ids': self.albert_id
-
         }
 
         exp_models.ExplorationRightsSnapshotContentModel(
