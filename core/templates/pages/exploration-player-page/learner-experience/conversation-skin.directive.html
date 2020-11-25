@@ -78,16 +78,18 @@
 
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
-      <supplemental-card on-click-continue-button="showUpcomingCard()"
-                         displayed-card="displayedCard"
-                         is-learn-again-button="isLearnAgainButton()">
-      </supplemental-card>
-      <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
-        <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
-                   ng-click="submitAnswerFromProgressNav()"
-                   ng-disabled="isSubmitButtonDisabled()"
-                   translate="I18N_INTERACTIONS_SUBMIT">
-        </md-button>
+      <div class="supplemental-card-parent-container">
+        <supplemental-card on-click-continue-button="showUpcomingCard()"
+                           displayed-card="displayedCard"
+                           is-learn-again-button="isLearnAgainButton()">
+        </supplemental-card>
+        <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
+          <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
+                     ng-click="submitAnswerFromProgressNav()"
+                     ng-disabled="isSubmitButtonDisabled()"
+                     translate="I18N_INTERACTIONS_SUBMIT">
+          </md-button>
+        </div>
       </div>
     </div>
   </div>
@@ -184,6 +186,11 @@ otherwise they will interfere with the iframed conversation skin directive.
     position: fixed;
     width: 100%;
     z-index: 16;
+  }
+
+  .supplemental-card-parent-container {
+    min-width: 50%;
+    position: fixed;
   }
 
   .conversation-skin-login-container {
@@ -481,6 +488,10 @@ otherwise they will interfere with the iframed conversation skin directive.
     .conversation-skin-tutor-card-alone {
       position: relative;
       top: 0;
+    }
+
+    .supplemental-card-parent-container {
+      position: unset;
     }
 
     .conversation-skin-supplemental-card-container {

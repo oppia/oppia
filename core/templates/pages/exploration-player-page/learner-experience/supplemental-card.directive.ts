@@ -86,7 +86,7 @@ angular.module('oppia').directive('supplementalCard', [
 
           $scope.getHelpCardBottomPosition = function() {
             var helpCard = $('.conversation-skin-help-card');
-            var container = $('.conversation-skin-supplemental-card-container');
+            var container = $('.conversation-skin-interaction-container');
             return Math.max(container.height() - helpCard.height() / 2, 0);
           };
 
