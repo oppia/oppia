@@ -85,7 +85,7 @@ describe('Splash Page', function() {
 
   it('should redirect to default classroom page', function() {
     var clickBrowseLibraryButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
+      SiteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
       .and.callThrough();
     ctrl.onClickBrowseLessonsButton();
     $timeout.flush(150);

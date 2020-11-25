@@ -22,6 +22,10 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+const splashConstants = require('constants.ts');
+
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
@@ -49,9 +53,10 @@ angular.module('oppia').component('splashPage', {
       };
 
       ctrl.onClickBrowseLessonsButton = function() {
-        SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+        SiteAnalyticsService.registerClickBrowseLessonsButtonEvent();
         $timeout(function() {
-          WindowRef.nativeWindow.location = '/learn/math';
+          WindowRef.nativeWindow.location = (
+            `/learn/${splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
         }, 150);
         return false;
       };
