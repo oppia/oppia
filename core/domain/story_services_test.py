@@ -32,6 +32,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
+import utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
@@ -63,7 +64,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             abbreviated_name='topic-one', url_fragment='topic-one',
             description='A new topic',
             canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
+            uncategorized_skill_ids=['skill_4'], subtopics=[],
+            next_subtopic_id=0)
         self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
@@ -294,6 +296,120 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.story_contents.nodes[0].destination_node_ids, [])
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
+
+    def test_prerequisite_skills_validation(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2', 'node_3'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': ['skill_4'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.initial_node_id = 'node_1'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+
+        expected_error_string = (
+            'The skills with ids skill_4 were specified as prerequisites for '
+            'Chapter Title 3, but were not taught in any chapter before it')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_string):
+            story_services.validate_prerequisite_skills_in_story_contents(
+                self.story.corresponding_topic_id, self.story.story_contents)
+
+    def test_story_with_loop(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        expected_error_string = 'Loops are not allowed in stories.'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_string):
+            story_services.validate_prerequisite_skills_in_story_contents(
+                self.story.corresponding_topic_id, self.story.story_contents)
 
     def test_does_story_exist_with_url_fragment(self):
         story_id_1 = story_services.get_new_story_id()
