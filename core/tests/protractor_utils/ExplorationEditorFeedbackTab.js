@@ -63,19 +63,20 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-    expect(await matchingRow.isDisplayed()).toBe(true);
-    await matchingRow.click();
-    await action.click('View suggestion button', viewSuggestionButton);
-    expect(await acceptSuggestionButton.isDisplayed()).toBe(true);
-    await suggestionCommitMessageInput.sendKeys('Commit message');
-    await acceptSuggestionButton.click();
+    await action.click('Matching Row', matchingRow);
+    await action.click('View Suggestion Button', viewSuggestionButton);
+    await action.sendKeys(
+      'Suggestion Commit Message Input',
+      suggestionCommitMessageInput, 'Commit message');
+    await action.click('Accept Suggestion Button', acceptSuggestionButton);
     await waitFor.invisibilityOf(
       acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
     await waitFor.pageToFullyLoad();
   };
 
   this.expectToHaveFeedbackThread = async function() {
-    expect(await feedbackTabRow.isPresent()).toBe(true);
+    await waitFor.presenceOf(
+      feedbackTabRow, 'Feedback Tab Row takes too long to appear');
   };
 
   this.getSuggestionThreads = async function() {
@@ -95,7 +96,7 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.goBackToAllFeedbacks = async function() {
-    await feedbackBackButton.click();
+    await action.click('Feedback Back Button', feedbackBackButton);
   };
 
   this.readFeedbackMessages = async function() {
@@ -107,12 +108,12 @@ var ExplorationEditorFeedbackTab = function() {
     var rowCount = await rows.count();
     for (var i = 0; i < rowCount; i++) {
       var row = await rows.get(i);
-      await row.click();
+      await action.click(`suggestionRow at row index ${i}`, row);
       await waitFor.visibilityOf(
         explorationFeedback, 'Feedback message text is not visible');
       var message = await explorationFeedback.getText();
       messages.push(message);
-      await feedbackBackButton.click();
+      await action.click('Feedback Back Button', feedbackBackButton);
     }
     return messages;
   };
@@ -124,36 +125,46 @@ var ExplorationEditorFeedbackTab = function() {
     var matchingRow = element(by.cssContainingText(
       `${suggestionRowClassName} ${feedbackSubjectClassName}`,
       suggestionDescription));
-    expect(await matchingRow.isDisplayed()).toBe(true);
-    await matchingRow.click();
-    await action.click('View suggestion button', viewSuggestionButton);
-    expect(await rejectSuggestionButton.isDisplayed()).toBe(true);
-    await suggestionReviewMessageInput.sendKeys('Review message');
-    await rejectSuggestionButton.click();
+    await action.click(
+      'Matching Suggestion Row and feedback subject', matchingRow);
+    await action.click('View Suggestion Button', viewSuggestionButton);
+    await action.sendKeys(
+      'Suggestion Review Message Input',
+      suggestionReviewMessageInput, 'Review message');
+    await action.click('Reject Suggestion Button', rejectSuggestionButton);
     await waitFor.invisibilityOf(
       acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
     await waitFor.pageToFullyLoad();
   };
 
   this.selectLatestFeedbackThread = async function() {
-    await waitFor.visibilityOf(
-      await element.all(by.css(suggestionRowClassName)).first(),
-      'No feedback messages are visible.');
-    await element.all(by.css(suggestionRowClassName)).first().click();
+    var suggestionRowFirst = (
+      element.all(by.css(suggestionRowClassName)).first());
+    await action.click(
+      'Suggestion Row First', suggestionRowFirst);
   };
 
   this.sendResponseToLatestFeedback = async function(feedbackResponse) {
     await this.selectLatestFeedbackThread();
-    await feedbackResponseTextArea.sendKeys(feedbackResponse);
-    await feedbackSendResponseButton.click();
+    await action.sendKeys(
+      'Feedback Response Text Area',
+      feedbackResponseTextArea, feedbackResponse);
+    await action.click(
+      'Feedback Send Response Button', feedbackSendResponseButton);
   };
 
   this.changeFeedbackStatus = async function(
       feedbackStatus, feedbackResponse) {
-    await feedbackResponseTextArea.sendKeys(feedbackResponse);
-    await feedbackStatusDropdown.click();
-    await element(by.css('option[label="' + feedbackStatus + '"]')).click();
-    await feedbackSendResponseButton.click();
+    await action.sendKeys(
+      'Feedback Response Text Area',
+      feedbackResponseTextArea, feedbackResponse);
+    await action.click('Feedback Status Dropdow', feedbackStatusDropdown);
+    var optionLabelFeedbackStatus = (
+      element(by.css(`option[label="${feedbackStatus}"]`)));
+    await action.click(
+      'Option[label = "feedback status"', optionLabelFeedbackStatus);
+    await action.click(
+      'Feedback Send Response Button', feedbackSendResponseButton);
   };
 
   this.readFeedbackMessagesFromThread = async function() {
