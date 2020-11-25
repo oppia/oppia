@@ -434,7 +434,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertTrue(
-            'pre-push hook file is now executable!'in self.print_arr)
+            'pre-push hook file is now executable!' in self.print_arr)
 
     def test_install_hook_with_error_in_making_pre_push_executable(self):
         def mock_islink(unused_file):
@@ -554,7 +554,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue('Removing broken symlink' in self.print_arr)
         self.assertTrue(
-            'pre-push hook file is now executable!'in self.print_arr)
+            'pre-push hook file is now executable!' in self.print_arr)
 
     def test_does_diff_include_js_or_ts_files_with_js_file(self):
         self.assertTrue(
