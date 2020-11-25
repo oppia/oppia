@@ -440,7 +440,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               .getActiveLanguageCode();
             $scope.canVoiceover = EditabilityService.isTranslatable();
             $scope.contentId = (
-              TranslationTabActiveContentIdService.getActiveContentId());
+              TranslationTabActiveContentIdService.activeContentId());
             var audioTranslationObject = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslationObject) {

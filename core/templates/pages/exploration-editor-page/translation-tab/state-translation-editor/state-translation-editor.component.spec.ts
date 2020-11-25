@@ -233,7 +233,7 @@ describe('State Translation Editor Component', function() {
           })
         )
       };
-      spyOn(translationTabActiveContentIdService, 'getActiveContentId').and
+      spyOn(translationTabActiveContentIdService, 'activeContentId').and
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('es');
@@ -258,7 +258,7 @@ describe('State Translation Editor Component', function() {
           })
         )
       };
-      spyOn(translationTabActiveContentIdService, 'getActiveContentId').and
+      spyOn(translationTabActiveContentIdService, 'activeContentId').and
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('en');
@@ -292,7 +292,7 @@ describe('State Translation Editor Component', function() {
           })
         )
       };
-      spyOn(translationTabActiveContentIdService, 'getActiveContentId').and
+      spyOn(translationTabActiveContentIdService, 'activeContentId').and
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('en');
@@ -386,7 +386,7 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
       spyOn(
-        translationTabActiveContentIdService, 'getActiveDataFormat'
+        translationTabActiveContentIdService, 'activeDataFormat'
       ).and.returnValue('html');
 
       stateWrittenTranslationsService.init(stateName, {
@@ -434,7 +434,7 @@ describe('State Translation Editor Component', function() {
       spyOn(
         stateWrittenTranslationsService.displayed,
         'addWrittenTranslation').and.callThrough();
-      spyOn(translationTabActiveContentIdService, 'getActiveContentId').and
+      spyOn(translationTabActiveContentIdService, 'activeContentId').and
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('es');
