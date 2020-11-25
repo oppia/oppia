@@ -500,7 +500,7 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
 
         span = exp_domain.StateVersionSpan(1, 'A', state)
 
-        with self.assertRaisesRegexp(Exception, 'does not cover version=5'):
+        with self.assertRaisesRegexp(Exception, 'does not contain version=5'):
             _ = span[5]
 
     def test_newly_constructed_span(self):
@@ -635,13 +635,13 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
             'A', None, self.new_state_domain_obj())
         nodiff = exp_domain.ExplorationVersionsDiff([])
 
-        with self.assertRaisesRegexp(Exception, 'version=2 should be next'):
+        with self.assertRaisesRegexp(Exception, 'version=2 must be next'):
             span.extend_or_split(3, 'A', self.new_state_domain_obj(), nodiff)
 
-        with self.assertRaisesRegexp(Exception, 'version=2 should be next'):
+        with self.assertRaisesRegexp(Exception, 'version=2 must be next'):
             span.extend_or_split(0, 'A', self.new_state_domain_obj(), nodiff)
 
-        with self.assertRaisesRegexp(Exception, 'version=2 should be next'):
+        with self.assertRaisesRegexp(Exception, 'version=2 must be next'):
             span.extend_or_split(-1, 'A', self.new_state_domain_obj(), nodiff)
 
     def test_extend_or_split_with_rename(self):
