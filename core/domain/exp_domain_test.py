@@ -530,7 +530,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })
 
         init_state.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict(old_answer_groups))
+            state_domain.AnswerGroup.from_dicts(old_answer_groups))
 
         exploration.validate()
 
@@ -730,7 +730,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_groups_list = [
             answer_group.to_dict() for answer_group in answer_groups]
         init_state.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict(answer_groups_list))
+            state_domain.AnswerGroup.from_dicts(answer_groups_list))
         init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
         solution_dict = {
@@ -1609,7 +1609,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         exploration.init_state.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict(answer_groups))
+            state_domain.AnswerGroup.from_dicts(answer_groups))
         with self.assertRaisesRegexp(
             Exception,
             'The parameter ParamChange was used in an answer group, '
@@ -9903,9 +9903,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
         state2.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict(answer_group_list2))
+            state_domain.AnswerGroup.from_dicts(answer_group_list2))
         state3.update_interaction_answer_groups(
-            state_domain.AnswerGroup.from_dict(answer_group_list3))
+            state_domain.AnswerGroup.from_dicts(answer_group_list3))
 
         expected_html_list = [
             '',
