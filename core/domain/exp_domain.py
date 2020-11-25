@@ -481,15 +481,16 @@ class StateVersionSpan(python_utils.OBJECT):
     passed in to the constructor. By default, all versions of a states are
     equivalent.
 
+    Spans can only be extended using the extend_or_split() method. It enforces
+    the invariant: all states in a span are equivalent.
+
     Equivalence has a prerequisite: the names of the state must match across all
-    versions. If the state's name changed in between versions, then an
+    versions. If the state's name has changed in between versions, then an
     ExplorationVersionsDiff must be used to satisfy the prerequisite.
-    See extend_or_split() for details.
 
     Spans must be extended in increasing and consecutive version-order. It is an
     error to extend a span with a version older than what it already contains,
-    or newer than the most recent version + 1. Exceptions are raised to enforce
-    this.
+    or newer than the most recent version + 1.
     """
 
     def __init__(
@@ -612,7 +613,8 @@ class StateVersionSpan(python_utils.OBJECT):
     def extend_or_split(
             self, exp_version, state_name, state, exp_version_diff):
         """Extends span to include the given state, unless it fails to pass the
-        given split predicate, in which case a new span is created and returned.
+        span's equality predicate, in which case a new span is created and
+        returned instead.
 
         Args:
             exp_version: int. The state's corresponding exploration version.
