@@ -463,8 +463,8 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
                 to enforce the following invariant: all versions of the state in
-                a span are equivalent. If None, then all versions of a state are
-                equivalent to each other.
+                a span are equivalent. If None, then uses a predicate that
+                unconditionally returns True.
             *subsequent_versions: tuple(state_domain.State). The subsequent
                 versions of the state.
 
@@ -650,7 +650,7 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
             }),
         ])
 
-        with self.assertRaisesRegexp(Exception, 'no mapping from v2 to v1'):
+        with self.assertRaisesRegexp(Exception, 'no mapping from v1 to v2'):
             span.extend_or_split(2, 'Z', self.new_state_domain_obj(), diff)
 
 

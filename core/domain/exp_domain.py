@@ -475,22 +475,18 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
 
 
 class StateVersionSpan(python_utils.OBJECT):
-    """A consecutive span of versions in which a state is "equivalent".
+    """A consecutive span of exploration versions where a state is equivalent.
 
     Equivalence between state versions are defined by the user-defined predicate
-    passed in to the constructor. By default, all versions of a states are
-    equivalent.
+    passed in to the constructor. By default, all versions of a state are equal.
 
     Spans can only be extended using the extend_or_split() method. It enforces
-    the invariant: all versions of the state in a span are equivalent.
+    the invariant: all versions of the state in a span are equivalent. Spans
+    must be extended in increasing and consecutive version-order.
 
     Equivalence has a prerequisite: the names of the state must match across all
     versions. If the state's name has changed in between versions, then an
-    ExplorationVersionsDiff must be used to satisfy the prerequisite.
-
-    Spans must be extended in increasing and consecutive version-order. It is an
-    error to extend a span with a version older than what it already contains,
-    or newer than the most recent version + 1.
+    ExplorationVersionsDiff must be used to satisfy the discrepancy.
     """
 
     def __init__(
@@ -507,8 +503,8 @@ class StateVersionSpan(python_utils.OBJECT):
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
                 to enforce the following invariant: all versions of the state in
-                a span are equivalent. If None, then all versions of a state are
-                equivalent to each other.
+                a span are equivalent. If None, then uses a predicate that
+                unconditionally returns True.
         """
         self._version_start, self._version_end = exp_version, exp_version + 1
         self._version_snapshots = (
@@ -629,8 +625,8 @@ class StateVersionSpan(python_utils.OBJECT):
         Raises:
             Exception. When any of the following occurs:
                 -   The given version is not "lastest version + 1".
-                -   The name of this span's state does not map to the new given
-                name, as defined by exp_version_diff.new_to_old_state_names.
+                -   The name of this span's state does not map to the given
+                name (as defined by exp_version_diff.new_to_old_state_names).
         """
         if exp_version != self._version_end:
             raise Exception(
@@ -650,17 +646,17 @@ class StateVersionSpan(python_utils.OBJECT):
                 'state is different; input exploration diff thinks that the '
                 'previous name was %r, but this span thinks that the previous '
                 'name was %r)' % (
-                    exp_version, prev_exp_version,
+                    prev_exp_version, exp_version,
                     prev_state_name, prev_snapshot_state_name))
 
-        if not self._state_equality_predicate(prev_snapshot_state, state):
+        if self._state_equality_predicate(prev_snapshot_state, state):
+            self._version_snapshots[exp_version] = (state_name, state)
+            self._version_end += 1
+            return self
+        else:
             return StateVersionSpan(
                 exp_version, state_name, state,
                 state_equality_predicate=self._state_equality_predicate)
-
-        self._version_snapshots[exp_version] = (state_name, state)
-        self._version_end += 1
-        return self
 
     def _get_multi_versions(self, version_start, version_end):
         """Returns state details for a half-open range of exploration versions.
@@ -707,8 +703,8 @@ class ExplorationStatesHistory(python_utils.OBJECT):
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
                 to enforce the following invariant: all versions of the state in
-                a span are equivalent. If None, then all versions of a state are
-                equivalent to each other.
+                a span are equivalent. If None, then uses a predicate that
+                unconditionally returns True.
         """
         if not exps or not exp_version_diffs:
             raise ValueError('Inputs must be non-empty')
