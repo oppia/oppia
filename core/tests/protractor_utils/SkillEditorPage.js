@@ -102,6 +102,8 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-skill-difficulty-easy'));
   var skillChangeCount = element(
     by.css('.protractor-test-changes-count-text'));
+  var selectRubricDifficulty = element(
+    by.css('.protractor-test-select-rubric-difficulty'));
 
   this.get = async function(skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
@@ -109,8 +111,12 @@ var SkillEditorPage = function() {
   };
 
   this.selectDifficultyForRubric = async function(difficulty) {
-    await element(by.css('.protractor-test-select-rubric-difficulty'))
-      .element(by.cssContainingText('option', difficulty)).click();
+    await waitFor.visibilityOf(
+      selectRubricDifficulty, 'Select Rubric takes too long to appear.');
+    await action.click(
+      'Rubric difficulty option',
+      selectRubricDifficulty.element(
+        by.cssContainingText('option', difficulty)));
   };
 
   this.addRubricExplanationForDifficulty = async function(
