@@ -22,6 +22,7 @@ import { TestBed } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AlertsService } from 'services/alerts.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LoggerService } from 'services/contextual/logger.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -31,32 +32,62 @@ import {
   // eslint-disable-next-line max-len
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {
+  SubtitledHtml,
+  SubtitledHtmlObjectFactory,
+} from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-fdescribe('Responses Service', () => {
+describe('Responses Service', () => {
+  let alertsService: AlertsService = null;
   let answerGroupObjectFactory: AnswerGroupObjectFactory = null;
   let answerGroupsCacheService: AnswerGroupsCacheService = null;
-  let alertsService: AlertsService = null;
+  let explorationHtmlFormatterService: ExplorationHtmlFormatterService = null;
+  let interactionData = null;
+  let interactionDataWithRules = null;
   let interactionObjectFactory: InteractionObjectFactory = null;
   let loggerService: LoggerService = null;
   let outcomeObjectFactory: OutcomeObjectFactory = null;
   let responsesService: ResponsesService = null;
+  let savedMemento = null;
   let stateEditorService: StateEditorService = null;
   let stateInteractionIdService: StateInteractionIdService = null;
-
-  let interactionData = null;
-  let interactionDataWithRules = null;
+  let stateSolutionService: StateSolutionService = null;
+  let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
 
   beforeEach(() => {
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     answerGroupsCacheService = TestBed.get(AnswerGroupsCacheService);
     alertsService = TestBed.get(AlertsService);
+    explorationHtmlFormatterService = TestBed.get(
+      ExplorationHtmlFormatterService
+    );
     loggerService = TestBed.get(LoggerService);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     responsesService = TestBed.get(ResponsesService);
     interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
+    stateSolutionService = TestBed.get(StateSolutionService);
+    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+
+    savedMemento = {
+      ehfs: explorationHtmlFormatterService,
+      shof: subtitledHtmlObjectFactory,
+      answerIsExclusive: true,
+      correctAnswer: 'This is the correct answer',
+      explanation: new SubtitledHtml('', 'tesster'),
+      toBackendDict: jasmine.createSpy('toBackendDict'),
+      getSummary: jasmine.createSpy('getSummary'),
+      setCorrectAnswer: jasmine.createSpy('setCorrectAnswer'),
+      setExplanation: jasmine.createSpy('setExplanation'),
+      getOppiaSolutionExplanationResponseHtml: jasmine.createSpy(
+        'getOppiaSolutionExplanationResponseHtml'
+      ),
+      getOppiaShortAnswerResponseHtml: jasmine.createSpy(
+        'getOppiaShortAnswerResponseHtml'
+      ),
+    };
 
     interactionData = interactionObjectFactory.createFromBackendDict({
       id: 'TextInput',
@@ -200,15 +231,13 @@ fdescribe('Responses Service', () => {
   });
 
   it('should update default outcome', () => {
-    spyOn(
-      alertsService,
-      'addInfoMessage'
-    ).and.callThrough();
+    spyOn(alertsService, 'addInfoMessage').and.callThrough();
 
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
     stateEditorService.setActiveStateName('Hola');
     stateInteractionIdService.init('stateName', 'TextInput');
+    stateSolutionService.savedMemento = savedMemento;
 
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
@@ -221,6 +250,8 @@ fdescribe('Responses Service', () => {
     );
     const callbackSpy = jasmine.createSpy('callback');
     responsesService.updateDefaultOutcome(updatedDefaultOutcome, callbackSpy);
+
+    expect(stateSolutionService.setterMethodKey).toBe('saveSolution');
 
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'The current solution does not lead to another card.'
@@ -309,11 +340,11 @@ fdescribe('Responses Service', () => {
         isConfusing: jasmine.createSpy('isConfusing'),
       },
       taggedSkillMisconceptionId: '',
-      feedback: 'This is a new feedback text',
+      feedback: new SubtitledHtml('', 'This is a new feedback text'),
       dest: 'State',
-      refresherExplorationId: '',
-      missingPrerequisiteSkillId: '',
-      labelledAsCorrect: false,
+      refresherExplorationId: 'test',
+      missingPrerequisiteSkillId: 'test_skill_id',
+      labelledAsCorrect: true,
       trainingData: 'This is training data text',
       toBackendDict: jasmine.createSpy('toBackendDict'),
     };
@@ -379,7 +410,7 @@ fdescribe('Responses Service', () => {
       dest: 'State',
       refresherExplorationId: '',
       missingPrerequisiteSkillId: '',
-      labelledAsCorrect: false,
+      labelledAsCorrect: true,
       trainingData: 'This is training data text',
       toBackendDict: jasmine.createSpy('toBackendDict'),
     };
@@ -839,14 +870,12 @@ fdescribe('Responses Service', () => {
   );
 
   it('should save new answer group and default outcome', () => {
-    spyOn(
-      alertsService,
-      'addInfoMessage'
-    ).and.callThrough();
+    spyOn(alertsService, 'addInfoMessage').and.callThrough();
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
     stateEditorService.setActiveStateName('Hola');
     stateInteractionIdService.init('stateName', 'TextInput');
+    stateSolutionService.savedMemento = savedMemento;
 
     const updatedAnswerGroups = [
       answerGroupObjectFactory.createNew(
@@ -884,14 +913,12 @@ fdescribe('Responses Service', () => {
   });
 
   it('should save new answer group and default outcome twice', () => {
-    spyOn(
-      alertsService,
-      'addInfoMessage'
-    ).and.callThrough();
+    spyOn(alertsService, 'addInfoMessage').and.callThrough();
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
     stateEditorService.setActiveStateName('Hola');
     stateInteractionIdService.init('stateName', 'TextInput');
+    stateSolutionService.savedMemento = savedMemento;
 
     const updatedAnswerGroups = [
       answerGroupObjectFactory.createNew(

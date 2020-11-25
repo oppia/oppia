@@ -352,8 +352,6 @@ export class ResponsesService {
       updates: Outcome,
       callback: (value: Outcome) => void
   ): void {
-    console.log(updates, "====outcome")
-    console.log(callback, "====callback")
     const outcome = this._defaultOutcome;
     if (updates.hasOwnProperty('feedback')) {
       outcome.feedback = updates.feedback;
