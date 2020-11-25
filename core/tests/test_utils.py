@@ -158,6 +158,28 @@ def check_image_png_or_webp(image_string):
     return image_string.startswith(('data:image/png', 'data:image/webp'))
 
 
+def _get_model_module_names():
+    """Get all module names in storage."""
+    # As models.NAMES is an enum, it cannot be iterated over. So we use the
+    # __dict__ property which can be iterated over.
+    for name in models.NAMES.__dict__:
+        if '__' not in name:
+            yield name
+
+
+def _get_model_classes():
+    """Get all model classes in storage."""
+    for module_name in _get_model_module_names():
+        (module,) = models.Registry.import_models([module_name])
+        for member_name, member_obj in inspect.getmembers(module):
+            if inspect.isclass(member_obj):
+                clazz = getattr(module, member_name)
+                all_base_classes = [
+                    base_class.__name__ for base_class in inspect.getmro(
+                        clazz)]
+                if 'Model' in all_base_classes:
+                    yield clazz
+
 class TaskqueueServicesStub(python_utils.OBJECT):
     """The stub class that mocks the API functionality offered by the platform
     layer, namely the platform.taskqueue taskqueue services API.

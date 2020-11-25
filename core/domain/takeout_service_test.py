@@ -322,27 +322,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         'VersionedModel',
     )
 
-    def _get_model_module_names(self):
-        """Get all module names in storage."""
-        # As models.NAMES is an enum, it cannot be iterated over. So we use the
-        # __dict__ property which can be iterated over.
-        for name in models.NAMES.__dict__:
-            if '__' not in name:
-                yield name
-
-    def _get_model_classes(self):
-        """Get all model classes in storage."""
-        for module_name in self._get_model_module_names():
-            (module,) = models.Registry.import_models([module_name])
-            for member_name, member_obj in inspect.getmembers(module):
-                if inspect.isclass(member_obj):
-                    clazz = getattr(module, member_name)
-                    all_base_classes = [
-                        base_class.__name__ for base_class in inspect.getmro(
-                            clazz)]
-                    if 'Model' in all_base_classes:
-                        yield clazz
-
     def set_up_non_trivial(self):
         """Set up all models for use in testing.
         1) Simulates the creation of a user, user_1, and their stats model.
@@ -962,7 +941,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in self._get_model_classes()
+            for clazz in test_utils._get_model_classes()
             if not clazz.__name__ in self.BASE_CLASSES
         ]
 
@@ -1026,7 +1005,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in self._get_model_classes()
+            for clazz in test_utils._get_model_classes()
             if not clazz.__name__ in self.BASE_CLASSES
         ]
 
