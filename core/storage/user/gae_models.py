@@ -2651,7 +2651,8 @@ class PseudonymizedUserModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model doesn't contain any data directly corresponding to a user.
-        PseudonymizedUserModel contains only pseudonymous ids."""
+        PseudonymizedUserModel contains only pseudonymous ids.
+        """
         return dict(super(cls, cls).get_export_policy(), **{})
 
     @classmethod

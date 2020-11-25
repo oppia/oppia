@@ -740,8 +740,8 @@ class QuestionSummaryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains data corresponding to a user, but this isn't exported
-        because model data has already been exported as a part of the QuestionModel
-        export_data function.
+        because model data has already been exported as a part of the
+        QuestionModel export_data function.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'question_model_last_updated':
