@@ -64,11 +64,11 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --suite="learnerDashboard" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="learnerDashboard" --prod_env
 
   - id: preferences
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
+    wait_for: ["e2e-learner-dashboard"]
     volumes:
       - name: 'test'
         path: '/test'
@@ -77,4 +77,4 @@ steps:
     args:
       - "-c"
       - |
-          xvfb-run -a python -m scripts.run_e2e_tests --suite="preferences" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="preferences" --prod_env
