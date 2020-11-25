@@ -54,6 +54,7 @@ angular.module('oppia').component('stateNameEditor', {
         var stateName = StateEditorService.getActiveStateName();
         StateNameService.setStateNameEditorVisibility(true);
         StateNameService.setStateNameSavedMemento(stateName);
+        ctrl.maxLen = 50;
         ctrl.tmpStateName = stateName;
         FocusManagerService.setFocus('stateNameEditorOpened');
       };
