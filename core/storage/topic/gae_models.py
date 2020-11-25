@@ -519,7 +519,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains data to export/delete corresponding to a user."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
             'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
