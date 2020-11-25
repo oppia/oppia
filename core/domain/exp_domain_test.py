@@ -452,12 +452,12 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         return state
 
     def get_state_version_spans(
-            self, name, state_equality_predicate, state_v1,
+            self, state_name, state_equality_predicate, state_v1,
             *subsequent_versions):
         """Returns the state version spans for the given snapshots of a state.
 
         Args:
-            name: str. The name of the state.
+            state_name: str. The name of the state.
             state_v1: state_domain.State. The first version of the state.
             state_equality_predicate:
                 callable(state_domain.State, state_domain.State) -> bool | None.
@@ -469,24 +469,23 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
                 versions of the state.
 
         Returns:
-            list(StateVersionSpan). A collection of state version spans. The
-            collection will have more than one element if a version of the state
-            is incompatible with its previous version.
+            list(StateVersionSpan). The list will have more than one element
+            when given states that are unequal to their previous version.
         """
         distinct_spans = [
             exp_domain.StateVersionSpan(
-                1, name, state_v1,
+                1, state_name, state_v1,
                 state_equality_predicate=state_equality_predicate),
         ]
         nodiff = exp_domain.ExplorationVersionsDiff([])
-        for version, state_snapshot in enumerate(subsequent_versions, start=2):
+        for exp_version, state in enumerate(subsequent_versions, start=2):
             span = distinct_spans[-1].extend_or_split(
-                version, name, state_snapshot, nodiff)
+                exp_version, state_name, state, nodiff)
             if span is not distinct_spans[-1]:
                 distinct_spans.append(span)
         return distinct_spans
 
-    def test_set_version_directly_raises_an_error(self):
+    def test_set_version_directly_raises_an_exception(self):
         state = self.new_state_domain_obj()
 
         span = exp_domain.StateVersionSpan(1, 'A', state)
@@ -495,7 +494,7 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
             Exception, 'Only `extend_or_split` can mutate a span'):
             span[2] = ('A', state)
 
-    def test_get_invalid_version_raises_an_error(self):
+    def test_get_invalid_version_raises_an_exception(self):
         state = self.new_state_domain_obj()
 
         span = exp_domain.StateVersionSpan(1, 'A', state)
@@ -554,7 +553,8 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         ]
 
         spans = self.get_state_version_spans(
-            'A', lambda s1, s2: s1.interaction.id == s2.interaction.id,
+            'A',
+            lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
 
         self.assertEqual(len(spans), 3)
@@ -590,7 +590,8 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         ]
 
         spans = self.get_state_version_spans(
-            'A', lambda s1, s2: s1.interaction.id == s2.interaction.id,
+            'A',
+            lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
 
         self.assertEqual(len(spans), 3)
@@ -609,7 +610,8 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
             self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
         (span,) = self.get_state_version_spans(
-            'A', lambda s1, s2: s1.interaction.id == s2.interaction.id,
+            'A',
+            lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
 
         self.assertEqual(span.get_multi_versions(1, 3), distinct_states[0:2])
@@ -620,15 +622,15 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
             self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
         (span,) = self.get_state_version_spans(
-            'A', lambda s1, s2: s1.interaction.id == s2.interaction.id,
+            'A',
+            lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
 
-        self.assertRaisesRegexp(
-            ValueError, 'out-of-bounds',
-            lambda: span.get_multi_versions(0, 20))
-        self.assertRaisesRegexp(
-            ValueError, 'out-of-bounds',
-            lambda: span.get_multi_version_names(0, 20))
+        with self.assertRaisesRegexp(ValueError, 'out-of-bounds'):
+            span.get_multi_versions(0, 20)
+
+        with self.assertRaisesRegexp(ValueError, 'out-of-bounds'):
+            span.get_multi_version_names(0, 20)
 
     def test_extend_or_split_with_unexpected_version(self):
         (span,) = self.get_state_version_spans(
@@ -678,22 +680,21 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
 
 class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
 
-    def new_exp_domain_obj(self, exp_id='exp_id', version=1):
+    def new_exp_domain_obj(self, version=1):
         """Returns an exploration domain object without putting it into storage.
 
         Args:
-            exp_id: str. The ID of the exploration.
             version: int. The version of the exploration.
 
         Returns:
-            exp_domain.Exploration. The new exploration instance.
+            exp_domain.Exploration. An exploration.
         """
-        exp = exp_domain.Exploration.create_default_exploration(exp_id)
+        exp = exp_domain.Exploration.create_default_exploration('exp_id')
         exp.version = version
         return exp
 
     def rename_state_change(self, old_state_name, new_state_name):
-        """Returns a domain object for the rename state operation."""
+        """Returns a domain object for a rename state operation."""
         return exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_RENAME_STATE,
             'old_state_name': old_state_name,
@@ -701,14 +702,14 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
         })
 
     def delete_state_change(self, state_name):
-        """Returns a domain object for the delete state operation."""
+        """Returns a domain object for a delete state operation."""
         return exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_DELETE_STATE,
             'state_name': state_name,
         })
 
     def add_state_change(self, state_name):
-        """Returns a domain object for the add state operation."""
+        """Returns a domain object for a add state operation."""
         return exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': state_name,
@@ -728,12 +729,12 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
     def test_create_from_exploration_with_renamed_states(self):
         self.save_new_linear_exp_with_state_names_and_interactions(
             'exp_id', 'owner_id', ['A', 'B'], ['TextInput', 'EndExploration'])
-        exp_services.update_exploration('owner_id', 'exp_id', [
-            self.rename_state_change('A', 'Y'),
-        ], 'commit message')
-        exp_services.update_exploration('owner_id', 'exp_id', [
-            self.rename_state_change('B', 'Z'),
-        ], 'commit message')
+        exp_services.update_exploration(
+            'owner_id', 'exp_id', [self.rename_state_change('A', 'Y')],
+            'commit message')
+        exp_services.update_exploration(
+            'owner_id', 'exp_id', [self.rename_state_change('B', 'Z')],
+            'commit message')
 
         history = exp_services.get_exploration_state_history('exp_id')
 
@@ -752,9 +753,9 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
     def test_create_from_exploration_with_added_states(self):
         self.save_new_linear_exp_with_state_names_and_interactions(
             'exp_id', 'owner_id', ['A', 'B'], ['TextInput', 'EndExploration'])
-        exp_services.update_exploration('owner_id', 'exp_id', [
-            self.add_state_change('C'),
-        ], 'commit message')
+        exp_services.update_exploration(
+            'owner_id', 'exp_id', [self.add_state_change('C')],
+            'commit message')
 
         history = exp_services.get_exploration_state_history('exp_id')
 
@@ -765,9 +766,9 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
     def test_create_from_exploration_with_deleted_states(self):
         self.save_new_linear_exp_with_state_names_and_interactions(
             'exp_id', 'owner_id', ['A', 'B'], ['TextInput', 'EndExploration'])
-        exp_services.update_exploration('owner_id', 'exp_id', [
-            self.delete_state_change('B'),
-        ], 'commit message')
+        exp_services.update_exploration(
+            'owner_id', 'exp_id', [self.delete_state_change('B')],
+            'commit message')
 
         history = exp_services.get_exploration_state_history('exp_id')
 
@@ -776,11 +777,11 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
         self.assertEqual(state_b_span.get_multi_version_names(1, 2), ['B'])
         self.assertFalse(history.has_state(2, 'B'))
 
-    def test_empty_inputs_raises_an_error(self):
+    def test_empty_inputs_raises_an_exception(self):
         with self.assertRaisesRegexp(Exception, 'Inputs must be non-empty'):
             exp_domain.ExplorationStatesHistory([], [])
 
-    def test_mismatched_input_lengths_raises_an_error(self):
+    def test_mismatched_input_lengths_raises_an_exception(self):
         exp = self.new_exp_domain_obj()
         nodiff = exp_domain.ExplorationVersionsDiff([])
 
@@ -790,7 +791,7 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'len of inputs do not match'):
             exp_domain.ExplorationStatesHistory([exp], [nodiff, nodiff])
 
-    def test_non_contiguous_version_inputs_raises_an_error(self):
+    def test_non_contiguous_version_inputs_raises_an_exception(self):
         exp_v1, exp_v2, exp_v4 = (
             self.new_exp_domain_obj(version=v) for v in (1, 2, 4))
         nodiff = exp_domain.ExplorationVersionsDiff([])
@@ -799,7 +800,7 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
             exp_domain.ExplorationStatesHistory(
                 [exp_v1, exp_v2, exp_v4], [nodiff, nodiff, nodiff])
 
-    def test_version_starting_after_1_raises_an_error(self):
+    def test_version_starting_after_1_raises_an_exception(self):
         exp_v2, exp_v3, exp_v4 = (
             self.new_exp_domain_obj(version=v) for v in (2, 3, 4))
         nodiff = exp_domain.ExplorationVersionsDiff([])
@@ -808,7 +809,7 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
             exp_domain.ExplorationStatesHistory(
                 [exp_v2, exp_v3, exp_v4], [nodiff, nodiff, nodiff])
 
-    def test_version_not_sorted_raises_an_error(self):
+    def test_unsorted_versions_raises_an_exception(self):
         exp_v1, exp_v3, exp_v2 = (
             self.new_exp_domain_obj(version=v) for v in (1, 3, 2))
         nodiff = exp_domain.ExplorationVersionsDiff([])
