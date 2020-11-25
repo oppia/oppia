@@ -48,6 +48,7 @@ describe('TranslationTabActiveContentIdService', () => {
   });
 
   it('should correctly set and get active content id', function() {
+    expect(contentIdService.getActiveContentId()).toBeNull();
     contentIdService.setActiveContent('content', 'html');
     expect(contentIdService.getActiveContentId()).toBe('content');
   });

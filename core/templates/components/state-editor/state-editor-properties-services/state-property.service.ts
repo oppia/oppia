@@ -53,8 +53,10 @@ export class StatePropertyService<StatePropertyType> {
     private utilsService: UtilsService) {
     this.setterMethodKey = null;
   }
-  // eslint-disable-next-line consistent-return
-  get displayed() { return this._displayed; }
+
+  get displayed() {
+    return this._displayed;
+  }
 
   set displayed(theDisplayed: StatePropertyType) {
     this._displayed = theDisplayed;

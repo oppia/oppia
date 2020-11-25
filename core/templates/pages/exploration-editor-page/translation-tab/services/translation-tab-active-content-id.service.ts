@@ -29,34 +29,46 @@ import { StateRecordedVoiceoversService } from
   providedIn: 'root'
 })
 export class TranslationTabActiveContentIdService {
-  private activeContentId: string = null;
-  private activeDataFormat: string = null;
+  private _activeContentId: string = null;
+  private _activeDataFormat: string = null;
   private _activeContentIdChangedEventEmitter = new EventEmitter();
 
   constructor(
-    private stateVoiceService: StateRecordedVoiceoversService) {}
+    private stateRecordedVoiceoversService: StateRecordedVoiceoversService) {}
 
-  getActiveContentId(): string {
-    return this.activeContentId;
+  get activeContentId() {
+    return this._activeContentId;
   }
 
-  getActiveDataFormat(): string {
-    return this.activeDataFormat;
+  set activeContentId(theActiveContentId: string) {
+    this._activeContentId = theActiveContentId;
+  }
+
+  get activeDataFormat() {
+    return this._activeDataFormat;
+  }
+
+  set activeDataFormat(theActiveDataFormat: string) {
+    this._activeDataFormat = theActiveDataFormat;
   }
 
   setActiveContent(contentId: string, dataFormat: string): void {
     let allContentIds: string[];
-    allContentIds = this.stateVoiceService.displayed.getAllContentId();
+    allContentIds =
+      this.stateRecordedVoiceoversService.displayed.getAllContentId();
     if (allContentIds.indexOf(contentId) === -1) {
       throw new Error('Invalid active content id: ' + contentId);
     }
-    this.activeContentId = contentId;
-    this.activeDataFormat = dataFormat;
+    this._activeContentId = contentId;
+    this._activeDataFormat = dataFormat;
     this._activeContentIdChangedEventEmitter.emit(dataFormat);
   }
- // eslint-disable-next-line consistent-return
-  get onActiveContentIdChanged() { return this._activeContentIdChangedEventEmitter; }
+
+  get onActiveContentIdChanged() {
+    return this._activeContentIdChangedEventEmitter;
+  }
 }
+
 angular.module('oppia').factory(
   'TranslationTabActiveContentIdService',
   downgradeInjectable(TranslationTabActiveContentIdService));
