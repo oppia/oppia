@@ -33,6 +33,9 @@ from scripts import common
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
+import requests
+
+MAX_RETRY_COUNT = 3
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
@@ -151,6 +154,53 @@ _PARSER.add_argument(
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
+
+
+def print_color_message(message):
+    """Prints the given message in red color.
+
+    Args:
+        message: str. The success message to print.
+    """
+    # \033[91m is the ANSI escape sequences for green color.
+    python_utils.PRINT('\033[92m' + message + '\033[0m\n')
+
+
+def is_test_output_flaky(output_lines, suite_name):
+    """Returns whether the test output matches any flaky test log."""
+    url = os.getenv('FLAKE_REPORT_URL')
+    if url is None:
+        print_color_message('No URL found to check flakiness.')
+        return False
+
+    data = {
+        'suite': suite_name,
+        'output_lines': output_lines,
+        'username': 'DubeySandeep',
+        'build_url': 'https://'
+    }
+    response = None
+    try:
+        response = requests.post(url, json=data, allow_redirects=False)
+    except Exception as e:
+        print_color_message('Failed to fetch report from %s: %s' % (url, e))
+
+    if not response.ok:
+        print_color_message('Failed request with response code: %s' % (
+            response.status_code))
+        return False
+
+    report = {}
+    try:
+        report = response.json()
+        print_color_message(report['log'])
+    except Exception as e:
+        print_color_message('Unable to convert json response: %s' % e)
+
+    if 'logs' in report:
+        print_color_message('\n'.join(report['logs']))
+
+    return report['result'] if 'result' in report else False
 
 
 def ensure_screenshots_dir_is_removed():
@@ -518,50 +568,86 @@ def cleanup_portserver(portserver_process):
         portserver_process.kill()
 
 
-def main(args=None):
+def run_tests(args):
     """Run the scripts to start end-to-end tests."""
-
-    parsed_args = _PARSER.parse_args(args=args)
     oppia_instance_is_already_running = is_oppia_server_already_running()
 
     if oppia_instance_is_already_running:
         sys.exit(1)
-    setup_and_install_dependencies(parsed_args.skip_install)
+    setup_and_install_dependencies(args.skip_install)
 
     common.start_redis_server()
     atexit.register(cleanup)
 
-    dev_mode = not parsed_args.prod_env
+    dev_mode = not args.prod_env
 
-    if parsed_args.skip_build:
-        build.modify_constants(prod_env=parsed_args.prod_env)
+    if args.skip_build:
+        build.modify_constants(prod_env=args.prod_env)
     else:
         build_js_files(
-            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser,
-            source_maps=parsed_args.source_maps)
-    version = parsed_args.chrome_driver_version or get_chrome_driver_version()
+            dev_mode, deparallelize_terser=args.deparallelize_terser,
+            source_maps=args.source_maps)
+    version = args.chrome_driver_version or get_chrome_driver_version()
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
     portserver_process = start_portserver()
     atexit.register(cleanup_portserver, portserver_process)
-    start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
+    start_google_app_engine_server(dev_mode, args.server_log_level)
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH]
-    if parsed_args.debug_mode:
+    if args.debug_mode:
         commands.append('--inspect-brk')
     # This flag ensures tests fail if waitFor calls time out.
     commands.append('--unhandled-rejections=strict')
     commands.append(PROTRACTOR_BIN_PATH)
     commands.extend(get_e2e_test_parameters(
-        parsed_args.sharding_instances, parsed_args.suite, dev_mode))
+        args.sharding_instances, args.suite, dev_mode))
 
-    p = subprocess.Popen(commands)
-    p.communicate()
-    sys.exit(p.returncode)
+    p = subprocess.Popen(commands, stdout=subprocess.PIPE)
+    output_lines = []
+    while True:
+        nextline = p.stdout.readline()
+        if len(nextline) == 0 and p.poll() is not None:
+            break
+        sys.stdout.write(nextline)
+        sys.stdout.flush()
+        try:
+            output_lines.append(python_utils.UNICODE(nextline.strip()))
+        except UnicodeDecodeError:
+            pass
+
+    try:
+        cleanup_portserver(portserver_process)
+        cleanup()
+    except Exception: # pragma: no cover
+        # This is marked as no cover because the
+        # exception happens due to some processes
+        # running on the local system, which might
+        # interfere with the cleanup stuff. This is
+        # added as a failsafe to make sure that
+        # even when it throws an exception, the
+        # test is retried.
+        pass # pragma: no cover
+    return output_lines, p.returncode
+
+
+def main(args=None):
+    """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
+    args = _PARSER.parse_args(args=args)
+    return_code = 1
+
+    for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
+        print_color_message('***Attempt %s.***' % (attempt_num + 1))
+        output, return_code = run_tests(args)
+        if return_code == 0 or not is_test_output_flaky(
+                output, args.suite):
+            break
+
+    sys.exit(return_code)
 
 
 if __name__ == '__main__':  # pragma: no cover
