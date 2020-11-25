@@ -191,10 +191,10 @@ angular.module('oppia').factory('SkillEditorStateService', [
             _updateSkill(skill);
             UndoRedoService.clearChanges();
             _skillIsBeingSaved = false;
-            $rootScope.$apply();
             if (successCallback) {
               successCallback();
             }
+            $rootScope.$apply();
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the skill');
