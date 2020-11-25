@@ -751,7 +751,7 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
         state_b_span = history.get_state_span(1, 'B')
 
         self.assertEqual(state_b_span.get_multi_version_names(1, 2), ['B'])
-        self.assertFalse(history.has_state_span(2, 'B'))
+        self.assertFalse(history.has_state(2, 'B'))
 
     def test_empty_inputs_raises_an_error(self):
         with self.assertRaisesRegexp(Exception, 'Inputs must be non-empty'):

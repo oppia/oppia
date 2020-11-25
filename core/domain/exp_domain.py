@@ -475,14 +475,21 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
 
 
 class StateVersionSpan(python_utils.OBJECT):
-    """A consecutive span of versions in which a state remains "equivalent".
+    """A consecutive span of versions in which a state is "equivalent".
 
-    Equivalence between spans are defined using a user-defined predicate, passed
-    in to the constructor. By default, all states are equivalent to each other.
+    Equivalence between state versions are defined by the user-defined predicate
+    passed in to the constructor. By default, all versions of a states are
+    equivalent.
 
-    Spans must be extended in increasing version-order. It is an error to extend
-    a span with a version older than what it already contains; exceptions are
-    raised to enforce this contract.
+    Equivalence has a prerequisite: the names of the state must match across all
+    versions. If the state's name changed in between versions, then an
+    ExplorationVersionsDiff must be used to satisfy the prerequisite.
+    See extend_or_split() for details.
+
+    Spans must be extended in increasing and consecutive version-order. It is an
+    error to extend a span with a version older than what it already contains,
+    or newer than the most recent version + 1. Exceptions are raised to enforce
+    this.
     """
 
     def __init__(
@@ -498,8 +505,9 @@ class StateVersionSpan(python_utils.OBJECT):
             state_equality_predicate:
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
-                to enforce invariant: all states in a span are equivalent.
-                If None, then states will always be equivalent to each other.
+                to enforce the following invariant: all states in a span are
+                equivalent. If None, then states will always be equivalent to
+                each other.
         """
         self._version_start, self._version_end = exp_version, exp_version + 1
         self._version_snapshots = (
@@ -531,13 +539,13 @@ class StateVersionSpan(python_utils.OBJECT):
         return len(self._version_snapshots)
 
     def iternames(self):
-        """Yields all (version, state name) pairs that this span holds."""
-        for version, (name, _) in self:
+        """Yields all (version, state_name) pairs that this span holds."""
+        for version, (name, _) in self._version_snapshots.items():
             yield (version, name)
 
     def iterstates(self):
         """Yields all (version, state) pairs that this span holds."""
-        for version, (_, state) in self:
+        for version, (_, state) in self._version_snapshots.items():
             yield (version, state)
 
     def get_version(self, version):
@@ -549,7 +557,7 @@ class StateVersionSpan(python_utils.OBJECT):
         Returns:
             state_domain.State. The state as it appeared in the given version.
         """
-        _, state = self[version]
+        _, state = self._version_snapshots[version]
         return state
 
     def get_version_name(self, version):
@@ -561,7 +569,7 @@ class StateVersionSpan(python_utils.OBJECT):
         Returns:
             str. The name of the state at the given exploration version.
         """
-        name, _ = self[version]
+        name, _ = self._version_snapshots[version]
         return name
 
     def get_multi_versions(self, version_start, version_end):
@@ -618,7 +626,8 @@ class StateVersionSpan(python_utils.OBJECT):
 
         Raises:
             Exception. When any of the following occurs:
-                The state is different.
+                The name of this span's state does not map to the new given name
+                    (determined via exp_version_diff.new_to_old_state_names).
                 The given version has already been recorded.
                 The given version is being added out-of-sequence.
         """
@@ -631,7 +640,8 @@ class StateVersionSpan(python_utils.OBJECT):
             exp_version - 1,
             exp_version_diff.new_to_old_state_names.get(state_name, state_name))
 
-        prev_snapshot_state_name, prev_snapshot_state = self[prev_exp_version]
+        prev_snapshot_state_name, prev_snapshot_state = (
+            self._version_snapshots[prev_exp_version])
 
         if prev_state_name != prev_snapshot_state_name:
             raise Exception(
@@ -670,7 +680,10 @@ class StateVersionSpan(python_utils.OBJECT):
             version_end <= self._version_end)
         if not range_is_valid:
             raise ValueError('Requested version range is out-of-bounds')
-        return [self[v] for v in python_utils.RANGE(version_start, version_end)]
+        return [
+            self._version_snapshots[v]
+            for v in python_utils.RANGE(version_start, version_end)
+        ]
 
     @staticmethod
     def _default_state_equality_predicate(unused_state1, unused_state2):
@@ -692,8 +705,9 @@ class ExplorationStatesHistory(python_utils.OBJECT):
             state_equality_predicate:
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
-                to enforce invariant: all states in a span are equivalent.
-                If None, then states will always be equivalent to each other.
+                to enforce the following invariant: all states in a span are
+                equivalent. If None, then states will always be equivalent to
+                each other.
         """
         if not exps or not exp_version_diffs:
             raise ValueError('Inputs must be non-empty')
@@ -701,13 +715,14 @@ class ExplorationStatesHistory(python_utils.OBJECT):
         if len(exps) != len(exp_version_diffs):
             raise ValueError('len of inputs do not match')
 
-        exp_versions = [exp.version for exp in exps]
+        actual_versions = [exp.version for exp in exps]
         expected_versions = list(python_utils.RANGE(1, len(exps) + 1))
-        if exp_versions != expected_versions:
+        if actual_versions != expected_versions:
             raise ValueError(
                 'Explorations must be sorted, begin from version 1, and have '
                 'no gaps; but got invalid input versions == [%s]' % (
-                    ', '.join(python_utils.UNICODE(v) for v in exp_versions)))
+                    ', '.join(
+                        python_utils.UNICODE(v) for v in actual_versions)))
 
         self._state_spans_history = []
         for exp, diff in python_utils.ZIP(exps, exp_version_diffs):
@@ -727,7 +742,8 @@ class ExplorationStatesHistory(python_utils.OBJECT):
             self._state_spans_history.append(new_state_spans)
 
     def get_state_span(self, exp_version, state_name):
-        """Returns the span of versions where the given state existed.
+        """Returns the span of versioned states where the given state existed
+        which includes the given version.
 
         Args:
             exp_version: int. Exploration version to query.
@@ -740,7 +756,7 @@ class ExplorationStatesHistory(python_utils.OBJECT):
         """
         return self._state_spans_history[exp_version - 1].get(state_name, None)
 
-    def has_state_span(self, exp_version, state_name):
+    def has_state(self, exp_version, state_name):
         """Returns whether the given version had a state with the given name.
 
         Args:
