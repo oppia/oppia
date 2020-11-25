@@ -641,7 +641,7 @@ def run_tests(args=None):
             break
         sys.stdout.write(nextline)
         sys.stdout.flush()
-        output_lines.append(nextline.strip())
+        output_lines.append(nextline.rstrip())
 
     flaky_tests_list = []
     google_auth_decode_password = os.getenv('GOOGLE_AUTH_DECODE_PASSWORD')
@@ -663,40 +663,64 @@ def run_tests(args=None):
 
     suite_name = parsed_args.suite.lower()
     if len(flaky_tests_list) > 0 and p.returncode != 0:
+        failure_heading_index = -1
         for i, line in enumerate(output_lines):
-            if line == '*                    Failures                    *':
-                test_name = output_lines[i + 3][3:].strip().lower()
+            if line == u'*                    Failures                    *':
+                failure_heading_index = i
+                break
+        if failure_heading_index < 0:
+            python_utils.PRINT(
+                'No failure heading found')
+            return
+        python_utils.PRINT(
+            'Found failure heading at line {}'.format(
+                failure_heading_index))
+        log_start = failure_heading_index + 4
+        log_end = -1
+        for i, line in enumerate(output_lines[log_start:]):
+            if not line.startswith(u'  '):
+                log_end = log_start + i
+        if log_end < 0:
+            python_utils.PRINT('No end of first failure log found')
+            return
+        python_utils.PRINT(
+            'Found end of first failure at line {}'.format(
+                log_end))
+        test_name = output_lines[failure_heading_index + 3][3:]
+        test_name = test_name.strip().lower()
 
-                # Remove coloring characters.
-                ansi_escape = re.compile(
-                    r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-                failure_log = ansi_escape.sub('', output_lines[i + 4])
-                failure_log = failure_log.strip().lower()
-                for index, row in enumerate(flaky_tests_list):
-                    flaky_suite_name = row[0].strip().lower()
-                    flaky_test_message = row[1].strip().lower()
-                    flaky_error_message = row[2].strip().lower()
-                    if (
-                            suite_name == flaky_suite_name or
-                            flaky_suite_name == '[general]'):
-                        if (
-                                test_name == flaky_test_message or
-                                flaky_test_message == 'many'):
-                            if flaky_error_message in failure_log:
-                                update_flaky_tests_count(sheet, index, row[3])
-                                try:
-                                    cleanup_portserver(portserver_process)
-                                    cleanup()
-                                except Exception: # pragma: no cover
-                                    # This is marked as no cover because the
-                                    # exception happens due to some processes
-                                    # running on the local system, which might
-                                    # interfere with the cleanup stuff. This is
-                                    # added as a failsafe to make sure that
-                                    # even when it throws an exception, the
-                                    # test is retried.
-                                    pass # pragma: no cover
-                                return 'flake'
+        failure_log_lines = output_lines[log_start:log_end + 1]
+        failure_log = '\n'.join(failure_log_lines)
+        # Remove coloring characters.
+        ansi_escape = re.compile(
+            r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        failure_log = ansi_escape.sub('', failure_log)
+        failure_log = failure_log.strip().lower()
+        for index, row in enumerate(flaky_tests_list):
+            flaky_suite_name = row[0].strip().lower()
+            flaky_test_message = row[1].strip().lower()
+            flaky_error_message = row[2].strip().lower()
+            if (
+                    suite_name == flaky_suite_name or
+                    flaky_suite_name == '[general]'):
+                if (
+                        test_name == flaky_test_message or
+                        flaky_test_message == 'many'):
+                    if flaky_error_message in failure_log:
+                        update_flaky_tests_count(sheet, index, row[3])
+                        try:
+                            cleanup_portserver(portserver_process)
+                            cleanup()
+                        except Exception: # pragma: no cover
+                            # This is marked as no cover because the
+                            # exception happens due to some processes
+                            # running on the local system, which might
+                            # interfere with the cleanup stuff. This is
+                            # added as a failsafe to make sure that
+                            # even when it throws an exception, the
+                            # test is retried.
+                            pass # pragma: no cover
+                        return 'flake'
     sys.exit(p.returncode)
 
 

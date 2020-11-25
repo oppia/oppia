@@ -1106,7 +1106,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             result.returncode = 1 # pylint: disable=attribute-defined-outside-init
             output = (
                 '*                    Failures                    *\n\n'
-                '\n 1. test1 \n1. error1 failed')
+                '\n1) test1\n  unrelated message\n  error1 failed\n2) ')
             result.stdout = python_utils.string_io(
                 buffer_value=output)
             return result
@@ -1215,6 +1215,324 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                                 with decrypt_swap, os_getenv_swap:
                                     with from_service_account_file_swap, discovery_build_swap, get_flaky_tests_data_from_sheets_swap, update_flaky_tests_count_swap:  # pylint: disable=line-too-long
                                         run_e2e_tests.main(args=[])
+                                        assert mock_simplecrypt.decrypt_called
+
+    def test_start_tests_and_does_not_log_if_no_failure_header(self):
+
+        mock_process = MockProcessClass()
+
+        def mock_is_oppia_server_already_running(*unused_args):
+            return False
+
+        def mock_setup_and_install_dependencies(unused_arg):
+            return
+
+        def mock_register(unused_func, unused_arg=None):
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
+            return
+
+        def mock_start_webdriver_manager(unused_arg):
+            return
+
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
+            return
+
+        def mock_wait_for_port_to_be_open(unused_port):
+            return
+
+        def mock_ensure_screenshots_dir_is_removed():
+            return
+
+        def mock_get_e2e_test_parameters(
+                unused_sharding_instances, unused_suite, unused_dev_mode):
+            return ['commands']
+
+        def mock_popen(commands, stdout=None): # pylint: disable=unused-argument
+            def mock_communicate():
+                return
+            result = mock_process
+            result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
+            result.returncode = 1 # pylint: disable=attribute-defined-outside-init
+            if run_e2e_tests.PROTRACTOR_BIN_PATH in commands:
+                output = (
+                    'Not a failure header\n\n'
+                    '\n1) test1\n  unrelated message\n'
+                    '  error1 failed\n2) \n')
+            else:
+                output = ''
+            result.stdout = python_utils.string_io(
+                buffer_value=output)
+            return result
+
+        mock_google_auth_password = '12345'
+
+        def mock_os_getenv(env_var):
+            if env_var == 'GOOGLE_AUTH_DECODE_PASSWORD':
+                return mock_google_auth_password
+            return None
+
+        def mock_exit(unused_code):
+            return
+
+        def mock_from_service_account_file(cls, unused_file_name, scopes): # pylint: disable=unused-argument
+            return
+
+        class MockResource(python_utils.OBJECT):
+            """Mock object with a spreadsheets() method, for testing."""
+
+            def spreadsheets(self):
+                """Placeholder function for testing."""
+                return
+
+        def mock_discovery_build(
+                unused_api_name, unused_version, credentials): # pylint: disable=unused-argument
+            return MockResource()
+
+        def mock_get_chrome_driver_version():
+            return CHROME_DRIVER_VERSION
+
+        def mock_get_flaky_tests_data_from_sheets(unused_sheet):
+            mock_data = [
+                ('[general]', 'many', 'error1', 5),
+                ('suite2', 'test2', 'error2', 0),
+                ('suite1', 'test1', 'error2', 0),
+            ]
+            return mock_data
+
+        def mock_update_flaky_tests_count(
+                unused_sheet, unused_index, unused_value):
+            raise AssertionError('update_flaky_tests_count called')
+
+        from_service_account_file_swap = self.swap(
+            service_account.Credentials, 'from_service_account_file',
+            types.MethodType(
+                mock_from_service_account_file, service_account.Credentials))
+        discovery_build_swap = self.swap(
+            googleapiclient.discovery, 'build', mock_discovery_build)
+        get_flaky_tests_data_from_sheets_swap = self.swap(
+            run_e2e_tests, 'get_flaky_tests_data_from_sheets',
+            mock_get_flaky_tests_data_from_sheets)
+        update_flaky_tests_count_swap = self.swap(
+            run_e2e_tests, 'update_flaky_tests_count',
+            mock_update_flaky_tests_count)
+
+        get_chrome_driver_version_swap = self.swap(
+            run_e2e_tests, 'get_chrome_driver_version',
+            mock_get_chrome_driver_version)
+
+        check_swap = self.swap(
+            run_e2e_tests, 'is_oppia_server_already_running',
+            mock_is_oppia_server_already_running)
+
+        setup_and_install_swap = self.swap(
+            run_e2e_tests, 'setup_and_install_dependencies',
+            mock_setup_and_install_dependencies)
+
+        register_swap = self.swap(atexit, 'register', mock_register)
+        os_getenv_swap = self.swap(os, 'getenv', mock_os_getenv)
+
+        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
+        build_swap = self.swap(
+            run_e2e_tests, 'build_js_files', mock_build_js_files)
+        start_webdriver_swap = self.swap(
+            run_e2e_tests, 'start_webdriver_manager',
+            mock_start_webdriver_manager)
+        start_google_app_engine_server_swap = self.swap(
+            run_e2e_tests, 'start_google_app_engine_server',
+            mock_start_google_app_engine_server)
+        wait_swap = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        ensure_screenshots_dir_is_removed_swap = self.swap(
+            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
+            mock_ensure_screenshots_dir_is_removed)
+        get_parameters_swap = self.swap(
+            run_e2e_tests, 'get_e2e_test_parameters',
+            mock_get_e2e_test_parameters)
+        popen_swap = self.swap(
+            subprocess, 'Popen', mock_popen)
+        exit_swap = self.swap(sys, 'exit', mock_exit)
+
+        mock_simplecrypt = MockSimpleCrypt(
+            password=mock_google_auth_password)
+        decrypt_swap = self.swap(
+            simplecrypt, 'decrypt', mock_simplecrypt.decrypt)
+
+        with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
+            with build_swap, start_webdriver_swap:
+                with start_google_app_engine_server_swap:
+                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                        with get_parameters_swap, popen_swap, exit_swap:
+                            with get_chrome_driver_version_swap:
+                                with decrypt_swap, os_getenv_swap:
+                                    with from_service_account_file_swap, discovery_build_swap, get_flaky_tests_data_from_sheets_swap, update_flaky_tests_count_swap:  # pylint: disable=line-too-long
+                                        returned = (
+                                            run_e2e_tests.run_tests(
+                                                args=[]))
+                                        assert returned is None
+                                        assert mock_simplecrypt.decrypt_called
+
+    def test_start_tests_and_does_not_log_if_no_ending_line(self):
+
+        mock_process = MockProcessClass()
+
+        def mock_is_oppia_server_already_running(*unused_args):
+            return False
+
+        def mock_setup_and_install_dependencies(unused_arg):
+            return
+
+        def mock_register(unused_func, unused_arg=None):
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
+            return
+
+        def mock_start_webdriver_manager(unused_arg):
+            return
+
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
+            return
+
+        def mock_wait_for_port_to_be_open(unused_port):
+            return
+
+        def mock_ensure_screenshots_dir_is_removed():
+            return
+
+        def mock_get_e2e_test_parameters(
+                unused_sharding_instances, unused_suite, unused_dev_mode):
+            return ['commands']
+
+        def mock_popen(commands, stdout=None): # pylint: disable=unused-argument
+            def mock_communicate():
+                return
+            result = mock_process
+            result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
+            result.returncode = 1 # pylint: disable=attribute-defined-outside-init
+            output = (
+                '*                    Failures                    *\n\n'
+                '\n1) test1\n  unrelated message\n  error1 failed\n')
+            result.stdout = python_utils.string_io(
+                buffer_value=output)
+            return result
+
+        mock_google_auth_password = '12345'
+
+        def mock_os_getenv(env_var):
+            if env_var == 'GOOGLE_AUTH_DECODE_PASSWORD':
+                return mock_google_auth_password
+            return None
+
+        def mock_exit(unused_code):
+            return
+
+        def mock_from_service_account_file(cls, unused_file_name, scopes): # pylint: disable=unused-argument
+            return
+
+        class MockResource(python_utils.OBJECT):
+            """Mock object with a spreadsheets() method, for testing."""
+
+            def spreadsheets(self):
+                """Placeholder function for testing."""
+                return
+
+        def mock_discovery_build(
+                unused_api_name, unused_version, credentials): # pylint: disable=unused-argument
+            return MockResource()
+
+        def mock_get_chrome_driver_version():
+            return CHROME_DRIVER_VERSION
+
+        def mock_get_flaky_tests_data_from_sheets(unused_sheet):
+            mock_data = [
+                ('[general]', 'many', 'error1', 5),
+                ('suite2', 'test2', 'error2', 0),
+                ('suite1', 'test1', 'error2', 0),
+            ]
+            return mock_data
+
+        def mock_update_flaky_tests_count(
+                unused_sheet, unused_index, unused_value):
+            raise AssertionError('update_flaky_tests called')
+
+        from_service_account_file_swap = self.swap(
+            service_account.Credentials, 'from_service_account_file',
+            types.MethodType(
+                mock_from_service_account_file, service_account.Credentials))
+        discovery_build_swap = self.swap(
+            googleapiclient.discovery, 'build', mock_discovery_build)
+        get_flaky_tests_data_from_sheets_swap = self.swap(
+            run_e2e_tests, 'get_flaky_tests_data_from_sheets',
+            mock_get_flaky_tests_data_from_sheets)
+        update_flaky_tests_count_swap = self.swap(
+            run_e2e_tests, 'update_flaky_tests_count',
+            mock_update_flaky_tests_count)
+
+        get_chrome_driver_version_swap = self.swap(
+            run_e2e_tests, 'get_chrome_driver_version',
+            mock_get_chrome_driver_version)
+
+        check_swap = self.swap(
+            run_e2e_tests, 'is_oppia_server_already_running',
+            mock_is_oppia_server_already_running)
+
+        setup_and_install_swap = self.swap(
+            run_e2e_tests, 'setup_and_install_dependencies',
+            mock_setup_and_install_dependencies)
+
+        register_swap = self.swap(atexit, 'register', mock_register)
+        os_getenv_swap = self.swap(os, 'getenv', mock_os_getenv)
+
+        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
+        build_swap = self.swap(
+            run_e2e_tests, 'build_js_files', mock_build_js_files)
+        start_webdriver_swap = self.swap(
+            run_e2e_tests, 'start_webdriver_manager',
+            mock_start_webdriver_manager)
+        start_google_app_engine_server_swap = self.swap(
+            run_e2e_tests, 'start_google_app_engine_server',
+            mock_start_google_app_engine_server)
+        wait_swap = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        ensure_screenshots_dir_is_removed_swap = self.swap(
+            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
+            mock_ensure_screenshots_dir_is_removed)
+        get_parameters_swap = self.swap(
+            run_e2e_tests, 'get_e2e_test_parameters',
+            mock_get_e2e_test_parameters)
+        popen_swap = self.swap(
+            subprocess, 'Popen', mock_popen)
+        exit_swap = self.swap(sys, 'exit', mock_exit)
+
+        mock_simplecrypt = MockSimpleCrypt(
+            password=mock_google_auth_password)
+        decrypt_swap = self.swap(
+            simplecrypt, 'decrypt', mock_simplecrypt.decrypt)
+
+        with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
+            with build_swap, start_webdriver_swap:
+                with start_google_app_engine_server_swap:
+                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                        with get_parameters_swap, popen_swap, exit_swap:
+                            with get_chrome_driver_version_swap:
+                                with decrypt_swap, os_getenv_swap:
+                                    with from_service_account_file_swap, discovery_build_swap, get_flaky_tests_data_from_sheets_swap, update_flaky_tests_count_swap:  # pylint: disable=line-too-long
+                                        returned = (
+                                            run_e2e_tests.run_tests(
+                                                args=[]))
+                                        assert returned is None
                                         assert mock_simplecrypt.decrypt_called
 
     def test_start_tests_when_no_other_instance_running(self):
