@@ -2288,8 +2288,23 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
                 ['exp_id0-1']
             ]
         ]
+        expected_commit_model = exp_models.ExplorationCommitLogEntryModel(
+            exploration_id=self.EXP_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            commit_message=None,
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            post_commit_status='public',
+            post_commit_is_private=False,
+            version=1
+        )
 
         self.assertIsNotNone(commit_model)
+        self.assertEqual(
+            commit_model.to_dict(exclude=['created_on', 'last_updated']),
+            expected_commit_model.to_dict(
+                exclude=['created_on', 'last_updated'])
+        )
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_exp_rights_with_commit_type_create(self):
@@ -2359,8 +2374,23 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
                 ['question_id0-1']
             ]
         ]
+        expected_commit_model = question_models.QuestionCommitLogEntryModel(
+            question_id=self.QUESTION_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            commit_message=None,
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            post_commit_status='public',
+            post_commit_is_private=False,
+            version=1
+        )
 
         self.assertIsNotNone(commit_model)
+        self.assertEqual(
+            commit_model.to_dict(exclude=['created_on', 'last_updated']),
+            expected_commit_model.to_dict(
+                exclude=['created_on', 'last_updated'])
+        )
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_add_missing_skill_commit_logs(self):
@@ -2397,8 +2427,23 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
                 ['skill_id0-1']
             ]
         ]
+        expected_commit_model = skill_models.SkillCommitLogEntryModel(
+            skill_id=self.SKILL_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            commit_message=None,
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            post_commit_status='public',
+            post_commit_is_private=False,
+            version=1
+        )
 
         self.assertIsNotNone(commit_model)
+        self.assertEqual(
+            commit_model.to_dict(exclude=['created_on', 'last_updated']),
+            expected_commit_model.to_dict(
+                exclude=['created_on', 'last_updated'])
+        )
         self.assertItemsEqual(expected_output, actual_output)
 
     def test_add_missing_skill_parent_model(self):

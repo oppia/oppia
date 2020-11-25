@@ -724,7 +724,7 @@ class AddMissingCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         commit_log_model = model_properties['commit_log_model_class'](
-            id=commit_log_id,
+            id=python_utils.UNICODE(commit_log_id),
             user_id=snapshot_model.committer_id,
             commit_type=snapshot_model.commit_type,
             commit_message=snapshot_model.commit_message,
