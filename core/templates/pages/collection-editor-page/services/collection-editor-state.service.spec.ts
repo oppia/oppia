@@ -20,14 +20,13 @@
 // collection-editor-state.service.ts is upgraded to Angular 8.
 import { Collection } from
   'domain/collection/collection.model';
-import { CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory';
+import { CollectionRights } from
+  'domain/collection/collection-rights.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
-require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/collection-update.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
@@ -36,7 +35,6 @@ import { Subscription } from 'rxjs';
 
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
-  var collectionRightsObjectFactory = null;
   var CollectionUpdateService = null;
   var fakeEditableCollectionBackendApiService = null;
   var fakeCollectionRightsBackendApiService = null;
@@ -53,8 +51,8 @@ describe('Collection editor state service', function() {
     var self = {
       newBackendCollectionObject: null,
       failure: null,
-      fetchCollection: null,
-      updateCollection: null
+      fetchCollectionAsync: null,
+      updateCollectionAsync: null
     };
 
     var _fetchOrUpdateCollection = function() {
@@ -70,8 +68,8 @@ describe('Collection editor state service', function() {
 
     self.newBackendCollectionObject = {};
     self.failure = null;
-    self.fetchCollection = _fetchOrUpdateCollection;
-    self.updateCollection = _fetchOrUpdateCollection;
+    self.fetchCollectionAsync = _fetchOrUpdateCollection;
+    self.updateCollectionAsync = _fetchOrUpdateCollection;
 
     return self;
   };
@@ -80,14 +78,14 @@ describe('Collection editor state service', function() {
     var self = {
       backendCollectionRightsObject: null,
       failure: null,
-      fetchCollectionRights: null,
+      fetchCollectionRightsAsync: null,
     };
 
     var _fetchCollectionRights = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
           resolve(
-            collectionRightsObjectFactory.create(
+            CollectionRights.create(
               self.backendCollectionRightsObject
             ));
         } else {
@@ -98,16 +96,12 @@ describe('Collection editor state service', function() {
 
     self.backendCollectionRightsObject = {};
     self.failure = null;
-    self.fetchCollectionRights = _fetchCollectionRights;
+    self.fetchCollectionRightsAsync = _fetchCollectionRights;
 
     return self;
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'CollectionRightsObjectFactory', new CollectionRightsObjectFactory());
-  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -133,8 +127,6 @@ describe('Collection editor state service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     CollectionEditorStateService = $injector.get(
       'CollectionEditorStateService');
-    collectionRightsObjectFactory = $injector.get(
-      'CollectionRightsObjectFactory');
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -209,20 +201,20 @@ describe('Collection editor state service', function() {
   it('should request to load the collection from the backend', function() {
     spyOn(
       fakeEditableCollectionBackendApiService,
-      'fetchCollection').and.callThrough();
+      'fetchCollectionAsync').and.callThrough();
 
     CollectionEditorStateService.loadCollection(5);
-    expect(fakeEditableCollectionBackendApiService.fetchCollection)
+    expect(fakeEditableCollectionBackendApiService.fetchCollectionAsync)
       .toHaveBeenCalled();
   });
 
   it('should request to load the collection rights from the backend',
     function() {
-      spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRights')
+      spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRightsAsync')
         .and.callThrough();
 
       CollectionEditorStateService.loadCollection(5);
-      expect(fakeCollectionRightsBackendApiService.fetchCollectionRights)
+      expect(fakeCollectionRightsBackendApiService.fetchCollectionRightsAsync)
         .toHaveBeenCalled();
     }
   );
@@ -335,7 +327,7 @@ describe('Collection editor state service', function() {
     function() {
       var previousCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
-      var expectedCollectionRights = collectionRightsObjectFactory.create(
+      var expectedCollectionRights = CollectionRights.create(
         fakeCollectionRightsBackendApiService.backendCollectionRightsObject);
       expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
@@ -378,7 +370,7 @@ describe('Collection editor state service', function() {
     function() {
       var previousCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
-      var expectedCollectionRights = collectionRightsObjectFactory.create(
+      var expectedCollectionRights = CollectionRights.create(
         unpublishablePublicCollectionRightsObject);
       expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
@@ -432,7 +424,7 @@ describe('Collection editor state service', function() {
   it('should be able to save the collection and pending changes', function() {
     spyOn(
       fakeEditableCollectionBackendApiService,
-      'updateCollection').and.callThrough();
+      'updateCollectionAsync').and.callThrough();
 
     CollectionEditorStateService.loadCollection(0);
     CollectionUpdateService.setCollectionTitle(
@@ -447,7 +439,7 @@ describe('Collection editor state service', function() {
     var expectedVersion = '1';
     var expectedCommitMessage = 'Commit message';
     var updateCollectionSpy = (
-      fakeEditableCollectionBackendApiService.updateCollection);
+      fakeEditableCollectionBackendApiService.updateCollectionAsync);
     expect(updateCollectionSpy).toHaveBeenCalledWith(
       expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
   });

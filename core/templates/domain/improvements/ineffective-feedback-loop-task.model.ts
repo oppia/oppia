@@ -17,7 +17,7 @@
  *    task.
  */
 
-import { TaskEntryBackendDict, TaskEntry } from 'domain/improvements/TaskEntryObjectFactory';
+import { TaskEntryBackendDict, TaskEntry } from 'domain/improvements/task-entry.model';
 import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
 
 export class IneffectiveFeedbackLoopTask extends TaskEntry<

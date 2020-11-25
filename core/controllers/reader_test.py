@@ -188,7 +188,6 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
     """
 
     def test_creation_of_state_classifier_mapping(self):
-        super(ExplorationStateClassifierMappingTests, self).setUp()
         exploration_id = '15'
 
         self.login(self.VIEWER_EMAIL)
@@ -259,7 +258,6 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             self.skill_id, 'user', description='Description')
 
     def test_get_exploration_pretests(self):
-        super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
@@ -1626,6 +1624,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1694,6 +1693,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
+        model.update_timestamps()
         model.put()
 
         self.playthrough_data = {
@@ -1736,6 +1736,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model.unresolved_issues[0]['playthrough_ids'] = [
             'id1', 'id2', 'id3', 'id4', 'id5'
         ]
+        model.update_timestamps()
         model.put()
 
         self.post_json('/explorehandler/store_playthrough/%s' % (self.exp_id), {

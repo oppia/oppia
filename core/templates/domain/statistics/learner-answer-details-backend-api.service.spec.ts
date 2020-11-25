@@ -26,6 +26,7 @@ describe('Learner answer info backend Api service', () => {
   let httpTestingController: HttpTestingController;
   let learnerAnswerDetailsBackendApiService:
     LearnerAnswerDetailsBackendApiService;
+  let ERROR_STATUS_CODE = 500;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,7 +46,7 @@ describe('Learner answer info backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetails(
+      learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
         'exp123', 'Introduction', 'TextInput', 'sample answer',
         'sample answer details').then(
         successHandler, failHandler);
@@ -59,4 +60,29 @@ describe('Learner answer info backend Api service', () => {
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
     }));
+
+  it('should use rejection handler if learner answer backend request failed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      learnerAnswerDetailsBackendApiService.recordLearnerAnswerDetailsAsync(
+        'exp123', 'Introduction', 'TextInput', 'sample answer',
+        'sample answer details').then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/learneranswerdetailshandler/exploration/exp123');
+      expect(req.request.method).toEqual('PUT');
+
+      req.flush('Error loading learner answer details data.', {
+        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 });

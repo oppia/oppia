@@ -42,6 +42,11 @@ class ActivityReferencesModel(base_models.BaseModel):
         """ActivityReferencesModel are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -61,6 +66,7 @@ class ActivityReferencesModel(base_models.BaseModel):
         entity = cls.get(list_name, strict=False)
         if entity is None:
             entity = cls(id=list_name, activity_references=[])
+            entity.update_timestamps()
             entity.put()
 
         return entity

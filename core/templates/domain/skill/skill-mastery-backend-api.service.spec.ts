@@ -23,12 +23,11 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { SkillMasteryBackendApiService } from
   'domain/skill/skill-mastery-backend-api.service';
-import { SkillMasteryObjectFactory, SkillMastery } from
-  './SkillMasteryObjectFactory';
+import { SkillMastery } from
+  './skill-mastery.model';
 
 describe('Skill mastery backend API service', () => {
   let skillMasteryBackendApiService: SkillMasteryBackendApiService = null;
-  let skillMasteryObjectFactory: SkillMasteryObjectFactory = null;
   let csrfService: CsrfTokenService = null;
   let masteryPerSkillMapping: {[key: string]: number} = null;
   let sampleResponse = null;
@@ -42,7 +41,6 @@ describe('Skill mastery backend API service', () => {
     });
 
     skillMasteryBackendApiService = TestBed.get(SkillMasteryBackendApiService);
-    skillMasteryObjectFactory = TestBed.get(SkillMasteryObjectFactory);
     csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
 
@@ -59,8 +57,8 @@ describe('Skill mastery backend API service', () => {
       degrees_of_mastery: masteryPerSkillMapping
     };
 
-    sampleReturnedObject = skillMasteryObjectFactory
-      .createFromBackendDict(sampleResponse.degrees_of_mastery);
+    sampleReturnedObject = SkillMastery.createFromBackendDict(
+      sampleResponse.degrees_of_mastery);
   });
 
   afterEach(() => {
@@ -75,7 +73,7 @@ describe('Skill mastery backend API service', () => {
       let requestUrl = '/skill_mastery_handler/data' +
         '?comma_separated_skill_ids=skillId1,skillId2';
 
-      skillMasteryBackendApiService.fetchSkillMasteryDegrees(
+      skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
         ['skillId1', 'skillId2']).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(requestUrl);
@@ -97,7 +95,7 @@ describe('Skill mastery backend API service', () => {
       let requestUrl = '/skill_mastery_handler/data' +
         '?comma_separated_skill_ids=skillId1,skillId2';
 
-      skillMasteryBackendApiService.fetchSkillMasteryDegrees(
+      skillMasteryBackendApiService.fetchSkillMasteryDegreesAsync(
         ['skillId1', 'skillId2']).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(requestUrl);
@@ -119,7 +117,7 @@ describe('Skill mastery backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      skillMasteryBackendApiService.updateSkillMasteryDegrees(
+      skillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
         masteryPerSkillMapping).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -138,7 +136,7 @@ describe('Skill mastery backend API service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      skillMasteryBackendApiService.updateSkillMasteryDegrees(
+      skillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
         masteryPerSkillMapping).then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
