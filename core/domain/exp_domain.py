@@ -523,7 +523,7 @@ class StateVersionSpan(python_utils.OBJECT):
 
     def __getitem__(self, version):
         """Returns the name and snapshot of the state at the given version."""
-        if version not in self:
+        if version not in self._version_snapshots:
             raise KeyError('Span does not cover version=%r' % version)
         return self._version_snapshots[version]
 
