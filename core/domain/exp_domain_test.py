@@ -462,8 +462,9 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
             state_equality_predicate:
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
-                to enforce invariant: all states in a span are equivalent.
-                If None, then states will always be equivalent to each other.
+                to enforce the following invariant: all states in a span are
+                equivalent. If None, then all versions of a state are equivalent
+                to each other.
             *subsequent_versions: tuple(state_domain.State). The subsequent
                 versions of the state.
 
