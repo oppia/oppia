@@ -18,6 +18,7 @@
  */
 
 var forms = require('./forms.js');
+var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
@@ -128,6 +129,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setTitle = async function(title) {
+    await general.scrollToTop();
     await action.clear('Exploration title input', explorationTitleInput);
     await action.sendKeys(
       'Exploration title input', explorationTitleInput, title);
