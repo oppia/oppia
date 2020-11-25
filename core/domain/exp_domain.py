@@ -482,7 +482,7 @@ class StateVersionSpan(python_utils.OBJECT):
     equivalent.
 
     Spans can only be extended using the extend_or_split() method. It enforces
-    the invariant: all states in a span are equivalent.
+    the invariant: all versions of the state in a span are equivalent.
 
     Equivalence has a prerequisite: the names of the state must match across all
     versions. If the state's name has changed in between versions, then an
@@ -506,9 +506,9 @@ class StateVersionSpan(python_utils.OBJECT):
             state_equality_predicate:
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
-                to enforce the following invariant: all states in a span are
-                equivalent. If None, then all versions of a state are equivalent
-                to each other.
+                to enforce the following invariant: all versions of the state in
+                a span are equivalent. If None, then all versions of a state are
+                equivalent to each other.
         """
         self._version_start, self._version_end = exp_version, exp_version + 1
         self._version_snapshots = (
@@ -706,9 +706,9 @@ class ExplorationStatesHistory(python_utils.OBJECT):
             state_equality_predicate:
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
-                to enforce the following invariant: all states in a span are
-                equivalent. If None, then all versions of a state are equivalent
-                to each other.
+                to enforce the following invariant: all versions of the state in
+                a span are equivalent. If None, then all versions of a state are
+                equivalent to each other.
         """
         if not exps or not exp_version_diffs:
             raise ValueError('Inputs must be non-empty')
