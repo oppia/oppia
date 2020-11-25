@@ -168,7 +168,7 @@ def print_color_message(message):
 
 def is_test_output_flaky(output_lines, suite_name):
     """Returns whether the test output matches any flaky test log."""
-    url = os.getenv('FLAKE_REPORT_URL')
+    url = 'http://oppia-flake-report.herokuapp.com/flake-report'
     if url is None:
         print_color_message('No URL found to check flakiness.')
         return False
