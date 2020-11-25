@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for PreviewSummaryTileModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Preview Summary Tile Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -24,6 +26,7 @@ describe('Preview Summary Tile Modal Controller', function() {
   var ExplorationTitleService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ExplorationCategoryService = $injector.get('ExplorationCategoryService');

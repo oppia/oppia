@@ -50,6 +50,8 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Exploration save and publish buttons component', function() {
@@ -112,6 +114,9 @@ describe('Exploration save and publish buttons component', function() {
     $provide.value(
       'StateInteractionIdService', TestBed.get(StateInteractionIdService));
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

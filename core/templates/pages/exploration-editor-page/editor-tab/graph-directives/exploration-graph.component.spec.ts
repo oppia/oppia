@@ -17,7 +17,7 @@
  */
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Exploration Graph Component', function() {
   var ctrl = null;
@@ -31,12 +31,7 @@ describe('Exploration Graph Component', function() {
   var routerService = null;
   var stateEditorService = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');

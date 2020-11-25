@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { EditabilityService } from 'services/editability.service';
@@ -49,6 +49,8 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('History tab component', function() {
   var ctrl = null;
@@ -81,6 +83,12 @@ describe('History tab component', function() {
     created_on_ms: 1416563100000,
     commit_cmds: []
   }];
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
 
   beforeEach(function() {
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
@@ -134,6 +142,9 @@ describe('History tab component', function() {
     $provide.value('RouterService', {
       onRefreshVersionHistory: mockRefreshVersionHistoryEmitter
     });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

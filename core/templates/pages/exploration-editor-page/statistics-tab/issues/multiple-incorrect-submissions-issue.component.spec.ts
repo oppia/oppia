@@ -24,6 +24,7 @@ import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Multiple Incorrect Submissions Issue Component', function() {
   var ctrl = null;
@@ -32,6 +33,8 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
   var subtitledHtmlObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(

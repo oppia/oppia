@@ -119,6 +119,7 @@ angular.module('oppia').factory('CompareVersionsService', [
               directionForwards: true
             }]
           );
+
           return {
             nodes: diffGraphData.nodes,
             links: diffGraphData.links,

@@ -39,13 +39,15 @@ require(
 angular.module('oppia').component('statisticsTab', {
   template: require('./statistics-tab.component.html'),
   controller: [
-    '$q', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
+    '$q', '$rootScope', '$scope', '$uibModal',
+    'AlertsService', 'ComputeGraphService',
     'ExplorationDataService', 'ExplorationStatsService',
     'ReadOnlyExplorationBackendApiService', 'RouterService',
     'StateInteractionStatsService', 'StatesObjectFactory',
     'UrlInterpolationService',
     function(
-        $q, $scope, $uibModal, AlertsService, ComputeGraphService,
+        $q, $rootScope, $scope, $uibModal,
+        AlertsService, ComputeGraphService,
         ExplorationDataService, ExplorationStatsService,
         ReadOnlyExplorationBackendApiService, RouterService,
         StateInteractionStatsService, StatesObjectFactory,
@@ -91,6 +93,7 @@ angular.module('oppia').component('statisticsTab', {
           if (expStats.numActualStarts > 0) {
             $scope.explorationHasBeenVisited = true;
           }
+          $rootScope.$applyAsync();
         });
       };
 

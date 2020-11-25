@@ -17,9 +17,11 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('Exploration Graph Modal Controller', function() {
   var $scope = null;
@@ -31,9 +33,17 @@ describe('Exploration Graph Modal Controller', function() {
   var graphData = {};
   var stateName = 'Introduction';
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');

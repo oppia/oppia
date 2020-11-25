@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require(
@@ -29,13 +29,9 @@ describe('Exploration Category Service', function() {
 
   beforeEach(function() {
     angular.mock.module('oppia');
-    angular.mock.module(function($provide) {
-      let ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
-    });
-
+  });
+  importAllAngularServices();
+  beforeEach(function() {
     angular.mock.inject(function($injector) {
       ecs = $injector.get('ExplorationCategoryService');
     });
