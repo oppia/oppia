@@ -1256,7 +1256,6 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
       upgradedServices['PlatformFeatureBackendApiService'],
-      upgradedServices['I18nLanguageCodeService'],
       upgradedServices['WindowRef'],
       upgradedServices['LoggerService'],
       upgradedServices['UrlService'],
