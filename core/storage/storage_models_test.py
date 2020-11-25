@@ -22,6 +22,7 @@ import inspect
 from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
+import feconf
 import python_utils
 
 (
@@ -60,18 +61,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     if 'Model' in all_base_classes:
                         yield clazz
 
-    # List of model classes that don't have Wipeout related class methods
-    # defined because they're not used directly but only as a base classes for
-    # the other models.
-    BASE_CLASSES = (
-        'BaseCommitLogEntryModel',
-        'BaseMapReduceBatchResultsModel',
-        'BaseModel',
-        'BaseSnapshotContentModel',
-        'BaseSnapshotMetadataModel',
-        'VersionedModel',
-    )
-
     def _get_base_or_versioned_model_child_classes(self):
         """Get child model classes that inherit directly from BaseModel or
         VersionedModel, these are classes that are used directly for saving data
@@ -79,7 +68,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         """
 
         for clazz in self._get_model_classes():
-            if clazz.__name__ in self.BASE_CLASSES:
+            if clazz.__name__ in self.feconf.BASE_CLASSES:
                 continue
             yield clazz
 
@@ -129,7 +118,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         all_models = [
             clazz
             for clazz in self._get_model_classes()
-            if not clazz.__name__ in self.BASE_CLASSES
+            if not clazz.__name__ in self.feconf.BASE_CLASSES
         ]
         models_with_export = (
             takeout_service.get_models_which_should_be_exported())
@@ -147,7 +136,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         all_models = [
             clazz
             for clazz in self._get_model_classes()
-            if not clazz.__name__ in self.BASE_CLASSES
+            if not clazz.__name__ in self.feconf.BASE_CLASSES
         ]
         for model in all_models:
             export_policy = model.get_export_policy()

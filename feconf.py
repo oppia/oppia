@@ -1250,3 +1250,15 @@ MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 # to go unrecorded.
 # https://cloud.google.com/appengine/docs/standard/python/outbound-requests#request_timeouts
 DEFAULT_TASKQUEUE_TIMEOUT_SECONDS = 30
+
+# List of model classes that don't have Wipeout related class methods
+# defined because they're not used directly but only as a base classes for
+# the other models.
+BASE_CLASSES = (
+    'BaseCommitLogEntryModel',
+    'BaseMapReduceBatchResultsModel',
+    'BaseModel',
+    'BaseSnapshotContentModel',
+    'BaseSnapshotMetadataModel',
+    'VersionedModel',
+)
