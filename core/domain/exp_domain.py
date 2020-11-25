@@ -626,10 +626,9 @@ class StateVersionSpan(python_utils.OBJECT):
 
         Raises:
             Exception. When any of the following occurs:
-                The name of this span's state does not map to the new given name
-                    (determined via exp_version_diff.new_to_old_state_names).
-                The given version has already been recorded.
-                The given version is being added out-of-sequence.
+                -   The name of this span's state does not map to the new given
+                    name, as defined by exp_version_diff.new_to_old_state_names.
+                -   The given version is not "lastest version + 1".
         """
         if exp_version != self._version_end:
             raise Exception(
