@@ -76,6 +76,7 @@ import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnico
 import { VoiceoverObjectFactory } from 'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
 import { StateInteractionStatsBackendApiService } from 'domain/exploration/state-interaction-stats-backend-api.service';
 import { StatsReportingBackendApiService } from 'domain/exploration/stats-reporting-backend-api.service';
@@ -523,6 +524,8 @@ export const angularServices: [string, unknown][] = [
   ['RatioExpressionInputValidationService',
     RatioExpressionInputValidationService],
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
+  ['ReadOnlyExplorationBackendApiService',
+    ReadOnlyExplorationBackendApiService],
   ['ReadOnlySubtopicPageObjectFactory', ReadOnlySubtopicPageObjectFactory],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
   ['RecordedVoiceoversObjectFactory', RecordedVoiceoversObjectFactory],
