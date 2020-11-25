@@ -524,6 +524,28 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
             dict(span.iterstates()), {1: state_v1, 2: state_v2, 3: state_v3})
         self.assertEqual(dict(span.iternames()), {1: 'A', 2: 'A', 3: 'A'})
 
+    def test_iter(self):
+        state_v1, state_v2, state_v3 = (
+            self.new_state_domain_obj() for _ in python_utils.RANGE(3))
+
+        (span,) = self.get_state_version_spans(
+            'A', None, state_v1, state_v2, state_v3)
+
+        self.assertEqual(
+            dict(iter(span)),
+            {1: ('A', state_v1), 2: ('A', state_v2), 3: ('A', state_v3)})
+
+    def test_getitem(self):
+        state_v1, state_v2, state_v3 = (
+            self.new_state_domain_obj() for _ in python_utils.RANGE(3))
+
+        (span,) = self.get_state_version_spans(
+            'A', None, state_v1, state_v2, state_v3)
+
+        self.assertEqual(span[1], ('A', state_v1))
+        self.assertEqual(span[2], ('A', state_v2))
+        self.assertEqual(span[3], ('A', state_v3))
+
     def test_multi_spans(self):
         distinct_states = [
             self.new_state_domain_obj(interaction_id='MathEquationInput'),
