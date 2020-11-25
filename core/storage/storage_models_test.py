@@ -46,14 +46,14 @@ class StorageModelsTest(test_utils.GenericTestBase):
         and not just inherited from.
         """
 
-        for clazz in test_utils._get_model_classes():
+        for clazz in test_utils.get_storage_model_classes():
             if clazz.__name__ in feconf.BASE_CLASSES:
                 continue
             yield clazz
 
     def test_all_model_module_names_unique(self):
         names_of_ndb_model_subclasses = [
-            clazz.__name__ for clazz in test_utils._get_model_classes()]
+            clazz.__name__ for clazz in test_utils.get_storage_model_classes()]
 
         self.assertEqual(
             len(set(names_of_ndb_model_subclasses)),
@@ -96,7 +96,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         """
         all_models = [
             clazz
-            for clazz in test_utils._get_model_classes()
+            for clazz in test_utils.get_storage_model_classes()
             if not clazz.__name__ in feconf.BASE_CLASSES
         ]
         models_with_export = (
@@ -114,7 +114,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
         """Ensure every field in every model has an export policy defined."""
         all_models = [
             clazz
-            for clazz in test_utils._get_model_classes()
+            for clazz in test_utils.get_storage_model_classes()
             if not clazz.__name__ in feconf.BASE_CLASSES
         ]
         for model in all_models:

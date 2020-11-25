@@ -941,7 +941,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in test_utils._get_model_classes()
+            for clazz in test_utils.get_storage_model_classes()
             if not clazz.__name__ in self.BASE_CLASSES
         ]
 
@@ -1005,7 +1005,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in test_utils._get_model_classes()
+            for clazz in test_utils.get_storage_model_classes()
             if not clazz.__name__ in self.BASE_CLASSES
         ]
 
