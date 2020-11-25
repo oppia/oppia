@@ -17,7 +17,7 @@
  * answer groups.
  */
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { EventEmitter } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
