@@ -33,13 +33,11 @@ SERVER_MODES = utils.create_enum('dev', 'test', 'prod') # pylint: disable=invali
 FEATURE_STAGES = SERVER_MODES # pylint: disable=invalid-name
 DATA_TYPES = utils.create_enum('bool', 'string', 'number') # pylint: disable=invalid-name
 
-ALLOWED_USER_LOCALES = [
-    lang_dict['id'] for lang_dict in constants.SUPPORTED_SITE_LANGUAGES]
 ALLOWED_SERVER_MODES = [
     SERVER_MODES.dev, SERVER_MODES.test, SERVER_MODES.prod]
 ALLOWED_FEATURE_STAGES = [
     FEATURE_STAGES.dev, FEATURE_STAGES.test, FEATURE_STAGES.prod]
-ALLOWED_CLIENT_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES
+ALLOWED_PLATFORM_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES
 ALLOWED_BROWSER_TYPES = constants.PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES
 ALLOWED_APP_VERSION_FLAVORS = (
     constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS)
@@ -70,22 +68,20 @@ class EvaluationContext(python_utils.OBJECT):
     """Domain object representing the context for parameter evaluation."""
 
     def __init__(
-            self, client_type, browser_type,
-            app_version, user_locale, server_mode):
-        self._client_type = client_type
+            self, platform_type, browser_type, app_version, server_mode):
+        self._platform_type = platform_type
         self._browser_type = browser_type
         self._app_version = app_version
-        self._user_locale = user_locale
         self._server_mode = server_mode
 
     @property
-    def client_type(self):
-        """Returns client type.
+    def platform_type(self):
+        """Returns platform type.
 
         Returns:
-            str. The client type, e.g. 'Web', 'Android'.
+            str. The platform type, e.g. 'Web', 'Android', 'Backend'.
         """
-        return self._client_type
+        return self._platform_type
 
     @property
     def browser_type(self):
@@ -93,30 +89,21 @@ class EvaluationContext(python_utils.OBJECT):
 
         Returns:
             str|None. The client browser type, e.g. 'Chrome', 'FireFox',
-            'Edge'. None if the client type is native, i.e. Android app.
+            'Edge'. None if the platform type is not Web.
         """
         return self._browser_type
 
     @property
     def app_version(self):
+        # TODO(#11208): Update the documentation below to reflect the change
+        # when the GAE app version is used for web & backend.
         """Returns client application version.
 
         Returns:
             str|None. The version of native application, e.g. '1.0.0',
-            None if the client type is web.
+            None if the platform type is Web.
         """
         return self._app_version
-
-    @property
-    def user_locale(self):
-        """Returns client locale.
-
-        Returns:
-            str. The client locale, e.g. 'en', 'es', 'ar'. This must be the id
-            of a supported language specified in SUPPORTED_SITE_LANGUAGES in
-            constants.ts.
-        """
-        return self._user_locale
 
     @property
     def server_mode(self):
@@ -142,10 +129,8 @@ class EvaluationContext(python_utils.OBJECT):
             parameters.
         """
         return (
-            self._client_type is not None and
-            self._client_type in ALLOWED_CLIENT_TYPES and
-            self._user_locale is not None and
-            self._user_locale in ALLOWED_USER_LOCALES)
+            self._platform_type is not None and
+            self._platform_type in ALLOWED_PLATFORM_TYPES)
 
     def validate(self):
         """Validates the EvaluationContext domain object, raising an exception
@@ -191,10 +176,9 @@ class EvaluationContext(python_utils.OBJECT):
             object.
         """
         return cls(
-            client_context_dict.get('client_type'),
+            client_context_dict.get('platform_type'),
             client_context_dict.get('browser_type'),
             client_context_dict.get('app_version'),
-            client_context_dict.get('user_locale'),
             server_context_dict.get('server_mode'),
         )
 
@@ -203,14 +187,13 @@ class PlatformParameterFilter(python_utils.OBJECT):
     """Domain object for filters in platform parameters."""
 
     SUPPORTED_FILTER_TYPES = [
-        'server_mode', 'user_locale', 'client_type', 'browser_type',
-        'app_version', 'app_version_flavor',
+        'server_mode', 'platform_type', 'browser_type', 'app_version',
+        'app_version_flavor',
     ]
 
     SUPPORTED_OP_FOR_FILTERS = {
         'server_mode': ['='],
-        'user_locale': ['='],
-        'client_type': ['='],
+        'platform_type': ['='],
         'browser_type': ['='],
         'app_version_flavor': ['=', '<', '<=', '>', '>='],
         'app_version': ['=', '<', '<=', '>', '>='],
@@ -276,10 +259,8 @@ class PlatformParameterFilter(python_utils.OBJECT):
         matched = False
         if self._type == 'server_mode' and op == '=':
             matched = context.server_mode == value
-        elif self._type == 'user_locale' and op == '=':
-            matched = context.user_locale == value
-        elif self._type == 'client_type' and op == '=':
-            matched = context.client_type == value
+        elif self._type == 'platform_type' and op == '=':
+            matched = context.platform_type == value
         elif self._type == 'browser_type' and op == '=':
             matched = context.browser_type == value
         elif self._type == 'app_version_flavor':
@@ -310,18 +291,12 @@ class PlatformParameterFilter(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'Invalid server mode \'%s\', must be one of %s.' % (
                             mode, ALLOWED_SERVER_MODES))
-        elif self._type == 'user_locale':
-            for _, locale in self._conditions:
-                if locale not in ALLOWED_USER_LOCALES:
+        elif self._type == 'platform_type':
+            for _, platform_type in self._conditions:
+                if platform_type not in ALLOWED_PLATFORM_TYPES:
                     raise utils.ValidationError(
-                        'Invalid user locale \'%s\', must be one of %s.' % (
-                            locale, ALLOWED_USER_LOCALES))
-        elif self._type == 'client_type':
-            for _, client_type in self._conditions:
-                if client_type not in ALLOWED_CLIENT_TYPES:
-                    raise utils.ValidationError(
-                        'Invalid client type \'%s\', must be one of %s.' % (
-                            client_type, ALLOWED_CLIENT_TYPES))
+                        'Invalid platform type \'%s\', must be one of %s.' % (
+                            platform_type, ALLOWED_PLATFORM_TYPES))
         elif self._type == 'app_version_flavor':
             for _, flavor in self._conditions:
                 if flavor not in ALLOWED_APP_VERSION_FLAVORS:
