@@ -45,3 +45,8 @@ jobs:
       - name: Run Core Editor And Player E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="coreEditorAndPlayerFeatures" --prod_env
+      - name: Store screenshots as artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: protractor_screenshots
+          path: ../protractor_screenshots/
