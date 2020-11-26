@@ -93,7 +93,7 @@ describe('Cyclic Transitions Issue Component', function() {
   it('should resolve issue if it\'s not resolved yet', function() {
     spyOn(playthroughIssuesService, 'resolveIssueAsync').and.callFake(() => {});
     spyOn(alertsService, 'addSuccessMessage');
-    $scope.resolveIssueAsync();
+    $scope.resolveIssue();
 
     expect(playthroughIssuesService.resolveIssueAsync).toHaveBeenCalled();
     expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
@@ -102,11 +102,11 @@ describe('Cyclic Transitions Issue Component', function() {
 
   it('should not resolve issue if it\'s already resolved', function() {
     // Resolve issue.
-    $scope.resolveIssueAsync();
+    $scope.resolveIssue();
 
     spyOn(playthroughIssuesService, 'resolveIssueAsync').and.callFake(() => {});
     spyOn(alertsService, 'addSuccessMessage');
-    $scope.resolveIssueAsync();
+    $scope.resolveIssue();
 
     expect(playthroughIssuesService.resolveIssueAsync).not.toHaveBeenCalled();
     expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
