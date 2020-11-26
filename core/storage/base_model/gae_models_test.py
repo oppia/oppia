@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import types
 
 from constants import constants
@@ -355,6 +356,183 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         base_models.BaseModel.get_new_id(u'¡Hola!')
         base_models.BaseModel.get_new_id(12345)
         base_models.BaseModel.get_new_id({'a': 'b'})
+
+
+class TestBaseHumanMaintainedModel(base_models.BaseHumanMaintainedModel):
+    """Model that inherits the BaseHumanMaintainedModel for testing."""
+
+    pass
+
+
+class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
+    """Test the generic base human maintained model."""
+
+    MODEL_ID = 'model1'
+
+    def setUp(self):
+        super(BaseHumanMaintainedModelTests, self).setUp()
+        self.model_instance = TestBaseHumanMaintainedModel(id=self.MODEL_ID)
+        def mock_put(self):
+            self._last_updated_timestamp_is_fresh = True
+            self.last_updated_by_human = datetime.datetime.utcnow()
+
+            # These if conditions can be removed once the auto_now property
+            # is set True to these attributes.
+            if self.created_on is None:
+                self.created_on = datetime.datetime.utcnow()
+
+            if self.last_updated is None:
+                self.last_updated = datetime.datetime.utcnow()
+
+            super(base_models.BaseHumanMaintainedModel, self).put()
+
+        with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):
+            self.model_instance.put()
+
+    def test_put(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError, 'Use put_for_human or put_for_bot instead'):
+            self.model_instance.put()
+
+    def test_put_for_human(self):
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+        previous_last_updated_by_human = (
+            model_instance.last_updated_by_human)
+
+        model_instance.update_timestamps()
+        self.model_instance.put_for_human()
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+
+        self.assertNotEqual(
+            previous_last_updated_by_human,
+            model_instance.last_updated_by_human)
+
+    def test_put_for_bot(self):
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+        previous_last_updated_by_human = (
+            model_instance.last_updated_by_human)
+
+        model_instance.update_timestamps()
+        self.model_instance.put_for_bot()
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+
+        self.assertEqual(
+            previous_last_updated_by_human,
+            model_instance.last_updated_by_human)
+
+    def test_put_async(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Use put_async_for_human or put_async_for_bot instead'):
+            self.model_instance.put_async()
+
+    def test_put_async_for_human(self):
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+        previous_last_updated_by_human = (
+            model_instance.last_updated_by_human)
+
+        model_instance.update_timestamps()
+        self.model_instance.put_async_for_human()
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+
+        self.assertNotEqual(
+            previous_last_updated_by_human,
+            model_instance.last_updated_by_human)
+
+    def test_put_async_for_bot(self):
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+        previous_last_updated_by_human = (
+            model_instance.last_updated_by_human)
+
+        model_instance.update_timestamps()
+        self.model_instance.put_async_for_bot()
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+
+        self.assertEqual(
+            previous_last_updated_by_human,
+            model_instance.last_updated_by_human)
+
+    def test_put_multi(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Use put_multi_for_human or put_multi_for_bot instead'):
+            TestBaseHumanMaintainedModel.put_multi([])
+
+    def test_put_multi_for_human(self):
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+        previous_last_updated_by_human = (
+            model_instance.last_updated_by_human)
+
+        with self.swap(
+            TestBaseHumanMaintainedModel, 'put_async',
+            TestBaseHumanMaintainedModel.put_async_for_human):
+            model_instance.update_timestamps()
+            TestBaseHumanMaintainedModel.put_multi_for_human([model_instance])
+            model_instance = TestBaseHumanMaintainedModel.get_by_id(
+                self.MODEL_ID)
+
+            self.assertNotEqual(
+                previous_last_updated_by_human,
+                model_instance.last_updated_by_human)
+
+    def test_put_multi_for_bot(self):
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+        previous_last_updated_by_human = (
+            model_instance.last_updated_by_human)
+
+        with self.swap(
+            TestBaseHumanMaintainedModel, 'put_async',
+            TestBaseHumanMaintainedModel.put_async_for_bot):
+            model_instance.update_timestamps()
+            TestBaseHumanMaintainedModel.put_multi_for_bot([model_instance])
+            model_instance = TestBaseHumanMaintainedModel.get_by_id(
+                self.MODEL_ID)
+
+            self.assertEqual(
+                previous_last_updated_by_human,
+                model_instance.last_updated_by_human)
+
+    def test_put_multi_async(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Use put_multi_async_for_human or put_multi_async_for_bot instead'):
+            self.model_instance.put_multi_async([])
+
+    def test_put_multi_async_for_human(self):
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+        previous_last_updated_by_human = (
+            model_instance.last_updated_by_human)
+
+        with self.swap(
+            TestBaseHumanMaintainedModel, 'put_async',
+            TestBaseHumanMaintainedModel.put_async_for_bot):
+            model_instance.update_timestamps()
+            TestBaseHumanMaintainedModel.put_multi_async_for_human(
+                [model_instance])
+            model_instance = TestBaseHumanMaintainedModel.get_by_id(
+                self.MODEL_ID)
+
+            self.assertNotEqual(
+                previous_last_updated_by_human,
+                model_instance.last_updated_by_human)
+
+    def test_put_multi_async_for_bot(self):
+        model_instance = TestBaseHumanMaintainedModel.get_by_id(self.MODEL_ID)
+        previous_last_updated_by_human = (
+            model_instance.last_updated_by_human)
+
+        with self.swap(
+            TestBaseHumanMaintainedModel, 'put_async',
+            TestBaseHumanMaintainedModel.put_async_for_bot):
+            model_instance.update_timestamps()
+            TestBaseHumanMaintainedModel.put_multi_async_for_bot(
+                [model_instance])
+            model_instance = TestBaseHumanMaintainedModel.get_by_id(
+                self.MODEL_ID)
+
+            self.assertEqual(
+                previous_last_updated_by_human,
+                model_instance.last_updated_by_human)
 
 
 class TestSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
