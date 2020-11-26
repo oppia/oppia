@@ -4120,8 +4120,8 @@ oppia-noninteractive-link {
 
 .oppia-about-otter-speech-bubble h3 {
   color: #333333;
-  margin: 20px 0 20px 0;
   font-weight: 700;
+  margin: 20px 0 20px 0;
 }
 
 .oppia-static-card-content {
@@ -4167,7 +4167,7 @@ oppia-noninteractive-link {
   text-align: center;
 }
 
-.participation h2:not(:first-child){
+.participation h2:not(:first-child) {
   margin-top: 2.5em;
 }
 
