@@ -334,7 +334,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
                       CollectionPlaythroughObjectFactory.create(
                         nextExplorationId, completedExplorationIds));
                   } else {
-                    ctrl.collectionPlaythrough = collection.getPlaythrough();
+                    ctrl.collectionPlaythrough = collection.getPlaythroughAsync();
                   }
                   ctrl.nextExplorationId =
                     ctrl.collectionPlaythrough.getNextExplorationId();
