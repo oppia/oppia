@@ -101,9 +101,9 @@ describe('Collection object factory', () => {
     expect(collection.getTags()).toBeNull();
     expect(collection.getVersion()).toBeNull();
     expect(collection.getSchemaVersion()).toBeNull();
-    expect(collection.getPlaythrough().getNextExplorationId()).toBeNull();
+    expect(collection.getPlaythroughAsync().getNextExplorationId()).toBeNull();
     expect(
-      collection.getPlaythrough().getCompletedExplorationIds()).toEqual([]);
+      collection.getPlaythroughAsync().getCompletedExplorationIds()).toEqual([]);
     expect(collection.getCollectionNodes()).toEqual([]);
   });
 
