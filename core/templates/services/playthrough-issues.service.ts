@@ -95,7 +95,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
         return PlaythroughIssuesBackendApiService.fetchIssues(
           explorationId, explorationVersion);
       },
-      getPlaythrough: function(playthroughId) {
+      getPlaythroughAsync: function(playthroughId) {
         return PlaythroughIssuesBackendApiService.fetchPlaythroughAsync(
           explorationId, playthroughId);
       },
@@ -129,7 +129,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
           issue, explorationId, explorationVersion);
       },
       openPlaythroughModal: function(playthroughId, index) {
-        this.getPlaythrough(playthroughId).then(function(playthrough) {
+        this.getPlaythroughAsync(playthroughId).then(function(playthrough) {
           ImprovementModalService.openPlaythroughModal(playthrough, index);
         });
       },
