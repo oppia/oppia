@@ -185,7 +185,6 @@ interface SkillRubricsChange {
   cmd: 'update_rubrics';
   difficulty: string;
   explanations: string[];
-  subtopic_id: number;
 }
 
 interface SkillContentsExplanationChange {
