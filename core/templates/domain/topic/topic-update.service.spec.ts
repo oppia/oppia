@@ -308,7 +308,6 @@ describe('Topic update service', function() {
       new_value: 'new meta tag content',
       old_value: null
     }]);
-    
   });
 
   it('should set/unset changes to a topic\'s practice tab is ' +

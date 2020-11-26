@@ -24,7 +24,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { BackendChangeObject, Change } from 'domain/editor/undo_redo/change.model';
+import { Change } from 'domain/editor/undo_redo/change.model';
 
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
