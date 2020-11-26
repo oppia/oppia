@@ -108,7 +108,7 @@ export class Collection {
     return this.schemaVersion;
   }
 
-  getPlaythrough(): CollectionPlaythrough {
+  getPlaythroughAsync(): CollectionPlaythrough {
     return this.playthrough;
   }
 
@@ -277,7 +277,7 @@ export class Collection {
     this.setLanguageCode(otherCollection.getLanguageCode());
     this.setTags(otherCollection.getTags());
     this.version = otherCollection.getVersion();
-    this.playthrough = otherCollection.getPlaythrough();
+    this.playthrough = otherCollection.getPlaythroughAsync();
     this.schemaVersion = otherCollection.getSchemaVersion();
     this.clearCollectionNodes();
 
