@@ -45,7 +45,7 @@ export class TopicUpdateService {
   // topic.
   // entity can be a topic object or a subtopic page object.
   private _applyChange(
-      entity: Topic|SubtopicPage|BackendChangeObject,
+      entity,
       command: string, params, apply: Function, reverse: Function) {
     let changeDict = angular.copy(params);
     changeDict.cmd = command;
@@ -318,7 +318,7 @@ export class TopicUpdateService {
       throw new Error('Subtopic doesn\'t exist');
     }
     let newlyCreated = false;
-    let changeList:BackendChangeObject[] =
+    let changeList =
     this.undoRedoService.getCommittableChangeList();
     for (let i = 0; i < changeList.length; i++) {
       if (changeList[i].cmd === 'add_subtopic' &&
