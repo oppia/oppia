@@ -384,7 +384,7 @@
 
         <div ng-if="$ctrl.ExplorationRightsService.ownerNames.length === 0 && !$ctrl.ExplorationRightsService.isCloned()">
           <h3>Permissions</h3>
-          <div>
+          <div class="protractor-test-is-community-owned">
             This exploration is <strong>public</strong> and <strong>community-editable</strong>.
             <p ng-if="!$ctrl.ExplorationRightsService.isPrivate()">
               It is <strong>available</strong> in the Oppia library.

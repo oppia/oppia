@@ -29,6 +29,8 @@ export interface ExplorationSummaryBackendDict {
   'summaries': [{
     'category': string,
     'community_owned': boolean,
+    'human_readable_contributors_summary': (
+      HumanReadableContributorSummaryBackendDict)
     'id': string,
     'language_code': string,
     'num_views': number,
@@ -40,6 +42,11 @@ export interface ExplorationSummaryBackendDict {
     'title': string
   }]
 }
+
+interface HumanReadableContributorSummaryBackendDict {
+  'num_commits': number
+}
+
 @Injectable({
   providedIn: 'root'
 })

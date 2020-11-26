@@ -24,6 +24,7 @@ require(
 require('domain/editor/undo_redo/base-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');
+require('domain/story/story-validation.service');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/story-editor-page/services/story-editor-navigation.service.ts');
@@ -39,13 +40,13 @@ angular.module('oppia').directive('storyEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditableStoryBackendApiService',
+        '$rootScope', '$scope', '$uibModal', 'EditableStoryBackendApiService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
-        'UndoRedoService',
+        'StoryValidationService', 'UndoRedoService',
         function(
-            $scope, $uibModal, EditableStoryBackendApiService,
+            $rootScope, $scope, $uibModal, EditableStoryBackendApiService,
             StoryEditorNavigationService, StoryEditorStateService,
-            UndoRedoService) {
+            StoryValidationService, UndoRedoService) {
           var ctrl = this;
           var EDITOR = 'Editor';
           var PREVIEW = 'Preview';
@@ -87,13 +88,25 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           var _validateStory = function() {
             $scope.validationIssues = $scope.story.validate();
+            let nodes = $scope.story.getStoryContents().getNodes();
+            let skillIdsInTopic = (
+              StoryEditorStateService.getSkillSummaries().map(
+                skill => skill.id));
+            if ($scope.validationIssues.length === 0 && nodes.length > 0) {
+              let prerequisiteSkillValidationIssues = (
+                StoryValidationService
+                  .validatePrerequisiteSkillsInStoryContents(
+                    skillIdsInTopic, $scope.story.getStoryContents()));
+              $scope.validationIssues = (
+                $scope.validationIssues.concat(
+                  prerequisiteSkillValidationIssues));
+            }
             if (StoryEditorStateService.getStoryWithUrlFragmentExists()) {
               $scope.validationIssues.push(
                 'Story URL fragment already exists.');
             }
             $scope.forceValidateExplorations = true;
             _validateExplorations();
-            var nodes = $scope.story.getStoryContents().getNodes();
             var storyPrepublishValidationIssues = (
               $scope.story.prepublishValidate());
             var nodePrepublishValidationIssues = (
@@ -127,6 +140,9 @@ angular.module('oppia').directive('storyEditorNavbar', [
                 ).then(function(validationIssues) {
                   $scope.explorationValidationIssues =
                     $scope.explorationValidationIssues.concat(validationIssues);
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the directive is migrated to angular.
+                  $rootScope.$apply();
                 });
               }
             }
