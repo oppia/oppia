@@ -21,7 +21,6 @@ import os
 
 from core.tests import test_utils
 import python_utils
-import utils
 
 from . import check_e2e_tests_are_captured_in_ci
 
@@ -283,10 +282,10 @@ jobs:
     steps:
       - name: Run Additional Editor E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="oneword" --prod_env
+        run: python -m scripts.run_e2e_tests --suite="oneword" --prod_env
       - name: Run Additional Player E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="twoWords" --prod_env
+        run: python -m scripts.run_e2e_tests --suite="twoWords" --prod_env
 """]
 
 EXPECTED_PROTRACTOR_CONF_FILE = """var path = require('path')

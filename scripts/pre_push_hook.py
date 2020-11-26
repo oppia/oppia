@@ -431,7 +431,7 @@ def does_diff_include_actions_config_or_js_files(diff_files):
     """
 
     for file_path in diff_files:
-        if file_path.endswith('.js') or re.search('e2e_.*\.yml', file_path):
+        if file_path.endswith('.js') or re.search(r'e2e_.*\.yml', file_path):
             return True
     return False
 

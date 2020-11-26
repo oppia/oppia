@@ -275,7 +275,7 @@ def execute_branch_cut(target_version, hotfix_number):
     # The release coordinator should verify that tests are passing on
     # the parent branch before checking out the new branch.
     common.open_new_tab_in_browser_if_possible(
-        'https://github.com/oppia/oppia/actions?page=2&query=branch%3A%s'
+        'https://github.com/oppia/oppia/actions?query=branch:%s'
         % branch_to_check)
     python_utils.PRINT(
         'Please confirm: are Actions checks passing on %s? (y/n) ' % (

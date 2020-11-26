@@ -23,8 +23,6 @@ import os
 import re
 
 import python_utils
-import utils
-import logging
 
 # These test suites are not present in Action. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
@@ -100,7 +98,7 @@ def read_and_parse_actions_config_files():
     """
     actions_ci_dicts = []
     for filepath in os.listdir(ACTIONS_PATH):
-        if re.search('e2e_.*\.yml', filepath):
+        if re.search(r'e2e_.*\.yml', filepath):
             actions_ci_file_content = python_utils.open_file(
                 os.path.join(ACTIONS_PATH, filepath), 'r').read()
             actions_ci_dicts.append(actions_ci_file_content)
@@ -194,8 +192,6 @@ def main():
             .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
     if protractor_test_suites != actions_suite_names:
-        logging.error(protractor_test_suites)
-        logging.error(actions_suite_names)
         raise Exception(
             'Protractor test suites and Actions test suites are not in sync.')
 
