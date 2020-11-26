@@ -87,19 +87,6 @@ export class RatioExpressionInputValidationService {
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
 
-    // Checks whether currentInput is in simplest form or not.
-    let isInSimplestForm = function(
-        currentRuleType: string,
-        ratio: Ratio,
-        currentInput: number[]
-    ): boolean {
-      return (
-        currentRuleType === 'IsEquivalent' &&
-        !Ratio.arrayEquals(
-          ratio.convertToSimplestForm(), currentInput)
-      );
-    };
-
     // Checks whether currentInput has less number of terms than seenInput.
     let hasLessNumberOfTerms = function(
         currentRuleType: string,
@@ -161,20 +148,13 @@ export class RatioExpressionInputValidationService {
           }
         }
         ratio = Ratio.fromList(<number[]> currentInput);
-        if (isInSimplestForm(currentRuleType, ratio, currentInput)) {
-          warningsList.push({
-            type: AppConstants.WARNING_TYPES.ERROR,
-            message: (
-              `Rule ${j + 1} from answer group ${i + 1} will never be` +
-              ' matched because provided input is not in its simplest form.')
-          });
-        }
         for (let seenRule of seenRules) {
           let seenInput = seenRule.inputs.x || seenRule.inputs.y;
           let seenRuleType = <string> seenRule.type;
 
           if (
             seenRuleType === 'Equals' &&
+            currentRuleType !== 'IsEquivalent' &&
             currentRuleType !== 'HasNumberOfTermsEqualTo' && (
               ratioRulesService.Equals(
                 seenInput, {x: currentInput}))) {
