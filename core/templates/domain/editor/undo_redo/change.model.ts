@@ -39,6 +39,8 @@ interface CollectionTitleChange {
   'property_name': 'title';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+
 }
 
 interface CollectionCategoryChange {
@@ -46,6 +48,7 @@ interface CollectionCategoryChange {
   'property_name': 'category';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
 }
 
 interface CollectionObjectiveChange {
@@ -53,6 +56,7 @@ interface CollectionObjectiveChange {
   'property_name': 'objective';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
 }
 
 interface CollectionLanguageCodeChange {
@@ -60,6 +64,7 @@ interface CollectionLanguageCodeChange {
   'property_name': 'language_code';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
 }
 
 interface CollectionTagsChange {
@@ -67,6 +72,7 @@ interface CollectionTagsChange {
   'property_name': 'tags';
   'new_value': string[];
   'old_value': string[];
+  'subtopic_id': number;
 }
 
 type CollectionPropertyChange = (
@@ -79,17 +85,20 @@ type CollectionPropertyChange = (
 interface CollectionAddNodeChange {
   'cmd': 'add_collection_node';
   'exploration_id': string;
+  'subtopic_id': number;
 }
 
 interface CollectionSwapNodeChange {
   'cmd': 'swap_nodes';
   'first_index': number;
   'second_index': number;
+  'subtopic_id': number;
 }
 
 interface CollectionDeleteNodeChange {
   'cmd': 'delete_collection_node';
   'exploration_id': string;
+  'subtopic_id': number;
 }
 
 type CollectionChange = (
@@ -103,6 +112,7 @@ interface QuestionLanguageCodeChange {
   'property_name': 'language_code';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
 }
 
 interface QuestionStateDataChange {
@@ -110,6 +120,7 @@ interface QuestionStateDataChange {
   'property_name': 'question_state_data';
   'new_value': StateBackendDict;
   'old_value': StateBackendDict;
+  'subtopic_id': number;
 }
 
 type QuestionPropertyChange = (
@@ -123,6 +134,7 @@ interface SkillDescriptionChange {
   'property_name': 'description';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
 }
 
 type SkillPropertyChange = SkillDescriptionChange;
@@ -133,6 +145,7 @@ interface SkillMisconceptionNameChange {
   'new_value': string;
   'old_value': string;
   'misconception_id': string;
+  'subtopic_id': number;
 }
 
 interface SkillMisconceptionMustBeAddressedChange {
@@ -141,6 +154,7 @@ interface SkillMisconceptionMustBeAddressedChange {
   'new_value': boolean;
   'old_value': boolean;
   'misconception_id': string;
+  'subtopic_id': number;
 }
 
 interface SkillMisconceptionsNotesChange {
@@ -149,6 +163,7 @@ interface SkillMisconceptionsNotesChange {
   'new_value': string;
   'old_value': string;
   'misconception_id': string;
+  'subtopic_id': number;
 }
 
 interface SkillMisconceptionsFeedbackChange {
@@ -157,6 +172,7 @@ interface SkillMisconceptionsFeedbackChange {
   'new_value': string;
   'old_value': string;
   'misconception_id': string;
+  'subtopic_id': number;
 }
 
 type SkillMisconceptionPropertyChange = (
@@ -169,6 +185,7 @@ interface SkillRubricsChange {
   cmd: 'update_rubrics';
   difficulty: string;
   explanations: string[];
+  subtopic_id: number;
 }
 
 interface SkillContentsExplanationChange {
@@ -176,6 +193,7 @@ interface SkillContentsExplanationChange {
   'property_name': 'explanation';
   'new_value': SubtitledHtmlBackendDict;
   'old_value': SubtitledHtmlBackendDict;
+  'subtopic_id': number;
 }
 
 interface SkillContentsWorkedExamplesChange {
@@ -183,6 +201,7 @@ interface SkillContentsWorkedExamplesChange {
   'property_name': 'worked_examples';
   'new_value': WorkedExampleBackendDict;
   'old_value': WorkedExampleBackendDict;
+  'subtopic_id': number;
 }
 
 type SkillContentsChange = (
@@ -192,11 +211,13 @@ type SkillContentsChange = (
 interface SkillAddMisconceptionChange {
   'cmd': 'add_skill_misconception';
   'new_misconception_dict': MisconceptionBackendDict;
+  'subtopic_id': number;
 }
 
 interface SkillDeleteMisconceptionChange {
   'cmd': 'delete_skill_misconception';
   'misconception_id': string;
+  'subtopic_id': number;
 }
 
 interface SkillAddPrerequisiteChange {
