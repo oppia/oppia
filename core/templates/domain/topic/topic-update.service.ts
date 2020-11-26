@@ -45,7 +45,7 @@ export class TopicUpdateService {
   // topic.
   // entity can be a topic object or a subtopic page object.
   private _applyChange(
-      entity: Topic|SubtopicPage,
+      entity: Topic|SubtopicPage|BackendChangeObject,
       command: string, params, apply: Function, reverse: Function) {
     let changeDict = angular.copy(params);
     changeDict.cmd = command;
@@ -60,8 +60,8 @@ export class TopicUpdateService {
   // Applies a topic property change, specifically. See _applyChange()
   // for details on the other behavior of this function.
   private _applyTopicPropertyChange(
-      topic :Topic, propertyName: string, newValue: string, oldValue: string,
-      apply: Function, reverse: Function) {
+      topic :Topic, propertyName: string, newValue: string|boolean,
+      oldValue: string|boolean, apply: Function, reverse: Function) {
     this._applyChange(topic, TopicDomainConstants.CMD_UPDATE_TOPIC_PROPERTY, {
       property_name: propertyName,
       new_value: angular.copy(newValue),
