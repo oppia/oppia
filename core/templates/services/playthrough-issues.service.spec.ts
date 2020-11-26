@@ -110,7 +110,7 @@ describe('Playthrough Issues Service', function() {
         backendPlaythrough)));
     var playthroughId = 'exp_id1';
 
-    PlaythroughIssuesService.getPlaythrough(playthroughId)
+    PlaythroughIssuesService.getPlaythroughAsync(playthroughId)
       .then(function(playthrough) {
         expect(backendCallSpy).toHaveBeenCalled();
         expect(playthrough).toEqual(
