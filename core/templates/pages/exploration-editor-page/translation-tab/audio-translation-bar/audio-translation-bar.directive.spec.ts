@@ -165,7 +165,7 @@ describe('Audio translation bar directive', function() {
     isTranslatableSpy.and.returnValue(false);
     spyOn(translationLanguageService, 'getActiveLanguageCode').and
       .returnValue('en');
-    spyOn(translationTabActiveContentIdService, 'activeContentId').and
+    spyOnProperty(translationTabActiveContentIdService, 'activeContentId', 'get').and
       .returnValue('content');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       stateName);

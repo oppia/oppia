@@ -233,7 +233,7 @@ describe('State Translation Editor Component', function() {
           })
         )
       };
-      spyOn(translationTabActiveContentIdService, 'activeContentId').and
+      spyOnProperty(translationTabActiveContentIdService, 'activeContentId', 'get').and
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('es');
@@ -258,7 +258,7 @@ describe('State Translation Editor Component', function() {
           })
         )
       };
-      spyOn(translationTabActiveContentIdService, 'activeContentId').and
+      spyOnProperty(translationTabActiveContentIdService, 'activeContentId', 'get').and
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('en');
@@ -292,7 +292,7 @@ describe('State Translation Editor Component', function() {
           })
         )
       };
-      spyOn(translationTabActiveContentIdService, 'activeContentId').and
+      spyOnProperty(translationTabActiveContentIdService, 'activeContentId', 'get').and
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('en');
@@ -434,7 +434,7 @@ describe('State Translation Editor Component', function() {
       spyOn(
         stateWrittenTranslationsService.displayed,
         'addWrittenTranslation').and.callThrough();
-      spyOn(translationTabActiveContentIdService, 'activeContentId').and
+      spyOnProperty(translationTabActiveContentIdService, 'activeContentId', 'get').and
         .returnValue('content_1');
       spyOn(translationLanguageService, 'getActiveLanguageCode').and
         .returnValue('es');

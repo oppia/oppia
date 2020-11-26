@@ -84,7 +84,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.activeWrittenTranslation = null;
         $scope.translationEditorIsOpen = false;
         contentId = (
-          TranslationTabActiveContentIdService.activeContentId());
+          TranslationTabActiveContentIdService.activeContentId);
         languageCode = TranslationLanguageService.getActiveLanguageCode();
         if (StateWrittenTranslationsService.displayed.hasWrittenTranslation(
           contentId, languageCode)) {
@@ -97,7 +97,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         var oldWrittenTranslation = null;
         var newWrittenTranslation = null;
         contentId = (
-          TranslationTabActiveContentIdService.activeContentId());
+          TranslationTabActiveContentIdService.activeContentId);
         languageCode = TranslationLanguageService.getActiveLanguageCode();
         if (StateWrittenTranslationsService
           .savedMemento.hasWrittenTranslation(contentId, languageCode)) {
@@ -162,7 +162,7 @@ angular.module('oppia').component('stateTranslationEditor', {
       };
       ctrl.$onInit = function() {
         $scope.dataFormat = (
-          TranslationTabActiveContentIdService.activeDataFormat());
+          TranslationTabActiveContentIdService.activeDataFormat);
         $scope.HTML_SCHEMA = {
           type: 'html'
         };
