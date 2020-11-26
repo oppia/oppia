@@ -18,7 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-
 import { StateGraphLayoutService } from
   'components/graph-services/graph-layout.service';
 import { AnswerGroupsCacheService } from
@@ -45,6 +44,8 @@ import { StateRecordedVoiceoversService } from
 import { StateWrittenTranslationsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -146,6 +147,9 @@ describe('State Graph Visualization directive', function() {
       'RouterService', {
         onCenterGraph: mockCenterGraphEventEmitter
       });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
