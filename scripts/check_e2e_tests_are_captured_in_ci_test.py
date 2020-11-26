@@ -32,22 +32,21 @@ DUMMY_CONF_FILES = os.path.join(
 
 
 class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
-    """Test the methods which performs .travis.yml and
+    """Test the methods which performs actions config files and
     protractor.conf.js sync checks.
     """
 
-    def test_read_travis_ci_file(self):
-        travis_ci_file = os.path.join(
-            DUMMY_CONF_FILES, '.dummy_travis.yml')
+    def test_read_actions_ci_file(self):
+        actions_ci_filepath = os.path.join(DUMMY_CONF_FILES)
 
-        travis_ci_file_swap = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'TRAVIS_CI_FILE_PATH',
-            travis_ci_file)
-        with travis_ci_file_swap:
-            actual_travis_ci_dict = (
+        actions_ci_filepath_swap = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'ACTIONS_PATH',
+            actions_ci_filepath)
+        with actions_ci_filepath_swap:
+            actual_actions_ci_list = (
                 check_e2e_tests_are_captured_in_ci
-                .read_and_parse_travis_yml_file())
-            self.assertEqual(EXPECTED_TRAVIS_CI_DICT, actual_travis_ci_dict)
+                .read_and_parse_actions_config_files())
+            self.assertEqual(EXPECTED_ACTIONS_CI_LIST, actual_actions_ci_list)
 
     def test_read_protractor_file(self):
         protractor_config_file = os.path.join(
@@ -62,39 +61,19 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         self.assertEqual(
             EXPECTED_PROTRACTOR_CONF_FILE, actual_protractor_config_file)
 
-    def test_get_e2e_suite_names_from_jobs_travis_yml_file(self):
-        def mock_read_travis_yml_file():
-            travis_ci_file = python_utils.open_file(
-                os.path.join(
-                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
-            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
-            return travis_ci_dict
+    def test_get_e2e_suite_names_from_script_actions_ci_files(self):
+        def mock_read_actions_ci_config_file():
+            return EXPECTED_ACTIONS_CI_LIST
 
         dummy_path = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
+            'read_and_parse_actions_config_files',
+            mock_read_actions_ci_config_file)
         with dummy_path:
-            actual_travis_jobs = (
+            actual_actions_ci_suite_names = (
                 check_e2e_tests_are_captured_in_ci
-                .get_e2e_suite_names_from_jobs_travis_yml_file())
-        self.assertEqual(DUMMY_TEST_SUITES, actual_travis_jobs)
-
-    def test_get_e2e_suite_names_from_script_travis_yml_file(self):
-        def mock_read_travis_yml_file():
-            travis_ci_file = python_utils.open_file(
-                os.path.join(
-                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
-            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
-            return travis_ci_dict
-
-        dummy_path = self.swap(
-            check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
-        with dummy_path:
-            actual_travis_script = (
-                check_e2e_tests_are_captured_in_ci
-                .get_e2e_suite_names_from_script_travis_yml_file())
-        self.assertEqual(DUMMY_TEST_SUITES, actual_travis_script)
+                .get_e2e_suite_names_from_actions_config_file())
+        self.assertEqual(DUMMY_TEST_SUITES, actual_actions_ci_suite_names)
 
     def test_get_e2e_suite_names_from_protractor_file(self):
         def mock_read_protractor_conf_file():
@@ -116,26 +95,21 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_get_e2e_suite_names_from_protractor_file():
             return ['oneword', 'fourWord', 'invalid', 'notPresent']
 
-        def mock_get_e2e_suite_names_from_travis_ci():
+        def mock_get_e2e_suite_names_from_actions_ci():
             return ['oneword', 'twoWords']
         mock_protractor_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_protractor_file',
             mock_get_e2e_suite_names_from_protractor_file)
 
-        mock_travis_jobs = self.swap(
+        mock_actions_ci_scripts = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_jobs_travis_yml_file',
-            mock_get_e2e_suite_names_from_travis_ci)
-
-        mock_travis_scripts = self.swap(
-            check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_script_travis_yml_file',
-            mock_get_e2e_suite_names_from_travis_ci)
+            'get_e2e_suite_names_from_actions_config_file',
+            mock_get_e2e_suite_names_from_actions_ci)
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_TRAVIS', ['fourWord'])
+            'TEST_SUITES_NOT_RUN_ON_ACTIONS', ['fourWord'])
 
         common_test_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
@@ -143,10 +117,10 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             'oneword')
 
         with common_test_swap, mock_tests_to_remove:
-            with mock_protractor_test_suites, mock_travis_jobs:
-                with mock_travis_scripts:
+            with mock_protractor_test_suites:
+                with mock_actions_ci_scripts:
                     with self.assertRaisesRegexp(
-                        Exception, 'Protractor test suites and Travis Ci test '
+                        Exception, 'Protractor test suites and Actions test '
                                    'suites are not in sync.'):
                         check_e2e_tests_are_captured_in_ci.main()
 
@@ -154,9 +128,9 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_get_e2e_suite_names():
             return ['oneword', 'twoWords']
 
-        mock_travis_scripts = self.swap(
+        mock_actions_scripts = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_script_travis_yml_file',
+            'get_e2e_suite_names_from_actions_config_file',
             mock_get_e2e_suite_names)
 
         mock_protractor_test_suites = self.swap(
@@ -164,85 +138,51 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             'get_e2e_suite_names_from_protractor_file',
             mock_get_e2e_suite_names)
 
-        mock_tests_not_on_travis = self.swap(
+        mock_tests_not_on_actions = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
+            'TEST_SUITES_NOT_RUN_ON_ACTIONS', [])
 
-        with mock_travis_scripts:
+        with mock_actions_scripts:
             with self.assertRaisesRegexp(
                 Exception, 'coreEditorAndPlayerFeatures is expected to be in '
                            'the e2e test suites extracted from the script '
-                           'section of .travis.yml file, but it is missing.'):
+                           'section of Actions config files, but it is '
+                           'missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
-        with mock_protractor_test_suites, mock_tests_not_on_travis:
+        with mock_protractor_test_suites, mock_tests_not_on_actions:
             with self.assertRaisesRegexp(
                 Exception, 'coreEditorAndPlayerFeatures is expected to be in '
                            'the e2e test suites extracted from the '
                            'protractor.conf.js file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
-    def test_main_with_invalid_travis_jobs_test_suite_length(self):
-        def mock_read_travis_yml_file():
-            travis_ci_file = python_utils.open_file(
-                os.path.join(
-                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
-            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
-            return travis_ci_dict
+    def test_main_with_invalid_actions_script_test_suite_length(self):
+        def mock_read_actions_config_file():
+            return EXPECTED_ACTIONS_CI_LIST
         def mock_return_empty_list():
             return []
 
-        travis_path_swap = self.swap(
+        actions_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yml_file',
-            mock_read_travis_yml_file)
+            'read_and_parse_actions_config_files',
+            mock_read_actions_config_file)
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
+            'TEST_SUITES_NOT_RUN_ON_ACTIONS', [])
 
-        mock_e2e_travis_jobs = self.swap(
+        mock_get_e2e_suite_names_from_actions_config_file = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_jobs_travis_yml_file',
+            'get_e2e_suite_names_from_actions_config_file',
             mock_return_empty_list)
 
-        with travis_path_swap, mock_tests_to_remove:
-            with mock_e2e_travis_jobs:
-                with self.assertRaisesRegexp(
-                    Exception, 'The e2e test suites that have been '
-                               'extracted from jobs section from travis.ci'
-                               ' are empty.'):
-                    check_e2e_tests_are_captured_in_ci.main()
-
-    def test_main_with_invalid_travis_script_test_suite_length(self):
-        def mock_read_travis_yml_file():
-            travis_ci_file = python_utils.open_file(
-                os.path.join(
-                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
-            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
-            return travis_ci_dict
-        def mock_return_empty_list():
-            return []
-
-        travis_path_swap = self.swap(
-            check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yml_file',
-            mock_read_travis_yml_file)
-
-        mock_tests_to_remove = self.swap(
-            check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
-
-        mock_e2e_travis_script = self.swap(
-            check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_script_travis_yml_file',
-            mock_return_empty_list)
-
-        with travis_path_swap, mock_tests_to_remove:
-            with mock_e2e_travis_script:
+        with actions_path_swap, mock_tests_to_remove:
+            with mock_get_e2e_suite_names_from_actions_config_file:
                 with self.assertRaisesRegexp(
                     Exception, 'The e2e test suites that have been extracted '
-                               'from script section from travis.ci are empty.'):
+                               'from script section from Actions config files '
+                               'are empty.'):
                     check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_invalid_protractor_test_suite_length(self):
@@ -269,7 +209,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
+            'TEST_SUITES_NOT_RUN_ON_ACTIONS', [])
 
         mock_e2e_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
@@ -309,12 +249,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                     DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
             return protractor_config_file
 
-        def mock_read_travis_yml_file():
-            travis_ci_file = python_utils.open_file(
-                os.path.join(
-                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
-            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
-            return travis_ci_dict
+        def mock_read_actions_ci_config():
+            return EXPECTED_ACTIONS_CI_LIST
 
         protractor_test_suite_files_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
@@ -323,9 +259,9 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         protractor_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
             mock_read_protractor_conf_file)
-        travis_path_swap = self.swap(
+        actions_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
+            'read_and_parse_actions_config_files', mock_read_actions_ci_config)
         common_test_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST',
@@ -333,25 +269,25 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
+            'TEST_SUITES_NOT_RUN_ON_ACTIONS', [])
 
-        with protractor_path_swap, travis_path_swap, mock_tests_to_remove:
+        with protractor_path_swap, actions_path_swap, mock_tests_to_remove:
             with common_test_swap, protractor_test_suite_files_swap:
                 check_e2e_tests_are_captured_in_ci.main()
 
 
-EXPECTED_TRAVIS_CI_DICT = {
-    'env': {
-        'jobs': [
-            'RUN_E2E_TESTS_ONEWORD=true', 'RUN_E2E_TESTS_TWO_WORDS=true']
-        },
-    'script': [
-        'if [ "RUN_E2E_TESTS_ONEWORD" == \'true\' ]; '
-        'then travis_retry python -m scripts.run_e2e_tests'
-        ' --suite="oneword" --prod_env; fi',
-        'if [ "RUN_E2E_TESTS_TWO_WORDS" == \'true\' ]; '
-        'then travis_retry python -m scripts.run_e2e_tests'
-        ' --suite="twoWords" --prod_env; fi']}
+EXPECTED_ACTIONS_CI_LIST = [
+    """name: End-to-End tests
+jobs:
+  e2e_additional_editor_and_player:
+    steps:
+      - name: Run Additional Editor E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a python -m scripts.run_e2e_tests --suite="oneword" --prod_env
+      - name: Run Additional Player E2E Test
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="twoWords" --prod_env
+"""]
 
 EXPECTED_PROTRACTOR_CONF_FILE = """var path = require('path')
 var suites = {
