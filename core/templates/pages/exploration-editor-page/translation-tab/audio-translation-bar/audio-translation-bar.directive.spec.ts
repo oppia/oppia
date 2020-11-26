@@ -19,6 +19,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
@@ -48,6 +49,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { StateEditorRefreshService } from
@@ -106,13 +108,11 @@ describe('Audio translation bar directive', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('directiveTemplates'));
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
   });
-
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
     editabilityService = TestBed.get(EditabilityService);
@@ -151,8 +151,10 @@ describe('Audio translation bar directive', function() {
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
-    $provide.value(
-      'UserService', TestBed.get(UserService));
+     $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

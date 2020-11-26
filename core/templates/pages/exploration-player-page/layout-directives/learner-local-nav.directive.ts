@@ -129,6 +129,7 @@ angular.module('oppia').directive('learnerLocalNav', [
               .loadExploration(ctrl.explorationId)
               .then(function(exploration) {
                 ctrl.canEdit = exploration.can_edit;
+                $rootScope.$applyAsync();
               });
             ctrl.username = '';
             ctrl.feedbackOptionIsShown = true;
