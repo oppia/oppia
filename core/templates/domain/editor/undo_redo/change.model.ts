@@ -182,9 +182,9 @@ type SkillMisconceptionPropertyChange = (
   SkillMisconceptionsFeedbackChange);
 
 interface SkillRubricsChange {
-  'cmd': 'update_rubrics';
-  'difficulty': string;
-  'explanations': string[];
+  cmd: 'update_rubrics';
+  difficulty: string;
+  explanations: string[];
 }
 
 interface SkillContentsExplanationChange {
