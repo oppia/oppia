@@ -24,7 +24,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Change } from 'domain/editor/undo_redo/change.model';
+import { BackendChangeObject, Change } from 'domain/editor/undo_redo/change.model';
 
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
@@ -318,7 +318,7 @@ export class TopicUpdateService {
       throw new Error('Subtopic doesn\'t exist');
     }
     let newlyCreated = false;
-    let changeList =
+    let changeList:BackendChangeObject[] =
     this.undoRedoService.getCommittableChangeList();
     for (let i = 0; i < changeList.length; i++) {
       if (changeList[i].cmd === 'add_subtopic' &&
