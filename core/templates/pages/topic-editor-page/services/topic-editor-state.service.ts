@@ -34,6 +34,7 @@ import { RubricObjectFactory, RubricBackendDict } from 'domain/skill/RubricObjec
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service.ts';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service.ts';
 import { AlertsService } from 'services/alerts.service';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 
 
 @Injectable({
@@ -454,7 +455,7 @@ export class TopicEditorStateService {
             );
             // this._updateSkillIdToRubricsObject(
             //   topicBackendObject.skillIdToRubricsDict);
-            let changeList = this.undoRedoService.getCommittableChangeList();
+            let changeList:BackendChangeObject[] = this.undoRedoService.getCommittableChangeList();
             for (let i = 0; i < changeList.length; i++) {
               if (changeList[i].cmd === 'delete_canonical_story' ||
                   changeList[i].cmd === 'delete_additional_story') {
