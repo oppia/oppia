@@ -795,110 +795,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_all_nodes_visited(self):
         self.story.story_contents.next_node_id = 'node_4'
-        # Case 1: Prerequisite skills not acquired.
-        node_1 = {
-            'id': 'node_1',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'title': 'Title 1',
-            'description': 'Description 1',
-            'destination_node_ids': ['node_2', 'node_3'],
-            'acquired_skill_ids': ['skill_2'],
-            'prerequisite_skill_ids': ['skill_1'],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': None
-        }
-        node_2 = {
-            'id': 'node_2',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'title': 'Title 2',
-            'description': 'Description 2',
-            'destination_node_ids': [],
-            'acquired_skill_ids': ['skill_3'],
-            'prerequisite_skill_ids': ['skill_2'],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': None
-        }
-        node_3 = {
-            'id': 'node_3',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'title': 'Title 3',
-            'description': 'Description 3',
-            'destination_node_ids': [],
-            'acquired_skill_ids': ['skill_4'],
-            'prerequisite_skill_ids': ['skill_3'],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': None
-        }
-        self.story.story_contents.initial_node_id = 'node_1'
-        self.story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(node_1),
-            story_domain.StoryNode.from_dict(node_2),
-            story_domain.StoryNode.from_dict(node_3)
-        ]
-        self._assert_validation_error(
-            'The prerequisite skills skill_3 were not completed before '
-            'the node with id node_3 was unlocked.')
-
-        # Case 2: Story with loops.
-        node_1 = {
-            'id': 'node_1',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'title': 'Title 1',
-            'description': 'Description 1',
-            'destination_node_ids': ['node_2'],
-            'acquired_skill_ids': ['skill_2'],
-            'prerequisite_skill_ids': ['skill_1'],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': None
-        }
-        node_2 = {
-            'id': 'node_2',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'title': 'Title 2',
-            'description': 'Description 2',
-            'destination_node_ids': ['node_3'],
-            'acquired_skill_ids': ['skill_3'],
-            'prerequisite_skill_ids': ['skill_2'],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': None
-        }
-        node_3 = {
-            'id': 'node_3',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
-            'title': 'Title 3',
-            'description': 'Description 3',
-            'destination_node_ids': ['node_2'],
-            'acquired_skill_ids': ['skill_4'],
-            'prerequisite_skill_ids': ['skill_3'],
-            'outline': '',
-            'outline_is_finalized': False,
-            'exploration_id': None
-        }
-        self.story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(node_1),
-            story_domain.StoryNode.from_dict(node_2),
-            story_domain.StoryNode.from_dict(node_3)
-        ]
-        self._assert_validation_error('Loops are not allowed in stories.')
-
-        # Case 3: Disconnected graph.
+        # Case 1: Disconnected graph.
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
@@ -947,7 +844,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_3)
         ]
 
-        # Case 4: Graph with duplicate nodes.
+        # Case 2: Graph with duplicate nodes.
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
@@ -997,7 +894,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         ]
         self._assert_validation_error('Expected all node ids to be distinct')
 
-        # Case 5: Graph with duplicate titles.
+        # Case 3: Graph with duplicate titles.
         node_1 = {
             'id': 'node_1',
             'title': 'Title 1',
@@ -1049,7 +946,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected all chapter titles to be distinct.')
 
         self.story.story_contents.next_node_id = 'node_5'
-        # Case 6: A valid graph.
+        # Case 4: A valid graph.
         node_1 = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
