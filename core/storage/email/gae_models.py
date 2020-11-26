@@ -486,6 +486,20 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         raise Exception('Unique id generator is producing too many collisions.')
 
     @classmethod
+    def get_by_thread_id(cls, thread_id):
+        """Fetches the GeneralFeedbackEmailReplyToIdModel instance corresponding
+        to the given thread id.
+
+        Args:
+            thread_id: str. The ID of the thread.
+
+        Returns:
+            list(FeedbackEmailReplyToIdModel). A list of instance corresponding
+            to the given thread_id.
+        """
+        return cls.query(cls.thread_id == thread_id).fetch()
+
+    @classmethod
     def create(cls, user_id, thread_id):
         """Creates a new FeedbackEmailReplyToIdModel instance.
 
