@@ -898,7 +898,10 @@ class GeneralFeedbackThreadModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids', user_models.UserSettingsModel,
-                    [item.original_author_id]))
+                    [item.original_author_id],
+                    allow_system_user_ids=False,
+                    allow_pseudonymous_ids=True
+                ))
         if item.has_suggestion:
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
@@ -919,7 +922,10 @@ class GeneralFeedbackThreadModelValidator(
                 base_model_validators.ExternalModelFetcherDetails(
                     'last_nonempty_message_author_ids',
                     user_models.UserSettingsModel,
-                    [item.last_nonempty_message_author_id]))
+                    [item.last_nonempty_message_author_id],
+                    allow_system_user_ids=False,
+                    allow_pseudonymous_ids=True
+                ))
         return field_name_to_external_model_references
 
     @classmethod
@@ -1030,7 +1036,9 @@ class GeneralFeedbackMessageModelValidator(
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids',
                     user_models.UserSettingsModel,
-                    [item.author_id]
+                    [item.author_id],
+                    allow_system_user_ids=False,
+                    allow_pseudonymous_ids=True
                 )
             )
         return field_name_to_external_model_references
@@ -1651,7 +1659,9 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids',
                     user_models.UserSettingsModel,
-                    [item.author_id]
+                    [item.author_id],
+                    allow_system_user_ids=True,
+                    allow_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -1670,7 +1680,10 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                 field_name_to_external_model_references.append(
                     base_model_validators.ExternalModelFetcherDetails(
                         'reviewer_ids', user_models.UserSettingsModel,
-                        [item.final_reviewer_id]))
+                        [item.final_reviewer_id],
+                        allow_system_user_ids=False,
+                        allow_pseudonymous_ids=True
+                    ))
         return field_name_to_external_model_references
 
     @classmethod
@@ -1868,7 +1881,9 @@ class GeneralVoiceoverApplicationModelValidator(
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids',
                     user_models.UserSettingsModel,
-                    [item.author_id]
+                    [item.author_id],
+                    allow_system_user_ids=False,
+                    allow_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -1884,7 +1899,10 @@ class GeneralVoiceoverApplicationModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     'final_reviewer_ids', user_models.UserSettingsModel,
-                    [item.final_reviewer_id]))
+                    [item.final_reviewer_id],
+                    allow_system_user_ids=False,
+                    allow_pseudonymous_ids=True
+                ))
         return field_name_to_external_model_references
 
     @classmethod

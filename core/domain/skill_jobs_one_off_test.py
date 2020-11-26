@@ -30,7 +30,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(base_models, skill_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.skill])
 
 
 class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
@@ -402,9 +403,15 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.SKILL_ID, 'A description', rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
 
-        self.model_instance = (
+        self.commit_model_instance = (
             skill_models.SkillCommitLogEntryModel.get_by_id(
                 'skill-skill_id-1'))
+        self.metadata_model_instance = (
+            skill_models.SkillSnapshotMetadataModel.get_by_id(
+                'skill_id-1'))
+        self.content_model_instance = (
+            skill_models.SkillSnapshotContentModel.get_by_id(
+                'skill_id-1'))
 
         self.process_and_flush_pending_mapreduce_tasks()
 
@@ -417,45 +424,73 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         output = skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
             job_id)
         self.assertEqual(output, [])
-        self.assertFalse(self.model_instance.deleted)
+        self.assertFalse(self.commit_model_instance.deleted)
 
     def test_migration_job_skips_deleted_model(self):
-        self.model_instance.deleted = True
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
+        model_instances = [
+            self.commit_model_instance,
+            self.metadata_model_instance,
+            self.content_model_instance]
+        for model in model_instances:
+            model.deleted = True
+            model.update_timestamps()
+            model.put()
 
-        def mock_get_skill_by_id(unused_skill_id, strict=True, version=None): # pylint: disable=unused-argument
-            return None
+        job_id = (
+            skill_jobs_one_off
+            .MissingSkillMigrationOneOffJob.create_new())
+        skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
 
-        with self.swap(skill_fetchers, 'get_skill_by_id', mock_get_skill_by_id):
-            job_id = (
-                skill_jobs_one_off
-                .MissingSkillMigrationOneOffJob.create_new())
-            skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_mapreduce_tasks()
+        output = (
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
+                job_id))
+        self.assertEqual(output, [])
 
-            output = (
-                skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
-                    job_id))
-            self.assertEqual(output, [])
-
-    def test_migration_job_removes_commit_log_model_if_skill_model_is_missing(
+    def test_migration_job_removes_sub_models_if_skill_model_is_missing(
             self):
-        def mock_get_skill_by_id(unused_skill_id, strict=True, version=None): # pylint: disable=unused-argument
-            return None
-        with self.swap(skill_fetchers, 'get_skill_by_id', mock_get_skill_by_id):
-            job_id = (
-                skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
-            skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_mapreduce_tasks()
+        skill = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        skill.deleted = True
+        skill.update_timestamps(update_last_updated_time=False)
+        base_models.BaseModel.put_multi([skill])
 
-            output = (
-                skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
-                    job_id))
-            self.assertEqual(
-                output,
-                ['[u\'Skill Commit Model deleted\', [u\'skill-skill_id-1\']]'])
-            self.model_instance = (
-                skill_models.SkillCommitLogEntryModel.get_by_id(
-                    'skill-skill_id-1'))
-            self.assertIsNone(self.model_instance)
+        job_id = (
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.create_new())
+        skill_jobs_one_off.MissingSkillMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+
+        stringified_output = (
+            skill_jobs_one_off.MissingSkillMigrationOneOffJob.get_output(
+                job_id))
+        eval_output = [
+            ast.literal_eval(stringified_item) for
+            stringified_item in stringified_output]
+        expected_output = [
+            [
+                'Skill Commit Model deleted-SkillCommitLogEntryModel',
+                ['skill-skill_id-1']
+            ],
+            [
+                'Skill Commit Model deleted-SkillSnapshotContentModel',
+                ['skill_id-1']
+            ],
+            [
+                'Skill Commit Model deleted-' +
+                'SkillSnapshotMetadataModel',
+                ['skill_id-1']
+            ]
+        ]
+        self.commit_model_instance = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-skill_id-1'))
+        self.metadata_model_instance = (
+            skill_models.SkillSnapshotMetadataModel.get_by_id(
+                'skill_id-1'))
+        self.content_model_instance = (
+            skill_models.SkillSnapshotContentModel.get_by_id(
+                'skill_id-1'))
+
+        self.assertItemsEqual(eval_output, expected_output)
+        self.assertIsNone(self.commit_model_instance)
+        self.assertIsNone(self.metadata_model_instance)
+        self.assertIsNone(self.content_model_instance)
