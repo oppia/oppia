@@ -23,6 +23,7 @@ import { Collection } from
 import { CollectionRights } from
   'domain/collection/collection-rights.model';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
@@ -45,6 +46,8 @@ describe('Collection editor state service', function() {
   var testSubscriptions: Subscription;
 
   const collectionInitializedSpy = jasmine.createSpy('collectionInitialized');
+
+  importAllAngularServices();
 
   // TODO(bhenning): Consider moving this to a more shareable location.
   var FakeEditableCollectionBackendApiService = function() {

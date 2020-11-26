@@ -26,12 +26,16 @@ import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Chapter Editor tab', function() {
   var $scope = null;
   var ctrl = null;
   var MockStoryEditorNavigationService = null;
   var storyInitializedEventEmitter = null;
   var storyReinitializedEventEmitter = null;
+
+  importAllAngularServices();
 
   beforeEach(() => {
     TestBed.configureTestingModule({

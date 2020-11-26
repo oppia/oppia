@@ -34,6 +34,7 @@ import { SubtopicPageObjectFactory } from
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -112,6 +113,9 @@ describe('Topic update service', function() {
     },
     language_code: 'en'
   };
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
