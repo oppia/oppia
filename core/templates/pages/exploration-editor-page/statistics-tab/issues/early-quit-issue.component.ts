@@ -42,7 +42,7 @@ angular.module('oppia').component('earlyQuitIssue', {
       };
 
       var issueResolved = false;
-      $scope.resolveIssueAsync = function() {
+      $scope.resolveIssue = function() {
         if (!issueResolved) {
           PlaythroughIssuesService.resolveIssueAsync(issue);
           AlertsService.addSuccessMessage(
