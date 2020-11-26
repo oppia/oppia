@@ -40,6 +40,8 @@ interface CollectionTitleChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'new_subtopic_id': number;
+  'old_subtopic_id': number;
 
 }
 
@@ -49,6 +51,8 @@ interface CollectionCategoryChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface CollectionObjectiveChange {
@@ -57,6 +61,8 @@ interface CollectionObjectiveChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface CollectionLanguageCodeChange {
@@ -65,6 +71,8 @@ interface CollectionLanguageCodeChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface CollectionTagsChange {
@@ -73,6 +81,8 @@ interface CollectionTagsChange {
   'new_value': string[];
   'old_value': string[];
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type CollectionPropertyChange = (
@@ -86,6 +96,8 @@ interface CollectionAddNodeChange {
   'cmd': 'add_collection_node';
   'exploration_id': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface CollectionSwapNodeChange {
@@ -93,12 +105,16 @@ interface CollectionSwapNodeChange {
   'first_index': number;
   'second_index': number;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface CollectionDeleteNodeChange {
   'cmd': 'delete_collection_node';
   'exploration_id': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type CollectionChange = (
@@ -113,6 +129,8 @@ interface QuestionLanguageCodeChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface QuestionStateDataChange {
@@ -121,6 +139,8 @@ interface QuestionStateDataChange {
   'new_value': StateBackendDict;
   'old_value': StateBackendDict;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type QuestionPropertyChange = (
@@ -135,6 +155,8 @@ interface SkillDescriptionChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type SkillPropertyChange = SkillDescriptionChange;
@@ -146,6 +168,8 @@ interface SkillMisconceptionNameChange {
   'old_value': string;
   'misconception_id': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface SkillMisconceptionMustBeAddressedChange {
@@ -155,6 +179,8 @@ interface SkillMisconceptionMustBeAddressedChange {
   'old_value': boolean;
   'misconception_id': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface SkillMisconceptionsNotesChange {
@@ -164,6 +190,8 @@ interface SkillMisconceptionsNotesChange {
   'old_value': string;
   'misconception_id': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface SkillMisconceptionsFeedbackChange {
@@ -173,6 +201,8 @@ interface SkillMisconceptionsFeedbackChange {
   'old_value': string;
   'misconception_id': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type SkillMisconceptionPropertyChange = (
@@ -182,9 +212,12 @@ type SkillMisconceptionPropertyChange = (
   SkillMisconceptionsFeedbackChange);
 
 interface SkillRubricsChange {
-  cmd: 'update_rubrics';
-  difficulty: string;
-  explanations: string[];
+  'cmd': 'update_rubrics';
+  'difficulty': string;
+  'explanations': string[];
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface SkillContentsExplanationChange {
@@ -193,6 +226,8 @@ interface SkillContentsExplanationChange {
   'new_value': SubtitledHtmlBackendDict;
   'old_value': SubtitledHtmlBackendDict;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface SkillContentsWorkedExamplesChange {
@@ -201,6 +236,8 @@ interface SkillContentsWorkedExamplesChange {
   'new_value': WorkedExampleBackendDict;
   'old_value': WorkedExampleBackendDict;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type SkillContentsChange = (
@@ -211,22 +248,32 @@ interface SkillAddMisconceptionChange {
   'cmd': 'add_skill_misconception';
   'new_misconception_dict': MisconceptionBackendDict;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface SkillDeleteMisconceptionChange {
   'cmd': 'delete_skill_misconception';
   'misconception_id': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface SkillAddPrerequisiteChange {
   'cmd': 'add_prerequisite_skill';
   'skill_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface SkillDeletePrerequisiteChange {
   'cmd': 'delete_prerequisite_skill';
   'skill_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 export type SkillChange = (
@@ -244,6 +291,9 @@ interface StoryTitleChange {
   'property_name': 'title';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryUrlFragmentChange {
@@ -251,6 +301,9 @@ interface StoryUrlFragmentChange {
   'property_name': 'url_fragment';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryThumbnailFilenameChange {
@@ -258,6 +311,9 @@ interface StoryThumbnailFilenameChange {
   'property_name': 'thumbnail_filename';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryThumbnailBgColorChange {
@@ -265,6 +321,9 @@ interface StoryThumbnailBgColorChange {
   'property_name': 'thumbnail_bg_color';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryDescriptionChange {
@@ -272,6 +331,9 @@ interface StoryDescriptionChange {
   'property_name': 'description';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNotesChange {
@@ -279,6 +341,9 @@ interface StoryNotesChange {
   'property_name': 'notes';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryLanguageCodeChange {
@@ -286,6 +351,9 @@ interface StoryLanguageCodeChange {
   'property_name': 'language_code';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type StoryPropertyChange = (
@@ -302,6 +370,9 @@ interface StoryInitialNodeIdChange {
   'property_name': 'initial_node_id';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodesChange {
@@ -309,6 +380,9 @@ interface StoryNodesChange {
   'property_name': 'node';
   'new_value': number;
   'old_value': number;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type StoryContentsChange = (
@@ -321,6 +395,9 @@ interface StoryNodeOutlineChange {
   'new_value': string;
   'old_value': string;
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodeTitleChange {
@@ -329,6 +406,9 @@ interface StoryNodeTitleChange {
   'new_value': string;
   'old_value': string;
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodeDescriptionChange {
@@ -337,6 +417,9 @@ interface StoryNodeDescriptionChange {
   'new_value': string;
   'old_value': string;
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodeThumbnailFilenameChange {
@@ -345,6 +428,9 @@ interface StoryNodeThumbnailFilenameChange {
   'new_value': string;
   'old_value': string;
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodeThumbnailBgColorChange {
@@ -353,6 +439,9 @@ interface StoryNodeThumbnailBgColorChange {
   'new_value': string;
   'old_value': string;
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodeExplorationIdChange {
@@ -361,6 +450,9 @@ interface StoryNodeExplorationIdChange {
   'new_value': string;
   'old_value': string;
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodeDestinationIdsChange {
@@ -369,6 +461,9 @@ interface StoryNodeDestinationIdsChange {
   'new_value': string[];
   'old_value': string[];
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodePrerequisiteSkillsChange {
@@ -377,6 +472,9 @@ interface StoryNodePrerequisiteSkillsChange {
   'new_value': string[];
   'old_value': string[];
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodeAcequiredSkillsChange {
@@ -385,6 +483,9 @@ interface StoryNodeAcequiredSkillsChange {
   'new_value': string[];
   'old_value': string[];
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type StoryNodePropertyChange = (
@@ -402,11 +503,17 @@ interface StoryAddNodeChange {
   'cmd': 'add_story_node';
   'node_id': string;
   'title': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryDeleteNodeChange {
   'cmd': 'delete_story_node';
   'node_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface StoryNodeOutlineStatusChange {
@@ -414,6 +521,9 @@ interface StoryNodeOutlineStatusChange {
   'node_id': string;
   'old_value': boolean;
   'new_value': boolean;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 export type StoryChange = (
@@ -429,6 +539,9 @@ interface TopicNameChange {
   'property_name': 'name';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicAbbreviatedNameChange {
@@ -436,12 +549,18 @@ interface TopicAbbreviatedNameChange {
   'property_name': 'abbreviated_name';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 interface TopicPracticeTabChange {
   'cmd': 'update_topic_property';
   'property_name': 'practice_tab_is_displayed';
   'new_value': boolean;
   'old_value': boolean;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicThumbnailFilenameChange {
@@ -449,6 +568,9 @@ interface TopicThumbnailFilenameChange {
   'property_name': 'thumbnail_filename';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicThumbnailBgColorChange {
@@ -456,6 +578,9 @@ interface TopicThumbnailBgColorChange {
   'property_name': 'thumbnail_bg_color';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicDescriptionChange {
@@ -463,6 +588,9 @@ interface TopicDescriptionChange {
   'property_name': 'description';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicUrlFragmentChange {
@@ -470,6 +598,9 @@ interface TopicUrlFragmentChange {
   'property_name': 'url_fragment';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicMetaTagContentChange {
@@ -477,6 +608,9 @@ interface TopicMetaTagContentChange {
   'property_name': 'meta_tag_content';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicLanguageCodeChange {
@@ -484,6 +618,9 @@ interface TopicLanguageCodeChange {
   'property_name': 'language_code';
   'new_value': string;
   'old_value': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type TopicPropertyChange = (
@@ -503,6 +640,8 @@ interface TopicSubtopicThumbnailFilenameChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicSubtopicThumbnailBgColorChange {
@@ -511,6 +650,8 @@ interface TopicSubtopicThumbnailBgColorChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicSubtopicTitleChange {
@@ -519,6 +660,8 @@ interface TopicSubtopicTitleChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicSubtopicUrlFragmentChange {
@@ -527,6 +670,8 @@ interface TopicSubtopicUrlFragmentChange {
   'new_value': string;
   'old_value': string;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 export type TopicSubtopicPropertyChange = (
@@ -541,6 +686,8 @@ interface TopicSubtopicPageHtmlChange {
   'new_value': SubtitledHtmlBackendDict;
   'old_value': SubtitledHtmlBackendDict;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicSubtopicPageAudioChange {
@@ -549,6 +696,8 @@ interface TopicSubtopicPageAudioChange {
   'new_value': RecordedVoiceOverBackendDict;
   'old_value': RecordedVoiceOverBackendDict;
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 type TopicSubtopicPagePropertyChange = (
@@ -559,11 +708,15 @@ interface TopicAddSubtopicChange {
   'cmd': 'add_subtopic';
   'subtopic_id': number;
   'title': string;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicDeleteSubtopicChange {
   'cmd': 'delete_subtopic';
   'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 export interface TopicMoveSkillToSubtopicChange {
@@ -578,22 +731,33 @@ export interface TopicRemoveSkillFromSubtopicChange {
   'cmd': 'remove_skill_id_from_subtopic';
   'subtopic_id': number;
   'skill_id': string;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicDeleteAdditionalStoryChange {
   'cmd': 'delete_additional_story';
   'story_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicDeleteCanonicalStoryChange {
   'cmd': 'delete_canonical_story';
   'story_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicRearrangeCanonicalStoryChange {
   'cmd': 'rearrange_canonical_story';
   'from_index': number;
   'to_index': number;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicRearrangeSkillInSubtopicChange {
@@ -601,17 +765,25 @@ interface TopicRearrangeSkillInSubtopicChange {
   'subtopic_id': number;
   'from_index': number;
   'to_index': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicRearrangeSubtopicChange {
   'cmd': 'rearrange_subtopic';
   'from_index': number;
   'to_index': number;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 interface TopicRemoveUncategorizedSkillChange {
   'cmd': 'remove_uncategorized_skill_id';
   'uncategorized_skill_id': string;
+  'subtopic_id': number;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
 }
 
 export type TopicChange = (
