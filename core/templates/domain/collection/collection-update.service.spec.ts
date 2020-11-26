@@ -23,6 +23,7 @@ import { Change } from
 import { Collection, CollectionBackendDict } from
   'domain/collection/collection.model';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('domain/collection/collection-update.service.ts');
@@ -38,6 +39,7 @@ describe('Collection update service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', Change);
   }));

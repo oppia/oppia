@@ -514,7 +514,7 @@ type TopicSubtopicPagePropertyChange = (
 
 interface TopicAddSubtopicChange {
   'cmd': 'add_subtopic';
-  'subtopic_id': string;
+  'subtopic_id': number;
   'title': string;
 }
 
@@ -525,14 +525,14 @@ interface TopicDeleteSubtopicChange {
 
 interface TopicMoveSkillToSubtopicChange {
   'cmd': 'move_skill_id_to_subtopic';
-  'old_subtopic_id': string;
-  'new_subtopic_id': string;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
   'skill_id': string;
 }
 
 interface TopicRemoveSkillFromSubtopicChange {
   'cmd': 'remove_skill_id_from_subtopic';
-  'subtopic_id': string;
+  'subtopic_id': number;
   'skill_id': string;
 }
 
