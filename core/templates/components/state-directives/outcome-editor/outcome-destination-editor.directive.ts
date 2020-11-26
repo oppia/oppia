@@ -27,10 +27,13 @@ require('services/editability.service.ts');
 require('services/user.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
+require('constants.ts');
+
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('outcomeDestinationEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'MAX_STATE_NAME_LENGTH',
+  function(UrlInterpolationService, MAX_STATE_NAME_LENGTH,) {
     return {
       restrict: 'E',
       scope: {},
@@ -67,6 +70,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
           };
 
           ctrl.isCreatingNewState = function(outcome) {
+            ctrl.maxLen = MAX_STATE_NAME_LENGTH;
             return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
           };
           ctrl.$onInit = function() {
