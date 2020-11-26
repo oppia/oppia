@@ -26,13 +26,6 @@ import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicPageObjectFactory } from
   'domain/topic/SubtopicPageObjectFactory';
-<<<<<<< HEAD
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-import { importAllAngularServices } from 'tests/unit-test-utils';
-=======
->>>>>>> 4dda78af6db79f9d1cc99e90b01f9d0fac1a66dd
 // ^^^ This block is to be removed.
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicObjectFactory, TopicBackendDict} from 'domain/topic/TopicObjectFactory';
@@ -110,51 +103,6 @@ describe('Topic update service', function() {
     },
     language_code: 'en'
   };
-<<<<<<< HEAD
-  importAllAngularServices();
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value(
-      'ShortSkillSummaryObjectFactory', new ShortSkillSummaryObjectFactory());
-    $provide.value(
-      'StoryReferenceObjectFactory', new StoryReferenceObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value(
-      'SubtopicObjectFactory',
-      new SubtopicObjectFactory(new ShortSkillSummaryObjectFactory()));
-    $provide.value(
-      'SubtopicPageContentsObjectFactory',
-      new SubtopicPageContentsObjectFactory(
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'SubtopicPageObjectFactory', new SubtopicPageObjectFactory(
-        new SubtopicPageContentsObjectFactory(
-          new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
-          new SubtitledHtmlObjectFactory())));
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    recordedVoiceoversObjectFactory = $injector.get(
-      'RecordedVoiceoversObjectFactory');
-    TopicUpdateService = $injector.get('TopicUpdateService');
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
-    subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
-    subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    UndoRedoService = $injector.get('UndoRedoService');
-    skillSummaryObjectFactory = $injector.get('ShortSkillSummaryObjectFactory');
-=======
 
 
   beforeEach(() => {
@@ -166,7 +114,6 @@ describe('Topic update service', function() {
     subtopicPageObjectFactory = TestBed.get(SubtopicPageObjectFactory);
     undoRedoService = TestBed.get(UndoRedoService);
     skillSummaryObjectFactory = TestBed.get(ShortSkillSummaryObjectFactory);
->>>>>>> 4dda78af6db79f9d1cc99e90b01f9d0fac1a66dd
 
     _firstSkillSummary = skillSummaryObjectFactory.create(
       'skill_1', 'Description 1');
@@ -891,8 +838,7 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       skill_id: 'skill_2',
       new_subtopic_id: 1,
-      old_subtopic_id: null,
-      subtopic_id: null
+      old_subtopic_id: null
     }]);
     undoRedoService.clearChanges();
 
@@ -927,8 +873,7 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 1,
       new_subtopic_id: 2,
-      skill_id: 'skill_2',
-      subtopic_id: null
+      skill_id: 'skill_2'
     }]);
   });
 
@@ -957,14 +902,12 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 1,
       new_subtopic_id: 2,
-      skill_id: 'skill_2',
-      subtopic_id: null
+      skill_id: 'skill_2'
     }, {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 2,
       new_subtopic_id: 3,
-      skill_id: 'skill_2',
-      subtopic_id: null
+      skill_id: 'skill_2'
     }]);
   });
 
@@ -976,8 +919,7 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: null,
       new_subtopic_id: 1,
-      skill_id: 'skill_1',
-      subtopic_id: null
+      skill_id: 'skill_1'
     }]);
   });
 

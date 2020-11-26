@@ -543,6 +543,7 @@ interface TopicAddSubtopicChange {
 
 interface TopicDeleteSubtopicChange {
   'cmd': 'delete_subtopic';
+  'subtopic_id': number;
 }
 
 export interface TopicMoveSkillToSubtopicChange {

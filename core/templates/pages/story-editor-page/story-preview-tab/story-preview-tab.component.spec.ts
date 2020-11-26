@@ -34,13 +34,8 @@ describe('Story Preview tab', function() {
   var MockStoryEditorNavigationService = null;
   var storyInitializedEventEmitter = null;
   var storyReinitializedEventEmitter = null;
-<<<<<<< HEAD
 
   importAllAngularServices();
-
-=======
-  importAllAngularServices();
->>>>>>> 4dda78af6db79f9d1cc99e90b01f9d0fac1a66dd
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],

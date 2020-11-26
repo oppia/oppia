@@ -27,12 +27,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import {
-  TopicMoveSkillToSubtopicChange,
-  TopicRemoveSkillFromSubtopicChange,
-  TopicChange,
-  Change }
-  from 'domain/editor/undo_redo/change.model';
+import { TopicRemoveSkillFromSubtopicChange, TopicChange, Change } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { Topic } from 'core/templates/domain/topic/TopicObjectFactory';
@@ -338,7 +333,7 @@ export class TopicUpdateService {
     }
     if (newlyCreated) {
       // Get the current change list.
-      let currentChangeList = this.undoRedoService.getChangeList();
+      let currentChangeList: Change[] = this.undoRedoService.getChangeList();
       let indicesToDelete = [];
       // Loop over the current changelist and handle all the cases where
       // a skill moved into the subtopic or moved out of it.
@@ -388,11 +383,11 @@ export class TopicUpdateService {
         currentChangeList[i].setBackendChangeObject(changeDict);
       }
       for (let i = 0; i < currentChangeList.length; i++) {
-        let _backendChangeDict =
-          currentChangeList[i].getBackendChangeObject();
         let backendChangeDict =
-        _backendChangeDict as TopicMoveSkillToSubtopicChange;
-        if (backendChangeDict.hasOwnProperty('subtopic_id')) {
+          currentChangeList[i].getBackendChangeObject();
+        // Check presence of member equivalent of hasOwnProperty
+        // https://www.typescriptlang.org/docs/handbook/advanced-types.html
+        if ('subtopic_id' in backendChangeDict) {
           if (backendChangeDict.subtopic_id === subtopicId) {
             // The indices in the change list corresponding to changes to
             // the currently deleted and newly created subtopic are to be
@@ -406,16 +401,14 @@ export class TopicUpdateService {
             backendChangeDict.subtopic_id--;
           }
         }
-        if (backendChangeDict.hasOwnProperty('old_subtopic_id')) {
+        if ('old_subtopic_id' in backendChangeDict) {
           if (backendChangeDict.old_subtopic_id > subtopicId) {
             backendChangeDict.old_subtopic_id--;
-            backendChangeDict.subtopic_id = null;
           }
         }
-        if (backendChangeDict.hasOwnProperty('new_subtopic_id')) {
+        if ('new_subtopic_id' in backendChangeDict) {
           if (backendChangeDict.new_subtopic_id > subtopicId) {
             backendChangeDict.new_subtopic_id--;
-            backendChangeDict.subtopic_id = null;
           }
         }
         // Apply the above id reduction changes to the backend change.
@@ -463,7 +456,6 @@ export class TopicUpdateService {
       TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC, {
         old_subtopic_id: oldSubtopicId,
         new_subtopic_id: newSubtopicId, skill_id: skillSummary.getId(),
-        subtopic_id: null
       }, (changeDict, topic) => {
         // ---- Apply ----
         if (!oldSubtopicId) {
