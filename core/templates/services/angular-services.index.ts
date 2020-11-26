@@ -54,6 +54,7 @@ import { GuestCollectionProgressService } from 'domain/collection/guest-collecti
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from 'domain/exploration/AnswerStatsObjectFactory';
@@ -609,6 +610,7 @@ export const angularServices: [string, unknown][] = [
   ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TruncatePipe', TruncatePipe],
+  ['UndoRedoService', UndoRedoService],
   ['UnitsObjectFactory', UnitsObjectFactory],
   ['UrlInterpolationService', UrlInterpolationService],
   ['UrlService', UrlService],

@@ -21,6 +21,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { StoryChange } from 'domain/editor/undo_redo/change.model';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { Story, StoryBackendDict, StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
@@ -205,8 +207,8 @@ export class StoryEditorStateService {
     }
     this._storyIsBeingSaved = true;
     this.editableStoryBackendApiService.updateStory(
-      this._story.getId(), this._story.getVersion(),
-      commitMessage, this.undoRedoService.getCommittableChangeList()).then(
+      this._story.getId(), this._story.getVersion(), commitMessage,
+      <StoryChange[]> this.undoRedoService.getCommittableChangeList()).then(
       (storyBackendObject) => {
         this._updateStory(storyBackendObject);
         this.undoRedoService.clearChanges();
