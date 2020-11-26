@@ -65,9 +65,9 @@ export class SiteAnalyticsService {
   registerNewSignupEvent(): void {
     this._sendEventToGoogleAnalytics('SignupButton', 'click', '');
   }
-  registerClickBrowseLibraryButtonEvent(): void {
+  registerClickBrowseLessonsButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
-      'BrowseLibraryButton', 'click',
+      'BrowseLessonsButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
   registerGoToDonationSiteEvent(donationSiteName: string): void {
