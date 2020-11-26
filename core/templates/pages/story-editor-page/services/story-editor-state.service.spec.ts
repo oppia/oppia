@@ -45,7 +45,6 @@ class MockEditableStoryBackendApiService {
           }]
         });
       } else {
-        console.log("??SDFSDF?????????????SDFDSF???????ERROR");
         reject();
       }
     });
@@ -334,19 +333,20 @@ describe('Story editor state service', () => {
     expect(storyEditorStateService.isSavingStory()).toBe(false);
   }));
 
-  it('should indicate a story is no longer saving after an error', fakeAsync(() => {
-    storyEditorStateService.loadStory('storyId_0');
-    storyUpdateService.setStoryTitle(
-      storyEditorStateService.getStory(), 'New title');
-    tick(1000);
+  it('should indicate a story is no longer saving after an error',
+    fakeAsync(() => {
+      storyEditorStateService.loadStory('storyId_0');
+      storyUpdateService.setStoryTitle(
+        storyEditorStateService.getStory(), 'New title');
+      tick(1000);
 
-    expect(storyEditorStateService.isSavingStory()).toBe(false);
-    fakeEditableStoryBackendApiService.failure = 'Internal 500 error';
+      expect(storyEditorStateService.isSavingStory()).toBe(false);
+      fakeEditableStoryBackendApiService.failure = 'Internal 500 error';
 
-    storyEditorStateService.saveStory('Commit message');
-    expect(storyEditorStateService.isSavingStory()).toBe(true);
+      storyEditorStateService.saveStory('Commit message');
+      expect(storyEditorStateService.isSavingStory()).toBe(true);
 
-    tick(1000);
-    expect(storyEditorStateService.isSavingStory()).toBe(false);
-  }));
+      tick(1000);
+      expect(storyEditorStateService.isSavingStory()).toBe(false);
+    }));
 });

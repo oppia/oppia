@@ -80,7 +80,7 @@ export class StoryEditorStateService {
   private _updateStory(newBackendStoryObject: StoryBackendDict): void {
     this._setStory(
       this.storyObjectFactory.createFromBackendDict(newBackendStoryObject));
-  };
+  }
 
   private _setStoryWithUrlFragmentExists(
       storyWithUrlFragmentExists: boolean): void {
@@ -172,7 +172,7 @@ export class StoryEditorStateService {
    * calls will similarly fire a next() function of the
    * _storyReinitializedEventEmitter.
    */
-  setStory(story: Story) {
+  setStory(story: Story): void {
     this._setStory(story);
   }
 
