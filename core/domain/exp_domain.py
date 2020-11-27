@@ -669,12 +669,13 @@ class StateVersionMapping(python_utils.OBJECT):
         Raises:
             ValueError. The input range is out-of-bounds.
         """
-        range_is_valid = (
-            version_start >= self._version_start and
-            version_end <= self._version_end)
-        if not range_is_valid:
+        if (version_start < self._version_start or
+                version_end > self._version_end):
             raise ValueError('Requested version range is out-of-bounds')
-        return [self[i] for i in python_utils.RANGE(version_start, version_end)]
+        slice_start, slice_end = (
+            version_start - self._version_start,
+            version_end - self._version_start)
+        return self._versioned_states[slice_start:slice_end]
 
     @staticmethod
     def _default_state_equality_predicate(unused_state1, unused_state2):
