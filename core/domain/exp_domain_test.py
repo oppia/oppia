@@ -509,6 +509,7 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(mapping), 1)
         self.assertIn(1, mapping)
+        self.assertEqual(dict(mapping.items()), {1: ('A', state)})
         self.assertEqual(list(mapping.state_names()), ['A'])
         self.assertEqual(list(mapping.state_contents()), [state])
 
@@ -519,9 +520,14 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
         (mapping,) = self.get_state_version_mappings(
             'A', None, state_v1, state_v2, state_v3)
 
+        self.assertEqual(dict(mapping.items()), {
+            1: ('A', state_v1),
+            2: ('A', state_v2),
+            3: ('A', state_v3),
+        })
+        self.assertEqual(list(mapping.state_names()), ['A', 'A', 'A'])
         self.assertEqual(
             list(mapping.state_contents()), [state_v1, state_v2, state_v3])
-        self.assertEqual(list(mapping.state_names()), ['A', 'A', 'A'])
 
     def test_iter(self):
         state_v1, state_v2, state_v3 = (
@@ -657,8 +663,10 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
         mapping = exp_domain.StateVersionMapping(1, 'A', state_v1)
         mapping.extend_or_split(2, 'B', state_v2, diff)
 
-        self.assertEqual(list(mapping.state_contents()), [state_v1, state_v2])
+        self.assertEqual(
+            dict(mapping.items()), {1: ('A', state_v1), 2: ('B', state_v2)})
         self.assertEqual(list(mapping.state_names()), ['A', 'B'])
+        self.assertEqual(list(mapping.state_contents()), [state_v1, state_v2])
 
     def test_extend_or_split_with_unexpected_rename(self):
         (mapping,) = self.get_state_version_mappings(
