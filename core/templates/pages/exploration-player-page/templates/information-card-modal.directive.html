@@ -56,10 +56,10 @@
     </ul>
 
     <div ng-if="!explorationIsPrivate" class="oppia-info-card-bottom-row">
-      <div flex="40" class="tag-spacing">
+      <div flex="40" class="pb-1">
         <md-content layout="row">
           <div class="oppia-info-card-tag-icon">
-            <span class="fas fa-tags spaced" tooltip-append-to-body="true"
+            <span class="fas fa-tags oppia-info-card-modal-tooltip" tooltip-append-to-body="true"
                   uib-tooltip="<['I18N_PLAYER_TAGS_TOOLTIP' | translate]>"
                   tooltip-placement="top">
               <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_TAGS_TOOLTIP' | translate]></span>
@@ -115,10 +115,7 @@
   .oppia-info-card-bottom-row {
     line-height: 1.5;
   }
-  .tag-spacing {
-    padding-bottom: 2%;
-  }
-  .fas.fa-tags.spaced {
+  .fas.fa-tags.oppia-info-card-modal-tooltip {
     margin-left: 0.0625rem;
     margin-right: 0.1875rem;
   }
