@@ -540,7 +540,7 @@ class StateVersionMapping(python_utils.OBJECT):
         return self._version_start <= version < self._version_end
 
     def __getitem__(self, version):
-        """Returns the name and snapshot of the state at the given version."""
+        """Returns the name and content of the state at the given version."""
         if version not in self:
             raise KeyError('Mapping does not contain version=%r' % version)
         return self._versioned_states[version - self._version_start]
@@ -581,7 +581,8 @@ class StateVersionMapping(python_utils.OBJECT):
             exp_version - 1,
             exp_version_diff.new_to_old_state_names.get(state_name, state_name))
 
-        expected_prev_state_name, prev_state_content = self[prev_exp_version]
+        expected_prev_state_name, prev_state_content = (
+            self._versioned_states[-1])
 
         if actual_prev_state_name != expected_prev_state_name:
             raise Exception(
