@@ -47,6 +47,7 @@ import { StateWrittenTranslationsService } from 'components/state-editor/state-e
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
+import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
@@ -54,6 +55,7 @@ import { GuestCollectionProgressService } from 'domain/collection/guest-collecti
 import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from 'domain/exploration/AnswerStatsObjectFactory';
@@ -349,6 +351,7 @@ export const angularServices: [string, unknown][] = [
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
+  ['CollectionUpdateService', CollectionUpdateService],
   ['CollectionValidationService', CollectionValidationService],
   ['ComputeGraphService', ComputeGraphService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
@@ -618,6 +621,7 @@ export const angularServices: [string, unknown][] = [
   ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TruncatePipe', TruncatePipe],
+  ['UndoRedoService', UndoRedoService],
   ['UnitsObjectFactory', UnitsObjectFactory],
   ['UrlInterpolationService', UrlInterpolationService],
   ['UrlService', UrlService],

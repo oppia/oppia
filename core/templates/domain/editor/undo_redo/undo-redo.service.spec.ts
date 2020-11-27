@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,358 +15,328 @@
 /**
  * @fileoverview Tests for UndoRedoService.
  */
-import { TestBed } from '@angular/core/testing';
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// undo-redo.service.ts is upgraded to Angular 8.
 import { Change } from 'domain/editor/undo_redo/change.model';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
-describe('Undo/Redo Service', () => {
-  let undoRedoService: UndoRedoService = null;
+describe('Undo/Redo Service', function() {
+  var UndoRedoService = null;
+  importAllAngularServices();
 
-  beforeEach(() => {
-    undoRedoService = TestBed.get(UndoRedoService);
-  });
+  beforeEach(angular.mock.module('oppia'));
 
-  const _createBackendChangeObject = (value) => {
+  beforeEach(angular.mock.inject(function($injector) {
+    UndoRedoService = $injector.get('UndoRedoService');
+  }));
+
+  var _createBackendChangeObject = function(value) {
     return {
-      roperty_name: value,
+      roperty_name: value
     };
   };
 
-  const _createChangeDomainObject = (
-      backendObj,
-      applyFunc = () => {},
-      reverseFunc = () => {}
-  ) => new Change(backendObj, applyFunc, reverseFunc);
+  var _createChangeDomainObject = function(
+      backendObj, applyFunc = function() {}, reverseFunc = function() {}) {
+    return new Change(backendObj, applyFunc, reverseFunc);
+  };
 
-  const _createNoOpChangeDomainObject = (value) => {
-    const backendObject = _createBackendChangeObject(value);
+  var _createNoOpChangeDomainObject = function(value) {
+    var backendObject = _createBackendChangeObject(value);
     return _createChangeDomainObject(backendObject);
   };
 
-  it('should apply a single change', () => {
-    const applyFunc = jasmine.createSpy('applyChange');
+  it('should apply a single change', function() {
+    var applyFunc = jasmine.createSpy('applyChange');
 
-    expect(undoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
 
-    const fakeDomainObject = {
+    var fakeDomainObject = {
       domain_property_name: 'fake value'
     };
-    const backendChangeObject = _createBackendChangeObject('value');
-    const changeDomainObject = _createChangeDomainObject(
-      backendChangeObject,
-      applyFunc,
-      () => {}
-    );
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    var backendChangeObject = _createBackendChangeObject('value');
+    var changeDomainObject = _createChangeDomainObject(
+      backendChangeObject, applyFunc, function() {});
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
 
-    expect(undoRedoService.hasChanges()).toBeTruthy();
+    expect(UndoRedoService.hasChanges()).toBeTruthy();
     expect(applyFunc).toHaveBeenCalledWith(
-      backendChangeObject,
-      fakeDomainObject
-    );
+      backendChangeObject, fakeDomainObject);
   });
 
-  it('should be able to undo an applied change', () => {
-    const applyFunc = jasmine.createSpy('applyChange');
-    const reverseFunc = jasmine.createSpy('reverseChange');
+  it('should be able to undo an applied change', function() {
+    var applyFunc = jasmine.createSpy('applyChange');
+    var reverseFunc = jasmine.createSpy('reverseChange');
 
-    expect(undoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
 
     // Apply the initial change.
-    const fakeDomainObject = {
-      domain_property_name: 'fake value',
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
     };
-    const backendChangeObject = _createBackendChangeObject('value');
-    const changeDomainObject = _createChangeDomainObject(
-      backendChangeObject,
-      applyFunc,
-      reverseFunc
-    );
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    var backendChangeObject = _createBackendChangeObject('value');
+    var changeDomainObject = _createChangeDomainObject(
+      backendChangeObject, applyFunc, reverseFunc);
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
 
-    expect(undoRedoService.hasChanges()).toBeTruthy();
+    expect(UndoRedoService.hasChanges()).toBeTruthy();
     expect(applyFunc).toHaveBeenCalledWith(
-      backendChangeObject,
-      fakeDomainObject
-    );
+      backendChangeObject, fakeDomainObject);
 
-    expect(undoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
-    expect(undoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
     expect(reverseFunc).toHaveBeenCalledWith(
-      backendChangeObject,
-      fakeDomainObject
-    );
+      backendChangeObject, fakeDomainObject);
   });
 
-  it('should be able to redo an undone change', () => {
-    const applyFunc = jasmine.createSpy('applyChange');
-    const reverseFunc = jasmine.createSpy('reverseChange');
+  it('should be able to redo an undone change', function() {
+    var applyFunc = jasmine.createSpy('applyChange');
+    var reverseFunc = jasmine.createSpy('reverseChange');
 
-    expect(undoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
 
     // Apply the initial change.
-    const fakeDomainObject = {
-      domain_property_name: 'fake value',
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
     };
-    const backendChangeObject = _createBackendChangeObject('value');
-    const changeDomainObject = _createChangeDomainObject(
-      backendChangeObject,
-      applyFunc,
-      reverseFunc
-    );
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
-    expect(undoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+    var backendChangeObject = _createBackendChangeObject('value');
+    var changeDomainObject = _createChangeDomainObject(
+      backendChangeObject, applyFunc, reverseFunc);
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
 
     expect(reverseFunc).toHaveBeenCalledWith(
-      backendChangeObject,
-      fakeDomainObject
-    );
-    expect(undoRedoService.hasChanges()).toBeFalsy();
+      backendChangeObject, fakeDomainObject);
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
 
-    expect(undoRedoService.redoChange(fakeDomainObject)).toBeTruthy();
-    expect(undoRedoService.hasChanges()).toBeTruthy();
+    expect(UndoRedoService.redoChange(fakeDomainObject)).toBeTruthy();
+    expect(UndoRedoService.hasChanges()).toBeTruthy();
     expect(applyFunc).toHaveBeenCalledWith(
-      backendChangeObject,
-      fakeDomainObject
-    );
+      backendChangeObject, fakeDomainObject);
 
     // Apply must be called twice (once for the first apply and once for redo).
     expect(applyFunc.calls.count()).toEqual(2);
   });
 
-  it('should not undo anything if no changes are applied', () => {
-    const fakeDomainObject = {
-      domain_property_name: 'fake value',
+  it('should not undo anything if no changes are applied', function() {
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
     };
 
-    expect(undoRedoService.hasChanges()).toBeFalsy();
-    expect(undoRedoService.undoChange(fakeDomainObject)).toBeFalsy();
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeFalsy();
   });
 
-  it('should not redo anything if no changes are undone', () => {
-    const fakeDomainObject = {
-      domain_property_name: 'fake value',
+  it('should not redo anything if no changes are undone', function() {
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
     };
 
-    expect(undoRedoService.hasChanges()).toBeFalsy();
-    expect(undoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
 
-    const changeDomainObject = _createNoOpChangeDomainObject('value');
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
-    expect(undoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
+    var changeDomainObject = _createNoOpChangeDomainObject('value');
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    expect(UndoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
   });
 
-  it('should only clear the list on clear and not undo changes', () => {
-    const applyFunc = jasmine.createSpy('applyChange');
-    const reverseFunc = jasmine.createSpy('reverseChange');
+  it('should only clear the list on clear and not undo changes', function() {
+    var applyFunc = jasmine.createSpy('applyChange');
+    var reverseFunc = jasmine.createSpy('reverseChange');
 
-    const fakeDomainObject = {
-      domain_property_name: 'fake value',
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
     };
-    const backendChangeObject = _createBackendChangeObject('value');
-    const changeDomainObject = _createChangeDomainObject(
-      backendChangeObject,
-      applyFunc,
-      reverseFunc
-    );
+    var backendChangeObject = _createBackendChangeObject('value');
+    var changeDomainObject = _createChangeDomainObject(
+      backendChangeObject, applyFunc, reverseFunc);
 
-    expect(undoRedoService.getChangeCount()).toEqual(0);
+    expect(UndoRedoService.getChangeCount()).toEqual(0);
 
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
-    expect(undoRedoService.getChangeCount()).toEqual(1);
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    expect(UndoRedoService.getChangeCount()).toEqual(1);
 
-    undoRedoService.clearChanges();
-    expect(undoRedoService.getChangeCount()).toEqual(0);
+    UndoRedoService.clearChanges();
+    expect(UndoRedoService.getChangeCount()).toEqual(0);
 
     expect(applyFunc).toHaveBeenCalled();
     expect(reverseFunc).not.toHaveBeenCalled();
     expect(applyFunc.calls.count()).toEqual(1);
   });
 
-  it('should undo changes in the reverse order of applying', () => {
-    const appliedChanges = [];
-    const reversedChanges = [];
+  it('should undo changes in the reverse order of applying', function() {
+    var appliedChanges = [];
+    var reversedChanges = [];
 
-    const fakeDomainObject = {
-      domain_property_name: 'fake value',
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
     };
-    const backendChangeObject1 = _createBackendChangeObject('value1');
-    const changeDomainObject1 = _createChangeDomainObject(
-      backendChangeObject1,
-      () => {
+    var backendChangeObject1 = _createBackendChangeObject('value1');
+    var changeDomainObject1 = _createChangeDomainObject(
+      backendChangeObject1, function() {
         appliedChanges.push('change1');
-      },
-      () => {
+      }, function() {
         reversedChanges.push('change1');
-      }
-    );
+      });
 
-    const backendChangeObject2 = _createBackendChangeObject('value2');
-    const changeDomainObject2 = _createChangeDomainObject(
-      backendChangeObject2,
-      () => {
+    var backendChangeObject2 = _createBackendChangeObject('value2');
+    var changeDomainObject2 = _createChangeDomainObject(
+      backendChangeObject2, function() {
         appliedChanges.push('change2');
-      },
-      () => {
+      }, function() {
         reversedChanges.push('change2');
-      }
-    );
+      });
 
-    const backendChangeObject3 = _createBackendChangeObject('value3');
-    const changeDomainObject3 = _createChangeDomainObject(
-      backendChangeObject3,
-      () => {
+    var backendChangeObject3 = _createBackendChangeObject('value3');
+    var changeDomainObject3 = _createChangeDomainObject(
+      backendChangeObject3, function() {
         appliedChanges.push('change3');
-      },
-      () => {
+      }, function() {
         reversedChanges.push('change3');
-      }
-    );
+      });
 
     expect(appliedChanges).toEqual([]);
     expect(reversedChanges).toEqual([]);
 
-    undoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
-    undoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
-    undoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
+    UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+    UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+    UndoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
 
     expect(appliedChanges).toEqual(['change1', 'change2', 'change3']);
     expect(reversedChanges).toEqual([]);
-    expect(undoRedoService.getChangeCount()).toEqual(3);
+    expect(UndoRedoService.getChangeCount()).toEqual(3);
 
-    expect(undoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
-    expect(undoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
-    expect(undoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
 
     expect(appliedChanges).toEqual(['change1', 'change2', 'change3']);
     expect(reversedChanges).toEqual(['change3', 'change2', 'change1']);
-    expect(undoRedoService.getChangeCount()).toEqual(0);
+    expect(UndoRedoService.getChangeCount()).toEqual(0);
   });
 
   it('should not be able to redo after applying a new change after undo',
-    () => {
-      expect(undoRedoService.getChangeCount()).toEqual(0);
+    function() {
+      expect(UndoRedoService.getChangeCount()).toEqual(0);
 
-      const fakeDomainObject = {
-        domain_property_name: 'fake value',
+      var fakeDomainObject = {
+        domain_property_name: 'fake value'
       };
-      const changeDomainObject1 = _createNoOpChangeDomainObject('value1');
-      const changeDomainObject2 = _createNoOpChangeDomainObject('value2');
-      const changeDomainObject3 = _createNoOpChangeDomainObject('value3');
+      var changeDomainObject1 = _createNoOpChangeDomainObject('value1');
+      var changeDomainObject2 = _createNoOpChangeDomainObject('value2');
+      var changeDomainObject3 = _createNoOpChangeDomainObject('value3');
 
-      undoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
-      undoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
-      expect(undoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+      UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+      expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
 
-      undoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
-      expect(undoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
+      UndoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
+      expect(UndoRedoService.redoChange(fakeDomainObject)).toBeFalsy();
 
-      expect(undoRedoService.getChangeCount()).toEqual(2);
-    });
+      expect(UndoRedoService.getChangeCount()).toEqual(2);
+    }
+  );
 
-  it('should have an empty change list with no changes', () => {
-    expect(undoRedoService.hasChanges()).toBeFalsy();
-    expect(undoRedoService.getChangeList()).toEqual([]);
+  it('should have an empty change list with no changes', function() {
+    expect(UndoRedoService.hasChanges()).toBeFalsy();
+    expect(UndoRedoService.getChangeList()).toEqual([]);
   });
 
-  it('should build a change list from only applied changes', () => {
-    expect(undoRedoService.getChangeCount()).toEqual(0);
+  it('should build a change list from only applied changes', function() {
+    expect(UndoRedoService.getChangeCount()).toEqual(0);
 
-    const fakeDomainObject = {
-      domain_property_name: 'fake value',
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
     };
-    const changeDomainObject1 = _createNoOpChangeDomainObject('value1');
-    const changeDomainObject2 = _createNoOpChangeDomainObject('value2');
-    const changeDomainObject3 = _createNoOpChangeDomainObject('value3');
+    var changeDomainObject1 = _createNoOpChangeDomainObject('value1');
+    var changeDomainObject2 = _createNoOpChangeDomainObject('value2');
+    var changeDomainObject3 = _createNoOpChangeDomainObject('value3');
 
-    undoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
-    undoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
-    expect(undoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+    UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+    UndoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
+    expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
 
-    undoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
-    expect(undoRedoService.getChangeCount()).toEqual(2);
+    UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+    expect(UndoRedoService.getChangeCount()).toEqual(2);
 
-    const changeList = undoRedoService.getChangeList();
+    var changeList = UndoRedoService.getChangeList();
     expect(changeList).toEqual([changeDomainObject2, changeDomainObject1]);
   });
 
   it('should return a change list whose mutations do not change the service',
-    () => {
-      const fakeDomainObject = {
-        domain_property_name: 'fake value',
+    function() {
+      var fakeDomainObject = {
+        domain_property_name: 'fake value'
       };
-      const changeDomainObject1 = _createNoOpChangeDomainObject('value1');
-      const changeDomainObject2 = _createNoOpChangeDomainObject('value2');
+      var changeDomainObject1 = _createNoOpChangeDomainObject('value1');
+      var changeDomainObject2 = _createNoOpChangeDomainObject('value2');
 
-      undoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
-      undoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
 
-      const changeList = undoRedoService.getChangeList();
+      var changeList = UndoRedoService.getChangeList();
       expect(changeList).toEqual([changeDomainObject1, changeDomainObject2]);
-      expect(undoRedoService.getChangeCount()).toEqual(2);
+      expect(UndoRedoService.getChangeCount()).toEqual(2);
 
       // Change the returned change list, which should be a copy.
       changeList.splice(0, 1);
-      expect(undoRedoService.getChangeCount()).toEqual(2);
+      expect(UndoRedoService.getChangeCount()).toEqual(2);
 
-      const origChangeList = undoRedoService.getChangeList();
-      expect(origChangeList).toEqual(
-        [changeDomainObject1, changeDomainObject2]);
-    });
+      var origChangeList = UndoRedoService.getChangeList();
+      expect(origChangeList)
+        .toEqual([changeDomainObject1, changeDomainObject2]);
+    }
+  );
 
-  it('should build a committable change list with one change', () => {
-    const fakeDomainObject = {
-      domain_property_name: 'fake value',
+  it('should build a committable change list with one change', function() {
+    var fakeDomainObject = {
+      domain_property_name: 'fake value'
     };
-    const backendChangeObject = _createBackendChangeObject('value');
-    const changeDomainObject = _createChangeDomainObject(backendChangeObject);
+    var backendChangeObject = _createBackendChangeObject('value');
+    var changeDomainObject = _createChangeDomainObject(backendChangeObject);
 
-    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
 
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
-    expect(undoRedoService.getCommittableChangeList()).toEqual(
-      [backendChangeObject,
-      ]);
+    UndoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([
+      backendChangeObject
+    ]);
   });
 
   it('should build a committable change list in the order of applied changes',
-    () => {
-    // Perform a series of complex operations to build the committable change
-    // list. Apply 3 changes, undo two, redo one, and apply one.
-      const fakeDomainObject = {
-        domain_property_name: 'fake value',
+    function() {
+      // Perform a series of complex operations to build the committable change
+      // list. Apply 3 changes, undo two, redo one, and apply one.
+      var fakeDomainObject = {
+        domain_property_name: 'fake value'
       };
-      const backendChangeObject1 = _createBackendChangeObject('value1');
-      const backendChangeObject2 = _createBackendChangeObject('value2');
-      const backendChangeObject3 = _createBackendChangeObject('value3');
-      const backendChangeObject4 = _createBackendChangeObject('value4');
-      const changeDomainObject1 = _createChangeDomainObject(
-        backendChangeObject1);
-      const changeDomainObject2 = _createChangeDomainObject(
-        backendChangeObject2);
-      const changeDomainObject3 = _createChangeDomainObject(
-        backendChangeObject3);
-      const changeDomainObject4 = _createChangeDomainObject(
-        backendChangeObject4);
+      var backendChangeObject1 = _createBackendChangeObject('value1');
+      var backendChangeObject2 = _createBackendChangeObject('value2');
+      var backendChangeObject3 = _createBackendChangeObject('value3');
+      var backendChangeObject4 = _createBackendChangeObject('value4');
+      var changeDomainObject1 = _createChangeDomainObject(backendChangeObject1);
+      var changeDomainObject2 = _createChangeDomainObject(backendChangeObject2);
+      var changeDomainObject3 = _createChangeDomainObject(backendChangeObject3);
+      var changeDomainObject4 = _createChangeDomainObject(backendChangeObject4);
 
-      expect(undoRedoService.getChangeCount()).toEqual(0);
+      expect(UndoRedoService.getChangeCount()).toEqual(0);
 
-      undoRedoService.applyChange(changeDomainObject4, fakeDomainObject);
-      undoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
-      undoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject4, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject2, fakeDomainObject);
+      UndoRedoService.applyChange(changeDomainObject3, fakeDomainObject);
 
-      expect(undoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
-      expect(undoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
-      expect(undoRedoService.redoChange(fakeDomainObject)).toBeTruthy();
+      expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+      expect(UndoRedoService.undoChange(fakeDomainObject)).toBeTruthy();
+      expect(UndoRedoService.redoChange(fakeDomainObject)).toBeTruthy();
 
-      undoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
-      expect(undoRedoService.getChangeCount()).toEqual(3);
+      UndoRedoService.applyChange(changeDomainObject1, fakeDomainObject);
+      expect(UndoRedoService.getChangeCount()).toEqual(3);
 
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
-        backendChangeObject4,
-        backendChangeObject2,
-        backendChangeObject1,
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([
+        backendChangeObject4, backendChangeObject2, backendChangeObject1
       ]);
-    });
+    }
+  );
 });

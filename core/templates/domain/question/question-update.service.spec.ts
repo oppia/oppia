@@ -47,7 +47,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('App.ts');
-require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/question-update.service.ts');
 require('domain/state/StateObjectFactory.ts');
