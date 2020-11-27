@@ -732,20 +732,20 @@ class ExplorationStatesHistory(python_utils.OBJECT):
 
         self._state_mappings = []
         for exp, diff in python_utils.ZIP(exps, exp_version_diffs):
-            new_state_mapping = dict()
+            new_state_mappings = dict()
             for state_name, state in exp.states.items():
                 if exp.version == 1 or state_name in diff.added_state_names:
-                    new_state_mapping[state_name] = StateVersionMapping(
+                    new_state_mappings[state_name] = StateVersionMapping(
                         exp.version, state_name, state,
                         state_equality_predicate=state_equality_predicate)
                 elif state_name not in diff.deleted_state_names:
-                    prev_state_mapping, prev_state_name = (
+                    prev_state_mappings, prev_state_name = (
                         self._state_mappings[-1],
                         diff.new_to_old_state_names.get(state_name, state_name))
-                    new_state_mapping[state_name] = (
-                        prev_state_mapping[prev_state_name].extend_or_split(
+                    new_state_mappings[state_name] = (
+                        prev_state_mappings[prev_state_name].extend_or_split(
                             exp.version, state_name, state, diff))
-            self._state_mappings.append(new_state_mapping)
+            self._state_mappings.append(new_state_mappings)
 
     def get_state_span(self, exp_version, state_name):
         """Returns the span of versions for the given state which includes the
