@@ -829,6 +829,7 @@ describe('Topic update service', function() {
       _sampleTopic, 2, 1, _secondSkillSummary
     );
     topicUpdateService.deleteSubtopic(_sampleTopic, 2);
+
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'remove_skill_id_from_subtopic',
       skill_id: 'skill_2',
@@ -837,7 +838,8 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       skill_id: 'skill_2',
       new_subtopic_id: 1,
-      old_subtopic_id: null
+      old_subtopic_id: null,
+      subtopic_id: null
     }]);
     undoRedoService.clearChanges();
 
@@ -872,7 +874,8 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 1,
       new_subtopic_id: 2,
-      skill_id: 'skill_2'
+      skill_id: 'skill_2',
+      subtopic_id: null
     }]);
   });
 
@@ -901,12 +904,14 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 1,
       new_subtopic_id: 2,
-      skill_id: 'skill_2'
+      skill_id: 'skill_2',
+      subtopic_id: null
     }, {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: 2,
       new_subtopic_id: 3,
-      skill_id: 'skill_2'
+      skill_id: 'skill_2',
+      subtopic_id: null
     }]);
   });
 
@@ -918,7 +923,8 @@ describe('Topic update service', function() {
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: null,
       new_subtopic_id: 1,
-      skill_id: 'skill_1'
+      skill_id: 'skill_1',
+      subtopic_id: null
     }]);
   });
 

@@ -24,7 +24,12 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { BackendChangeObject, Change } from 'domain/editor/undo_redo/change.model';
+import {
+  TopicMoveSkillToSubtopicChange,
+  TopicRemoveSkillFromSubtopicChange,
+  TopicChange,
+  Change }
+  from 'domain/editor/undo_redo/change.model';
 
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
@@ -318,11 +323,12 @@ export class TopicUpdateService {
       throw new Error('Subtopic doesn\'t exist');
     }
     let newlyCreated = false;
-    let changeList:BackendChangeObject[] =
+    let changeList =
     this.undoRedoService.getCommittableChangeList();
     for (let i = 0; i < changeList.length; i++) {
-      if (changeList[i].cmd === 'add_subtopic' &&
-          changeList[i].subtopic_id === subtopicId) {
+      let _changeList = changeList[i] as TopicChange;
+      if (_changeList.cmd === 'add_subtopic' &&
+          _changeList.subtopic_id === subtopicId) {
         newlyCreated = true;
       }
     }
@@ -351,11 +357,12 @@ export class TopicUpdateService {
               // Change the move operation to the deleted subtopic to a
               // remove operation, to move that skill into the uncategorized
               // section from its origin.
-              changeDict.cmd =
-              TopicDomainConstants.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC;
-              changeDict.subtopic_id = changeDict.old_subtopic_id;
-              delete changeDict.old_subtopic_id;
-              delete changeDict.new_subtopic_id;
+              let _changeDict: TopicRemoveSkillFromSubtopicChange = {
+                cmd: TopicDomainConstants.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+                subtopic_id: changeDict.old_subtopic_id,
+                skill_id: changeDict.skill_id
+              };
+              changeDict = _changeDict;
             }
           } else if (changeDict.old_subtopic_id === subtopicId) {
             // Any operation where a skill was moved out of this subtopic
@@ -377,8 +384,10 @@ export class TopicUpdateService {
         currentChangeList[i].setBackendChangeObject(changeDict);
       }
       for (let i = 0; i < currentChangeList.length; i++) {
-        let backendChangeDict =
+        let _backendChangeDict =
           currentChangeList[i].getBackendChangeObject();
+        let backendChangeDict =
+        _backendChangeDict as TopicMoveSkillToSubtopicChange;
         if (backendChangeDict.hasOwnProperty('subtopic_id')) {
           if (backendChangeDict.subtopic_id === subtopicId) {
             // The indices in the change list corresponding to changes to
@@ -396,18 +405,20 @@ export class TopicUpdateService {
         if (backendChangeDict.hasOwnProperty('old_subtopic_id')) {
           if (backendChangeDict.old_subtopic_id > subtopicId) {
             backendChangeDict.old_subtopic_id--;
+            backendChangeDict.subtopic_id = null;
           }
         }
         if (backendChangeDict.hasOwnProperty('new_subtopic_id')) {
           if (backendChangeDict.new_subtopic_id > subtopicId) {
             backendChangeDict.new_subtopic_id--;
+            backendChangeDict.subtopic_id = null;
           }
         }
         // Apply the above id reduction changes to the backend change.
         currentChangeList[i].setBackendChangeObject(backendChangeDict);
       }
       // The new change list is found by deleting the above found elements.
-      let newChangeList = currentChangeList.filter(function(change) {
+      let newChangeList = currentChangeList.filter((change) => {
         let changeObjectIndex = currentChangeList.indexOf(change);
         // Return all elements that were not deleted.
         return (indicesToDelete.indexOf(changeObjectIndex) === -1);
@@ -446,7 +457,8 @@ export class TopicUpdateService {
       topic,
       TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC, {
         old_subtopic_id: oldSubtopicId,
-        new_subtopic_id: newSubtopicId, skill_id: skillSummary.getId()
+        new_subtopic_id: newSubtopicId, skill_id: skillSummary.getId(),
+        subtopic_id: null
       }, (changeDict, topic) => {
         // ---- Apply ----
         if (!oldSubtopicId) {
@@ -643,10 +655,10 @@ export class TopicUpdateService {
     this._applyChange(
       topic, TopicDomainConstants.CMD_DELETE_ADDITIONAL_STORY, {
         story_id: storyId
-      }, function(changeDict, topic) {
+      }, (changeDict, topic) => {
         // ---- Apply ----
         topic.removeAdditionalStory(storyId);
-      }, function(changeDict, topic) {
+      }, (changeDict, topic) => {
         // ---- Undo ----
         topic.addAdditionalStory(storyId);
       });
