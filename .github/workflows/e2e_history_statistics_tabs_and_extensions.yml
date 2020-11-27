@@ -10,7 +10,7 @@ on:
       - release-*
 
 jobs:
-  e2e_group_4:
+  e2e_history_statistics_tabs_and_extensions:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
