@@ -556,9 +556,10 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
             *distinct_states)
 
         self.assertEqual(len(mappings), 3)
-        self.assertEqual(mappings[0][1], ('A', distinct_states[0]))
-        self.assertEqual(mappings[1][2], ('A', distinct_states[1]))
-        self.assertEqual(mappings[2][3], ('A', distinct_states[2]))
+        mapping1, mapping2, mapping3 = mappings
+        self.assertEqual(mapping1[1], ('A', distinct_states[0]))
+        self.assertEqual(mapping2[2], ('A', distinct_states[1]))
+        self.assertEqual(mapping3[3], ('A', distinct_states[2]))
 
     def test_get_multi_with_newly_constructed_span(self):
         state = self.new_state_domain_obj()
@@ -591,15 +592,16 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
             *distinct_states)
 
         self.assertEqual(len(mappings), 3)
+        mapping1, mapping2, mapping3 = mappings
         self.assertEqual(
-            mappings[0].get_multi_contents(1, 2), distinct_states[0:1])
+            mapping1.get_multi_contents(1, 2), distinct_states[0:1])
         self.assertEqual(
-            mappings[1].get_multi_contents(2, 3), distinct_states[1:2])
+            mapping2.get_multi_contents(2, 3), distinct_states[1:2])
         self.assertEqual(
-            mappings[2].get_multi_contents(3, 4), distinct_states[2:3])
-        self.assertEqual(mappings[0].get_multi_names(1, 2), ['A'])
-        self.assertEqual(mappings[1].get_multi_names(2, 3), ['A'])
-        self.assertEqual(mappings[2].get_multi_names(3, 4), ['A'])
+            mapping3.get_multi_contents(3, 4), distinct_states[2:3])
+        self.assertEqual(mapping1.get_multi_names(1, 2), ['A'])
+        self.assertEqual(mapping2.get_multi_names(2, 3), ['A'])
+        self.assertEqual(mapping3.get_multi_names(3, 4), ['A'])
 
     def test_get_multi(self):
         distinct_states = [
