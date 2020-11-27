@@ -120,7 +120,9 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                 with mock_actions_ci_scripts:
                     with self.assertRaisesRegexp(
                         Exception, 'Protractor test suites and Actions test '
-                                   'suites are not in sync.'):
+                                   'suites are not in sync. Following suites'
+                                   ' are not in sync: '
+                                   r'\[u\'notPresent\', u\'invalid\'\]'):
                         check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_missing_test_fail(self):

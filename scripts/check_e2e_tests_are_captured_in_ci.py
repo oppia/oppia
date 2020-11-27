@@ -23,6 +23,7 @@ import os
 import re
 
 import python_utils
+import utils
 
 # These test suites are not present in Action. One is extra
 # (ie. (full: [*.js])) and other test suites are being run by CircleCI.
@@ -193,7 +194,10 @@ def main():
 
     if protractor_test_suites != actions_suite_names:
         raise Exception(
-            'Protractor test suites and Actions test suites are not in sync.')
+            'Protractor test suites and Actions test suites are not in sync. '
+            'Following suites are not in sync: {}'.format(
+                utils.compute_list_difference(
+                    protractor_test_suites, actions_suite_names)))
 
     python_utils.PRINT('Done!')
 
