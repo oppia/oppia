@@ -22,6 +22,7 @@ import atexit
 import contextlib
 import os
 import re
+import shutil
 import signal
 import subprocess
 import sys
@@ -178,7 +179,7 @@ def ensure_screenshots_dir_is_removed():
         'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
         'core/tests/protractor.conf.js, you can view screenshots'
         'of the failed tests in ../protractor-screenshots/')
-    os.rmdir(screenshots_dir)
+    shutil.rmtree(screenshots_dir)
 
 
 def cleanup():
