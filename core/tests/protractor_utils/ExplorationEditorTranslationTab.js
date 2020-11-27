@@ -239,7 +239,8 @@ var ExplorationEditorTranslationTab = function() {
   this.uploadAudioRecord = async function(audioPath) {
     await action.click('Audio Record Button', uploadAudioButton);
     absPath = path.resolve(__dirname, audioPath);
-    await action.sendKeys('Audio upload input', audioUploadInput, absPath);
+    await action.sendKeys(
+      'Audio upload input', audioUploadInput, absPath, false);
   };
 
   this.saveAudioRecord = async function() {
