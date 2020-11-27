@@ -463,7 +463,7 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
                 to enforce the following invariant: all versions of the state in
-                a span are equivalent. If None, then uses a predicate that
+                a mapping are equivalent. If None, then uses a predicate that
                 unconditionally returns True.
             *subsequent_versions: tuple(state_domain.State). The subsequent
                 versions of the state.
@@ -479,69 +479,69 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
         ]
         nodiff = exp_domain.ExplorationVersionsDiff([])
         for exp_version, state in enumerate(subsequent_versions, start=2):
-            span = distinct_mappings[-1].extend_or_split(
+            mapping = distinct_mappings[-1].extend_or_split(
                 exp_version, state_name, state, nodiff)
-            if span is not distinct_mappings[-1]:
-                distinct_mappings.append(span)
+            if mapping is not distinct_mappings[-1]:
+                distinct_mappings.append(mapping)
         return distinct_mappings
 
     def test_set_version_directly_raises_an_exception(self):
         state = self.new_state_domain_obj()
 
-        span = exp_domain.StateVersionMapping(1, 'A', state)
+        mapping = exp_domain.StateVersionMapping(1, 'A', state)
 
         with self.assertRaisesRegexp(
-            Exception, 'Only `extend_or_split` can mutate a span'):
-            span[2] = ('A', state)
+            Exception, 'Only `extend_or_split` can mutate a mapping'):
+            mapping[2] = ('A', state)
 
     def test_get_invalid_version_raises_an_exception(self):
         state = self.new_state_domain_obj()
 
-        span = exp_domain.StateVersionMapping(1, 'A', state)
+        mapping = exp_domain.StateVersionMapping(1, 'A', state)
 
         with self.assertRaisesRegexp(Exception, 'does not contain version=5'):
-            _ = span[5]
+            _ = mapping[5]
 
     def test_newly_constructed_span(self):
         state = self.new_state_domain_obj()
 
-        span = exp_domain.StateVersionMapping(1, 'A', state)
+        mapping = exp_domain.StateVersionMapping(1, 'A', state)
 
-        self.assertEqual(len(span), 1)
-        self.assertIn(1, span)
-        self.assertEqual(list(span.state_names()), ['A'])
-        self.assertEqual(list(span.state_contents()), [state])
+        self.assertEqual(len(mapping), 1)
+        self.assertIn(1, mapping)
+        self.assertEqual(list(mapping.state_names()), ['A'])
+        self.assertEqual(list(mapping.state_contents()), [state])
 
     def test_extended_span(self):
         state_v1, state_v2, state_v3 = (
             self.new_state_domain_obj() for _ in python_utils.RANGE(3))
 
-        (span,) = self.get_state_version_mappings(
+        (mapping,) = self.get_state_version_mappings(
             'A', None, state_v1, state_v2, state_v3)
 
         self.assertEqual(
-            list(span.state_contents()), [state_v1, state_v2, state_v3])
-        self.assertEqual(list(span.state_names()), ['A', 'A', 'A'])
+            list(mapping.state_contents()), [state_v1, state_v2, state_v3])
+        self.assertEqual(list(mapping.state_names()), ['A', 'A', 'A'])
 
     def test_iter(self):
         state_v1, state_v2, state_v3 = (
             self.new_state_domain_obj() for _ in python_utils.RANGE(3))
 
-        (span,) = self.get_state_version_mappings(
+        (mapping,) = self.get_state_version_mappings(
             'A', None, state_v1, state_v2, state_v3)
 
-        self.assertEqual(list(span), [1, 2, 3])
+        self.assertEqual(list(mapping), [1, 2, 3])
 
     def test_getitem(self):
         state_v1, state_v2, state_v3 = (
             self.new_state_domain_obj() for _ in python_utils.RANGE(3))
 
-        (span,) = self.get_state_version_mappings(
+        (mapping,) = self.get_state_version_mappings(
             'A', None, state_v1, state_v2, state_v3)
 
-        self.assertEqual(span[1], ('A', state_v1))
-        self.assertEqual(span[2], ('A', state_v2))
-        self.assertEqual(span[3], ('A', state_v3))
+        self.assertEqual(mapping[1], ('A', state_v1))
+        self.assertEqual(mapping[2], ('A', state_v2))
+        self.assertEqual(mapping[3], ('A', state_v3))
 
     def test_multi_mappings(self):
         distinct_states = [
@@ -563,19 +563,20 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
     def test_get_multi_with_newly_constructed_span(self):
         state = self.new_state_domain_obj()
 
-        span = exp_domain.StateVersionMapping(1, 'A', state)
+        mapping = exp_domain.StateVersionMapping(1, 'A', state)
 
-        self.assertEqual(span.get_multi_contents(1, 2), [state])
-        self.assertEqual(span.get_multi_names(1, 2), ['A'])
+        self.assertEqual(mapping.get_multi_contents(1, 2), [state])
+        self.assertEqual(mapping.get_multi_names(1, 2), ['A'])
 
     def test_get_multi_with_extended_span(self):
         distinct_states = [
             self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
-        (span,) = self.get_state_version_mappings('A', None, *distinct_states)
+        (mapping,) = (
+            self.get_state_version_mappings('A', None, *distinct_states))
 
-        self.assertEqual(span.get_multi_contents(1, 4), distinct_states)
-        self.assertEqual(span.get_multi_names(1, 4), ['A', 'A', 'A'])
+        self.assertEqual(mapping.get_multi_contents(1, 4), distinct_states)
+        self.assertEqual(mapping.get_multi_names(1, 4), ['A', 'A', 'A'])
 
     def test_get_multi_with_multi_mappings(self):
         distinct_states = [
@@ -604,42 +605,43 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
         distinct_states = [
             self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
-        (span,) = self.get_state_version_mappings(
+        (mapping,) = self.get_state_version_mappings(
             'A',
             lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
 
-        self.assertEqual(span.get_multi_contents(1, 3), distinct_states[0:2])
-        self.assertEqual(span.get_multi_names(1, 3), ['A', 'A'])
+        self.assertEqual(mapping.get_multi_contents(1, 3), distinct_states[0:2])
+        self.assertEqual(mapping.get_multi_names(1, 3), ['A', 'A'])
 
     def test_get_multi_rejects_out_of_bounds_ranges(self):
         distinct_states = [
             self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
-        (span,) = self.get_state_version_mappings(
+        (mapping,) = self.get_state_version_mappings(
             'A',
             lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
 
         with self.assertRaisesRegexp(ValueError, 'out-of-bounds'):
-            span.get_multi_contents(0, 20)
+            mapping.get_multi_contents(0, 20)
 
         with self.assertRaisesRegexp(ValueError, 'out-of-bounds'):
-            span.get_multi_names(0, 20)
+            mapping.get_multi_names(0, 20)
 
     def test_extend_or_split_with_unexpected_version(self):
-        (span,) = self.get_state_version_mappings(
+        (mapping,) = self.get_state_version_mappings(
             'A', None, self.new_state_domain_obj())
         nodiff = exp_domain.ExplorationVersionsDiff([])
 
         with self.assertRaisesRegexp(Exception, 'version=2 must be next'):
-            span.extend_or_split(3, 'A', self.new_state_domain_obj(), nodiff)
+            mapping.extend_or_split(3, 'A', self.new_state_domain_obj(), nodiff)
 
         with self.assertRaisesRegexp(Exception, 'version=2 must be next'):
-            span.extend_or_split(0, 'A', self.new_state_domain_obj(), nodiff)
+            mapping.extend_or_split(0, 'A', self.new_state_domain_obj(), nodiff)
 
         with self.assertRaisesRegexp(Exception, 'version=2 must be next'):
-            span.extend_or_split(-1, 'A', self.new_state_domain_obj(), nodiff)
+            mapping.extend_or_split(
+                -1, 'A', self.new_state_domain_obj(), nodiff)
 
     def test_extend_or_split_with_rename(self):
         state_v1, state_v2 = (
@@ -652,14 +654,14 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
             }),
         ])
 
-        span = exp_domain.StateVersionMapping(1, 'A', state_v1)
-        span.extend_or_split(2, 'B', state_v2, diff)
+        mapping = exp_domain.StateVersionMapping(1, 'A', state_v1)
+        mapping.extend_or_split(2, 'B', state_v2, diff)
 
-        self.assertEqual(list(span.state_contents()), [state_v1, state_v2])
-        self.assertEqual(list(span.state_names()), ['A', 'B'])
+        self.assertEqual(list(mapping.state_contents()), [state_v1, state_v2])
+        self.assertEqual(list(mapping.state_names()), ['A', 'B'])
 
     def test_extend_or_split_with_unexpected_rename(self):
-        (span,) = self.get_state_version_mappings(
+        (mapping,) = self.get_state_version_mappings(
             'A', None, self.new_state_domain_obj())
         diff = exp_domain.ExplorationVersionsDiff([
             exp_domain.ExplorationChange({
@@ -670,7 +672,7 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
         ])
 
         with self.assertRaisesRegexp(Exception, 'no mapping from v1 to v2'):
-            span.extend_or_split(2, 'Z', self.new_state_domain_obj(), diff)
+            mapping.extend_or_split(2, 'Z', self.new_state_domain_obj(), diff)
 
 
 class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
