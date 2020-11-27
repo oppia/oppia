@@ -24,13 +24,15 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+
+import cloneDeep from 'lodash/cloneDeep';
+
 import {
   TopicMoveSkillToSubtopicChange,
   TopicRemoveSkillFromSubtopicChange,
   TopicChange,
   Change }
   from 'domain/editor/undo_redo/change.model';
-
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { Topic } from 'core/templates/domain/topic/TopicObjectFactory';
@@ -52,7 +54,7 @@ export class TopicUpdateService {
   private _applyChange(
       entity,
       command: string, params, apply: Function, reverse: Function) {
-    let changeDict = angular.copy(params);
+    let changeDict = cloneDeep(params);
     changeDict.cmd = command;
     let changeObj = new Change(changeDict, apply, reverse);
     this.undoRedoService.applyChange(changeObj, entity);
@@ -69,8 +71,8 @@ export class TopicUpdateService {
       oldValue: string|boolean, apply: Function, reverse: Function) {
     this._applyChange(topic, TopicDomainConstants.CMD_UPDATE_TOPIC_PROPERTY, {
       property_name: propertyName,
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue) || null
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue) || null
     }, apply, reverse);
   }
 
@@ -81,8 +83,8 @@ export class TopicUpdateService {
       topic, TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PROPERTY, {
         subtopic_id: subtopicId,
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue)
       }, apply, reverse);
   }
 
@@ -94,8 +96,8 @@ export class TopicUpdateService {
       subtopicPage, TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY, {
         subtopic_id: subtopicId,
         property_name: propertyName,
-        new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue)
       }, apply, reverse);
   }
 
@@ -114,8 +116,9 @@ export class TopicUpdateService {
    * Changes the name of a topic and records the change in the
    * undo/redo service.
    */
-  setTopicName(topic: Topic, name: string): void {
-    let oldName = angular.copy(topic.getName());
+  setTopicName(
+      topic: Topic, name: string): void {
+    let oldName = cloneDeep(topic.getName());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_NAME, name, oldName,
       (changeDict, topic) => {
@@ -134,7 +137,7 @@ export class TopicUpdateService {
    */
   setAbbreviatedTopicName(
       topic: Topic, abbreviatedName: string): void {
-    let oldAbbreviatedName = angular.copy(topic.getAbbreviatedName());
+    let oldAbbreviatedName = cloneDeep(topic.getAbbreviatedName());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_ABBREVIATED_NAME,
       abbreviatedName, oldAbbreviatedName,
@@ -154,7 +157,7 @@ export class TopicUpdateService {
    */
   setMetaTagContent(
       topic: Topic, metaTagContent: string): void {
-    let oldMetaTagContent = angular.copy(topic.getMetaTagContent());
+    let oldMetaTagContent = cloneDeep(topic.getMetaTagContent());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_META_TAG_CONTENT,
       metaTagContent, oldMetaTagContent,
@@ -175,7 +178,7 @@ export class TopicUpdateService {
    */
   setPracticeTabIsDisplayed(
       topic: Topic, practiceTabIsDisplayed: boolean): void {
-    let oldPracticeTabIsDisplayed = angular.copy(
+    let oldPracticeTabIsDisplayed = cloneDeep(
       topic.getPracticeTabIsDisplayed());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
@@ -197,7 +200,7 @@ export class TopicUpdateService {
    */
   setTopicUrlFragment(
       topic: Topic, urlFragment: string): void {
-    let oldUrlFragment = angular.copy(topic.getUrlFragment());
+    let oldUrlFragment = cloneDeep(topic.getUrlFragment());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_URL_FRAGMENT,
       urlFragment, oldUrlFragment,
@@ -217,7 +220,7 @@ export class TopicUpdateService {
    */
   setTopicThumbnailFilename(
       topic: Topic, thumbnailFilename: string): void {
-    let oldThumbnailFilename = angular.copy(topic.getThumbnailFilename());
+    let oldThumbnailFilename = cloneDeep(topic.getThumbnailFilename());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
       thumbnailFilename, oldThumbnailFilename,
@@ -238,7 +241,7 @@ export class TopicUpdateService {
    */
   setTopicThumbnailBgColor(
       topic: Topic, thumbnailBgColor: string): void {
-    let oldThumbnailBgColor = angular.copy(topic.getThumbnailBgColor());
+    let oldThumbnailBgColor = cloneDeep(topic.getThumbnailBgColor());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
       thumbnailBgColor, oldThumbnailBgColor,
@@ -259,7 +262,7 @@ export class TopicUpdateService {
    */
   setTopicDescription(
       topic: Topic, description: string): void {
-    let oldDescription = angular.copy(topic.getDescription());
+    let oldDescription = cloneDeep(topic.getDescription());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_DESCRIPTION,
       description, oldDescription,
@@ -279,7 +282,7 @@ export class TopicUpdateService {
    */
   setTopicLanguageCode(
       topic: Topic, languageCode: string): void {
-    let oldLanguageCode = angular.copy(topic.getLanguageCode());
+    let oldLanguageCode = cloneDeep(topic.getLanguageCode());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_LANGUAGE_CODE, languageCode,
       oldLanguageCode,
@@ -312,6 +315,7 @@ export class TopicUpdateService {
       topic.deleteSubtopic(subtopicId);
     });
   }
+
   /**
    * @param {Topic} topic - The topic object to be edited.
    * @param {number} subtopicId - The id of the subtopic to delete.
@@ -438,6 +442,7 @@ export class TopicUpdateService {
       throw new Error('A deleted subtopic cannot be restored');
     });
   }
+
   /**
    * Moves a skill to a subtopic from either another subtopic or
    * uncategorized skills and records the change in the undo/redo service.
@@ -517,7 +522,7 @@ export class TopicUpdateService {
     if (!subtopic) {
       throw new Error('Subtopic doesn\'t exist');
     }
-    let oldThumbnailFilename = angular.copy(
+    let oldThumbnailFilename = cloneDeep(
       subtopic.getThumbnailFilename());
     this._applySubtopicPropertyChange(
       topic, TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
@@ -537,13 +542,14 @@ export class TopicUpdateService {
    * Changes the url fragment of a subtopic and records the change in
    * the undo/redo service.
    */
-  setSubtopicUrlFragment(topic: Topic, subtopicId: number, urlFragment: string)
+  setSubtopicUrlFragment(
+      topic: Topic, subtopicId: number, urlFragment: string)
   : void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
       throw new Error('Subtopic doesn\'t exist');
     }
-    let oldUrlFragment = angular.copy(subtopic.getUrlFragment());
+    let oldUrlFragment = cloneDeep(subtopic.getUrlFragment());
     this._applySubtopicPropertyChange(
       topic, TopicDomainConstants.SUBTOPIC_PROPERTY_URL_FRAGMENT, subtopicId,
       urlFragment, oldUrlFragment,
@@ -568,7 +574,7 @@ export class TopicUpdateService {
     if (!subtopic) {
       throw new Error('Subtopic doesn\'t exist');
     }
-    let oldThumbnailBgColor = angular.copy(
+    let oldThumbnailBgColor = cloneDeep(
       subtopic.getThumbnailBgColor());
     this._applySubtopicPropertyChange(
       topic, TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
@@ -588,12 +594,13 @@ export class TopicUpdateService {
    * Changes the title of a subtopic and records the change in
    * the undo/redo service.
    */
-  setSubtopicTitle(topic: Topic, subtopicId: number, title: string): void {
+  setSubtopicTitle(
+      topic: Topic, subtopicId: number, title: string): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
       throw new Error('Subtopic doesn\'t exist');
     }
-    let oldTitle = angular.copy(subtopic.getTitle());
+    let oldTitle = cloneDeep(subtopic.getTitle());
     this._applySubtopicPropertyChange(
       topic, TopicDomainConstants.SUBTOPIC_PROPERTY_TITLE,
       subtopicId, title, oldTitle,
@@ -610,7 +617,7 @@ export class TopicUpdateService {
   setSubtopicPageContentsHtml(
       subtopicPage: SubtopicPage, subtopicId: number,
       newSubtitledHtml: SubtitledHtml): void {
-    let oldSubtitledHtml = angular.copy(
+    let oldSubtitledHtml = cloneDeep(
       subtopicPage.getPageContents().getSubtitledHtml());
     this._applySubtopicPagePropertyChange(
       subtopicPage,
@@ -629,7 +636,7 @@ export class TopicUpdateService {
   setSubtopicPageContentsAudio(
       subtopicPage: SubtopicPage, subtopicId: number,
       newRecordedVoiceovers: RecordedVoiceovers): void {
-    let oldRecordedVoiceovers = angular.copy(
+    let oldRecordedVoiceovers = cloneDeep(
       subtopicPage.getPageContents().getRecordedVoiceovers());
     this._applySubtopicPagePropertyChange(
       subtopicPage,
@@ -651,7 +658,8 @@ export class TopicUpdateService {
    * Removes an additional story id from a topic and records the change
    * in the undo/redo service.
    */
-  removeAdditionalStory(topic: Topic, storyId: string): void {
+  removeAdditionalStory(
+      topic: Topic, storyId: string): void {
     this._applyChange(
       topic, TopicDomainConstants.CMD_DELETE_ADDITIONAL_STORY, {
         story_id: storyId
@@ -668,7 +676,8 @@ export class TopicUpdateService {
    * Removes an canonical story id from a topic and records the change
    * in the undo/redo service.
    */
-  removeCanonicalStory(topic: Topic, storyId: string): void {
+  removeCanonicalStory(
+      topic: Topic, storyId: string): void {
     this._applyChange(topic, TopicDomainConstants.CMD_DELETE_CANONICAL_STORY, {
       story_id: storyId
     }, (changeDict, topic) =>{
@@ -698,6 +707,7 @@ export class TopicUpdateService {
         topic.rearrangeCanonicalStory(toIndex, fromIndex);
       });
   }
+
   /**
    * Rearranges or moves a skill in a subtopic to another position and
    * records the change in undo/redo service.
@@ -718,6 +728,7 @@ export class TopicUpdateService {
         topic.rearrangeSkillInSubtopic(subtopicId, toIndex, fromIndex);
       });
   }
+
   /**
    * Rearranges a subtopic to another position and records the change in
    * undo/redo service.
@@ -740,8 +751,8 @@ export class TopicUpdateService {
    * Removes an uncategorized skill from a topic and records the change
    * in the undo/redo service.
    */
-  removeUncategorizedSkill(topic: Topic, skillSummary: ShortSkillSummary)
-  : void {
+  removeUncategorizedSkill(
+      topic: Topic, skillSummary: ShortSkillSummary): void {
     this._applyChange(
       topic, TopicDomainConstants.CMD_REMOVE_UNCATEGORIZED_SKILL_ID, {
         uncategorized_skill_id: skillSummary.getId()
@@ -760,5 +771,5 @@ export class TopicUpdateService {
   }
 }
 angular.module('oppia').factory(
-  'TopicDomainConstants',
-  downgradeInjectable(TopicDomainConstants));
+  'TopicUpdateService',
+  downgradeInjectable(TopicUpdateService));
