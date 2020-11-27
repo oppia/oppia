@@ -487,7 +487,7 @@ class StateVersionMapping(python_utils.OBJECT):
 
     Mappings can only be extended using the extend_or_split() method. It
     enforces the invariant: all versions of the state in a mapping are
-    equivalent.  Mappings must be extended in increasing and consecutive
+    equivalent. Mappings must be extended in increasing and consecutive
     version-order.
 
     This class implements a dict interface. It can be iterated and accessed like
