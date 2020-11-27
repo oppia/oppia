@@ -489,27 +489,30 @@ class StateVersionMapping(python_utils.OBJECT):
     versions. If the state's name has changed in between versions, then an
     ExplorationVersionsDiff must be used to satisfy the discrepancy.
 
-    This class provides a dict interface. It can be iterated for version/
-    square-brackets, for example:
+    This class provides a dict interface. It can be iterated and accessed like a
+    normal dict. Example:
 
-        state, state_name = self[3] # Returns version 3 of the state.
+        >>> state_name, state = self[3] # Returns version 3 of the state.
 
-        if 5 in self: # Version 5 is included in the mapping.
-            pass
+        >>> if 5 in self: # Version 5 is included in the mapping.
+        ...     pass
 
-        len(self) # Returns the number of versions in the mapping.
+        >>> for exp_version, (state_name, state) in self.items():
+        ...     pass
+
+        >>> len(self) # Returns the number of versions in the mapping.
     """
 
     def __init__(
-            self, exp_version, state_name, state,
+            self, exp_version, state_name, state_content,
             state_equality_predicate=None):
         """Initializes a span for the given version of an exploration's state.
 
         Args:
             exp_version: int. The version the state corresponds to.
             state_name: str. The name of the state at the given version.
-            state: state_domain.State. The content of the state at the given
-                version.
+            state_content: state_domain.State. The content of the state at the
+                given version.
             state_equality_predicate:
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
@@ -518,14 +521,18 @@ class StateVersionMapping(python_utils.OBJECT):
                 unconditionally returns True.
         """
         self._version_start, self._version_end = exp_version, exp_version + 1
-        self._versioned_states = [(state_name, state)]
+        self._versioned_states = [(state_name, state_content)]
         self._are_states_equal = (
             state_equality_predicate or
             StateVersionMapping._default_state_equality_predicate)
 
     def __iter__(self):
-        """Returns an iterable over the state versions held by the span."""
-        return enumerate(self._versioned_states, start=self._version_start)
+        """Returns an iterator over the exploration versions in the span."""
+        return iter(python_utils.RANGE(self._version_start, self._version_end))
+
+    def __len__(self):
+        """Returns the number of versions within the span."""
+        return self._version_end - self._version_start
 
     def __contains__(self, version):
         """Returns whether the span includes the given version."""
@@ -541,87 +548,22 @@ class StateVersionMapping(python_utils.OBJECT):
         """Raises an exception. Only `extend_or_split` can mutate a span."""
         raise Exception('Only `extend_or_split` can mutate a span')
 
-    def __len__(self):
-        """Returns the number of versions within the span."""
-        return len(self._versioned_states)
+    def items(self):
+        """Returns an iterable over the {version: state content} items."""
+        return enumerate(self._versioned_states, start=self._version_start)
 
-    def iternames(self):
-        """Yields all (version, state_name) pairs held by the span."""
-        for version, (state_name, _) in self:
-            yield (version, state_name)
+    def state_names(self):
+        """Yields all state names held by the span."""
+        for state_name, _ in self._versioned_states:
+            yield state_name
 
-    def iterstates(self):
-        """Yields all (version, state) pairs held by the span."""
-        for version, (_, state) in self:
-            yield (version, state)
-
-    def get_version(self, version):
-        """Returns the content of the state at the given exploration version.
-
-        Args:
-            version: int. The version to get.
-
-        Returns:
-            state_domain.State. The content of the state at the given
-            exploration version.
-        """
-        _, state = self[version]
-        return state
-
-    def get_version_name(self, version):
-        """Returns the name of the state at the given exploration version.
-
-        Args:
-            version: int. The version to get.
-
-        Returns:
-            str. The name of the state at the given exploration version.
-        """
-        state_name, _ = self[version]
-        return state_name
-
-    def get_multi_versions(self, version_start, version_end):
-        """Returns the state contents corresponding to the given half-open range
-        of exploration versions.
-
-        Args:
-            version_start: int. The lower bound of versions to get (inclusive).
-            version_end: int. The upper bound of versions to get (exclusive).
-
-        Returns:
-            list(state_domain.State). The state contents corresponding to the
-            given half-open range of exploration versions.
-
-        Raises:
-            ValueError. The input range is out-of-bounds.
-        """
-        return [
-            state for _, state in self._get_multi_versions(
-                version_start, version_end)
-        ]
-
-    def get_multi_version_names(self, version_start, version_end):
-        """Returns the state names corresponding to the given half-open range of
-        exploration versions.
-
-        Args:
-            version_start: int. The lower bound of versions to get (inclusive).
-            version_end: int. The upper bound of versions to get (exclusive).
-
-        Returns:
-            list(str). The state names corresponding to the given half-open
-            range of exploration versions.
-
-        Raises:
-            ValueError. The input range is out-of-bounds.
-        """
-        return [
-            state_name for state_name, _ in self._get_multi_versions(
-                version_start, version_end)
-        ]
+    def state_contents(self):
+        """Yields all state contents held by the span."""
+        for _, state_content in self._versioned_states:
+            yield state_content
 
     def extend_or_split(
-            self, exp_version, state_name, state, exp_version_diff):
+            self, exp_version, state_name, state_content, exp_version_diff):
         """Extends the span to include the given state, unless it fails to pass
         the span's equality predicate, in which case a new span is created and
         returned instead.
@@ -629,7 +571,7 @@ class StateVersionMapping(python_utils.OBJECT):
         Args:
             exp_version: int. The exploration version being added.
             state_name: str. The state's name at the given exploration version.
-            state: state_domain.State. The state's content at the given
+            state_content: state_domain.State. The state's content at the given
                 exploration version.
             exp_version_diff: ExplorationVersionsDiff. The changes to the
                 exploration since its previous version.
@@ -652,27 +594,67 @@ class StateVersionMapping(python_utils.OBJECT):
             exp_version - 1,
             exp_version_diff.new_to_old_state_names.get(state_name, state_name))
 
-        prev_snapshot_state_name, prev_snapshot_state = self[prev_exp_version]
+        actual_prev_state_name, prev_state_content = self[prev_exp_version]
 
-        if prev_state_name != prev_snapshot_state_name:
+        if prev_state_name != actual_prev_state_name:
             raise Exception(
                 'State has no mapping from v%d to v%d (previous name of the '
                 'state is different; input exploration diff thinks that the '
                 'previous name was %r, but this span thinks that the previous '
                 'name was %r)' % (
                     prev_exp_version, exp_version,
-                    prev_state_name, prev_snapshot_state_name))
+                    prev_state_name, actual_prev_state_name))
 
-        if self._are_states_equal(prev_snapshot_state, state):
-            self._versioned_states.append((state_name, state))
+        if self._are_states_equal(prev_state_content, state_content):
+            self._versioned_states.append((state_name, state_content))
             self._version_end = exp_version + 1
             return self
         else:
             return StateVersionMapping(
-                exp_version, state_name, state,
+                exp_version, state_name, state_content,
                 state_equality_predicate=self._are_states_equal)
 
-    def _get_multi_versions(self, version_start, version_end):
+    def get_multi_contents(self, version_start, version_end):
+        """Returns the state contents corresponding to the given half-open range
+        of exploration versions.
+
+        Args:
+            version_start: int. The lower bound of versions to get (inclusive).
+            version_end: int. The upper bound of versions to get (exclusive).
+
+        Returns:
+            list(state_domain.State). The state contents corresponding to the
+            given half-open range of exploration versions.
+
+        Raises:
+            ValueError. The input range is out-of-bounds.
+        """
+        return [
+            state_content for _, state_content in self._get_multi(
+                version_start, version_end)
+        ]
+
+    def get_multi_names(self, version_start, version_end):
+        """Returns the state names corresponding to the given half-open range of
+        exploration versions.
+
+        Args:
+            version_start: int. The lower bound of versions to get (inclusive).
+            version_end: int. The upper bound of versions to get (exclusive).
+
+        Returns:
+            list(str). The state names corresponding to the given half-open
+            range of exploration versions.
+
+        Raises:
+            ValueError. The input range is out-of-bounds.
+        """
+        return [
+            state_name for state_name, _ in self._get_multi(
+                version_start, version_end)
+        ]
+
+    def _get_multi(self, version_start, version_end):
         """Returns state details for the given half-open range of exploration
         versions.
 
@@ -736,10 +718,10 @@ class ExplorationStatesHistory(python_utils.OBJECT):
         self._state_mappings = []
         for exp, diff in python_utils.ZIP(exps, exp_version_diffs):
             new_state_mappings = dict()
-            for state_name, state in exp.states.items():
+            for state_name, state_content in exp.states.items():
                 if exp.version == 1 or state_name in diff.added_state_names:
                     new_state_mappings[state_name] = StateVersionMapping(
-                        exp.version, state_name, state,
+                        exp.version, state_name, state_content,
                         state_equality_predicate=state_equality_predicate)
                 elif state_name not in diff.deleted_state_names:
                     prev_state_mappings, prev_state_name = (
@@ -747,7 +729,7 @@ class ExplorationStatesHistory(python_utils.OBJECT):
                         diff.new_to_old_state_names.get(state_name, state_name))
                     new_state_mappings[state_name] = (
                         prev_state_mappings[prev_state_name].extend_or_split(
-                            exp.version, state_name, state, diff))
+                            exp.version, state_name, state_content, diff))
             self._state_mappings.append(new_state_mappings)
 
     def get_state_span(self, exp_version, state_name):
