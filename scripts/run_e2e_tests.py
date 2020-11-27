@@ -593,7 +593,7 @@ def update_flaky_tests_count(sheet, row_index, current_count):
         python_utils.PRINT('** NOTE: Updated sheet for first failing test **')
 
 
-def run_tests(run_count, args=None):
+def run_tests(run_count=MAX_RETRY_COUNT, args=None):
     """Run the scripts to start end-to-end tests."""
 
     parsed_args = _PARSER.parse_args(args=args)
@@ -706,13 +706,13 @@ def run_tests(run_count, args=None):
         python_utils.PRINT('\n\n###### RERUN COUNT %d ######\n\n' % run_count)
         cleanup_portserver(portserver_process)
         cleanup()
-        run_tests(run_count + 1, args)
+        run_tests(run_count=run_count + 1, args=args)
     sys.exit(p.returncode)
 
 
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
-    flake_state = run_tests(run_count=1, args=args)
+    run_tests(run_count=1, args=args)
 
 
 if __name__ == '__main__':  # pragma: no cover
