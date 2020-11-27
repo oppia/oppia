@@ -549,20 +549,6 @@ class StateVersionMapping(python_utils.OBJECT):
         """Raises an exception. Only `extend_or_split` can mutate a mapping."""
         raise Exception('Only `extend_or_split` can mutate a mapping')
 
-    def items(self):
-        """Returns an iterable over the {version: state content} items."""
-        return enumerate(self._versioned_states, start=self._version_start)
-
-    def state_names(self):
-        """Yields all state names held by the mapping."""
-        for state_name, _ in self._versioned_states:
-            yield state_name
-
-    def state_contents(self):
-        """Yields all state contents held by the mapping."""
-        for _, state_content in self._versioned_states:
-            yield state_content
-
     def extend_or_split(
             self, exp_version, state_name, state_content, exp_version_diff):
         """Extends the mapping to include the given state, unless it fails to
@@ -615,25 +601,19 @@ class StateVersionMapping(python_utils.OBJECT):
                 exp_version, state_name, state_content,
                 state_equality_predicate=self._are_states_equal)
 
-    def get_multi_contents(self, version_start, version_end):
-        """Returns the state contents corresponding to the given half-open range
-        of exploration versions.
+    def items(self):
+        """Returns an iterable over the {version: state content} items."""
+        return enumerate(self._versioned_states, start=self._version_start)
 
-        Args:
-            version_start: int. The lower bound of versions to get (inclusive).
-            version_end: int. The upper bound of versions to get (exclusive).
+    def state_names(self):
+        """Yields all state names held by the mapping."""
+        for state_name, _ in self._versioned_states:
+            yield state_name
 
-        Returns:
-            list(state_domain.State). The state contents corresponding to the
-            given half-open range of exploration versions.
-
-        Raises:
-            ValueError. The input range is out-of-bounds.
-        """
-        return [
-            state_content for _, state_content in self._get_multi(
-                version_start, version_end)
-        ]
+    def state_contents(self):
+        """Yields all state contents held by the mapping."""
+        for _, state_content in self._versioned_states:
+            yield state_content
 
     def get_multi_names(self, version_start, version_end):
         """Returns the state names corresponding to the given half-open range of
@@ -652,6 +632,26 @@ class StateVersionMapping(python_utils.OBJECT):
         """
         return [
             state_name for state_name, _ in self._get_multi(
+                version_start, version_end)
+        ]
+
+    def get_multi_contents(self, version_start, version_end):
+        """Returns the state contents corresponding to the given half-open range
+        of exploration versions.
+
+        Args:
+            version_start: int. The lower bound of versions to get (inclusive).
+            version_end: int. The upper bound of versions to get (exclusive).
+
+        Returns:
+            list(state_domain.State). The state contents corresponding to the
+            given half-open range of exploration versions.
+
+        Raises:
+            ValueError. The input range is out-of-bounds.
+        """
+        return [
+            state_content for _, state_content in self._get_multi(
                 version_start, version_end)
         ]
 
