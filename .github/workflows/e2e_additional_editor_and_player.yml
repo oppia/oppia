@@ -46,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: protractor_screenshots
-          path: ../protractor_screenshots/
+          path: /home/runner/work/oppia/protractor_screenshots/
