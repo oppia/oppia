@@ -550,13 +550,10 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
             self.new_state_domain_obj(interaction_id='ItemSelectionInput'),
         ]
 
-        mappings = self.get_state_version_mappings(
+        (mapping1, mapping2, mapping3) = self.get_state_version_mappings(
             'A',
             lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
-
-        self.assertEqual(len(mappings), 3)
-        (mapping1, mapping2, mapping3) = mappings
         self.assertEqual(mapping1[1], ('A', distinct_states[0]))
         self.assertEqual(mapping2[2], ('A', distinct_states[1]))
         self.assertEqual(mapping3[3], ('A', distinct_states[2]))
@@ -586,13 +583,10 @@ class StateVersionMappingTests(test_utils.GenericTestBase):
             self.new_state_domain_obj(interaction_id='ItemSelectionInput'),
         ]
 
-        mappings = self.get_state_version_mappings(
+        (mapping1, mapping2, mapping3) = self.get_state_version_mappings(
             'A',
             lambda s1, s2: s1.interaction.id == s2.interaction.id,
             *distinct_states)
-
-        self.assertEqual(len(mappings), 3)
-        (mapping1, mapping2, mapping3) = mappings
         self.assertEqual(
             mapping1.get_multi_contents(1, 2), distinct_states[0:1])
         self.assertEqual(
