@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for GraphDataService.
  */
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/exploration-editor-page/services/graph-data.service');
 require('pages/exploration-editor-page/services/exploration-property.service');
@@ -28,12 +28,7 @@ describe('Graph Data Service', function() {
   var ExplorationStatesService;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     GraphDataService = $injector.get('GraphDataService');
     ExplorationInitStateNameService = $injector.get(
