@@ -46,4 +46,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: protractor_screenshots
+          if: ${{ failure() }}
           path: /home/runner/work/oppia/protractor_screenshots/
