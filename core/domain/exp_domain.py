@@ -477,7 +477,7 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
 class StateVersionSpan(python_utils.OBJECT):
     """A consecutive span of exploration versions with equivalent state content.
 
-    Equivalence between state versions are determined by the user-defined
+    Equivalence between state versions is determined by the user-defined
     predicate passed in to the constructor. By default, all versions of a state
     are equal.
 
@@ -509,7 +509,7 @@ class StateVersionSpan(python_utils.OBJECT):
         """
         self._version_start, self._version_end = exp_version, exp_version + 1
         self._versioned_states = [(state_name, state)]
-        self._state_equality_predicate = (
+        self._are_states_equal = (
             state_equality_predicate or
             StateVersionSpan._default_state_equality_predicate)
 
@@ -659,14 +659,14 @@ class StateVersionSpan(python_utils.OBJECT):
                     prev_exp_version, exp_version,
                     prev_state_name, prev_snapshot_state_name))
 
-        if self._state_equality_predicate(prev_snapshot_state, state):
+        if self._are_states_equal(prev_snapshot_state, state):
             self._versioned_states.append((state_name, state))
             self._version_end = exp_version + 1
             return self
         else:
             return StateVersionSpan(
                 exp_version, state_name, state,
-                state_equality_predicate=self._state_equality_predicate)
+                state_equality_predicate=self._are_states_equal)
 
     def _get_multi_versions(self, version_start, version_end):
         """Returns state details for the given half-open range of exploration
