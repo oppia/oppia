@@ -488,6 +488,16 @@ class StateVersionMapping(python_utils.OBJECT):
     Equivalence has a prerequisite: the names of the state must match across all
     versions. If the state's name has changed in between versions, then an
     ExplorationVersionsDiff must be used to satisfy the discrepancy.
+
+    This class provides a dict interface. It can be iterated for version/
+    square-brackets, for example:
+
+        state, state_name = self[3] # Returns version 3 of the state.
+
+        if 5 in self: # Version 5 is included in the mapping.
+            pass
+
+        len(self) # Returns the number of versions in the mapping.
     """
 
     def __init__(
@@ -523,7 +533,6 @@ class StateVersionMapping(python_utils.OBJECT):
 
     def __getitem__(self, version):
         """Returns the name and snapshot of the state at the given version."""
-        # `item not in self` is equivalent to `not self.__contains__(item)`.
         if version not in self:
             raise KeyError('Span does not contain version=%r' % version)
         return self._versioned_states[version - self._version_start]
@@ -538,13 +547,11 @@ class StateVersionMapping(python_utils.OBJECT):
 
     def iternames(self):
         """Yields all (version, state_name) pairs held by the span."""
-        # `for item in self` is equivalent to `for item in self.__iter__()`.
         for version, (state_name, _) in self:
             yield (version, state_name)
 
     def iterstates(self):
         """Yields all (version, state) pairs held by the span."""
-        # `for item in self` is equivalent to `for item in self.__iter__()`.
         for version, (_, state) in self:
             yield (version, state)
 
@@ -558,7 +565,6 @@ class StateVersionMapping(python_utils.OBJECT):
             state_domain.State. The content of the state at the given
             exploration version.
         """
-        # `item = self[i]` is equivalent to `item = self.__getitem__(i)`.
         _, state = self[version]
         return state
 
@@ -571,7 +577,6 @@ class StateVersionMapping(python_utils.OBJECT):
         Returns:
             str. The name of the state at the given exploration version.
         """
-        # `item = self[i]` is equivalent to `item = self.__getitem__(i)`.
         state_name, _ = self[version]
         return state_name
 
@@ -647,7 +652,6 @@ class StateVersionMapping(python_utils.OBJECT):
             exp_version - 1,
             exp_version_diff.new_to_old_state_names.get(state_name, state_name))
 
-        # `item = self[i]` is equivalent to `item = self.__getitem__(i)`.
         prev_snapshot_state_name, prev_snapshot_state = self[prev_exp_version]
 
         if prev_state_name != prev_snapshot_state_name:
@@ -688,7 +692,6 @@ class StateVersionMapping(python_utils.OBJECT):
             version_end <= self._version_end)
         if not range_is_valid:
             raise ValueError('Requested version range is out-of-bounds')
-        # `item = self[i]` is equivalent to `item = self.__getitem__(i)`.
         return [self[i] for i in python_utils.RANGE(version_start, version_end)]
 
     @staticmethod
