@@ -33,13 +33,13 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
   '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
   'GenerateContentIdService', 'OutcomeObjectFactory', 'RuleObjectFactory',
   'StateEditorService', 'addState', 'currentInteractionId',
-  'stateName', 'COMPONENT_NAME_FEEDBACK',
+  'stateName', 'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_RULE_INPUTS',
   'INTERACTION_SPECS',
   function(
       $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
       GenerateContentIdService, OutcomeObjectFactory, RuleObjectFactory,
       StateEditorService, addState, currentInteractionId,
-      stateName, COMPONENT_NAME_FEEDBACK,
+      stateName, COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_RULE_INPUTS,
       INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -86,7 +86,35 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
 
     $scope.addAnswerGroupForm = {};
 
+    $scope.populateRuleContentIds = function() {
+      const inputTypes = $scope.tmpRule.inputTypes;
+      const inputs = $scope.tmpRule.inputs;
+
+      if ($scope.tmpRule.type === null) {
+        return;
+      }
+
+      Object.keys(inputTypes).forEach(inputName => {
+        const hasContentId = (
+          inputTypes[inputName] === 'SubtitledSetOfNormalizedString' ||
+          inputTypes[inputName] === 'SubtitledSetOfUnicodeString'
+        );
+        if (!hasContentId) {
+          return;
+        }
+        const needsContentId = inputs[inputName].getContentId() === null;
+
+        if (needsContentId) {
+          inputs[inputName].setContentId(
+            GenerateContentIdService.getNextStateId(
+              `${COMPONENT_NAME_RULE_INPUTS}_${$scope.tmpRule.type}`
+            ));
+        }
+      });
+    };
+
     $scope.saveResponse = function(reopen) {
+      $scope.populateRuleContentIds();
       StateEditorService.onSaveOutcomeDestDetails.emit();
 
       EditorFirstTimeEventsService.registerFirstSaveRuleEvent();

@@ -35,6 +35,8 @@ import { Outcome } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { UtilsService } from 'services/utils.service';
+import { SubtitledSetOfNormalizedString, SubtitledSetOfNormalizedStringObjectFactory } from 'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import { TextInputRuleInputs } from 'interactions/rule-input-defs';
 
 interface Warning {
   type: string,
@@ -45,7 +47,10 @@ interface Warning {
   providedIn: 'root'
 })
 export class TextInputValidationService {
-  constructor(private bivs: baseInteractionValidationService) {}
+  constructor(
+      private bivs: baseInteractionValidationService,
+      private ssonsof: SubtitledSetOfNormalizedStringObjectFactory
+  ) {}
   getCustomizationArgsWarnings(
       customizationArgs: TextInputCustomizationArgs): Warning[] {
     let warningsList = [];
@@ -128,7 +133,8 @@ export class TextInputValidationService {
         seenRuleTypes.add(rule.type);
 
 
-        let currentStrings = <string[]> rule.inputs.x;
+        let currentStrings = (
+          <SubtitledSetOfNormalizedString>rule.inputs.x).getNormalizedStrings();
         if (rule.type === 'Contains') {
           // Check if any of the current strings contain any of the previously
           // seen strings as a substring.
@@ -170,7 +176,9 @@ export class TextInputValidationService {
         } else if (rule.type === 'Equals') {
           if (seenStringsEquals.some(
             (seenString) => textInputRulesService.Equals(
-              seenString, {x: currentStrings}))) {
+              seenString, {x: this.ssonsof.createFromBackendDict({
+                content_id: null, normalized_str_set: currentStrings
+              })}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -179,7 +187,9 @@ export class TextInputValidationService {
             });
           } else if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
-              seenString, {x: currentStrings}))) {
+              seenString, {x: this.ssonsof.createFromBackendDict({
+                content_id: null, normalized_str_set: currentStrings
+              })}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -191,7 +201,9 @@ export class TextInputValidationService {
         } else if (rule.type === 'FuzzyEquals') {
           if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
-              seenString, {x: currentStrings}))) {
+              seenString, {x: this.ssonsof.createFromBackendDict({
+                content_id: null, normalized_str_set: currentStrings
+              })}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +

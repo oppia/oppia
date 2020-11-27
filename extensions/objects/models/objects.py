@@ -349,6 +349,11 @@ class SubtitledSetOfUnicodeString(BaseObject):
         "unicode_str_set", the latter being a set (a list with unique 
         elements) of unicode strings."""
 
+    default_value = {
+        'content_id': None,
+        'unicode_str_set': []
+    }
+
     SCHEMA = {
         'type': 'dict',
         'properties': [{
@@ -378,6 +383,11 @@ class SubtitledSetOfNormalizedString(BaseObject):
     description = """A dictionary with properties "content_id" and 
         "normalized_str_set", the latter being a set (a list with unique 
         elements) of whitespace-collapsed strings."""
+
+    default_value = {
+        'content_id': None,
+        'normalized_str_set': []
+    }
 
     SCHEMA = {
         'type': 'dict',

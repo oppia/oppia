@@ -51,11 +51,17 @@ angular.module('oppia').directive('ruleEditor', [
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'ResponsesService', 'StateEditorService',
-        'StateInteractionIdService', 'INTERACTION_SPECS',
+        '$scope', '$timeout', 'GenerateContentIdService', 'ResponsesService',
+        'StateEditorService', 'StateInteractionIdService',
+        'SubtitledSetOfNormalizedStringObjectFactory',
+        'SubtitledSetOfUnicodeStringObjectFactory',
+        'COMPONENT_NAME_RULE_INPUTS', 'INTERACTION_SPECS',
         function(
-            $scope, $timeout, ResponsesService, StateEditorService,
-            StateInteractionIdService, INTERACTION_SPECS) {
+            $scope, $timeout, GenerateContentIdService, ResponsesService,
+            StateEditorService, StateInteractionIdService,
+            SubtitledSetOfNormalizedStringObjectFactory,
+            SubtitledSetOfUnicodeStringObjectFactory,
+            COMPONENT_NAME_RULE_INPUTS, INTERACTION_SPECS) {
           var ctrl = this;
           // This returns the rule description string.
           var computeRuleDescriptionFragments = function() {
@@ -228,6 +234,12 @@ angular.module('oppia').directive('ruleEditor', [
               } else if (answerChoices) {
                 ctrl.rule.inputs[varName] = angular.copy(
                   answerChoices[0].val);
+              } else if (varType === 'SubtitledSetOfNormalizedString') {
+                ctrl.rule.inputs[varName] = (
+                  SubtitledSetOfNormalizedStringObjectFactory.createDefault());
+              } else if (varType === 'SubtitledSetOfUnicodeString') {
+                ctrl.rule.inputs[varName] = (
+                  SubtitledSetOfUnicodeStringObjectFactory.createDefault());
               } else {
                 ctrl.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
               }
@@ -243,11 +255,35 @@ angular.module('oppia').directive('ruleEditor', [
             }
           };
 
+          ctrl.populateRuleContentIds = function() {
+            const inputTypes = ctrl.rule.inputTypes;
+            const inputs = ctrl.rule.inputs;
+
+            Object.keys(inputTypes).forEach(inputName => {
+              const hasContentId = (
+                inputTypes[inputName] === 'SubtitledSetOfNormalizedString' ||
+                inputTypes[inputName] === 'SubtitledSetOfUnicodeString'
+              );
+              if (!hasContentId) {
+                return;
+              }
+              const needsContentId = inputs[inputName].getContentId() === null;
+
+              if (needsContentId) {
+                inputs[inputName].setContentId(
+                  GenerateContentIdService.getNextStateId(
+                    `${COMPONENT_NAME_RULE_INPUTS}_${ctrl.rule.type}`
+                  ));
+              }
+            });
+          };
+
           ctrl.cancelThisEdit = function() {
             ctrl.onCancelRuleEdit();
           };
 
           ctrl.saveThisRule = function() {
+            ctrl.populateRuleContentIds();
             ctrl.onSaveRule();
           };
 

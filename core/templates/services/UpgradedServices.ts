@@ -468,10 +468,10 @@ import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledSetOfUnicodeStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { SubtitledSetOfNormalizedStringObjectFactory } from
   'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import { SubtitledSetOfUnicodeStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
@@ -862,7 +862,8 @@ export class UpgradedServices {
       upgradedServices['SuggestionsService']);
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+        upgradedServices['baseInteractionValidationService'],
+        upgradedServices['SubtitledSetOfNormalizedStringObjectFactory']);
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
@@ -881,9 +882,6 @@ export class UpgradedServices {
         upgradedServices['WrittenTranslationObjectFactory']);
 
     // Topological level: 2.
-    upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
-      upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['RuleObjectFactory']);
     upgradedServices['CkEditorCopyContentService'] =
       new CkEditorCopyContentService(
         upgradedServices['HtmlEscaperService'],);
@@ -1003,6 +1001,9 @@ export class UpgradedServices {
       upgradedServices['HttpClient']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
+    upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
+      upgradedServices['OutcomeObjectFactory'],
+      upgradedServices['RuleObjectFactory']);
     upgradedServices['AssetsBackendApiService'] =
       new AssetsBackendApiService(
         upgradedServices['CsrfTokenService'],

@@ -58,6 +58,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
+        getOnSaveNextContentIdIndex: '&onSaveNextContentIdIndex',
         taggedSkillMisconceptionId: '=',
         isEditable: '=',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
@@ -74,11 +75,17 @@ angular.module('oppia').directive('answerGroupEditor', [
       controller: [
         'AlertsService', 'ExternalSaveService', 'ResponsesService',
         'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
+        'StateNextContentIdIndexService',
+        'SubtitledSetOfNormalizedStringObjectFactory',
+        'SubtitledSetOfUnicodeStringObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'INTERACTION_SPECS',
         function(
             AlertsService, ExternalSaveService, ResponsesService,
             RuleObjectFactory, StateEditorService, StateInteractionIdService,
+            StateNextContentIdIndexService,
+            SubtitledSetOfNormalizedStringObjectFactory,
+            SubtitledSetOfUnicodeStringObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             INTERACTION_SPECS) {
           var ctrl = this;
@@ -179,6 +186,12 @@ angular.module('oppia').directive('answerGroupEditor', [
                     getDefaultInputValue('Real'), getDefaultInputValue('Real')],
                   clickedRegions: []
                 };
+              case 'SubtitledSetOfNormalizedString':
+                return (
+                  SubtitledSetOfNormalizedStringObjectFactory.createDefault());
+              case 'SubtitledSetOfUnicodeString':
+                return (
+                  SubtitledSetOfUnicodeStringObjectFactory.createDefault());
             }
           };
 
@@ -199,6 +212,7 @@ angular.module('oppia').directive('answerGroupEditor', [
 
             var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
             var inputs = {};
+            const inputTypes = {};
             while (description.match(PATTERN)) {
               var varName = description.match(PATTERN)[1];
               var varType = description.match(PATTERN)[2];
@@ -206,6 +220,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                 varType = varType.substring(1);
               }
 
+              inputTypes[varName] = varType;
               inputs[varName] = getDefaultInputValue(varType);
               description = description.replace(PATTERN, ' ');
             }
@@ -217,7 +232,9 @@ angular.module('oppia').directive('answerGroupEditor', [
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
             // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
-            ctrl.rules.push(RuleObjectFactory.createNew(ruleType, inputs));
+            const rule = RuleObjectFactory.createNew(ruleType, inputs);
+            rule.inputTypes = inputTypes;
+            ctrl.rules.push(rule);
             ctrl.changeActiveRuleIndex(ctrl.rules.length - 1);
           };
 
@@ -243,6 +260,9 @@ angular.module('oppia').directive('answerGroupEditor', [
             ctrl.changeActiveRuleIndex(-1);
             ctrl.rulesMemento = null;
             ctrl.getOnSaveAnswerGroupRulesFn()(ctrl.rules);
+            StateNextContentIdIndexService.saveDisplayedValue();
+            ctrl.getOnSaveNextContentIdIndex()(
+              StateNextContentIdIndexService.displayed);
           };
 
           ctrl.changeActiveRuleIndex = function(newIndex) {

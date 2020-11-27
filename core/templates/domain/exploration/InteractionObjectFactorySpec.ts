@@ -485,8 +485,8 @@ describe('Interaction object factory', () => {
       },
       training_data: ['training_data'],
       tagged_skill_misconception_id: 'skill_id-1'
-    })]);
-    newAnswerGroup = agof.createFromBackendDict(newAnswerGroup);
+    }, 'TextInput')]);
+    newAnswerGroup = agof.createFromBackendDict(newAnswerGroup, 'TextInput');
     testInteraction.setAnswerGroups([newAnswerGroup]);
     expect(testInteraction.answerGroups).toEqual([newAnswerGroup]);
   });

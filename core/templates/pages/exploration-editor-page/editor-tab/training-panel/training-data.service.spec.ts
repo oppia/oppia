@@ -43,6 +43,10 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledSetOfNormalizedStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import { SubtitledSetOfUnicodeStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -95,7 +99,10 @@ describe('TrainingDataService', function() {
       $provide.value(
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
           new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
+          new RuleObjectFactory(
+            new SubtitledSetOfNormalizedStringObjectFactory(),
+            new SubtitledSetOfUnicodeStringObjectFactory()
+          )));
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
@@ -108,7 +115,10 @@ describe('TrainingDataService', function() {
       $provide.value(
         'ParamChangesObjectFactory', new ParamChangesObjectFactory(
           new ParamChangeObjectFactory()));
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
+      $provide.value('RuleObjectFactory', new RuleObjectFactory(
+        new SubtitledSetOfNormalizedStringObjectFactory(),
+        new SubtitledSetOfUnicodeStringObjectFactory()
+      ));
       $provide.value(
         'RecordedVoiceoversObjectFactory',
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
@@ -169,7 +179,10 @@ describe('TrainingDataService', function() {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: 'Test'}
+              inputs: {x: {
+                content_id: 'ri',
+                normalized_str_set: ['Test']
+              }}
             }],
             outcome: {
               dest: 'State',

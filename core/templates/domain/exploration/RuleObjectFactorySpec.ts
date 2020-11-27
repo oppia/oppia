@@ -32,13 +32,14 @@ describe('RuleObjectFactory', () => {
       x: [['<p>list_of_sets_of_html_strings</p>']]
     };
     ruleBackendDict = {
-      rule_type: 'rule_type_1',
+      rule_type: 'Equals',
       inputs: inputBackend
     };
   });
 
   it('should convert to a backend dictionary', () => {
-    let rulesDict = ruleObjectFactory.createFromBackendDict(ruleBackendDict);
+    let rulesDict = ruleObjectFactory.createFromBackendDict(
+      ruleBackendDict, 'ItemSelectionInput');
     expect(rulesDict.toBackendDict()).toEqual(ruleBackendDict);
   });
 

@@ -145,7 +145,7 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [equalsRule, equalsRule]
           );
@@ -170,13 +170,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let equalsRule2 = rof.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: ['3', '4', '5', '6']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [equalsRule1, equalsRule2]
           );
@@ -198,7 +198,7 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [subsetRule, subsetRule]
           );
@@ -223,13 +223,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let subsetRule2 = rof.createFromBackendDict({
             rule_type: 'IsSubsetOf',
             inputs: {
               x: ['3', '4', '5', '6']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [subsetRule1, subsetRule2]
           );
@@ -251,7 +251,7 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [hasElementsInRule, hasElementsInRule]
           );
@@ -276,13 +276,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let hasElementsInRule2 = rof.createFromBackendDict({
             rule_type: 'HasElementsIn',
             inputs: {
               x: ['3', '4', '5', '6']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [hasElementsInRule1, hasElementsInRule2]
           );
@@ -304,7 +304,7 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [disjointRule, disjointRule]
           );
@@ -329,13 +329,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let disjointRule2 = rof.createFromBackendDict({
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: ['3', '4', '5', '6']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [disjointRule1, disjointRule2]
           );
@@ -357,7 +357,7 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [supersetRule, supersetRule]
           );
@@ -382,13 +382,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let supersetRule2 = rof.createFromBackendDict({
             rule_type: 'IsSupersetOf',
             inputs: {
               x: ['3', '4', '5', '6']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [supersetRule1, supersetRule2]
           );
@@ -410,7 +410,7 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [hasElementNotInRule, hasElementNotInRule]
           );
@@ -435,13 +435,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let hasElementNotInRule2 = rof.createFromBackendDict({
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: ['3', '4', '5', '6']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [hasElementNotInRule1, hasElementNotInRule2]
           );
@@ -463,7 +463,7 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [omitElementRule, omitElementRule]
           );
@@ -488,13 +488,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           let omitElementRule2 = rof.createFromBackendDict({
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: ['3', '4', '5', '6']
             }
-          });
+          }, 'SetInput');
           let answerGroup = createAnswerGroupByRules(
             [omitElementRule1, omitElementRule2]
           );
@@ -520,13 +520,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           subsetRule2 = rof.createFromBackendDict({
             rule_type: 'IsSubsetOf',
             inputs: {
               x: ['1', '2', '3', '4']
             }
-          });
+          }, 'SetInput');
         });
 
         it('should generate errors with redundant rules', () => {
@@ -571,13 +571,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           hasElementsInRule2 = rof.createFromBackendDict({
             rule_type: 'HasElementsIn',
             inputs: {
               x: ['1', '2', '3', '4']
             }
-          });
+          }, 'SetInput');
         });
 
         it('should generate errors with redundant rules', () => {
@@ -622,13 +622,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           disjointRule2 = rof.createFromBackendDict({
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: ['1', '2', '3', '4']
             }
-          });
+          }, 'SetInput');
         });
 
         it('should generate errors with redundant rules', () => {
@@ -673,13 +673,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           supersetRule2 = rof.createFromBackendDict({
             rule_type: 'IsSupersetOf',
             inputs: {
               x: ['1', '2', '3', '4']
             }
-          });
+          }, 'SetInput');
         });
 
         it('should generate errors with redundant rules', () => {
@@ -724,13 +724,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           hasElementsNotInRule2 = rof.createFromBackendDict({
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: ['1', '2', '3', '4']
             }
-          });
+          }, 'SetInput');
         });
 
         it('should generate errors with redundant rules', () => {
@@ -775,13 +775,13 @@ describe('SetInputValidationService', () => {
             inputs: {
               x: ['1', '2', '3']
             }
-          });
+          }, 'SetInput');
           omitsElementsInRule2 = rof.createFromBackendDict({
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: ['1', '2', '3', '4']
             }
-          });
+          }, 'SetInput');
         });
 
         it('should generate errors with redundant rules', () => {

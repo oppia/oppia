@@ -147,13 +147,13 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          }),
+          }, 'TextInput'),
           rof.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
               x: ['xyza']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -176,7 +176,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -186,7 +186,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyza']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -207,7 +207,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -217,7 +217,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['abc']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -238,7 +238,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -248,7 +248,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -271,7 +271,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -281,7 +281,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyza']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -302,7 +302,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -312,7 +312,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['abc']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -333,7 +333,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -343,7 +343,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyzy']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -366,7 +366,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -376,7 +376,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -397,7 +397,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -407,7 +407,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xya']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -430,7 +430,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -440,7 +440,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -461,7 +461,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xyz']
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -471,7 +471,7 @@ describe('TextInputValidationService', () => {
             inputs: {
               x: ['xya']
             }
-          })
+          }, 'TextInput')
         ]
       )];
 

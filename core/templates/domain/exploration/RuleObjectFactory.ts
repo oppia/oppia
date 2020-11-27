@@ -30,6 +30,8 @@ import {
   SubtitledSetOfUnicodeStringObjectFactory
 } from 'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+
 export interface RuleBackendDict {
   'inputs': RuleInputs;
   'rule_type': string;
@@ -51,11 +53,11 @@ export class Rule {
     let inputsDict = {};
 
     Object.keys(this.inputs).forEach(ruleName => {
-      if (this.inputs instanceof SubtitledSetOfNormalizedString) {
+      if (this.inputs[ruleName] instanceof SubtitledSetOfNormalizedString) {
         inputsDict[ruleName] = (
           <SubtitledSetOfNormalizedString> this.inputs[ruleName]
         ).toBackendDict();
-      } else if (this.inputs instanceof SubtitledSetOfUnicodeString) {
+      } else if (this.inputs[ruleName] instanceof SubtitledSetOfUnicodeString) {
         inputsDict[ruleName] = (
           <SubtitledSetOfUnicodeString> this.inputs[ruleName]
         ).toBackendDict();
@@ -76,61 +78,61 @@ export class Rule {
 })
 export class RuleObjectFactory {
   constructor(
-      private subtitledSetOfNormalizedStringObjectFactory:
-        SubtitledSetOfNormalizedStringObjectFactory,
-      private subtitledSetOfUnicodeStringObjectFactory:
-        SubtitledSetOfUnicodeStringObjectFactory
+    private subtitledSetOfNormalizedStringObjectFactory:
+      SubtitledSetOfNormalizedStringObjectFactory,
+    private subtitledSetOfUnicodeStringObjectFactory:
+      SubtitledSetOfUnicodeStringObjectFactory
   ) {}
 
   createNew(type: string, inputs: RuleInputs): Rule {
-    let ruleInputs = {};
-
-    Object.keys(inputs).forEach(ruleName => {
-      if ('content_id' in inputs[ruleName]) {
-        if ('normalized_str_set' in inputs[ruleName]) {
-          ruleInputs[ruleName] = (
-            this.subtitledSetOfNormalizedStringObjectFactory
-              .createFromBackendDict(
-                <SubtitledSetOfNormalizedStringBackendDict> inputs[ruleName])
-          );
-        } else if ('unicode_str_set' in inputs[ruleName]) {
-          ruleInputs[ruleName] = (
-            this.subtitledSetOfUnicodeStringObjectFactory
-              .createFromBackendDict(
-                <SubtitledSetOfUnicodeStringBackendDict> inputs[ruleName])
-          );
-        }
-      } else {
-        ruleInputs[ruleName] = inputs[ruleName];
-      }
-    });
-    console.log('here', ruleInputs);
-
-    return new Rule(type, ruleInputs);
+    return new Rule(type, inputs);
   }
 
-  createFromBackendDict(ruleDict: RuleBackendDict): Rule {
-    let inputs = {};
+  createFromBackendDict(
+      ruleDict: RuleBackendDict, interactionId: string
+  ): Rule {
+    const ruleType = ruleDict.rule_type;
+    const inputs = {};
+    const inputsBackendDict = ruleDict.inputs;
 
-    Object.keys(ruleDict).forEach(ruleName => {
-      if ('content_id' in ruleDict[ruleName]) {
-        if ('normalized_str_set' in ruleDict[ruleName]) {
-          inputs[ruleName] = (
-            this.subtitledSetOfNormalizedStringObjectFactory
-              .createFromBackendDict(ruleDict[ruleName])
-          );
-        } else if ('unicode_str_set' in ruleDict[ruleName]) {
-          inputs[ruleName] = (
-            this.subtitledSetOfUnicodeStringObjectFactory
-              .createFromBackendDict(ruleDict[ruleName])
-          );
-        }
-      } else {
-        inputs[ruleName] = ruleDict[ruleName];
+    let ruleDescription = (
+      INTERACTION_SPECS[interactionId].rule_descriptions[ruleType]);
+
+    // Finds the parameters and sets them in ctrl.rule.inputs.
+    const PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    while (true) {
+      if (!ruleDescription.match(PATTERN)) {
+        break;
       }
-    });
+      const varName = ruleDescription.match(PATTERN)[1];
+      let varType = null;
+      if (ruleDescription.match(PATTERN)[2]) {
+        varType = ruleDescription.match(PATTERN)[2].substring(1);
+      }
 
-    return new Rule(ruleDict.rule_type, inputs);
+      if (varType === 'SubtitledSetOfNormalizedString') {
+        inputs[varName] = (
+          this.subtitledSetOfNormalizedStringObjectFactory
+            .createFromBackendDict(
+              <SubtitledSetOfNormalizedStringBackendDict>
+                inputsBackendDict[varName])
+        );
+      } else if (varType === 'SubtitledSetOfUnicodeString') {
+        inputs[varName] = (
+          this.subtitledSetOfUnicodeStringObjectFactory
+            .createFromBackendDict(
+              <SubtitledSetOfUnicodeStringBackendDict>
+                inputsBackendDict[varName])
+        );
+      } else {
+        inputs[varName] = varType;
+      }
+
+      ruleDescription = ruleDescription.replace(PATTERN, ' ');
+    }
+
+
+    return new Rule(ruleType, inputs);
   }
 }
 

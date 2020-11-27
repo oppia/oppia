@@ -21,7 +21,7 @@ import {
   SubtitledSetOfNormalizedStringObjectFactory, SubtitledSetOfNormalizedString
 } from 'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
 
-fdescribe('SubtitledSetOfNormalizedString object factory', () => {
+describe('SubtitledSetOfNormalizedString object factory', () => {
   let ssonsof: SubtitledSetOfNormalizedStringObjectFactory;
   let subtitledSetOfNormalizedString: SubtitledSetOfNormalizedString;
 
@@ -32,6 +32,11 @@ fdescribe('SubtitledSetOfNormalizedString object factory', () => {
       content_id: 'content_id',
       normalized_str_set: ['some string']
     });
+  });
+
+  it('should get normalized strings', () => {
+    expect(subtitledSetOfNormalizedString.getNormalizedStrings()).toEqual(
+      ['some string']);
   });
 
   it('should get and set contentId correctly', () => {

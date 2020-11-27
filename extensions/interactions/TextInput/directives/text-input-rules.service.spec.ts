@@ -20,28 +20,42 @@ import { TestBed } from '@angular/core/testing';
 
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+import { SubtitledSetOfNormalizedStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Text Input rules service', () => {
-  var tirs: TextInputRulesService = null;
+  let tirs: TextInputRulesService;
+  let ssonsof: SubtitledSetOfNormalizedStringObjectFactory;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe]
     });
     tirs = TestBed.get(TextInputRulesService);
+    ssonsof = TestBed.get(SubtitledSetOfNormalizedStringObjectFactory);
   });
 
   const RULE_INPUT = {
-    x: ['abc def']
+    x: ssonsof.createFromBackendDict({
+      content_id: 'ri',
+      normalized_str_set: ['abc def']
+    })
   };
 
   const RULE_INPUT_PLURAL = {
-    x: ['testing', 'abc def']
+    x: ssonsof.createFromBackendDict({
+      content_id: 'ri',
+      normalized_str_set: ['testing', 'abc def']
+    })
   };
 
   const RULE_INPUT_EMPTY = {
-    x: []
+    x: ssonsof.createFromBackendDict({
+      content_id: 'ri',
+      normalized_str_set: []
+    })
   };
 
   it('should have a correct \'equals\' rule', () => {

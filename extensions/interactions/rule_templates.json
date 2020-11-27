@@ -242,25 +242,25 @@
   },
   "SetInput": {
     "Equals": {
-      "description": "is equal to {{x|SetOfUnicodeString}}"
+      "description": "is equal to {{x|SubtitledSetOfUnicodeString}}"
     },
     "IsSubsetOf": {
-      "description": "is a proper subset of {{x|SetOfUnicodeString}}"
+      "description": "is a proper subset of {{x|SubtitledSetOfUnicodeString}}"
     },
     "IsSupersetOf": {
-      "description": "is a proper superset of {{x|SetOfUnicodeString}}"
+      "description": "is a proper superset of {{x|SubtitledSetOfUnicodeString}}"
     },
     "HasElementsIn": {
-      "description": "has elements in common with {{x|SetOfUnicodeString}}"
+      "description": "has elements in common with {{x|SubtitledSetOfUnicodeString}}"
     },
     "HasElementsNotIn": {
-      "description": "has elements not in {{x|SetOfUnicodeString}}"
+      "description": "has elements not in {{x|SubtitledSetOfUnicodeString}}"
     },
     "OmitsElementsIn": {
-      "description": "omits some elements of {{x|SetOfUnicodeString}}"
+      "description": "omits some elements of {{x|SubtitledSetOfUnicodeString}}"
     },
     "IsDisjointFrom": {
-      "description": "has no elements in common with {{x|SetOfUnicodeString}}"
+      "description": "has no elements in common with {{x|SubtitledSetOfUnicodeString}}"
     }
   },
   "TextInput": {

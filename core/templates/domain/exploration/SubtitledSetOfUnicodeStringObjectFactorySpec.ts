@@ -34,6 +34,11 @@ describe('SubtitledSetOfUnicodeString object factory', () => {
     });
   });
 
+  it('should get unicode strings', () => {
+    expect(subtitledSetOfUnicodeString.getUnicodeStrings()).toEqual(
+      ['some string']);
+  });
+
   it('should get and set contentId correctly', () => {
     expect(subtitledSetOfUnicodeString.getContentId()).toEqual('content_id');
     subtitledSetOfUnicodeString.setContentId('new_content_id');

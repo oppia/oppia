@@ -471,13 +471,13 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "HasElementsNotIn": "has elements not in {{x|SetOfUnicodeString}}",
-      "Equals": "is equal to {{x|SetOfUnicodeString}}",
-      "IsSupersetOf": "is a proper superset of {{x|SetOfUnicodeString}}",
-      "OmitsElementsIn": "omits some elements of {{x|SetOfUnicodeString}}",
-      "HasElementsIn": "has elements in common with {{x|SetOfUnicodeString}}",
-      "IsSubsetOf": "is a proper subset of {{x|SetOfUnicodeString}}",
-      "IsDisjointFrom": "has no elements in common with {{x|SetOfUnicodeString}}"
+      "HasElementsNotIn": "has elements not in {{x|SubtitledSetOfUnicodeString}}",
+      "Equals": "is equal to {{x|SubtitledSetOfUnicodeString}}",
+      "IsSupersetOf": "is a proper superset of {{x|SubtitledSetOfUnicodeString}}",
+      "OmitsElementsIn": "omits some elements of {{x|SubtitledSetOfUnicodeString}}",
+      "HasElementsIn": "has elements in common with {{x|SubtitledSetOfUnicodeString}}",
+      "IsSubsetOf": "is a proper subset of {{x|SubtitledSetOfUnicodeString}}",
+      "IsDisjointFrom": "has no elements in common with {{x|SubtitledSetOfUnicodeString}}"
     }
   },
   "CodeRepl": {

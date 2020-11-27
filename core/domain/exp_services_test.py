@@ -121,7 +121,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
         interaction_answer_groups = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
-                'inputs': {'x': ['abc']},
+                'inputs': {
+                    'x': {
+                        'content_id': 'ri',
+                        'normalized_str_set': ['abc']
+                    }
+                },
             }],
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,

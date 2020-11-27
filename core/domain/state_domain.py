@@ -1989,7 +1989,7 @@ class RuleSpec(python_utils.OBJECT):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             interaction_id)
         inputs_name_and_types = (
-            re.findall(r'{{([a-z])\|([^}]*)}',
+            re.findall(r'{{([a-z]+)\|([^}]*)}',
             interaction.rules_dict[rule_type]['description']))
 
         rule_inputs = {}
@@ -2991,7 +2991,7 @@ class State(python_utils.OBJECT):
                                     normalized_param))
                         if isSubtitledSetOfUnicodeString:
                             normalized_param = (
-                                isSubtitledSetOfUnicodeString.from_dict(
+                                SubtitledSetOfUnicodeString.from_dict(
                                     normalized_param))
 
                     rule_inputs[param_name] = normalized_param

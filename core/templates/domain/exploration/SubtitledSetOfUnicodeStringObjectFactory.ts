@@ -34,6 +34,10 @@ export class SubtitledSetOfUnicodeString {
     private _contentId: string | null
   ) {}
 
+  getUnicodeStrings(): string[] {
+    return this._unicodeStrings;
+  }
+
   getContentId(): string {
     return this._contentId;
   }

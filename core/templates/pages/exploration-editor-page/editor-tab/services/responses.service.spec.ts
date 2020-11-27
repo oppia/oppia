@@ -184,7 +184,10 @@ describe('Responses Service', function() {
       rules: [{
         type: 'Contains',
         inputs: {
-          x: 'correct',
+          x: {
+            content_id: 'ri',
+            normalized_str_set: ['correct']
+          },
         }
       }],
       taggedSkillMisconceptionId: '',
@@ -225,7 +228,10 @@ describe('Responses Service', function() {
       rules: [{
         type: 'Contains',
         inputs: {
-          x: 'correct',
+          x: {
+            content_id: 'ri',
+            normalized_str_set: ['correct']
+          },
         }
       }],
       taggedSkillMisconceptionId: '',
@@ -274,7 +280,10 @@ describe('Responses Service', function() {
       rules: [{
         type: 'Contains',
         inputs: {
-          x: 'correct',
+          x: {
+            content_id: 'ri',
+            normalized_str_set: ['correct']
+          },
         }
       }],
       taggedSkillMisconceptionId: '',
