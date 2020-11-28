@@ -3703,17 +3703,6 @@ oppia-noninteractive-link {
   }
 }
 
-.oppia-activity-summary-tile .exploration-summary-avatars,
-.oppia-activity-summary-tile-mobile .exploration-summary-avatars {
-  left: 140px;
-  padding-bottom: 4px;
-  padding-right: 5px;
-  position: absolute;
-  top: 3px;
-  width: 31px;
-  z-index: 11;
-}
-
 .oppia-activity-summary-tile .exploration-summary-tile-mask {
   background-color: #eee;
   height: 258px;
@@ -3753,12 +3742,6 @@ oppia-noninteractive-link {
   border-radius: 50%;
   height: 26px;
   width: 26px;
-}
-
-.oppia-activity-summary-tile .exploration-summary-avatars profile-link-image,
-.oppia-activity-summary-tile-mobile .exploration-summary-avatars profile-link-image {
-  display: block;
-  margin-bottom: 3px;
 }
 
 .oppia-activity-summary-tile .contributor-indicator,
