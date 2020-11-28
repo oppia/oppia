@@ -238,6 +238,23 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     SKILL_ID = 'skill_id'
 
+    default_commit_cmd0 = [{'cmd': 'create_new'}]
+    default_commit_cmd1 = [{
+        'difficulty': 'Easy', 'cmd': 'update_rubrics',
+        'explanations': ['New explanation']
+    }, {
+        'cmd': 'update_skill_property',
+        'new_value': 'Test description',
+        'old_value': '', 'property_name': 'description'
+    }]
+    invalid_commit_cmd = [{
+        'difficulty': 'Easy', 'cmd': 'update_rubrics',
+        'explanation': ['New explanation']
+    }, {
+        'cmd': 'update_skill_property', 'new_value': 'Test description',
+        'old_value': '', 'property_name': 'description'
+    }]
+
     def setUp(self):
         super(SkillCommitCmdMigrationOneOffJobTests, self).setUp()
 
@@ -269,27 +286,34 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'new_value': 'Test description'
             })], 'Changes.')
 
-        self.model_instance_0 = (
+        self.commit_model_instance_0 = (
             skill_models.SkillCommitLogEntryModel.get_by_id(
                 'skill-skill_id-1'))
-        self.model_instance_1 = (
+        self.commit_model_instance_1 = (
             skill_models.SkillCommitLogEntryModel.get_by_id(
                 'skill-skill_id-2'))
+
+        self.metadata_model_instance_0 = (
+            skill_models.SkillSnapshotMetadataModel.get_by_id(
+                'skill_id-1'))
+        self.metadata_model_instance_1 = (
+            skill_models.SkillSnapshotMetadataModel.get_by_id(
+                'skill_id-2'))
 
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_standard_operation(self):
         self.assertEqual(
-            self.model_instance_0.commit_cmds, [{'cmd': 'create_new'}])
+            self.commit_model_instance_0.commit_cmds, self.default_commit_cmd0)
         self.assertEqual(
-            self.model_instance_1.commit_cmds,
-            [{
-                'difficulty': 'Easy', 'cmd': 'update_rubrics',
-                'explanations': ['New explanation']
-            }, {
-                'cmd': 'update_skill_property', 'new_value': 'Test description',
-                'old_value': '', 'property_name': 'description'
-            }])
+            self.commit_model_instance_1.commit_cmds,
+            self.default_commit_cmd1)
+        self.assertEqual(
+            self.metadata_model_instance_0.commit_cmds,
+            self.default_commit_cmd0)
+        self.assertEqual(
+            self.metadata_model_instance_1.commit_cmds,
+            self.default_commit_cmd1)
         job_id = (
             skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
@@ -299,28 +323,26 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
             job_id)
         self.assertEqual(output, [])
         self.assertEqual(
-            self.model_instance_0.commit_cmds, [{'cmd': 'create_new'}])
+            self.commit_model_instance_0.commit_cmds, self.default_commit_cmd0)
         self.assertEqual(
-            self.model_instance_1.commit_cmds,
-            [{
-                'difficulty': 'Easy', 'cmd': 'update_rubrics',
-                'explanations': ['New explanation']
-            }, {
-                'cmd': 'update_skill_property', 'new_value': 'Test description',
-                'old_value': '', 'property_name': 'description'
-            }])
+            self.commit_model_instance_1.commit_cmds, self.default_commit_cmd1)
+        self.assertEqual(
+            self.metadata_model_instance_0.commit_cmds,
+            self.default_commit_cmd0)
+        self.assertEqual(
+            self.metadata_model_instance_1.commit_cmds,
+            self.default_commit_cmd1)
 
     def test_migration_job_skips_deleted_model(self):
-        self.model_instance_1.commit_cmds = [{
-            'difficulty': 'Easy', 'cmd': 'update_rubrics',
-            'explanation': ['New explanation']
-        }, {
-            'cmd': 'update_skill_property', 'new_value': 'Test description',
-            'old_value': '', 'property_name': 'description'
-        }]
-        self.model_instance_1.deleted = True
-        self.model_instance_1.update_timestamps()
-        self.model_instance_1.put()
+        self.commit_model_instance_1.commit_cmds = self.invalid_commit_cmd
+        self.commit_model_instance_1.deleted = True
+        self.commit_model_instance_1.update_timestamps()
+        self.commit_model_instance_1.put()
+
+        self.metadata_model_instance_1.commit_cmds = self.invalid_commit_cmd
+        self.metadata_model_instance_1.deleted = True
+        self.metadata_model_instance_1.update_timestamps()
+        self.metadata_model_instance_1.put()
         job_id = (
             skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
@@ -330,51 +352,83 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
             job_id)
         self.assertEqual(output, [])
 
-    def test_migration_job_updates_invalid_command(self):
-        self.model_instance_1.commit_cmds = [{
-            'difficulty': 'Easy', 'cmd': 'update_rubrics',
-            'explanation': ['New explanation']
-        }, {
-            'cmd': 'update_skill_property', 'new_value': 'Test description',
-            'old_value': '', 'property_name': 'description'
-        }]
-        self.model_instance_1.update_timestamps()
-        self.model_instance_1.put()
+    def test_migration_job_updates_invalid_command_of_commit_model(self):
+        self.commit_model_instance_1.commit_cmds = self.invalid_commit_cmd
+        self.commit_model_instance_1.update_timestamps()
+        self.commit_model_instance_1.put()
 
         self.assertEqual(
-            self.model_instance_0.commit_cmds, [{'cmd': 'create_new'}])
+            self.commit_model_instance_0.commit_cmds,
+            self.default_commit_cmd0)
         self.assertEqual(
-            self.model_instance_1.commit_cmds,
-            [{
-                'difficulty': 'Easy', 'cmd': 'update_rubrics',
-                'explanation': ['New explanation']
-            }, {
-                'cmd': 'update_skill_property', 'new_value': 'Test description',
-                'old_value': '', 'property_name': 'description'
-            }])
+            self.commit_model_instance_1.commit_cmds, self.invalid_commit_cmd)
+
         job_id = (
             skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
         skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
+                job_id))
+        eval_output = [
+            ast.literal_eval(stringified_item) for
+            stringified_item in stringified_output]
+        expected_output = [
+            [
+                'Commit Commands Updated-SkillCommitLogEntryModel',
+                ['skill-skill_id-2']
+            ]
+        ]
 
-        output = skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
-            job_id)
+        self.assertItemsEqual(eval_output, expected_output)
         self.assertEqual(
-            output, ['[u\'Commit Commands Updated\', [u\'skill-skill_id-2\']]'])
-        self.assertEqual(
-            self.model_instance_0.commit_cmds, [{'cmd': 'create_new'}])
-        self.model_instance_1 = (
+            self.commit_model_instance_0.commit_cmds, self.default_commit_cmd0)
+        self.commit_model_instance_1 = (
             skill_models.SkillCommitLogEntryModel.get_by_id(
                 'skill-skill_id-2'))
         self.assertEqual(
-            self.model_instance_1.commit_cmds,
-            [{
-                'difficulty': 'Easy', 'cmd': 'update_rubrics',
-                'explanations': ['New explanation']
-            }, {
-                'cmd': 'update_skill_property', 'new_value': 'Test description',
-                'old_value': '', 'property_name': 'description'
-            }])
+            self.commit_model_instance_1.commit_cmds,
+            self.default_commit_cmd1)
+
+    def test_migration_job_updates_invalid_command_of_metadata_model(self):
+        self.metadata_model_instance_1.commit_cmds = self.invalid_commit_cmd
+        self.metadata_model_instance_1.update_timestamps()
+        self.metadata_model_instance_1.put()
+
+        self.assertEqual(
+            self.metadata_model_instance_0.commit_cmds,
+            self.default_commit_cmd0)
+        self.assertEqual(
+            self.metadata_model_instance_1.commit_cmds,
+            self.invalid_commit_cmd)
+
+        job_id = (
+            skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
+        skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.get_output(
+                job_id))
+        eval_output = [
+            ast.literal_eval(stringified_item) for
+            stringified_item in stringified_output]
+        expected_output = [
+            [
+                'Commit Commands Updated-SkillSnapshotMetadataModel',
+                ['skill_id-2']
+            ]
+        ]
+
+        self.assertItemsEqual(eval_output, expected_output)
+        self.assertEqual(
+            self.metadata_model_instance_0.commit_cmds,
+            self.default_commit_cmd0)
+        self.metadata_model_instance_1 = (
+            skill_models.SkillSnapshotMetadataModel.get_by_id(
+                'skill_id-2'))
+        self.assertEqual(
+            self.metadata_model_instance_1.commit_cmds,
+            self.default_commit_cmd1)
 
 
 class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
