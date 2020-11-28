@@ -182,6 +182,8 @@ describe('Exploration editor page component', function() {
     }
   };
 
+  importAllAngularServices();
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -232,7 +234,7 @@ describe('Exploration editor page component', function() {
     sts = $injector.get('StateTutorialFirstTimeService');
     stass = $injector.get('StateTopAnswersStatsService');
     stfts = $injector.get('StateTutorialFirstTimeService');
-    tds = $injector.get('ThreadDataService');
+    tds = $injector.get('ThreadDataBackendApiService');
     ueps = $injector.get('UserExplorationPermissionsService');
 
     $scope = $rootScope.$new();
