@@ -172,18 +172,21 @@ var ListEditor = function(elem) {
 var RealEditor = function(elem) {
   return {
     setValue: async function(value) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(value);
+      var tagNameInput = elem.element(by.tagName('input'));
+      await action.clear('Tag Name Input', tagNameInput);
+      await action.sendKeys('Tag Name Input', tagNameInput, value);
     }
   };
 };
 
 var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
-  await (await elem.all(by.css('.oppia-rte')).first()).click();
+  var oppiaRte = await elem.all(by.css('.oppia-rte')).first();
+  await action.click('Test Oppia Rte', oppiaRte);
 
   var _appendContentText = async function(text) {
-    await (await elem.all(by.css('.oppia-rte')).first()).sendKeys(text);
+    var oppiaRte = await elem.all(by.css('.oppia-rte')).first();
+    await action.sendKeys('Oppia Rte', oppiaRte, text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
@@ -195,7 +198,8 @@ var RichTextEditor = async function(elem) {
     expect(
       await (await elem.all(by.css('.oppia-rte')).first()).isPresent()
     ).toBe(true);
-    await (await elem.all(by.css('.oppia-rte')).first()).clear();
+    var oppiaRte = (await elem.all(by.css('.oppia-rte')).first());
+    await action.clear('oppia Rte', oppiaRte);
   };
   return {
     clear: async function() {
@@ -258,7 +262,7 @@ var RichTextEditor = async function(elem) {
       await waitFor.elementToBeClickable(
         doneButton,
         'save button taking too long to be clickable');
-      await doneButton.click();
+      await action.click('Test Done Button', doneButton);
       await waitFor.invisibilityOf(
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
@@ -267,8 +271,9 @@ var RichTextEditor = async function(elem) {
         [
           'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
         ].includes(componentName)) {
-        await elem.all(
-          by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
+        
+        var oppiaRte = elem.all(by.css('.oppia-rte')).first();
+        await action.sendKeys('Oppia Rte', oppiaRte, protractor.Key.DOWN);
       }
 
       // Ensure that the cursor is at the end of the RTE.
@@ -294,8 +299,9 @@ var SetOfHtmlStringEditor = function(elem) {
 var UnicodeEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.element(by.tagName('input')).clear();
-      await elem.element(by.tagName('input')).sendKeys(text);
+      var tagNameInput = elem.element(by.tagName('input'));
+      await action.clear('tag Name Input', tagNameInput);
+      await action.sendKeys('Tag Name Input', tagNameInput, text);
     }
   };
 };
@@ -303,15 +309,19 @@ var UnicodeEditor = function(elem) {
 var AutocompleteDropdownEditor = function(elem) {
   return {
     setValue: async function(text) {
-      await elem.element(by.css('.select2-container')).click();
+      var select2ContainerButton = elem.element(by.css('.select2-container'));
+      await action.click('Test Select2 Container Button', select2ContainerButton);
+      
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      await element(by.css('.select2-dropdown')).element(
-        by.css('.select2-search input')).sendKeys(text + '\n');
+      var select2DropDown = element(by.css('.select2-dropdown')).element(
+        by.css('.select2-search input'));
+      await action.sendKeys('Select2 Drop Down', select2DropDown, text + '\n');
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await elem.element(by.css('.select2-container')).click();
+      var select2ContainerButton = elem.element(by.css('.select2-container'));
+      await action.click('Test Select2 Container Button', select2ContainerButton);
       var actualOptions = await element(by.css('.select2-dropdown'))
         .all(by.tagName('li')).map(
           async function(optionElem) {
@@ -320,8 +330,9 @@ var AutocompleteDropdownEditor = function(elem) {
         );
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
-      await element(by.css('.select2-dropdown')).element(
-        by.css('.select2-search input')).sendKeys('\n');
+      var select2DropDown = element(by.css('.select2-dropdown')).element(
+        by.css('.select2-search input'));
+      await action.sendKeys('Select2 Drop Down', select2DropDown, '\n');
     }
   };
 };
@@ -344,9 +355,10 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       }
 
       for (var i = 0; i < texts.length; i++) {
-        await elem.element(by.css('.select2-container')).click();
-        await elem.element(by.css('.select2-search__field')).sendKeys(
-          texts[i] + '\n');
+        var select2ContainerButton = elem.element(by.css('.select2-container'));
+        await action.click('Test Select2 Container Button', select2ContainerButton);
+        var select2SearchField = elem.element(by.css('.select2-search__field'));
+        await action.sendKeys('Select2 Search Field', select2SearchField, texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
@@ -369,9 +381,8 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = async function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    await elem.element(by.css(
-      '.protractor-test-search-bar-dropdown-toggle')).click();
-
+    var dropDownToggleButton = elem.element(by.css('.protractor-test-search-bar-dropdown-toggle'));
+    await action.click('Test Dropdown Toggle', dropDownToggleButton);
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
       var filteredElement = elem.element(
@@ -381,7 +392,7 @@ var MultiSelectEditor = function(elem) {
         filteredElementsCount += 1;
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
-        await filteredElement.click();
+        await action.click('Test Filtered Element', filteredElement);
       }
     }
 
@@ -392,8 +403,7 @@ var MultiSelectEditor = function(elem) {
     }
 
     // Close the dropdown menu at the end.
-    await elem.element(by.css(
-      '.protractor-test-search-bar-dropdown-toggle')).click();
+    await action.click('Test Dropdown Toggle', dropDownToggleButton);
   };
 
   return {
@@ -407,8 +417,8 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      await elem.element(by.css(
-        '.protractor-test-search-bar-dropdown-toggle')).click();
+      var dropDownToggleButton = elem.element(by.css('.protractor-test-search-bar-dropdown-toggle'));
+      await action.click('Test Dropdown Toggle', dropDownToggleButton);
 
       // Find the selected elements.
       var actualSelection = await elem.element(
@@ -420,8 +430,7 @@ var MultiSelectEditor = function(elem) {
       expect(actualSelection).toEqual(expectedCurrentSelection);
 
       // Close the dropdown menu at the end.
-      await elem.element(by.css(
-        '.protractor-test-search-bar-dropdown-toggle')).click();
+      await action.click('Test Dropdown Toggle', dropDownToggleButton);
     }
   };
 };
@@ -697,8 +706,9 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
 var CodeStringEditor = function(elem) {
   return {
     setValue: async function(code) {
-      await elem.element(by.tagName('textarea')).clear();
-      await elem.element(by.tagName('textarea')).sendKeys(code);
+      var tagNameTextArea = elem.element(by.tagName('textarea'));
+      await action.clear('tag Name Text Area', tagNameTextArea);
+      await action.sendKeys('Tag Name Text Area', tagNameTextArea, code);
     }
   };
 };
