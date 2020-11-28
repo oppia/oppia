@@ -360,7 +360,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
         var select2ContainerButton = elem.element(by.css('.select2-container'));
         await action.click('Test Container Button', select2ContainerButton);
         var select2SearchField = elem.element(by.css('.select2-search__field'));
-        await action.sendKeys('Search Field', select2SearchField, texts[i] + '\n');
+        await action.sendKeys('Field', select2SearchField, texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
@@ -383,7 +383,9 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = async function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    var dropDownToggleButton = elem.element(by.css('.protractor-test-search-bar-dropdown-toggle'));
+    var dropDownToggleButton = elem.element(
+      by.css(
+        '.protractor-test-search-bar-dropdown-toggle'));
     await action.click('Test Dropdown Toggle', dropDownToggleButton);
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
