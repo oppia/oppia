@@ -91,7 +91,6 @@ var GraphEditor = function(graphInputContainer) {
       var deleteButton = graphInputContainer.element(
         by.css('.protractor-test-Delete-button'));
       await action.click('Test delete Button', deleteButton);
-    
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
         await vertexElement(i).click();
@@ -133,9 +132,7 @@ var ListEditor = function(elem) {
   var addItem = async function(objectType = null) {
     var listLength = await _getLength();
     var addListEntryButton = elem.element(by.css('.protractor-test-add-list-entry'));
-    await action.click('Test add List Entry Button', addlistEntryButton);
-    
-    
+    await action.click('Test add List Entry Button', addListEntryButton);
     if (objectType !== null) {
       return await getEditor(objectType)(
         elem.element(
@@ -201,7 +198,6 @@ var RichTextEditor = async function(elem) {
     ).toBe(true);
     await (await elem.all(by.css('.oppia-rte')).first()).clear();
   };
-
   return {
     clear: async function() {
       await _clearContent();
