@@ -431,11 +431,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id))):
             question_models.QuestionSummaryModel.get(self.question_id)
 
-        with self.assertRaisesRegexp(
-            Exception, 'Entity for class QuestionModel with id question_id '
-            'not found'):
-            question_services.delete_question(self.editor_id, 'question_id')
-
     def test_update_question(self):
         new_question_data = self._create_valid_question_data('DEF')
         change_dict = {

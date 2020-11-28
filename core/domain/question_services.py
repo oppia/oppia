@@ -305,14 +305,18 @@ def delete_question(
             still retained in the datastore. This last option is the preferred
             one.
     """
-    question_model = question_models.QuestionModel.get(question_id)
-    question_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
-        force_deletion=force_deletion)
+    question_model = question_models.QuestionModel.get_by_id(question_id)
+    if question_model is not None:
+        opportunity_services.increment_question_counts(
+            question_model.linked_skill_ids, -1)
 
-    question_models.QuestionSummaryModel.get(question_id).delete()
-    opportunity_services.increment_question_counts(
-        question_model.linked_skill_ids, -1)
+    question_models.QuestionModel.delete_multi(
+        [question_id], committer_id,
+        feconf.COMMIT_MESSAGE_QUESTION_DELETED, force_deletion=force_deletion)
+    question_summary_model = (
+        question_models.QuestionSummaryModel.get(question_id, False))
+    if question_summary_model is not None:
+        question_summary_model.delete()
 
 
 def get_question_skill_link_from_model(
