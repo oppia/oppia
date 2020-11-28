@@ -111,6 +111,8 @@ var GraphEditor = function(graphInputContainer) {
         // dict's edges.
         var allEdgesElement = element.all(by.css(
           '.protractor-test-graph-edge'));
+        await waitFor.visibilityOf(allEdgesElement,
+            'Edges element taking too long to appear');
         expect(await allEdgesElement.count()).toEqual(edgesList.length);
       }
     }
@@ -328,6 +330,8 @@ var AutocompleteDropdownEditor = function(elem) {
             return await optionElem.getText();
           }
         );
+      await waitFor.visibilityOf(actualOptions,
+        'Actual options taking too long to appear');
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
       var select2DropDown = element(by.css('.select2-dropdown')).element(
@@ -390,6 +394,8 @@ var MultiSelectEditor = function(elem) {
           '.protractor-test-search-bar-dropdown-menu span', texts[i]));
       if (await filteredElement.isPresent()) {
         filteredElementsCount += 1;
+        await waitFor.visibilityOf(filteredElement,
+            'Filtered element taking too long to appear');
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         await action.click('Test Filtered Element', filteredElement);
