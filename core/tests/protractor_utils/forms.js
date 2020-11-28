@@ -112,7 +112,7 @@ var GraphEditor = function(graphInputContainer) {
         var allEdgesElement = element.all(by.css(
           '.protractor-test-graph-edge'));
         await waitFor.visibilityOf(
-          allEdgesElement,'Edges element taking too long to appear');
+          allEdgesElement, 'Edges element taking too long to appear');
         expect(await allEdgesElement.count()).toEqual(edgesList.length);
       }
     }
@@ -329,7 +329,7 @@ var AutocompleteDropdownEditor = function(elem) {
           }
         );
       await waitFor.visibilityOf(
-        actualOptions,'Actual options taking too long to appear');
+        actualOptions, 'Actual options taking too long to appear');
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
       var select2DropDown = element(by.css('.select2-dropdown')).element(
@@ -358,9 +358,9 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 
       for (var i = 0; i < texts.length; i++) {
         var select2ContainerButton = elem.element(by.css('.select2-container'));
-        await action.click('Test Select2 Container Button', select2ContainerButton);
+        await action.click('Test Container Button', select2ContainerButton);
         var select2SearchField = elem.element(by.css('.select2-search__field'));
-        await action.sendKeys('Select2 Search Field', select2SearchField, texts[i] + '\n');
+        await action.sendKeys('Search Field', select2SearchField, texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
@@ -392,8 +392,8 @@ var MultiSelectEditor = function(elem) {
           '.protractor-test-search-bar-dropdown-menu span', texts[i]));
       if (await filteredElement.isPresent()) {
         filteredElementsCount += 1;
-        await waitFor.visibilityOf(filteredElement,
-          'Filtered element taking too long to appear');
+        await waitFor.visibilityOf(
+          filteredElement, 'Filtered element taking too long to appear');
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         await action.click('Test Filtered Element', filteredElement);
