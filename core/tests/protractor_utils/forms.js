@@ -131,8 +131,8 @@ var ListEditor = function(elem) {
   // If objectType is not specified, this function returns nothing.
   var addItem = async function(objectType = null) {
     var listLength = await _getLength();
-    var addListEntryButton = elem.element(by.css('.protractor-test-add-list-entry'));
-    await action.click('Test add List Entry Button', addListEntryButton);
+    var addListButton = elem.element(by.css('.protractor-test-add-list-entry'));
+    await action.click('Test add List Entry Button', addListButton);
     if (objectType !== null) {
       return await getEditor(objectType)(
         elem.element(
@@ -189,7 +189,6 @@ var RichTextEditor = async function(elem) {
     await waitFor.elementToBeClickable(
       elem.element(by.css('.' + buttonName)),
       'Toolbar button takes too long to be clickable.');
-    
     await elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = async function() {
