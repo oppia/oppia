@@ -775,6 +775,20 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
 
+    def test_delete_skill_marked_deleted(self):
+        skill_models.SkillModel.delete_multi(
+            [self.SKILL_ID], self.USER_ID, '', force_deletion=False)
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertTrue(skill_model.deleted)
+
+        skill_services.delete_skill(
+            self.USER_ID, self.SKILL_ID, force_deletion=True)
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertEqual(skill_model, None)
+        self.assertEqual(
+            skill_services.get_skill_summary_by_id(
+                self.SKILL_ID, strict=False), None)
+
     def test_cannot_update_skill_with_no_commit_message(self):
         changelist = [
             skill_domain.SkillChange({
