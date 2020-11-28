@@ -2959,16 +2959,16 @@ class DeleteInvalidSuggestionModelsOneOffJobTests(test_utils.GenericTestBase):
         """
         job_id = (
             suggestion_jobs_one_off
-            .PopulateFinalReviewerIdOneOffJob.create_new())
+            .DeleteInvalidSuggestionModelsOneOffJob.create_new())
         (
             suggestion_jobs_one_off
-            .PopulateFinalReviewerIdOneOffJob.enqueue(job_id)
+            .DeleteInvalidSuggestionModelsOneOffJob.enqueue(job_id)
         )
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off
-            .PopulateFinalReviewerIdOneOffJob.get_output(job_id))
+            .DeleteInvalidSuggestionModelsOneOffJob.get_output(job_id))
 
         self.assertEqual(actual_output, expected_output)
 
@@ -2982,6 +2982,11 @@ class DeleteInvalidSuggestionModelsOneOffJobTests(test_utils.GenericTestBase):
         self.add_question_change_dict['question_dict'][
             'question_state_data'] = self._create_valid_question_data(
                 'default_state').to_dict()
+
+        self.skill_id = 'skill_id'
+        self.save_new_skill(
+            self.skill_id, self.author_id, description='Skill Description')
+
         self.process_and_flush_pending_mapreduce_tasks()
 
     def test_no_action_is_performed_for_suggestions_that_are_marked_deleted(
@@ -3006,9 +3011,18 @@ class DeleteInvalidSuggestionModelsOneOffJobTests(test_utils.GenericTestBase):
         suggestion_model.update_timestamps()
         suggestion_model.put()
 
-        expected_output = [u'[u\'DELETED_MODELS\', 1]']
+        expected_output = [u'[u\'SUGGESTION_ALREADY_DELETED\', 1]']
         self._run_job_and_verify_output(expected_output)
 
         suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
             self.EXPLORATION_THREAD_ID)
         self.assertEqual(suggestion_model.final_reviewer_id, None)
+
+    def test_migration_job_deletes_existing_question_suggestion(self):
+        suggestion = suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, self.skill_id, 1,
+            self.author_id, self.add_question_change_dict, 'test description')
+
+        expected_output = ['[u\'SUGGESTION_DELETED\', 1]']
+        self._run_job_and_verify_output(expected_output)
