@@ -98,5 +98,11 @@ describe('Browser Checker Service', function() {
 
       expect(bcs.detectBrowserType()).toEqual('Safari');
     });
+
+    it('should return \'Others\' if no other browser type is detected.', () => {
+      mockUserAgent('unknown-user-agent-value');
+
+      expect(bcs.detectBrowserType()).toEqual('Others');
+    });
   });
 });
