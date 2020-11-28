@@ -933,14 +933,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
                 ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
-                    '--daemonize', 'yes'
-                ],),
-                ([
                     'python', '-m',
                     'scripts.run_portserver',
                     '--portserver_unix_socket_address',
                     run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                ],),
+                ([
+                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    '--daemonize', 'yes'
                 ],),
                 ([
                     common.NODE_BIN_PATH,
@@ -1052,14 +1052,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
                 ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
-                    '--daemonize', 'yes'
-                ],),
-                ([
                     'python', '-m',
                     'scripts.run_portserver',
                     '--portserver_unix_socket_address',
                     run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                ],),
+                ([
+                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    '--daemonize', 'yes'
                 ],),
                 ([
                     common.NODE_BIN_PATH,
@@ -1225,14 +1225,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
                 ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
-                    '--daemonize', 'yes'
-                ],),
-                ([
                     'python', '-m',
                     'scripts.run_portserver',
                     '--portserver_unix_socket_address',
                     run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                ],),
+                ([
+                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    '--daemonize', 'yes'
                 ],),
                 ([
                     common.NODE_BIN_PATH,
@@ -1349,14 +1349,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
                 ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
-                    '--daemonize', 'yes'
-                ],),
-                ([
                     'python', '-m',
                     'scripts.run_portserver',
                     '--portserver_unix_socket_address',
                     run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                ],),
+                ([
+                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    '--daemonize', 'yes'
                 ],),
                 ([
                     common.NODE_BIN_PATH,
