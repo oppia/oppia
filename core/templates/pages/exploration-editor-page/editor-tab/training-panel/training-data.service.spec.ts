@@ -16,19 +16,16 @@
  * @fileoverview Unit tests for the training data service.
  */
 
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // training-data.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AnswerGroupsCacheService } from
+  /* eslint-disable-next-line max-len */
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { OutcomeObjectFactory } from
@@ -57,6 +54,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -84,6 +82,7 @@ describe('TrainingDataService', function() {
       $provide.value(key, value);
     }
   }));
+  importAllAngularServices();
 
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -92,17 +91,11 @@ describe('TrainingDataService', function() {
     angular.mock.module(function($provide) {
       $provide.value('AngularNameService', new AngularNameService());
       $provide.value(
-        'AnswerClassificationResultObjectFactory',
-        new AnswerClassificationResultObjectFactory());
-      $provide.value(
         'AnswerGroupsCacheService', new AnswerGroupsCacheService());
       $provide.value(
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
           new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
           new RuleObjectFactory()));
-      $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
-      $provide.value(
-        'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value('FractionObjectFactory', new FractionObjectFactory());
       $provide.value(
         'HintObjectFactory', new HintObjectFactory(
@@ -121,8 +114,7 @@ describe('TrainingDataService', function() {
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value(
-        'StateClassifierMappingService', new StateClassifierMappingService(
-          new ClassifierObjectFactory()));
+        'StateClassifierMappingService', new StateClassifierMappingService());
       $provide.value(
         'StateEditorService', new StateEditorService(
           new SolutionValidityService()));

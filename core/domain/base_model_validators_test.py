@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
+
 from core import jobs_registry
 from core.domain import base_model_validators
 from core.domain import prod_validation_jobs_one_off
@@ -77,6 +79,7 @@ class MockSnapshotMetadataModelValidator(
         base_model_validators.BaseSnapshotMetadataModelValidator):
 
     EXTERNAL_MODEL_NAME = 'external model'
+
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
@@ -107,27 +110,28 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
-        self.item = MockModel(id='mockmodel')
-        self.item.put()
+        self.invalid_model = MockModel(id='mockmodel')
+        self.invalid_model.update_timestamps()
+        self.invalid_model.put()
 
     def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             r'The _get_external_id_relationships\(\) method is missing from the'
             ' derived class. It should be implemented in the derived class.'):
-            MockBaseModelValidator().validate(self.item)
+            MockBaseModelValidator().validate(self.invalid_model)
 
     def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             r'The _get_external_model_properties\(\) method is missing from the'
             ' derived class. It should be implemented in the derived class.'):
-            MockSummaryModelValidator().validate(self.item)
+            MockSummaryModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_external_model_name_is_undefined(self):
         with self.assertRaisesRegexp(
             Exception, 'External model name should be specified'):
-            MockSnapshotContentModelValidator().validate(self.item)
+            MockSnapshotContentModelValidator().validate(self.invalid_model)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
         with self.assertRaisesRegexp(
@@ -135,6 +139,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             r'The _get_change_domain_class\(\) method is missing from the '
             'derived class. It should be implemented in the derived class.'):
             snapshot_model = MockSnapshotModel(id='mockmodel')
+            snapshot_model.update_timestamps()
             snapshot_model.put()
             MockSnapshotMetadataModelValidator().validate(snapshot_model)
 
@@ -151,7 +156,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_error_is_raised_with_invalid_validation_type_for_domain_objects(
             self):
-        MockModelValidatorWithInvalidValidationType.validate(self.item)
+        MockModelValidatorWithInvalidValidationType.validate(self.invalid_model)
         expected_errors = {
             'domain object check': [
                 'Entity id mockmodel: Entity fails domain validation with '
@@ -161,5 +166,27 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_no_error_is_raised_for_base_user_model(self):
         user = MockModel(id='12345')
+        user.update_timestamps()
         user.put()
         MockBaseUserModelValidator().validate(user)
+
+    def test_validate_deleted_reports_error_for_old_deleted_model(self):
+        year_ago = datetime.datetime.utcnow() - datetime.timedelta(weeks=52)
+        model = MockModel(
+            id='123',
+            deleted=True,
+            last_updated=year_ago
+        )
+        model.update_timestamps(update_last_updated_time=False)
+        model.put()
+        validator = MockBaseUserModelValidator()
+        validator.validate_deleted(model)
+        self.assertEqual(
+            validator.errors,
+            {
+                'entity stale check': [
+                    'Entity id 123: model marked as '
+                    'deleted is older than 8 weeks'
+                ]
+            }
+        )

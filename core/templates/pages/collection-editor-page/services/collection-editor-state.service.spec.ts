@@ -18,22 +18,15 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // collection-editor-state.service.ts is upgraded to Angular 8.
-import { CollectionNodeObjectFactory } from
-  'domain/collection/collection-node-object.factory';
-import { CollectionObjectFactory } from
-  'domain/collection/CollectionObjectFactory';
-import { CollectionPlaythroughObjectFactory } from
-  'domain/collection/CollectionPlaythroughObjectFactory';
-import { ChangeObjectFactory } from
-  'domain/editor/undo_redo/ChangeObjectFactory';
-import { CollectionRightsObjectFactory } from
-  'domain/collection/CollectionRightsObjectFactory';
+import { Collection } from
+  'domain/collection/collection.model';
+import { CollectionRights } from
+  'domain/collection/collection-rights.model';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
-require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/collection-update.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
@@ -42,8 +35,6 @@ import { Subscription } from 'rxjs';
 
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;
-  var collectionObjectFactory = null;
-  var collectionRightsObjectFactory = null;
   var CollectionUpdateService = null;
   var fakeEditableCollectionBackendApiService = null;
   var fakeCollectionRightsBackendApiService = null;
@@ -60,14 +51,14 @@ describe('Collection editor state service', function() {
     var self = {
       newBackendCollectionObject: null,
       failure: null,
-      fetchCollection: null,
-      updateCollection: null
+      fetchCollectionAsync: null,
+      updateCollectionAsync: null
     };
 
     var _fetchOrUpdateCollection = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
-          resolve(collectionObjectFactory.create(
+          resolve(Collection.create(
             self.newBackendCollectionObject));
         } else {
           reject();
@@ -77,8 +68,8 @@ describe('Collection editor state service', function() {
 
     self.newBackendCollectionObject = {};
     self.failure = null;
-    self.fetchCollection = _fetchOrUpdateCollection;
-    self.updateCollection = _fetchOrUpdateCollection;
+    self.fetchCollectionAsync = _fetchOrUpdateCollection;
+    self.updateCollectionAsync = _fetchOrUpdateCollection;
 
     return self;
   };
@@ -87,14 +78,14 @@ describe('Collection editor state service', function() {
     var self = {
       backendCollectionRightsObject: null,
       failure: null,
-      fetchCollectionRights: null,
+      fetchCollectionRightsAsync: null,
     };
 
     var _fetchCollectionRights = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
           resolve(
-            collectionRightsObjectFactory.create(
+            CollectionRights.create(
               self.backendCollectionRightsObject
             ));
         } else {
@@ -105,23 +96,12 @@ describe('Collection editor state service', function() {
 
     self.backendCollectionRightsObject = {};
     self.failure = null;
-    self.fetchCollectionRights = _fetchCollectionRights;
+    self.fetchCollectionRightsAsync = _fetchCollectionRights;
 
     return self;
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
-    $provide.value(
-      'CollectionNodeObjectFactory', new CollectionNodeObjectFactory());
-    $provide.value(
-      'CollectionObjectFactory', new CollectionObjectFactory(
-        new CollectionNodeObjectFactory(),
-        new CollectionPlaythroughObjectFactory()));
-    $provide.value(
-      'CollectionRightsObjectFactory', new CollectionRightsObjectFactory());
-  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -147,9 +127,6 @@ describe('Collection editor state service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     CollectionEditorStateService = $injector.get(
       'CollectionEditorStateService');
-    collectionObjectFactory = $injector.get('CollectionObjectFactory');
-    collectionRightsObjectFactory = $injector.get(
-      'CollectionRightsObjectFactory');
     CollectionUpdateService = $injector.get('CollectionUpdateService');
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
@@ -224,20 +201,20 @@ describe('Collection editor state service', function() {
   it('should request to load the collection from the backend', function() {
     spyOn(
       fakeEditableCollectionBackendApiService,
-      'fetchCollection').and.callThrough();
+      'fetchCollectionAsync').and.callThrough();
 
     CollectionEditorStateService.loadCollection(5);
-    expect(fakeEditableCollectionBackendApiService.fetchCollection)
+    expect(fakeEditableCollectionBackendApiService.fetchCollectionAsync)
       .toHaveBeenCalled();
   });
 
   it('should request to load the collection rights from the backend',
     function() {
-      spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRights')
+      spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRightsAsync')
         .and.callThrough();
 
       CollectionEditorStateService.loadCollection(5);
-      expect(fakeCollectionRightsBackendApiService.fetchCollectionRights)
+      expect(fakeCollectionRightsBackendApiService.fetchCollectionRightsAsync)
         .toHaveBeenCalled();
     }
   );
@@ -302,7 +279,7 @@ describe('Collection editor state service', function() {
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-      var newCollection = collectionObjectFactory.create(
+      var newCollection = Collection.create(
         secondBackendCollectionObject);
       CollectionEditorStateService.setCollection(newCollection);
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(true);
@@ -329,7 +306,7 @@ describe('Collection editor state service', function() {
 
   it('should return the last collection loaded as the same object', function() {
     var previousCollection = CollectionEditorStateService.getCollection();
-    var expectedCollection = collectionObjectFactory.create(
+    var expectedCollection = Collection.create(
       fakeEditableCollectionBackendApiService.newBackendCollectionObject);
     expect(previousCollection).not.toEqual(expectedCollection);
 
@@ -350,7 +327,7 @@ describe('Collection editor state service', function() {
     function() {
       var previousCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
-      var expectedCollectionRights = collectionRightsObjectFactory.create(
+      var expectedCollectionRights = CollectionRights.create(
         fakeCollectionRightsBackendApiService.backendCollectionRightsObject);
       expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
@@ -372,7 +349,7 @@ describe('Collection editor state service', function() {
   it('should be able to set a new collection with an in-place copy',
     function() {
       var previousCollection = CollectionEditorStateService.getCollection();
-      var expectedCollection = collectionObjectFactory.create(
+      var expectedCollection = Collection.create(
         secondBackendCollectionObject);
       expect(previousCollection).not.toEqual(expectedCollection);
 
@@ -393,7 +370,7 @@ describe('Collection editor state service', function() {
     function() {
       var previousCollectionRights = (
         CollectionEditorStateService.getCollectionRights());
-      var expectedCollectionRights = collectionRightsObjectFactory.create(
+      var expectedCollectionRights = CollectionRights.create(
         unpublishablePublicCollectionRightsObject);
       expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
@@ -418,7 +395,7 @@ describe('Collection editor state service', function() {
       CollectionEditorStateService.loadCollection(5);
       $rootScope.$apply();
 
-      var newCollection = collectionObjectFactory.create(
+      var newCollection = Collection.create(
         secondBackendCollectionObject);
       CollectionEditorStateService.setCollection(newCollection);
 
@@ -447,7 +424,7 @@ describe('Collection editor state service', function() {
   it('should be able to save the collection and pending changes', function() {
     spyOn(
       fakeEditableCollectionBackendApiService,
-      'updateCollection').and.callThrough();
+      'updateCollectionAsync').and.callThrough();
 
     CollectionEditorStateService.loadCollection(0);
     CollectionUpdateService.setCollectionTitle(
@@ -462,7 +439,7 @@ describe('Collection editor state service', function() {
     var expectedVersion = '1';
     var expectedCommitMessage = 'Commit message';
     var updateCollectionSpy = (
-      fakeEditableCollectionBackendApiService.updateCollection);
+      fakeEditableCollectionBackendApiService.updateCollectionAsync);
     expect(updateCollectionSpy).toHaveBeenCalledWith(
       expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
   });

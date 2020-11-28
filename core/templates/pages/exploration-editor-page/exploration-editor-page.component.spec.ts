@@ -44,8 +44,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateTopAnswersStatsBackendApiService } from
   'services/state-top-answers-stats-backend-api.service';
 
-// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require(
@@ -53,6 +52,8 @@ require(
   'state-tutorial-first-time.service.ts');
 
 describe('Exploration editor page component', function() {
+  importAllAngularServices();
+
   var ctrl = null;
 
   var $q = null;
@@ -181,6 +182,8 @@ describe('Exploration editor page component', function() {
     }
   };
 
+  importAllAngularServices();
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -203,10 +206,6 @@ describe('Exploration editor page component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
     $provide.value('ExplorationDataService', mockExplorationDataService);
   }));
 
@@ -235,7 +234,7 @@ describe('Exploration editor page component', function() {
     sts = $injector.get('StateTutorialFirstTimeService');
     stass = $injector.get('StateTopAnswersStatsService');
     stfts = $injector.get('StateTutorialFirstTimeService');
-    tds = $injector.get('ThreadDataService');
+    tds = $injector.get('ThreadDataBackendApiService');
     ueps = $injector.get('UserExplorationPermissionsService');
 
     $scope = $rootScope.$new();

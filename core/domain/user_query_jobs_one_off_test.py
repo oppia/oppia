@@ -23,6 +23,7 @@ import datetime
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import taskqueue_services
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.domain import user_services
@@ -32,13 +33,12 @@ import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-taskqueue_services = models.Registry.import_taskqueue_services()
-
 
 class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     EXP_ID_3 = 'exp_id_3'
+    EXP_ID_4 = 'exp_id_4'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'b@example.com'
@@ -49,6 +49,8 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
     USER_D_USERNAME = 'd'
     USER_E_EMAIL = 'e@example.com'
     USER_E_USERNAME = 'e'
+    USER_F_EMAIL = 'f@example.com'
+    USER_F_USERNAME = 'f'
     USER_SUBMITTER_EMAIL = 'submit@example.com'
     USER_SUBMITTER_USERNAME = 'submit'
 
@@ -61,10 +63,10 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params=params)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            self.process_and_flush_pending_tasks()
+            self.process_and_flush_pending_mapreduce_tasks()
 
     def _run_one_off_job_resulting_in_failure(self, query_id):
         """Runs the one-off MapReduce job and fails it. After failing the job,
@@ -86,25 +88,42 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
 
     def setUp(self):
         super(UserQueryJobOneOffTests, self).setUp()
-        # User A has no created or edited explorations
-        # User B has one created exploration
-        # User C has one edited exploration
+        # User A has no created or edited explorations.
+        # User B has one created exploration.
+        # User C has one edited exploration.
         # User D has created an exploration and then edited it.
         # User E has created an exploration 10 days before.
+        # User F has one created exploration but is not subscribed to emails.
         # Submitter is the user who submits the query.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        user_services.update_email_preferences(
+            self.user_a_id, True, True, True, True)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+        user_services.update_email_preferences(
+            self.user_b_id, True, True, True, True)
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        user_services.update_email_preferences(
+            self.user_c_id, True, True, True, True)
         self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
         self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
+        user_services.update_email_preferences(
+            self.user_d_id, True, True, True, True)
         self.signup(self.USER_E_EMAIL, self.USER_E_USERNAME)
         self.user_e_id = self.get_user_id_from_email(self.USER_E_EMAIL)
+        user_services.update_email_preferences(
+            self.user_e_id, True, True, True, True)
+        self.signup(self.USER_F_EMAIL, self.USER_F_USERNAME)
+        self.user_f_id = self.get_user_id_from_email(self.USER_F_EMAIL)
+        user_services.update_email_preferences(
+            self.user_f_id, False, True, True, True)
         self.signup(self.USER_SUBMITTER_EMAIL, self.USER_SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(
             self.USER_SUBMITTER_EMAIL)
+        user_services.update_email_preferences(
+            self.submitter_id, True, True, True, True)
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
@@ -139,6 +158,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             user_e_settings,
             user_e_settings.last_logged_in - datetime.timedelta(days=10))
 
+        self.save_new_valid_exploration(
+            self.EXP_ID_4, self.user_f_id, end_state_name='End')
+
         user_a_settings = user_services.get_user_settings(self.user_a_id)
         user_services.update_last_logged_in(
             user_a_settings,
@@ -155,9 +177,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         query = user_models.UserQueryModel.get(query_id)
 
         # List of users who has not logged_in in last 6 days.
-        qualifying_user_ids = [self.user_e_id]
-        self.assertEqual(len(query.user_ids), 1)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        self.assertItemsEqual(query.user_ids, [self.user_e_id])
 
         query_id = user_query_services.save_new_query_model(
             self.submitter_id, has_not_logged_in_for_n_days=2)
@@ -166,10 +186,8 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         query = user_models.UserQueryModel.get(query_id)
 
         # List of users logged_in in last 2 days.
-        qualifying_user_ids = (
-            [self.user_a_id, self.user_e_id])
-        self.assertEqual(len(query.user_ids), 2)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        qualifying_user_ids = [self.user_a_id, self.user_e_id]
+        self.assertItemsEqual(query.user_ids, qualifying_user_ids)
 
         # Test for legacy user.
         user_settings = user_services.get_user_settings(self.user_a_id)
@@ -180,11 +198,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = ([self.user_a_id, self.user_e_id])
 
         # Make sure that legacy user is included in qualified user's list.
-        self.assertEqual(len(query.user_ids), 2)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        self.assertItemsEqual(query.user_ids, [self.user_a_id, self.user_e_id])
 
     def test_user_is_inactive_in_last_n_days(self):
         query_id = user_query_services.save_new_query_model(
@@ -194,9 +210,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         query = user_models.UserQueryModel.get(query_id)
 
         # List of users who were not active in last 3 days.
-        qualifying_user_ids = [self.user_e_id]
-        self.assertEqual(len(query.user_ids), 1)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        self.assertItemsEqual(query.user_ids, [self.user_e_id])
 
     def test_user_has_created_at_least_n_exps(self):
         query_id = user_query_services.save_new_query_model(
@@ -204,9 +218,8 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = [self.user_b_id, self.user_d_id, self.user_e_id]
-        self.assertEqual(len(query.user_ids), 3)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        self.assertItemsEqual(
+            query.user_ids, [self.user_b_id, self.user_d_id, self.user_e_id])
 
     def test_user_has_created_fewer_than_n_exps(self):
         query_id = user_query_services.save_new_query_model(
@@ -214,9 +227,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = [self.user_a_id, self.user_c_id]
-        self.assertEqual(len(query.user_ids), 2)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        self.assertItemsEqual(query.user_ids, [self.user_a_id, self.user_c_id])
 
     def test_user_has_edited_at_least_n_exps(self):
         query_id = user_query_services.save_new_query_model(
@@ -224,10 +235,9 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = (
-            [self.user_b_id, self.user_c_id, self.user_d_id, self.user_e_id])
-        self.assertEqual(len(query.user_ids), 4)
-        self.assertEqual(sorted(query.user_ids), sorted(qualifying_user_ids))
+        qualifying_user_ids = [
+            self.user_b_id, self.user_c_id, self.user_d_id, self.user_e_id]
+        self.assertItemsEqual(query.user_ids, qualifying_user_ids)
 
     def test_user_has_edited_fewer_than_n_exps(self):
         query_id = user_query_services.save_new_query_model(
@@ -235,9 +245,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self._run_one_off_job(query_id)
 
         query = user_models.UserQueryModel.get(query_id)
-        qualifying_user_ids = [self.user_a_id]
-        self.assertEqual(len(query.user_ids), 1)
-        self.assertEqual(query.user_ids, qualifying_user_ids)
+        self.assertItemsEqual(query.user_ids, [self.user_a_id])
 
     def test_combination_of_query_params(self):
         query_a_id = user_query_services.save_new_query_model(
@@ -298,7 +306,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.'
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.'
         ) % (query_id, query_id)
 
         expected_email_text_body = (
@@ -343,7 +351,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.'
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.'
         ) % query_id
 
         expected_email_text_body = (
@@ -365,3 +373,11 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             messages[0].html.decode(), expected_email_html_body)
         self.assertEqual(
             messages[0].body.decode(), expected_email_text_body)
+
+    def test_that_user_unsubscribed_from_emails_is_skipped(self):
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, created_at_least_n_exps=1)
+        self._run_one_off_job(query_id)
+
+        query = user_models.UserQueryModel.get(query_id)
+        self.assertNotIn(self.user_f_id, query.user_ids)

@@ -29,6 +29,7 @@ require('pages/admin-page/config-tab/admin-config-tab.directive.ts');
 require('pages/admin-page/jobs-tab/admin-jobs-tab.directive.ts');
 require('pages/admin-page/misc-tab/admin-misc-tab.directive.ts');
 require('pages/admin-page/roles-tab/admin-roles-tab.directive.ts');
+require('pages/admin-page/features-tab/admin-features-tab.component');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
@@ -49,10 +50,12 @@ angular.module('oppia').directive('adminPage', [
       controllerAs: '$ctrl',
       controller: [
         '$location', '$rootScope', '$scope', 'AdminDataService',
-        'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
+        'AdminRouterService', 'CsrfTokenService', 'PlatformFeatureService',
+        'DEV_MODE',
         function(
             $location, $rootScope, $scope, AdminDataService,
-            AdminRouterService, CsrfTokenService, DEV_MODE) {
+            AdminRouterService, CsrfTokenService, PlatformFeatureService,
+            DEV_MODE) {
           var ctrl = this;
           ctrl.isActivitiesTabOpen = function() {
             return AdminRouterService.isActivitiesTabOpen();
@@ -63,6 +66,9 @@ angular.module('oppia').directive('adminPage', [
           ctrl.isConfigTabOpen = function() {
             return AdminRouterService.isConfigTabOpen();
           };
+          ctrl.isFeaturesTabOpen = function() {
+            return AdminRouterService.isFeaturesTabOpen();
+          };
           ctrl.isRolesTabOpen = function() {
             return AdminRouterService.isRolesTabOpen();
           };
@@ -71,6 +77,13 @@ angular.module('oppia').directive('adminPage', [
           };
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular.
+            $rootScope.$applyAsync();
+          };
+
+          ctrl.isDummyFeatureEnabled = function() {
+            return PlatformFeatureService.status.DummyFeature.isEnabled;
           };
 
           ctrl.$onInit = function() {

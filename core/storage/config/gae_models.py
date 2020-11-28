@@ -19,9 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.platform import models
 import core.storage.base_model.gae_models as base_models
 
-from google.appengine.ext import ndb
+datastore_services = models.Registry.import_datastore_services()
 
 
 class ConfigPropertySnapshotMetadataModel(
@@ -34,7 +35,12 @@ class ConfigPropertySnapshotMetadataModel(
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """ConfigPropertySnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class ConfigPropertyModel(base_models.VersionedModel):
@@ -47,12 +53,17 @@ class ConfigPropertyModel(base_models.VersionedModel):
     SNAPSHOT_CONTENT_CLASS = ConfigPropertySnapshotContentModel
 
     # The property value.
-    value = ndb.JsonProperty(indexed=False)
+    value = datastore_services.JsonProperty(indexed=False)
 
     @staticmethod
     def get_deletion_policy():
         """ConfigPropertyModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -76,7 +87,12 @@ class PlatformParameterSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content for a platform parameter snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """PlatformParameterSnapshotContentModel doesn't contain any data
+        directly corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class PlatformParameterModel(base_models.VersionedModel):
@@ -89,13 +105,19 @@ class PlatformParameterModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
 
-    rules = ndb.JsonProperty(repeated=True)
-    rule_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    rules = datastore_services.JsonProperty(repeated=True)
+    rule_schema_version = (
+        datastore_services.IntegerProperty(required=True, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
         """PlatformParameterModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

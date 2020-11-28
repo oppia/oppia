@@ -32,6 +32,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import feconf
+import utils
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
@@ -63,12 +64,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             abbreviated_name='topic-one', url_fragment='topic-one',
             description='A new topic',
             canonical_story_ids=[], additional_story_ids=[],
-            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=0)
+            uncategorized_skill_ids=['skill_4'], subtopics=[],
+            next_subtopic_id=0)
         self.save_new_story(self.STORY_ID, self.USER_ID, self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         self.save_new_valid_exploration(
-            self.EXP_ID, self.user_id_admin, end_state_name='End')
+            self.EXP_ID, self.user_id_admin, end_state_name='End',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_admin, self.EXP_ID)
         changelist = [
             story_domain.StoryChange({
@@ -294,6 +297,120 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
 
+    def test_prerequisite_skills_validation(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2', 'node_3'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': ['skill_4'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.initial_node_id = 'node_1'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+
+        expected_error_string = (
+            'The skills with ids skill_4 were specified as prerequisites for '
+            'Chapter Title 3, but were not taught in any chapter before it')
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_string):
+            story_services.validate_prerequisite_skills_in_story_contents(
+                self.story.corresponding_topic_id, self.story.story_contents)
+
+    def test_story_with_loop(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 1',
+            'description': 'Description 1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 2',
+            'description': 'Description 2',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'chapter'][0],
+            'title': 'Title 3',
+            'description': 'Description 3',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        expected_error_string = 'Loops are not allowed in stories.'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_string):
+            story_services.validate_prerequisite_skills_in_story_contents(
+                self.story.corresponding_topic_id, self.story.story_contents)
+
     def test_does_story_exist_with_url_fragment(self):
         story_id_1 = story_services.get_new_story_id()
         story_id_2 = story_services.get_new_story_id()
@@ -510,13 +627,16 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'Added node.')
         self.save_new_valid_exploration(
             '0', self.user_id_admin, title='Title 1',
-            category='Mathematics', language_code='en')
+            category='Mathematics', language_code='en',
+            correctness_feedback_enabled=True)
         self.save_new_valid_exploration(
             '1', self.user_id_admin, title='Title 2',
-            category='Mathematics', language_code='en')
+            category='Mathematics', language_code='en',
+            correctness_feedback_enabled=True)
         self.save_new_valid_exploration(
             '2', self.user_id_admin, title='Title 3',
-            category='Mathematics', language_code='en')
+            category='Mathematics', language_code='en',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_admin, '0')
         self.publish_exploration(self.user_id_admin, '1')
         self.publish_exploration(self.user_id_admin, '2')
@@ -741,7 +861,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.TOPIC_ID, 'story_id_2')
         self.save_new_valid_exploration(
             '0', self.user_id_admin, title='Title 1',
-            category='Mathematics', language_code='en')
+            category='Mathematics', language_code='en',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_admin, '0')
 
         change_list = [story_domain.StoryChange({
@@ -896,7 +1017,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            correctness_feedback_enabled=True)
         validation_error_messages = (
             story_services.validate_explorations_for_story(
                 ['invalid_exp', 'exp_id_1'], False))
@@ -913,7 +1035,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            correctness_feedback_enabled=True)
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
@@ -951,11 +1074,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         self.save_new_valid_exploration(
-            'exp_id_2', self.user_id_a, title='title', category='Category 2')
+            'exp_id_2', self.user_id_a, title='title', category='Category 2',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_2')
 
         change_list = [
@@ -1010,7 +1135,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            language_code='es')
+            language_code='es', correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         change_list = [
@@ -1035,12 +1160,43 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
+    def test_cannot_update_story_with_exps_without_correctness_feedback(self):
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            language_code='en')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        validation_error_messages = (
+            story_services.validate_explorations_for_story(['exp_id_1'], False))
+        self.assertEqual(
+            validation_error_messages, [
+                'Expected all explorations to have correctness feedback '
+                'enabled. Invalid exploration: exp_id_1'])
+        with self.assertRaisesRegexp(
+            Exception, 'Expected all explorations to have correctness feedback '
+            'enabled. Invalid exploration: exp_id_1'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
     def test_cannot_update_story_with_exps_with_invalid_interactions(self):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            interaction_id='LogicProof')
+            interaction_id='LogicProof', correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         change_list = [
@@ -1071,7 +1227,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            interaction_id='TextInput', end_state_name='End')
+            interaction_id='TextInput', end_state_name='End',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
 
         exp_services.update_exploration(
@@ -1115,7 +1272,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
             'exp_id_1', self.user_id_a, title='title', category='Category 1',
-            end_state_name='End')
+            end_state_name='End', correctness_feedback_enabled=True)
         self.publish_exploration(self.user_id_a, 'exp_id_1')
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
@@ -1161,7 +1318,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.user_id_admin)
         self.save_new_valid_exploration(
-            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            correctness_feedback_enabled=True)
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -1199,7 +1357,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(
             'exp_id_2', self.user_id_a, title='title 2', category='Category 1',
-            interaction_id='LogicProof')
+            interaction_id='LogicProof', correctness_feedback_enabled=True)
         exp_services.update_exploration(
             self.user_id_a, 'exp_id_2', [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,

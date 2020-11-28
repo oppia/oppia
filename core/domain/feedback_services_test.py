@@ -17,8 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
-
 from core.domain import email_services
 from core.domain import event_services
 from core.domain import exp_domain
@@ -27,6 +25,7 @@ from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -38,7 +37,6 @@ import python_utils
 ) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion
 ])
-taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class FeedbackServicesUnitTests(test_utils.EmailTestBase):
@@ -344,13 +342,13 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         """Runs the MockFeedbackAnalyticsAggregator computation."""
         MockFeedbackAnalyticsAggregator.start_computation()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def test_get_threads_single_exploration(self):
         threads = feedback_services.get_threads('exploration', self.EXP_ID_1)
@@ -441,6 +439,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
                 thread_id)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
+            thread.update_timestamps()
             thread.put()
 
         _close_thread(threads_exp_1[0].id)
@@ -470,6 +469,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             original_author_id=self.user_id, subject='Feedback',
             status=feedback_models.STATUS_CHOICES_OPEN, message_count=0,
             has_suggestion=False)
+        thread_3.update_timestamps()
         thread_3.put()
         feedback_services.create_message(
             'exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
@@ -759,7 +759,8 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         user_id = 'user'
         feedback_services.enqueue_feedback_message_batch_email_task(user_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EMAILS),
             1)
 
         tasks = self.get_pending_tasks(
@@ -782,15 +783,15 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
         feedback_services.enqueue_feedback_message_instant_email_task(
             user_id, reference)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_EMAILS),
             1)
 
         tasks = self.get_pending_tasks(
             queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
-        payload = json.loads(tasks[0].payload)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
-        self.assertDictEqual(payload['reference_dict'], reference_dict)
+        self.assertDictEqual(tasks[0].payload['reference_dict'], reference_dict)
 
 
 class FeedbackMessageEmailTests(test_utils.EmailTestBase):
@@ -1273,7 +1274,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi editor,\n'
@@ -1332,7 +1333,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi editor,\n'
@@ -1428,7 +1429,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -1477,7 +1478,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body = (
             'Hi newuser,\n'
@@ -1526,7 +1527,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body_message = (
             'Hi newuser,\n'
@@ -1552,7 +1553,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
             'The Oppia team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="https://www.example.com">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
 
         expected_email_text_body_status = (
             'Hi newuser,\n'

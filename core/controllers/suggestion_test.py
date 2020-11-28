@@ -27,6 +27,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import opportunity_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -1385,7 +1386,8 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            category='Algebra', end_state_name='End State')
+            category='Algebra', end_state_name='End State',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -1523,6 +1525,28 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getsubmittedsuggestions/topic/add_question')
         self.assertEqual(response, {})
 
+    def test_question_suggestions_data_for_deleted_opportunities(self):
+        self.login(self.AUTHOR_EMAIL)
+
+        opportunity_services.delete_skill_opportunity(self.SKILL_ID)
+        response = self.get_json(
+            '/getsubmittedsuggestions/skill/add_question')
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'][self.SKILL_ID], None)
+
+    def test_translation_suggestions_data_for_deleted_opportunities(self):
+        self.login(self.AUTHOR_EMAIL)
+
+        opportunity_services.delete_exploration_opportunities([self.EXP_ID])
+        response = self.get_json(
+            '/getsubmittedsuggestions/exploration/translate_content')
+        self.assertEqual(len(response['suggestions']), 1)
+        self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'][self.EXP_ID], None)
+
     def test_handler_with_invalid_suggestion_type_raise_error(self):
         self.login(self.AUTHOR_EMAIL)
 
@@ -1575,7 +1599,8 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            category='Algebra', end_state_name='End State')
+            category='Algebra', end_state_name='End State',
+            correctness_feedback_enabled=True)
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(

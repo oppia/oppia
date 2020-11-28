@@ -45,6 +45,11 @@ ROLE_VOICE_ARTIST = feconf.ROLE_VOICE_ARTIST
 ROLE_VIEWER = feconf.ROLE_VIEWER
 ROLE_NONE = feconf.ROLE_NONE
 
+ASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Changed role of %s from %s to %s'
+ASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Changed role of (.*) from (.*) to (.*)$'
+DEASSIGN_ROLE_COMMIT_MESSAGE_TEMPLATE = 'Remove %s from role %s'
+DEASSIGN_ROLE_COMMIT_MESSAGE_REGEX = '^Remove (.*) from role (.*)$'
+
 
 class ActivityRights(python_utils.OBJECT):
     """Domain object for the rights/publication status of an activity (an
@@ -214,6 +219,17 @@ class ActivityRights(python_utils.OBJECT):
             bool. Whether activity is private.
         """
         return bool(self.status == ACTIVITY_STATUS_PRIVATE)
+
+    def is_solely_owned_by_user(self, user_id):
+        """Checks whether the activity is solely owned by the user.
+
+        Args:
+            user_id: str. The id of the user.
+
+        Returns:
+            bool. Whether the activity is solely owned by the user.
+        """
+        return user_id in self.owner_ids and len(self.owner_ids) == 1
 
 
 class ExplorationRightsChange(change_domain.BaseChange):

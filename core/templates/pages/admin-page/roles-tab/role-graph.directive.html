@@ -105,7 +105,8 @@
             <div class="col-md-8 ml-auto">
               <select id="label-target-view-reviewer-method"
                       ng-model="$ctrl.formData.viewContributionReviewers.filterCriterion"
-                      class="form-control protractor-test-view-reviewer-method">
+                      class="form-control protractor-test-view-reviewer-method"
+                      ng-change="$ctrl.clearReviewersData()">
                 <option value="<[$ctrl.USER_FILTER_CRITERION_ROLE]>">By Role</option>
                 <option value="<[$ctrl.USER_FILTER_CRITERION_USERNAME]>">By Username</option>
               </select>
@@ -192,7 +193,7 @@
 
       <md-card class="oppia-page-card oppia-long-text protractor-test-assign-reviewer-form">
         <form class="form-horizontal" ng-submit="$ctrl.submitAddContributionReviewerForm($ctrl.formData.addContributionReviewer)">
-          <legend class="text-center">Add Reviewer For Community</legend>
+          <legend class="text-center">Add Contribution Reviewer</legend>
           <div class="d-xl-inline-flex form-group">
             <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
@@ -231,18 +232,21 @@
 
       <md-card class="oppia-page-card oppia-long-text protractor-test-remove-reviewer-form">
         <form class="form-horizontal" ng-submit="$ctrl.submitRemoveContributionReviewerForm($ctrl.formData.removeContributionReviewer)">
-          <legend class="text-center">Remove Reviewer From Community</legend>
+          <legend class="text-center">Remove Contribution Reviewer</legend>
           <div class="d-xl-inline-flex form-group">
             <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
-            <div class="col-md-4 col-lg-4 col-sm-4 ml-auto">
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <input type="text"
                      id="label-target-form-reviewer-username"
                      class="form-control protractor-test-form-reviewer-username"
                      placeholder="Enter username"
                      ng-model="$ctrl.formData.removeContributionReviewer.username">
             </div>
+          </div>
+
+          <div class="d-xl-inline-flex form-group">
             <label for="label-target-form-remove-reviewer" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Rights</label>
-            <div class="col-md-4 ml-auto">
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
               <select id="label-target-form-remove-reviewer" ng-model="$ctrl.formData.removeContributionReviewer.method" class="form-control">
                 <option value="<[$ctrl.ACTION_REMOVE_ALL_REVIEW_RIGHTS]>">Remove all review rights</option>
                 <option value="<[$ctrl.ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS]>">Remove specific review rights</option>

@@ -16,22 +16,36 @@
  * @fileoverview Unit tests for topic preview tab.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { StorySummaryObjectFactory } from
-  'domain/story/StorySummaryObjectFactory';
+
+import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
+import { StorySummary} from 'domain/story/story-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Topic preview tab', function() {
   var ctrl = null;
   var $rootScope = null;
   var $scope = null;
   var TopicEditorStateService = null;
-  var storySummaryObjectFactory = null;
-  beforeEach(angular.mock.module('oppia'));
 
+  importAllAngularServices();
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [EditableStoryBackendApiService]
+    });
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'EditableStoryBackendApiService',
+      TestBed.get(EditableStoryBackendApiService));
+  }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
-    storySummaryObjectFactory = TestBed.get(StorySummaryObjectFactory);
     $scope = $rootScope.$new();
     ctrl = $componentController('topicPreviewTab', {
       $scope: $scope,
@@ -44,9 +58,11 @@ describe('Topic preview tab', function() {
       thumbnail_bg_color: '#F8BF74',
       description: 'Description',
       story_is_published: true,
-      completed_node_titles: ['Chapter 1']
+      completed_node_titles: ['Chapter 1'],
+      url_fragment: 'story-url-fragment',
+      pending_node_dicts: []
     };
-    var story = storySummaryObjectFactory.createFromBackendDict(
+    var story = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict);
     spyOn(
       TopicEditorStateService,

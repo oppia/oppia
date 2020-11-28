@@ -100,6 +100,10 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-delete-rubric-explanation-button'));
   var easyRubricDifficulty = element(
     by.css('.protractor-test-skill-difficulty-easy'));
+  var skillChangeCount = element(
+    by.css('.protractor-test-changes-count-text'));
+  var selectRubricDifficulty = element(
+    by.css('.protractor-test-select-rubric-difficulty'));
 
   this.get = async function(skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
@@ -107,8 +111,12 @@ var SkillEditorPage = function() {
   };
 
   this.selectDifficultyForRubric = async function(difficulty) {
-    await element(by.css('.protractor-test-select-rubric-difficulty'))
-      .element(by.cssContainingText('option', difficulty)).click();
+    await waitFor.visibilityOf(
+      selectRubricDifficulty, 'Select Rubric takes too long to appear.');
+    await action.click(
+      'Rubric difficulty option',
+      selectRubricDifficulty.element(
+        by.cssContainingText('option', difficulty)));
   };
 
   this.addRubricExplanationForDifficulty = async function(
@@ -196,49 +204,52 @@ var SkillEditorPage = function() {
 
   this.saveQuestion = async function() {
     await general.scrollToTop();
-    await saveQuestionButton.click();
+    await action.click('Save Question Button', saveQuestionButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.moveToQuestionsTab = async function() {
-    await waitFor.elementToBeClickable(
-      questionsTab,
-      'Questions tab button takes too long to be clickable');
-    await questionsTab.click();
+    await action.click('Questions tab button', questionsTab);
   };
 
   this.clickCreateQuestionButton = async function() {
-    await createQuestionButton.click();
+    await action.click('Create Question Button', createQuestionButton);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
 
   this.confirmSkillDifficulty = async function() {
-    await confirmSkillDifficultyButton.click();
+    await action.click(
+      'Confirm skill difficulty button', confirmSkillDifficultyButton);
   };
 
   this.changeSkillDescription = async function(description) {
-    await skillDescriptionField.clear();
-    await skillDescriptionField.sendKeys(description);
+    await action.clear('Skill description', skillDescriptionField);
+    await action.sendKeys(
+      'Skill description', skillDescriptionField, description);
   };
 
   this.expectSkillDescriptionToBe = async function(description) {
+    await waitFor.visibilityOf(skillDescriptionField, 'Skill description');
     var description = await skillDescriptionField.getAttribute('value');
     expect(description).toEqual(description);
   };
 
   this.saveOrPublishSkill = async function(commitMessage) {
-    await saveOrPublishSkillButton.click();
-
-    await commitMessageField.sendKeys(commitMessage);
-    await waitFor.elementToBeClickable(
-      closeSaveModalButton,
-      'Close save modal button takes too long to be clickable');
-    await closeSaveModalButton.click();
-    await waitFor.pageToFullyLoad();
+    await action.click(
+      'Save or Publish Skill button', saveOrPublishSkillButton);
+    await action.sendKeys('Commit message', commitMessageField, commitMessage);
+    await action.click('Close save modal button', closeSaveModalButton);
+    await waitFor.invisibilityOf(
+      closeSaveModalButton, 'Save modal takes too long to disappear.');
+    await waitFor.invisibilityOf(
+      skillChangeCount, 'Skill change count takes too long to update.');
+    await waitFor.visibilityOfSuccessToast('Changes Saved.');
+    expect(await saveOrPublishSkillButton.isEnabled()).toEqual(false);
   };
 
   this.editConceptCard = async function(explanation) {
-    await editConceptCardExplanationButton.click();
+    await action.click(
+      'Edit concept card explanation', editConceptCardExplanationButton);
 
     var editor = element(by.css('.protractor-test-concept-card-text'));
     await waitFor.visibilityOf(
@@ -260,7 +271,7 @@ var SkillEditorPage = function() {
   };
 
   this.addWorkedExample = async function(question, explanation) {
-    await addWorkedExampleButton.click();
+    await action.click('Add worked example', addWorkedExampleButton);
 
     var addWorkedExampleModal = (
       element(by.css('.protractor-test-add-worked-example-modal')));

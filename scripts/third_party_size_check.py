@@ -33,7 +33,7 @@ sys.path.insert(0, _YAML_PATH)
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
-THIRD_PARTY_SIZE_LIMIT = 7000
+THIRD_PARTY_SIZE_LIMIT = 8500
 
 
 def _get_skip_files_list():

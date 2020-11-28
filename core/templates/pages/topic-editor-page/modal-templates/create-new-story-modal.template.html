@@ -9,7 +9,7 @@
       <div class="story-input-header">
         <span>Title*</span>
       </div>
-      <input class="form-control protractor-test-new-story-title-field" ng-model="story.title" maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" aria-label="Title" autofocus>
+      <input class="form-control protractor-test-new-story-title-field required" ng-model="story.title" maxlength="<[MAX_CHARS_IN_STORY_TITLE]>" aria-label="Title" autofocus>
       <div>
         <span class="oppia-input-box-subtitle">
           <em>
@@ -22,14 +22,14 @@
       <div class="story-input-header">
         <span>Description*</span>
       </div>
-      <textarea rows="3" cols="50" ng-model="story.description" class="form-control protractor-test-new-story-description-field" aria-label="Description"></textarea>
+      <textarea rows="3" cols="50" ng-model="story.description" class="form-control protractor-test-new-story-description-field required" aria-label="Description"></textarea>
     </div>
     <div class="story-input">
       <div class="story-input-header">
         <span>Url Fragment*</span>
       </div>
       <input class="form-control protractor-test-new-story-url-fragment-field" ng-model="story.urlFragment" maxlength="<[MAX_CHARS_IN_STORY_URL_FRAGMENT]>"
-             ng-class="{'is-invalid': storyUrlFragmentExists}"
+             ng-class="{'is-invalid': storyUrlFragmentExists || !validUrlFragmentRegex.test(story.urlFragment)}"
              ng-change="onStoryUrlFragmentChange()"
              aria-label="Url fragment">
       <div>
@@ -86,5 +86,8 @@
   }
   .create-new-story .story-input-thumbnail {
     padding-top: 15px;
+  }
+  .create-new-story .ng-touched.ng-empty.required {
+     outline: 1px solid #F00;
   }
 </style>

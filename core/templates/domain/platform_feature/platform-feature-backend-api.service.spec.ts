@@ -20,20 +20,16 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ClientContextObjectFactory } from
-  'domain/platform_feature/client-context-object.factory';
-import { FeatureStatusSummaryObjectFactory } from
-  'domain/platform_feature/feature-status-summary-object.factory';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
+import { ClientContext } from 'domain/platform_feature/client-context.model';
+import { FeatureStatusSummary } from 'domain/platform_feature/feature-status-summary.model';
 
 describe('PlatformFeatureBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let platformFeatureBackendApiService: PlatformFeatureBackendApiService;
-  let clientContextObjectFactory: ClientContextObjectFactory;
-  let featureStatusSummaryObjectFactory: FeatureStatusSummaryObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -43,9 +39,6 @@ describe('PlatformFeatureBackendApiService', () => {
     platformFeatureBackendApiService = TestBed.get(
       PlatformFeatureBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    clientContextObjectFactory = TestBed.get(ClientContextObjectFactory);
-    featureStatusSummaryObjectFactory = TestBed.get(
-      FeatureStatusSummaryObjectFactory);
   });
 
   afterEach(() => {
@@ -58,8 +51,7 @@ describe('PlatformFeatureBackendApiService', () => {
         const successHandler = jasmine.createSpy('success');
         const failHandler = jasmine.createSpy('fail');
 
-        const context = clientContextObjectFactory.create(
-          'Web', 'Chrome', 'en');
+        const context = ClientContext.create('Web', 'Chrome');
         const contextDict = context.toBackendDict();
         const responseDict = {
           feature_a: true,
@@ -79,7 +71,7 @@ describe('PlatformFeatureBackendApiService', () => {
 
         flushMicrotasks();
         expect(successHandler).toHaveBeenCalledWith(
-          featureStatusSummaryObjectFactory.createFromBackendDict(responseDict)
+          FeatureStatusSummary.createFromBackendDict(responseDict)
         );
         expect(failHandler).not.toHaveBeenCalled();
       })
@@ -89,8 +81,7 @@ describe('PlatformFeatureBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      const context = clientContextObjectFactory.create(
-        'Web', 'Chrome', 'en');
+      const context = ClientContext.create('Web', 'Chrome');
       const contextDict = context.toBackendDict();
 
       platformFeatureBackendApiService.fetchFeatureFlags(context)

@@ -17,7 +17,7 @@
 
 <style>
   .stories-list .oppia-stories-list-container .oppia-page-card {
-    margin-top: 18vh;
+    margin-top: 10em;
     max-width: 100%;
     padding: 30px 55px 30px 45px;
   }
@@ -32,7 +32,13 @@
 
   .stories-list .topic-description {
     border-bottom: 1px solid #7B7B7B;
-    font-size: 0.9em;
+    font-size: 1.1em;
     padding-bottom: 2vh;
+  }
+
+  @media(max-width: 500px) {
+    .stories-list .oppia-stories-list-container .oppia-page-card {
+      padding: 30px 30px 30px 25px;
+    }
   }
 </style>

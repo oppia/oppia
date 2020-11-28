@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for the keyboard shortcut service.
  */
-import 'mousetrap';
+import Mousetrap from 'mousetrap';
 
 import { ApplicationRef } from '@angular/core';
 import { async, TestBed } from '@angular/core/testing';

@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
+import re
 import xml
 
 import bs4
@@ -941,6 +942,52 @@ def validate_math_content_attribute_in_html(html_string):
                 'error': python_utils.UNICODE(e)
             })
     return error_list
+
+
+def does_svg_tag_contains_xmlns_attribute(svg_string):
+    """Checks whether the svg tag in the given svg string contains the xmlns
+    attribute.
+
+    Args:
+        svg_string: str. The SVG string.
+
+    Returns:
+        bool. Whether the svg tag in the given svg string contains the xmlns
+        attribute.
+    """
+    # We don't need to encode the svg_string here because, beautiful soup can
+    # detect the encoding automatically and process the string.
+    # see https://beautiful-soup-4.readthedocs.io/en/latest/#encodings for info
+    # on auto encoding detection.
+    # Also if we encode the svg_string here manually, then it fails to process
+    # SVGs having non-ascii unicode characters and raises a UnicodeDecodeError.
+    soup = bs4.BeautifulSoup(svg_string, 'html.parser')
+    return all(
+        svg_tag.get('xmlns') is not None for svg_tag in soup.findAll(name='svg')
+    )
+
+
+def get_svg_with_xmlns_attribute(svg_string):
+    """Returns the svg_string with xmlns attribute if it does not exist in the
+    svg tag.
+
+    Args:
+        svg_string: str. The SVG string.
+
+    Returns:
+        str. The svg_string with xmlns attribute in the svg tag.
+    """
+    soup = bs4.BeautifulSoup(svg_string, 'html.parser')
+    if soup.find(
+            name='svg', attrs={'xmlns': 'http://www.w3.org/2000/svg'}) is None:
+        # Editing svg_string with soup will result in an invalid svg string
+        # which browsers cannot render. We are adding required
+        # attribute using regex search.
+        svg_string = re.sub(
+            '<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ',
+            svg_string.decode(encoding='utf-8')).encode(encoding='utf-8')
+
+    return svg_string
 
 
 def get_invalid_svg_tags_and_attrs(svg_string):

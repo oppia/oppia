@@ -340,6 +340,33 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             Exception, 'ERROR: A "release_version" arg must be specified.'):
             cut_release_or_hotfix_branch.main()
 
+    def test_main_with_valid_args(self):
+        check_function_calls = {
+            'execute_branch_cut_gets_called': False,
+            'release_version': None,
+            'hotfix_number': None
+        }
+        expected_check_function_calls = {
+            'execute_branch_cut_gets_called': True,
+            'release_version': '1.2.3',
+            'hotfix_number': 1
+        }
+        def mock_execute_branch_cut(
+                release_version, hotfix_number):
+            check_function_calls['release_version'] = release_version
+            check_function_calls['hotfix_number'] = hotfix_number
+            check_function_calls['execute_branch_cut_gets_called'] = True
+        args_swap = self.swap(
+            sys, 'argv', [
+                'cut_release_or_hotfix_branch.py',
+                '--release_version=1.2.3', '--hotfix_number=1'])
+        branch_cut_swap = self.swap(
+            cut_release_or_hotfix_branch, 'execute_branch_cut',
+            mock_execute_branch_cut)
+        with args_swap, branch_cut_swap:
+            cut_release_or_hotfix_branch.main()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_exception_is_raised_if_travis_is_failing(self):
         def mock_input():
             return 'n'

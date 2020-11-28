@@ -41,21 +41,23 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
 
 (
-    exp_models, job_models, opportunity_models, audit_models,
-    suggestion_models) = models.Registry.import_models(
-        [models.NAMES.exploration, models.NAMES.job, models.NAMES.opportunity,
-         models.NAMES.audit, models.NAMES.suggestion])
+    audit_models, exp_models, job_models,
+    opportunity_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.audit, models.NAMES.exploration, models.NAMES.job,
+    models.NAMES.opportunity, models.NAMES.user
+])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -306,36 +308,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 15)
         self.logout()
 
-    def test_flush_migration_bot_contributions_action(self):
-        created_exploration_ids = ['exp_1', 'exp_2']
-        edited_exploration_ids = ['exp_3', 'exp_4']
-        user_services.create_user_contributions(
-            feconf.MIGRATION_BOT_USER_ID, created_exploration_ids,
-            edited_exploration_ids)
-
-        migration_bot_contributions_model = (
-            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
-        self.assertEqual(
-            migration_bot_contributions_model.created_exploration_ids,
-            created_exploration_ids)
-        self.assertEqual(
-            migration_bot_contributions_model.edited_exploration_ids,
-            edited_exploration_ids)
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        self.post_json(
-            '/adminhandler', {
-                'action': 'flush_migration_bot_contribution_data'
-            }, csrf_token=csrf_token)
-
-        migration_bot_contributions_model = (
-            user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
-        self.assertEqual(
-            migration_bot_contributions_model.created_exploration_ids, [])
-        self.assertEqual(
-            migration_bot_contributions_model.edited_exploration_ids, [])
-
     def test_regenerate_topic_related_opportunities_action(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -345,8 +317,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         topic_id = 'topic'
         story_id = 'story'
         self.save_new_valid_exploration(
-            '0', owner_id, title='title',
-            end_state_name='End State')
+            '0', owner_id, title='title', end_state_name='End State',
+            correctness_feedback_enabled=True)
         self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(
@@ -439,13 +411,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         SampleMapReduceJobManager.enqueue(job_id)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         response = self.get_json('/adminjoboutput', params={'job_id': job_id})
         self.assertIsNone(response['output'])
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
 
         response = self.get_json('/adminjoboutput', params={'job_id': job_id})
         self.assertEqual(
@@ -487,7 +459,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
         with self.swap(
@@ -502,7 +474,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         self.logout()
@@ -513,7 +485,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(job_id)
 
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         status = SampleMapReduceJobManager.get_status_code(job_id)
 
         self.assertEqual(status, job_models.STATUS_CODE_STARTED)
@@ -582,7 +554,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
 
         jobs_test.StartExplorationEventCounter.start_computation()
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         status = jobs_test.StartExplorationEventCounter.get_status_code()
 
         self.assertEqual(
@@ -619,7 +591,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         jobs_test.StartExplorationEventCounter.start_computation()
 
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         status = jobs_test.StartExplorationEventCounter.get_status_code()
 
         self.assertEqual(
@@ -655,7 +627,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             jobs_test.StartExplorationEventCounter.get_count('exp_id'), 0)
 
         jobs_test.StartExplorationEventCounter.start_computation()
-        self.run_but_do_not_flush_pending_tasks()
+        self.run_but_do_not_flush_pending_mapreduce_tasks()
         status = jobs_test.StartExplorationEventCounter.get_status_code()
 
         self.assertEqual(
@@ -2275,3 +2247,27 @@ class MemoryCacheAdminHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/memorycacheadminhandler')
         self.assertEqual(response['total_keys_stored'], 0)
+
+
+class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
+    """Tests NumberOfDeletionRequestsHandler."""
+
+    def setUp(self):
+        super(NumberOfDeletionRequestsHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+    def test_get_with_no_deletion_request_returns_zero(self):
+        response = self.get_json('/numberofdeletionrequestshandler')
+        self.assertEqual(response['number_of_pending_deletion_models'], 0)
+
+    def test_get_with_two_deletion_request_returns_two(self):
+        user_models.PendingDeletionRequestModel(
+            id='id1', email='id1@email.com', role='role'
+        ).put()
+        user_models.PendingDeletionRequestModel(
+            id='id2', email='id2@email.com', role='role'
+        ).put()
+
+        response = self.get_json('/numberofdeletionrequestshandler')
+        self.assertEqual(response['number_of_pending_deletion_models'], 2)

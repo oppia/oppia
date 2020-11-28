@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0029.
+presubmit checks. Next message id would be C0031.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -1570,40 +1570,6 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
             self.add_message('newline-at-eof', line=file_length)
 
 
-class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
-    """Checks if only one space is used after a yield statement
-    when applicable ('yield' is acceptable).
-    """
-
-    __implements__ = interfaces.IAstroidChecker
-
-    name = 'single-space-after-yield'
-    priority = -1
-    msgs = {
-        'C0010': (
-            'Not using \'yield\' or a single space after yield statement.',
-            'single-space-after-yield',
-            'Ensure a single space is used after yield statement.',
-        ),
-    }
-
-    def visit_yield(self, node):
-        """Visit every yield statement to ensure that yield keywords are
-        followed by exactly one space, so matching 'yield *' where * is not a
-        whitespace character. Note that 'yield' is also acceptable in
-        cases where the user wants to yield nothing.
-
-        Args:
-            node: astroid.nodes.Yield. Nodes to access yield statements.
-                content.
-        """
-        line_number = node.fromlineno
-        line = linecache.getline(node.root().file, line_number).lstrip()
-        if (line.startswith(b'yield') and
-                not re.search(br'^(yield)( \S|$|\w)', line)):
-            self.add_message('single-space-after-yield', node=node)
-
-
 class DivisionOperatorChecker(checkers.BaseChecker):
     """Checks if division operator is used."""
 
@@ -1612,9 +1578,9 @@ class DivisionOperatorChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0015': (
-            'Division Operator is used.',
+            'Please use python_utils.divide() instead of the "/" operator',
             'division-operator-used',
-            'Please use python_utils.divide() instead of the "/" operator'
+            'Do not use division operator.'
         )
     }
 
@@ -1643,12 +1609,12 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             'Please use valid punctuation.'
         ),
         'C0017': (
-            'No space is used at beginning of comment.',
+            'Please use single space at beginning of comment.',
             'no-space-at-beginning',
             'Please use single space at the beginning of comment.'
         ),
         'C0018': (
-            'No capital letter is used at the beginning of comment.',
+            'Please use a capital letter at the beginning of comment.',
             'no-capital-letter-at-beginning',
             'Please use capital letter to begin the content of comment.'
         )
@@ -1766,7 +1732,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0024': (
-            'No empty line used below the fileoverview docstring.',
+            'Please add an empty line below the fileoverview docstring.',
             'no-empty-line-provided-below-fileoverview',
             'please provide an empty line below the fileoverview.'
         ),
@@ -1854,6 +1820,79 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                         'single-line-pragma', line=line_num)
 
 
+class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks that there is a single space
+    after keywords like `if`, `elif`, `while`, and `yield`.
+    """
+
+    __implements__ = interfaces.ITokenChecker
+
+    name = 'single-space-after-keyword'
+    priority = -1
+    msgs = {
+        'C0029': (
+            'Please add a single space after `%s` statement.',
+            'single-space-after-keyword',
+            'A single space should be added after a keyword.',
+        ),
+    }
+
+    keywords = set(['if', 'elif', 'while', 'yield'])
+
+    def process_tokens(self, tokens):
+        """Custom pylint checker which makes sure that every keyword is
+        followed by a single space.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.NAME and token in self.keywords:
+                line = line.strip()
+                # Regex evaluates to True if the line is of the form "if #" or
+                # "... if #" where # is not a space.
+                if not re.search(br'(\s|^)' + token + br'(\s[^\s]|$)', line):
+                    self.add_message(
+                        'single-space-after-keyword',
+                        args=(token),
+                        line=line_num)
+
+
+class InequalityWithNoneChecker(checkers.BaseChecker):
+    """Custom pylint checker prohibiting use of "if x != None" and
+    enforcing use of "if x is not None" instead.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'inequality-with-none'
+    priority = -1
+    msgs = {
+        'C0030': (
+            'Please refrain from using "x != None" '
+            'and use "x is not None" instead.',
+            'inequality-with-none',
+            'Use "is" to assert equality or inequality against None.'
+        )
+    }
+
+    def visit_compare(self, node):
+        """Called for comparisons (a != b).
+
+        Args:
+            node: astroid.node.Compare. A node indicating comparison.
+        """
+
+        ops = node.ops
+        for operator, operand in ops:
+            if operator != '!=':
+                continue
+            # Check if value field is in operand node, since
+            # not all righthand side nodes will have this field.
+            if 'value' in vars(operand) and operand.value is None:
+                self.add_message('inequality-with-none', node=node)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1868,8 +1907,9 @@ def register(linter):
     linter.register_checker(FunctionArgsOrderChecker(linter))
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
-    linter.register_checker(SingleSpaceAfterYieldChecker(linter))
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))
+    linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
+    linter.register_checker(InequalityWithNoneChecker(linter))

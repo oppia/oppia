@@ -325,7 +325,6 @@
 	"I18N_SIGNUP_UPDATE_WARNING": "Repara qu'anovamos apocayá les nueses Condiciones d'usu.",
 	"I18N_SIGNUP_USERNAME": "Nome d'usuariu",
 	"I18N_SIGNUP_USERNAME_EXPLANATION": "El to nome d'usuariu apaecerá cabo les tos contribuciones.",
-	"I18N_SIGNUP_WAIVER_OBJECTIVE": "L'arrenunciu al requerimientu d'atribución significa que, si daquién reutiliza esi trabayu, nun tán obligaos a atribuyilo a los autores. Sicasí, toles tos contribuciones individuales a les esploraciones van tar disponibles nel sitiu, nel rexistru de cambeos de la esploración. Encamiéntase (pero nun ye obligatorio) que los que reutilicen la esploración incluyan un enllaz a esta páxina.",
 	"I18N_SIGNUP_WHY_LICENSE": "¿Por qué CC-BY-SA?",
 	"I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "Les lleiciones d'Oppia, tamién llamaes esploraciones, ufren esperiencies más envolventes que los videos estáticos o'l testu, ayudando a los usuarios a deprender faciendo.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia ye una plataforma de deprendimientu llibre y de códigu abiertu enllena d'actividaes interactives llamaes esploraciones. Por desgracia, Oppia rique que JavaScript tea activáu nel navegador pa funcionar apropiadamente, ya'l to navegador tien JavaScript desactiváu. Si precises ayuda p'activar JavaScript, <a href=\"<[hrefUrl]>\">fai click equí</a>.",

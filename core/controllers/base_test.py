@@ -149,6 +149,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         deleted_user_model = (
             user_models.UserSettingsModel.get_by_id(deleted_user_id))
         deleted_user_model.deleted = True
+        deleted_user_model.update_timestamps()
         deleted_user_model.put()
 
     def test_that_no_get_results_in_500_error(self):
@@ -1151,6 +1152,7 @@ class SignUpTests(test_utils.GenericTestBase):
         during signup.
         """
         self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
@@ -1171,6 +1173,7 @@ class SignUpTests(test_utils.GenericTestBase):
         after signup.
         """
         self.login('abc@example.com')
+        self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL, {

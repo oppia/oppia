@@ -16,42 +16,33 @@
  * @fileoverview Unit tests for EditableTopicBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
+import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 import { TranslatorProviderForTests } from 'tests/test.extras';
 
-require('domain/topic/editable-topic-backend-api.service.ts');
-require('services/csrf-token.service.ts');
+describe('Editable topic backend API service', () => {
+  let httpTestingController = null;
+  let editableTopicBackendApiService = null;
+  let sampleDataResults = null;
+  let csrfService = null;
 
-describe('Editable topic backend API service', function() {
-  var EditableTopicBackendApiService = null;
-  var sampleDataResults = null;
-  var $httpBackend = null;
-  var CsrfService = null;
-
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    EditableTopicBackendApiService = $injector.get(
-      'EditableTopicBackendApiService');
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    httpTestingController = TestBed.get(HttpTestingController);
+    editableTopicBackendApiService = TestBed.get(
+      EditableTopicBackendApiService);
+    csrfService = TestBed.get(CsrfTokenService);
 
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('sample-csrf-token');
     });
 
     // Sample topic object returnable from the backend.
@@ -105,23 +96,24 @@ describe('Editable topic backend API service', function() {
         language_code: 'en'
       }
     };
-  }));
+  });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing topic from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/topic_editor_handler/data/0').respond(
-        sampleDataResults);
-      EditableTopicBackendApiService.fetchTopic('0').then(
+      editableTopicBackendApiService.fetchTopic('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne('/topic_editor_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith({
         topicDict: sampleDataResults.topic_dict,
@@ -133,78 +125,88 @@ describe('Editable topic backend API service', function() {
         classroomUrlFragment: sampleDataResults.classroom_url_fragment
       });
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    }));
 
   it('should use the rejection handler if the backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/topic_editor_handler/data/1').respond(
-        500, 'Error loading topic 1.');
-      EditableTopicBackendApiService.fetchTopic('1').then(
+      editableTopicBackendApiService.fetchTopic('1').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne('/topic_editor_handler/data/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading topic 1.', {
+        status: 500,
+        statusText: 'Error loading topic 1.'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading topic 1.');
-    }
-  );
+    }));
 
   it('should successfully fetch an existing subtopic page from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect(
-        'GET', '/subtopic_page_editor_handler/data/topicId/1').respond(
-        sampleDataResults);
-      EditableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
+      editableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne(
+        '/subtopic_page_editor_handler/data/topicId/1');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
         sampleDataResults.subtopic_page);
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    }));
 
   it('should use the rejection handler when fetching an existing subtopic' +
-    ' page fails', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    ' page fails', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect(
-      'GET', '/subtopic_page_editor_handler/data/topicId/1')
-      .respond(500, 'Error loading subtopic 1.');
-    EditableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
+    editableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/subtopic_page_editor_handler/data/topicId/1');
+    expect(req.request.method).toEqual('GET');
+    req.flush('Error loading subtopic 1.', {
+      status: 500,
+      statusText: 'Error loading subtopic 1.'
+    });
+
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Error loading subtopic 1.');
-  });
+  }));
 
   it('should update a topic after fetching it from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      var topic = null;
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let topic = null;
 
       // Loading a topic the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/topic_editor_handler/data/0').respond(
-        sampleDataResults);
-
-      EditableTopicBackendApiService.fetchTopic('0').then(
+      editableTopicBackendApiService.fetchTopic('0').then(
         function(data) {
           topic = data.topicDict;
         });
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne('/topic_editor_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
 
       topic.name = 'New Name';
       topic.version = '2';
-      var topicWrapper = {
+      let topicWrapper = {
         topic_dict: topic,
         skill_id_to_description_dict: {
           skill_id_1: 'Description 1'
@@ -212,14 +214,15 @@ describe('Editable topic backend API service', function() {
         skill_id_to_rubrics_dict: []
       };
 
-      $httpBackend.expect('PUT', '/topic_editor_handler/data/0').respond(
-        topicWrapper);
-
       // Send a request to update topic.
-      EditableTopicBackendApiService.updateTopic(
+      editableTopicBackendApiService.updateTopic(
         topic.id, topic.version, 'Name is updated', []
       ).then(successHandler, failHandler);
-      $httpBackend.flush();
+      req = httpTestingController.expectOne('/topic_editor_handler/data/0');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(topicWrapper);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith({
         topicDict: topic,
@@ -227,145 +230,174 @@ describe('Editable topic backend API service', function() {
         skillIdToRubricsDict: topicWrapper.skill_id_to_rubrics_dict
       });
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    }));
 
   it('should use the rejection handler if the topic to update doesn\'t exist',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       // Loading a topic the first time should fetch it from the backend.
-      $httpBackend.expect('PUT', '/topic_editor_handler/data/1').respond(
-        404, 'Topic with given id doesn\'t exist.');
-
-      EditableTopicBackendApiService.updateTopic(
+      editableTopicBackendApiService.updateTopic(
         '1', '1', 'Update an invalid topic.', []
       ).then(successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne('/topic_editor_handler/data/1');
+      expect(req.request.method).toEqual('PUT');
+      req.flush('Topic with given id doesn\'t exist.', {
+        status: 404,
+        statusText: 'Topic with given id doesn\'t exist.'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'Topic with given id doesn\'t exist.');
-    }
-  );
+    }));
 
   it('should check if a topic name already exists',
-    function() {
-      $httpBackend.expect('GET', '/topic_name_handler/topic-name').respond({
-        topic_name_exists: true
-      });
-
-      EditableTopicBackendApiService.doesTopicWithNameExistAsync(
+    fakeAsync(() => {
+      editableTopicBackendApiService.doesTopicWithNameExistAsync(
         'topic-name').then(topicNameExists => {
         expect(topicNameExists).toBeTrue();
       });
-      $httpBackend.flush();
-    }
-  );
+      let req = httpTestingController.expectOne(
+        '/topic_name_handler/topic-name');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        topic_name_exists: true
+      });
+
+      flushMicrotasks();
+    }));
 
   it('should use the rejection handler if the topic name already exists',
-    function() {
-      $httpBackend.expect(
-        'GET', '/topic_name_handler/topic-name').respond(
-        500, 'Error: Failed to check topic name.');
-
-      EditableTopicBackendApiService.doesTopicWithNameExistAsync(
+    fakeAsync(() => {
+      editableTopicBackendApiService.doesTopicWithNameExistAsync(
         'topic-name').then(() => {}, error => {
         expect(error).toEqual('Error: Failed to check topic name.');
       });
-      $httpBackend.flush();
-    }
-  );
-
-  it('should check if a topic url fragment already exists',
-    function() {
-      $httpBackend.expect(
-        'GET',
-        '/topic_url_fragment_handler/topic-url-fragment').respond({
-        topic_url_fragment_exists: true
+      let req = httpTestingController.expectOne(
+        '/topic_name_handler/topic-name');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error: Failed to check topic name.', {
+        status: 500,
+        statusText: 'Error: Failed to check topic name.'
       });
 
-      EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
+      flushMicrotasks();
+    }));
+
+  it('should check if a topic url fragment already exists',
+    fakeAsync(() => {
+      editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
         'topic-url-fragment').then(topicUrlFragmentExists => {
         expect(topicUrlFragmentExists).toBeTrue();
       });
-      $httpBackend.flush();
-    }
-  );
+      let req = httpTestingController.expectOne(
+        '/topic_url_fragment_handler/topic-url-fragment');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        topic_url_fragment_exists: true
+      });
+
+      flushMicrotasks();
+    }));
 
   it('should use the rejection handler if the url fragment already exists',
-    function() {
-      $httpBackend.expect(
-        'GET', '/topic_url_fragment_handler/topic-url-fragment').respond(
-        500, 'Error: Failed to check topic url fragment.');
-
-      EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
+    fakeAsync(() => {
+      editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
         'topic-url-fragment').then(() => {}, error => {
         expect(error).toEqual('Error: Failed to check topic url fragment.');
       });
-      $httpBackend.flush();
-    }
-  );
+      let req = httpTestingController.expectOne(
+        '/topic_url_fragment_handler/topic-url-fragment');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error: Failed to check topic url fragment.', {
+        status: 500,
+        statusText: 'Error: Failed to check topic url fragment.'
+      });
 
-  it('should sucessfully fetch stories from a topic', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+      flushMicrotasks();
+    }));
 
-    $httpBackend.expect('GET', '/topic_editor_story_handler/' + '0')
-      .respond(200, sampleDataResults);
-    EditableTopicBackendApiService.fetchStories('0').then(
+  it('should sucessfully fetch stories from a topic', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    editableTopicBackendApiService.fetchStories('0').then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/topic_editor_story_handler/' + '0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
       sampleDataResults.canonical_story_summary_dicts);
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should use the rejection handler when fetching stories from a' +
-    ' topic fails', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+    ' topic fails', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/topic_editor_story_handler/' + '0')
-      .respond(500, 'Error loading story with id 0.');
-    EditableTopicBackendApiService.fetchStories('0').then(
+    editableTopicBackendApiService.fetchStories('0').then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/topic_editor_story_handler/' + '0');
+    expect(req.request.method).toEqual('GET');
+    req.flush('Error loading story with id 0.', {
+      status: 500,
+      statusText: 'Error loading story with id 0.'
+    });
+
+    flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       'Error loading story with id 0.');
-  });
+  }));
 
-  it('should sucessfully delete a topic', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
+  it('should sucessfully delete a topic', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expectDELETE('/topic_editor_handler/data/' + '0')
-      .respond(200);
-    EditableTopicBackendApiService.deleteTopic('0').then(
+    editableTopicBackendApiService.deleteTopic('0').then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    let req = httpTestingController.expectOne(
+      '/topic_editor_handler/data/' + '0');
+    expect(req.request.method).toEqual('DELETE');
+    req.flush({
+      status: 200
+    });
+
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(200);
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should use the rejection handler when deleting a topic fails',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectDELETE('/topic_editor_handler/data/' + '1')
-        .respond(500, 'Error deleting topic 1.');
-      EditableTopicBackendApiService.deleteTopic('1').then(
+      editableTopicBackendApiService.deleteTopic('1').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne(
+        '/topic_editor_handler/data/' + '1');
+      expect(req.request.method).toEqual('DELETE');
+      req.flush('Error deleting topic 1.', {
+        status: 500,
+        statusText: 'Error deleting topic 1.'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error deleting topic 1.');
-    }
-  );
+    }));
 });

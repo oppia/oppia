@@ -28,7 +28,7 @@ import $ from 'jquery';
   providedIn: 'root'
 })
 export class CsrfTokenService {
-  tokenPromise: PromiseLike<string> = null;
+  tokenPromise: PromiseLike<string> | null = null;
 
   initializeToken(): void {
     if (this.tokenPromise !== null) {

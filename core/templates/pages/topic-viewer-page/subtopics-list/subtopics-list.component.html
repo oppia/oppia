@@ -2,10 +2,10 @@
   <div class="oppia-subtopics-list-container">
     <mat-card class="oppia-page-card oppia-long-text">
       <h2 class="tab-title">
-        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate"></span>
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS' | translate: {topicName: topicName}"></span>
       </h2>
       <div class="subtopic-subheading">
-        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate"></span>
+        <span [innerHTML]="'I18N_TOPIC_VIEWER_STUDY_SKILLS_SUBTITLE' | translate: {topicName: topicName}"></span>
       </div>
       <div class="subtopics-container">
         <div *ngFor="let subtopic of subtopicsList">
@@ -21,11 +21,11 @@
 </div>
 <style>
   .subtopics-list .oppia-page-card.oppia-long-text {
-    padding: 30px 55px 30px 45px;
+    padding: 30px 30px 30px 40px;
   }
 
   .subtopics-list .oppia-page-card {
-    margin-top: 18vh;
+    margin-top: 10em;
   }
 
   .subtopics-list .tab-title {
@@ -67,9 +67,18 @@
   @media(max-width: 500px) {
     .subtopics-list .subtopics-container {
       display: grid;
-      grid-template-columns: 140px 140px;
+      grid-template-columns: 130px 130px;
       justify-content: space-between;
-      margin-left: 0;
+      margin-left: -10px;
+    }
+  }
+
+  @media(max-width: 350px) {
+    .subtopics-list .subtopics-container {
+      display: grid;
+      grid-template-columns: 120px 120px;
+      justify-content: space-between;
+      margin-left: -10px;
     }
   }
 </style>

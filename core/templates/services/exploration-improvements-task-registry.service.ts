@@ -24,22 +24,22 @@ import { group } from 'd3-array';
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { States } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config-object.factory';
+  'domain/improvements/exploration-improvements-config.model';
 import {
   ExplorationTask,
-  ExplorationTaskObjectFactory,
+  ExplorationTaskModel,
   ExplorationTaskType,
-} from 'domain/improvements/ExplorationTaskObjectFactory';
+} from 'domain/improvements/exploration-task.model';
 import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+  'domain/improvements/high-bounce-rate-task.model';
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
 import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+  'domain/improvements/ineffective-feedback-loop-task.model';
 import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+  'domain/improvements/needs-guiding-response-task.model';
 import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+  'domain/improvements/successive-incorrect-answers-task.model';
 import { State } from 'domain/state/StateObjectFactory';
 import {
   CyclicStateTransitionsPlaythroughIssue,
@@ -48,8 +48,8 @@ import {
   PlaythroughIssue
 } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
-import { StateStats } from 'domain/statistics/StateStatsObjectFactory';
+  'domain/statistics/exploration-stats.model';
+import { StateStats } from 'domain/statistics/state-stats-model';
 
 type HbrTask = HighBounceRateTask;
 type IflTask = IneffectiveFeedbackLoopTask;
@@ -170,9 +170,6 @@ export class ExplorationImprovementsTaskRegistryService {
   private tasksByState: Map<string, StateTasks>;
   private openTasksByType: ReadonlyMap<ExplorationTaskType, ExplorationTask[]>;
 
-  constructor(
-      private explorationTaskObjectFactory: ExplorationTaskObjectFactory) {}
-
   initialize(
       config: ExplorationImprovementsConfig,
       states: States,
@@ -228,7 +225,7 @@ export class ExplorationImprovementsTaskRegistryService {
     const newStateTasks = new StateTasks(
       newStateName,
       new Map(ImprovementsConstants.TASK_TYPES.map(taskType => [
-        taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
+        taskType, ExplorationTaskModel.createNewObsoleteTask(
           this.config.explorationId, this.config.explorationVersion, taskType,
           newStateName),
       ])),
@@ -261,7 +258,7 @@ export class ExplorationImprovementsTaskRegistryService {
       newStateName,
       new Map(oldStateTasks.map(oldTask => [
         oldTask.taskType,
-        this.explorationTaskObjectFactory.createFromBackendDict({
+        ExplorationTaskModel.createFromBackendDict({
           ...oldTask.toBackendDict(),
           ...{target_id: newStateName},
         })
@@ -425,7 +422,7 @@ export class ExplorationImprovementsTaskRegistryService {
       //    let map = new Map([['a', 1], ['b', 3], ['a', 9]]);
       //    map.get('a'); // Returns 9.
       ...ImprovementsConstants.TASK_TYPES.map(taskType => [
-        taskType, this.explorationTaskObjectFactory.createNewObsoleteTask(
+        taskType, ExplorationTaskModel.createNewObsoleteTask(
           this.config.explorationId, this.config.explorationVersion, taskType,
           stateName)
       ]),
@@ -433,7 +430,7 @@ export class ExplorationImprovementsTaskRegistryService {
         task.taskType, task
       ]),
       ...resolvedTaskTypes.map(taskType => [
-        taskType, this.explorationTaskObjectFactory.createNewResolvedTask(
+        taskType, ExplorationTaskModel.createNewResolvedTask(
           this.config.explorationId, this.config.explorationVersion, taskType,
           stateName)
       ]),

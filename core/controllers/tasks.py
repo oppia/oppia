@@ -19,13 +19,20 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 
+from core import jobs_registry
 from core.controllers import base
 from core.domain import email_manager
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import question_services
 from core.domain import rights_manager
+from core.domain import stats_services
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
+from core.domain import wipeout_service
 from core.platform import models
+import python_utils
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
@@ -70,6 +77,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         transaction_services.run_in_transaction(
             feedback_services.pop_feedback_message_references, user_id,
             len(references))
+        self.render_json({})
 
 
 class SuggestionEmailHandler(base.BaseHandler):
@@ -88,6 +96,7 @@ class SuggestionEmailHandler(base.BaseHandler):
         email_manager.send_suggestion_email(
             exploration.title, exploration.id, suggestion.author_id,
             exploration_rights.owner_ids)
+        self.render_json({})
 
 
 class InstantFeedbackMessageEmailHandler(base.BaseHandler):
@@ -112,6 +121,7 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
             user_id, message.author_id, message.text, subject,
             exploration.title, reference_dict['entity_id'],
             thread.subject, reply_to_id=reply_to_id)
+        self.render_json({})
 
 
 class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
@@ -137,6 +147,7 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, text, subject, exploration.title,
             reference_dict['entity_id'], thread.subject)
+        self.render_json({})
 
 
 class FlagExplorationEmailHandler(base.BaseHandler):
@@ -154,3 +165,47 @@ class FlagExplorationEmailHandler(base.BaseHandler):
 
         email_manager.send_flag_exploration_email(
             exploration.title, exploration_id, reporter_id, report_text)
+        self.render_json({})
+
+
+class DeferredTasksHandler(base.BaseHandler):
+    """This task handler handles special tasks that make single asynchronous
+    function calls. For more complex tasks that require a large number of
+    function calls, the correct approach is to create a special url handler that
+    handles that specific task. However, it doesn't make sense to create a url
+    handler for single function calls. This handler handles those cases.
+
+    The convention of function ids and an explanation of the different queue
+    names exists in 'core/domain/taskqueue_services.py' file.
+    """
+
+    DEFERRED_TASK_FUNCTIONS = {
+        taskqueue_services.FUNCTION_ID_DISPATCH_EVENT: (
+            jobs_registry.ContinuousComputationEventDispatcher.dispatch_event),
+        taskqueue_services.FUNCTION_ID_DELETE_EXPLORATIONS: (
+            exp_services.delete_explorations_from_subscribed_users),
+        taskqueue_services.FUNCTION_ID_UPDATE_STATS: (
+            stats_services.update_stats),
+        taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
+            question_services.untag_deleted_misconceptions),
+        taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: (
+            wipeout_service
+            .remove_user_from_activities_with_associated_rights_models)
+    }
+
+    def post(self):
+        payload = json.loads(self.request.body.decode())
+        if 'fn_identifier' not in payload:
+            raise Exception(
+                'This request cannot defer tasks because it does not contain a '
+                'function identifier attribute (fn_identifier). Deferred tasks '
+                'must contain a function_identifier in the payload.')
+        if payload['fn_identifier'] not in self.DEFERRED_TASK_FUNCTIONS:
+            raise Exception(
+                'The function id, %s, is not valid.' %
+                python_utils.convert_to_bytes(payload['fn_identifier']))
+
+        deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
+            payload['fn_identifier']]
+        deferred_task_function(*payload['args'], **payload['kwargs'])
+        self.render_json({})

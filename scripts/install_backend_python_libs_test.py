@@ -26,11 +26,10 @@ import subprocess
 import sys
 
 from core.tests import test_utils
+import pkg_resources
 import python_utils
 from scripts import common
 from scripts import install_backend_python_libs
-
-import pkg_resources
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):

@@ -39,13 +39,13 @@ angular.module('oppia').directive('collectionNodeCreator', [
         'collection-node-creator.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$http', 'AlertsService',
+        '$filter', '$http', '$rootScope', 'AlertsService',
         'CollectionEditorStateService', 'CollectionLinearizerService',
         'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
         'ValidatorsService', 'INVALID_NAME_CHARS',
         function(
-            $filter, $http, AlertsService,
+            $filter, $http, $rootScope, AlertsService,
             CollectionEditorStateService, CollectionLinearizerService,
             ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, SiteAnalyticsService,
@@ -107,7 +107,8 @@ angular.module('oppia').directive('collectionNodeCreator', [
 
             ExplorationSummaryBackendApiService
               .loadPublicAndPrivateExplorationSummaries([newExplorationId])
-              .then(function(summaries) {
+              .then(function(responseObject) {
+                var summaries = responseObject.summaries;
                 var summaryBackendObject = null;
                 if (summaries.length !== 0 &&
                     summaries[0].id === newExplorationId) {
@@ -121,6 +122,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
                     'That exploration does not exist or you do not have edit ' +
                     'access to it.');
                 }
+                $rootScope.$applyAsync();
               }, function() {
                 AlertsService.addWarning(
                   'There was an error while adding an exploration to the ' +

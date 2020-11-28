@@ -24,7 +24,7 @@ angular.module('oppia').directive(
       './oppia-visualization-enumerated-frequency-table.directive.html'),
     style: require(
       './oppia-visualization-enumerated-frequency-table.directive.css'),
-    controller: function($scope) {
+    controller: ['$scope', function($scope) {
       this.$onInit = () => {
         // By default only the first element is shown, the rest are hidden.
         $scope.answerVisible = $scope.data.map((_, i) => i === 0);
@@ -33,6 +33,5 @@ angular.module('oppia').directive(
           $scope.answerVisible[i] = !$scope.answerVisible[i];
         };
       };
-    }
-  })
-);
+    }],
+  }));

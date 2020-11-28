@@ -39,20 +39,16 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
     NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
-    USER_1_GAE_ID = 'gae_id'
     USER_1_EMAIL = 'user@example.com'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
     USER_2_ID = 'user2_id'
-    USER_2_GAE_ID = 'gae2_id'
     USER_2_EMAIL = 'user2@example.com'
     USER_2_ROLE = feconf.ROLE_ID_BANNED_USER
     USER_3_ID = 'user3_id'
-    USER_3_GAE_ID = 'gae3_id'
     USER_3_EMAIL = 'user3@example.com'
     USER_3_ROLE = feconf.ROLE_ID_ADMIN
     GENERIC_PIN = '12345'
     PROFILE_1_ID = 'profile_id'
-    PROFILE_1_GAE_ID = 'gae_id'
     PROFILE_1_EMAIL = 'user@example.com'
     PROFILE_1_ROLE = feconf.ROLE_ID_LEARNER
     GENERIC_USERNAME = 'user'
@@ -68,26 +64,22 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         super(UserSettingsModelTest, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_1_ID,
-            gae_id=self.USER_1_GAE_ID,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.PROFILE_1_ID,
-            gae_id=self.PROFILE_1_GAE_ID,
             email=self.PROFILE_1_EMAIL,
             role=self.PROFILE_1_ROLE
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_2_ID,
-            gae_id=self.USER_2_GAE_ID,
             email=self.USER_2_EMAIL,
             role=self.USER_2_ROLE,
             deleted=True
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_3_ID,
-            gae_id=self.USER_3_GAE_ID,
             email=self.USER_3_EMAIL,
             role=self.USER_3_ROLE,
             username=self.GENERIC_USERNAME,
@@ -120,7 +112,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy_is_delete(self):
         self.assertEqual(
             user_models.UserSettingsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_users_deletes_them(self):
         # Case for a full user.
@@ -199,11 +191,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': None,
             'normalized_username': None,
-            'last_agreed_to_terms': None,
-            'last_started_state_editor_tutorial': None,
-            'last_started_state_translation_tutorial': None,
-            'last_logged_in': None,
-            'last_edited_an_exploration': None,
+            'last_agreed_to_terms_msec': None,
+            'last_started_state_editor_tutorial_msec': None,
+            'last_started_state_translation_tutorial_msec': None,
+            'last_logged_in_msec': None,
+            'last_edited_an_exploration_msec': None,
+            'last_created_an_exploration_msec': None,
             'profile_picture_data_url': None,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
@@ -213,8 +206,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_language_codes': [],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
-            'display_alias': None,
-            'pin': None
+            'display_alias': None
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -226,22 +218,22 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.GENERIC_USERNAME,
             'normalized_username': self.GENERIC_USERNAME,
-            'last_agreed_to_terms': self.GENERIC_EPOCH,
-            'last_started_state_editor_tutorial': self.GENERIC_EPOCH,
-            'last_started_state_translation_tutorial': self.GENERIC_EPOCH,
-            'last_logged_in': self.GENERIC_EPOCH,
-            'last_edited_an_exploration': self.GENERIC_EPOCH,
+            'last_agreed_to_terms_msec': self.GENERIC_EPOCH,
+            'last_started_state_editor_tutorial_msec': self.GENERIC_EPOCH,
+            'last_started_state_translation_tutorial_msec': self.GENERIC_EPOCH,
+            'last_logged_in_msec': self.GENERIC_EPOCH,
+            'last_edited_an_exploration_msec': self.GENERIC_EPOCH,
+            'last_created_an_exploration_msec': self.GENERIC_EPOCH,
             'profile_picture_data_url': self.GENERIC_IMAGE_URL,
             'default_dashboard': 'learner',
             'creator_dashboard_display_pref': 'card',
             'user_bio': self.GENERIC_USER_BIO,
             'subject_interests': self.GENERIC_SUBJECT_INTERESTS,
-            'first_contribution_msec': 1,
+            'first_contribution_msec': 1.0,
             'preferred_language_codes': self.GENERIC_LANGUAGE_CODES,
             'preferred_site_language_code': self.GENERIC_LANGUAGE_CODES[0],
             'preferred_audio_language_code': self.GENERIC_LANGUAGE_CODES[0],
-            'display_alias': self.GENERIC_DISPLAY_ALIAS,
-            'pin': self.GENERIC_PIN
+            'display_alias': self.GENERIC_DISPLAY_ALIAS
         }
         self.assertEqual(expected_user_data, user_data)
 
@@ -251,8 +243,20 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             new_id = user_models.UserSettingsModel.get_new_id('')
             self.assertNotIn(new_id, ids)
             user_models.UserSettingsModel(
-                id=new_id, gae_id='gae_id', email='some@email.com').put()
+                id=new_id, email='some@email.com').put()
             ids.add(new_id)
+
+    def test_get_new_id_with_deleted_user_model(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+            user_models.DeletedUserModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, user_models.DeletedUserModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            user_models.UserSettingsModel.get_new_id('exploration')
 
     def test_get_new_id_for_too_many_collisions_raises_error(self):
         # Swap dependent method get_by_id to simulate collision every time.
@@ -338,8 +342,8 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         user_data = (
             user_models.CompletedActivitiesModel.export_data(self.USER_1_ID))
         expected_data = {
-            'completed_exploration_ids': self.EXPLORATION_IDS_1,
-            'completed_collection_ids': self.COLLECTION_IDS_1
+            'exploration_ids': self.EXPLORATION_IDS_1,
+            'collection_ids': self.COLLECTION_IDS_1
         }
         self.assertEqual(expected_data, user_data)
 
@@ -415,8 +419,8 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         user_data = (
             user_models.IncompleteActivitiesModel.export_data(self.USER_1_ID))
         expected_data = {
-            'incomplete_exploration_ids': self.EXPLORATION_IDS_1,
-            'incomplete_collection_ids': self.COLLECTION_IDS_1
+            'exploration_ids': self.EXPLORATION_IDS_1,
+            'collection_ids': self.COLLECTION_IDS_1
         }
         self.assertEqual(expected_data, user_data)
 
@@ -545,8 +549,8 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             self.USER_ID_1)
         expected_data = {
             self.EXP_ID_0: {
-                'exp_version': self.EXP_VERSION,
-                'state_name': self.STATE_NAME_1
+                'last_played_exp_version': self.EXP_VERSION,
+                'last_played_state_name': self.STATE_NAME_1
             }
         }
         self.assertEqual(expected_data, user_data)
@@ -557,12 +561,12 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             self.USER_ID_2)
         expected_data = {
             self.EXP_ID_0: {
-                'exp_version': self.EXP_VERSION,
-                'state_name': self.STATE_NAME_2
+                'last_played_exp_version': self.EXP_VERSION,
+                'last_played_state_name': self.STATE_NAME_2
             },
             self.EXP_ID_1: {
-                'exp_version': self.EXP_VERSION,
-                'state_name': self.STATE_NAME_2
+                'last_played_exp_version': self.EXP_VERSION,
+                'last_played_state_name': self.STATE_NAME_2
             }
         }
         self.assertEqual(expected_data, user_data)
@@ -637,8 +641,8 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         """Test if export_data works as intended on a user in datastore."""
         user_data = user_models.LearnerPlaylistModel.export_data(self.USER_ID_1)
         expected_data = {
-            'playlist_exploration_ids': self.EXPLORATION_IDS_1,
-            'playlist_collection_ids': self.COLLECTION_IDS_1
+            'exploration_ids': self.EXPLORATION_IDS_1,
+            'collection_ids': self.COLLECTION_IDS_1
         }
         self.assertEqual(expected_data, user_data)
 
@@ -752,6 +756,7 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
     USER_ID_1 = 'id_1'
     USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
@@ -761,6 +766,13 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
         user_models.UserEmailPreferencesModel(
             id=self.USER_ID_2,
             deleted=True
+        ).put()
+        user_models.UserEmailPreferencesModel(
+            id=self.USER_ID_3,
+            site_updates=False,
+            editor_role_notifications=False,
+            feedback_message_notifications=False,
+            subscription_notifications=False
         ).put()
 
     def test_get_deletion_policy(self):
@@ -792,6 +804,32 @@ class UserEmailPreferencesModelTests(test_utils.GenericTestBase):
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
 
+    def test_export_data_trivial(self):
+        user_data = user_models.UserEmailPreferencesModel.export_data(
+            self.USER_ID_1)
+        self.assertEqual(
+            {
+                'site_updates': None,
+                'editor_role_notifications': True,
+                'feedback_message_notifications': True,
+                'subscription_notifications': True
+            },
+            user_data
+        )
+
+    def test_export_data_nontrivial(self):
+        user_data = user_models.UserEmailPreferencesModel.export_data(
+            self.USER_ID_3)
+        self.assertEqual(
+            user_data,
+            {
+                'site_updates': False,
+                'editor_role_notifications': False,
+                'feedback_message_notifications': False,
+                'subscription_notifications': False
+            }
+        )
+
 
 class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     """Tests for UserSubscriptionsModel."""
@@ -815,12 +853,10 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         super(UserSubscriptionsModelTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id='gae_1_id',
             email='some@email.com'
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
-            gae_id='gae_2_id',
             email='some_other@email.com'
         ).put()
 
@@ -829,7 +865,6 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         for creator_id in self.CREATOR_IDS:
             user_models.UserSettingsModel(
                 id=creator_id,
-                gae_id='gae_' + creator_id,
                 username='username' + creator_id,
                 email=creator_id + '@example.com'
             ).put()
@@ -839,6 +874,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
             activity_ids=self.ACTIVITY_IDS,
+            feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATETIME
         ).put()
@@ -900,8 +936,9 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'creator_usernames': [],
             'collection_ids': [],
             'activity_ids': [],
+            'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
-            'last_checked': None
+            'last_checked_msec': None
         }
         self.assertEqual(user_data, test_data)
 
@@ -913,8 +950,10 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
+            'feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
-            'last_checked': utils.get_time_in_millisecs(self.GENERIC_DATETIME)
+            'last_checked_msec':
+                utils.get_time_in_millisecs(self.GENERIC_DATETIME)
         }
         self.assertEqual(user_data, test_data)
 
@@ -939,12 +978,10 @@ class UserSubscribersModelTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
-            gae_id='gae_1_id',
             email='some@email.com'
         ).put()
         user_models.UserSettingsModel(
             id=self.USER_ID_2,
-            gae_id='gae_2_id',
             email='some_other@email.com'
         ).put()
 
@@ -1292,9 +1329,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_EPOCH,
+                'rated_on_msec': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_EPOCH,
+                'draft_change_list_last_updated_msec': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1324,9 +1361,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
-                'rated_on': self.DATETIME_EPOCH,
+                'rated_on_msec': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {}},
-                'draft_change_list_last_updated': self.DATETIME_EPOCH,
+                'draft_change_list_last_updated_msec': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 3,
                 'draft_change_list_id': 1,
                 'mute_suggestion_notifications': (
@@ -1336,9 +1373,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             },
             self.EXP_ID_TWO: {
                 'rating': None,
-                'rated_on': None,
+                'rated_on_msec': None,
                 'draft_change_list': None,
-                'draft_change_list_last_updated': None,
+                'draft_change_list_last_updated_msec': None,
                 'draft_change_list_exp_version': None,
                 'draft_change_list_id': 0,
                 'mute_suggestion_notifications': (
@@ -1348,9 +1385,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             },
             self.EXP_ID_THREE: {
                 'rating': 5,
-                'rated_on': self.DATETIME_EPOCH,
+                'rated_on_msec': self.DATETIME_EPOCH,
                 'draft_change_list': {'new_content': {'content': 3}},
-                'draft_change_list_last_updated': self.DATETIME_EPOCH,
+                'draft_change_list_last_updated_msec': self.DATETIME_EPOCH,
                 'draft_change_list_exp_version': 2,
                 'draft_change_list_id': 2,
                 'mute_suggestion_notifications': (
@@ -1458,7 +1495,9 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_2)
         expected_data = {
-            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATION_IDS_1
+            self.COLLECTION_ID_1: {
+                'completed_explorations': self.COMPLETED_EXPLORATION_IDS_1
+            }
         }
         self.assertEqual(expected_data, user_data)
 
@@ -1467,8 +1506,12 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.CollectionProgressModel.export_data(
             self.USER_ID_1)
         expected_data = {
-            self.COLLECTION_ID_1: self.COMPLETED_EXPLORATION_IDS_1,
-            self.COLLECTION_ID_2: self.COMPLETED_EXPLORATION_IDS_2
+            self.COLLECTION_ID_1: {
+                'completed_explorations': self.COMPLETED_EXPLORATION_IDS_1
+            },
+            self.COLLECTION_ID_2: {
+                'completed_explorations': self.COMPLETED_EXPLORATION_IDS_2
+            }
         }
         self.assertEqual(expected_data, user_data)
 
@@ -1564,7 +1607,9 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.StoryProgressModel.export_data(
             self.USER_ID_1)
         expected_data = {
-            self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
+            self.STORY_ID_1: {
+                'completed_node_ids': self.COMPLETED_NODE_IDS_1
+            }
         }
         self.assertEqual(expected_data, user_data)
 
@@ -1572,18 +1617,24 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         user_data = user_models.StoryProgressModel.export_data(
             self.USER_ID_2)
         expected_data = {
-            self.STORY_ID_1: self.COMPLETED_NODE_IDS_1,
-            self.STORY_ID_2: self.COMPLETED_NODE_IDS_2
+            self.STORY_ID_1: {
+                'completed_node_ids': self.COMPLETED_NODE_IDS_1
+            },
+            self.STORY_ID_2: {
+                'completed_node_ids': self.COMPLETED_NODE_IDS_2
+            }
         }
         self.assertEqual(expected_data, user_data)
 
     def test_get_multi(self):
         model = user_models.StoryProgressModel.create(
             'user_id', 'story_id_1')
+        model.update_timestamps()
         model.put()
 
         model = user_models.StoryProgressModel.create(
             'user_id', 'story_id_2')
+        model.update_timestamps()
         model.put()
 
         story_progress_models = user_models.StoryProgressModel.get_multi(
@@ -1923,8 +1974,12 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
         user_data = user_models.UserSkillMasteryModel.export_data(
             self.USER_1_ID)
         test_data = {
-            self.SKILL_ID_1: self.DEGREE_OF_MASTERY,
-            self.SKILL_ID_2: self.DEGREE_OF_MASTERY
+            self.SKILL_ID_1: {
+                'degree_of_mastery': self.DEGREE_OF_MASTERY
+            },
+            self.SKILL_ID_2: {
+                'degree_of_mastery': self.DEGREE_OF_MASTERY
+            }
         }
         self.assertEqual(user_data, test_data)
 
@@ -2310,14 +2365,25 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             id=self.USER_1_ID,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE,
-            exploration_ids=[],
-            collection_ids=[],
         ).put()
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE_AT_END)
+
+    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.USER_1_ID)
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(self.USER_1_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(
+            user_models.PendingDeletionRequestModel.get_by_id(
+                self.NONEXISTENT_USER_ID))
+        user_models.PendingDeletionRequestModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -2330,13 +2396,22 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
         )
 
 
+class DeletedUserModelTests(test_utils.GenericTestBase):
+    """Tests for DeletedUserModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.DeletedUserModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+
 class PseudonymizedUserModelTests(test_utils.GenericTestBase):
     """Tests for PseudonymizedUserModel."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             user_models.PendingDeletionRequestModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_create_raises_error_when_many_id_collisions_occur(self):
         # Swap dependent method get_by_id to simulate collision every time.
@@ -2349,6 +2424,15 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
             user_models.PseudonymizedUserModel.get_new_id('exploration')
+
+
+class DeletedUsernameModelTests(test_utils.GenericTestBase):
+    """Tests for DeletedUsernameModel."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.DeletedUsernameModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class UserAuthDetailsModelTests(test_utils.GenericTestBase):
@@ -2387,10 +2471,10 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             feconf.ROLE_ID_LEARNER
         )
 
-    def test_get_deletion_policy_is_delete(self):
+    def test_get_deletion_policy_is_delete_at_end(self):
         self.assertEqual(
             user_models.UserAuthDetailsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(self):
         # Deleting a full user.
@@ -2470,3 +2554,60 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
                 self.USER_ID)
         )
         self.assertItemsEqual(user_auth_details_models, fetched_output)
+
+
+class UserIdentifiersModelTests(test_utils.GenericTestBase):
+    """Tests for UserIdentifiersModel."""
+
+    NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
+    NONEXISTENT_USER_ID = 'id_x'
+    NONREGISTERED_GAE_ID = 'gae_id_x'
+    USER_ID = 'user_id'
+    USER_GAE_ID = 'gae_id'
+    PROFILE_ID = 'profile_id'
+    PROFILE_2_ID = 'profile_2_id'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserIdentifiersModelTests, self).setUp()
+
+        user_models.UserIdentifiersModel(
+            id=self.USER_GAE_ID,
+            user_id=self.USER_ID,
+        ).put()
+
+    def test_get_deletion_policy_is_delete_at_end(self):
+        self.assertEqual(
+            user_models.UserIdentifiersModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE_AT_END)
+
+    def test_apply_deletion_policy_for_registered_user_deletes_them(self):
+        # Deleting a full user.
+        user_models.UserIdentifiersModel.apply_deletion_policy(self.USER_ID)
+        self.assertIsNone(user_models.UserIdentifiersModel.get_by_id(
+            self.USER_ID))
+
+    def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
+        self.assertIsNone(user_models.UserIdentifiersModel.get_by_id(
+            self.NONEXISTENT_USER_ID))
+        user_models.UserIdentifiersModel.apply_deletion_policy(
+            self.NONEXISTENT_USER_ID)
+
+    def test_has_reference_to_existing_user_id_is_true(self):
+        # For a full user.
+        self.assertTrue(
+            user_models.UserIdentifiersModel.has_reference_to_user_id(
+                self.USER_ID)
+        )
+
+    def test_has_reference_to_non_existing_user_id_is_false(self):
+        self.assertFalse(
+            user_models.UserIdentifiersModel.has_reference_to_user_id(
+                self.NONEXISTENT_USER_ID)
+        )
+
+    def test_get_by_user_id_for_correct_user_id(self):
+        self.assertEqual(
+            user_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID),
+            user_models.UserIdentifiersModel.get_by_user_id(self.USER_ID)
+        )

@@ -19,15 +19,10 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Classifier, ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
+import { Classifier, ClassifierBackendDict } from 'domain/classifier/classifier.model';
 
 interface StateClassifierMappingBackendDict {
-  [state: string]: {
-    'algorithm_id': string;
-    'classifier_data': ClassifierData;
-    'data_schema_version': number;
-  }
+  [state: string]: ClassifierBackendDict;
 }
 
 interface StateClassifierMapping {
@@ -38,24 +33,17 @@ interface StateClassifierMapping {
   providedIn: 'root'
 })
 export class StateClassifierMappingService {
-  constructor(private classifierObjectFactory: ClassifierObjectFactory) {}
+  constructor() {}
   stateClassifierMapping: StateClassifierMapping = null;
 
   init(
       backendStateClassifierMapping: StateClassifierMappingBackendDict): void {
     this.stateClassifierMapping = {};
-    var algorithmId, classifierData, dataSchemaVersion;
     for (var stateName in backendStateClassifierMapping) {
       if (backendStateClassifierMapping.hasOwnProperty(stateName)) {
-        algorithmId = backendStateClassifierMapping[
-          stateName].algorithm_id;
-        classifierData = backendStateClassifierMapping[
-          stateName].classifier_data;
-        dataSchemaVersion = backendStateClassifierMapping[
-          stateName].data_schema_version;
-        this.stateClassifierMapping[stateName] =
-          this.classifierObjectFactory.create(
-            algorithmId, classifierData, dataSchemaVersion);
+        this.stateClassifierMapping[stateName] = (
+          Classifier.createFromBackendDict(
+            backendStateClassifierMapping[stateName]));
       }
     }
   }

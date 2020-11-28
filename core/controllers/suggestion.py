@@ -34,6 +34,7 @@ import feconf
 import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+transaction_services = models.Registry.import_transaction_services()
 
 
 def _get_target_id_to_exploration_opportunity_dict(suggestions):
@@ -48,10 +49,13 @@ def _get_target_id_to_exploration_opportunity_dict(suggestions):
         summary dict.
     """
     target_ids = set([s.target_id for s in suggestions])
-    opportunities = (
-        opportunity_services.get_exploration_opportunity_summaries_by_ids(
-            list(target_ids)))
-    return {opp.id: opp.to_dict() for opp in opportunities}
+    opportunity_id_to_opportunity_dict = {
+        opp_id: (opp.to_dict() if opp is not None else None)
+        for opp_id, opp in (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                list(target_ids)).items())
+    }
+    return opportunity_id_to_opportunity_dict
 
 
 def _get_target_id_to_skill_opportunity_dict(suggestions):
@@ -65,22 +69,25 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
         dict. Dict mapping target_id to corresponding skill opportunity dict.
     """
     target_ids = set([s.target_id for s in suggestions])
-    opportunities = (
-        opportunity_services.get_skill_opportunities_by_ids(list(target_ids)))
-    opportunity_skill_ids = [opp.id for opp in opportunities]
+    opportunity_id_to_opportunity_dict = {
+        opp_id: (opp.to_dict() if opp is not None else None)
+        for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(
+            list(target_ids)).items()
+    }
     opportunity_id_to_skill = {
         skill.id: skill
-        for skill in skill_fetchers.get_multi_skills(opportunity_skill_ids)
+        for skill in skill_fetchers.get_multi_skills([
+            opp['id']
+            for opp in opportunity_id_to_opportunity_dict.values()
+            if opp is not None])
     }
-    opportunity_id_to_opportunity = {}
-    for opp in opportunities:
-        opp_dict = opp.to_dict()
-        skill = opportunity_id_to_skill.get(opp.id)
+
+    for opp_id, skill in opportunity_id_to_skill.items():
         if skill is not None:
-            opp_dict['skill_rubrics'] = [
+            opportunity_id_to_opportunity_dict[opp_id]['skill_rubrics'] = [
                 rubric.to_dict() for rubric in skill.rubrics]
-        opportunity_id_to_opportunity[opp.id] = opp_dict
-    return opportunity_id_to_opportunity
+
+    return opportunity_id_to_opportunity_dict
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -89,7 +96,12 @@ class SuggestionHandler(base.BaseHandler):
     @acl_decorators.can_suggest_changes
     def post(self):
         try:
-            suggestion = suggestion_services.create_suggestion(
+            # The create_suggestion method needs to be run in transaction as it
+            # generates multiple connected models (suggestion, feedback thread,
+            # feedback message etc.) and all these models needs to be created
+            # together, in a batch.
+            suggestion = transaction_services.run_in_transaction(
+                suggestion_services.create_suggestion,
                 self.payload.get('suggestion_type'),
                 self.payload.get('target_type'), self.payload.get('target_id'),
                 self.payload.get('target_version_at_submission'),
