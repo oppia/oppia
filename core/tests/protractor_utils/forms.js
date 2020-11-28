@@ -112,7 +112,7 @@ var GraphEditor = function(graphInputContainer) {
         var allEdgesElement = element.all(by.css(
           '.protractor-test-graph-edge'));
         await waitFor.visibilityOf(
-            allEdgesElement,'Edges element taking too long to appear');
+          allEdgesElement,'Edges element taking too long to appear');
         expect(await allEdgesElement.count()).toEqual(edgesList.length);
       }
     }
@@ -311,7 +311,7 @@ var AutocompleteDropdownEditor = function(elem) {
   return {
     setValue: async function(text) {
       var select2ContainerButton = elem.element(by.css('.select2-container'));
-      await action.click('Test Select2 Container Button', select2ContainerButton);
+      await action.click('Test Container Button', select2ContainerButton);
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
@@ -321,15 +321,15 @@ var AutocompleteDropdownEditor = function(elem) {
     },
     expectOptionsToBe: async function(expectedOptions) {
       var select2ContainerButton = elem.element(by.css('.select2-container'));
-      await action.click('Test Select2 Container Button', select2ContainerButton);
+      await action.click('Test Container Button', select2ContainerButton);
       var actualOptions = await element(by.css('.select2-dropdown'))
         .all(by.tagName('li')).map(
           async function(optionElem) {
             return await optionElem.getText();
           }
         );
-      await waitFor.visibilityOf(actualOptions,
-        'Actual options taking too long to appear');
+      await waitFor.visibilityOf(
+        actualOptions,'Actual options taking too long to appear');
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
       var select2DropDown = element(by.css('.select2-dropdown')).element(
