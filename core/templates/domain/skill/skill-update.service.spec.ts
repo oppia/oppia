@@ -23,6 +23,7 @@ import { RecordedVoiceoversObjectFactory } from
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('App.ts');
@@ -38,6 +39,8 @@ describe('Skill update service', function() {
     UndoRedoService = null,
     workedExampleObjectFactory = null;
   var skillDict = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
