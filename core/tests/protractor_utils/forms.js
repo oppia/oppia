@@ -423,7 +423,8 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      var dropDownToggleButton = elem.element(by.css('.protractor-test-search-bar-dropdown-toggle'));
+      var dropDownToggleButton = elem.element(
+        by.css('.protractor-test-search-bar-dropdown-toggle'));
       await action.click('Test Dropdown Toggle', dropDownToggleButton);
 
       // Find the selected elements.
