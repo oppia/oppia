@@ -24,6 +24,7 @@ var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -51,7 +52,7 @@ var GraphEditor = function(graphInputContainer) {
   var createVertex = async function(xOffset, yOffset) {
     var addNodeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Node-button'));
-    await addNodeButton.click();
+    await action.click('Test Add Node Button', addNodeButton);
     // Offsetting from the graph container.
     await browser.actions().mouseMove(
       graphInputContainer, {x: xOffset, y: yOffset}).perform();
@@ -61,7 +62,7 @@ var GraphEditor = function(graphInputContainer) {
   var createEdge = async function(vertexIndex1, vertexIndex2) {
     var addEdgeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Edge-button'));
-    await addEdgeButton.click();
+    await action.click('Test Add Edge Button', addEdgeButton);
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
@@ -89,7 +90,8 @@ var GraphEditor = function(graphInputContainer) {
     clearDefaultGraph: async function() {
       var deleteButton = graphInputContainer.element(
         by.css('.protractor-test-Delete-button'));
-      await deleteButton.click();
+      await action.click('Test delete Button', deleteButton);
+    
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
         await vertexElement(i).click();
@@ -130,7 +132,10 @@ var ListEditor = function(elem) {
   // If objectType is not specified, this function returns nothing.
   var addItem = async function(objectType = null) {
     var listLength = await _getLength();
-    await elem.element(by.css('.protractor-test-add-list-entry')).click();
+    var addListEntryButton = elem.element(by.css('.protractor-test-add-list-entry'));
+    await action.click('Test add List Entry Button', addlistEntryButton);
+    
+    
     if (objectType !== null) {
       return await getEditor(objectType)(
         elem.element(
@@ -187,6 +192,7 @@ var RichTextEditor = async function(elem) {
     await waitFor.elementToBeClickable(
       elem.element(by.css('.' + buttonName)),
       'Toolbar button takes too long to be clickable.');
+    
     await elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = async function() {
