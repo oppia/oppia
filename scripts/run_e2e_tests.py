@@ -30,10 +30,9 @@ import time
 import python_utils
 from scripts import build
 from scripts import common
+from scripts import flake_checker
 from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
-
-import requests
 
 MAX_RETRY_COUNT = 3
 WEB_DRIVER_PORT = 4444
@@ -154,53 +153,6 @@ _PARSER.add_argument(
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
-
-
-def print_color_message(message):
-    """Prints the given message in red color.
-
-    Args:
-        message: str. The success message to print.
-    """
-    # \033[91m is the ANSI escape sequences for green color.
-    python_utils.PRINT('\033[92m' + message + '\033[0m\n')
-
-
-def is_test_output_flaky(output_lines, suite_name):
-    """Returns whether the test output matches any flaky test log."""
-    url = 'http://oppia-flake-report.herokuapp.com/flake-report'
-    if url is None:
-        print_color_message('No URL found to check flakiness.')
-        return False
-
-    data = {
-        'suite': suite_name,
-        'output_lines': output_lines,
-        'username': 'DubeySandeep',
-        'build_url': 'https://'
-    }
-    response = None
-    try:
-        response = requests.post(url, json=data, allow_redirects=False)
-    except Exception as e:
-        print_color_message('Failed to fetch report from %s: %s' % (url, e))
-
-    if not response.ok:
-        print_color_message('Failed request with response code: %s' % (
-            response.status_code))
-        return False
-
-    report = {}
-    try:
-        report = response.json()
-        print_color_message(report['log'])
-    except Exception as e:
-        print_color_message('Unable to convert json response: %s' % e)
-
-    if 'logs' in report:
-        print_color_message('\n'.join(report['logs']))
-
-    return report['result'] if 'result' in report else False
 
 
 def ensure_screenshots_dir_is_removed():
@@ -591,8 +543,6 @@ def run_tests(args):
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
-    portserver_process = start_portserver()
-    atexit.register(cleanup_portserver, portserver_process)
     start_google_app_engine_server(dev_mode, args.server_log_level)
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
@@ -620,32 +570,27 @@ def run_tests(args):
         except UnicodeDecodeError:
             pass
 
-    try:
-        cleanup_portserver(portserver_process)
-        cleanup()
-    except Exception: # pragma: no cover
-        # This is marked as no cover because the
-        # exception happens due to some processes
-        # running on the local system, which might
-        # interfere with the cleanup stuff. This is
-        # added as a failsafe to make sure that
-        # even when it throws an exception, the
-        # test is retried.
-        pass # pragma: no cover
     return output_lines, p.returncode
 
 
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     args = _PARSER.parse_args(args=args)
+
+    portserver_process = start_portserver()
+    atexit.register(cleanup_portserver, portserver_process)
+
     return_code = 1
 
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
-        print_color_message('***Attempt %s.***' % (attempt_num + 1))
+        python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
         output, return_code = run_tests(args)
-        if return_code == 0 or not is_test_output_flaky(
+        if return_code == 0 or not flake_checker.is_test_output_flaky(
                 output, args.suite):
             break
+        else:
+            cleanup_portserver(portserver_process)
+            cleanup()
 
     sys.exit(return_code)
 
