@@ -37,9 +37,7 @@ class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ConfigPropertySnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -89,9 +87,7 @@ class PlatformParameterSnapshotContentModel(
 
     @staticmethod
     def get_deletion_policy():
-        """PlatformParameterSnapshotContentModel doesn't contain any data
-        directly corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 

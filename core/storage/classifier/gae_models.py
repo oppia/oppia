@@ -59,7 +59,8 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         default=feconf.TRAINING_JOB_STATUS_PENDING, indexed=True)
     # The training data which is to be populated when retrieving the job.
     # The list contains dicts where each dict represents a single training
-    # data group.
+    # data group. The training data are computed from answers that have been
+    # anonymized and that are not connected to any existing or deleted users.
     training_data = datastore_services.JsonProperty(default=None)
     # The time when the job's status should next be checked.
     # It is incremented by TTL when a job with status NEW is picked up by VM.
@@ -71,7 +72,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ClassifierTrainingJobModel is not related to users."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -245,7 +246,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TrainingJobExplorationMappingModel is not related to users."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod

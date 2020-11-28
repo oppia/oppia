@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
 from constants import constants
 from core.domain import caching_services
 from core.domain import change_domain
@@ -26,6 +28,7 @@ from core.platform import models
 import feconf
 import python_utils
 import schema_utils
+import utils
 
 (config_models, suggestion_models,) = models.Registry.import_models(
     [models.NAMES.config, models.NAMES.suggestion])
@@ -33,13 +36,13 @@ import schema_utils
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
-    'type': 'list',
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'dict',
+        'type': schema_utils.SCHEMA_TYPE_DICT,
         'properties': [{
             'name': 'language_code',
             'schema': {
-                'type': 'unicode',
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 'validators': [{
                     'id': 'is_supported_audio_language_code',
                 }]
@@ -47,16 +50,16 @@ LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
         }, {
             'name': 'explanation',
             'schema': {
-                'type': 'unicode'
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }]
     }
 }
 
 SET_OF_STRINGS_SCHEMA = {
-    'type': 'list',
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'unicode',
+        'type': schema_utils.SCHEMA_TYPE_UNICODE,
     },
     'validators': [{
         'id': 'is_uniquified',
@@ -64,18 +67,18 @@ SET_OF_STRINGS_SCHEMA = {
 }
 
 SET_OF_CLASSROOM_DICTS_SCHEMA = {
-    'type': 'list',
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'dict',
+        'type': schema_utils.SCHEMA_TYPE_DICT,
         'properties': [{
             'name': 'name',
             'schema': {
-                'type': 'unicode'
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }, {
             'name': 'url_fragment',
             'schema': {
-                'type': 'unicode',
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 'validators': [{
                     'id': 'is_url_fragment',
                 }, {
@@ -86,7 +89,7 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
         }, {
             'name': 'course_details',
             'schema': {
-                'type': 'unicode',
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 'ui_config': {
                     'rows': 8,
                 }
@@ -94,7 +97,7 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
         }, {
             'name': 'topic_list_intro',
             'schema': {
-                'type': 'unicode',
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 'ui_config': {
                     'rows': 5,
                 }
@@ -102,9 +105,9 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
         }, {
             'name': 'topic_ids',
             'schema': {
-                'type': 'list',
+                'type': schema_utils.SCHEMA_TYPE_LIST,
                 'items': {
-                    'type': 'unicode',
+                    'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 },
                 'validators': [{
                     'id': 'is_uniquified',
@@ -115,18 +118,18 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
 }
 
 VMID_SHARED_SECRET_KEY_SCHEMA = {
-    'type': 'list',
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'dict',
+        'type': schema_utils.SCHEMA_TYPE_DICT,
         'properties': [{
             'name': 'vm_id',
             'schema': {
-                'type': 'unicode'
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }, {
             'name': 'shared_secret_key',
             'schema': {
-                'type': 'unicode'
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }]
     }
@@ -211,8 +214,7 @@ class ConfigProperty(python_utils.OBJECT):
         self._name = name
         self._schema = schema
         self._description = description
-        self._default_value = schema_utils.normalize_against_schema(
-            default_value, self._schema)
+        self._default_value = self.normalize(default_value)
 
         Registry.init_config_property(self.name, self)
 
@@ -297,6 +299,11 @@ class ConfigProperty(python_utils.OBJECT):
         Returns:
             instance. The normalized object.
         """
+        string_types = (python_utils.BASESTRING, python_utils.UNICODE)
+        regex = re.compile(schema_utils.EMAIL_REGEX)
+        if isinstance(value, string_types) and regex.search(value):
+            raise utils.ValidationError(
+                'The config contains email address, this is not allowed.')
         return schema_utils.normalize_against_schema(value, self._schema)
 
 

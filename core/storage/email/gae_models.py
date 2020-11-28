@@ -89,7 +89,10 @@ class SentEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Sent email should be kept for audit purposes."""
+        """Model contains data corresponding to a user: recipient_id,
+        recipient_email, sender_id, and sender_email, but this isn't deleted
+        because this model is needed for auditing purposes.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
@@ -325,7 +328,10 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Sent email should be kept for audit purposes."""
+        """Model contains data corresponding to a user: recipient_ids,
+        sender_id, and sender_email, but this isn't deleted because this model
+        is needed for auditing purposes.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
@@ -410,7 +416,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Feedback email reply to id should be deleted."""
+        """Model contains data to delete corresponding to a user:
+        user_id field.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod

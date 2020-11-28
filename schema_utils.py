@@ -33,6 +33,7 @@ import re
 from constants import constants
 from core.domain import expression_parser
 from core.domain import html_cleaner
+import feconf
 import python_utils
 import utils
 
@@ -59,6 +60,8 @@ SCHEMA_TYPE_UNICODE_OR_NONE = 'unicode_or_none'
 
 SCHEMA_OBJ_TYPE_SUBTITLED_HTML = 'SubtitledHtml'
 SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
+
+EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
 
 def normalize_against_schema(obj, schema, apply_custom_validators=True):
@@ -424,7 +427,19 @@ class _Validators(python_utils.OBJECT):
         Returns:
             bool. Whether the given object is a valid email.
         """
-        return bool(re.search(r'^[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}$', obj))
+        return bool(re.search(r'^' + EMAIL_REGEX + r'$', obj))
+
+    @staticmethod
+    def is_valid_user_id(obj):
+        """Ensures that `obj` (a string) is a valid user ID.
+
+        Args:
+            obj: str. A string.
+
+        Returns:
+            bool. Whether the given object is a valid user ID.
+        """
+        return bool(re.search(feconf.USER_ID_REGEX, obj))
 
     @staticmethod
     def is_valid_math_expression(obj, algebraic):

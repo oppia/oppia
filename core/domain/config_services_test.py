@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import config_domain
 from core.domain import config_services
 from core.tests import test_utils
+import utils
 
 
 class ConfigServicesTests(test_utils.GenericTestBase):
@@ -29,6 +30,15 @@ class ConfigServicesTests(test_utils.GenericTestBase):
         self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
         config_services.set_property('admin', 'promo_bar_enabled', True)
         self.assertTrue(config_domain.PROMO_BAR_ENABLED.value)
+
+    def test_can_not_set_config_property_containing_email(self):
+        self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The config contains email address, this is not allowed.'
+        ):
+            config_services.set_property(
+                'admin', 'promo_bar_message', 'Test some@email.cz test')
 
     def test_can_not_set_config_property_with_invalid_config_property_name(
             self):

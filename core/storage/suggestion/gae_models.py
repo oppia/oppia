@@ -189,7 +189,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General suggestion needs to be pseudonymized for the user."""
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
+        """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
@@ -559,8 +561,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General voiceover application needs to be pseudonymized for the
-        user.
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
@@ -750,9 +752,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod

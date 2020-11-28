@@ -39,7 +39,7 @@ class ActivityReferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ActivityReferencesModel are not related to users."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
