@@ -23,7 +23,7 @@ import python_utils
 
 import requests
 
-FLAKE_REPORT_URL = 'https://oppia-flake-report.herokuapp.com/'
+FLAKE_REPORT_URL = 'https://oppia-flake-report.herokuapp.com/flake-report'
 
 CI_INFO = {
     'circleCI': {
