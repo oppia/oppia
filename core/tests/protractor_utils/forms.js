@@ -111,8 +111,8 @@ var GraphEditor = function(graphInputContainer) {
         // dict's edges.
         var allEdgesElement = element.all(by.css(
           '.protractor-test-graph-edge'));
-        await waitFor.visibilityOf(allEdgesElement,
-            'Edges element taking too long to appear');
+        await waitFor.visibilityOf(
+            allEdgesElement,'Edges element taking too long to appear');
         expect(await allEdgesElement.count()).toEqual(edgesList.length);
       }
     }
@@ -273,7 +273,6 @@ var RichTextEditor = async function(elem) {
         [
           'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
         ].includes(componentName)) {
-        
         var oppiaRte = elem.all(by.css('.oppia-rte')).first();
         await action.sendKeys('Oppia Rte', oppiaRte, protractor.Key.DOWN);
       }
@@ -313,7 +312,6 @@ var AutocompleteDropdownEditor = function(elem) {
     setValue: async function(text) {
       var select2ContainerButton = elem.element(by.css('.select2-container'));
       await action.click('Test Select2 Container Button', select2ContainerButton);
-      
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
@@ -395,7 +393,7 @@ var MultiSelectEditor = function(elem) {
       if (await filteredElement.isPresent()) {
         filteredElementsCount += 1;
         await waitFor.visibilityOf(filteredElement,
-            'Filtered element taking too long to appear');
+          'Filtered element taking too long to appear');
         expect(await filteredElement.getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         await action.click('Test Filtered Element', filteredElement);
