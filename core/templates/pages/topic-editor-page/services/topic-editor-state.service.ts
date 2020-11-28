@@ -17,273 +17,278 @@
  * throughout the topic editor. This service provides functionality for
  * retrieving the topic, saving it, and listening for changes.
  */
-
-require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/skill/RubricObjectFactory.ts');
-require('domain/story/editable-story-backend-api.service.ts');
-require('domain/topic/editable-topic-backend-api.service.ts');
-require('domain/topic/SubtopicPageObjectFactory.ts');
-require('domain/topic/TopicObjectFactory.ts');
-require('domain/topic/topic-rights-backend-api.service.ts');
-require('services/alerts.service.ts');
+ 
 require('services/questions-list.service.ts');
-
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
-
+import { Injectable } from '@angular/core'; 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service.ts';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { TopicRights } from 'domain/topic/topic-rights.model';
+import { SubtopicPageObjectFactory } from 'domain/topic/SubtopicPageObjectFactory.ts';
+import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory.ts';
+import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service.ts';
+import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory.ts';
+import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service.ts';
+import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service.ts';
+import { AlertsService } from 'services/alerts.service';
 
-angular.module('oppia').factory('TopicEditorStateService', [
-  '$rootScope', 'AlertsService',
-  'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'RubricObjectFactory', 'SubtopicPageObjectFactory',
-  'TopicObjectFactory', 'TopicRightsBackendApiService', 'UndoRedoService',
-  function(
-      $rootScope, AlertsService,
-      EditableStoryBackendApiService, EditableTopicBackendApiService,
-      RubricObjectFactory, SubtopicPageObjectFactory, TopicObjectFactory,
-      TopicRightsBackendApiService, UndoRedoService) {
-    var _topic = TopicObjectFactory.createInterstitialTopic();
-    var _topicRights = TopicRights.createInterstitialRights();
-    // The array that caches all the subtopic pages loaded by the user.
-    var _cachedSubtopicPages = [];
-    // The array that stores all the ids of the subtopic pages that were not
-    // loaded from the backend i.e those that correspond to newly created
-    // subtopics (and not loaded from the backend).
-    var _newSubtopicPageIds = [];
-    var _subtopicPage =
-      SubtopicPageObjectFactory.createInterstitialSubtopicPage();
-    var _topicIsInitialized = false;
-    var _topicIsLoading = false;
-    var _topicIsBeingSaved = false;
-    var _topicWithNameExists = false;
-    var _topicWithUrlFragmentExists = false;
-    var _canonicalStorySummaries = [];
-    var _skillIdToRubricsObject = {};
-    var _skillQuestionCountDict = {};
-    var _groupedSkillSummaries = {
-      current: [],
-      others: []
-    };
-    var _classroomUrlFragment = 'staging';
-    var _storySummariesInitializedEventEmitter = new EventEmitter();
-    var _subtopicPageLoadedEventEmitter = new EventEmitter();
 
-    var _topicInitializedEventEmitter = new EventEmitter();
-    var _topicReinitializedEventEmitter = new EventEmitter();
+@Injectable({
+  providedIn: 'root'
+})
+export class TopicEditorStateService {
+  
+  constructor(
+    private alertService: AlertsService,
+    private editableStoryBackendApiService: EditableStoryBackendApiService,
+    private editableTopicBackendApiService: EditableTopicBackendApiService,
+    private rubricObjectFactory: RubricObjectFactory,
+    private subtopicPageObjectFactory: SubtopicPageObjectFactory,
+    private topicObjectFactory: TopicObjectFactory,
+    private topicRightsBackendApiService: TopicRightsBackendApiService,
+    private undoRedoService: UndoRedoService) {}
 
-    var _getSubtopicPageId = function(topicId, subtopicId) {
+  _topic = this.topicObjectFactory.createInterstitialTopic();
+  _topicRights = TopicRights.createInterstitialRights();
+  // The array that caches all the subtopic pages loaded by the user.
+  _cachedSubtopicPages = [];
+  // The array that stores all the ids of the subtopic pages that were not
+  // loaded from the backend i.e those that correspond to newly created
+  // subtopics (and not loaded from the backend).
+  _newSubtopicPageIds = [];
+  _subtopicPage =
+  this.subtopicPageObjectFactory.createInterstitialSubtopicPage();
+  _topicIsInitialized = false;
+  _topicIsLoading: boolean;
+  _topicIsBeingSaved = false;
+  _topicWithNameExists = false;
+  _topicWithUrlFragmentExists = false;
+  _canonicalStorySummaries = [];
+  _skillIdToRubricsObject;
+  _skillQuestionCountDict = {};
+  _groupedSkillSummaries = {
+    current: [],
+    others: []
+  };
+     _classroomUrlFragment = 'staging';
+     _storySummariesInitializedEventEmitter = new EventEmitter();
+     _subtopicPageLoadedEventEmitter = new EventEmitter();
+
+     _topicInitializedEventEmitter = new EventEmitter();
+     _topicReinitializedEventEmitter = new EventEmitter();
+
+     _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
     };
 
-    var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
-      _groupedSkillSummaries.current = [];
-      _groupedSkillSummaries.others = [];
+     _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
+      this._groupedSkillSummaries.current = [];
+      this._groupedSkillSummaries.others = [];
 
-      for (var idx in groupedSkillSummaries[_topic.getName()]) {
-        _groupedSkillSummaries.current.push(
-          groupedSkillSummaries[_topic.getName()][idx]);
+      for (let idx in groupedSkillSummaries[this._topic.getName()]) {
+        this._groupedSkillSummaries.current.push(
+          groupedSkillSummaries[this._topic.getName()][idx]);
       }
-      for (var name in groupedSkillSummaries) {
-        if (name === _topic.getName()) {
+      for (let name in groupedSkillSummaries) {
+        if (name === this._topic.getName()) {
           continue;
         }
-        var skillSummaries = groupedSkillSummaries[name];
-        for (var idx in skillSummaries) {
-          _groupedSkillSummaries.others.push(skillSummaries[idx]);
+         this.skillSummaries = groupedSkillSummaries[name];
+        for (let idx in this.skillSummaries) {
+          this._groupedSkillSummaries.others.push(this.skillSummaries[idx]);
         }
       }
     };
-    var _getSubtopicIdFromSubtopicPageId = function(subtopicPageId) {
+     _getSubtopicIdFromSubtopicPageId = function(subtopicPageId) {
       // The subtopic page id consists of the topic id of length 12, a hyphen
       // and a subtopic id (which is a number).
       return parseInt(subtopicPageId.slice(13));
     };
-    var _setTopic = function(topic) {
-      _topic.copyFromTopic(topic);
+     _setTopic = function(topic) {
+      this._topic.copyFromTopic(topic);
       // Reset the subtopic pages list after setting new topic.
-      _cachedSubtopicPages.length = 0;
-      if (_topicIsInitialized) {
-        _topicIsInitialized = true;
-        _topicReinitializedEventEmitter.emit();
+      this._cachedSubtopicPages.length = 0;
+      if (this._topicIsInitialized) {
+        this._topicIsInitialized = true;
+        this._topicReinitializedEventEmitter.emit();
       } else {
-        _topicIsInitialized = true;
-        _topicInitializedEventEmitter.emit();
+        this._topicIsInitialized = true;this.
+        this._topicInitializedEventEmitter.emit();
       }
     };
-    var _getSubtopicPageIndex = function(subtopicPageId) {
-      for (var i = 0; i < _cachedSubtopicPages.length; i++) {
-        if (_cachedSubtopicPages[i].getId() === subtopicPageId) {
+     _getSubtopicPageIndex = function(subtopicPageId) {
+      for (let i = 0; i < this._cachedSubtopicPages.length; i++) {
+        if (this._cachedSubtopicPages[i].getId() === subtopicPageId) {
           return i;
         }
       }
       return null;
     };
-    var _updateClassroomUrlFragment = function(classroomUrlFragment) {
-      _classroomUrlFragment = classroomUrlFragment;
+     _updateClassroomUrlFragment = function(classroomUrlFragment) {
+      this._classroomUrlFragment = classroomUrlFragment;
     };
-    var _updateTopic = function(newBackendTopicDict, skillIdToDescriptionDict) {
-      _setTopic(
-        TopicObjectFactory.create(
+     _updateTopic = function(newBackendTopicDict, skillIdToDescriptionDict) {
+      this._setTopic(
+        this.topicObjectFactory.create(
           newBackendTopicDict, skillIdToDescriptionDict));
     };
-    var _updateSkillIdToRubricsObject = function(skillIdToRubricsObject) {
-      for (var skillId in skillIdToRubricsObject) {
-        var rubrics = skillIdToRubricsObject[skillId].map(function(rubric) {
-          return RubricObjectFactory.createFromBackendDict(rubric);
+     _updateSkillIdToRubricsObject = function(skillIdToRubricsObject) {
+      for (let skillId in skillIdToRubricsObject) {
+          let rubrics = skillIdToRubricsObject[skillId].map((rubric) => {
+          return this.rubricObjectFactory.createFromBackendDict(rubric);
         });
-        _skillIdToRubricsObject[skillId] = rubrics;
+        this._skillIdToRubricsObject[skillId] = rubrics;
       }
     };
-    var _setSubtopicPage = function(subtopicPage) {
-      _subtopicPage.copyFromSubtopicPage(subtopicPage);
-      _cachedSubtopicPages.push(angular.copy(subtopicPage));
-      _subtopicPageLoadedEventEmitter.emit();
+     _setSubtopicPage = function(subtopicPage) {
+      this._subtopicPage.copyFromSubtopicPage(subtopicPage);
+      this._cachedSubtopicPages.push(angular.copy(subtopicPage));
+      this._subtopicPageLoadedEventEmitter.emit();
     };
-    var _updateSubtopicPage = function(newBackendSubtopicPageObject) {
-      _setSubtopicPage(SubtopicPageObjectFactory.createFromBackendDict(
+     _updateSubtopicPage = function(newBackendSubtopicPageObject) {
+      this._setSubtopicPage(this.subtopicPageObjectFactory.createFromBackendDict(
         newBackendSubtopicPageObject));
     };
-    var _setTopicRights = function(topicRights) {
-      _topicRights.copyFromTopicRights(topicRights);
+     _setTopicRights = function(topicRights) {
+      this._topicRights.copyFromTopicRights(topicRights);
     };
-    var _updateTopicRights = function(newBackendTopicRightsObject) {
-      _setTopicRights(TopicRights.createFromBackendDict(
+     _updateTopicRights = function(newBackendTopicRightsObject) {
+      this._setTopicRights(TopicRights.createFromBackendDict(
         newBackendTopicRightsObject));
     };
-    var _setCanonicalStorySummaries = function(canonicalStorySummaries) {
-      _canonicalStorySummaries = canonicalStorySummaries.map(
+     _setCanonicalStorySummaries = function(canonicalStorySummaries) {
+      this._canonicalStorySummaries = canonicalStorySummaries.map(
         function(storySummaryDict) {
           return StorySummary.createFromBackendDict(
             storySummaryDict);
         });
-      _storySummariesInitializedEventEmitter.emit();
+      this._storySummariesInitializedEventEmitter.emit();
     };
 
-    var _setTopicWithNameExists = function(topicWithNameExists) {
-      _topicWithNameExists = topicWithNameExists;
+     _setTopicWithNameExists = function(topicWithNameExists) {
+      this._topicWithNameExists = topicWithNameExists;
     };
 
-    var _setTopicWithUrlFragmentExists = function(topicWithUrlFragmentExists) {
-      _topicWithUrlFragmentExists = topicWithUrlFragmentExists;
+     _setTopicWithUrlFragmentExists = function(topicWithUrlFragmentExists) {
+      this._topicWithUrlFragmentExists = topicWithUrlFragmentExists;
     };
 
-    return {
       /**
        * Loads, or reloads, the topic stored by this service given a
        * specified topic ID. See setTopic() for more information on
        * additional behavior of this function.
        */
-      loadTopic: function(topicId) {
-        _topicIsLoading = true;
-        EditableTopicBackendApiService.fetchTopic(
+      loadTopic(topicId) {
+        this._topicIsLoading = true;
+        this.editableTopicBackendApiService.fetchTopic(
           topicId).then(
           function(newBackendTopicObject) {
-            _skillQuestionCountDict = (
+            this._skillQuestionCountDict = (
               newBackendTopicObject.skillQuestionCountDict);
-            _updateGroupedSkillSummaries(
+            this._updateGroupedSkillSummaries(
               newBackendTopicObject.groupedSkillSummaries);
-            _updateTopic(
+            this._updateTopic(
               newBackendTopicObject.topicDict,
               newBackendTopicObject.skillIdToDescriptionDict
             );
-            _updateGroupedSkillSummaries(
+            this._updateGroupedSkillSummaries(
               newBackendTopicObject.groupedSkillSummaries);
-            _updateSkillIdToRubricsObject(
+            this._updateSkillIdToRubricsObject(
               newBackendTopicObject.skillIdToRubricsDict);
-            _updateClassroomUrlFragment(
+            this._updateClassroomUrlFragment(
               newBackendTopicObject.classroomUrlFragment);
-            EditableTopicBackendApiService.fetchStories(topicId).then(
+            this.editableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
-                _setCanonicalStorySummaries(canonicalStorySummaries);
-                $rootScope.$applyAsync();
+                this._setCanonicalStorySummaries(canonicalStorySummaries);
+                // $rootScope.$applyAsync();
               });
           },
           function(error) {
-            AlertsService.addWarning(
+            this.this.alertsService.addWarning(
               error || 'There was an error when loading the topic.');
-            _topicIsLoading = false;
+            this._topicIsLoading = false;
           });
-        TopicRightsBackendApiService.fetchTopicRights(
+        this.topicRightsBackendApiService.fetchTopicRights(
           topicId).then(function(newBackendTopicRightsObject) {
-          _updateTopicRights(newBackendTopicRightsObject);
-          _topicIsLoading = false;
-          $rootScope.$applyAsync();
+          this._updateTopicRights(newBackendTopicRightsObject);
+          this._topicIsLoading = false;
+          // $rootScope.$applyAsync();
         }, function(error) {
-          AlertsService.addWarning(
+          this.alertsService.addWarning(
             error ||
             'There was an error when loading the topic rights.');
-          _topicIsLoading = false;
+          this._topicIsLoading = false;
         });
-      },
+      };
 
-      getGroupedSkillSummaries: function() {
-        return angular.copy(_groupedSkillSummaries);
-      },
+      getGroupedSkillSummaries() {
+        return angular.copy(this._groupedSkillSummaries);
+      }
 
-      getSkillQuestionCountDict: function() {
-        return _skillQuestionCountDict;
-      },
+      getSkillQuestionCountDict() {
+        return this._skillQuestionCountDict;
+      }
 
       /**
        * Returns whether the topic name already exists on the server.
        */
-      getTopicWithNameExists: function() {
-        return _topicWithNameExists;
-      },
+      getTopicWithNameExists() { 
+        return this._topicWithNameExists;
+      }
 
       /**
        * Returns whether the topic URL fragment already exists on the server.
        */
-      getTopicWithUrlFragmentExists: function() {
-        return _topicWithUrlFragmentExists;
-      },
+      getTopicWithUrlFragmentExists() {
+        return this._topicWithUrlFragmentExists;
+      }
 
       /**
        * Loads, or reloads, the subtopic page stored by this service given a
        * specified topic ID and subtopic ID.
        */
-      loadSubtopicPage: function(topicId, subtopicId) {
-        var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
-        if (_getSubtopicPageIndex(subtopicPageId) !== null) {
-          _subtopicPage = angular.copy(
-            _cachedSubtopicPages[_getSubtopicPageIndex(subtopicPageId)]);
-          _subtopicPageLoadedEventEmitter.emit();
+      loadSubtopicPage(topicId, subtopicId) {
+        var subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
+        if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
+          this._subtopicPage = angular.copy(
+            this._cachedSubtopicPages[this._getSubtopicPageIndex(subtopicPageId)]);
+          this._subtopicPageLoadedEventEmitter.emit();
           return;
         }
-        EditableTopicBackendApiService.fetchSubtopicPage(
+        this.editableTopicBackendApiService.fetchSubtopicPage(
           topicId, subtopicId).then(
           function(newBackendSubtopicPageObject) {
-            _updateSubtopicPage(newBackendSubtopicPageObject);
-            $rootScope.$applyAsync();
+            this._updateSubtopicPage(newBackendSubtopicPageObject);
+            // $rootScope.$applyAsync();
           },
           function(error) {
-            AlertsService.addWarning(
+            this.alertsService.addWarning(
               error || 'There was an error when loading the topic.');
           });
-      },
+      }
 
       /**
        * Returns whether this service is currently attempting to load the
        * topic maintained by this service.
        */
-      isLoadingTopic: function() {
-        return _topicIsLoading;
-      },
+      isLoadingTopic() {
+        return this._topicIsLoading;
+      }
 
       /**
        * Returns whether a topic has yet been loaded using either
        * loadTopic() or setTopic().
        */
-      hasLoadedTopic: function() {
-        return _topicIsInitialized;
-      },
+      hasLoadedTopic() {
+        return this._topicIsInitialized;
+      }
 
-      getSkillIdToRubricsObject: function() {
-        return _skillIdToRubricsObject;
-      },
+      getSkillIdToRubricsObject() {
+        return this._skillIdToRubricsObject;
+      }
 
       /**
        * Returns the current topic to be shared among the topic
@@ -293,13 +298,13 @@ angular.module('oppia').factory('TopicEditorStateService', [
        * return an empty topic object if the topic has not yet been
        * loaded for this editor instance.
        */
-      getTopic: function() {
-        return _topic;
-      },
+      getTopic() {
+        return this._topic;
+      }
 
-      getCanonicalStorySummaries: function() {
-        return _canonicalStorySummaries;
-      },
+      getCanonicalStorySummaries() {
+        return this._canonicalStorySummaries;
+      }
 
       /**
        * Returns the current subtopic page to be shared among the topic
@@ -309,13 +314,13 @@ angular.module('oppia').factory('TopicEditorStateService', [
        * null, though it may return an empty subtopic page object if the topic
        * has not yet been loaded for this editor instance.
        */
-      getSubtopicPage: function() {
-        return _subtopicPage;
-      },
+      getSubtopicPage() {
+        return this._subtopicPage;
+      }
 
-      getCachedSubtopicPages: function() {
-        return _cachedSubtopicPages;
-      },
+      getCachedSubtopicPages() {
+        return this._cachedSubtopicPages;
+      }
 
       /**
        * Returns the current topic rights to be shared among the topic
@@ -325,9 +330,9 @@ angular.module('oppia').factory('TopicEditorStateService', [
        * null, though it may return an empty topic rights object if the
        * topic rights has not yet been loaded for this editor instance.
        */
-      getTopicRights: function() {
-        return _topicRights;
-      },
+      getTopicRights() {
+        return this._topicRights;
+      }
 
 
       /**
@@ -337,29 +342,29 @@ angular.module('oppia').factory('TopicEditorStateService', [
        * onTopicInitialized. All subsequent
        * calls will similarly fire a onTopicReinitialized event.
        */
-      setTopic: function(topic) {
-        _setTopic(topic);
-      },
+      setTopic(topic) {
+        this._setTopic(topic);
+      }
 
       /**
        * Sets the updated subtopic page object in the correct position in the
        * _cachedSubtopicPages list.
        */
-      setSubtopicPage: function(subtopicPage) {
-        if (_getSubtopicPageIndex(subtopicPage.getId()) !== null) {
-          _cachedSubtopicPages[_getSubtopicPageIndex(subtopicPage.getId())] =
+      setSubtopicPage(subtopicPage) {
+        if (this._getSubtopicPageIndex(subtopicPage.getId()) !== null) {
+          this._cachedSubtopicPages[this._getSubtopicPageIndex(subtopicPage.getId())] =
             angular.copy(subtopicPage);
-          _subtopicPage.copyFromSubtopicPage(subtopicPage);
+          this._subtopicPage.copyFromSubtopicPage(subtopicPage);
         } else {
-          _setSubtopicPage(subtopicPage);
-          _newSubtopicPageIds.push(subtopicPage.getId());
+          this._setSubtopicPage(subtopicPage);
+          this._newSubtopicPageIds.push(subtopicPage.getId());
         }
-      },
+      }
 
-      deleteSubtopicPage: function(topicId, subtopicId) {
-        var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
-        var index = _getSubtopicPageIndex(subtopicPageId);
-        var newIndex = _newSubtopicPageIds.indexOf(subtopicPageId);
+      deleteSubtopicPage(topicId, subtopicId) {
+        var subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
+        var index = this._getSubtopicPageIndex(subtopicPageId);
+        var newIndex = this._newSubtopicPageIds.indexOf(subtopicPageId);
         // If index is null, that means the corresponding subtopic page was
         // never loaded from the backend and not that the subtopic page doesn't
         // exist at all. So, not required to throw an error here.
@@ -371,42 +376,42 @@ angular.module('oppia').factory('TopicEditorStateService', [
             return;
           }
         }
-        _cachedSubtopicPages.splice(index, 1);
+        this._cachedSubtopicPages.splice(index, 1);
         // If the deleted subtopic page corresponded to a newly created
         // subtopic, then the 'subtopicId' part of the id of all subsequent
         // subtopic pages should be decremented to make it in sync with the
         // their corresponding subtopic ids.
         if (newIndex !== -1) {
-          _newSubtopicPageIds.splice(newIndex, 1);
-          for (var i = 0; i < _cachedSubtopicPages.length; i++) {
-            var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
-              _cachedSubtopicPages[i].getId());
+          this._newSubtopicPageIds.splice(newIndex, 1);
+          for (var i = 0; i < this._cachedSubtopicPages.length; i++) {
+            var newSubtopicId = this._getSubtopicIdFromSubtopicPageId(
+              this._cachedSubtopicPages[i].getId());
             if (newSubtopicId > subtopicId) {
               newSubtopicId--;
-              _cachedSubtopicPages[i].setId(
-                _getSubtopicPageId(topicId, newSubtopicId));
+              this._cachedSubtopicPages[i].setId(
+                this._getSubtopicPageId(topicId, newSubtopicId));
             }
           }
-          for (var i = 0; i < _newSubtopicPageIds.length; i++) {
-            var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
-              _newSubtopicPageIds[i]);
+          for (var i = 0; i < this._newSubtopicPageIds.length; i++) {
+            var newSubtopicId = this._getSubtopicIdFromSubtopicPageId(
+              this._newSubtopicPageIds[i]);
             if (newSubtopicId > subtopicId) {
               newSubtopicId--;
-              _newSubtopicPageIds[i] = _getSubtopicPageId(
+              this._newSubtopicPageIds[i] = this._getSubtopicPageId(
                 topicId, newSubtopicId);
             }
           }
         }
-      },
+      }
 
       /**
        * Sets the topic rights stored within this service, propogating
        * changes to all bindings to the topic returned by
        * getTopicRights().
        */
-      setTopicRights: function(topicRights) {
-        _setTopicRights(topicRights);
-      },
+      setTopicRights(topicRights) {
+        this._setTopicRights(topicRights);
+      }
 
 
       /**
@@ -417,9 +422,9 @@ angular.module('oppia').factory('TopicEditorStateService', [
        * will clear the UndoRedoService of pending changes. This function also
        * shares behavior with setTopic(), when it succeeds.
        */
-      saveTopic: function(commitMessage, successCallback) {
-        if (!_topicIsInitialized) {
-          AlertsService.fatalWarning(
+      saveTopic(commitMessage, successCallback) {
+        if (!this._topicIsInitialized) {
+          this.alertService.fatalWarning(
             'Cannot save a topic before one is loaded.');
         }
 
@@ -427,60 +432,60 @@ angular.module('oppia').factory('TopicEditorStateService', [
         if (!UndoRedoService.hasChanges()) {
           return false;
         }
-        _topicIsBeingSaved = true;
-        EditableTopicBackendApiService.updateTopic(
-          _topic.getId(), _topic.getVersion(),
+        this._topicIsBeingSaved = true;
+        this.editableTopicBackendApiService.updateTopic(
+          this._topic.getId(), this._topic.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(topicBackendObject) {
-            _updateTopic(
+            this._updateTopic(
               topicBackendObject.topicDict,
               topicBackendObject.skillIdToDescriptionDict
             );
-            _updateSkillIdToRubricsObject(
+            this._updateSkillIdToRubricsObject(
               topicBackendObject.skillIdToRubricsDict);
             var changeList = UndoRedoService.getCommittableChangeList();
             for (var i = 0; i < changeList.length; i++) {
               if (changeList[i].cmd === 'delete_canonical_story' ||
                   changeList[i].cmd === 'delete_additional_story') {
-                EditableStoryBackendApiService.deleteStory(
+                this.editableStoryBackendApiService.deleteStory(
                   changeList[i].story_id);
               }
             }
             UndoRedoService.clearChanges();
-            _topicIsBeingSaved = false;
+            this._topicIsBeingSaved = false;
             if (successCallback) {
               successCallback();
             }
-            $rootScope.$applyAsync();
+            // $rootScope.$applyAsync();
           }, function(error) {
-            AlertsService.addWarning(
+            this.alertsService.addWarning(
               error || 'There was an error when saving the topic.');
-            _topicIsBeingSaved = false;
+            this._topicIsBeingSaved = false;
           });
         return true;
-      },
+      }
 
       /**
        * Returns whether this service is currently attempting to save the
        * topic maintained by this service.
        */
-      isSavingTopic: function() {
-        return _topicIsBeingSaved;
-      },
+      isSavingTopic() {
+        return this._topicIsBeingSaved;
+      }
 
       get onTopicInitialized() {
-        return _topicInitializedEventEmitter;
-      },
+        return this._topicInitializedEventEmitter;
+      }
 
       get onTopicReinitialized() {
-        return _topicReinitializedEventEmitter;
-      },
+        return this._topicReinitializedEventEmitter;
+      }
       /**
        * Returns the classroom name for the topic.
        */
-      getClassroomUrlFragment: function() {
-        return _classroomUrlFragment;
-      },
+      getClassroomUrlFragment() {
+        return this._classroomUrlFragment;
+      }
 
       /**
        * Attempts to set the boolean variable _topicWithNameExists based
@@ -490,22 +495,22 @@ angular.module('oppia').factory('TopicEditorStateService', [
        * async backend call was successful and that _topicWithNameExists
        * has been successfully updated.
        */
-      updateExistenceOfTopicName: function(topicName, successCallback) {
-        EditableTopicBackendApiService.doesTopicWithNameExistAsync(
+      updateExistenceOfTopicName(topicName, successCallback) {
+        this.editableTopicBackendApiService.doesTopicWithNameExistAsync(
           topicName).then(
           function(topicNameExists) {
-            _setTopicWithNameExists(topicNameExists);
+            this._setTopicWithNameExists(topicNameExists);
             if (successCallback) {
               successCallback();
             }
-            $rootScope.$applyAsync();
+            // $rootScope.$applyAsync();
           }, function(error) {
-            AlertsService.addWarning(
+            this.AlertsService.addWarning(
               error ||
               'There was an error when checking if the topic name ' +
               'exists for another topic.');
           });
-      },
+      }
 
       /**
        * Attempts to set the boolean variable _topicWithUrlFragmentExists based
@@ -515,31 +520,32 @@ angular.module('oppia').factory('TopicEditorStateService', [
        * async backend call was successful and that _topicWithUrlFragmentExists
        * has been successfully updated.
        */
-      updateExistenceOfTopicUrlFragment: function(
+      updateExistenceOfTopicUrlFragment(
           topicUrlFragment, successCallback) {
-        EditableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
+        this.editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
           topicUrlFragment).then(
           function(topicUrlFragmentExists) {
-            _setTopicWithUrlFragmentExists(topicUrlFragmentExists);
+            this._setTopicWithUrlFragmentExists(topicUrlFragmentExists);
             if (successCallback) {
               successCallback();
             }
-            $rootScope.$applyAsync();
+            // $rootScope.$applyAsync();
           }, function(error) {
-            AlertsService.addWarning(
+            this.AlertsService.addWarning(
               error ||
               'There was an error when checking if the topic url fragment ' +
               'exists for another topic.');
           });
-      },
+      }
 
       get onStorySummariesInitialized() {
-        return _storySummariesInitializedEventEmitter;
-      },
+        return this._storySummariesInitializedEventEmitter;
+      }
 
       get onSubtopicPageLoaded() {
-        return _subtopicPageLoadedEventEmitter;
+        return this._subtopicPageLoadedEventEmitter;
       }
-    };
-  }
-]);
+}
+
+angular.module('oppia').factory(
+  'TopicEditorStateService', downgradeInjectable(TopicEditorStateService));
