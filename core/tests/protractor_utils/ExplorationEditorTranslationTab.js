@@ -318,7 +318,7 @@ var ExplorationEditorTranslationTab = function() {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
     await action.sendKeys(
-      'Audio upload input', audioUploadInput, audioAbsolutePath);
+      'Audio upload input', audioUploadInput, audioAbsolutePath, false);
     await action.click('Save uploaded audio button', saveUploadedAudioButton);
     await waitFor.invisibilityOf(
       saveUploadedAudioButton,
