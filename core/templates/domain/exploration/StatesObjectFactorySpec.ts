@@ -228,7 +228,11 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          id: null,
+          id: 'MultipleChoiceInput',
+          customization_args: {
+            choices: {value: []},
+            showChoicesInShuffledOrder: {value: false}
+          },
           answer_groups: [{
             outcome: {
               dest: 'second state',
@@ -280,7 +284,11 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          id: null,
+          id: 'MultipleChoiceInput',
+          customization_args: {
+            choices: {value: []},
+            showChoicesInShuffledOrder: {value: false}
+          },
           answer_groups: [{
             outcome: {
               dest: 'first state',
@@ -564,7 +572,11 @@ describe('States Object Factory', () => {
           }
         },
         interaction: {
-          id: null,
+          id: 'MultipleChoiceInput',
+          customization_args: {
+            choices: {value: []},
+            showChoicesInShuffledOrder: {value: false}
+          },
           answer_groups: [{
             outcome: {
               dest: 'third state',

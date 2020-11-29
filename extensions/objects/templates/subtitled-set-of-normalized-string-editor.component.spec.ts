@@ -26,8 +26,16 @@ describe('SubtitledSetOfNormalizedStringEditor', function() {
     ctrl = $componentController('subtitledSetOfNormalizedStringEditor');
   }));
 
-  it('should initialize the value with an empty array', function() {
+  it('should initialize the schema', function() {
     ctrl.$onInit();
-    expect(ctrl.value).toEqual([]);
+    expect(ctrl.SCHEMA).toEqual({
+      type: 'list',
+      items: {
+        type: 'unicode'
+      },
+      validators: [{
+        id: 'is_uniquified'
+      }]
+    });
   });
 });

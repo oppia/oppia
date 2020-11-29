@@ -94,7 +94,6 @@ export class RuleObjectFactory {
     const ruleType = ruleDict.rule_type;
     const inputs = {};
     const inputsBackendDict = ruleDict.inputs;
-
     let ruleDescription = (
       INTERACTION_SPECS[interactionId].rule_descriptions[ruleType]);
 
@@ -125,12 +124,11 @@ export class RuleObjectFactory {
                 inputsBackendDict[varName])
         );
       } else {
-        inputs[varName] = varType;
+        inputs[varName] = inputsBackendDict[varName];
       }
 
       ruleDescription = ruleDescription.replace(PATTERN, ' ');
     }
-
 
     return new Rule(ruleType, inputs);
   }

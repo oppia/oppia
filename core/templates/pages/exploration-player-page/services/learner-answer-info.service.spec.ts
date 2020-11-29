@@ -21,6 +21,7 @@ import { AnswerClassificationResult } from
   'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { State, StateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
@@ -45,6 +46,7 @@ interface MockInteractionRuleInputs {
 }
 
 describe('Learner answer info service', () =>{
+  let rof: RuleObjectFactory;
   let sof: StateObjectFactory;
   let oof: OutcomeObjectFactory;
   let stateDict: StateBackendDict;
@@ -88,10 +90,7 @@ describe('Learner answer info service', () =>{
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_specs: [{
-            rule_type: 'Equals',
-            inputs: {x: 10}
-          }],
+          rule_specs: [],
           training_data: [],
           tagged_skill_misconception_id: ''
         }, {
@@ -106,16 +105,7 @@ describe('Learner answer info service', () =>{
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_specs: [{
-            rule_type: 'Equals',
-            inputs: { x: 5 }
-          }, {
-            rule_type: 'Equals',
-            inputs: { x: 6 }
-          }, {
-            rule_type: 'NotEquals',
-            inputs: { x: 7 }
-          }],
+          rule_specs: [],
           training_data: [],
           tagged_skill_misconception_id: ''
         }],
@@ -149,6 +139,7 @@ describe('Learner answer info service', () =>{
       next_content_id_index: null
     };
 
+    rof = TestBed.get(RuleObjectFactory);
     sof = TestBed.get(StateObjectFactory);
     oof = TestBed.get(OutcomeObjectFactory);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
@@ -160,6 +151,37 @@ describe('Learner answer info service', () =>{
     firstState = sof.createFromBackendDict('new state', stateDict);
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
+
+    // Because RuleObjectFactory.createFromBackendDict, which is used when
+    // initializing state, relies on the interaction being present in
+    // rule_templates.json (but we are creating a mock interaction without
+    // an interaction id), we must manually construct rules.
+    firstState.interaction.answerGroups[0].rules = [
+      rof.createNew('Equals', { x: 10 })
+    ];
+    firstState.interaction.answerGroups[1].rules = [
+      rof.createNew('Equals', { x: 5 }),
+      rof.createNew('Equals', { x: 6 }),
+      rof.createNew('NotEquals', { x: 7 })
+    ];
+
+    secondState.interaction.answerGroups[0].rules = [
+      rof.createNew('Equals', { x: 10 })
+    ];
+    secondState.interaction.answerGroups[1].rules = [
+      rof.createNew('Equals', { x: 5 }),
+      rof.createNew('Equals', { x: 6 }),
+      rof.createNew('NotEquals', { x: 7 })
+    ];
+
+    thirdState.interaction.answerGroups[0].rules = [
+      rof.createNew('Equals', { x: 10 })
+    ];
+    thirdState.interaction.answerGroups[1].rules = [
+      rof.createNew('Equals', { x: 5 }),
+      rof.createNew('Equals', { x: 6 }),
+      rof.createNew('NotEquals', { x: 7 })
+    ];
 
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(new AnswerClassificationResult(

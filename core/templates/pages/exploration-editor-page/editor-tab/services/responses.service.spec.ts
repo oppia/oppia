@@ -100,10 +100,12 @@ describe('Responses Service', function() {
           },
         },
         rule_specs: [{
-          type: '',
+          rule_type: 'Equals',
           inputs: {
-            x: ['c', 'd', 'e'],
-            y: ['a', 'b', 'c']
+            x: {
+              content_id: 'ri',
+              normalized_str_set: ['c', 'd', 'e']
+            }
           }
         }],
       }],
@@ -328,6 +330,10 @@ describe('Responses Service', function() {
 
   it('should update answer choices when savedMemento is ItemSelectionInput' +
     ' and choices has its positions changed', function() {
+    interactionDataWithRules.answerGroups[0].rules[0].inputs = {
+      x: ['c', 'd', 'e'],
+      y: ['a', 'b', 'c']
+    };
     ResponsesService.init(interactionDataWithRules);
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'ItemSelectionInput');
@@ -364,6 +370,10 @@ describe('Responses Service', function() {
 
   it('should update answer choices when savedMemento is ItemSelectionInput' +
     ' and choices has its values changed', function() {
+    interactionDataWithRules.answerGroups[0].rules[0].inputs = {
+      x: ['c', 'd', 'e'],
+      y: ['a', 'b', 'c']
+    };
     ResponsesService.init(interactionDataWithRules);
     StateEditorService.setInteraction(interactionDataWithRules);
     StateInteractionIdService.init('stateName', 'ItemSelectionInput');

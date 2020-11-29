@@ -35,8 +35,10 @@ import { Outcome } from
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { UtilsService } from 'services/utils.service';
-import { SubtitledSetOfNormalizedString, SubtitledSetOfNormalizedStringObjectFactory } from 'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
-import { TextInputRuleInputs } from 'interactions/rule-input-defs';
+import {
+  SubtitledSetOfNormalizedString,
+  SubtitledSetOfNormalizedStringObjectFactory
+} from 'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
 
 interface Warning {
   type: string,
