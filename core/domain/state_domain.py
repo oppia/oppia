@@ -2967,10 +2967,13 @@ class State(python_utils.OBJECT):
                         # referred to exist and have the correct types.
                         normalized_param = value
                     else:
-                        if isinstance(
-                                value,
-                                (SubtitledSetOfNormalizedString,
-                                 SubtitledSetOfUnicodeString)
+                        is_subtitled_set_of_normalized_string = isinstance(
+                            rule_input, SubtitledSetOfNormalizedString)
+                        is_subtitled_set_of_unicode_string = isinstance(
+                            rule_input, SubtitledSetOfUnicodeString)
+                        if (
+                                is_subtitled_set_of_normalized_string or
+                                is_subtitled_set_of_unicode_string
                         ):
                             new_content_id_list.append(value.content_id)
                             value = value.to_dict()
@@ -2982,11 +2985,11 @@ class State(python_utils.OBJECT):
                                 '%s has the wrong type. It should be a %s.' %
                                 (value, param_type.__name__))
 
-                        if isSubtitledSetOfNormalizedString:
+                        if is_subtitled_set_of_normalized_string:
                             normalized_param = (
                                 SubtitledSetOfNormalizedString.from_dict(
                                     normalized_param))
-                        if isSubtitledSetOfUnicodeString:
+                        if is_subtitled_set_of_unicode_string:
                             normalized_param = (
                                 SubtitledSetOfUnicodeString.from_dict(
                                     normalized_param))
