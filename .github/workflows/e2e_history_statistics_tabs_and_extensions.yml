@@ -46,8 +46,8 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="extensions" --prod_env
       - name: Store screenshots as artifacts
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v2
         with:
           name: protractor_screenshots
-          if: ${{ failure() }}
           path: /home/runner/work/oppia/protractor_screenshots/
