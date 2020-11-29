@@ -2567,13 +2567,11 @@ class State(python_utils.OBJECT):
             for rule_spec in answer_group.rule_specs:
                 for input_name in rule_spec.inputs:
                     rule_input = rule_spec.inputs[input_name]
-
-                    isSubtitledSetOfNoormalizedString = isinstance(
-                        rule_input, SubtitledSetOfNormalizedString)
-                    isSubtitledSetOfUnicodeString = isinstance(
-                        rule_input, SubtitledSetOfUnicodeString)
-                    if (isSubtitledSetOfNoormalizedString or
-                            isSubtitledSetOfUnicodeString):
+                    if isinstance(
+                            rule_input,
+                            (SubtitledSetOfNormalizedString,
+                             SubtitledSetOfUnicodeString)
+                    ):
                         content_id_list.append(rule_input.content_id)
 
         if self.interaction.default_outcome:
