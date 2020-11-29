@@ -19,16 +19,17 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
+require('pages/admin-page/services/admin-misc-tab-backend-api.service');
 
 require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http', '$window',
+  '$http','$window','AdminMiscTabBackendApiService',
   'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http, $window,
+      $http,$window,AdminMiscTabBackendApiService,
       AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
@@ -66,12 +67,11 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.setStatusMessage('Clearing search index...');
 
           AdminTaskManagerService.startTask();
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'clear_search_index'
-          }).then(function() {
+          AdminMiscTabBackendApiService.clearSearchIndex()
+            .then(function() {
             ctrl.setStatusMessage('Index successfully cleared.');
             AdminTaskManagerService.finishTask();
-          }, function(errorResponse) {
+          },function(errorResponse) {
             ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
             AdminTaskManagerService.finishTask();
@@ -86,10 +86,9 @@ angular.module('oppia').directive('adminMiscTab', [
             return;
           }
           ctrl.regenerationMessage = 'Regenerating opportunities...';
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'regenerate_topic_related_opportunities',
-            topic_id: ctrl.topicIdForRegeneratingOpportunities
-          }).then(function(response) {
+          AdminMiscTabBackendApiService.regenerateTopicRelatedOpportunities
+          (ctrl.topicIdForRegeneratingOpportunities)
+            .then(function(response) {
             ctrl.regenerationMessage = (
               'No. of opportunities model created: ' +
               response.data.opportunities_count);
@@ -140,7 +139,8 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         ctrl.flushMemoryCache = function() {
-          $http.post(MEMORY_CACHE_HANDLER_URL)
+          //$http.post(MEMORY_CACHE_HANDLER_URL)
+          AdminMiscTabBackendApiService.flushCache()
             .then(function(response) {
               ctrl.setStatusMessage('Success! Memory Cache Flushed.');
             }, function(errorResponse) {

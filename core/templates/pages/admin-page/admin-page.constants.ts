@@ -23,6 +23,7 @@ export const AdminPageConstants = {
   ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL: '/admintopicscsvdownloadhandler',
 
   ADMIN_JOB_OUTPUT_URL_TEMPLATE: '/adminjoboutput?job_id=<jobId>',
+  MEMORY_CACHE_HANDLER_URL: '/memorycacheadminhandler',
 
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#activities',
