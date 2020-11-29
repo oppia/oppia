@@ -501,7 +501,7 @@ class DeleteInvalidSuggestionModelsOneOffJob(
         feedback_model = feedback_models.GeneralFeedbackThreadModel.get_by_id(
             item.id)
 
-        if feedback_model is None or item.suggestion_type != (
+        if feedback_model is not None and item.suggestion_type != (
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
             yield ('SUGGESTION_IGNORED', 1)
             return
@@ -510,7 +510,7 @@ class DeleteInvalidSuggestionModelsOneOffJob(
         model_keys.append(datastore_services.Key(
             suggestion_models.GeneralSuggestionModel, item.id))
 
-        if feedback_model is None:
+        if feedback_model is not None:
             model_keys.append(datastore_services.Key(
                 feedback_models.GeneralFeedbackThreadModel, item.id))
 

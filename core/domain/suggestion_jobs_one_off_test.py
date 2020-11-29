@@ -3026,3 +3026,66 @@ class DeleteInvalidSuggestionModelsOneOffJobTests(test_utils.GenericTestBase):
 
         expected_output = ['[u\'SUGGESTION_DELETED\', 1]']
         self._run_job_and_verify_output(expected_output)
+
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            suggestion.suggestion_id)
+        self.assertEqual(suggestion_model, None)
+
+    def test_migration_job_ignore_exp_suggestion_with_feedback_model(self):
+        exp_id = 'expId1'
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                exp_id, self.author_id, ['State 1', 'State 2'],
+                ['TextInput'], category='Algebra'))
+
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'State 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': exploration.states['State 1'].content.html,
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            exp_id, 1, self.author_id, add_translation_change_dict,
+            'test description')
+
+        expected_output = ['[u\'SUGGESTION_IGNORED\', 1]']
+        self._run_job_and_verify_output(expected_output)
+
+    def test_migration_job_deletes_suggestion_without_feedback_model(self):
+        exp_id = 'expId1'
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                exp_id, self.author_id, ['State 1', 'State 2'],
+                ['TextInput'], category='Algebra'))
+
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'State 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': exploration.states['State 1'].content.html,
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        suggestion = suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            exp_id, 1, self.author_id, add_translation_change_dict,
+            'test description')
+
+        feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            suggestion.suggestion_id).delete()
+        self.assertEqual(feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            suggestion.suggestion_id), None)
+
+        expected_output = ['[u\'SUGGESTION_DELETED\', 1]']
+        self._run_job_and_verify_output(expected_output)
+
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+            suggestion.suggestion_id)
+        self.assertEqual(suggestion_model, None)
