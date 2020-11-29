@@ -1962,8 +1962,9 @@ class RuleSpec(python_utils.OBJECT):
         for rule_input_name in self.inputs:
             rule_input = self.inputs[rule_input_name]
             if isinstance(
-                rule_input,
-                (SubtitledSetOfNormalizedString, SubtitledSetOfUnicodeString)
+                    rule_input,
+                    (SubtitledSetOfNormalizedString,
+                     SubtitledSetOfUnicodeString)
             ):
                 rule_inputs_dict[rule_input_name] = rule_input.to_dict()
             else:
@@ -2925,9 +2926,10 @@ class State(python_utils.OBJECT):
             for rule_spec in answer_group.rule_specs:
                 for input_name in rule_spec.inputs:
                     rule_input = rule_spec.inputs[input_name]
-                    if isinstance(rule_input,
-                        (SubtitledSetOfNormalizedString,
-                        SubtitledSetOfUnicodeString)
+                    if isinstance(
+                            rule_input,
+                            (SubtitledSetOfNormalizedString,
+                             SubtitledSetOfUnicodeString)
                     ):
                         old_content_id_list.append(rule_input.content_id)
 
@@ -2967,14 +2969,11 @@ class State(python_utils.OBJECT):
                         # referred to exist and have the correct types.
                         normalized_param = value
                     else:
-                        isSubtitledSetOfNormalizedString = isinstance(
-                            value, SubtitledSetOfNormalizedString)
-                        isSubtitledSetOfUnicodeString = isinstance(
-                            value, SubtitledSetOfUnicodeString)
-
-                        if (
-                                isSubtitledSetOfNormalizedString or
-                                isSubtitledSetOfUnicodeString):
+                        if isinstance(
+                                value,
+                                (SubtitledSetOfNormalizedString,
+                                 SubtitledSetOfUnicodeString)
+                        ):
                             new_content_id_list.append(value.content_id)
                             value = value.to_dict()
 
