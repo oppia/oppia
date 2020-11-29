@@ -48,6 +48,43 @@ export class AdminMiscTabBackendApiService {
     ).toPromise();
   }
 
+  private  _uploadTopicSimilarities (data:string | ArrayBuffer):Promise<void> {
+    return this.http.post<void>(
+        AdminPageConstants.ADMIN_HANDLER_URL,{
+                action: 'upload_topic_similarities',
+                data: data   
+        }
+    ).toPromise();
+  }
+
+  private _sendDummyMail():Promise<void> {
+    return this.http.post<void>(
+        AdminPageConstants.SEND_DUMMY_MAIL_HANDLER_URL,{}
+    ).toPromise();
+  }
+
+  private _getMemoryCacheProfile ():Promise<void> {
+    return this.http.get<void>(
+        AdminPageConstants.MEMORY_CACHE_HANDLER_URL,{}
+    ).toPromise();
+  }
+
+  private _updateUserName (oldUsername:string,newUsername:string):Promise<void> {
+    return this.http.put<void>(
+        AdminPageConstants.UPDATE_USERNAME_HANDLER_URL,{
+            old_username: oldUsername,
+            new_username: newUsername
+          }
+    ).toPromise();
+  }
+
+  private _numberOfPendingDeletionRequest ():Promise<void> {
+    return this.http.get<void>(
+        AdminPageConstants.NUMBER_OF_DELETION_REQUEST_HANDLER_URL,{}
+    ).toPromise();
+  }
+  
+
   flushCache(): Promise<void> {
     return this._flushCache();
   }
@@ -56,8 +93,28 @@ export class AdminMiscTabBackendApiService {
     return this._clearSearchIndex();
   }
 
-  regenerateTopicRelatedOpportunities(topicId:string){
+  regenerateTopicRelatedOpportunities(topicId:string) :Promise<void> {
     return this._regenerateTopicRelatedOpportunities(topicId);
+  }
+
+  uploadTopicSimilarities( data:string | ArrayBuffer):Promise<void> {
+    return this._uploadTopicSimilarities(data);
+  }
+
+  sendDummyMail():Promise<void> {
+    return this._sendDummyMail();
+  }
+
+  getMemoryCacheProfile():Promise<void> {
+    return this._getMemoryCacheProfile();
+  }
+
+  updateUserName(oldUsername:string,newUsername:string):Promise<void> {
+    return this._updateUserName(oldUsername,newUsername);
+  }
+
+  numberOfPendingDeletionRequest():Promise<void> {
+    return this._numberOfPendingDeletionRequest();
   }
 
 }

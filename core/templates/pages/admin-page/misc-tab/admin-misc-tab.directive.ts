@@ -25,11 +25,11 @@ require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$http','$window','AdminMiscTabBackendApiService',
+  '$window','AdminMiscTabBackendApiService',
   'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $http,$window,AdminMiscTabBackendApiService,
+      $window,AdminMiscTabBackendApiService,
       AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
@@ -73,7 +73,7 @@ angular.module('oppia').directive('adminMiscTab', [
             AdminTaskManagerService.finishTask();
           },function(errorResponse) {
             ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse.error.error);
             AdminTaskManagerService.finishTask();
           });
         };
@@ -91,10 +91,10 @@ angular.module('oppia').directive('adminMiscTab', [
             .then(function(response) {
             ctrl.regenerationMessage = (
               'No. of opportunities model created: ' +
-              response.data.opportunities_count);
+              response.opportunities_count);
           }, function(errorResponse) {
             ctrl.regenerationMessage = (
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse.error.error);
           });
         };
 
@@ -105,15 +105,13 @@ angular.module('oppia').directive('adminMiscTab', [
           var reader = new FileReader();
           reader.onload = function(e) {
             var data = (<FileReader>e.target).result;
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'upload_topic_similarities',
-              data: data
-            }).then(function() {
+            AdminMiscTabBackendApiService.uploadTopicSimilarities(data)
+              .then(function() {
               ctrl.setStatusMessage(
                 'Topic similarities uploaded successfully.');
             }, function(errorResponse) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse.error.error);
             });
           };
           reader.readAsText(file);
@@ -129,56 +127,54 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         ctrl.sendDummyMailToAdmin = function() {
-          $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
+          AdminMiscTabBackendApiService.sendDummyMail()
             .then(function(response) {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
             }, function(errorResponse) {
+              console.log(errorResponse)
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse.error.error);
             });
         };
 
         ctrl.flushMemoryCache = function() {
-          //$http.post(MEMORY_CACHE_HANDLER_URL)
           AdminMiscTabBackendApiService.flushCache()
             .then(function(response) {
               ctrl.setStatusMessage('Success! Memory Cache Flushed.');
             }, function(errorResponse) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse.error.error);
             });
         };
 
         ctrl.getMemoryCacheProfile = function() {
-          $http.get(MEMORY_CACHE_HANDLER_URL)
+          AdminMiscTabBackendApiService.getMemoryCacheProfile()
             .then(function(response) {
               ctrl.result = {
-                totalAllocatedInBytes: response.data.total_allocation,
-                peakAllocatedInBytes: response.data.peak_allocation,
-                totalKeysStored: response.data.total_keys_stored
+                totalAllocatedInBytes: response.total_allocation,
+                peakAllocatedInBytes: response.peak_allocation,
+                totalKeysStored: response.total_keys_stored
               };
               ctrl.memoryCacheDataFetched = true;
               ctrl.setStatusMessage('Success!');
             }, function(errorResponse) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse.error.error);
             });
         };
 
         ctrl.updateUsername = function() {
           ctrl.setStatusMessage('Updating username...');
-          $http.put(
-            UPDATE_USERNAME_HANDLER_URL, {
-              old_username: ctrl.oldUsername,
-              new_username: ctrl.newUsername
-            }).then(
+          AdminMiscTabBackendApiService.updateUserName
+          (ctrl.oldUsername,ctrl.newUsername)
+            .then(
             function(response) {
               ctrl.setStatusMessage(
                 'Successfully renamed ' + ctrl.oldUsername + ' to ' +
                   ctrl.newUsername + '!');
             }, function(errorResponse) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse.error.error);
             }
           );
         };
@@ -186,15 +182,16 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.getNumberOfPendingDeletionRequestModels = function() {
           ctrl.setStatusMessage(
             'Getting the number of users that are being deleted...');
-          $http.get(NUMBER_OF_DELETION_REQUEST_HANDLER_URL).then(
+            AdminMiscTabBackendApiService.numberOfPendingDeletionRequest()
+            .then(
             function(response) {
               ctrl.setStatusMessage(
                 'The number of users that are being deleted is: ' +
-                response.data.number_of_pending_deletion_models);
+                response.number_of_pending_deletion_models);
             },
             function(errorResponse) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
+                'Server error: ' + errorResponse.error.error);
             }
           );
         };
