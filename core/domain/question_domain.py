@@ -854,13 +854,13 @@ class Question(python_utils.OBJECT):
                 content_id = content_id_counter.generate_content_id(
                     'ri_%s_' % rule_spec_dict['rule_type'])
                 if interaction_id == 'TextInput':
-                    # Convert to SubtitledSetOfNormalizedString
+                    # Convert to SubtitledSetOfNormalizedString.
                     rule_spec_dict['inputs']['x'] = {
                         'content_id': content_id,
                         'normalized_str_set': rule_spec_dict['inputs']['x']
                     }
                 elif interaction_id == 'SetInput':
-                    # Convert to SubtitledSetOfUnicodeString
+                    # Convert to SubtitledSetOfUnicodeString.
                     rule_spec_dict['inputs']['x'] = {
                         'content_id': content_id,
                         'unicode_str_set': rule_spec_dict['inputs']['x']

@@ -99,7 +99,7 @@ class AnswerGroup(python_utils.OBJECT):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs, interaction_id)
-                for rs in answer_group_dict['rule_specs']],
+             for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
         )
@@ -1961,11 +1961,12 @@ class RuleSpec(python_utils.OBJECT):
         rule_inputs_dict = {}
         for rule_input_name in self.inputs:
             rule_input = self.inputs[rule_input_name]
-            if (
-                    isinstance(rule_input, SubtitledSetOfNormalizedString) or
-                    isinstance(rule_input, SubtitledSetOfUnicodeString)):
+            if isinstance(
+                rule_input,
+                (SubtitledSetOfNormalizedString, SubtitledSetOfUnicodeString)
+            ):
                 rule_inputs_dict[rule_input_name] = rule_input.to_dict()
-            else: 
+            else:
                 rule_inputs_dict[rule_input_name] = rule_input
 
         return {
@@ -1980,6 +1981,7 @@ class RuleSpec(python_utils.OBJECT):
         Args:
             rulespec_dict: dict. The dict representation of RuleSpec object.
             interaction_id: str. The interaction id of the interaction.
+
         Returns:
             RuleSpec. The corresponding RuleSpec domain object.
         """
@@ -1989,8 +1991,9 @@ class RuleSpec(python_utils.OBJECT):
         interaction = interaction_registry.Registry.get_interaction_by_id(
             interaction_id)
         inputs_name_and_types = (
-            re.findall(r'{{([a-z]+)\|([^}]*)}',
-            interaction.rules_dict[rule_type]['description']))
+            re.findall(
+                r'{{([a-z]+)\|([^}]*)}',
+                interaction.rules_dict[rule_type]['description']))
 
         rule_inputs = {}
         for input_name, input_type in inputs_name_and_types:
@@ -2079,16 +2082,16 @@ class RuleSpec(python_utils.OBJECT):
             else:
                 # Otherwise, a simple parameter value needs to be normalizable
                 # by the parameter object in order to be valid.
-                isSubtitledSetOfNormalizedString = isinstance(
+                is_subtitled_set_of_normalized_string = isinstance(
                     param_value, SubtitledSetOfNormalizedString)
-                isSubtitledSetOfUnicodeString = isinstance(
+                is_subtitled_set_of_unicode_string = isinstance(
                     param_value, SubtitledSetOfUnicodeString)
-                if isSubtitledSetOfNormalizedString:
+                if is_subtitled_set_of_normalized_string:
                     self.inputs[param_name] = (
                         SubtitledSetOfNormalizedString.from_dict(
                             param_obj.normalize(param_value.to_dict())
                         ))
-                elif isSubtitledSetOfUnicodeString:
+                elif is_subtitled_set_of_unicode_string:
                     self.inputs[param_name] = (
                         SubtitledSetOfUnicodeString.from_dict(
                             param_obj.normalize(param_value.to_dict())
@@ -2922,15 +2925,12 @@ class State(python_utils.OBJECT):
             for rule_spec in answer_group.rule_specs:
                 for input_name in rule_spec.inputs:
                     rule_input = rule_spec.inputs[input_name]
-                    isSubtitledSetOfNormalizedString = isinstance(
-                        rule_input, SubtitledSetOfNormalizedString)
-                    isSubtitledSetOfUnicodeString = isinstance(
-                        rule_input, SubtitledSetOfUnicodeString)
-                    if (
-                            isSubtitledSetOfNormalizedString or
-                            isSubtitledSetOfUnicodeString):
+                    if isinstance(rule_input,
+                        (SubtitledSetOfNormalizedString,
+                        SubtitledSetOfUnicodeString)
+                    ):
                         old_content_id_list.append(rule_input.content_id)
-        
+
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
@@ -2971,7 +2971,7 @@ class State(python_utils.OBJECT):
                             value, SubtitledSetOfNormalizedString)
                         isSubtitledSetOfUnicodeString = isinstance(
                             value, SubtitledSetOfUnicodeString)
-                        
+
                         if (
                                 isSubtitledSetOfNormalizedString or
                                 isSubtitledSetOfUnicodeString):

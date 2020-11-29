@@ -69,8 +69,8 @@ export class AnswerGroupObjectFactory {
       ruleBackendDicts: RuleBackendDict[],
       interactionId: string
   ): Rule[] {
-    return ruleBackendDicts.map(ruleBackendDict =>
-      this.ruleObjectFactory.createFromBackendDict(
+    return ruleBackendDicts.map(
+      ruleBackendDict => this.ruleObjectFactory.createFromBackendDict(
         ruleBackendDict, interactionId)
     );
   }

@@ -345,7 +345,7 @@ class NormalizedString(BaseObject):
 class SubtitledSetOfUnicodeString(BaseObject):
     """Class for subtitled sets of unicode strings."""
 
-    description = """A dictionary with properties "content_id" and 
+    description = """A dictionary with properties "content_id" and
         "unicode_str_set", the latter being a set (a list with unique 
         elements) of unicode strings."""
 
@@ -380,7 +380,7 @@ class SubtitledSetOfUnicodeString(BaseObject):
 class SubtitledSetOfNormalizedString(BaseObject):
     """Class for subtitled sets of NormalizedStrings."""
 
-    description = """A dictionary with properties "content_id" and 
+    description = """A dictionary with properties "content_id" and
         "normalized_str_set", the latter being a set (a list with unique 
         elements) of whitespace-collapsed strings."""
 
