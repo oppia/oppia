@@ -38,7 +38,7 @@ export class SubtitledSetOfNormalizedString {
     return this._normalizedStrings;
   }
 
-  getContentId(): string {
+  getContentId(): string | null {
     return this._contentId;
   }
 
