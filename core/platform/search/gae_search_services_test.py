@@ -370,53 +370,6 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             delete_docs_counter.times_called,
             gae_search_services.DEFAULT_NUM_RETRIES)
 
-    def test_use_custom_number_of_retries(self):
-        exception = self._get_delete_error(1, transient=0)
-        failing_delete = test_utils.FailingFunction(
-            search.Index.delete, exception, 42)
-
-        delete_docs_counter = test_utils.CallCounter(
-            gae_search_services.delete_documents_from_index)
-
-        delete_ctx = self.swap(search.Index, 'delete', failing_delete)
-        delete_docs_ctx = self.swap(
-            gae_search_services,
-            'delete_documents_from_index',
-            delete_docs_counter)
-        assert_raises_ctx = self.assertRaisesRegexp(
-            gae_search_services.SearchFailureError,
-            '<class \'google.appengine.api.search.search.DeleteError\'>: lol')
-        with delete_ctx, delete_docs_ctx, assert_raises_ctx:
-            gae_search_services.delete_documents_from_index(
-                ['id'], 'index', retries=42)
-
-        self.assertEqual(delete_docs_counter.times_called, 42)
-
-    def test_arguments_are_preserved_in_retries(self):
-        index = search.Index('index')
-        index.put([search.Document(doc_id='doc', fields=[
-            search.TextField(name='prop', value='val')
-        ])])
-        exception = self._get_delete_error(1, transient=0)
-        failing_delete = test_utils.FailingFunction(
-            search.Index.delete, exception, 3)
-
-        delete_docs_counter = test_utils.CallCounter(
-            gae_search_services.delete_documents_from_index)
-
-        index_ctx = self.swap(search.Index, 'delete', failing_delete)
-        delete_docs_ctx = self.swap(
-            gae_search_services,
-            'delete_documents_from_index',
-            delete_docs_counter)
-        with index_ctx, delete_docs_ctx:
-            gae_search_services.delete_documents_from_index(
-                ['doc'], 'index', retries=4)
-
-        self.assertEqual(delete_docs_counter.times_called, 4)
-        result = search.Index('my_index').get('doc')
-        self.assertIsNone(result)
-
     def test_delete_error_with_transient_result(self):
         error = self._get_delete_error(3, transient=1)
         failing_delete = test_utils.FailingFunction(
@@ -439,10 +392,8 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         with delete_ctx, delete_docs_ctx:
             gae_search_services.delete_documents_from_index(
                 ['d0', 'd1', 'd2'],
-                'my_index',
-                retries=5)
+                'my_index')
 
-        self.assertEqual(delete_docs_counter.times_called, 5)
         for i in python_utils.RANGE(3):
             result = search.Index('my_index').get(bytes(
                 'doc' + python_utils.convert_to_bytes(i)))

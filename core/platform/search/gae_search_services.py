@@ -31,77 +31,6 @@ from google.appengine.api import search as gae_search
 DEFAULT_NUM_RETRIES = 3
 
 
-class SearchFailureError(Exception):
-    """This error is raised when a search operation fails.
-       The original_exception will point to what went wrong inside the gae sdk.
-       Other platform implementations should have a similar way of revealing
-       platform specific errors.
-    """
-
-    def __init__(self, original_exception=None):
-        super(SearchFailureError, self).__init__(
-            '%s: %s' % (type(original_exception), original_exception.message))
-        self.original_exception = original_exception
-
-
-def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
-    """Adds a document to an index.
-
-    Args:
-        documents: list(dict). Each document should be a dictionary.
-            Every key in the document is a field name, and the corresponding
-            value will be the field's value.
-            If there is a key named 'id', its value will be used as the
-            document's id.
-            If there is a key named 'rank', its value will be used as
-            the document's rank.
-            By default, search results are returned ordered by descending rank.
-            If there is a key named 'language_code', its value will be used as
-            the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE
-            is used.
-        index: str. The name of the index to insert the document into.
-        retries: int. The number of times to retry inserting the documents.
-
-    Returns:
-        list(str). Returns a list of document ids of the documents that were
-        added.
-
-    Raises:
-        SearchFailureError. Raised when the indexing fails. If it fails for any
-            document, none will be inserted.
-        ValueError. Raised when invalid values are given.
-    """
-    if not isinstance(index, python_utils.BASESTRING):
-        raise ValueError(
-            'Index must be the unicode/str name of an index, got %s'
-            % type(index))
-
-    index = gae_search.Index(index)
-    gae_docs = [_dict_to_search_document(d) for d in documents]
-
-    try:
-        logging.debug(
-            'adding the following docs to index %s: %s', index.name, documents)
-        results = index.put(gae_docs, deadline=5)
-    except gae_search.PutError as e:
-        logging.exception('PutError raised.')
-        if retries > 1:
-            for res in e.results:
-                if res.code == gae_search.OperationResult.TRANSIENT_ERROR:
-                    new_retries = retries - 1
-                    logging.debug('%d tries left, retrying.' % (new_retries))
-                    return add_documents_to_index(
-                        documents,
-                        index.name,
-                        retries=new_retries)
-
-        # At this pint, either we don't have any tries left, or none of the
-        # results has a transient error code.
-        raise SearchFailureError(e)
-
-    return [r.id for r in results]
-
-
 def _dict_to_search_document(d):
     """Returns and converts the document dict into objects.
 
@@ -190,15 +119,123 @@ def _validate_list(key, value):
                 ' type %s.' % (ind, key, type(element)))
 
 
+def _string_to_sort_expressions(input_string):
+    """Returns the sorted expression of the input string.
+
+    Args:
+        input_string: str. The input string to be sorted.
+
+    Returns:
+        list(SortExpression). A list of sorted expressions.
+
+    Raises:
+        ValueError. Fields in the sort expression do not start with '+' or '-'
+            to indicate sort direction.
+    """
+    sort_expressions = []
+    s_tokens = input_string.split()
+    for expression in s_tokens:
+        if expression.startswith('+'):
+            direction = gae_search.SortExpression.ASCENDING
+        elif expression.startswith('-'):
+            direction = gae_search.SortExpression.DESCENDING
+        else:
+            raise ValueError(
+                'Fields in the sort expression must start with "+"'
+                ' or "-" to indicate sort direction.'
+                ' The field %s has no such indicator'
+                ' in expression "%s".' % (expression, input_string))
+        sort_expressions.append(
+            gae_search.SortExpression(expression[1:], direction))
+    return sort_expressions
+
+
+def _search_document_to_dict(doc):
+    """Converts and returns the search document into a dict format.
+
+    Args:
+        doc: Document. The document to be converted into dict format.
+
+    Returns:
+        dict(str, str). The document in dict format.
+    """
+    d = {'id': doc.doc_id, 'language_code': doc.language, 'rank': doc.rank}
+
+    for field in doc.fields:
+        d[field.name] = field.value
+
+    return d
+
+
+class SearchFailureError(Exception):
+    """This error is raised when a search operation fails.
+       The original_exception will point to what went wrong inside the gae sdk.
+       Other platform implementations should have a similar way of revealing
+       platform specific errors.
+    """
+
+    def __init__(self, original_exception=None):
+        super(SearchFailureError, self).__init__(
+            '%s: %s' % (type(original_exception), original_exception.message))
+        self.original_exception = original_exception
+
+
+def add_documents_to_index(documents, index):
+    """Adds a document to an index.
+
+    Args:
+        documents: list(dict). Each document should be a dictionary.
+            Every key in the document is a field name, and the corresponding
+            value will be the field's value.
+            If there is a key named 'id', its value will be used as the
+            document's id.
+            If there is a key named 'rank', its value will be used as
+            the document's rank.
+            By default, search results are returned ordered by descending rank.
+            If there is a key named 'language_code', its value will be used as
+            the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE
+            is used.
+        index: str. The name of the index to insert the document into.
+
+    Returns:
+        list(str). Returns a list of document ids of the documents that were
+        added.
+
+    Raises:
+        SearchFailureError. Raised when the indexing fails. If it fails for any
+            document, none will be inserted.
+        ValueError. Raised when invalid values are given.
+    """
+    if not isinstance(index, python_utils.BASESTRING):
+        raise ValueError(
+            'Index must be the unicode/str name of an index, got %s'
+            % type(index))
+
+    index = gae_search.Index(index)
+    gae_docs = [_dict_to_search_document(d) for d in documents]
+
+    try:
+        logging.debug(
+            'adding the following docs to index %s: %s', index.name, documents)
+        results = index.put(gae_docs, deadline=5)
+    except gae_search.PutError as e:
+        logging.exception('PutError raised.')
+
+        # At this pint, either we don't have any tries left, or none of the
+        # results has a transient error code.
+        raise SearchFailureError(e)
+
+    return [r.id for r in results]
+
+
 def delete_documents_from_index(
-        doc_ids, index, retries=DEFAULT_NUM_RETRIES):
+        doc_ids, index):
     """Deletes documents from an index.
 
     Args:
         doc_ids: list(str). A list of document ids of documents to be deleted
             from the index.
         index: str. The name of the index to delete the document from.
-        retries: int. The number of times to retry deleting the documents.
 
     Raises:
         SearchFailureError. Raised when the deletion fails. If it fails for any
@@ -223,17 +260,6 @@ def delete_documents_from_index(
         index.delete(doc_ids, deadline=5)
     except gae_search.DeleteError as e:
         logging.exception('Something went wrong during deletion.')
-        if retries > 1:
-            for res in e.results:
-                if res.code == gae_search.OperationResult.TRANSIENT_ERROR:
-                    new_retries = retries - 1
-                    logging.debug('%d tries left, retrying.' % (new_retries))
-                    delete_documents_from_index(
-                        doc_ids,
-                        index.name,
-                        retries=new_retries)
-                    return
-
         raise SearchFailureError(e)
 
 
@@ -345,37 +371,6 @@ def search(
     return result_docs, result_cursor_str
 
 
-def _string_to_sort_expressions(input_string):
-    """Returns the sorted expression of the input string.
-
-    Args:
-        input_string: str. The input string to be sorted.
-
-    Returns:
-        list(SortExpression). A list of sorted expressions.
-
-    Raises:
-        ValueError. Fields in the sort expression do not start with '+' or '-'
-            to indicate sort direction.
-    """
-    sort_expressions = []
-    s_tokens = input_string.split()
-    for expression in s_tokens:
-        if expression.startswith('+'):
-            direction = gae_search.SortExpression.ASCENDING
-        elif expression.startswith('-'):
-            direction = gae_search.SortExpression.DESCENDING
-        else:
-            raise ValueError(
-                'Fields in the sort expression must start with "+"'
-                ' or "-" to indicate sort direction.'
-                ' The field %s has no such indicator'
-                ' in expression "%s".' % (expression, input_string))
-        sort_expressions.append(
-            gae_search.SortExpression(expression[1:], direction))
-    return sort_expressions
-
-
 def get_document_from_index(doc_id, index):
     """Returns a document with a give doc_id(s) from the index.
 
@@ -388,20 +383,3 @@ def get_document_from_index(doc_id, index):
     """
     index = gae_search.Index(index)
     return _search_document_to_dict(index.get(doc_id))
-
-
-def _search_document_to_dict(doc):
-    """Converts and returns the search document into a dict format.
-
-    Args:
-        doc: Document. The document to be converted into dict format.
-
-    Returns:
-        dict(str, str). The document in dict format.
-    """
-    d = {'id': doc.doc_id, 'language_code': doc.language, 'rank': doc.rank}
-
-    for field in doc.fields:
-        d[field.name] = field.value
-
-    return d
