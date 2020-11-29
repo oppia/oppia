@@ -274,7 +274,7 @@ export class TopicEditorStateService {
        * Returns whether this service is currently attempting to load the
        * topic maintained by this service.
        */
-      isLoadingTopic() {
+      isLoadingTopic(): Boolean {
         return this._topicIsLoading;
       }
 
@@ -429,13 +429,13 @@ export class TopicEditorStateService {
         }
 
         // Don't attempt to save the topic if there are no changes pending.
-        if (!UndoRedoService.hasChanges()) {
+        if (!this.undoRedoService.hasChanges()) {
           return false;
         }
         this._topicIsBeingSaved = true;
         this.editableTopicBackendApiService.updateTopic(
           this._topic.getId(), this._topic.getVersion(),
-          commitMessage, UndoRedoService.getCommittableChangeList()).then(
+          commitMessage, this.undoRedoService.getCommittableChangeList()).then(
           function(topicBackendObject) {
             this._updateTopic(
               topicBackendObject.topicDict,
@@ -443,7 +443,7 @@ export class TopicEditorStateService {
             );
             this._updateSkillIdToRubricsObject(
               topicBackendObject.skillIdToRubricsDict);
-            var changeList = UndoRedoService.getCommittableChangeList();
+            var changeList = this.undoRedoService.getCommittableChangeList();
             for (var i = 0; i < changeList.length; i++) {
               if (changeList[i].cmd === 'delete_canonical_story' ||
                   changeList[i].cmd === 'delete_additional_story') {
@@ -451,7 +451,7 @@ export class TopicEditorStateService {
                   changeList[i].story_id);
               }
             }
-            UndoRedoService.clearChanges();
+            this.undoRedoService.clearChanges();
             this._topicIsBeingSaved = false;
             if (successCallback) {
               successCallback();
