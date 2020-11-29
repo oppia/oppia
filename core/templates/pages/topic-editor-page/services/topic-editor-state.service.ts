@@ -51,28 +51,28 @@ export class TopicEditorStateService {
     private topicRightsBackendApiService: TopicRightsBackendApiService,
     private undoRedoService: UndoRedoService) {}
 
-  _topic = this.topicObjectFactory.createInterstitialTopic();
-  _topicRights = TopicRights.createInterstitialRights();
-  // The array that caches all the subtopic pages loaded by the user.
-  _cachedSubtopicPages = [];
-  // The array that stores all the ids of the subtopic pages that were not
-  // loaded from the backend i.e those that correspond to newly created
-  // subtopics (and not loaded from the backend).
-  _newSubtopicPageIds = [];
-  _subtopicPage =
-  this.subtopicPageObjectFactory.createInterstitialSubtopicPage();
-  _topicIsInitialized = false;
-  _topicIsLoading: boolean;
-  _topicIsBeingSaved = false;
-  _topicWithNameExists = false;
-  _topicWithUrlFragmentExists = false;
-  _canonicalStorySummaries = [];
-  _skillIdToRubricsObject;
-  _skillQuestionCountDict = {};
-  _groupedSkillSummaries = {
-    current: [],
-    others: []
-  };
+    _topic = this.topicObjectFactory.createInterstitialTopic();
+    _topicRights = TopicRights.createInterstitialRights();
+    // The array that caches all the subtopic pages loaded by the user.
+    _cachedSubtopicPages = [];
+    // The array that stores all the ids of the subtopic pages that were not
+    // loaded from the backend i.e those that correspond to newly created
+    // subtopics (and not loaded from the backend).
+    _newSubtopicPageIds = [];
+    _subtopicPage =
+    this.subtopicPageObjectFactory.createInterstitialSubtopicPage();
+    _topicIsInitialized = false;
+    _topicIsLoading: boolean;
+    _topicIsBeingSaved = false;
+    _topicWithNameExists = false;
+    _topicWithUrlFragmentExists = false;
+    _canonicalStorySummaries = [];
+    _skillIdToRubricsObject;
+    _skillQuestionCountDict = {};
+    _groupedSkillSummaries = {
+      current: [],
+      others: []
+    };
      _classroomUrlFragment = 'staging';
      _storySummariesInitializedEventEmitter = new EventEmitter();
      _subtopicPageLoadedEventEmitter = new EventEmitter();

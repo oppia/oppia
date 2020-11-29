@@ -20,6 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { Collection, CollectionBackendDict } from
   'domain/collection/collection.model';
+<<<<<<< HEAD
 import { CollectionUpdateService } from
   'domain/collection/collection-update.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
@@ -29,10 +30,25 @@ describe('Collection update service', () => {
   let undoRedoService: UndoRedoService = null;
   let _sampleCollection = null;
   let _sampleExplorationSummaryBackendObject = {
+=======
+import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
+
+require('domain/collection/collection-update.service.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+
+describe('Collection update service', function() {
+  var CollectionUpdateService = null;
+  var UndoRedoService = null;
+  var _sampleCollection = null;
+  var _sampleExplorationSummaryBackendObject = {
+>>>>>>> 4dda78af6db79f9d1cc99e90b01f9d0fac1a66dd
     title: 'Title',
     status: 'public'
   };
 
+<<<<<<< HEAD
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: []
@@ -40,6 +56,23 @@ describe('Collection update service', () => {
     collectionUpdateService = TestBed.get(CollectionUpdateService);
     undoRedoService = TestBed.get(UndoRedoService);
   });
+=======
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('ChangeObjectFactory', Change);
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+
+  beforeEach(angular.mock.inject(function($injector) {
+    CollectionUpdateService = $injector.get('CollectionUpdateService');
+    UndoRedoService = $injector.get('UndoRedoService');
+>>>>>>> 4dda78af6db79f9d1cc99e90b01f9d0fac1a66dd
 
   beforeEach(() => {
     const sampleCollectionBackendObject = {

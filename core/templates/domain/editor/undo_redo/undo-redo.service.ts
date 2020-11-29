@@ -16,11 +16,18 @@
  * @fileoverview Undo Redo Service.
  */
 
+<<<<<<< HEAD
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { BaseUndoRedo } from 'domain/editor/undo_redo/base-undo-redo.service';
 
+=======
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { BaseUndoRedo } from 'domain/editor/undo_redo/base-undo-redo.service';
+
+>>>>>>> 4dda78af6db79f9d1cc99e90b01f9d0fac1a66dd
 @Injectable({
   providedIn: 'root'
 })

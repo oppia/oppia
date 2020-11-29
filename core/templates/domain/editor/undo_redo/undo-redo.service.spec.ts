@@ -19,6 +19,10 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // undo-redo.service.ts is upgraded to Angular 8.
 import { Change } from 'domain/editor/undo_redo/change.model';
+<<<<<<< HEAD
+=======
+import { UpgradedServices } from 'services/UpgradedServices';
+>>>>>>> 4dda78af6db79f9d1cc99e90b01f9d0fac1a66dd
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -27,6 +31,16 @@ describe('Undo/Redo Service', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
+<<<<<<< HEAD
+=======
+  importAllAngularServices();
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+>>>>>>> 4dda78af6db79f9d1cc99e90b01f9d0fac1a66dd
 
   beforeEach(angular.mock.inject(function($injector) {
     UndoRedoService = $injector.get('UndoRedoService');

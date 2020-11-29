@@ -37,6 +37,7 @@ import { TopicRights } from 'domain/topic/topic-rights.model';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { TopicUpdateService } from 'domain/topic/topic-update.service';
 // ^^^ This block is to be removed.
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory.ts';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service.ts';
@@ -56,7 +57,7 @@ fdescribe('Topic editor state service', () => {
   let topicEditorStateService : TopicEditorStateService;
   let topicObjectFactory : TopicObjectFactory;
   let subtopicPageObjectFactory : SubtopicPageObjectFactory;
-  let TopicUpdateService = null;
+  let topicUpdateService :TopicUpdateService;
   let fakeEditableTopicBackendApiService = null;
   let fakeTopicRightsBackendApiService = null;
   let secondSubtopicPageObject = null;
@@ -166,8 +167,7 @@ fdescribe('Topic editor state service', () => {
         {provide: EditableTopicBackendApiService, useValue: [FakeEditableTopicBackendApiService][0]},
         {provide: TopicRightsBackendApiService, useValue: FakeTopicRightsBackendApiService},
         TopicEditorStateService,
-        // FakeTopicRightsBackendApiService,
-        // FakeEditableTopicBackendApiService
+        TopicUpdateService
       ]
     });
     topicEditorStateService = TestBed.get(TopicEditorStateService);
@@ -175,12 +175,11 @@ fdescribe('Topic editor state service', () => {
     fakeTopicRightsBackendApiService = TestBed.get(TopicRightsBackendApiService);
     topicObjectFactory = TestBed.get(TopicObjectFactory);
     subtopicPageObjectFactory = TestBed.get(SubtopicPageObjectFactory);
+    topicUpdateService = TestBed.get(TopicUpdateService);
   });
   // importAllAngularServices();
 
   beforeEach(() => {
-    // subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    // TopicUpdateService = $injector.get('TopicUpdateService');
 
     fakeEditableTopicBackendApiService.newBackendTopicObject = {
       topicDict: {
@@ -630,7 +629,7 @@ fdescribe('Topic editor state service', () => {
       'updateTopic').and.callThrough();
 
     topicEditorStateService.loadTopic(0);
-    TopicUpdateService.setTopicName(
+    topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
     //$rootScope.$apply();
 
@@ -649,7 +648,7 @@ fdescribe('Topic editor state service', () => {
 
   xit('should fire an update event after saving the topic', function() {
     topicEditorStateService.loadTopic(5);
-    TopicUpdateService.setTopicName(
+    topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
     //$rootScope.$apply();
 
@@ -661,7 +660,7 @@ fdescribe('Topic editor state service', () => {
 
   xit('should track whether it is currently saving the topic', function() {
     topicEditorStateService.loadTopic(5);
-    TopicUpdateService.setTopicName(
+    topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
     //$rootScope.$apply();
 
@@ -676,7 +675,7 @@ fdescribe('Topic editor state service', () => {
   xit('should indicate a topic is no longer saving after an error',
     function() {
       topicEditorStateService.loadTopic(5);
-      TopicUpdateService.setTopicName(
+      topicUpdateService.setTopicName(
         topicEditorStateService.getTopic(), 'New name');
       //$rootScope.$apply();
 

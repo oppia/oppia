@@ -40,6 +40,7 @@ describe('Collection linearizer service', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('Change', Change);
   }));

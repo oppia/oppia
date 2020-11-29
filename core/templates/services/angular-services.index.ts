@@ -78,6 +78,7 @@ import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnico
 import { VoiceoverObjectFactory } from 'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
 import { StateInteractionStatsBackendApiService } from 'domain/exploration/state-interaction-stats-backend-api.service';
 import { StatsReportingBackendApiService } from 'domain/exploration/stats-reporting-backend-api.service';
@@ -122,6 +123,7 @@ import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-back
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
 import { StoryContentsObjectFactory } from 'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { StoryValidationService } from 'domain/story/story-validation.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ReadOnlySubtopicPageObjectFactory } from 'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
@@ -137,6 +139,7 @@ import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service.ts';
+import { TopicUpdateService } from 'domain/topic/topic-update.service.ts';
 import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -310,6 +313,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -526,6 +530,8 @@ export const angularServices: [string, unknown][] = [
   ['RatioExpressionInputValidationService',
     RatioExpressionInputValidationService],
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
+  ['ReadOnlyExplorationBackendApiService',
+    ReadOnlyExplorationBackendApiService],
   ['ReadOnlySubtopicPageObjectFactory', ReadOnlySubtopicPageObjectFactory],
   ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
   ['RecordedVoiceoversObjectFactory', RecordedVoiceoversObjectFactory],
@@ -585,6 +591,7 @@ export const angularServices: [string, unknown][] = [
   ['StoryEditorNavigationService', StoryEditorNavigationService],
   ['StoryObjectFactory', StoryObjectFactory],
   ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
+  ['StoryValidationService', StoryValidationService],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
   ['SubtitledHtmlObjectFactory', SubtitledHtmlObjectFactory],
   ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],
@@ -608,6 +615,7 @@ export const angularServices: [string, unknown][] = [
   ['TopicObjectFactory', TopicObjectFactory],
   ['TopicRightsBackendApiService', TopicRightsBackendApiService],
   ['TopicViewerBackendApiService', TopicViewerBackendApiService],
+  ['TopicUpdateService', TopicUpdateService],
   ['TopicsAndSkillsDashboardBackendApiService',
     TopicsAndSkillsDashboardBackendApiService],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
@@ -632,4 +640,5 @@ export const angularServices: [string, unknown][] = [
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['baseInteractionValidationService', baseInteractionValidationService],
+  ['UndoRedoService', UndoRedoService]
 ];

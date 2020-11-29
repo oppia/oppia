@@ -33,6 +33,7 @@ describe('Chapter Editor tab', function() {
   var MockStoryEditorNavigationService = null;
   var storyInitializedEventEmitter = null;
   var storyReinitializedEventEmitter = null;
+  importAllAngularServices();
 
   importAllAngularServices();
 
