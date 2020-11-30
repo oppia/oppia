@@ -44,6 +44,12 @@ require(
 require('services/alerts.service.ts');
 require('services/external-save.service.ts');
 
+import _ from 'lodash';
+
+import { SubtitledSetOfNormalizedString } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import { SubtitledSetOfUnicodeString } from
+  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('answerGroupEditor', [
@@ -257,6 +263,22 @@ angular.module('oppia').directive('answerGroupEditor', [
           };
 
           ctrl.saveRules = function() {
+            const updatedContentIdToContent = ctrl.getContentIdToContent();
+            const contentIdsWithModifiedContent = [];
+
+            Object.keys(ctrl.originalContentIdToContent).forEach(contentId => {
+              if (
+                ctrl.originalContentIdToContent.hasOwnProperty(contentId) &&
+                updatedContentIdToContent.hasOwnProperty(contentId) &&
+                (!_.isEqual(ctrl.originalContentIdToContent[contentId],
+                  updatedContentIdToContent[contentId]))
+              ) {
+                contentIdsWithModifiedContent.push(contentId);
+              }
+            });
+            ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+              contentIdsWithModifiedContent);
+
             ctrl.changeActiveRuleIndex(-1);
             ctrl.rulesMemento = null;
             ctrl.getOnSaveAnswerGroupRulesFn()(ctrl.rules);
@@ -275,6 +297,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               // The rule editor may not be opened in a read-only editor view.
               return;
             }
+            ctrl.originalContentIdToContent = ctrl.getContentIdToContent();
             ctrl.rulesMemento = angular.copy(ctrl.rules);
             ctrl.changeActiveRuleIndex(index);
           };
@@ -297,6 +320,33 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           ctrl.isMLEnabled = function() {
             return ENABLE_ML_CLASSIFIERS;
+          };
+
+          /**
+          * Extracts a mapping of content ids to the html or unicode content
+          * found in the customization arguments.
+          * @returns {Object} A Mapping of content ids (string) to content
+          *   (string).
+          */
+          ctrl.getContentIdToContent = function() {
+            const contentIdToContent = {};
+            ctrl.rules.forEach(rule => {
+              Object.keys(rule.inputs).forEach(ruleName => {
+                const ruleInput = rule.inputs[ruleName];
+                const isSubtitledSetOfNormalizedString = (
+                  ruleInput instanceof SubtitledSetOfNormalizedString);
+                const isSubtitledSetOfUnicodeString = (
+                  ruleInput instanceof SubtitledSetOfUnicodeString);
+                if (isSubtitledSetOfNormalizedString) {
+                  contentIdToContent[ruleInput.getContentId()] = (
+                    [...ruleInput.getNormalizedStrings()]);
+                } else if (isSubtitledSetOfUnicodeString) {
+                  contentIdToContent[ruleInput.getContentId()] = (
+                    [...ruleInput.getUnicodeStrings()]);
+                }
+              });
+            });
+            return contentIdToContent;
           };
 
           ctrl.$onInit = function() {

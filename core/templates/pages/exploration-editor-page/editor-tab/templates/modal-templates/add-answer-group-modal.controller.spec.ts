@@ -27,8 +27,8 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { Subscription } from 'rxjs';
-import { SubtitledSetOfNormalizedStringObjectFactory } from 'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
-import { null } from 'mathjs';
+import { SubtitledSetOfNormalizedStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
 
 describe('Add Answer Group Modal Controller', function() {
   var $scope = null;

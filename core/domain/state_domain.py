@@ -2968,9 +2968,9 @@ class State(python_utils.OBJECT):
                         normalized_param = value
                     else:
                         is_subtitled_set_of_normalized_string = isinstance(
-                            rule_input, SubtitledSetOfNormalizedString)
+                            value, SubtitledSetOfNormalizedString)
                         is_subtitled_set_of_unicode_string = isinstance(
-                            rule_input, SubtitledSetOfUnicodeString)
+                            value, SubtitledSetOfUnicodeString)
                         if (
                                 is_subtitled_set_of_normalized_string or
                                 is_subtitled_set_of_unicode_string

@@ -256,26 +256,39 @@ angular.module('oppia').directive('ruleEditor', [
           };
 
           ctrl.populateRuleContentIds = function() {
-            const inputTypes = ctrl.rule.inputTypes;
             const inputs = ctrl.rule.inputs;
 
-            Object.keys(inputTypes).forEach(inputName => {
+            let tmpRuleDescription = computeRuleDescriptionFragments();
+            // Finds the parameters and sets them in ctrl.rule.inputs.
+            const PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+            while (true) {
+              if (!tmpRuleDescription.match(PATTERN)) {
+                break;
+              }
+              const varName = tmpRuleDescription.match(PATTERN)[1];
+              let varType = null;
+              if (tmpRuleDescription.match(PATTERN)[2]) {
+                varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
+              }
+
               const hasContentId = (
-                inputTypes[inputName] === 'SubtitledSetOfNormalizedString' ||
-                inputTypes[inputName] === 'SubtitledSetOfUnicodeString'
+                varType === 'SubtitledSetOfNormalizedString' ||
+                varType === 'SubtitledSetOfUnicodeString'
               );
               if (!hasContentId) {
-                return;
+                continue;
               }
-              const needsContentId = inputs[inputName].getContentId() === null;
+              const needsContentId = inputs[varName].getContentId() === null;
 
               if (needsContentId) {
-                inputs[inputName].setContentId(
+                inputs[varName].setContentId(
                   GenerateContentIdService.getNextStateId(
                     `${COMPONENT_NAME_RULE_INPUTS}_${ctrl.rule.type}`
                   ));
               }
-            });
+
+              tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
+            }
           };
 
           ctrl.cancelThisEdit = function() {
