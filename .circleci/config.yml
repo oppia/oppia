@@ -131,8 +131,8 @@ jobs:
             - oppia/third_party/
             - oppia_tools/
       - store_artifacts:
-          path: /home/circleci/protractor_screenshots/
-          destination: protractor_screenshots
+          path: /home/circleci/protractor-screenshots/
+          destination: protractor-screenshots
 
   # Production environment e2e tests
   # The following e2e tests are run in the production environment. Tests that require uploading files
@@ -167,8 +167,8 @@ jobs:
             - oppia/build/
             - oppia/third_party/generated/
       - store_artifacts:
-          path: /home/circleci/protractor_screenshots/
-          destination: protractor_screenshots
+          path: /home/circleci/protractor-screenshots/
+          destination: protractor-screenshots
 
   e2e_library_and_collections:
     <<: *job_defaults
@@ -203,8 +203,8 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="accessibility" --prod_env
       - store_artifacts:
-          path: /home/circleci/protractor_screenshots/
-          destination: protractor_screenshots
+          path: /home/circleci/protractor-screenshots/
+          destination: protractor-screenshots
 
   e2e_users:
     <<: *job_defaults
@@ -243,8 +243,8 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env
       - store_artifacts:
-          path: /home/circleci/protractor_screenshots/
-          destination: protractor_screenshots
+          path: /home/circleci/protractor-screenshots/
+          destination: protractor-screenshots
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
@@ -284,8 +284,8 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="featureGating"
       - store_artifacts:
-          path: /home/circleci/protractor_screenshots/
-          destination: protractor_screenshots
+          path: /home/circleci/protractor-screenshots/
+          destination: protractor-screenshots
 
   e2e_non_prod_new_structure_tests:
     <<: *job_defaults
@@ -320,8 +320,8 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="topicAndStoryViewer"
       - store_artifacts:
-          path: /home/circleci/protractor_screenshots/
-          destination: protractor_screenshots
+          path: /home/circleci/protractor-screenshots/
+          destination: protractor-screenshots
 
 notify:
   webhooks:
