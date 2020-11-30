@@ -22,6 +22,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { SpyLocation } from '@angular/common/testing';
 import { Location } from '@angular/common';
+
 import { TopicEditorRoutingService } from './topic-editor-routing.service';
 import { angularServices } from 'services/angular-services.index';
 import { importAllAngularServices } from 'tests/unit-test-utils';

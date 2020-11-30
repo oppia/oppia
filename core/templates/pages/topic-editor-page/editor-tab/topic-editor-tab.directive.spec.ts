@@ -18,15 +18,13 @@
  */
 
 import { EventEmitter } from '@angular/core';
-
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
 import { SpyLocation } from '@angular/common/testing';
 import { Location } from '@angular/common';
-import { angularServices } from 'services/angular-services.index';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
+import { angularServices } from 'services/angular-services.index';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 
