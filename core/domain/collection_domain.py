@@ -1310,13 +1310,9 @@ class CollectionSummary(python_utils.OBJECT):
         Args:
             contributor_id: str. ID of the contributor to be added.
         """
-        contributors_summary = (
-            self.contributors_summary if self.contributors_summary else {})
-
         if contributor_id not in constants.SYSTEM_USER_IDS:
             self.contributors_summary[contributor_id] = (
                 self.contributors_summary.get(contributor_id, 0) + 1)
 
-        self.contributors_summary = contributors_summary
         if contributor_id not in self.contributor_ids:
             self.contributor_ids.append(contributor_id)
