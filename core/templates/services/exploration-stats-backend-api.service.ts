@@ -34,7 +34,7 @@ export class ExplorationStatsBackendApiService {
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchExplorationStats(expId: string): Promise<ExplorationStats> {
+  async fetchExplorationStatsAsync(expId: string): Promise<ExplorationStats> {
     return this.http.get<ExplorationStatsBackendDict>(
       this.urlInterpolationService.interpolateUrl(
         '/createhandler/statistics/<exploration_id>', {
