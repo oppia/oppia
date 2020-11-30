@@ -2910,7 +2910,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(suggestion_model.final_reviewer_id, None)
 
 
-class DeleteInvalidSuggestionModelsOneOffJobTests(test_utils.GenericTestBase):
+class DeleteAllQuestionAndInvalidSuggestionsOneOffJobTests(
+        test_utils.GenericTestBase):
 
     target_id = 'exp1'
     target_version_at_submission = 1
@@ -2950,7 +2951,7 @@ class DeleteInvalidSuggestionModelsOneOffJobTests(test_utils.GenericTestBase):
     }
 
     def _run_job_and_verify_output(self, expected_output):
-        """Runs the DeleteInvalidSuggestionModelsOneOffJobTests and
+        """Runs the DeleteAllQuestionAndInvalidSuggestionsOneOffJobTests and
         verifies that the output matches the expected output.
 
         Args:
@@ -2959,21 +2960,23 @@ class DeleteInvalidSuggestionModelsOneOffJobTests(test_utils.GenericTestBase):
         """
         job_id = (
             suggestion_jobs_one_off
-            .DeleteInvalidSuggestionModelsOneOffJob.create_new())
+            .DeleteAllQuestionAndInvalidSuggestionsOneOffJob.create_new())
         (
             suggestion_jobs_one_off
-            .DeleteInvalidSuggestionModelsOneOffJob.enqueue(job_id)
+            .DeleteAllQuestionAndInvalidSuggestionsOneOffJob.enqueue(job_id)
         )
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
             suggestion_jobs_one_off
-            .DeleteInvalidSuggestionModelsOneOffJob.get_output(job_id))
+            .DeleteAllQuestionAndInvalidSuggestionsOneOffJob.get_output(
+                job_id))
 
         self.assertEqual(actual_output, expected_output)
 
     def setUp(self):
-        super(DeleteInvalidSuggestionModelsOneOffJobTests, self).setUp()
+        super(
+            DeleteAllQuestionAndInvalidSuggestionsOneOffJobTests, self).setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')

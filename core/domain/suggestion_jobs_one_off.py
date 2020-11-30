@@ -477,9 +477,10 @@ class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class DeleteInvalidSuggestionModelsOneOffJob(
+class DeleteAllQuestionAndInvalidSuggestionsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to delete invalid suggestion models in the server.
+    """One-off job to delete all questions and invalid suggestion models in the
+    server.
 
     This job deletes following suggestion and connected models:
         - Deletes all the question suggestions as the old question suggestions
