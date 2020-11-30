@@ -281,7 +281,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               });
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
                 contentIdsWithModifiedContent);
-            };
+            }
 
             ctrl.changeActiveRuleIndex(-1);
             ctrl.rulesMemento = null;
