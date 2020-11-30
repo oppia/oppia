@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -86,3 +87,12 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
             'classroom_promos_are_enabled': (
                 config_domain.CLASSROOM_PROMOS_ARE_ENABLED.value)
         })
+
+
+class DefaultClassroomRedirectPage(base.BaseHandler):
+    """Redirects to the default classroom page."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
