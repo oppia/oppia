@@ -154,7 +154,9 @@
 
 ##########################################################################
 
-FROM ubuntu:18.04
+# Use latest version of Ubuntu that supports python 2
+# TODO: replace with "ubuntu:latest" once the backed is running on python 3
+FROM ubuntu:18.04 
 
 # To bypass tzdata configuration. 
 ENV DEBIAN_FRONTEND noninteractive
