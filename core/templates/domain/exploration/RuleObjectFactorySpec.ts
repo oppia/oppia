@@ -38,9 +38,43 @@ describe('RuleObjectFactory', () => {
   });
 
   it('should convert to a backend dictionary', () => {
-    let rulesDict = ruleObjectFactory.createFromBackendDict(
+    const rule = ruleObjectFactory.createFromBackendDict(
       ruleBackendDict, 'ItemSelectionInput');
-    expect(rulesDict.toBackendDict()).toEqual(ruleBackendDict);
+    expect(rule.toBackendDict()).toEqual(ruleBackendDict);
+  });
+
+  it('should convert to a backend dictionary with ' +
+     'SubtitledSetOfNormalizedString present', () => {
+    const textInputRuleBackendDict = {
+      rule_type: 'Equals',
+      inputs: {
+        x: {
+          content_id: 'ri',
+          normalized_str_set: ['a', 'b']
+        }
+      }
+    };
+    const textInputRule = ruleObjectFactory.createFromBackendDict(
+      textInputRuleBackendDict,
+      'TextInput');
+    expect(textInputRule.toBackendDict()).toEqual(textInputRuleBackendDict);
+  });
+
+  it('should convert to a backend dictionary with ' +
+     'SubtitledSetOfUnicodeString present', () => {
+    const setInputRuleBackendDict = {
+      rule_type: 'Equals',
+      inputs: {
+        x: {
+          content_id: 'ri',
+          unicode_str_set: ['a', 'b']
+        }
+      }
+    };
+    const setInputRule = ruleObjectFactory.createFromBackendDict(
+      setInputRuleBackendDict,
+      'SetInput');
+    expect(setInputRule.toBackendDict()).toEqual(setInputRuleBackendDict);
   });
 
   it('should creat a new rule from creatNew()', () => {
