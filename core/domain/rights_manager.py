@@ -130,7 +130,7 @@ def _update_collection_summary(activity_rights):
             activity.
     """
     from core.domain import collection_services
-    collection_services.regenerate_collection_summary_and_contributors_summary(
+    collection_services.regenerate_collection_and_contributors_summaries(
         activity_rights.id)
 
 

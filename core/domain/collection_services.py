@@ -976,12 +976,12 @@ def regenerate_collection_summary_with_new_contributor(
             summary.
     """
     collection = get_collection_by_id(collection_id)
-    collection_summary = compute_summary_of_collection(collection)
+    collection_summary = _compute_summary_of_collection(collection)
     collection_summary.add_new_contributor(contributor_id)
     save_collection_summary(collection_summary)
 
 
-def regenerate_collection_summary_and_contributors_summary(collection_id):
+def regenerate_collection_and_contributors_summaries(collection_id):
     """Regenerate a summary of the given collection and also regenerate
     the contributors summary from the snapshots. If the summary does not exist,
     this function generates a new one.
@@ -990,13 +990,13 @@ def regenerate_collection_summary_and_contributors_summary(collection_id):
         collection_id: str. ID of the collection.
     """
     collection = get_collection_by_id(collection_id)
-    collection_summary = compute_summary_of_collection(collection)
+    collection_summary = _compute_summary_of_collection(collection)
     collection_summary.contributors_summary = (
         compute_collection_contributors_summary(collection_summary.id))
     save_collection_summary(collection_summary)
 
 
-def compute_summary_of_collection(collection):
+def _compute_summary_of_collection(collection):
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
 
@@ -1011,6 +1011,11 @@ def compute_summary_of_collection(collection):
     collection_summary_model = (
         collection_models.CollectionSummaryModel.get_by_id(collection.id))
 
+    contributors_summary = (
+        collection_summary_model.contributors_summary
+        if collection_summary_model else {}
+    )
+
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on
     collection_model_node_count = len(collection.nodes)
@@ -1020,9 +1025,8 @@ def compute_summary_of_collection(collection):
         collection.objective, collection.language_code, collection.tags,
         collection_rights.status, collection_rights.community_owned,
         collection_rights.owner_ids, collection_rights.editor_ids,
-        collection_rights.viewer_ids, collection_summary_model.contributor_ids,
-        collection_summary_model.contributors_summary,
-        collection.version, collection_model_node_count,
+        collection_rights.viewer_ids, list(contributors_summary.keys()),
+        contributors_summary, collection.version, collection_model_node_count,
         collection_model_created_on, collection_model_last_updated
     )
 
