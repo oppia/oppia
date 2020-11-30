@@ -138,6 +138,7 @@ describe('ExplorationStatesService', function() {
             content: {},
             default_outcome: {},
             feedback_1: {},
+            ri: {}
           },
         },
         param_changes: [],
@@ -186,6 +187,7 @@ describe('ExplorationStatesService', function() {
             content: {},
             default_outcome: {},
             feedback_1: {},
+            ri: {}
           },
         },
         classifier_model_id: 0,
