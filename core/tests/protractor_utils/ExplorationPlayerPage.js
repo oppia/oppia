@@ -108,7 +108,7 @@ var ExplorationPlayerPage = function() {
     await waitFor.visibilityOf(
       voiceoverLanguageSelector, 'Language selector takes too long to appear.');
     var voiceoverLanguageOptionSelector = voiceoverLanguageSelector.element(
-      by.cssContainingText('option', language))
+      by.cssContainingText('option', language));
     await action.click('Next Card button', voiceoverLanguageOptionSelector);
   };
 
@@ -135,11 +135,15 @@ var ExplorationPlayerPage = function() {
       suggestionModal, 'Suggestion Modal is taking too long to appear.');
     var suggestionHeader = element(by.css('.oppia-rte'));
     await action.click('Suggestion Header', suggestionHeader);
-    await action.sendKeys('Suggestion Header', suggestionHeader, suggestionTitle);
+    await action.sendKeys(
+      'Suggestion Header', suggestionHeader, suggestionTitle);
     var suggestionModalDescription = element(
       by.css('.protractor-test-suggestion-description-input'));
     await action.click('Suggestion Modal Description', suggestionModalDescription);
-    await action.sendKeys('Suggestion Modal Description', suggestionModalDescription, suggestionDescription);
+    await action.sendKeys(
+      'Suggestion Modal Description',
+       suggestionModalDescription,
+       suggestionDescription);
     var submitSuggestionBtn = element(
       by.css('.protractor-test-suggestion-submit-btn'));
 
@@ -167,19 +171,16 @@ var ExplorationPlayerPage = function() {
   };
 
   this.viewHint = async function() {
-    var until = protractor.ExpectedConditions;
-    const WAIT_FOR_FIRST_HINT_MSEC = 60000;
     // We need to wait some time for the solution to activate.
     await action.click('View Hint Button', viewHintButton);
     await clickGotItButton();
   };
 
   this.viewSolution = async function() {
-    var until = protractor.ExpectedConditions;
-    const WAIT_FOR_SUBSEQUENT_HINTS = 30000;
     // We need to wait some time for the solution to activate.
     await action.click('View Solution Button', viewSolutionButton);
-    await action.click('Continue To Solution Button', continueToSolutionButton);
+    await action.click(
+      'Continue To Solution Button', continueToSolutionButton);
     await clickGotItButton();
   };
 
@@ -202,7 +203,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickOnCloseSuggestionModalButton = async function() {
-    await action.click('Close Suggestion Modal Button', closeSuggestionModalButton);
+    await action.click(
+      'Close Suggestion Modal Button', closeSuggestionModalButton);
     await waitFor.pageToFullyLoad();
   };
 
@@ -309,7 +311,8 @@ var ExplorationPlayerPage = function() {
     await action.click('Suggestion Popup Link', suggestionPopupLink);
     var editor = await forms.RichTextEditor(explorationSuggestionModal);
     await editor.setPlainText(suggestion);
-    await action.sendKeys('Suggestion Description Input', suggestionDescriptionInput, description);
+    await action.sendKeys(
+      'Suggestion Description Input', suggestionDescriptionInput, description);
     await action.click('Suggestion Submit Button', suggestionSubmitButton);
     await waitFor.invisibilityOf(
       suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
