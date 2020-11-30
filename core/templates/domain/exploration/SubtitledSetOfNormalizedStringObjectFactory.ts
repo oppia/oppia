@@ -47,6 +47,10 @@ export class SubtitledSetOfNormalizedString {
   }
 
   toBackendDict(): SubtitledSetOfNormalizedStringBackendDict {
+    if (this._contentId === null) {
+      throw new Error('Content id is null');
+    }
+
     return {
       normalized_str_set: this._normalizedStrings,
       content_id: this._contentId

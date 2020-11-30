@@ -57,4 +57,12 @@ describe('SubtitledSetOfNormalizedString object factory', () => {
     const defaultSubtitledUnicode = ssonsof.createDefault();
     expect(defaultSubtitledUnicode.getContentId()).toEqual(null);
   });
+
+  it('should throw an error if converted to backend dict when content id ' +
+    'is null', () => {
+    subtitledSetOfNormalizedString.setContentId(null);
+    expect(() => {
+      subtitledSetOfNormalizedString.toBackendDict();
+    }).toThrowError('Content id is null');
+  });
 });
