@@ -105,8 +105,9 @@ describe('Subtopic viewer page', function() {
           url_fragment: subtopicUrlFragment
         }
       }));
-    spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicData').and.returnValue(
-      $q.resolve(subtopicDataObject));
+    spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicDataAsync').and
+      .returnValue(
+        $q.resolve(subtopicDataObject));
     spyOn(
       OppiaAngularRootComponent.pageTitleService,
       'setPageTitle').and.callThrough();
@@ -150,7 +151,7 @@ describe('Subtopic viewer page', function() {
         'math');
       spyOn(UrlService, 'getSubtopicUrlFragmentFromLearnerUrl').and.returnValue(
         subtopicUrlFragment);
-      spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicData').and
+      spyOn(SubtopicViewerBackendApiService, 'fetchSubtopicDataAsync').and
         .returnValue(
           $q.reject({
             status: 404
