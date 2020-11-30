@@ -139,11 +139,12 @@ var ExplorationPlayerPage = function() {
       'Suggestion Header', suggestionHeader, suggestionTitle);
     var suggestionModalDescription = element(
       by.css('.protractor-test-suggestion-description-input'));
-    await action.click('Suggestion Modal Description', suggestionModalDescription);
+    await action.click(
+      'Suggestion Modal Description', suggestionModalDescription);
     await action.sendKeys(
       'Suggestion Modal Description',
-       suggestionModalDescription,
-       suggestionDescription);
+      suggestionModalDescription,
+      suggestionDescription);
     var submitSuggestionBtn = element(
       by.css('.protractor-test-suggestion-submit-btn'));
 
