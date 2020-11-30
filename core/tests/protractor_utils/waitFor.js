@@ -148,7 +148,7 @@ var invisibilityOfInfoToast = async function(errorMessage) {
 };
 
 var visibilityOfSuccessToast = async function(errorMessage) {
-  await invisibilityOf(toastSuccessElement, errorMessage);
+  await visibilityOf(toastSuccessElement, errorMessage);
 };
 
 var modalPopupToAppear = async function() {
