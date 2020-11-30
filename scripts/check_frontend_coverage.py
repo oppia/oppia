@@ -112,7 +112,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-summary-tile.directive.ts',
     'expression-evaluator.service.ts',
     'expression-interpolation.service.ts',
-    'expression-type-parser.service.ts',
     'fatigue-detection.service.ts',
     'feedback-popup.directive.ts',
     'filepath-editor.directive.ts',
