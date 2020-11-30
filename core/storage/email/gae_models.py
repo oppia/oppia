@@ -316,7 +316,8 @@ class BulkEmailModel(base_models.BaseModel):
             feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
             feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
             feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT,
-            feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT
+            feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT,
+            feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE
         ])
     # The subject line of the email.
     subject = datastore_services.TextProperty(required=True)
