@@ -263,21 +263,25 @@ angular.module('oppia').directive('answerGroupEditor', [
           };
 
           ctrl.saveRules = function() {
-            const updatedContentIdToContent = ctrl.getContentIdToContent();
-            const contentIdsWithModifiedContent = [];
+            if (ctrl.originalContentIdToContent) {
+              const updatedContentIdToContent = ctrl.getContentIdToContent();
+              const contentIdsWithModifiedContent = [];
 
-            Object.keys(ctrl.originalContentIdToContent).forEach(contentId => {
-              if (
-                ctrl.originalContentIdToContent.hasOwnProperty(contentId) &&
-                updatedContentIdToContent.hasOwnProperty(contentId) &&
-                (!_.isEqual(ctrl.originalContentIdToContent[contentId],
-                  updatedContentIdToContent[contentId]))
-              ) {
-                contentIdsWithModifiedContent.push(contentId);
-              }
-            });
-            ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-              contentIdsWithModifiedContent);
+              Object.keys(
+                ctrl.originalContentIdToContent
+              ).forEach(contentId => {
+                if (
+                  ctrl.originalContentIdToContent.hasOwnProperty(contentId) &&
+                  updatedContentIdToContent.hasOwnProperty(contentId) &&
+                  (!_.isEqual(ctrl.originalContentIdToContent[contentId],
+                    updatedContentIdToContent[contentId]))
+                ) {
+                  contentIdsWithModifiedContent.push(contentId);
+                }
+              });
+              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+                contentIdsWithModifiedContent);
+            };
 
             ctrl.changeActiveRuleIndex(-1);
             ctrl.rulesMemento = null;
