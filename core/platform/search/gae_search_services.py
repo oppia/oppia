@@ -228,8 +228,7 @@ def add_documents_to_index(documents, index):
     return [r.id for r in results]
 
 
-def delete_documents_from_index(
-        doc_ids, index):
+def delete_documents_from_index(doc_ids, index):
     """Deletes documents from an index.
 
     Args:
