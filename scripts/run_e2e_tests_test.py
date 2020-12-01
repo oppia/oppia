@@ -1338,6 +1338,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
+        def mock_exit(unused_exit_code):
+            return
+
         def mock_build_js_files(
                 unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
             return
@@ -1439,13 +1442,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 {'stdout': subprocess.PIPE},
             ],
         )
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(0,)])
 
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
                         with get_parameters_swap, popen_swap:
-                            with get_chrome_driver_version_swap:
+                            with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(args=[])
 
     def test_start_tests_skip_build(self):
@@ -1462,6 +1467,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         def mock_cleanup():
+            return
+
+        def mock_exit(unused_exit_code):
             return
 
         def mock_modify_constants(prod_env, maintenance_mode=False):  # pylint: disable=unused-argument
@@ -1559,12 +1567,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 {'stdout': subprocess.PIPE},
             ],
         )
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with modify_constants_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
                         with get_parameters_swap, popen_swap:
-                            with get_chrome_driver_version_swap:
+                            with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
                                     args=['--skip-install', '--skip-build'])
 
@@ -1631,6 +1641,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         def mock_cleanup():
+            return
+
+        def mock_exit(unused_exit_code):
             return
 
         def mock_build_js_files(
@@ -1733,11 +1746,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 {'stdout': subprocess.PIPE},
             ],
         )
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
-                        with get_parameters_swap, popen_swap:
+                        with get_parameters_swap, popen_swap, exit_swap:
                             with get_chrome_driver_version_swap:
                                 run_e2e_tests.main(args=['--debug_mode'])
 
@@ -1755,6 +1770,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         def mock_cleanup():
+            return
+
+        def mock_exit(unused_exit_code):
             return
 
         def mock_build_js_files(
@@ -1856,12 +1874,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 {'stdout': subprocess.PIPE},
             ],
         )
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
                         with get_parameters_swap, popen_swap:
-                            with get_chrome_driver_version_swap:
+                            with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
                                     args=[
                                         '--chrome_driver_version',

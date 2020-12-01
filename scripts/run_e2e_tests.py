@@ -716,6 +716,7 @@ def main(args=None):
         flake_state = run_tests(args=args)
         if flake_state == 'pass':
             break
+    sys.exit(0 if flake_state == 'pass' else 1)
 
 
 if __name__ == '__main__':  # pragma: no cover
