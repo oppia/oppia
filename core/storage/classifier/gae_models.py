@@ -28,6 +28,8 @@ import utils
 
 datastore_services = models.Registry.import_datastore_services()
 
+ALGORITHM_CHOICES = [classifier_details['algorithm_id'] for (
+    classifier_details) in feconf.INTERACTION_CLASSIFIER_MAPPING.values()]
 
 class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
@@ -38,7 +40,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     # The ID of the algorithm used to create the model.
     algorithm_id = datastore_services.StringProperty(
-        required=True, indexed=True)
+        required=True, choices=ALGORITHM_CHOICES, indexed=True)
     # The ID of the interaction to which the algorithm belongs.
     interaction_id = (
         datastore_services.StringProperty(required=True, indexed=True))

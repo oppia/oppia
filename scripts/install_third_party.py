@@ -332,8 +332,7 @@ def download_manifest_files(filepath):
 
             elif download_format == _DOWNLOAD_FORMAT_TAR:
                 dependency_tar_root_name = (
-                    dependency_contents['tarRootDirPrefix'] +
-                    dependency_rev)
+                    dependency_contents['tarRootDirPrefix'] + dependency_rev)
 
                 dependency_target_root_name = (
                     dependency_contents['targetDirPrefix'] + dependency_rev)
