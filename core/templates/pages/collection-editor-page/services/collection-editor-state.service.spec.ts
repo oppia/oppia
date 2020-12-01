@@ -54,8 +54,8 @@ describe('Collection editor state service', function() {
     var self = {
       newBackendCollectionObject: null,
       failure: null,
-      fetchCollection: null,
-      updateCollection: null
+      fetchCollectionAsync: null,
+      updateCollectionAsync: null
     };
 
     var _fetchOrUpdateCollection = function() {
@@ -71,8 +71,8 @@ describe('Collection editor state service', function() {
 
     self.newBackendCollectionObject = {};
     self.failure = null;
-    self.fetchCollection = _fetchOrUpdateCollection;
-    self.updateCollection = _fetchOrUpdateCollection;
+    self.fetchCollectionAsync = _fetchOrUpdateCollection;
+    self.updateCollectionAsync = _fetchOrUpdateCollection;
 
     return self;
   };
@@ -81,7 +81,7 @@ describe('Collection editor state service', function() {
     var self = {
       backendCollectionRightsObject: null,
       failure: null,
-      fetchCollectionRights: null,
+      fetchCollectionRightsAsync: null,
     };
 
     var _fetchCollectionRights = function() {
@@ -99,7 +99,7 @@ describe('Collection editor state service', function() {
 
     self.backendCollectionRightsObject = {};
     self.failure = null;
-    self.fetchCollectionRights = _fetchCollectionRights;
+    self.fetchCollectionRightsAsync = _fetchCollectionRights;
 
     return self;
   };
@@ -204,20 +204,20 @@ describe('Collection editor state service', function() {
   it('should request to load the collection from the backend', function() {
     spyOn(
       fakeEditableCollectionBackendApiService,
-      'fetchCollection').and.callThrough();
+      'fetchCollectionAsync').and.callThrough();
 
     CollectionEditorStateService.loadCollection(5);
-    expect(fakeEditableCollectionBackendApiService.fetchCollection)
+    expect(fakeEditableCollectionBackendApiService.fetchCollectionAsync)
       .toHaveBeenCalled();
   });
 
   it('should request to load the collection rights from the backend',
     function() {
-      spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRights')
+      spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRightsAsync')
         .and.callThrough();
 
       CollectionEditorStateService.loadCollection(5);
-      expect(fakeCollectionRightsBackendApiService.fetchCollectionRights)
+      expect(fakeCollectionRightsBackendApiService.fetchCollectionRightsAsync)
         .toHaveBeenCalled();
     }
   );
@@ -427,7 +427,7 @@ describe('Collection editor state service', function() {
   it('should be able to save the collection and pending changes', function() {
     spyOn(
       fakeEditableCollectionBackendApiService,
-      'updateCollection').and.callThrough();
+      'updateCollectionAsync').and.callThrough();
 
     CollectionEditorStateService.loadCollection(0);
     CollectionUpdateService.setCollectionTitle(
@@ -442,7 +442,7 @@ describe('Collection editor state service', function() {
     var expectedVersion = '1';
     var expectedCommitMessage = 'Commit message';
     var updateCollectionSpy = (
-      fakeEditableCollectionBackendApiService.updateCollection);
+      fakeEditableCollectionBackendApiService.updateCollectionAsync);
     expect(updateCollectionSpy).toHaveBeenCalledWith(
       expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
   });

@@ -18,6 +18,8 @@
 
 require('pages/splash-page/splash-page.component.ts');
 
+const constants = require('constants.ts');
+
 describe('Splash Page', function() {
   var $scope = null, ctrl = null;
   var $timeout = null;
@@ -81,14 +83,15 @@ describe('Splash Page', function() {
     expect(startLoginEventSpy).toHaveBeenCalled();
   });
 
-  it('should redirect to library page', function() {
+  it('should redirect to default classroom page', function() {
     var clickBrowseLibraryButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
+      SiteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
       .and.callThrough();
-    ctrl.onClickBrowseLibraryButton();
+    ctrl.onClickBrowseLessonsButton();
     $timeout.flush(150);
 
-    expect(windowRefMock.nativeWindow.location).toBe('/community-library');
+    expect(windowRefMock.nativeWindow.location).toBe(
+      `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
     expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
   });
 

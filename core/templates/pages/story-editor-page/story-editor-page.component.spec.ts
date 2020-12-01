@@ -231,6 +231,9 @@ describe('Story editor page', function() {
     spyOn(
       StoryEditorStateService,
       'getStoryWithUrlFragmentExists').and.returnValue(true);
+    spyOn(StoryEditorStateService, 'getSkillSummaries').and.returnValue([{
+      id: 'skill_id'
+    }]);
     MockStoryEditorNavigationService.checkIfPresentInChapterEditor = () => true;
     ctrl.$onInit();
     expect(ctrl.validationIssues).toEqual(
