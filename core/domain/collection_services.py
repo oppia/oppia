@@ -966,7 +966,7 @@ def update_collection(
 
 def regenerate_collection_summary_with_new_contributor(
         collection_id, contributor_id):
-    """Regenerate a summary of the given collection and adds new contributor to
+    """Regenerate a summary of the given collection and add a new contributor to
     the contributors summary. If the summary does not exist, this function
     generates a new one.
 
@@ -977,7 +977,7 @@ def regenerate_collection_summary_with_new_contributor(
     """
     collection = get_collection_by_id(collection_id)
     collection_summary = _compute_summary_of_collection(collection)
-    collection_summary.add_new_contributor(contributor_id)
+    collection_summary.add_new_contribution_for_user(contributor_id)
     save_collection_summary(collection_summary)
 
 
@@ -1015,6 +1015,7 @@ def _compute_summary_of_collection(collection):
         collection_summary_model.contributors_summary
         if collection_summary_model else {}
     )
+    contributor_ids = list(contributors_summary.keys())
 
     collection_model_last_updated = collection.last_updated
     collection_model_created_on = collection.created_on
@@ -1025,8 +1026,8 @@ def _compute_summary_of_collection(collection):
         collection.objective, collection.language_code, collection.tags,
         collection_rights.status, collection_rights.community_owned,
         collection_rights.owner_ids, collection_rights.editor_ids,
-        collection_rights.viewer_ids, list(contributors_summary.keys()),
-        contributors_summary, collection.version, collection_model_node_count,
+        collection_rights.viewer_ids, contributor_ids, contributors_summary,
+        collection.version, collection_model_node_count,
         collection_model_created_on, collection_model_last_updated
     )
 

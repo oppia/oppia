@@ -155,7 +155,7 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # does not create a summary object, which is needed for the
         # job to update the index after updating the collection.
         collection_services.regenerate_collection_summary_with_new_contributor(
-            model, self.albert_id)
+            model.id, self.albert_id)
 
         # Start migration job on sample collection.
         job_id = (
@@ -257,7 +257,7 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # does not create a summary object, which is needed for the
         # job to update the index after updating the collection.
         collection_services.regenerate_collection_summary_with_new_contributor(
-            model, self.albert_id)
+            model.id, self.albert_id)
 
         # Check that collection_contents is empty.
         self.assertEqual(model.collection_contents, {})

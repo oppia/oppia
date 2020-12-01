@@ -397,8 +397,8 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.regenerate_exploration_summary(
-            self.NEW_EXP_ID, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.NEW_EXP_ID)
 
         # Delete the exploration before migration occurs.
         exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
@@ -706,8 +706,8 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.regenerate_exploration_summary(
-            self.NEW_EXP_ID, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.NEW_EXP_ID)
 
         # Delete the exploration before migration occurs.
         exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)

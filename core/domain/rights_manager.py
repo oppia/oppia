@@ -116,7 +116,8 @@ def _update_exploration_summary(activity_rights):
     """
     # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
-    exp_services.regenerate_exploration_summary(activity_rights.id, None)
+    exp_services.regenerate_exploration_and_contributors_summaries(
+        activity_rights.id)
 
 
 def _update_collection_summary(activity_rights):

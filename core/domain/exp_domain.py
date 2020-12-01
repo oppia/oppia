@@ -4815,7 +4815,7 @@ class ExplorationSummary(python_utils.OBJECT):
             user_id in self.viewer_ids
         )
 
-    def add_new_contributor(self, contributor_id):
+    def add_new_contribution_for_user(self, contributor_id):
         """Add a new contributor to the contributors summary.
 
         Args:
@@ -4825,5 +4825,4 @@ class ExplorationSummary(python_utils.OBJECT):
             self.contributors_summary[contributor_id] = (
                 self.contributors_summary.get(contributor_id, 0) + 1)
 
-        if contributor_id not in self.contributor_ids:
-            self.contributor_ids.append(contributor_id)
+        self.contributor_ids = list(self.contributors_summary.keys())
