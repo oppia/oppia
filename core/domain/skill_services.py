@@ -43,6 +43,7 @@ import python_utils
         models.NAMES.skill, models.NAMES.user, models.NAMES.question,
         models.NAMES.topic]))
 datastore_services = models.Registry.import_datastore_services()
+transaction_services = models.Registry.import_transaction_services()
 
 
 # Repository GET methods.
@@ -777,8 +778,9 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
-    skill_models.SkillModel.delete_multi(
-        [skill_id], committer_id, '', force_deletion=force_deletion)
+    transaction_services.run_in_transaction(
+        skill_models.SkillModel.delete_multi, [skill_id],
+        committer_id, '', force_deletion=force_deletion)
 
     # This must come after the skill is retrieved. Otherwise the memcache
     # key will be reinstated.

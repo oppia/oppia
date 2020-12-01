@@ -33,6 +33,7 @@ import utils
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
+transaction_services = models.Registry.import_transaction_services()
 
 
 def create_new_question(committer_id, question, commit_message):
@@ -310,9 +311,11 @@ def delete_question(
         opportunity_services.increment_question_counts(
             question_model.linked_skill_ids, -1)
 
-    question_models.QuestionModel.delete_multi(
-        [question_id], committer_id,
-        feconf.COMMIT_MESSAGE_QUESTION_DELETED, force_deletion=force_deletion)
+    transaction_services.run_in_transaction(
+        question_models.QuestionModel.delete_multi, [question_id],
+        committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
+        force_deletion=force_deletion)
+
     question_summary_model = (
         question_models.QuestionSummaryModel.get(question_id, False))
     if question_summary_model is not None:
