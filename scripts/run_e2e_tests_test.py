@@ -34,7 +34,6 @@ import googleapiclient.discovery
 import python_utils
 from scripts import build
 from scripts import common
-from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 
@@ -682,30 +681,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         with install_swap:
             run_e2e_tests.setup_and_install_dependencies(False)
-
-    def test_setup_and_install_dependencies_on_travis(self):
-
-        def mock_install_third_party_libs_main():
-            return
-
-        def mock_install_chrome_main(args):  # pylint: disable=unused-argument
-            return
-
-        def mock_getenv(unused_variable_name):
-            return True
-
-        install_swap = self.swap_with_checks(
-            install_third_party_libs, 'main',
-            mock_install_third_party_libs_main)
-        install_chrome_swap = self.swap_with_checks(
-            install_chrome_on_travis, 'main', mock_install_chrome_main,
-            expected_kwargs=[{'args': []}])
-        getenv_swap = self.swap_with_checks(
-            os, 'getenv', mock_getenv, expected_args=[('TRAVIS',)])
-
-        with install_swap, install_chrome_swap:
-            with getenv_swap:
-                run_e2e_tests.setup_and_install_dependencies(False)
 
     def test_setup_and_install_dependencies_with_skip(self):
 
