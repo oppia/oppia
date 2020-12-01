@@ -215,7 +215,7 @@ def add_documents_to_index(documents, index):
     except gae_search.PutError as e:
         logging.exception('PutError raised.')
 
-        # At this pint, either we don't have any tries left, or none of the
+        # At this point, either we don't have any tries left, or none of the
         # results has a transient error code.
         raise SearchFailureError(e)
 

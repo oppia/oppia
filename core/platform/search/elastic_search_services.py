@@ -23,10 +23,17 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 
-import elasticsearch
 import feconf
 import python_utils
 
+import elasticsearch
+
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-max-result-window
+# This is the maximum number of pages to page through using the from and size
+# parameters to page through any given index. This number is equal to the limit
+# index.max_result_window and defines the maximum the sum of the parameters
+# (size + from) can be. If needed, we will have to change this to use the
+# search_after parameter or scrolling option as mentioned in the link above.
 MAXIMUM_NUMBER_OF_PAGES = 10000
 ES = elasticsearch.Elasticsearch()
 
@@ -103,9 +110,9 @@ def search(
         query_string, index_name, offset=None,
         limit=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents matching the given query in the given index.
-    NOTE: We cannot search through more than 10,000 documents by paginating
-    using limit and offset. If the number of items to search through is greater
-    that 10,000, use the elasticsearch scroll API instead.
+    NOTE: We cannot search through more than 10,000 pages from a search by
+    paginating using limit and offset. If the number of items to search through
+    is greater that 10,000, use the elasticsearch scroll API instead.
 
     Args:
         query_string: str. The search definition using Query DSL.
@@ -122,9 +129,10 @@ def search(
             result_docs: list(dict). Represents search documents. If ids_only is
                 True, this will be a list of strings, doc_ids.
             resulting_offset: int. The resulting offset to start at for the next
-                page of results. Return None if there are no more pages.
+                section of the resulting pages. Return None if there are no more
+                pages.
     """
-    assert limit < MAXIMUM_NUMBER_OF_PAGES
+    assert offset + limit < MAXIMUM_NUMBER_OF_PAGES
     query_definiton = json.loads(query_string)
     response = ES.search(
         body=query_definiton, index=index_name,
