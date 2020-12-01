@@ -82,10 +82,6 @@ def _get_build_info():
 
 def is_test_output_flaky(output_lines, suite_name):
     """Returns whether the test output matches any flaky test log."""
-    if FLAKE_REPORT_URL is None:
-        _print_color_message('No URL found to check flakiness.')
-        return False
-
     build_info = _get_build_info()
     payload = {
         'suite': suite_name,
@@ -101,19 +97,21 @@ def is_test_output_flaky(output_lines, suite_name):
         _print_color_message('Failed to fetch report from %s: %s' % (
             FLAKE_REPORT_URL, e))
 
+        return False
+
     if not response.ok:
-        _print_color_message('Failed request with response code: %s' % (
-            response.status_code))
+        _print_color_message('Failed request with response code: %s (%s)' % (
+            response.status_code, response.reason))
         return False
 
     report = {}
     try:
         report = response.json()
-        _print_color_message(report['log'])
     except Exception as e:
         _print_color_message('Unable to convert json response: %s' % e)
 
-    if 'logs' in report:
-        _print_color_message('\n'.join(report['logs']))
+    if 'log' in report:
+        _print_color_message(
+            'Logs from test result logging server:\n %s' % report['log'])
 
     return report['result'] if 'result' in report else False

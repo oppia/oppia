@@ -75,6 +75,7 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor.conf.js')
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
+FAILURE_OUTPUT_STRING = '*                    Failures                    *'
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -566,7 +567,7 @@ def run_tests(args):
         sys.stdout.write(nextline)
         sys.stdout.flush()
         try:
-            output_lines.append(python_utils.UNICODE(nextline.strip()))
+            output_lines.append(python_utils.UNICODE(nextline.rstrip()))
         except UnicodeDecodeError:
             pass
 
@@ -575,7 +576,7 @@ def run_tests(args):
 
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
-    args = _PARSER.parse_args(args=args)
+    parsed_args = _PARSER.parse_args(args=args)
 
     portserver_process = start_portserver()
     atexit.register(cleanup_portserver, portserver_process)
@@ -584,9 +585,9 @@ def main(args=None):
 
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
-        output, return_code = run_tests(args)
+        output, return_code = run_tests(parsed_args)
         if return_code == 0 or not flake_checker.is_test_output_flaky(
-                output, args.suite):
+                output, parsed_args.suite):
             break
         else:
             cleanup_portserver(portserver_process)
