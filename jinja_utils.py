@@ -86,7 +86,10 @@ def parse_string(string, params, autoescape=True):
     env = jinja2.Environment(autoescape=autoescape)
 
     env.filters.update(JINJA_FILTERS)
-    parsed_string = env.parse(string)
+    try:
+        parsed_string = env.parse(string)
+    except jinja2.exceptions.TemplateError:
+        raise Exception('Unable to parse string with Jinja: %s' % string)
 
     variables = meta.find_undeclared_variables(parsed_string)
     if any([var not in params for var in variables]):

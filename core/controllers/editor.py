@@ -397,7 +397,10 @@ class ExplorationFileDownloader(EditorHandler):
         version_str = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
 
-        version = int(version_str)
+        try:
+            version = int(version_str)
+        except ValueError:
+            version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
         if not exploration.title:

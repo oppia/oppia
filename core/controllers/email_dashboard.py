@@ -137,7 +137,7 @@ class QueryStatusCheckHandler(base.BaseHandler):
     def get(self):
         query_id = self.request.get('query_id')
 
-        query_model = user_models.UserQueryModel.get(query_id, strcit=False)
+        query_model = user_models.UserQueryModel.get(query_id, strict=False)
         if query_model is None:
             raise self.InvalidInputException('Invalid query id.')
 
