@@ -42,7 +42,7 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationPlayerStateService', [
-  '$q', 'ContextService', 'EditableExplorationBackendApiService',
+  '$q', '$rootScope', 'ContextService', 'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerTranscriptService',
@@ -51,7 +51,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
   'ReadOnlyExplorationBackendApiService', 'StatsReportingService', 'UrlService',
   'EXPLORATION_MODE',
   function(
-      $q, ContextService, EditableExplorationBackendApiService,
+      $q, $rootScope, ContextService, EditableExplorationBackendApiService,
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerTranscriptService,
@@ -72,6 +72,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         .loadExploration(explorationId, version)
         .then(function(exploration) {
           version = exploration.version;
+          $rootScope.$applyAsync();
         });
     }
 

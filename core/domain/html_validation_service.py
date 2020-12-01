@@ -963,7 +963,8 @@ def does_svg_tag_contains_xmlns_attribute(svg_string):
     # SVGs having non-ascii unicode characters and raises a UnicodeDecodeError.
     soup = bs4.BeautifulSoup(svg_string, 'html.parser')
     return all(
-        svg_tag.get('xmlns') != None for svg_tag in soup.findAll(name='svg'))
+        svg_tag.get('xmlns') is not None for svg_tag in soup.findAll(name='svg')
+    )
 
 
 def get_svg_with_xmlns_attribute(svg_string):

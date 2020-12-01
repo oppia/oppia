@@ -23,6 +23,7 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import logging
 
 from constants import constants
@@ -234,6 +235,82 @@ def does_story_exist_with_url_fragment(url_fragment):
     return story is not None
 
 
+def validate_prerequisite_skills_in_story_contents(
+        corresponding_topic_id, story_contents):
+    """Validates the prerequisites skills in the story contents.
+
+    Args:
+        corresponding_topic_id: str. The corresponding topic id of the story.
+        story_contents: StoryContents. The story contents.
+
+    Raises:
+        ValidationError. Expected prerequisite skills to have been acquired in
+            previous nodes.
+        ValidationError. Expected story to not contain loops.
+    """
+    if len(story_contents.nodes) == 0:
+        return
+    # nodes_queue stores the pending nodes to visit in the story that
+    # are unlocked, in a 'queue' form with a First In First Out
+    # structure.
+    nodes_queue = []
+    is_node_visited = [False] * len(story_contents.nodes)
+    starting_node_index = story_contents.get_node_index(
+        story_contents.initial_node_id)
+    nodes_queue.append(story_contents.nodes[starting_node_index].id)
+
+    # The user is assumed to have all the prerequisite skills of the
+    # starting node before starting the story. Also, this list models
+    # the skill IDs acquired by a learner as they progress through the
+    # story.
+    simulated_skill_ids = copy.deepcopy(
+        story_contents.nodes[starting_node_index].prerequisite_skill_ids)
+
+    # The following loop employs a Breadth First Search from the given
+    # starting node and makes sure that the user has acquired all the
+    # prerequisite skills required by the destination nodes 'unlocked'
+    # by visiting a particular node by the time that node is finished.
+    while len(nodes_queue) > 0:
+        current_node_id = nodes_queue.pop()
+        current_node_index = story_contents.get_node_index(current_node_id)
+        is_node_visited[current_node_index] = True
+        current_node = story_contents.nodes[current_node_index]
+
+        for skill_id in current_node.acquired_skill_ids:
+            simulated_skill_ids.append(skill_id)
+
+        for node_id in current_node.destination_node_ids:
+            node_index = story_contents.get_node_index(node_id)
+            # The following condition checks whether the destination
+            # node for a particular node, has already been visited, in
+            # which case the story would have loops, which are not
+            # allowed.
+            if is_node_visited[node_index]:
+                raise utils.ValidationError(
+                    'Loops are not allowed in stories.')
+            destination_node = story_contents.nodes[node_index]
+            skill_ids_present_in_topic = (
+                topic_fetchers.get_topic_by_id(
+                    corresponding_topic_id).get_all_skill_ids())
+            # Include only skill ids relevant to the topic for validation.
+            topic_relevant_skill_ids = list(
+                set(skill_ids_present_in_topic).intersection(
+                    set(destination_node.prerequisite_skill_ids)))
+            if not (
+                    set(
+                        topic_relevant_skill_ids
+                    ).issubset(simulated_skill_ids)):
+                raise utils.ValidationError(
+                    'The skills with ids ' +
+                    ' '.join(
+                        set(topic_relevant_skill_ids) -
+                        set(simulated_skill_ids)) +
+                    ' were specified as prerequisites for Chapter %s,'
+                    ' but were not taught in any chapter before it.'
+                    % destination_node.title)
+            nodes_queue.append(node_id)
+
+
 def validate_explorations_for_story(exp_ids, raise_error):
     """Validates the explorations in the given story and checks whether they
     are compatible with the mobile app and ready for publishing.
@@ -398,6 +475,8 @@ def _save_story(
             'save story %s: %s' % (story.id, change_list))
 
     story.validate()
+    validate_prerequisite_skills_in_story_contents(
+        story.corresponding_topic_id, story.story_contents)
 
     if story_is_published:
         exp_ids = []

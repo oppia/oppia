@@ -136,7 +136,7 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
                 exploration_id, exp_version, state_name))
         if state_training_jobs_mapping is None:
             raise self.InvalidInputException(
-                "No training jobs exist for given exploration state")
+                'No training jobs exist for given exploration state')
 
         if not (
                 algorithm_id in state_training_jobs_mapping.
@@ -149,15 +149,15 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
             # upon further requests. This exception should be gracefully
             # handled in the client code and shouldn't break UX.
             raise self.PageNotFoundException(
-                "No valid classifier exists for the given exploration state")
+                'No valid classifier exists for the given exploration state')
 
         training_job = classifier_services.get_classifier_training_job_by_id(
             state_training_jobs_mapping.algorithm_ids_to_job_ids[algorithm_id])
 
         if training_job is None or (
                 training_job.status != feconf.TRAINING_JOB_STATUS_COMPLETE):
-            raise self.PageNotFoundException (
-                "No valid classifier exists for the given exploration state")
+            raise self.PageNotFoundException(
+                'No valid classifier exists for the given exploration state')
 
         if training_job.algorithm_version != algorithm_version:
             classifier_services.migrate_state_training_jobs(
@@ -168,7 +168,7 @@ class TrainedClassifierHandler(base.OppiaMLVMHandler):
             # upon further requests. This exception should be gracefully
             # handled in the client code and shouldn't break UX.
             raise self.PageNotFoundException(
-                "No valid classifier exists for the given exploration state")
+                'No valid classifier exists for the given exploration state')
 
         return self.render_json({
             'gcs_filename': training_job.classifier_data_filename
