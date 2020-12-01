@@ -28,8 +28,6 @@ import python_utils
 
 from google.appengine.api import search as gae_search
 
-DEFAULT_NUM_RETRIES = 3
-
 
 def _dict_to_search_document(d):
     """Returns and converts the document dict into objects.
@@ -278,7 +276,7 @@ def clear_index(index_name):
 
 def search(
         query_string, index, cursor=None, limit=feconf.SEARCH_RESULTS_PAGE_SIZE,
-        sort='', ids_only=False, retries=DEFAULT_NUM_RETRIES):
+        sort='', ids_only=False):
     """Searches for documents in an index.
 
     Args:
@@ -296,7 +294,6 @@ def search(
             descending order respectively. This character should be followed by
             a field name to sort on.
         ids_only: bool. Whether to only return document ids.
-        retries: int. The number of times to retry searching the index.
 
     Returns:
         2-tuple of (result_docs, result_cursor_str). Where:
@@ -338,18 +335,7 @@ def search(
         results = index.search(query)
     except Exception as e:
         logging.exception('something went wrong while searching.')
-        if retries > 1:
-            logging.debug('%d attempts left, retrying...' % (retries - 1))
-            return search(
-                query_string,
-                index.name,
-                cursor=cursor,
-                limit=limit,
-                sort=sort,
-                ids_only=ids_only,
-                retries=retries - 1)
-        else:
-            raise SearchFailureError(e)
+        raise SearchFailureError(e)
 
     result_cursor_str = None
     if results.cursor:

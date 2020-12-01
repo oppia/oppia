@@ -23,8 +23,7 @@ from core.platform.search import elastic_search_services
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):
 
-    def run(self, result=None):
-        # Needs some type of edit.
+    def test(self):
         pass
 
 

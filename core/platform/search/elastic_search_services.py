@@ -117,17 +117,9 @@ def clear_index(index_name):
 
     Args:
         index_name: str. The name of the index to clear.
-
-    Raises:
-        ValueError. Invalid values are given as the index name.
     """
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
-    if not isinstance(index_name, python_utils.BASESTRING):
-        raise ValueError(
-            'Index must be the unicode/str name of an index, got %s'
-            % type(index_name))
-
     es.delete_by_query(
         index=index_name,
         body={
