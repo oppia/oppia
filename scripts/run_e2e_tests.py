@@ -89,6 +89,7 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor.conf.js')
 BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
+FAILURE_OUTPUT_STRING = '*                    Failures                    *'
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -635,13 +636,17 @@ def run_tests(args=None):
 
     p = subprocess.Popen(commands, stdout=subprocess.PIPE)
     output_lines = []
+    failure_seen = False
     while True:
         nextline = p.stdout.readline()
         if len(nextline) == 0 and p.poll() is not None:
             break
         sys.stdout.write(nextline)
         sys.stdout.flush()
-        output_lines.append(nextline.strip())
+        new_output_line = nextline.strip()
+        if new_output_line.decode('utf-8') == FAILURE_OUTPUT_STRING:
+            failure_seen = True
+        output_lines.append(new_output_line)
 
     flaky_tests_list = []
     google_auth_decode_password = os.getenv('GOOGLE_AUTH_DECODE_PASSWORD')
@@ -664,7 +669,7 @@ def run_tests(args=None):
     suite_name = parsed_args.suite.lower()
     if len(flaky_tests_list) > 0 and p.returncode != 0:
         for i, line in enumerate(output_lines):
-            if line == '*                    Failures                    *':
+            if line.decode('utf-8') == FAILURE_OUTPUT_STRING:
                 test_name = output_lines[i + 3][3:].strip().lower()
 
                 # Remove coloring characters.
@@ -697,15 +702,21 @@ def run_tests(args=None):
                                     # test is retried.
                                     pass # pragma: no cover
                                 return 'flake'
-    sys.exit(p.returncode)
+    if failure_seen:
+        cleanup_portserver(portserver_process)
+        cleanup()
+        return 'fail'
+    return 'pass'
 
 
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
-    for _ in python_utils.RANGE(MAX_RETRY_COUNT):
+    for count in python_utils.RANGE(MAX_RETRY_COUNT):
+        python_utils.PRINT('\n\n###### RUN COUNT %d ######\n\n' % (count + 1))
         flake_state = run_tests(args=args)
-        if flake_state != 'flake':
+        if flake_state == 'pass':
             break
+    sys.exit(0 if flake_state == 'pass' else 1)
 
 
 if __name__ == '__main__':  # pragma: no cover
