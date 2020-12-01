@@ -2862,3 +2862,56 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
+
+
+class InequalityWithNoneCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(InequalityWithNoneCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.InequalityWithNoneChecker)
+        self.checker_test_object.setup_method()
+
+    def test_inequality_op_on_none_adds_message(self):
+        if_node = astroid.extract_node(
+            """
+            if x != None: #@
+                pass
+            """
+        )
+        compare_node = if_node.test
+        not_equal_none_message = testutils.Message(
+            msg_id='inequality-with-none', node=compare_node)
+        with self.checker_test_object.assertAddsMessages(
+            not_equal_none_message
+        ):
+            self.checker_test_object.checker.visit_compare(compare_node)
+
+    def test_inequality_op_on_none_with_wrapped_none_adds_message(self):
+        if_node = astroid.extract_node(
+            """
+            if x != ( #@
+                None
+            ):
+                pass
+            """
+        )
+        compare_node = if_node.test
+        not_equal_none_message = testutils.Message(
+            msg_id='inequality-with-none', node=compare_node)
+        with self.checker_test_object.assertAddsMessages(
+            not_equal_none_message
+        ):
+            self.checker_test_object.checker.visit_compare(compare_node)
+
+    def test_usage_of_is_not_on_none_does_not_add_message(self):
+        if_node = astroid.extract_node(
+            """
+            if x is not None: #@
+                pass
+            """
+        )
+        compare_node = if_node.test
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_compare(compare_node)
