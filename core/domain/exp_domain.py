@@ -4821,6 +4821,7 @@ class ExplorationSummary(python_utils.OBJECT):
         Args:
             contributor_id: str. ID of the contributor to be added.
         """
+        # We don't want to record the contributions of system users.
         if contributor_id not in constants.SYSTEM_USER_IDS:
             self.contributors_summary[contributor_id] = (
                 self.contributors_summary.get(contributor_id, 0) + 1)
