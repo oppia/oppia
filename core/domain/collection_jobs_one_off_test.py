@@ -28,10 +28,12 @@ from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
 import feconf
+from google.appengine.ext import ndb
 
 (job_models, collection_models,) = models.Registry.import_models([
     models.NAMES.job, models.NAMES.collection])
 
+datastore_services = models.Registry.import_datastore_services()
 
 class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
@@ -275,3 +277,94 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
             new_model.collection_contents, {
                 'nodes': [node.to_dict()]
             })
+
+
+class MockCollectionRightsModel(collection_models.CollectionRightsModel):
+    """Mock CollectionRightsModel so that it allows to set `translator_ids`."""
+
+    translator_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True, required=False)
+
+
+class RemoveCollectionRightsTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob.create_new())
+        collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_one_collection_rights_model_with_translator_id(self):
+        with self.swap(collection_models, 'CollectionRightsModel', MockCollectionRightsModel):
+            original_collection_rights_model = (
+                collection_models.CollectionRightsModel(
+                    id='id',
+                    owner_ids=['owner_ids'],
+                    editor_ids=['editor_ids'],
+                    voice_artist_ids=[],
+                    viewer_ids=[],
+                    community_owned=False,
+                    status=constants.ACTIVITY_STATUS_PUBLIC,
+                    viewable_if_private=False,
+                    first_published_msec=0.0,
+                    translator_ids=['translator_id']
+                )
+            )
+            original_collection_rights_model.put()
+
+            self.assertIsNotNone(original_collection_rights_model.translator_ids)
+            self.assertIn('translator_ids', original_collection_rights_model._values)  # pylint: disable=protected-access
+            self.assertIn('translator_ids', original_collection_rights_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - CollectionRightsModel', 1]], output)
+
+            migrated_collection_rights_model = collection_models.CollectionRightsModel.get_by_id('id')
+
+            self.assertNotIn('translator_ids', migrated_collection_rights_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'translator_ids', migrated_collection_rights_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_collection_rights_model.last_updated,
+                migrated_collection_rights_model.last_updated)
+
+    def test_one_collection_rights_model_without_translator_id(self):
+        original_collection_rights_model = (
+            collection_models.CollectionRightsModel(
+                id='id',
+                owner_ids=['owner_ids'],
+                editor_ids=['editor_ids'],
+                voice_artist_ids=[],
+                viewer_ids=[],
+                community_owned=False,
+                status=constants.ACTIVITY_STATUS_PUBLIC,
+                viewable_if_private=False,
+                first_published_msec=0.0
+            )
+        )
+        original_collection_rights_model.put()
+
+        self.assertNotIn('translator_ids', original_collection_rights_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('translator_ids', original_collection_rights_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - CollectionRightsModel', 1]], output)
+
+        migrated_collection_rights_model = collection_models.CollectionRightsModel.get_by_id('id')
+        self.assertNotIn('translator_ids', migrated_collection_rights_model._values)  # pylint: disable=protected-access
+        self.assertNotIn('translator_ids', migrated_collection_rights_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_collection_rights_model.last_updated,
+            migrated_collection_rights_model.last_updated)

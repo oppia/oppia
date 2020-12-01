@@ -274,10 +274,6 @@ class CollectionRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
-    # DEPRECATED in v2.8.3. Do not use.
-    translator_ids = (
-        datastore_services.StringProperty(indexed=True, repeated=True))
-
     @staticmethod
     def get_deletion_policy():
         """CollectionRightsModel contains data to pseudonymize/delete
@@ -321,9 +317,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             'community_owned': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'viewable_if_private': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'status': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            # DEPRECATED in v2.8.3, so translator_ids are not exported.
-            'translator_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'first_published_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
