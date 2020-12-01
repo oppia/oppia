@@ -1217,7 +1217,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                                         run_e2e_tests.main(args=[])
                                         assert mock_simplecrypt.decrypt_called
 
-    def test_start_tests_when_no_other_instance_running(self):
+    def test_restart_on_failure(self):
 
         mock_process = MockProcessClass()
 
@@ -1258,13 +1258,118 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 return
             result = mock_process
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
+            result.returncode = 1 # pylint: disable=attribute-defined-outside-init
+            output = (
+                '*                    Failures                    *\n\n'
+                '\n 1. test1 \n1. error1 failed')
+            result.stdout = python_utils.string_io(
+                buffer_value=output)
+            return result
+
+        def mock_os_getenv(unused_env_var):
+            return None
+
+        def mock_exit(unused_code):
+            return
+
+        def mock_get_chrome_driver_version():
+            return CHROME_DRIVER_VERSION
+
+        get_chrome_driver_version_swap = self.swap(
+            run_e2e_tests, 'get_chrome_driver_version',
+            mock_get_chrome_driver_version)
+
+        check_swap = self.swap(
+            run_e2e_tests, 'is_oppia_server_already_running',
+            mock_is_oppia_server_already_running)
+
+        setup_and_install_swap = self.swap(
+            run_e2e_tests, 'setup_and_install_dependencies',
+            mock_setup_and_install_dependencies)
+
+        register_swap = self.swap(atexit, 'register', mock_register)
+        os_getenv_swap = self.swap(os, 'getenv', mock_os_getenv)
+
+        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
+        build_swap = self.swap(
+            run_e2e_tests, 'build_js_files', mock_build_js_files)
+        start_webdriver_swap = self.swap(
+            run_e2e_tests, 'start_webdriver_manager',
+            mock_start_webdriver_manager)
+        start_google_app_engine_server_swap = self.swap(
+            run_e2e_tests, 'start_google_app_engine_server',
+            mock_start_google_app_engine_server)
+        wait_swap = self.swap(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open)
+        ensure_screenshots_dir_is_removed_swap = self.swap(
+            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
+            mock_ensure_screenshots_dir_is_removed)
+        get_parameters_swap = self.swap(
+            run_e2e_tests, 'get_e2e_test_parameters',
+            mock_get_e2e_test_parameters)
+        popen_swap = self.swap(
+            subprocess, 'Popen', mock_popen)
+        exit_swap = self.swap(sys, 'exit', mock_exit)
+
+        with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
+            with build_swap, start_webdriver_swap:
+                with start_google_app_engine_server_swap:
+                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                        with get_parameters_swap, popen_swap, exit_swap:
+                            with get_chrome_driver_version_swap:
+                                with os_getenv_swap:
+                                    flake_state = run_e2e_tests.run_tests()
+                                    assert flake_state == 'fail'
+
+    def test_start_tests_when_no_other_instance_running(self):
+
+        mock_process = MockProcessClass()
+
+        def mock_is_oppia_server_already_running(*unused_args):
+            return False
+
+        def mock_setup_and_install_dependencies(unused_arg):
+            return
+
+        def mock_register(unused_func, unused_arg=None):
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_exit(unused_exit_code):
+            return
+
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
+            return
+
+        def mock_start_webdriver_manager(unused_arg):
+            return
+
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
+            return
+
+        def mock_wait_for_port_to_be_open(unused_port):
+            return
+
+        def mock_ensure_screenshots_dir_is_removed():
+            return
+
+        def mock_get_e2e_test_parameters(
+                unused_sharding_instances, unused_suite, unused_dev_mode):
+            return ['commands']
+
+        def mock_popen(unused_commands, stdout=None): # pylint: disable=unused-argument
+            def mock_communicate():
+                return
+            result = mock_process
+            result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             result.stdout = python_utils.string_io(
                 buffer_value='sample output\n')
             return result
-
-        def mock_exit(unused_code):
-            return
 
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
@@ -1344,8 +1449,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
-                        with get_parameters_swap, popen_swap, exit_swap:
-                            with get_chrome_driver_version_swap:
+                        with get_parameters_swap, popen_swap:
+                            with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(args=[])
 
     def test_start_tests_skip_build(self):
@@ -1362,6 +1467,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         def mock_cleanup():
+            return
+
+        def mock_exit(unused_exit_code):
             return
 
         def mock_modify_constants(prod_env, maintenance_mode=False):  # pylint: disable=unused-argument
@@ -1390,9 +1498,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
-
-        def mock_exit(unused_code):
-            return
 
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
@@ -1468,8 +1573,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             with modify_constants_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
-                        with get_parameters_swap, popen_swap, exit_swap:
-                            with get_chrome_driver_version_swap:
+                        with get_parameters_swap, popen_swap:
+                            with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
                                     args=['--skip-install', '--skip-build'])
 
@@ -1538,6 +1643,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
+        def mock_exit(unused_exit_code):
+            return
+
         def mock_build_js_files(
                 unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
             return
@@ -1565,9 +1673,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
-
-        def mock_exit(unused_code):
-            return
 
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
@@ -1667,6 +1772,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_cleanup():
             return
 
+        def mock_exit(unused_exit_code):
+            return
+
         def mock_build_js_files(
                 unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
             return
@@ -1694,9 +1802,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
-
-        def mock_exit(unused_code):
-            return
 
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
@@ -1775,8 +1880,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
                     with wait_swap, ensure_screenshots_dir_is_removed_swap:
-                        with get_parameters_swap, popen_swap, exit_swap:
-                            with get_chrome_driver_version_swap:
+                        with get_parameters_swap, popen_swap:
+                            with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
                                     args=[
                                         '--chrome_driver_version',
