@@ -3265,6 +3265,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-splash-section-one {
   background-color: #e7f6ff;
+  display: flex;
   height: 75vh;
   max-height: 75vw;
   overflow: hidden;
@@ -3279,12 +3280,6 @@ md-card.preview-conversation-skin-supplemental-card {
   color: #005c5e;
   display: flex;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-}
-
-.oppia-splash-headers {
-  margin-top: 15vh;
-  position: relative;
-  width: 45vw;
 }
 
 .oppia-splash-h1 {

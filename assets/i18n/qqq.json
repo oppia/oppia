@@ -552,7 +552,6 @@
 	"I18N_SPLASH_THIRD_EXPLORATION_DESCRIPTION": "Paragraph describing Oppia showed in the splash page next to an image.",
 	"I18N_SPLASH_TITLE_LINE_1": "The first line of the main title shown in Oppia's landing page. It should not exceed one line in length.",
 	"I18N_SPLASH_TITLE_LINE_2": "The second line of the main title shown in Oppia's landing page. It should not exceed one line in length.",
-	"I18N_SPLASH_TITLE_LINE_3": "The third line of the main title shown in Oppia's landing page. It should not exceed one line in length.",
 	"I18N_SPLASH_VOLUNTEERS_CONTENT": "The content displayed in the volunteers section on the splash page.",
 	"I18N_SPLASH_VOLUNTEERS_TITLE": "The main title for the volunteers section on the splash page.",
 	"I18N_START_HERE": "Click here to start!",

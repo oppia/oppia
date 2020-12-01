@@ -19,6 +19,7 @@
 require('base-components/base-content.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 
@@ -30,10 +31,12 @@ angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
     '$timeout', 'LoaderService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserService', 'WindowRef',
+    'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
+    'WindowRef',
     function(
         $timeout, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UserService, WindowRef) {
+        UrlInterpolationService, UserService, WindowDimensionsService,
+        WindowRef) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -75,6 +78,18 @@ angular.module('oppia').component('splashPage', {
         return false;
       };
 
+      ctrl.getMainBackgroundUrl = function() {
+        if (ctrl.isWindowNarrow()) {
+          return ctrl.getStaticImageUrl('/splash/splashMainMobile.png');
+        } else {
+          return ctrl.getStaticImageUrl('/splash/splashMainDesktop.png');
+        }
+      };
+
+      ctrl.isWindowNarrow = function() {
+        return WindowDimensionsService.isWindowNarrow();
+      };
+
       ctrl.onClickStartContributingButton = function() {
         $timeout(function() {
           WindowRef.nativeWindow.location = (
@@ -103,18 +118,24 @@ angular.module('oppia').component('splashPage', {
         ctrl.userIsLoggedIn = null;
         ctrl.testimonialId = 0;
         LoaderService.showLoadingScreen('Loading');
+        var communityBackgroundImageName = 'dsk_community_background.png';
+        var testimonialBackgroundImageName = 'dsk_testimonial_background.png';
+        if (ctrl.isWindowNarrow()) {
+          communityBackgroundImageName = 'm_community_background.png';
+          testimonialBackgroundImageName = 'm_testimonial_background.png';
+        }
         Array.from(
           document.getElementsByClassName(
             'oppia-splash-section-five') as HTMLCollectionOf<HTMLElement>
         )[0].style.backgroundImage = (
           'url(' + ctrl.getStaticImageUrl(
-            '/splash/dsk_testimonial_background.png') + ')');
+            '/splash/' + testimonialBackgroundImageName) + ')');
         Array.from(
           document.getElementsByClassName(
             'oppia-splash-section-seven') as HTMLCollectionOf<HTMLElement>
         )[0].style.backgroundImage = (
           'url(' + ctrl.getStaticImageUrl(
-            '/splash/dsk_community_background.png') + ')');
+            '/splash/' + communityBackgroundImageName) + ')');
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
