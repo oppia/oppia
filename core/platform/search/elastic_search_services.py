@@ -27,24 +27,9 @@ import feconf
 import json
 import python_utils
 
-# TODO: Add elastic search instance details.
+
+MAXIMUM_NUMBER_OF_PAGES = 10000
 es = Elasticsearch()
-
-
-def create_index(index_name):
-    """Creates an index on the elastic search instance.
-
-    Args:
-        index_name: str. The name of the index to insert the document into.
-
-    Raises:
-        ValueError. Invalid values are given as the index name.
-    """
-    if not isinstance(index_name, python_utils.BASESTRING):
-        raise ValueError(
-            'Index must be the unicode/str name of an index, got %s'
-            % type(index_name))
-    es.indices.create(index=index_name)
 
 
 def add_documents_to_index(documents, index_name):
@@ -59,24 +44,18 @@ def add_documents_to_index(documents, index_name):
         index_name: str. The name of the index to insert the document into.
 
     Raises:
-        SearchFailureError. Raised when the indexing fails.
-        ValueError. Invalid values are given as the index name.
-        ValueError. One or more of the documents does not contain an id.
+        Exception. Raised a document cannot be added to the index.
     """
-    if not isinstance(index_name, python_utils.BASESTRING):
-        raise ValueError(
-            'Index must be the unicode/str name of an index, got %s'
-            % type(index_name))
+    assert(isinstance(index_name, python_utils.BASESTRING))
 
     for document in documents:
-        if 'id' not in documents:
-            raise ValueError('Documents are required to have a document id.')
-
+        assert('id' in document)
     for document in documents:
         response = es.index(
             index=index_name, id=document['id'], body=document)
         if response == None or response['_shards']['failed'] > 0:
-            raise SearchFailureError(e)
+            raise Exception(
+                'Failed to add document to index.')
 
 
 def delete_documents_from_index(doc_ids, index_name):
@@ -88,28 +67,18 @@ def delete_documents_from_index(doc_ids, index_name):
         index_name: str. The name of the index to delete the document from.
 
     Raises:
-        SearchFailureError. Raised when the deletion fails. If it fails for any
-            document, none will be deleted.
-        ValueError. The type of the index name or the document ids are not
-            strings.
+        Exception. Document id does not exist.
     """
-    if not isinstance(index_name, python_utils.BASESTRING):
-        raise ValueError(
-            'Index must be the unicode/str name of an index, got %s'
-            % type(index_name))
-
+    assert(isinstance(index_name, python_utils.BASESTRING))
     for ind, doc_id in enumerate(doc_ids):
-        if not isinstance(doc_id, python_utils.BASESTRING):
-            raise ValueError(
-                'all doc_ids must be string, got %s at index %d' % (
-                    type(doc_id), ind))
+        assert(doc_id, python_utils.BASESTRING)
 
     for doc_id in doc_ids:
         if es.exists(index=index_name, id=doc_id):
-            res=es.delete(index=index_name, id=doc_id)
+            es.delete(index=index_name, id=doc_id)
         else:
-            logging.exception('Something went wrong during deletion.')
-            raise SearchFailureError(e)
+            raise Exception(
+                'Document id does not exist: %s' % doc_id)
 
 
 def clear_index(index_name):
@@ -118,6 +87,7 @@ def clear_index(index_name):
     Args:
         index_name: str. The name of the index to clear.
     """
+    assert(isinstance(index_name, python_utils.BASESTRING))
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
     es.delete_by_query(
@@ -155,18 +125,18 @@ def search(
             result_offset: int. The resulting offset to start at for the next
                 page of results. Return None if there are no more pages.
     """
+    assert(limit < MAXIMUM_NUMBER_OF_PAGES)
     query_definiton = json.loads(query_string)
     response = es.search(
         body=query_definiton, index=index_name, size=limit, from_=offset)
-    offset = None
+    resulting_offset = None
     if (len(response['hits']['hits']) != 0):
-        offset = offset+limit
-
+        resulting_offset = offset+limit
     if ids_only:
         result_docs = [doc['_id'] for doc in response['hits']['hits']]
     else:
         result_docs = [doc['_source'] for doc in response['hits']['hits']]
-    return result_docs, offset
+    return result_docs, resulting_offset
 
 
 
@@ -180,10 +150,7 @@ def get_document_from_index(doc_id, index_name):
     Raises:
         ValueError. Invalid values are given as the index name.
     """
-    if not isinstance(index_name, python_utils.BASESTRING):
-        raise ValueError(
-            'Index must be the unicode/str name of an index, got %s'
-            % type(index_name))
+    assert(isinstance(index_name, python_utils.BASESTRING))
 
     res = es.get(index=index_name, id=doc_id)
     # The actual document is stored in the '_source' field.
