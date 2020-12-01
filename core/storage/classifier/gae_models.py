@@ -28,6 +28,7 @@ import utils
 
 datastore_services = models.Registry.import_datastore_services()
 
+
 class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
 
