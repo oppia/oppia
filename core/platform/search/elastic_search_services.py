@@ -21,15 +21,14 @@ API.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from elasticsearch import Elasticsearch
-
-import feconf
 import json
+
+import elasticsearch
+import feconf
 import python_utils
 
-
 MAXIMUM_NUMBER_OF_PAGES = 10000
-es = Elasticsearch()
+ES = elasticsearch.Elasticsearch()
 
 
 def add_documents_to_index(documents, index_name):
@@ -46,14 +45,14 @@ def add_documents_to_index(documents, index_name):
     Raises:
         Exception. Raised a document cannot be added to the index.
     """
-    assert(isinstance(index_name, python_utils.BASESTRING))
+    assert isinstance(index_name, python_utils.BASESTRING)
 
     for document in documents:
-        assert('id' in document)
+        assert 'id' in document
     for document in documents:
-        response = es.index(
-            index=index_name, id=document['id'], body=document)
-        if response == None or response['_shards']['failed'] > 0:
+        response = ES.index(
+            index_name, document, id=document['id'])
+        if response is None or response['_shards']['failed'] > 0:
             raise Exception(
                 'Failed to add document to index.')
 
@@ -69,13 +68,13 @@ def delete_documents_from_index(doc_ids, index_name):
     Raises:
         Exception. Document id does not exist.
     """
-    assert(isinstance(index_name, python_utils.BASESTRING))
-    for ind, doc_id in enumerate(doc_ids):
-        assert(doc_id, python_utils.BASESTRING)
+    assert isinstance(index_name, python_utils.BASESTRING)
+    for doc_id in doc_ids:
+        assert isinstance(doc_id, python_utils.BASESTRING)
 
     for doc_id in doc_ids:
-        if es.exists(index=index_name, id=doc_id):
-            es.delete(index=index_name, id=doc_id)
+        if ES.exists(index_name, doc_id):
+            ES.delete(index_name, doc_id)
         else:
             raise Exception(
                 'Document id does not exist: %s' % doc_id)
@@ -87,16 +86,17 @@ def clear_index(index_name):
     Args:
         index_name: str. The name of the index to clear.
     """
-    assert(isinstance(index_name, python_utils.BASESTRING))
+    assert isinstance(index_name, python_utils.BASESTRING)
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
-    es.delete_by_query(
-        index=index_name,
-        body={
-            "query":
-            {
-                "match_all": {}
-            }})
+    ES.delete_by_query(
+        index_name,
+        {
+            'query':
+                {
+                    'match_all': {}
+                }
+        })
 
 
 def search(
@@ -111,7 +111,7 @@ def search(
     Args:
         query_string: str. The search definition using Query DSL.
         index_name: str. Use _all or empty string to perform the operation on
-        all indices.
+            all indices.
         offset: int. The offset. Pass this in to start at the 'offset' when
             searching through a list of results of max length 'limit'. Leave as
             None to start at the beginning.
@@ -125,19 +125,22 @@ def search(
             result_offset: int. The resulting offset to start at for the next
                 page of results. Return None if there are no more pages.
     """
-    assert(limit < MAXIMUM_NUMBER_OF_PAGES)
+    assert limit < MAXIMUM_NUMBER_OF_PAGES
     query_definiton = json.loads(query_string)
-    response = es.search(
-        body=query_definiton, index=index_name, size=limit, from_=offset)
+    response = ES.search(
+        body=query_definiton, index=index_name,
+        params={
+            'size': limit,
+            'from': offset
+        })
     resulting_offset = None
-    if (len(response['hits']['hits']) != 0):
-        resulting_offset = offset+limit
+    if len(response['hits']['hits']) != 0:
+        resulting_offset = offset + limit
     if ids_only:
         result_docs = [doc['_id'] for doc in response['hits']['hits']]
     else:
         result_docs = [doc['_source'] for doc in response['hits']['hits']]
     return result_docs, resulting_offset
-
 
 
 def get_document_from_index(doc_id, index_name):
@@ -147,11 +150,11 @@ def get_document_from_index(doc_id, index_name):
         doc_id: str. The document id.
         index_name: str. The name of the index to clear.
 
-    Raises:
-        ValueError. Invalid values are given as the index name.
+    Returns:
+        dict. The document in a dictionary format.
     """
-    assert(isinstance(index_name, python_utils.BASESTRING))
+    assert isinstance(index_name, python_utils.BASESTRING)
 
-    res = es.get(index=index_name, id=doc_id)
+    res = ES.get(index_name, doc_id)
     # The actual document is stored in the '_source' field.
     return res['_source']
