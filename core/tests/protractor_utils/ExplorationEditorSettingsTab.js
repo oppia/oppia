@@ -121,8 +121,9 @@ var ExplorationEditorSettingsTab = function() {
   this.setLanguage = async function(language) {
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
-    await element(by.css('.protractor-test-exploration-language-select')).
-      element(by.cssContainingText('option', language)).click();
+    var languageButton = explorationLanguageInput.element(
+      by.cssContainingText('option', language));
+    await action.click('Language button', languageButton);
   };
 
   this.setObjective = async function(objective) {
