@@ -705,7 +705,7 @@ def run_tests(args=None):
     if failure_seen:
         cleanup_portserver(portserver_process)
         cleanup()
-        return 'flake'
+        return 'fail'
     return 'pass'
 
 
