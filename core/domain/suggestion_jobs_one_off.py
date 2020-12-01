@@ -521,8 +521,9 @@ class DeleteAllQuestionAndInvalidSuggestionsOneOffJob(
                     feedback_models.GeneralFeedbackMessageModel, message.id))
 
         reply_to_id_models = (
-            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_thread_id(
-                item.id))
+            email_models.GeneralFeedbackEmailReplyToIdModel.query(
+                email_models.GeneralFeedbackEmailReplyToIdModel.thread_id == (
+                    item.id)).fetch())
 
         model_keys += [
             datastore_services.Key(
