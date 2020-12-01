@@ -159,11 +159,10 @@ var CollectionEditorPage = function() {
   this.setCategory = async function(category) {
     await action.click(
       'Editor Category Drop Down', editorCategoryDropdown.first());
-    // Below line needs to be corrected under this issue:
-    // https://github.com/oppia/oppia/issues/10798 but it throws Error
-    // "Failed: Cannot read property 'bind' of undefined"on this change:-
-    // await action.sendKeys('Category Item',
-    // await browser.driver.switchTo().activeElement(),category + '\n');
+    // TODO(#11289): sendKeys statement cannot be
+    // converted to action.sendKeys(..)
+    // because doing so causes the e2e test to fail with the error
+    // "Failed: Cannot read property 'bind' of undefined".
     await browser.driver.switchTo().activeElement().sendKeys(category + '\n');
   };
 
