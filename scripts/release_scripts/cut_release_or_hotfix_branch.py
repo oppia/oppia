@@ -241,7 +241,7 @@ def execute_branch_cut(target_version, hotfix_number):
         hotfix_number: int. The number for the hotfix branch.
 
     Raises:
-        Exception. Travis tests are failing on the branch from which
+        Exception. Actions tests are failing on the branch from which
             the new branch is cut.
     """
 
@@ -275,9 +275,10 @@ def execute_branch_cut(target_version, hotfix_number):
     # The release coordinator should verify that tests are passing on
     # the parent branch before checking out the new branch.
     common.open_new_tab_in_browser_if_possible(
-        'https://travis-ci.com/oppia/oppia/branches')
+        'https://github.com/oppia/oppia/actions?query=branch:%s'
+        % branch_to_check)
     python_utils.PRINT(
-        'Please confirm: are Travis checks passing on %s? (y/n) ' % (
+        'Please confirm: are Actions checks passing on %s? (y/n) ' % (
             branch_to_check))
     answer = python_utils.INPUT().lower()
     if answer not in common.AFFIRMATIVE_CONFIRMATIONS:

@@ -157,7 +157,6 @@
 /.isort.cfg @DubeySandeep
 /.pylintrc @DubeySandeep
 /.stylelintrc @DubeySandeep
-/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
 /core/templates/css/.stylelintrc @DubeySandeep

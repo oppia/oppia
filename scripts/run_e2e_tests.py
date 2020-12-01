@@ -30,7 +30,6 @@ import time
 import python_utils
 from scripts import build
 from scripts import common
-from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
 from google.oauth2 import service_account
@@ -264,8 +263,6 @@ def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
     if not skip_install:
         install_third_party_libs.main()
-    if os.getenv('TRAVIS'):
-        install_chrome_on_travis.main(args=[])
 
 
 def build_js_files(
