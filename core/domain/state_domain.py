@@ -2538,20 +2538,13 @@ class State(python_utils.OBJECT):
             translations available in that language as the value.
         """
         translation_counts = collections.defaultdict(int)
-        translatable_content_ids = self._get_all_translatable_content()
+        translations_mapping = self.written_translations.translations_mapping
 
-        for content_id, translations in (
-                self.written_translations.translations_mapping.items()):
-            # Currently, we don't support interaction translation through
-            # contributor dashboard, the check below ensures that we are only
-            # counting translations which are translatable through the
-            # contributor dashboard. This keeps the translation percentage in
-            # opportunity model intact and correct.
-            if content_id not in translatable_content_ids:
-                continue
-            for language, translation in translations.items():
+        for content_id in self._get_all_translatable_content():
+            for language_code, translation in (
+                    translations_mapping[content_id].items()):
                 if not translation.needs_update:
-                    translation_counts[language] += 1
+                    translation_counts[language_code] += 1
         return translation_counts
 
     def get_translatable_content_count(self):
@@ -2890,6 +2883,10 @@ class State(python_utils.OBJECT):
 
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
+
+        Note: Currently, we don't support interaction translation through
+        contributor dashboard, this method only returns content which are
+        translatable through the contributor dashboard.
 
         Returns:
             dict(str, str). Returns a dict with key as content id and content
