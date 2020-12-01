@@ -31,21 +31,21 @@ DUMMY_CONF_FILES = os.path.join(
 
 
 class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
-    """Test the methods which performs actions config files and
+    """Test the methods which performs CI config files and
     protractor.conf.js sync checks.
     """
 
-    def test_read_actions_ci_file(self):
-        actions_ci_filepath = os.path.join(DUMMY_CONF_FILES)
+    def test_read_ci_file(self):
+        ci_filepath = os.path.join(DUMMY_CONF_FILES)
 
-        actions_ci_filepath_swap = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'ACTIONS_PATH',
-            actions_ci_filepath)
-        with actions_ci_filepath_swap:
-            actual_actions_ci_list = (
+        ci_filepath_swap = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'CI_PATH',
+            ci_filepath)
+        with ci_filepath_swap:
+            actual_ci_list = (
                 check_e2e_tests_are_captured_in_ci
-                .read_and_parse_actions_config_files())
-            self.assertEqual(EXPECTED_ACTIONS_CI_LIST, actual_actions_ci_list)
+                .read_and_parse_ci_config_files())
+            self.assertEqual(EXPECTED_CI_LIST, actual_ci_list)
 
     def test_read_protractor_file(self):
         protractor_config_file = os.path.join(
@@ -60,19 +60,19 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         self.assertEqual(
             EXPECTED_PROTRACTOR_CONF_FILE, actual_protractor_config_file)
 
-    def test_get_e2e_suite_names_from_script_actions_ci_files(self):
-        def mock_read_actions_ci_config_file():
-            return EXPECTED_ACTIONS_CI_LIST
+    def test_get_e2e_suite_names_from_script_ci_files(self):
+        def mock_read_ci_config_file():
+            return EXPECTED_CI_LIST
 
         dummy_path = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_actions_config_files',
-            mock_read_actions_ci_config_file)
+            'read_and_parse_ci_config_files',
+            mock_read_ci_config_file)
         with dummy_path:
-            actual_actions_ci_suite_names = (
+            actual_ci_suite_names = (
                 check_e2e_tests_are_captured_in_ci
-                .get_e2e_suite_names_from_actions_config_file())
-        self.assertEqual(DUMMY_TEST_SUITES, actual_actions_ci_suite_names)
+                .get_e2e_suite_names_from_ci_config_file())
+        self.assertEqual(DUMMY_TEST_SUITES, actual_ci_suite_names)
 
     def test_get_e2e_suite_names_from_protractor_file(self):
         def mock_read_protractor_conf_file():
@@ -94,21 +94,21 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_get_e2e_suite_names_from_protractor_file():
             return ['oneword', 'fourWord', 'invalid', 'notPresent']
 
-        def mock_get_e2e_suite_names_from_actions_ci():
+        def mock_get_e2e_suite_names_from_ci():
             return ['oneword', 'twoWords']
         mock_protractor_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_protractor_file',
             mock_get_e2e_suite_names_from_protractor_file)
 
-        mock_actions_ci_scripts = self.swap(
+        mock_ci_scripts = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_actions_config_file',
-            mock_get_e2e_suite_names_from_actions_ci)
+            'get_e2e_suite_names_from_ci_config_file',
+            mock_get_e2e_suite_names_from_ci)
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_ACTIONS', ['fourWord'])
+            'TEST_SUITES_NOT_RUN_IN_CI', ['fourWord'])
 
         common_test_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
@@ -117,9 +117,9 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         with common_test_swap, mock_tests_to_remove:
             with mock_protractor_test_suites:
-                with mock_actions_ci_scripts:
+                with mock_ci_scripts:
                     with self.assertRaisesRegexp(
-                        Exception, 'Protractor test suites and Actions test '
+                        Exception, 'Protractor test suites and CI test '
                                    'suites are not in sync. Following suites'
                                    ' are not in sync: '
                                    r'\[u\'notPresent\', u\'invalid\'\]'):
@@ -129,9 +129,9 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_get_e2e_suite_names():
             return ['oneword', 'twoWords']
 
-        mock_actions_scripts = self.swap(
+        mock_ci_scripts = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_actions_config_file',
+            'get_e2e_suite_names_from_ci_config_file',
             mock_get_e2e_suite_names)
 
         mock_protractor_test_suites = self.swap(
@@ -139,50 +139,51 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             'get_e2e_suite_names_from_protractor_file',
             mock_get_e2e_suite_names)
 
-        mock_tests_not_on_actions = self.swap(
+        mock_tests_not_in_ci = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_ACTIONS', [])
+            'TEST_SUITES_NOT_RUN_IN_CI', [])
 
-        with mock_actions_scripts:
+        with mock_ci_scripts:
             with self.assertRaisesRegexp(
                 Exception, 'coreEditorAndPlayerFeatures is expected to be in '
                            'the e2e test suites extracted from the script '
-                           'section of Actions config files, but it is '
+                           'section of CI config files, but it is '
                            'missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
-        with mock_protractor_test_suites, mock_tests_not_on_actions:
+        with mock_protractor_test_suites, mock_tests_not_in_ci:
             with self.assertRaisesRegexp(
                 Exception, 'coreEditorAndPlayerFeatures is expected to be in '
                            'the e2e test suites extracted from the '
                            'protractor.conf.js file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
-    def test_main_with_invalid_actions_script_test_suite_length(self):
-        def mock_read_actions_config_file():
-            return EXPECTED_ACTIONS_CI_LIST
+    def test_main_with_invalid_ci_script_test_suite_length(self):
+        def mock_read_ci_config_file():
+            return EXPECTED_CI_LIST
+
         def mock_return_empty_list():
             return []
 
-        actions_path_swap = self.swap(
+        CI_PATH_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_actions_config_files',
-            mock_read_actions_config_file)
+            'read_and_parse_ci_config_files',
+            mock_read_ci_config_file)
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_ACTIONS', [])
+            'TEST_SUITES_NOT_RUN_IN_CI', [])
 
-        mock_get_e2e_suite_names_from_actions_config_file = self.swap(
+        mock_get_e2e_suite_names_from_ci_config_file = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_actions_config_file',
+            'get_e2e_suite_names_from_ci_config_file',
             mock_return_empty_list)
 
-        with actions_path_swap, mock_tests_to_remove:
-            with mock_get_e2e_suite_names_from_actions_config_file:
+        with CI_PATH_swap, mock_tests_to_remove:
+            with mock_get_e2e_suite_names_from_ci_config_file:
                 with self.assertRaisesRegexp(
                     Exception, 'The e2e test suites that have been extracted '
-                               'from script section from Actions config files '
+                               'from script section from CI config files '
                                'are empty.'):
                     check_e2e_tests_are_captured_in_ci.main()
 
@@ -210,7 +211,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_ACTIONS', [])
+            'TEST_SUITES_NOT_RUN_IN_CI', [])
 
         mock_e2e_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
@@ -250,8 +251,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                     DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
             return protractor_config_file
 
-        def mock_read_actions_ci_config():
-            return EXPECTED_ACTIONS_CI_LIST
+        def mock_read_ci_config():
+            return EXPECTED_CI_LIST
 
         protractor_test_suite_files_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
@@ -260,9 +261,9 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         protractor_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
             mock_read_protractor_conf_file)
-        actions_path_swap = self.swap(
+        CI_PATH_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_actions_config_files', mock_read_actions_ci_config)
+            'read_and_parse_ci_config_files', mock_read_ci_config)
         common_test_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST',
@@ -270,14 +271,14 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_ACTIONS', [])
+            'TEST_SUITES_NOT_RUN_IN_CI', [])
 
-        with protractor_path_swap, actions_path_swap, mock_tests_to_remove:
+        with protractor_path_swap, CI_PATH_swap, mock_tests_to_remove:
             with common_test_swap, protractor_test_suite_files_swap:
                 check_e2e_tests_are_captured_in_ci.main()
 
 
-EXPECTED_ACTIONS_CI_LIST = [
+EXPECTED_CI_LIST = [
     """name: End-to-End tests
 jobs:
   e2e_additional_editor_and_player:
