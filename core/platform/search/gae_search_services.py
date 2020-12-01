@@ -197,10 +197,6 @@ def add_documents_to_index(documents, index):
             is used.
         index: str. The name of the index to insert the document into.
 
-    Returns:
-        list(str). Returns a list of document ids of the documents that were
-        added.
-
     Raises:
         SearchFailureError. Raised when the indexing fails. If it fails for any
             document, none will be inserted.
@@ -217,15 +213,13 @@ def add_documents_to_index(documents, index):
     try:
         logging.debug(
             'adding the following docs to index %s: %s', index.name, documents)
-        results = index.put(gae_docs, deadline=5)
+        index.put(gae_docs, deadline=5)
     except gae_search.PutError as e:
         logging.exception('PutError raised.')
 
         # At this pint, either we don't have any tries left, or none of the
         # results has a transient error code.
         raise SearchFailureError(e)
-
-    return [r.id for r in results]
 
 
 def delete_documents_from_index(doc_ids, index):
