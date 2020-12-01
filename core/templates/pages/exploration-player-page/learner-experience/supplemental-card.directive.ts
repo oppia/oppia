@@ -42,7 +42,7 @@ angular.module('oppia').directive('supplementalCard', [
     return {
       restrict: 'E',
       scope: {
-        continueButtonClick: '&',
+        onClickContinueButton: '&',
         isLearnAgainButton: '&',
         getDisplayedCard: '&displayedCard',
       },

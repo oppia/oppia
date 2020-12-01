@@ -19,8 +19,8 @@
     <br>
     <oppia-continue-button ng-if="helpCardHasContinueButton"
                            focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                           [isLearnAgainButton]="isLearnAgainButton"
-                           ng-click="continueButtonClick()"
+                           [is-learn-again-button]="isLearnAgainButton()"
+                           ng-click="onClickContinueButton()"
                            class="d-inline-block">
     </oppia-continue-button>
   </div>

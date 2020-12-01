@@ -34,8 +34,8 @@
     </div>
     <oppia-continue-button ng-if="shouldContinueButtonBeShown()"
                            focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                           [isLearnAgainButton]="isLearnAgainButton"
-                           ng-click="continueButtonClick()"
+                           [is-learn-again-button]="isLearnAgainButton()"
+                           ng-click="onClickContinueButton()"
                            class="d-block">
     </oppia-continue-button>
   </div>
