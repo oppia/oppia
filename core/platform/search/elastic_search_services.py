@@ -43,7 +43,7 @@ def add_documents_to_index(documents, index_name):
         index_name: str. The name of the index to insert the document into.
 
     Raises:
-        Exception. Raised a document cannot be added to the index.
+        Exception. A document cannot be added to the index.
     """
     assert isinstance(index_name, python_utils.BASESTRING)
 
@@ -101,28 +101,27 @@ def clear_index(index_name):
 
 def search(
         query_string, index_name, offset=None,
-        limit=feconf.SEARCH_RESULTS_PAGE_SIZE,
-        ids_only=False):
+        limit=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 documents by paginating
-    using limit and offset. If the number of items to search through is greater,
-    that 10,000, use scroll API instead.
+    using limit and offset. If the number of items to search through is greater
+    that 10,000, use the elasticsearch scroll API instead.
 
     Args:
         query_string: str. The search definition using Query DSL.
-        index_name: str. Use _all or empty string to perform the operation on
-            all indices.
-        offset: int. The offset. Pass this in to start at the 'offset' when
-            searching through a list of results of max length 'limit'. Leave as
-            None to start at the beginning.
+        index_name: str. The name of the index. Use '_all' or empty string to
+            perform the operation on all indices.
+        offset: int. The offset into the index. Pass this in to start at the
+            'offset' when searching through a list of results of max length
+            'limit'. Leave as None to start at the beginning.
         limit: int. The maximum number of documents to return.
         ids_only: bool. Whether to only return document ids.
 
     Returns:
-        2-tuple of (result_docs, result_offset). Where:
+        2-tuple of (result_docs, resulting_offset). Where:
             result_docs: list(dict). Represents search documents. If ids_only is
                 True, this will be a list of strings, doc_ids.
-            result_offset: int. The resulting offset to start at for the next
+            resulting_offset: int. The resulting offset to start at for the next
                 page of results. Return None if there are no more pages.
     """
     assert limit < MAXIMUM_NUMBER_OF_PAGES
