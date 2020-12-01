@@ -165,7 +165,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         def mock_return_empty_list():
             return []
 
-        CI_PATH_swap = self.swap(
+        ci_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'read_and_parse_ci_config_files',
             mock_read_ci_config_file)
@@ -179,7 +179,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             'get_e2e_suite_names_from_ci_config_file',
             mock_return_empty_list)
 
-        with CI_PATH_swap, mock_tests_to_remove:
+        with ci_path_swap, mock_tests_to_remove:
             with mock_get_e2e_suite_names_from_ci_config_file:
                 with self.assertRaisesRegexp(
                     Exception, 'The e2e test suites that have been extracted '
@@ -261,7 +261,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         protractor_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
             mock_read_protractor_conf_file)
-        CI_PATH_swap = self.swap(
+        ci_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'read_and_parse_ci_config_files', mock_read_ci_config)
         common_test_swap = self.swap(
@@ -273,7 +273,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             check_e2e_tests_are_captured_in_ci,
             'TEST_SUITES_NOT_RUN_IN_CI', [])
 
-        with protractor_path_swap, CI_PATH_swap, mock_tests_to_remove:
+        with protractor_path_swap, ci_path_swap, mock_tests_to_remove:
             with common_test_swap, protractor_test_suite_files_swap:
                 check_e2e_tests_are_captured_in_ci.main()
 
