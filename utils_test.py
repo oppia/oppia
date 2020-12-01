@@ -423,6 +423,22 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, max_length_error):
             utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
 
+    def test_require_valid_page_title(self):
+        page_title = 'name'
+        utils.require_valid_page_title(page_title)
+
+        non_string_page_title = 0
+        invalid_type_error = (
+            'Expected page title to be a string, received 0')
+        with self.assertRaisesRegexp(Exception, invalid_type_error):
+            utils.require_valid_page_title(non_string_page_title)
+        lengthy_page_title = 'a' * 60
+        max_length_error = (
+            'Page title should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_PAGE_TITLE)
+        with self.assertRaisesRegexp(Exception, max_length_error):
+            utils.require_valid_page_title(lengthy_page_title)
+
     def test_require_valid_url_fragment(self):
         name = 'name'
         utils.require_valid_url_fragment(name, 'name-type', 20)

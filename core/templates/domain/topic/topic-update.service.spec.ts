@@ -350,6 +350,26 @@ describe('Topic update service', function() {
     }]);
   });
 
+  it('should set/unset changes to a topic\'s page title', function() {
+    expect(_sampleTopic.getPageTitle()).toBeUndefined();
+    TopicUpdateService.setPageTitle(_sampleTopic, 'new page title');
+    expect(_sampleTopic.getPageTitle()).toEqual('new page title');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getPageTitle()).toBeUndefined();
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s page title', function() {
+    TopicUpdateService.setPageTitle(_sampleTopic, 'new page title');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'page_title',
+      new_value: 'new page title',
+      old_value: null
+    }]);
+  });
+
   it('should set/unset changes to a topic\'s practice tab is ' +
     'displayed property', function() {
     expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();

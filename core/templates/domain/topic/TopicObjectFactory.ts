@@ -53,6 +53,7 @@ export interface TopicBackendDict {
   'url_fragment': string;
   'practice_tab_is_displayed': boolean;
   'meta_tag_content': string;
+  'page_title': string;
 }
 
 const constants = require('constants.ts');
@@ -74,6 +75,7 @@ export class Topic {
   _urlFragment: string;
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
+  _pageTitle: string;
   skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
@@ -91,7 +93,7 @@ export class Topic {
       subtopicObjectFactory: SubtopicObjectFactory,
       storyReferenceObjectFactory: StoryReferenceObjectFactory,
       practiceTabIsDisplayed: boolean,
-      metaTagContent: string) {
+      metaTagContent: string, pageTitle: string) {
     this._id = id;
     this._name = name;
     this._abbreviatedName = abbreviatedName;
@@ -115,6 +117,7 @@ export class Topic {
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
+    this._pageTitle = pageTitle;
   }
 
   // ---- Instance methods ----
@@ -152,6 +155,14 @@ export class Topic {
 
   setMetaTagContent(metaTagContent: string): void {
     this._metaTagContent = metaTagContent;
+  }
+
+  getPageTitle(): string {
+    return this._pageTitle;
+  }
+
+  setPageTitle(pageTitle: string): void {
+    this._pageTitle = pageTitle;
   }
 
   getUrlFragment(): string {
@@ -284,6 +295,13 @@ export class Topic {
           'Subtopic with title ' + this._subtopics[i].getTitle() +
           ' does not have any skill IDs linked.');
       }
+    }
+    if (!this._pageTitle) {
+      issues.push('Topic should have page title.');
+    } else if (this._pageTitle.length > constants.MAX_CHARS_IN_PAGE_TITLE) {
+      issues.push(
+        'Topic page title should not be longer than ' +
+        `${constants.MAX_CHARS_IN_PAGE_TITLE} characters.`);
     }
     if (!this._metaTagContent) {
       issues.push('Topic should have meta tag content.');
@@ -527,6 +545,7 @@ export class Topic {
     this.setLanguageCode(otherTopic.getLanguageCode());
     this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
     this.setMetaTagContent(otherTopic.getMetaTagContent());
+    this.setPageTitle(otherTopic.getPageTitle());
     this._version = otherTopic.getVersion();
     this._nextSubtopicId = otherTopic.getNextSubtopicId();
     this.clearAdditionalStoryReferences();
@@ -591,7 +610,7 @@ export class TopicObjectFactory {
       skillIdToDescriptionDict, this.skillSummaryObjectFactory,
       this.subtopicObjectFactory, this.storyReferenceObjectFactory,
       topicBackendDict.practice_tab_is_displayed,
-      topicBackendDict.meta_tag_content
+      topicBackendDict.meta_tag_content, topicBackendDict.page_title
     );
   }
 
@@ -603,7 +622,7 @@ export class TopicObjectFactory {
       'Url Fragment loading', 'Topic description loading', 'en',
       [], [], [], 1, 1, [], '', '', {},
       this.skillSummaryObjectFactory, this.subtopicObjectFactory,
-      this.storyReferenceObjectFactory, false, ''
+      this.storyReferenceObjectFactory, false, '', ''
     );
   }
 }

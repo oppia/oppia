@@ -72,8 +72,8 @@ angular.module('oppia').directive('topicEditorTab', [
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
         'UndoRedoService', 'UrlInterpolationService',
         'WindowDimensionsService', 'WindowRef',
-        'MAX_CHARS_IN_META_TAG_CONTENT', 'MAX_CHARS_IN_TOPIC_DESCRIPTION',
-        'MAX_CHARS_IN_TOPIC_NAME',
+        'MAX_CHARS_IN_META_TAG_CONTENT', 'MAX_CHARS_IN_PAGE_TITLE',
+        'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
         function(
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, ImageUploadHelperService,
@@ -82,8 +82,8 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
             UndoRedoService, UrlInterpolationService,
             WindowDimensionsService, WindowRef,
-            MAX_CHARS_IN_META_TAG_CONTENT, MAX_CHARS_IN_TOPIC_DESCRIPTION,
-            MAX_CHARS_IN_TOPIC_NAME) {
+            MAX_CHARS_IN_META_TAG_CONTENT, MAX_CHARS_IN_PAGE_TITLE,
+            MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -92,6 +92,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
           $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
+          $scope.MAX_CHARS_IN_PAGE_TITLE = MAX_CHARS_IN_PAGE_TITLE;
           ctrl.initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.skillQuestionCountDict = (
@@ -104,6 +105,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             $scope.editableName = $scope.topic.getName();
             $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
+            $scope.editablePageTitle = $scope.topic.getPageTitle();
             $scope.editablePracticeIsDisplayed = (
               $scope.topic.getPracticeTabIsDisplayed());
             $scope.initialTopicName = $scope.topic.getName();
@@ -297,6 +299,12 @@ angular.module('oppia').directive('topicEditorTab', [
             if (newMetaTagContent !== $scope.topic.getMetaTagContent()) {
               TopicUpdateService.setMetaTagContent(
                 $scope.topic, newMetaTagContent);
+            }
+          };
+
+          $scope.updateTopicPageTitle = function(newTopicPageTitle) {
+            if (newTopicPageTitle !== $scope.topic.getPageTitle()) {
+              TopicUpdateService.setPageTitle($scope.topic, newTopicPageTitle);
             }
           };
 

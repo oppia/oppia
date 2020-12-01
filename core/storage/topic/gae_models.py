@@ -107,6 +107,9 @@ class TopicModel(base_models.VersionedModel):
     # The content of the meta tag in the Topic viewer page.
     meta_tag_content = datastore_services.StringProperty(
         indexed=True, default='')
+    # The page title used in the Topic viewer page.
+    page_title = datastore_services.StringProperty(
+        indexed=True, default='')
 
     @staticmethod
     def get_deletion_policy():

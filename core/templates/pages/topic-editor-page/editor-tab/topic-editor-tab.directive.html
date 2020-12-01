@@ -82,6 +82,20 @@
                 What does this topic contain?
               </span>
             </div>
+            <div class="topic-page-title" ng-class="{'has-error': editablePageTitle.length === 0}">
+              <label for="topicPageTitle" class="form-heading protractor-test-topic-page-title-label">Page Title</label>
+              <textarea type="text" class="form-control topic-description protractor-test-topic-meta-tag-content-field"
+                        ng-model="editablePageTitle" maxlength="<[MAX_CHARS_IN_PAGE_TITLE]>"
+                        ng-blur="updateTopicPageTitle(editablePageTitle)"
+                        placeholder="Enter the page title for the topic">
+              </textarea>
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Page title will appear in the browser tab for relevant learner facing pages.
+                  Topic page title should be at most <[MAX_CHARS_IN_PAGE_TITLE]> characters.
+                </em>
+              </span>
+            </div>
             <div class="topic-meta-tag-content" ng-class="{'has-error': editableMetaTagContent.length === 0}">
               <label for="topicMetaTagContent" class="form-heading protractor-test-topic-meta-tag-content-label">Meta Tag Content</label>
               <textarea type="text" class="form-control topic-description protractor-test-topic-meta-tag-content-field"
@@ -435,7 +449,8 @@
 
   .topic-editor .topic-name,
   .topic-editor .topic-url-fragment,
-  .topic-editor .topic-meta-tag-content {
+  .topic-editor .topic-meta-tag-content,
+  .topic-editor .topic-page-title {
     margin-bottom: 25px;
     margin-top: 32px;
   }

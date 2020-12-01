@@ -44,7 +44,8 @@ angular.module('oppia').factory('TopicUpdateService', [
   'SUBTOPIC_PROPERTY_URL_FRAGMENT',
   'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
   'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_META_TAG_CONTENT',
-  'TOPIC_PROPERTY_NAME', 'TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED',
+  'TOPIC_PROPERTY_NAME', 'TOPIC_PROPERTY_PAGE_TITLE',
+  'TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED',
   'TOPIC_PROPERTY_THUMBNAIL_BG_COLOR',
   'TOPIC_PROPERTY_THUMBNAIL_FILENAME',
   'TOPIC_PROPERTY_URL_FRAGMENT', function(
@@ -64,7 +65,8 @@ angular.module('oppia').factory('TopicUpdateService', [
       SUBTOPIC_PROPERTY_URL_FRAGMENT,
       TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
       TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_META_TAG_CONTENT,
-      TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
+      TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_PAGE_TITLE,
+      TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
       TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
       TOPIC_PROPERTY_THUMBNAIL_FILENAME,
       TOPIC_PROPERTY_URL_FRAGMENT) {
@@ -180,6 +182,26 @@ angular.module('oppia').factory('TopicUpdateService', [
           }, function(changeDict, topic) {
             // ---- Undo ----
             topic.setMetaTagContent(oldMetaTagContent);
+          });
+      },
+
+      /**
+       * Changes the page title of a topic and records the change in the
+       * undo/redo service.
+       */
+      setPageTitle: function(topic, pageTitle) {
+        var oldPageTitle = angular.copy(topic.getPageTitle());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_PAGE_TITLE,
+          pageTitle, oldPageTitle,
+          function(changeDict, topic) {
+            // ---- Apply ----
+            var pageTitle = _getNewPropertyValueFromChangeDict(
+              changeDict);
+            topic.setPageTitle(pageTitle);
+          }, function(changeDict, topic) {
+            // ---- Undo ----
+            topic.setPageTitle(oldPageTitle);
           });
       },
 

@@ -728,6 +728,26 @@ def require_valid_meta_tag_content(meta_tag_content):
             % constants.MAX_CHARS_IN_META_TAG_CONTENT)
 
 
+def require_valid_page_title(page_title):
+    """Generic page title validation.
+
+    Args:
+        page_title: str. The page title to validate.
+
+    Raises:
+        Exception. Page title is not a string.
+        Exception. Page title is too lengthy.
+    """
+    if not isinstance(page_title, python_utils.BASESTRING):
+        raise ValidationError(
+            'Expected page title to be a string, received %s'
+            % page_title)
+    if len(page_title) > constants.MAX_CHARS_IN_PAGE_TITLE:
+        raise ValidationError(
+            'Page title should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_PAGE_TITLE)
+
+
 def capitalize_string(input_string):
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
