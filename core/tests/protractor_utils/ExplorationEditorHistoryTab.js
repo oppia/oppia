@@ -145,6 +145,8 @@ var ExplorationEditorHistoryTab = function() {
        *                            may be truncated.)
        */
       expectHistoryStatesToMatch: async function(expectedStates) {
+        await waitFor.visibilityOf(
+          historyGraph, 'History graph takes too long to be visible.');
         var states = await stateNodes.map(async function(stateElement) {
           var label = await stateNodeLabel(stateElement).getText();
           var color = await stateNodeBackground(stateElement).getCssValue(
