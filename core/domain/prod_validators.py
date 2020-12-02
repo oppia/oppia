@@ -1443,58 +1443,6 @@ class UnsentFeedbackEmailModelValidator(
         return [cls._validate_entity_type_and_entity_id_feedback_reference]
 
 
-class ContinuousComputationModelValidator(
-        base_model_validators.BaseModelValidator):
-    """Class for validating ContinuousComputationModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        # Valid id: Name of continuous computation manager class.
-        regex_string = '^(%s)$' % ('|').join(
-            ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES)
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return []
-
-    @classmethod
-    def _validate_time_fields(cls, item):
-        """Validate the time fields in entity.
-
-        Args:
-            item: datastore_services.Model. ContinuousComputationModel to
-                validate.
-        """
-        if item.last_started_msec > item.last_finished_msec and (
-                item.last_started_msec > item.last_stopped_msec):
-            cls._add_error(
-                'last started check',
-                'Entity id %s: last started %s is greater '
-                'than both last finished %s and last stopped %s' % (
-                    item.id, item.last_started_msec, item.last_finished_msec,
-                    item.last_stopped_msec))
-
-        current_time_msec = utils.get_current_time_in_millisecs()
-        if item.last_finished_msec > current_time_msec:
-            cls._add_error(
-                'last finished check',
-                'Entity id %s: last finished %s is greater '
-                'than the current time' % (
-                    item.id, item.last_finished_msec))
-
-        if item.last_stopped_msec > current_time_msec:
-            cls._add_error(
-                'last stopped check',
-                'Entity id %s: last stopped %s is greater '
-                'than the current time' % (
-                    item.id, item.last_stopped_msec))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_time_fields]
-
-
 class QuestionModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating QuestionModel."""
 
