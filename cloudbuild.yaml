@@ -1,4 +1,4 @@
-timeout: 1800s # 30 minutes
+timeout: 3600s # 1 hour
 logsBucket: 'gs://oppia-cloudbuild-logs'
 steps:
   - id: build-oppia-base
@@ -66,4 +66,3 @@ steps:
       - |
           xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="learnerDashboard" --prod_env
           xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="preferences" --prod_env
-
