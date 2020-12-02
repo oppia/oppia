@@ -1185,6 +1185,153 @@ class UserContributionsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
+class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    def setUp(self):
+        super(UserAuthDetailsModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
+
+        # Note: There will be a total of 2 UserSettingsModels (hence 2
+        # UserAuthDetailsModels too) even though only one user signs up in the
+        # test since superadmin signup is also done in
+        # test_utils.AuditJobsTestBase.
+        self.model_instance = user_models.UserAuthDetailsModel.get_by_id(
+            self.user_id)
+        self.job_class = (
+            prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob)
+
+    def test_audit_standard_operation_passes(self):
+        expected_output = [
+            u'[u\'fully-validated UserAuthDetailsModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_audit_with_created_on_greater_than_last_updated_fails(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of UserAuthDetailsModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.user_id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            ), u'[u\'fully-validated UserAuthDetailsModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_audit_with_last_updated_greater_than_current_time_fails(self):
+        user_models.UserAuthDetailsModel.get_by_id(
+            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'UserAuthDetailsModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.user_id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_audit_with_missing_user_settings_model_fails(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_settings_ids '
+                'field check of UserAuthDetailsModel\', '
+                '[u"Entity id %s: based on '
+                'field user_settings_ids having value '
+                '%s, expected model UserSettingsModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.user_id, self.user_id, self.user_id),
+            u'[u\'fully-validated UserAuthDetailsModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+
+class UserIdentifiersModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    def setUp(self):
+        super(UserIdentifiersModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
+
+        # Note: There will be a total of 2 UserSettingsModels (hence 2
+        # UserAuthDetailsModels too) even though only one user signs up in the
+        # test since superadmin signup is also done in
+        # test_utils.AuditJobsTestBase.
+        self.model_instance = user_models.UserIdentifiersModel.get_by_id(
+            self.gae_id)
+        self.job_class = (
+            prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob)
+
+    def test_audit_standard_operation_passes(self):
+        expected_output = [
+            u'[u\'fully-validated UserIdentifiersModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_audit_with_created_on_greater_than_last_updated_fails(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of UserIdentifiersModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.gae_id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            ), u'[u\'fully-validated UserIdentifiersModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_audit_with_last_updated_greater_than_current_time_fails(self):
+        user_models.UserIdentifiersModel.get_by_id(
+            self.get_gae_id_from_email('tmpsuperadmin@example.com')
+        ).delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'UserIdentifiersModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.gae_id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_audit_with_missing_user_settings_model_fails(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_settings_ids '
+                'field check of UserIdentifiersModel\', '
+                '[u"Entity id %s: based on '
+                'field user_settings_ids having value '
+                '%s, expected model UserSettingsModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.gae_id, self.user_id, self.user_id),
+            u'[u\'fully-validated UserIdentifiersModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+
 class UserEmailPreferencesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -2416,6 +2563,11 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.query_id, 'subject', 'body',
                 feconf.BULK_EMAIL_INTENT_MARKETING, 5)
         self.sent_mail_id = self.model_instance.sent_email_model_id
+
+        self.model_instance.query_status = feconf.USER_QUERY_STATUS_COMPLETED
+        self.model_instance.deleted = False
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
         self.job_class = (
             prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob)
 
@@ -2521,6 +2673,32 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
             'UserQueryModel\', [u\'Entity id %s: UserBulkEmails model '
             'is missing for recipient with id %s\']]') % (
                 self.query_id, self.owner_id)]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_not_marked_as_deleted_when_older_than_4_weeks(self):
+        self.model_instance.created_on = (
+            self.model_instance.created_on - datetime.timedelta(weeks=5))
+        self.model_instance.last_updated = (
+            self.model_instance.last_updated - datetime.timedelta(weeks=5))
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+        expected_output = [(
+            '[u\'failed validation check for entity stale check of '
+            'UserQueryModel\', [u\'Entity id %s: '
+            'Model older than 4 weeks\']]') % self.query_id]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_not_marked_as_deleted_when_query_status_set_as_archived(
+            self):
+        self.model_instance.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            '[u\'failed validation check for entity stale check of '
+            'UserQueryModel\', [u\'Entity id %s: '
+            'Archived model not marked as deleted\']]') % self.query_id]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -3025,8 +3203,6 @@ class DeletedUserModelValidatorTests(test_utils.AuditJobsTestBase):
         wipeout_service.run_user_deletion_completion(
             wipeout_service.get_pending_deletion_request(self.user_id))
 
-        user_models.DeletedUserModel(id=self.user_id).put()
-
         self.model_instance = (
             user_models.DeletedUserModel.get_by_id(self.user_id))
 
@@ -3165,74 +3341,67 @@ class PseudonymizedUserModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=False, literal_eval=False)
 
 
-class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
+class DeletedUsernameModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
-        super(UserAuthDetailsModelValidatorTests, self).setUp()
+        super(DeletedUsernameModelValidatorTests, self).setUp()
 
-        self.signup(USER_EMAIL, USER_NAME)
+        date_10_days_ago = (
+            datetime.datetime.utcnow() - datetime.timedelta(days=10))
+        with self.mock_datetime_utcnow(date_10_days_ago):
+            self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.gae_id = self.get_gae_id_from_email(USER_EMAIL)
 
-        # Note: There will be a total of 2 UserSettingsModels (hence 2
-        # UserAuthDetailsModels too) even though only one user signs up in the
-        # test since superadmin signup is also done in
-        # test_utils.AuditJobsTestBase.
-        self.model_instance = user_models.UserAuthDetailsModel.get_by_id(
-            self.user_id)
+        # Run the full user deletion process as it works when the user
+        # pre-deletes itself via frontend and then is fully deleted via
+        # subsequent cron jobs.
+        wipeout_service.pre_delete_user(self.user_id)
+        wipeout_service.run_user_deletion(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+        wipeout_service.run_user_deletion_completion(
+            wipeout_service.get_pending_deletion_request(self.user_id))
+
+        self.model_instance = (
+            user_models.DeletedUsernameModel.get_by_id(
+                utils.convert_to_hash(
+                    USER_NAME, user_models.DeletedUsernameModel.ID_LENGTH)))
+
         self.job_class = (
-            prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob)
+            prod_validation_jobs_one_off.DeletedUsernameModelAuditOneOffJob)
 
-    def test_audit_standard_operation_passes(self):
+    def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated UserAuthDetailsModel\', 2]']
+            u'[u\'fully-validated DeletedUsernameModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_audit_with_created_on_greater_than_last_updated_fails(self):
+    def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
         self.model_instance.update_timestamps()
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
-            'of UserAuthDetailsModel\', '
+            'of DeletedUsernameModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
-                self.user_id, self.model_instance.created_on,
+                self.model_instance.id, self.model_instance.created_on,
                 self.model_instance.last_updated
-            ), u'[u\'fully-validated UserAuthDetailsModel\', 1]']
+            )]
         self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
+            expected_output, sort=False, literal_eval=False)
 
-    def test_audit_with_last_updated_greater_than_current_time_fails(self):
-        user_models.UserAuthDetailsModel.get_by_id(
-            self.get_user_id_from_email('tmpsuperadmin@example.com')).delete()
+    def test_model_with_last_updated_greater_than_current_time(self):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'UserAuthDetailsModel\', '
+            'DeletedUsernameModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
-        ) % (self.user_id, self.model_instance.last_updated)]
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
         with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
-
-    def test_audit_with_missing_user_settings_model_fails(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for user_settings_ids '
-                'field check of UserAuthDetailsModel\', '
-                '[u"Entity id %s: based on '
-                'field user_settings_ids having value '
-                '%s, expected model UserSettingsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.user_id, self.user_id, self.user_id),
-            u'[u\'fully-validated UserAuthDetailsModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=False)
