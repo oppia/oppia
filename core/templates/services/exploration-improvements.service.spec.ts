@@ -318,7 +318,7 @@ describe('ExplorationImprovementsService', function() {
       expect(
         async() => (
           await explorationImprovementsService
-          .flushUpdatedTasksToBackendAsync()))
+            .flushUpdatedTasksToBackendAsync()))
         .not.toThrowError();
 
       flushMicrotasks();

@@ -405,7 +405,7 @@ angular.module('oppia').component('explorationEditorPage', {
 
           await ExplorationImprovementsService.initAsync();
           await ExplorationImprovementsService
-          .flushUpdatedTasksToBackendAsync();
+            .flushUpdatedTasksToBackendAsync();
 
           ExplorationWarningsService.updateWarnings();
           StateEditorRefreshService.onRefreshStateEditor.emit();
