@@ -189,7 +189,6 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         for i in python_utils.RANGE(10):
             self.assertIsNone(index.get('doc%d' % i))
 
-
     def _get_delete_error(self, num_res, transient=None):
         """returns a DeleteError. with num_res results.
         If transient is given, it should be an index in the

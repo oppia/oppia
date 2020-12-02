@@ -119,19 +119,17 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
     def test_search_explorations(self):
         expected_query_string = 'a query string'
         expected_cursor = 'cursor'
-        expected_sort = 'title'
         expected_limit = 30
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, cursor=None, size=20, sort='',
+                query_string, index, cursor=None, size=20,
                 ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(cursor, expected_cursor)
             self.assertEqual(size, expected_limit)
-            self.assertEqual(sort, expected_sort)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
@@ -141,7 +139,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             result, cursor = search_services.search_explorations(
                 expected_query_string,
                 expected_limit,
-                sort=expected_sort,
                 cursor=expected_cursor,
             )
 
@@ -151,20 +148,18 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
     def test_search_collections(self):
         expected_query_string = 'a query string'
         expected_cursor = 'cursor'
-        expected_sort = 'title'
         expected_limit = 30
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, cursor=None, size=20, sort='',
+                query_string, index, cursor=None, size=20,
                 ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)
             self.assertEqual(cursor, expected_cursor)
             self.assertEqual(size, expected_limit)
-            self.assertEqual(sort, expected_sort)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
@@ -174,7 +169,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             result, cursor = search_services.search_collections(
                 expected_query_string,
                 expected_limit,
-                sort=expected_sort,
                 cursor=expected_cursor,
             )
 

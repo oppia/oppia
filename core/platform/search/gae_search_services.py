@@ -304,7 +304,7 @@ def get_document_from_index(doc_id, index_name):
 
     Args:
         doc_id: str. A doc_id as a string.
-        index: str. The name of an index.
+        index_name: str. The name of an index.
 
     Returns:
         dict. The requested document as a dict.
