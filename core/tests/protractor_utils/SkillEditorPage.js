@@ -69,6 +69,8 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-confirm-add-misconception-button'));
   var misconceptionListItems = element.all(
     by.css('.protractor-test-misconception-list-item'));
+  var misconceptionListContainer = element(
+    by.css('.protractor-test-misconception-list-container'));
   var deleteMisconceptionButton = function(index) {
     return element(
       by.css('.protractor-test-misconception-' + index))
@@ -285,17 +287,16 @@ var SkillEditorPage = function() {
     await workedExampleExplanation.click();
     await browser.switchTo().activeElement().sendKeys(explanation);
 
-    await waitFor.elementToBeClickable(
-      saveWorkedExampleButton,
-      'Save Worked Example button takes too long to be clickable');
-    await saveWorkedExampleButton.click();
+    await action.click(
+      'Save worked example', saveWorkedExampleButton);
     await waitFor.invisibilityOf(
       addWorkedExampleModal,
       'Add Worked Example Modal takes too long to close');
   };
 
   this.deleteWorkedExampleWithIndex = async function(index) {
-    await deleteWorkedExampleButton(index).click();
+    await action.click(
+      'Delete Worked Example button', deleteWorkedExampleButton(index));
 
     var deleteWorkedExampleModal = (
       element(by.css('.protractor-test-delete-worked-example-modal')));
@@ -303,7 +304,8 @@ var SkillEditorPage = function() {
       deleteWorkedExampleModal,
       'Delete Worked Example Modal takes too long to appear');
 
-    await confirmDeleteWorkedExample.click();
+    await action.click(
+      'Confirm delete worked example', confirmDeleteWorkedExample);
 
     await waitFor.invisibilityOf(
       deleteWorkedExampleModal,
@@ -318,19 +320,27 @@ var SkillEditorPage = function() {
     var questionIndexToCheck = 0;
     var explanationIndexToCheck = 0;
     for (var index in questions) {
-      await workedExampleSummary(index).click();
+      await action.click(
+        'Worked Example Summary', workedExampleSummary(index));
+      await waitFor.visibilityOf(
+        workedExampleQuestionField,
+        'Worked example question field takes too long to appear.');
       var text = await workedExampleQuestionField.getText();
       expect(text).toMatch(questions[questionIndexToCheck]);
       questionIndexToCheck++;
+      await waitFor.visibilityOf(
+        workedExampleExplanationField,
+        'Worked example explanation field takes too long to appear.');
       var text = await workedExampleExplanationField.getText();
       expect(text).toMatch(explanations[explanationIndexToCheck]);
       explanationIndexToCheck++;
-      await workedExampleSummary(index).click();
+      await action.click(
+        'Worked Example Summary', workedExampleSummary(index));
     }
   };
 
   this.addMisconception = async function(name, notes, feedback) {
-    await addMisconceptionButton.click();
+    await action.click('Add misconception', addMisconceptionButton);
 
     var addMisconceptionModal = (
       element(by.css('.protractor-test-add-misconception-modal')));
@@ -347,10 +357,7 @@ var SkillEditorPage = function() {
     await misconceptionFeedbackField.click();
     await browser.switchTo().activeElement().sendKeys(feedback);
 
-    await waitFor.elementToBeClickable(
-      confirmAddMisconception,
-      'Save Misconception button takes too long to be clickable');
-    await confirmAddMisconception.click();
+    await action.click('Confirm add misconception', confirmAddMisconception);
 
     await waitFor.invisibilityOf(
       addMisconceptionModal,
@@ -358,11 +365,15 @@ var SkillEditorPage = function() {
   };
 
   this.expectNumberOfMisconceptionsToBe = async function(number) {
+    await waitFor.visibilityOf(
+      misconceptionListContainer,
+      'Misconception list container takes too long to appear.');
     expect(await misconceptionListItems.count()).toBe(number);
   };
 
   this.deleteMisconception = async function(index) {
-    await deleteMisconceptionButton(index).click();
+    await action.click(
+      'Delete misconception button', deleteMisconceptionButton(index));
 
     var deleteMisconceptionModal = (
       element(by.css('.protractor-test-delete-misconception-modal')));
@@ -370,7 +381,8 @@ var SkillEditorPage = function() {
       deleteMisconceptionModal,
       'Delete Misconception Modal takes too long to appear');
 
-    await confirmDeleteMisconception.click();
+    await action.click(
+      'Confirm delete misconception', confirmDeleteMisconception);
 
     await waitFor.invisibilityOf(
       deleteMisconceptionModal,
