@@ -312,15 +312,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         {'cmd2': 'another_command'}
     ]
 
-    BASE_CLASSES = (
-        'BaseCommitLogEntryModel',
-        'BaseMapReduceBatchResultsModel',
-        'BaseModel',
-        'BaseSnapshotContentModel',
-        'BaseSnapshotMetadataModel',
-        'VersionedModel',
-    )
-
     def set_up_non_trivial(self):
         """Set up all models for use in testing.
         1) Simulates the creation of a user, user_1, and their stats model.
@@ -941,7 +932,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         all_models = [
             clazz
             for clazz in test_utils.get_storage_model_classes()
-            if not clazz.__name__ in self.BASE_CLASSES
+            if not clazz.__name__ in test_utils.NON_TAKEOUT_BASE_MODEL_CLASSES
         ]
 
         for model in all_models:
@@ -1005,7 +996,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         all_models = [
             clazz
             for clazz in test_utils.get_storage_model_classes()
-            if not clazz.__name__ in self.BASE_CLASSES
+            if not clazz.__name__ in test_utils.NON_TAKEOUT_BASE_MODEL_CLASSES
         ]
 
         # Iterate over models and test export policies.

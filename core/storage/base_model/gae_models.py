@@ -462,7 +462,7 @@ class BaseCommitLogEntryModel(BaseModel):
     @staticmethod
     def get_model_association_to_user():
         """The history of commits is not relevant for the purposes of
-        Takeout.
+        Takeout, since commits do not contain any personal data of the user.
         """
         return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -477,7 +477,8 @@ class BaseCommitLogEntryModel(BaseModel):
     def get_export_policy(cls):
         """Model contains data corresponding to a user,
         but this isn't exported because the history of commits is not
-        relevant to a user for the purposes of Takeout.
+        relevant to a user for the purposes of Takeout, since commits do not
+        contain any personal user data.
         """
         return dict(BaseModel.get_export_policy(), **{
             'user_id': EXPORT_POLICY.NOT_APPLICABLE,
@@ -1175,7 +1176,7 @@ class VersionedModel(BaseModel):
     @staticmethod
     def get_model_association_to_user():
         """The history of commits is not relevant for the purposes of
-        Takeout.
+        Takeout, since commits do not contain any personal user data.
         """
         return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -1183,7 +1184,7 @@ class VersionedModel(BaseModel):
     def get_export_policy(cls):
         """Model contains data corresponding to a user, but this isn't exported
         because the history of commits is not relevant for the purposes of
-        Takeout.
+        Takeout, since commits do not contain any personal user data.
         """
         return dict(BaseModel.get_export_policy(), **{
             'version': EXPORT_POLICY.NOT_APPLICABLE

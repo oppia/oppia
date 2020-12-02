@@ -1089,13 +1089,15 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model is not included because it contains data about other users."""
+        """Model is not included because it contains data corresponding to other
+        users.
+        """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
         """Model contains data corresponding to a user, but this model is not
-        expotted because it contains data about other users.
+        exported because it contains data corresponding to other users.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'subscriber_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -1961,8 +1963,8 @@ class UserQueryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains data corresponding to a user, but model is not
-        exported since this is a computed model and the information already
-        exists in other exported models.
+        exported since this is a computed model and because noteworthy details
+        that belong to this model have already been exported.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'inactive_in_last_n_days': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2566,9 +2568,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains data corresponding to a user, but model does not need
-        to exported as it temporarily holds user requests for data deletion, and
-        does not contain any information relevant to the user for data export.
+        """Model contains data corresponding to a user, but the model does not
+        need to be exported as it temporarily holds user requests for data
+        deletion, and does not contain any information relevant to the user for
+        data export.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2617,8 +2620,9 @@ class DeletedUserModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model doesn't contain any data directly corresponding to a user.
-        DeletedUserModel contains only IDs that were deleted.
+        """Model doesn't contain any data directly corresponding to a
+        particular, existing user. DeletedUserModel contains only IDs that were
+        deleted.
         """
         return dict(super(cls, cls).get_export_policy(), **{})
 

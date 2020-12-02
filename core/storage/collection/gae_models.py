@@ -544,7 +544,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     @staticmethod
     def get_model_association_to_user():
         """The history of commits is not relevant for the purposes of
-        Takeout.
+        Takeout, since commits do not contain any personal user data.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -552,7 +552,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     def get_export_policy(cls):
         """Model contains data corresponding to a user, but this isn't exported
         because the history of commits is not relevant for the purposes of
-        Takeout.
+        Takeout, since commits do not contain any personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -715,8 +715,8 @@ class CollectionSummaryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains data corresponding to a user, but this isn't exported
-        because the model data has already been exported as a part of the
-        CollectionRightsModel.
+        because noteworthy details that belong to this model have already been
+        exported as a part of the CollectionRightsModel.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,

@@ -151,7 +151,7 @@ class TaskEntryModel(base_models.BaseModel):
     @classmethod
     def get_export_policy(cls):
         """Model contains data to export corresponding to a user:
-        TaskEntryModel contains the user ID that acted on a task.
+        TaskEntryModel contains the ID of the user that acted on a task.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'composite_entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
