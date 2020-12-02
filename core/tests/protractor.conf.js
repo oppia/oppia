@@ -324,7 +324,9 @@ exports.config = {
         pathBuilder: function(currentSpec) {
           return currentSpec.fullName;
         },
-        captureOnlyFailedSpecs: true
+        captureOnlyFailedSpecs: true,
+        reportFailedUrl: true,
+        preserveDirectory: true
       }));
     }
 

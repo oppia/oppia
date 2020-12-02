@@ -620,7 +620,6 @@ def run_tests(args=None):
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
-    ensure_screenshots_dir_is_removed()
     python_utils.PRINT(
         'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
         'core/tests/protractor.conf.js, you can view screenshots'
@@ -703,6 +702,7 @@ def run_tests(args=None):
 
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
+    ensure_screenshots_dir_is_removed()
     for _ in python_utils.RANGE(MAX_RETRY_COUNT):
         flake_state = run_tests(args=args)
         if flake_state != 'flake':
