@@ -169,7 +169,7 @@ describe('Exploration translation and voiceover tab', function() {
     let expEditorTranslationTab = explorationEditorTranslationTab;
 
     await expEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-      '0 items translated out of 8 items');
+      '0 items translated out of 9 items');
     await expEditorTranslationTab.expectContentAccessibilityToMatch(
       'Content of the card');
     await expEditorTranslationTab.expectFeedbackAccessibilityToMatch(
@@ -257,7 +257,7 @@ describe('Exploration translation and voiceover tab', function() {
       await expEditorTranslationTab.expectCorrectStatusColor(
         'final card', RED_STATE_PROGRESS_COLOR);
       await expEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-        '1 item translated out of 8 items');
+        '1 item translated out of 9 items');
 
       await expEditorTranslationTab.moveToState('first');
       await expEditorTranslationTab.expectContentTabContentToMatch(
@@ -301,7 +301,7 @@ describe('Exploration translation and voiceover tab', function() {
       await expEditorTranslationTab.expectCorrectStatusColor(
         'final card', GREEN_STATE_PROGRESS_COLOR);
       await expEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
-        '3 items translated out of 8 items');
+        '3 items translated out of 9 items');
       await users.logout();
     });
 

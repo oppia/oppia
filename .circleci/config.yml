@@ -44,7 +44,7 @@ anchor_for_job_defaults: &job_defaults
 
 commands:
   install_chrome:
-    # Chrome version installed should be consistent with that installed on Travis CI.
+    # Chrome version installed should be consistent with that installed on Github Actions.
     description: "Install Chrome"
     steps:
       - run:
@@ -229,6 +229,10 @@ jobs:
           name: Run e2e profileFeatures test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="profileFeatures" --prod_env
+      - run:
+          name: Run e2e wipeout test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="wipeout" --prod_env
 
   # Non-prod e2e Tests
   # The following tests must be run in a non-production environment because they are uploading files.
@@ -261,6 +265,12 @@ jobs:
           name: Run e2e contributor dashboard test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="contributorDashboard"
+      # Feature Gating test suites must run in non-production environment because
+      # the dummy_feature being used must not be enabled in production environment.
+      - run:
+          name: Run e2e feature gating test
+          command: |
+            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="featureGating"
 
   e2e_non_prod_new_structure_tests:
     <<: *job_defaults

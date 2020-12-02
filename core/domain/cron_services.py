@@ -80,8 +80,11 @@ def delete_models_marked_as_deleted():
             if deleted_model.last_updated < date_before_which_to_hard_delete
         ]
         if issubclass(model_class, base_models.VersionedModel):
+            model_ids_to_hard_delete = [
+                model.id for model in models_to_hard_delete
+            ]
             model_class.delete_multi(
-                models_to_hard_delete, '', '', force_deletion=True)
+                model_ids_to_hard_delete, '', '', force_deletion=True)
         else:
             model_class.delete_multi(models_to_hard_delete)
 

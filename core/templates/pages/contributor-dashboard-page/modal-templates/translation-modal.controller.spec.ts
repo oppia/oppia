@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for TranslationModalController.
  */
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 import { importAllAngularServices } from 'tests/unit-test-utils';
 

@@ -1,6 +1,6 @@
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
-var glob = require('glob')
-var path = require('path')
+var glob = require('glob');
+var path = require('path');
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -81,6 +81,10 @@ var suites = {
       'protractor_desktop/extensions.js'
     ],
 
+    featureGating: [
+      'protractor/featureGatingFlow.js'
+    ],
+
     fileUploadFeatures: [
       'protractor_desktop/voiceoverUploadFeatures.js'
     ],
@@ -152,6 +156,10 @@ var suites = {
     users: [
       'protractor_desktop/userJourneys.js',
     ],
+
+    wipeout: [
+      'protractor_desktop/wipeout.js',
+    ]
   };
 
 // A reference configuration file.
