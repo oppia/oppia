@@ -240,7 +240,6 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.uploadAudioRecord = async function(audioPath) {
-<<<<<<< HEAD
     await action.click('Upload Audio Button', uploadAudioButton);
     absPath = path.resolve(__dirname, audioPath);
     await waitFor.visibilityOf(
@@ -251,16 +250,6 @@ var ExplorationEditorTranslationTab = function() {
 
   this.saveAudioRecord = async function() {
     await action.click('Save Uploaded Audio Button', saveUploadedAudioButton);
-=======
-    await action.click('Audio Record Button', uploadAudioButton);
-    absPath = path.resolve(__dirname, audioPath);
-    await action.sendKeys(
-      'Audio upload input', audioUploadInput, absPath, false);
-  };
-
-  this.saveAudioRecord = async function() {
-    await action.click('Save uploaded audio button', saveUploadedAudioButton);
->>>>>>> upstream/develop
     await waitFor.pageToFullyLoad();
   };
 
@@ -321,13 +310,8 @@ var ExplorationEditorTranslationTab = function() {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
     await action.sendKeys(
-<<<<<<< HEAD
       'Audio Upload Input', audioUploadInput, audioAbsolutePath);
     await action.click('Save Uploaded Audio Button', saveUploadedAudioButton);
-=======
-      'Audio upload input', audioUploadInput, audioAbsolutePath, false);
-    await action.click('Save uploaded audio button', saveUploadedAudioButton);
->>>>>>> upstream/develop
     await waitFor.invisibilityOf(
       saveUploadedAudioButton,
       'Upload Audio modal takes too long to disappear');
@@ -362,11 +346,7 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.openUploadAudioModal = async function() {
-<<<<<<< HEAD
     await action.click('Upload Audio Button', uploadAudioButton);
-=======
-    await action.click('Upload Audio button', uploadAudioButton);
->>>>>>> upstream/develop
   };
 
   this.closeUploadAudioModal = async function() {
