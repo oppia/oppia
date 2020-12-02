@@ -17,6 +17,7 @@
  * tests.
  */
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var CollectionEditorPage = function() {
   var addExplorationButton = element(
@@ -52,19 +53,21 @@ var CollectionEditorPage = function() {
   this.addExistingExploration = async function(explorationId) {
     await waitFor.visibilityOf(
       addExplorationInput, 'Add Exploration Input is not visible');
-    await addExplorationInput.sendKeys(explorationId);
+    await action.sendKeys(
+      'Add Exploration Input', addExplorationInput, explorationId);
     // Waits until the button becomes active after debouncing.
     await waitFor.elementToBeClickable(
       addExplorationButton,
       'Unable to find exploration ID: ' + explorationId);
-    await addExplorationButton.click();
+    await action.click('Add Exploration Button', addExplorationButton);
   };
 
   // Search and add existing exploration to the node graph.
   this.searchForAndAddExistingExploration = async function(query) {
     await waitFor.visibilityOf(
       addExplorationInput, 'Add Exploration Input is not visible');
-    await addExplorationInput.sendKeys(query);
+    await action.sendKeys(
+      'Add Exploration Input', addExplorationInput, query);
     // Need to wait for result to appear.
     await waitFor.elementToBeClickable(
       addExplorationButton, 'Unable to find exploration: ' + query);
@@ -73,19 +76,20 @@ var CollectionEditorPage = function() {
     var dropdownResultElement = element(
       by.cssContainingText('.dropdown-menu', new RegExp(query)));
     if (await dropdownResultElement.isPresent()) {
-      await dropdownResultElement.click();
+      await action.click('DropDown Result Element', dropdownResultElement);
       matched = true;
     }
     if (!matched) {
       // Press Tab to fill in the default result should one appear when
       // none of the answer matches the given query.
-      await addExplorationInput.sendKeys(protractor.Key.TAB);
+      await action.sendKeys(
+        'Add Exploration Input', addExplorationInput, protractor.Key.TAB);
       // If query gets zero result, hitting Tab would not enable the
       // addExplorationButton.
     }
     var isEnabled = await addExplorationButton.isEnabled();
     if (isEnabled) {
-      await addExplorationButton.click();
+      await action.click('Add Exploration Button', addExplorationButton);
     } else {
       throw new Error ('Add Exploration Button is not clickable');
     }
@@ -93,7 +97,7 @@ var CollectionEditorPage = function() {
 
   // Shift a node left in the node graph.
   this.shiftNodeLeft = async function(number) {
-    await editorShiftLeft.get(number).click();
+    await action.click('Editor Shift Left', editorShiftLeft.get(number));
   };
 
   this.setCommitMessage = async function(message) {
@@ -101,32 +105,33 @@ var CollectionEditorPage = function() {
       saveModal, 'Save Modal takes too long to appear');
     await waitFor.elementToBeClickable(
       commitMessageInput, 'Commit Message input takes too long to appear');
-    await commitMessageInput.click();
-    await commitMessageInput.sendKeys(message);
+    await action.click('Commit Message Input', commitMessageInput);
+    await action.sendKeys(
+      'Commit Message Input', commitMessageInput, message);
   };
 
   // Shift a node right in the node graph.
   this.shiftNodeRight = async function(number) {
-    await editorShiftRight.get(number).click();
+    await action.click('Editor Shift Right', editorShiftRight.get(number));
   };
 
   // Delete a node in the node graph.
   this.deleteNode = async function(number) {
-    await editorDeleteNode.get(number).click();
+    await action.click('Editor Delete Node', editorDeleteNode.get(number));
   };
 
   // Save draft of the collection.
   this.saveDraft = async function() {
     await waitFor.elementToBeClickable(
       saveDraftButton, 'Collection Save Draft button is not clickable');
-    await saveDraftButton.click();
+    await action.click('Save Draft Button', saveDraftButton);
   };
 
   // Closes the save modal.
   this.closeSaveModal = async function() {
     await waitFor.elementToBeClickable(
       closeSaveModalButton, 'Publish Changes button is not clickable');
-    await closeSaveModalButton.click();
+    await action.click('Close Save Modal Button', closeSaveModalButton);
     await waitFor.invisibilityOf(
       closeSaveModalButton, 'Save Modal takes too long to close');
   };
@@ -135,22 +140,29 @@ var CollectionEditorPage = function() {
   this.publishCollection = async function() {
     await waitFor.elementToBeClickable(
       editorPublishButton, 'Collection Publish button is not clickable');
-    await editorPublishButton.click();
+    await action.click('Editor Publish Button', editorPublishButton);
   };
 
   // Set collection title.
   this.setTitle = async function(title) {
-    await editorTitleInput.sendKeys(title);
+    await action.sendKeys('Editor Title Input', editorTitleInput, title);
   };
 
   // Set collection objective.
   this.setObjective = async function(objective) {
-    await collectionEditorObjectiveInput.sendKeys(objective);
+    await action.sendKeys(
+      'Collection Editor Objective Input',
+      collectionEditorObjectiveInput, objective);
   };
 
   // Set collection category.
   this.setCategory = async function(category) {
-    await editorCategoryDropdown.first().click();
+    await action.click(
+      'Editor Category Drop Down', editorCategoryDropdown.first());
+    // TODO(#11289): sendKeys statement cannot be
+    // converted to action.sendKeys(..)
+    // because doing so causes the e2e test to fail with the error
+    // "Failed: Cannot read property 'bind' of undefined".
     await browser.driver.switchTo().activeElement().sendKeys(category + '\n');
   };
 
@@ -158,9 +170,9 @@ var CollectionEditorPage = function() {
   this.saveChanges = async function() {
     await waitFor.elementToBeClickable(
       saveChangesButton, 'Save Changes button is not clickable');
-    await saveChangesButton.click();
+    await action.click('Save Changes Button', saveChangesButton);
     await waitFor.invisibilityOf(
-      saveChangesButton, 'Save Changes modal takes too long to close');
+      saveChangesButton, 'Save Changes Modal takes too long to close');
     await waitFor.invisibilityOf(
       saveInProgressLabel, 'Collection is taking too long to save.');
   };
