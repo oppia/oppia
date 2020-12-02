@@ -30,7 +30,7 @@ import utils
 
 datastore_services = models.Registry.import_datastore_services()
 
-job_models = models.Registry.import_models([models.NAMES.job])
+(job_models,) = models.Registry.import_models([models.NAMES.job])
 
 class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 

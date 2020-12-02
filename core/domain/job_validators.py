@@ -25,7 +25,7 @@ from core.domain import base_model_validators
 from core.platform import models
 import utils
 
-job_models = models.Registry.import_models([models.NAMES.job])
+(job_models,) = models.Registry.import_models([models.NAMES.job])
 
 class JobModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating JobModels."""
