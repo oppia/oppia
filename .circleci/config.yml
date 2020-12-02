@@ -44,7 +44,7 @@ anchor_for_job_defaults: &job_defaults
 
 commands:
   install_chrome:
-    # Chrome version installed should be consistent with that installed on Travis CI.
+    # Chrome version installed should be consistent with that installed on Github Actions.
     description: "Install Chrome"
     steps:
       - run:
