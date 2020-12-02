@@ -85,31 +85,51 @@ var ExplorationPlayerPage = function() {
   var pauseButton = element(by.css('.protractor-test-pause-circle'));
 
   this.expandAudioBar = async function() {
+<<<<<<< HEAD
     await action.click('Audio Bar Expand Button', audioBarExpandButton);
   };
 
   this.pressPlayButton = async function() {
     await action.click('Play Button', playButton);
+=======
+    await action.click('Audio bar expand button', audioBarExpandButton);
+  };
+
+  this.pressPlayButton = async function() {
+    await action.click('Play button', playButton);
+>>>>>>> 9098f3541c3cf1c906811b73118c16aa004283fb
   };
 
   this.expectAudioToBePlaying = async function() {
-    expect(await pauseButton.isPresent()).toBeTruthy();
+    await waitFor.visibilityOf(
+      pauseButton, 'Pause button taking too long to show up.');
   };
 
   this.pressPauseButton = async function() {
+<<<<<<< HEAD
     await action.click('Pause Button', pauseButton);
+=======
+    await action.click('Pause button', pauseButton);
+>>>>>>> 9098f3541c3cf1c906811b73118c16aa004283fb
   };
 
   this.expectAudioToBePaused = async function() {
-    expect(await playButton.isPresent()).toBeTruthy();
+    await waitFor.visibilityOf(
+      playButton, 'Play button taking too long to show up.');
   };
 
   this.changeVoiceoverLanguage = async function(language) {
     await waitFor.visibilityOf(
       voiceoverLanguageSelector, 'Language selector takes too long to appear.');
+<<<<<<< HEAD
     var voiceoverLanguageOptionSelector = voiceoverLanguageSelector.element(
       by.cssContainingText('option', language));
     await action.click('Next Card button', voiceoverLanguageOptionSelector);
+=======
+    var languageButton = voiceoverLanguageSelector.element(
+      by.cssContainingText('option', language));
+    await action.click('Language button', languageButton);
+>>>>>>> 9098f3541c3cf1c906811b73118c16aa004283fb
   };
 
   this.clickThroughToNextCard = async function() {
@@ -292,6 +312,8 @@ var ExplorationPlayerPage = function() {
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
   this.submitAnswer = async function(interactionId, answerData) {
+    await waitFor.visibilityOf(
+      conversationInput, 'Conversation input takes too long to appear.');
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
     await interactions.getInteraction(interactionId).submitAnswer(
