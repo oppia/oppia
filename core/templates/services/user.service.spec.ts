@@ -34,7 +34,8 @@ describe('User Service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', {
       location: {
-        pathname: 'home'
+        pathname: 'home',
+        search: '?q=something'
       }
     });
   }));
@@ -215,7 +216,7 @@ describe('User Service', function() {
 
   it('should return the login url', function() {
     var loginUrl = '/login';
-    var currentUrl = 'home';
+    var currentUrl = 'home%3Fq%3Dsomething';
     $httpBackend.expect('GET', '/url_handler?current_url=' + currentUrl)
       .respond({login_url: loginUrl});
 

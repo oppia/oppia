@@ -55,7 +55,7 @@
   <!-- Do not show this button if an interaction is already selected. -->
   <button class="btn btn-secondary float-left" ng-click="returnToInteractionSelector()" ng-if="StateInteractionIdService.displayed && !StateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
 
-  <button class="btn btn-secondary" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
+  <button class="btn btn-secondary" ng-click="cancelWithConfirm()" ng-if="hasCustomizationArgs">Cancel</button>
   <div class="btn-group"
        ng-if="hasCustomizationArgs"
        popover-append-to-body

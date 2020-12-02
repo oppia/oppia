@@ -17,7 +17,6 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -31,7 +30,8 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
-
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { Subscription } from 'rxjs';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
@@ -73,6 +73,9 @@ describe('State Translation Status Graph Component', function() {
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
     $provide.value('UtilsService', TestBed.get(UtilsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(function() {
