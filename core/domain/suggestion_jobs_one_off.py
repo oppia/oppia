@@ -484,9 +484,13 @@ class DeleteAllQuestionAndInvalidSuggestionsOneOffJob(
 
     This job deletes following suggestion and connected models:
         - Deletes all the question suggestions as the old question suggestions
-          have invalid state schema version number.
+          have invalid state schema version number and deleting this model will
+          be fine as questions suggestion is an unreleased feature.
         - Delete all suggestions which does not have corresponding feedback
-          models.
+          models. This deletion is only required in the test server.
+
+    TODO(#11300): This job is only needed once and we are expecting to remove it
+    once it's used.
     """
 
     @classmethod
