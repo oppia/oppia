@@ -85,36 +85,33 @@ var ExplorationPlayerPage = function() {
   var pauseButton = element(by.css('.protractor-test-pause-circle'));
 
   this.expandAudioBar = async function() {
-    await waitFor.elementToBeClickable(
-      audioBarExpandButton, 'Audio bar taking too long to be clickable');
-    await audioBarExpandButton.click();
+    await action.click('Audio bar expand button', audioBarExpandButton);
   };
 
   this.pressPlayButton = async function() {
-    await waitFor.elementToBeClickable(
-      playButton, 'Play button taking too long to be clickable');
-    await playButton.click();
+    await action.click('Play button', playButton);
   };
 
   this.expectAudioToBePlaying = async function() {
-    expect(await pauseButton.isPresent()).toBeTruthy();
+    await waitFor.visibilityOf(
+      pauseButton, 'Pause button taking too long to show up.');
   };
 
   this.pressPauseButton = async function() {
-    await waitFor.elementToBeClickable(
-      pauseButton, 'Pause button taking too long to be clickable');
-    await pauseButton.click();
+    await action.click('Pause button', pauseButton);
   };
 
   this.expectAudioToBePaused = async function() {
-    expect(await playButton.isPresent()).toBeTruthy();
+    await waitFor.visibilityOf(
+      playButton, 'Play button taking too long to show up.');
   };
 
   this.changeVoiceoverLanguage = async function(language) {
     await waitFor.visibilityOf(
       voiceoverLanguageSelector, 'Language selector takes too long to appear.');
-    await voiceoverLanguageSelector.element(
-      by.cssContainingText('option', language)).click();
+    var languageButton = voiceoverLanguageSelector.element(
+      by.cssContainingText('option', language));
+    await action.click('Language button', languageButton);
   };
 
   this.clickThroughToNextCard = async function() {

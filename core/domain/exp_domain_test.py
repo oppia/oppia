@@ -1059,7 +1059,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.get_languages_with_complete_translation(), [])
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
@@ -1079,9 +1079,25 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
@@ -1097,14 +1113,25 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
+        init_state.update_written_translations(written_translations)
 
         exploration.add_states(['New state'])
+        new_state = exploration.states['New state']
+        new_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        new_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None)
+        new_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>New state translation in Hindi.</p>',
@@ -1120,8 +1147,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        exploration.states['New state'].update_written_translations(
-            written_translations)
+        new_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 4})
@@ -1130,9 +1156,24 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
+
+        init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
@@ -1148,9 +1189,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
+        init_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 1})
@@ -1159,9 +1198,24 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
+        init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi-en': {
                         'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
@@ -1182,9 +1236,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
+        init_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {
