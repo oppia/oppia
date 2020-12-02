@@ -29,4 +29,4 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 EXCLUDED_BYPASS_SECURITY_TRUST_FILES = ()
 EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES = (
     'core/templates/components/forms/custom-forms-directives/thumbnail-display.component.ts', # pylint: disable=line-too-long
-    'core/templates/services/image-upload-helper.service.ts')
+    'core/templates/components/forms/custom-forms-directives/thumbnail-display.component.spec.ts') # pylint: disable=line-too-long
