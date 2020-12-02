@@ -24,14 +24,18 @@ import logging
 
 from constants import constants
 from core import jobs
+from core.domain import feedback_services
 from core.domain import html_validation_service
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
 
-(feedback_models, suggestion_models, user_models,) = (
-    models.Registry.import_models(
-        [models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user]))
+(email_models, feedback_models, suggestion_models, user_models,) = (
+    models.Registry.import_models([
+        models.NAMES.email, models.NAMES.feedback, models.NAMES.suggestion,
+        models.NAMES.user]))
+
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -471,3 +475,82 @@ class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class DeleteAllQuestionAndInvalidSuggestionsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to delete all questions and invalid suggestion models in the
+    server.
+
+    This job is only needed once and should not be kept after the problem
+    is fixed.
+
+    This job deletes following suggestion and connected models:
+        - Deletes all the question suggestions as the old question suggestions
+          have invalid state schema version number and deleting this model will
+          be fine as questions suggestion is an unreleased feature.
+        - Delete all suggestions which does not have corresponding feedback
+          models. This deletion is only required in the test server.
+
+    TODO(#11300): This job is only needed once and we are expecting to remove it
+    once it's used.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield ('SUGGESTION_ALREADY_DELETED', 1)
+            return
+
+        feedback_model = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            item.id)
+
+        if feedback_model is not None and item.suggestion_type != (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            yield ('SUGGESTION_IGNORED', 1)
+            return
+
+        model_keys = []
+        model_keys.append(datastore_services.Key(
+            suggestion_models.GeneralSuggestionModel, item.id))
+
+        if feedback_model is not None:
+            model_keys.append(datastore_services.Key(
+                feedback_models.GeneralFeedbackThreadModel, item.id))
+
+        for message in feedback_services.get_messages(item.id):
+            model_keys.append(
+                datastore_services.Key(
+                    feedback_models.GeneralFeedbackMessageModel, message.id))
+
+        reply_to_id_models = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.query(
+                email_models.GeneralFeedbackEmailReplyToIdModel.thread_id == (
+                    item.id)).fetch())
+
+        model_keys += [
+            datastore_services.Key(
+                email_models.GeneralFeedbackEmailReplyToIdModel,
+                reply_to_id_model.id)
+            for reply_to_id_model in reply_to_id_models]
+
+        model_keys += feedback_models.GeneralFeedbackThreadUserModel.query(
+            feedback_models.GeneralFeedbackThreadUserModel.thread_id == item.id
+        ).fetch(keys_only=True)
+
+        if item.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+            model_keys.append(
+                datastore_services.Key(
+                    feedback_models.FeedbackAnalyticsModel, item.target_id))
+
+        transaction_services.run_in_transaction(
+            datastore_services.delete_multi, model_keys)
+        yield ('SUGGESTION_DELETED', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
