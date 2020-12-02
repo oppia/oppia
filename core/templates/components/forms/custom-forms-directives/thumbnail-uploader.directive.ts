@@ -89,6 +89,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               uploadedImage = null;
             }
             $scope.thumbnailIsLoading = false;
+            $scope.$applyAsync();
           });
           $scope.showEditThumbnailModal = function() {
             if ($scope.disabled) {

@@ -9,24 +9,16 @@
       <i class="material-icons oppia-editor-edit-icon oppia-pencil-icon">
         &#xE254;
       </i>
-      <thumbnail-display ng-show="!thumbnailIsLoading"
-                         [source]="editableThumbnailDataUrl"
+      <oppia-svg-thumbnail-display ng-show="!thumbnailIsLoading"
+                         [img-src]="editableThumbnailDataUrl"
                          [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                          [background]="getBgColor()">
-      </thumbnail-display>
-      <thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
-                         [source]="newThumbnailDataUrl"
+      </oppia-svg-thumbnail-display>
+      <oppia-svg-thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
+                         [img-src]="newThumbnailDataUrl"
                          [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                          [background]="localStorageBgcolor">
-      </thumbnail-display>
-      <!-- <img ng-show="!thumbnailIsLoading"
-           ng-src="<[editableThumbnailDataUrl]>"
-           class="img-thumbnail protractor-test-custom-photo"
-           ng-style="{background: getBgColor()}"> -->
-      <!-- <img ng-if="useLocalStorage && newThumbnailDataUrl"
-           ng-src="<[newThumbnailDataUrl]>"
-           ng-style="{background: localStorageBgcolor}"
-           class="img-thumbnail protractor-test-custom-photo"> -->
+      </oppia-svg-thumbnail-display>
     </div>
   </div>
 </div>

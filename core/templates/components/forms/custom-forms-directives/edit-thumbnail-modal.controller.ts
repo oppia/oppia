@@ -41,6 +41,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
+    $scope.bgColor = '#fff';
     $scope.uploadedImage = uploadedImage;
     $scope.invalidImageWarningIsShown = false;
     $scope.invalidTagsAndAttributes = {
@@ -69,11 +70,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
     };
 
     $scope.updateBackgroundColor = function(color) {
-      var thumbnailImageElement = (
-        <HTMLElement>document.querySelector(
-          '.oppia-thumbnail-image'));
-      thumbnailImageElement.style.background = color;
-      tempBgColor = color;
+      $scope.bgColor = color;
     };
 
     $scope.onFileChanged = function(file) {
