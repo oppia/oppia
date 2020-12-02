@@ -58,20 +58,18 @@ def create_http_task(
     parent = CLIENT.queue_path(
         feconf.OPPIA_PROJECT_ID, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 
-    complete_url = '%s%s' % (feconf.OPPIA_SITE_URL, url)
     # Construct the request body.
     task = {
-        'http_request': {  # Specify the type of request.
-            'http_method': 1,
-            'url': complete_url,
-            # The full url path that the task will be sent to.
+        'app_engine_http_request': {  # Specify the type of request.
+            'http_method': tasks_v2.types.target_pb2.HttpMethod.POST,
+            'relative_uri': url,
         }
     }
 
     if payload is not None:
         if isinstance(payload, dict):
             payload = json.dumps(payload)
-            task['http_request']['headers'] = {
+            task['app_engine_http_request']['headers'] = {
                 'Content-type': 'application/json'
             }
 
@@ -79,11 +77,9 @@ def create_http_task(
         converted_payload = payload.encode()
 
         # Add the payload to the request.
-        task['http_request']['body'] = converted_payload
+        task['app_engine_http_request']['body'] = converted_payload
 
     if scheduled_for is not None:
-
-        # Create Timestamp protobuf.
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(scheduled_for)
 

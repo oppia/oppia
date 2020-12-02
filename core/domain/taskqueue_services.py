@@ -93,8 +93,7 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
     # See https://bugs.python.org/issue7980
     datetime.datetime.strptime('', '')
     platform_taskqueue_services.create_http_task(
-        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED,
-        payload=payload)
+        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
 
 
 def enqueue_task(url, params, countdown):
