@@ -1316,6 +1316,46 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(init_state.get_translation_counts(), {'hi': 1})
 
+    def test_get_translation_counts_returns_correct_value(self):
+        state = state_domain.State.create_default_state(None)
+        state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+
+        self.set_interaction_for_state(state, 'TextInput')
+
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))]
+        state.update_interaction_hints(hints_list)
+
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            },
+        }
+
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, solution_dict)
+
+        state.update_interaction_solution(solution)
+        state.validate({}, True)
+        state.add_translation('hint_1', 'hi', 'Some translation')
+        state.add_translation('content', 'hi', 'Some translation')
+
+        self.assertEqual(state.get_translation_counts(), {'hi': 2})
+
+        # Adding interaction placeholder translation won't be reflected in
+        # get_translation_counts method.
+        state.add_translation('ca_placeholder_0', 'hi', 'Some translation')
+
+        self.assertEqual(state.get_translation_counts(), {'hi': 2})
+
     def test_state_operations(self):
         """Test adding, updating and checking existence of states."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
