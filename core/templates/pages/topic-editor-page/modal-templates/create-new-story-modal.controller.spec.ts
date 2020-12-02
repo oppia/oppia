@@ -15,7 +15,6 @@
 /**
  * @fileoverview Unit tests for CreateNewStoryModalController.
  */
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';

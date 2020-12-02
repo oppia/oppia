@@ -17,8 +17,6 @@
  */
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
-
 describe('Translation Modal Controller', function() {
   let $httpBackend = null;
   let $q = null;
