@@ -53,7 +53,7 @@ steps:
           python -m scripts.typescript_checks
           python -m scripts.typescript_checks --strict_checks
  
-  - id: e2e-learner-dashboard
+  - id: e2e-learner-dashboard-preferences
     name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
     wait_for: ["setup-and-typescript-tests"]
     volumes:
@@ -65,16 +65,5 @@ steps:
       - "-c"
       - |
           xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="learnerDashboard" --prod_env
+          xvfb-run -a python -m scripts.run_e2e_tests --skip-build --skip-install --suite="preferences" --prod_env
 
-  - id: preferences
-    name: gcr.io/oppia-jenkins-test-server/oppia-base:$SHORT_SHA
-    wait_for: ["e2e-learner-dashboard"]
-    volumes:
-      - name: 'test'
-        path: '/test'
-    dir: /test/oppia
-    entrypoint: bash
-    args:
-      - "-c"
-      - |
-          xvfb-run -a python -m scripts.run_e2e_tests --skip-install --suite="preferences" --prod_env
