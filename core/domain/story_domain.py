@@ -527,57 +527,6 @@ class StoryContents(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected all chapter titles to be distinct.')
 
-            # nodes_queue stores the pending nodes to visit in the story that
-            # are unlocked, in a 'queue' form with a First In First Out
-            # structure.
-            nodes_queue = []
-            is_node_visited = [False] * len(self.nodes)
-            starting_node_index = self.get_node_index(self.initial_node_id)
-            nodes_queue.append(self.nodes[starting_node_index].id)
-
-            # The user is assumed to have all the prerequisite skills of the
-            # starting node before starting the story. Also, this list models
-            # the skill IDs acquired by a learner as they progress through the
-            # story.
-            simulated_skill_ids = copy.deepcopy(
-                self.nodes[starting_node_index].prerequisite_skill_ids)
-
-            # The following loop employs a Breadth First Search from the given
-            # starting node and makes sure that the user has acquired all the
-            # prerequisite skills required by the destination nodes 'unlocked'
-            # by visiting a particular node by the time that node is finished.
-            while len(nodes_queue) > 0:
-                current_node_id = nodes_queue.pop()
-                current_node_index = self.get_node_index(current_node_id)
-                is_node_visited[current_node_index] = True
-                current_node = self.nodes[current_node_index]
-
-                for skill_id in current_node.acquired_skill_ids:
-                    simulated_skill_ids.append(skill_id)
-
-                for node_id in current_node.destination_node_ids:
-                    node_index = self.get_node_index(node_id)
-                    # The following condition checks whether the destination
-                    # node for a particular node, has already been visited, in
-                    # which case the story would have loops, which are not
-                    # allowed.
-                    if is_node_visited[node_index]:
-                        raise utils.ValidationError(
-                            'Loops are not allowed in stories.')
-                    destination_node = self.nodes[node_index]
-                    if not (
-                            set(
-                                destination_node.prerequisite_skill_ids
-                            ).issubset(simulated_skill_ids)):
-                        raise utils.ValidationError(
-                            'The prerequisite skills ' +
-                            ' '.join(
-                                set(destination_node.prerequisite_skill_ids) -
-                                set(simulated_skill_ids)) +
-                            ' were not completed before the node with id %s'
-                            ' was unlocked.' % node_id)
-                    nodes_queue.append(node_id)
-
     def get_node_index(self, node_id):
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.
