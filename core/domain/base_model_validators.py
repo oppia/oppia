@@ -74,7 +74,7 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
 
     def __init__(
             self, field_name, model_class, model_ids,
-            allow_system_user_ids=False, allow_pseudonymous_ids=False):
+            remove_system_user_ids=False, remove_pseudonymous_ids=False):
         """Initializes an ExternalModelFetcherDetails domain object.
 
         Args:
@@ -86,16 +86,16 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
             model_class: ClassObject. The external model class.
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
-            allow_system_user_ids: bool. Whether to allow system user IDs in
-                the model_ids.
-            allow_pseudonymous_ids: bool. Whether to allow pseudonymous user
+            remove_system_user_ids: bool. Whether to remove the system user IDs
+                in the model_ids.
+            remove_pseudonymous_ids: bool. Whether to remove pseudonymous user
                 IDs in the model_ids.
         """
         filtered_model_ids = model_ids
-        if allow_system_user_ids:
+        if remove_system_user_ids:
             filtered_model_ids = list(
                 set(filtered_model_ids) - set(feconf.SYSTEM_USERS.values()))
-        if allow_pseudonymous_ids:
+        if remove_pseudonymous_ids:
             filtered_model_ids = [
                 i for i in filtered_model_ids
                 if not utils.is_pseudonymous_id(i)

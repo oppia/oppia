@@ -269,6 +269,8 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
 class StorySnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(StorySnapshotMetadataModelValidatorTests, self).setUp()
 
@@ -336,7 +338,7 @@ class StorySnapshotMetadataModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_pseudo_committer_id(self):
-        self.model_instance_1.committer_id = 'pid_' + 'a' * 32
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
         self.model_instance_1.update_timestamps(update_last_updated_time=False)
         self.model_instance_1.put()
 

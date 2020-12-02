@@ -168,8 +168,8 @@ class CollectionSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id],
-                allow_system_user_ids=True,
-                allow_pseudonymous_ids=True
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
             )]
 
 
@@ -262,8 +262,8 @@ class CollectionRightsSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id],
-                allow_system_user_ids=True,
-                allow_pseudonymous_ids=True
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
             )]
 
 
@@ -555,8 +555,8 @@ class ExplorationSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id],
-                allow_system_user_ids=True,
-                allow_pseudonymous_ids=True
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
             )]
 
 
@@ -659,8 +659,8 @@ class ExplorationRightsSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id],
-                allow_system_user_ids=True,
-                allow_pseudonymous_ids=True
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
             )]
 
 
@@ -908,8 +908,7 @@ class GeneralFeedbackThreadModelValidator(
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids', user_models.UserSettingsModel,
                     [item.original_author_id],
-                    allow_system_user_ids=False,
-                    allow_pseudonymous_ids=True
+                    remove_pseudonymous_ids=True
                 ))
         if item.has_suggestion:
             field_name_to_external_model_references.append(
@@ -932,8 +931,7 @@ class GeneralFeedbackThreadModelValidator(
                     'last_nonempty_message_author_ids',
                     user_models.UserSettingsModel,
                     [item.last_nonempty_message_author_id],
-                    allow_system_user_ids=False,
-                    allow_pseudonymous_ids=True
+                    remove_pseudonymous_ids=True
                 ))
         return field_name_to_external_model_references
 
@@ -1046,8 +1044,7 @@ class GeneralFeedbackMessageModelValidator(
                     'author_ids',
                     user_models.UserSettingsModel,
                     [item.author_id],
-                    allow_system_user_ids=False,
-                    allow_pseudonymous_ids=True
+                    remove_pseudonymous_ids=True
                 )
             )
         return field_name_to_external_model_references
@@ -1411,8 +1408,8 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                     'author_ids',
                     user_models.UserSettingsModel,
                     [item.author_id],
-                    allow_system_user_ids=True,
-                    allow_pseudonymous_ids=True
+                    remove_system_user_ids=True,
+                    remove_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -1423,18 +1420,12 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                     [item.target_id]))
         if item.final_reviewer_id and user_services.is_user_id_valid(
                 item.final_reviewer_id):
-
-            # Bot rejects suggestions when the suggestion's targeted entity gets
-            # removed from the topic. The bot doesn't have a UserSettingsModel
-            # for their user_id. Exclude external model validation for bot.
-            if item.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID:
-                field_name_to_external_model_references.append(
-                    base_model_validators.ExternalModelFetcherDetails(
-                        'reviewer_ids', user_models.UserSettingsModel,
-                        [item.final_reviewer_id],
-                        allow_system_user_ids=False,
-                        allow_pseudonymous_ids=True
-                    ))
+            field_name_to_external_model_references.append(
+                base_model_validators.ExternalModelFetcherDetails(
+                    'reviewer_ids', user_models.UserSettingsModel,
+                    [item.final_reviewer_id],
+                    remove_pseudonymous_ids=True
+                ))
         return field_name_to_external_model_references
 
     @classmethod
@@ -1633,8 +1624,7 @@ class GeneralVoiceoverApplicationModelValidator(
                     'author_ids',
                     user_models.UserSettingsModel,
                     [item.author_id],
-                    allow_system_user_ids=False,
-                    allow_pseudonymous_ids=True
+                    remove_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -1651,8 +1641,7 @@ class GeneralVoiceoverApplicationModelValidator(
                 base_model_validators.ExternalModelFetcherDetails(
                     'final_reviewer_ids', user_models.UserSettingsModel,
                     [item.final_reviewer_id],
-                    allow_system_user_ids=False,
-                    allow_pseudonymous_ids=True
+                    remove_pseudonymous_ids=True
                 ))
         return field_name_to_external_model_references
 
@@ -1957,8 +1946,8 @@ class SubtopicPageSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id],
-                allow_system_user_ids=True,
-                allow_pseudonymous_ids=True
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
             )]
 
 

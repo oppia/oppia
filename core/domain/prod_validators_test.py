@@ -320,6 +320,8 @@ class CollectionModelValidatorTests(test_utils.AuditJobsTestBase):
 class CollectionSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(CollectionSnapshotMetadataModelValidatorTests, self).setUp()
 
@@ -392,7 +394,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_pseudo_committer_id(self):
-        self.model_instance_1.committer_id = 'pid_' + 'a' * 32
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
         self.model_instance_1.update_timestamps(update_last_updated_time=False)
         self.model_instance_1.put()
 
@@ -868,6 +870,8 @@ class CollectionRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 class CollectionRightsSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(CollectionRightsSnapshotMetadataModelValidatorTests, self).setUp(
             )
@@ -919,6 +923,26 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             .CollectionRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_commiter_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
         expected_output = [
             u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]']
         self.run_job_and_check_output(
@@ -1927,6 +1951,8 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 class ExplorationSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(ExplorationSnapshotMetadataModelValidatorTests, self).setUp()
 
@@ -1970,6 +1996,26 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 4]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_commiter_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 3]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -2468,6 +2514,8 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 class ExplorationRightsSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(ExplorationRightsSnapshotMetadataModelValidatorTests, self).setUp(
             )
@@ -2506,6 +2554,28 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_commiter_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 3]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -3311,6 +3381,8 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(GeneralFeedbackThreadModelValidatorTests, self).setUp()
 
@@ -3361,6 +3433,29 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralFeedbackThreadModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_author_id(self):
+        self.model_instance.original_author_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralFeedbackThreadModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_last_nonempty_message_author_id(self):
+        self.model_instance.last_nonempty_message_author_id = (
+            self.PSEUDONYMOUS_ID)
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralFeedbackThreadModel\', 1]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -3526,6 +3621,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(GeneralFeedbackMessageModelValidatorTests, self).setUp()
 
@@ -3554,6 +3651,17 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralFeedbackMessageModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_author_id(self):
+        self.model_instance.author_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralFeedbackMessageModel\', 1]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -4406,6 +4514,9 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
 
 
 class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(GeneralSuggestionModelValidatorTests, self).setUp()
 
@@ -4452,6 +4563,39 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralSuggestionModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_author_id_migration_bot(self):
+        self.model_instance.author_ids = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_author_id(self):
+        self.model_instance.author_ids = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_final_reviewer_id(self):
+        self.model_instance.final_reviewer_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -4538,20 +4682,6 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                     self.model_instance.id, self.admin_id, self.admin_id)]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-
-    def test_bot_as_final_reviewer_does_not_fail_reviewer_id_validation(self):
-        self.assertEqual(
-            user_models.UserSettingsModel.get_by_id(
-                feconf.SUGGESTION_BOT_USER_ID), None)
-
-        self.model_instance.final_reviewer_id = feconf.SUGGESTION_BOT_USER_ID
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-
-        expected_output = [
-            u'[u\'fully-validated GeneralSuggestionModel\', 1]']
-        self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
 
     def test_invalid_target_version(self):
         self.model_instance.target_version_at_submission = 5
@@ -4704,6 +4834,9 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class GeneralVoiceoverApplicationModelValidatorTests(
         test_utils.AuditJobsTestBase):
+
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(GeneralVoiceoverApplicationModelValidatorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -4742,6 +4875,28 @@ class GeneralVoiceoverApplicationModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_author_id(self):
+        self.model_instance.author_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_final_reviewer_id(self):
+        self.model_instance.final_reviewer_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -5559,6 +5714,8 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 class SubtopicPageSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(SubtopicPageSnapshotMetadataModelValidatorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -5660,6 +5817,28 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 4]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_commiter_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 3]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

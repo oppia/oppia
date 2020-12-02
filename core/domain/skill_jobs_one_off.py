@@ -129,7 +129,8 @@ class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def entity_classes_to_map_over(cls):
         return [
             skill_models.SkillCommitLogEntryModel,
-            skill_models.SkillSnapshotMetadataModel]
+            skill_models.SkillSnapshotMetadataModel
+        ]
 
     @staticmethod
     def map(item):
@@ -154,7 +155,8 @@ class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             item.put()
             yield (
                 'Commit Commands Updated-%s' % item.__class__.__name__,
-                item.id)
+                item.id
+            )
 
     @staticmethod
     def reduce(key, values):
@@ -173,7 +175,8 @@ class MissingSkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         return [
             skill_models.SkillCommitLogEntryModel,
             skill_models.SkillSnapshotMetadataModel,
-            skill_models.SkillSnapshotContentModel]
+            skill_models.SkillSnapshotContentModel
+        ]
 
     @staticmethod
     def map(item):

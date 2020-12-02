@@ -124,6 +124,8 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
 class ConfigPropertySnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(ConfigPropertySnapshotMetadataModelValidatorTests, self).setUp()
 
@@ -152,6 +154,26 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
         self.config_model.commit(self.admin_id, [])
         expected_output = [
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_commiter_id_migration_bot(self):
+        self.model_instance.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -468,6 +490,8 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
 class PlatformParameterSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(
             PlatformParameterSnapshotMetadataModelValidatorTests, self).setUp()
@@ -499,6 +523,26 @@ class PlatformParameterSnapshotMetadataModelValidatorTests(
         self.parameter_model.commit(self.admin_id, '', [])
         expected_output = [
             u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_commiter_id_migration_bot(self):
+        self.model_instance.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated PlatformParameterSnapshotMetadataModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

@@ -393,6 +393,8 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
 class TopicSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(TopicSnapshotMetadataModelValidatorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -488,7 +490,7 @@ class TopicSnapshotMetadataModelValidatorTests(
             expected_output, sort=True, literal_eval=False)
 
     def test_model_with_pseudo_committer_id(self):
-        self.model_instance_1.committer_id = 'pid_' + 'a' * 32
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
         self.model_instance_1.update_timestamps(update_last_updated_time=False)
         self.model_instance_1.put()
         expected_output = [
@@ -975,6 +977,8 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 class TopicRightsSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
+
     def setUp(self):
         super(TopicRightsSnapshotMetadataModelValidatorTests, self).setUp()
 
@@ -1080,7 +1084,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_pseudo_committer_id(self):
-        self.model_instance_1.committer_id = 'pid_' + 'a' * 32
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
         self.model_instance_1.update_timestamps(update_last_updated_time=False)
         self.model_instance_1.put()
         expected_output = [

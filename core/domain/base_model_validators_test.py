@@ -85,9 +85,7 @@ class MockSnapshotMetadataModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'external_model_ids', MockModel, []),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', MockModel, [])]
+                'external_model_ids', MockModel, [])]
 
 
 class MockBaseUserModelValidator(
@@ -112,7 +110,7 @@ class MockBaseUserModelValidator(
 class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     system_user_id = feconf.MIGRATION_BOT_USER_ID
-    pseudonymous_id = 'pid_' + 'a' * 32
+    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
 
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
@@ -197,12 +195,22 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             }
         )
 
-    def test_allow_system_and_pseudonymous_users(self):
+    def test_remove_system_users(self):
         external_model = base_model_validators.ExternalModelFetcherDetails(
             'committer_ids', MockModel,
-            [self.system_user_id, 'User-1', self.pseudonymous_id],
-            allow_system_user_ids=True,
-            allow_pseudonymous_ids=True
+            [self.system_user_id, 'User-1', self.PSEUDONYMOUS_ID],
+            remove_system_user_ids=True
         )
 
-        self.assertItemsEqual(external_model.model_ids, ['User-1'])
+        self.assertItemsEqual(
+            external_model.model_ids, ['User-1', self.PSEUDONYMOUS_ID])
+
+    def test_remove_pseudonymous_users(self):
+        external_model = base_model_validators.ExternalModelFetcherDetails(
+            'committer_ids', MockModel,
+            [self.system_user_id, 'User-1', self.PSEUDONYMOUS_ID],
+            remove_pseudonymous_ids=True
+        )
+
+        self.assertItemsEqual(
+            external_model.model_ids, [self.system_user_id, 'User-1'])

@@ -113,8 +113,8 @@ class SkillSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id],
-                allow_system_user_ids=True,
-                allow_pseudonymous_ids=True
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
             )]
 
 
