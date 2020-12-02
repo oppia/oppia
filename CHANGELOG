@@ -3,7 +3,8 @@ This file contains a summary of changes to the Oppia code base.
 v3.0.5 (02 Dec 2020)
 ------------------------
 Contributor Pages
-* Fix part of #10687: Make it possible to get the top 5 suggestions that have been waiting longest for review per reviewer. (#10860)* Fix #10955: Make the updates to the CommunityContributionStatsModel transactional in the PopulateContributionStatsOneOffJob (#10956)
+* Fix part of #10687: Make it possible to get the top 5 suggestions that have been waiting longest for review per reviewer. (#10860)
+* Fix #10955: Make the updates to the CommunityContributionStatsModel transactional in the PopulateContributionStatsOneOffJob (#10956)
 * Fix #10687: Make it possible to notify Contributor Dashboard reviewers that there are suggestions waiting for review. (#10943)
 * Fix translation count issue for the exploration opportunity models (#11290)
 * Add job to delete invalid suggestion models on server (#11274)
@@ -14,7 +15,7 @@ Cloud NDB Migration
 * Improve code health of test_utils (#11080)
 
 Bug fixes
-* Fix #11200: fix browser detection mismatch between frontend and backend (#11211)
+* Fix #11200: Fix browser detection mismatch between frontend and backend (#11211)
 * Fix part of #11202: Enable logging and add retry for create task (#11209)
 * Bug fixes: enable signup button after usernamehandler/data call has completed; login redirection must include search params (#11115)
 * Fix #11023: Improve robustness of platform parameter evaluation (#11074)
@@ -39,7 +40,7 @@ Data handling
 * Fix hard-deletion cron job for versioned models (#11204)
 * Wipeout 8.16: Save the username of deleted user so it cannot be reused (#11168)
 * Wipeout 8.15: Fix removal of user from contributors (#11151)
-* Fix #10951: Create a new model that is used to retrieve th user ID from the GAE ID (#11134)
+* Fix #10951: Create a new model that is used to retrieve the user ID from the GAE ID (#11134)
 * Fix issues with ExplorationSnapshotMetadataModelAuditOneOffJob due to large output (#11127)
 * Wipeout 4.5: Add username confirmation field into the delete account modal (#11082)
 * Wipeout 8.14: Hard deletion for models marked as deleted and other small stuff (#11071)
@@ -86,23 +87,23 @@ QA Team
 * Rewriting the Extensions Suite (#10776)
 
 Angular Migration
-* Fix Part of #8472: Migrate solution verification service (#11135)
+* Fix part of #8472: Migrate solution verification service (#11135)
 * Fix part of #9749: Migrates collection-navbar.component.ts (#11053)
-* Fix part of #8472 : Migrate EditableQuestionBackendApiService to Angular8 (#11040)
-* Fix Part of #8472: Migrate Expression Interpolation Service (#10991)
+* Fix part of #8472: Migrate EditableQuestionBackendApiService to Angular8 (#11040)
+* Fix part of #8472: Migrate Expression Interpolation Service (#10991)
 * Fix part of #9749: Migrates state-param-changes-editor.component to Angular (#10962)
-* Fix Part of #8472: Migrate exploration-summary-backend-api.service.ts and exploration-id-validation.service.ts (#10908)
+* Fix part of #8472: Migrate exploration-summary-backend-api.service.ts and exploration-id-validation.service.ts (#10908)
 * Fix part of #10700: Refactor Object Factories with Dependencies (#10868)
 * Migrate QuestionsListService to Angular (#10867)
-* Fix Part of #10700: Refactor Object Factories (#10838)
+* Fix part of #10700: Refactor Object Factories (#10838)
 * Fix part of #8472 : Migrate TranslationTabActiveModeService to Angular8 (#10813)
-* Fix Part of #10700: Refactor Object Factories (#10701)
+* Fix part of #10700: Refactor Object Factories (#10701)
 * Fix part of #8472: Migrate editable-story-backend-api.service.ts file to angular 8 (#10378)
 * Fix part of #8472: Migrate admin-config-tab-backend-api.service.ts file to angular 8 (#11058)
 * Fix part of #8472: Migrate learner answer info service to angular 8 (#11021)
-* Fix Part of #8472: Migrate EditableTopicBackendApiService to Angular 8 (#10997)
-* Fix #8038: http calls moved from promo-bar.service.ts to *backend.api.service  (#11067)
-* Fix #10398 Remove services from app and add require (#10725)
+* Fix part of #8472: Migrate EditableTopicBackendApiService to Angular 8 (#10997)
+* Fix #8038: Http calls moved from promo-bar.service.ts to *backend.api.service  (#11067)
+* Fix #10398: Remove services from app and add require (#10725)
 
 
 v3.0.4 (17 Oct 2020)
