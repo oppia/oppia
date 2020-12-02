@@ -64,6 +64,7 @@ class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):
     def _validate_time_fields_of_user_actions(cls, item):
         """Validates that value for time fields for user actions is
         less than the current time when the job is run.
+
         Args:
             item: datastore_services.Model. UserSettingsModel to validate.
         """
@@ -212,6 +213,7 @@ class ExpUserLastPlaythroughModelValidator(
     def _validate_exp_id_is_marked_as_incomplete(cls, item):
         """Validates that exploration id for model is marked as
         incomplete.
+
         Args:
             item: datastore_services.Model. ExpUserLastPlaythroughModel to
                 validate.
@@ -230,6 +232,7 @@ class ExpUserLastPlaythroughModelValidator(
             cls, item, field_name_to_external_model_references):
         """Validates that last played exp version is less than or equal to
         for version of the exploration.
+
         Args:
             item: datastore_services.Model. ExpUserLastPlaythroughModel to
                 validate.
@@ -274,6 +277,7 @@ class ExpUserLastPlaythroughModelValidator(
             cls, item, field_name_to_external_model_references):
         """Validates that state name is a valid state in the exploration
         corresponding to the entity.
+
         Args:
             item: datastore_services.Model. ExpUserLastPlaythroughModel to
                 validate.
@@ -445,6 +449,7 @@ class UserSubscriptionsModelValidator(
     def _validate_last_checked(cls, item):
         """Validates that last checked time field is less than the time
         when job was run.
+
         Args:
             item: datastore_services.Model. UserSubscriptionsModel to validate.
         """
@@ -461,6 +466,7 @@ class UserSubscriptionsModelValidator(
             cls, item, field_name_to_external_model_references):
         """Validates that user id is present in list of
         subscriber ids of the creators the user has subscribed to.
+
         Args:
             item: datastore_services.Model. UserSubscriptionsModel to validate.
             field_name_to_external_model_references:
@@ -528,6 +534,7 @@ class UserSubscribersModelValidator(
     def _validate_user_id_not_in_subscriber_ids(cls, item):
         """Validates that user id is not present in list of
         subscribers of user.
+
         Args:
             item: datastore_services.Model. UserSubscribersModel to validate.
         """
@@ -543,6 +550,7 @@ class UserSubscribersModelValidator(
         """Validates that user id is present in list of
         creator ids to which the subscribers of user have
         subscribed.
+
         Args:
             item: datastore_services.Model. UserSubscribersModel to validate.
             field_name_to_external_model_references:
@@ -604,6 +612,7 @@ class UserRecentChangesBatchModelValidator(
     def _validate_job_queued_msec(cls, item):
         """Validates that job queued msec is less than the time
         when job was run.
+
         Args:
             item: datastore_services.Model. UserRecentChangesBatchModel to
                 validate.
@@ -633,6 +642,7 @@ class UserStatsModelValidator(base_model_validators.BaseUserModelValidator):
     @classmethod
     def _validate_schema_version(cls, item):
         """Validates that schema version is less than current version.
+
         Args:
             item: datastore_services.Model. UserStatsModel to validate.
         """
@@ -651,6 +661,7 @@ class UserStatsModelValidator(base_model_validators.BaseUserModelValidator):
         by a datetime field and value as a dict with keys: num_ratings,
         average_ratings, total_plays. Values for these keys should be
         integers.
+
         Args:
             item: datastore_services.Model. UserStatsModel to validate.
         """
@@ -703,6 +714,7 @@ class ExplorationUserDataModelValidator(
     def _validate_draft_change_list(cls, item):
         """Validates that commands in draft change list follow
         the schema of ExplorationChange domain object.
+
         Args:
             item: datastore_services.Model. ExplorationUserDataModel to
                 validate.
@@ -721,6 +733,7 @@ class ExplorationUserDataModelValidator(
     @classmethod
     def _validate_rating(cls, item):
         """Validates that rating is in the interval [1, 5].
+
         Args:
             item: datastore_services.Model. ExplorationUserDataModel to
                 validate.
@@ -735,6 +748,7 @@ class ExplorationUserDataModelValidator(
     def _validate_rated_on(cls, item):
         """Validates that rated on is less than the time when job
         was run.
+
         Args:
             item: datastore_services.Model. ExplorationUserDataModel to
                 validate.
@@ -755,6 +769,7 @@ class ExplorationUserDataModelValidator(
     def _validate_draft_change_list_last_updated(cls, item):
         """Validates that draft change list last updated is less than
         the time when job was run.
+
         Args:
             item: datastore_services.Model. ExplorationUserDataModel to
                 validate.
@@ -781,6 +796,7 @@ class ExplorationUserDataModelValidator(
             cls, item, field_name_to_external_model_references):
         """Validates that draft change exp version is less than version
         of the exploration corresponding to the model.
+
         Args:
             item: datastore_services.Model. ExplorationUserDataModel to
                 validate.
@@ -865,6 +881,7 @@ class CollectionProgressModelValidator(
         """Validates that completed exploration ids belong to
         the collection and are present in CompletedActivitiesModel
         for the user.
+
         Args:
             item: datastore_services.Model. CollectionProgressModel to validate.
             field_name_to_external_model_references:
@@ -970,6 +987,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
     def _validate_story_is_public(
             cls, item, field_name_to_external_model_references):
         """Validates that story is public.
+
         Args:
             item: datastore_services.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
@@ -1020,6 +1038,7 @@ class StoryProgressModelValidator(base_model_validators.BaseUserModelValidator):
     def _validate_completed_nodes(
             cls, item, field_name_to_external_model_references):
         """Validates that completed nodes belong to the story.
+
         Args:
             item: datastore_services.Model. StoryProgressModel to validate.
             field_name_to_external_model_references:
@@ -1142,6 +1161,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
         is only sent to a limited maximum of qualified users.
         It also checks that a UserBulkEmailsModel exists for each
         of the recipients.
+
         Args:
             item: datastore_services.Model. UserQueryModel to validate.
             field_name_to_external_model_references:
@@ -1213,6 +1233,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
     def _validate_old_models_marked_deleted(cls, item):
         """Validate that there are no models that were last updated more than
         four weeks ago, these models should be deleted.
+
         Args:
             item: UserQueryModel. UserQueryModel to validate.
         """
@@ -1230,6 +1251,7 @@ class UserQueryModelValidator(base_model_validators.BaseUserModelValidator):
     def _validate_archived_models_marked_deleted(cls, item):
         """Validate that there are no models that were last updated more than
         four weeks ago, these models should be deleted.
+
         Args:
             item: UserQueryModel. UserQueryModel to validate.
         """
@@ -1269,6 +1291,7 @@ class UserBulkEmailsModelValidator(
             cls, item, field_name_to_external_model_references):
         """Validates that user id is present in recipient ids
         for bulk email model.
+
         Args:
             item: datastore_services.Model. UserBulkEmailsModel to validate.
             field_name_to_external_model_references:
@@ -1330,6 +1353,7 @@ class UserSkillMasteryModelValidator(
     @classmethod
     def _validate_skill_mastery(cls, item):
         """Validates that skill mastery is in range [0.0, 1.0].
+
         Args:
             item: datastore_services.Model. UserSkillMasteryModel to validate.
         """
@@ -1363,6 +1387,7 @@ class UserContributionProficiencyModelValidator(
     @classmethod
     def _validate_score(cls, item):
         """Validates that score is non-negative.
+
         Args:
             item: datastore_services.Model. UserContributionProficiencyModel to
                 validate.
@@ -1408,6 +1433,7 @@ class PendingDeletionRequestModelValidator(
     @classmethod
     def _validate_user_settings_are_marked_deleted(cls, item):
         """Validates that explorations for model are marked as deleted.
+
         Args:
             item: PendingDeletionRequestModel. Pending deletion request model
                 to validate.
@@ -1423,6 +1449,7 @@ class PendingDeletionRequestModelValidator(
     def _validate_activity_mapping_contains_only_allowed_keys(cls, item):
         """Validates that pseudonymizable_entity_mappings keys are only from
         the core.platform.models.NAMES enum.
+
         Args:
             item: PendingDeletionRequestModel. Pending deletion request model
                 to validate.
@@ -1459,6 +1486,7 @@ class DeletedUserModelValidator(base_model_validators.BaseUserModelValidator):
     @classmethod
     def _validate_user_is_properly_deleted(cls, item):
         """Validates that user settings do not exist for the deleted user ID.
+
         Args:
             item: DeletedUserModel. Pending deletion request model to validate.
         """
@@ -1490,6 +1518,7 @@ class PseudonymizedUserModelValidator(
     def _validate_user_settings_with_same_id_not_exist(cls, item):
         """Validates that the UserSettingsModel with the same ID as this model
         does not exist.
+
         Args:
             item: PseudonymizedUserModel. PseudonymizedUserModel to validate.
         """
@@ -1511,8 +1540,10 @@ class DeletedUsernameModelValidator(
     def _get_model_id_regex(cls, unused_item):
         """Returns a regex for model id.
         This method can be overridden by subclasses, if needed.
+
         Args:
             unused_item: datastore_services.Model. Entity to validate.
+
         Returns:
             str. A regex pattern to be followed by the model id.
         """
@@ -1541,8 +1572,10 @@ class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
     def _get_model_id_regex(cls, unused_item):
         """Returns a regex for model id.
         This method can be overridden by subclasses, if needed.
+
         Args:
             unused_item: datastore_services.Model. Entity to validate.
+
         Returns:
             str. A regex pattern to be followed by the model id.
         """
