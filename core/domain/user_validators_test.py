@@ -181,6 +181,59 @@ class UserSettingsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
 
+class UserNormalizedNameAuditOneOffJobTests(test_utils.AuditJobsTestBase):
+
+    def setUp(self):
+        super(UserNormalizedNameAuditOneOffJobTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        # Note: There will a total of 3 UserSettingsModel even though
+        # only two users signup in the test since superadmin signup
+        # is also done in test_utils.AuditJobsTestBase.
+        self.model_instance_0 = user_models.UserSettingsModel.get_by_id(
+            self.user_id)
+        self.model_instance_1 = user_models.UserSettingsModel.get_by_id(
+            self.admin_id)
+        self.job_class = (
+            prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = []
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_repeated_normalized_username(self):
+        self.model_instance_1.normalized_username = USER_NAME
+        self.model_instance_1.update_timestamps()
+        self.model_instance_1.put()
+        sorted_user_ids = sorted([self.user_id, self.admin_id])
+        expected_output = [(
+            u'[u\'failed validation check for normalized username '
+            'check of UserSettingsModel\', '
+            'u"Users with ids [\'%s\', \'%s\'] have the same normalized '
+            'username username"]') % (
+                sorted_user_ids[0], sorted_user_ids[1])]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
+
+    def test_normalized_username_not_set(self):
+        self.model_instance_0.normalized_username = None
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        self.model_instance_1.normalized_username = None
+        self.model_instance_1.update_timestamps()
+        self.model_instance_1.put()
+
+        expected_output = []
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=True)
+
+
 class CompletedActivitiesModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
