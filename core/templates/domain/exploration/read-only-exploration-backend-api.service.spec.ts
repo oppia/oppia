@@ -202,7 +202,6 @@ describe('Read only exploration backend API service', () => {
       session_id: 'sessionId',
       version: 1,
       preferred_audio_language_code: 'en',
-      state_classifier_mapping: null,
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1
@@ -224,7 +223,6 @@ describe('Read only exploration backend API service', () => {
       session_id: 'sessionId',
       version: 1,
       preferred_audio_language_code: 'en',
-      state_classifier_mapping: null,
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1
@@ -243,7 +241,6 @@ describe('Read only exploration backend API service', () => {
       session_id: 'sessionId',
       version: 1,
       preferred_audio_language_code: 'en',
-      state_classifier_mapping: null,
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
       record_playthrough_probability: 1
