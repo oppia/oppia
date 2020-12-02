@@ -134,7 +134,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
     };
 
     return {
-      initAsync(): Promise<void> {
+      async initAsync(): Promise<void> {
         if (!initializationHasStarted) {
           initializationHasStarted = true;
           doInitAsync().then(resolveInitPromise, rejectInitPromise);
@@ -142,7 +142,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
         return initPromise;
       },
 
-      async flushUpdatedTasksToBackend(): Promise<void> {
+      async flushUpdatedTasksToBackendAsync(): Promise<void> {
         if (!await this.isImprovementsTabEnabledAsync()) {
           return;
         }

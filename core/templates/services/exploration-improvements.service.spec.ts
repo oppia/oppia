@@ -317,7 +317,7 @@ describe('ExplorationImprovementsService', function() {
       explorationImprovementsService.initAsync();
       expect(
         async() => (
-          await explorationImprovementsService.flushUpdatedTasksToBackend()))
+          await explorationImprovementsService.flushUpdatedTasksToBackendAsync()))
         .not.toThrowError();
 
       flushMicrotasks();
@@ -352,7 +352,7 @@ describe('ExplorationImprovementsService', function() {
       });
 
       explorationImprovementsService.initAsync();
-      let p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      let p = explorationImprovementsService.flushUpdatedTasksToBackendAsync();
       flushMicrotasks();
       await p;
 
@@ -364,7 +364,7 @@ describe('ExplorationImprovementsService', function() {
         expect(tasks.length).toEqual(0);
       });
 
-      p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      p = explorationImprovementsService.flushUpdatedTasksToBackendAsync();
       flushMicrotasks();
       await p;
 
@@ -417,7 +417,7 @@ describe('ExplorationImprovementsService', function() {
         expect(tasks).toEqual([hbrTask]);
       });
 
-      p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      p = explorationImprovementsService.flushUpdatedTasksToBackendAsync();
       flushMicrotasks();
       await p;
 
@@ -429,7 +429,7 @@ describe('ExplorationImprovementsService', function() {
         expect(tasks).toEqual([]);
       });
 
-      p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      p = explorationImprovementsService.flushUpdatedTasksToBackendAsync();
       flushMicrotasks();
       await p;
 
@@ -466,7 +466,7 @@ describe('ExplorationImprovementsService', function() {
           expect(tasks).toEqual([]);
         });
 
-        p = explorationImprovementsService.flushUpdatedTasksToBackend();
+        p = explorationImprovementsService.flushUpdatedTasksToBackendAsync();
         flushMicrotasks();
         await p;
         expect(this.eibasPostTasksAsyncSpy).toHaveBeenCalled();
@@ -483,7 +483,7 @@ describe('ExplorationImprovementsService', function() {
           expect(tasks).toEqual([ngrTask]);
         });
 
-        p = explorationImprovementsService.flushUpdatedTasksToBackend();
+        p = explorationImprovementsService.flushUpdatedTasksToBackendAsync();
         flushMicrotasks();
         await p;
 
@@ -495,7 +495,7 @@ describe('ExplorationImprovementsService', function() {
           expect(tasks).toEqual([]);
         });
 
-        p = explorationImprovementsService.flushUpdatedTasksToBackend();
+        p = explorationImprovementsService.flushUpdatedTasksToBackendAsync();
         flushMicrotasks();
         await p;
 
@@ -538,7 +538,7 @@ describe('ExplorationImprovementsService', function() {
         expect(tasks).toEqual([]);
       });
 
-      p = explorationImprovementsService.flushUpdatedTasksToBackend();
+      p = explorationImprovementsService.flushUpdatedTasksToBackendAsync();
       flushMicrotasks();
       await p;
 
