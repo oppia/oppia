@@ -778,9 +778,8 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
-    transaction_services.run_in_transaction(
-        skill_models.SkillModel.delete_multi, [skill_id],
-        committer_id, '', force_deletion=force_deletion)
+    skill_models.SkillModel.delete_multi(
+        [skill_id], committer_id, '', force_deletion=force_deletion)
 
     # This must come after the skill is retrieved. Otherwise the memcache
     # key will be reinstated.

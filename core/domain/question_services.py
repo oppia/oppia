@@ -306,15 +306,21 @@ def delete_question(
             still retained in the datastore. This last option is the preferred
             one.
     """
-    question_model = question_models.QuestionModel.get_by_id(question_id)
-    if question_model is not None:
-        opportunity_services.increment_question_counts(
-            question_model.linked_skill_ids, -1)
+
+    def delete_question_model(question_id, committer_id, force_deletion):
+        """Inner function that is to be done in a transaction."""
+        question_model = question_models.QuestionModel.get_by_id(question_id)
+        if question_model is not None:
+            opportunity_services.increment_question_counts(
+                question_model.linked_skill_ids, -1)
+        question_models.QuestionModel.delete_multi(
+            [question_id], committer_id,
+            feconf.COMMIT_MESSAGE_QUESTION_DELETED,
+            force_deletion=force_deletion)
 
     transaction_services.run_in_transaction(
-        question_models.QuestionModel.delete_multi, [question_id],
-        committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
-        force_deletion=force_deletion)
+        delete_question_model, question_id,
+        committer_id, force_deletion=force_deletion)
 
     question_summary_model = (
         question_models.QuestionSummaryModel.get(question_id, False))
