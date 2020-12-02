@@ -57,11 +57,11 @@ describe('Site Analytics Service', () => {
       'send', 'event', 'SignupButton', 'click', '');
   });
 
-  it('should register click browse library button event', () => {
-    sas.registerClickBrowseLibraryButtonEvent();
+  it('should register click browse lessons event', () => {
+    sas.registerClickBrowseLessonsButtonEvent();
 
     expect(gaSpy).toHaveBeenCalledWith(
-      'send', 'event', 'BrowseLibraryButton', 'click', '/context.html');
+      'send', 'event', 'BrowseLessonsButton', 'click', '/context.html');
   });
 
   it('should register go to donation site event', () => {
