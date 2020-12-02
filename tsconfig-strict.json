@@ -83,6 +83,8 @@
     "core/templates/services/loader.service.spec.ts",
     "core/templates/services/math-interactions.service.ts",
     "core/templates/services/math-interactions.service.spec.ts",
+    "core/templates/pages/exploration-player-page/services/learner-params.service.ts",
+    "core/templates/pages/exploration-player-page/services/learner-params.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",
     "core/templates/services/stateful/background-mask.service.spec.ts",
     "extensions/classifiers/count-vectorizer.service.ts",
