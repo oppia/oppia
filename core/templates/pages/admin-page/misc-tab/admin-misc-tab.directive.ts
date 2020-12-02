@@ -45,12 +45,6 @@ angular.module('oppia').directive('adminMiscTab', [
         const ctrl = this;
         const DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
-        const SEND_DUMMY_MAIL_HANDLER_URL = (
-          '/senddummymailtoadminhandler');
-        const MEMORY_CACHE_HANDLER_URL = '/memorycacheadminhandler';
-        const UPDATE_USERNAME_HANDLER_URL = '/updateusernamehandler';
-        const NUMBER_OF_DELETION_REQUEST_HANDLER_URL = (
-          '/numberofdeletionrequestshandler');
         const irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
