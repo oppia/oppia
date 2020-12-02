@@ -42,11 +42,10 @@ def add_documents_to_index(documents, index_name):
     """Adds a document to an index.
 
     Args:
-        documents: list(dict). Each document should be a dictionary.
-            Every key in the document is a field name, and the corresponding
-            value will be the field's value.
-            There MUST be a key named 'id', its value will be used as the
-            document's id.
+        documents: list(dict). Each document should be a dictionary. Every key
+            in the document is a field name, and the corresponding value will be
+            the field's value. There MUST be a key named 'id', its value will be
+            used as the document's id.
         index_name: str. The name of the index to insert the document into.
 
     Raises:
@@ -107,7 +106,7 @@ def clear_index(index_name):
 
 
 def search(
-        query_string, index_name, offset=None,
+        query_string, index_name, cursor=0,
         limit=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 pages from a search by
@@ -115,10 +114,11 @@ def search(
     is greater that 10,000, use the elasticsearch scroll API instead.
 
     Args:
-        query_string: str. The search definition using Query DSL.
+        query_string: str. A JSON-encoded string representation of the
+            dictionary search definition that uses Query DSL.
         index_name: str. The name of the index. Use '_all' or empty string to
             perform the operation on all indices.
-        offset: int. The offset into the index. Pass this in to start at the
+        cursor: int. The offset into the index. Pass this in to start at the
             'offset' when searching through a list of results of max length
             'limit'. Leave as None to start at the beginning.
         limit: int. The maximum number of documents to return.
@@ -126,28 +126,34 @@ def search(
 
     Returns:
         2-tuple of (result_docs, resulting_offset). Where:
-            result_docs: list(dict). Represents search documents. If ids_only is
-                True, this will be a list of strings, doc_ids.
+            result_docs: list(dict)|list(str). Represents search documents. If
+                'ids_only' is True, this will be a list of strings corresponding
+                to the search document ids. If 'ids_only' is False, the full
+                dictionaries representing each document retrieved from the
+                elastic search instance will be returned. The document id will
+                be contained as the '_id' attribute in each document.
             resulting_offset: int. The resulting offset to start at for the next
                 section of the resulting pages. Return None if there are no more
                 pages.
     """
-    assert offset + limit < MAXIMUM_NUMBER_OF_PAGES
+    assert cursor + limit < MAXIMUM_NUMBER_OF_PAGES
     query_definiton = json.loads(query_string)
     response = ES.search(
         body=query_definiton, index=index_name,
         params={
             'size': limit,
-            'from': offset
+            'from': cursor
         })
-    resulting_offset = None
+    resulting_cursor = None
     if len(response['hits']['hits']) != 0:
-        resulting_offset = offset + limit
+        resulting_cursor = cursor + limit
     if ids_only:
         result_docs = [doc['_id'] for doc in response['hits']['hits']]
     else:
+        # Each dictionary(document) stored in doc['_source'] also contains an
+        # attribute '_id' which contains the document id.
         result_docs = [doc['_source'] for doc in response['hits']['hits']]
-    return result_docs, resulting_offset
+    return result_docs, resulting_cursor
 
 
 def get_document_from_index(doc_id, index_name):

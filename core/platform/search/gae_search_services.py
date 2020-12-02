@@ -38,13 +38,7 @@ def _dict_to_search_document(d):
 
     Returns:
         Document. The document containing fields.
-
-    Raises:
-        ValueError. The given document is not in the dict format.
     """
-    if not isinstance(d, dict):
-        raise ValueError('document should be a dictionary, got %s' % type(d))
-
     doc_id = d.get('id')
 
     rank = d.get('rank')
@@ -117,37 +111,6 @@ def _validate_list(key, value):
                 ' type %s.' % (ind, key, type(element)))
 
 
-def _string_to_sort_expressions(input_string):
-    """Returns the sorted expression of the input string.
-
-    Args:
-        input_string: str. The input string to be sorted.
-
-    Returns:
-        list(SortExpression). A list of sorted expressions.
-
-    Raises:
-        ValueError. Fields in the sort expression do not start with '+' or '-'
-            to indicate sort direction.
-    """
-    sort_expressions = []
-    s_tokens = input_string.split()
-    for expression in s_tokens:
-        if expression.startswith('+'):
-            direction = gae_search.SortExpression.ASCENDING
-        elif expression.startswith('-'):
-            direction = gae_search.SortExpression.DESCENDING
-        else:
-            raise ValueError(
-                'Fields in the sort expression must start with "+"'
-                ' or "-" to indicate sort direction.'
-                ' The field %s has no such indicator'
-                ' in expression "%s".' % (expression, input_string))
-        sort_expressions.append(
-            gae_search.SortExpression(expression[1:], direction))
-    return sort_expressions
-
-
 def _search_document_to_dict(doc):
     """Converts and returns the search document into a dict format.
 
@@ -178,7 +141,7 @@ class SearchFailureError(Exception):
         self.original_exception = original_exception
 
 
-def add_documents_to_index(documents, index):
+def add_documents_to_index(documents, index_name):
     """Adds a document to an index.
 
     Args:
@@ -193,19 +156,15 @@ def add_documents_to_index(documents, index):
             If there is a key named 'language_code', its value will be used as
             the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE
             is used.
-        index: str. The name of the index to insert the document into.
+        index_name: str. The name of the index to insert the document into.
 
     Raises:
         SearchFailureError. Raised when the indexing fails. If it fails for any
             document, none will be inserted.
-        ValueError. Raised when invalid values are given.
     """
-    if not isinstance(index, python_utils.BASESTRING):
-        raise ValueError(
-            'Index must be the unicode/str name of an index, got %s'
-            % type(index))
+    assert isinstance(index_name, python_utils.BASESTRING)
 
-    index = gae_search.Index(index)
+    index = gae_search.Index(index_name)
     gae_docs = [_dict_to_search_document(d) for d in documents]
 
     try:
@@ -220,30 +179,23 @@ def add_documents_to_index(documents, index):
         raise SearchFailureError(e)
 
 
-def delete_documents_from_index(doc_ids, index):
+def delete_documents_from_index(doc_ids, index_name):
     """Deletes documents from an index.
 
     Args:
         doc_ids: list(str). A list of document ids of documents to be deleted
             from the index.
-        index: str. The name of the index to delete the document from.
+        index_name: str. The name of the index to delete the document from.
 
     Raises:
         SearchFailureError. Raised when the deletion fails. If it fails for any
             document, none will be deleted.
     """
-    if not isinstance(index, python_utils.BASESTRING):
-        raise ValueError(
-            'Index must be the unicode/str name of an index, got %s'
-            % type(index))
+    assert isinstance(index_name, python_utils.BASESTRING)
+    for doc_id in doc_ids:
+        assert isinstance(doc_id, python_utils.BASESTRING)
 
-    for ind, doc_id in enumerate(doc_ids):
-        if not isinstance(doc_id, python_utils.BASESTRING):
-            raise ValueError(
-                'all doc_ids must be string, got %s at index %d' % (
-                    type(doc_id), ind))
-
-    index = gae_search.Index(index)
+    index = gae_search.Index(index_name)
     try:
         logging.debug(
             'Attempting to delete documents from index %s, ids: %s' %
@@ -263,6 +215,7 @@ def clear_index(index_name):
     Args:
         index_name: str. The name of the index to delete the document from.
     """
+    assert isinstance(index_name, python_utils.BASESTRING)
     index = gae_search.Index(index_name)
 
     while True:
@@ -275,24 +228,19 @@ def clear_index(index_name):
 
 
 def search(
-        query_string, index, cursor=None, limit=feconf.SEARCH_RESULTS_PAGE_SIZE,
-        sort='', ids_only=False):
+        query_string, index_name, cursor=None,
+        limit=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents in an index.
 
     Args:
         query_string: str. The search query.
             The syntax used is described here:
             https://developers.google.com/appengine/docs/python/search/query_strings
-        index: str. The name of the index to search.
+        index_name: str. The name of the index to search.
         cursor: str. A cursor string, as returned by this function. Pass this in
             to get the next 'page' of results. Leave as None to start at the
             beginning.
         limit: int. The maximum number of documents to return.
-        sort: str. A string indicating how to sort results. This should be a
-            string of space separated values. Each value should start with a '+'
-            or a '-' character indicating whether to sort in ascending or
-            descending order respectively. This character should be followed by
-            a field name to sort on.
         ids_only: bool. Whether to only return document ids.
 
     Returns:
@@ -303,22 +251,16 @@ def search(
                 the next page of results. This wil be a web safe string that you
                 can use in urls. It will be None if there is no next page.
     """
-    sort_options = None
 
     if cursor is None:
         gae_cursor = gae_search.Cursor()
     else:
         gae_cursor = gae_search.Cursor(web_safe_string=cursor)
 
-    if sort:
-        expr = _string_to_sort_expressions(sort)
-        sort_options = gae_search.SortOptions(expr)
-
     options = gae_search.QueryOptions(
         limit=limit,
         cursor=gae_cursor,
-        ids_only=ids_only,
-        sort_options=sort_options)
+        ids_only=ids_only)
 
     try:
         query = gae_search.Query(query_string, options=options)
@@ -328,7 +270,7 @@ def search(
         logging.exception('Could not parse query string %s' % query_string)
         return [], None
 
-    index = gae_search.Index(index)
+    index = gae_search.Index(index_name)
 
     try:
         logging.debug('attempting a search with query %s' % query)
@@ -350,7 +292,7 @@ def search(
     return result_docs, result_cursor_str
 
 
-def get_document_from_index(doc_id, index):
+def get_document_from_index(doc_id, index_name):
     """Returns a document with a give doc_id(s) from the index.
 
     Args:
@@ -360,5 +302,6 @@ def get_document_from_index(doc_id, index):
     Returns:
         dict. The requested document as a dict.
     """
-    index = gae_search.Index(index)
+    assert isinstance(index_name, python_utils.BASESTRING)
+    index = gae_search.Index(index_name)
     return _search_document_to_dict(index.get(doc_id))

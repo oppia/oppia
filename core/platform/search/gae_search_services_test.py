@@ -115,14 +115,6 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(ValueError, python_utils.UNICODE(set)):
             gae_search_services.add_documents_to_index([doc2], 'my_index')
 
-    def test_index_must_be_string(self):
-        index = search.Index('test')
-        # Check that the error message mentions the type the user passed in.
-        with self.assertRaisesRegexp(
-            ValueError, python_utils.UNICODE(type(index))):
-            gae_search_services.add_documents_to_index(
-                {'id': 'one', 'key': 'value'}, index)
-
     def _get_put_error(self, num_res, transient=None):
         """returns a PutError. with num_res results.
         If transient is given, it should be an index in the
@@ -197,19 +189,6 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         for i in python_utils.RANGE(10):
             self.assertIsNone(index.get('doc%d' % i))
 
-    def test_doc_ids_must_be_strings(self):
-        with self.assertRaisesRegexp(ValueError, python_utils.UNICODE(dict)):
-            gae_search_services.delete_documents_from_index(
-                ['d1', {'id': 'd2'}],
-                'index')
-
-    def test_index_must_be_string(self):
-        with self.assertRaisesRegexp(
-            ValueError,
-            'Index must be the unicode/str name of an index, got '
-            '<class \'google.appengine.api.search.search.Index\''):
-            gae_search_services.delete_documents_from_index(
-                ['doc_id'], search.Index('ind'))
 
     def _get_delete_error(self, num_res, transient=None):
         """returns a DeleteError. with num_res results.
@@ -435,49 +414,6 @@ class SearchQueryTests(test_utils.GenericTestBase):
         gae_search_services.add_documents_to_index([doc1, doc2, doc3], 'index')
         result = gae_search_services.search('k:abc', 'index')[0]
         self.assertEqual(result, [doc1, doc3, doc2])
-
-    def test_search_using_single_sort_expression(self):
-        doc1 = {'id': 'doc1', 'k': 'abc ghi'}
-        doc2 = {'id': 'doc2', 'k': 'abc def'}
-        doc3 = {'id': 'doc3', 'k': 'abc jkl'}
-        gae_search_services.add_documents_to_index([doc1, doc2, doc3], 'index')
-
-        result = gae_search_services.search('k:abc', 'index', sort='+k')[0]
-        self.assertEqual(result[0].get('id'), 'doc2')
-        self.assertEqual(result[1].get('id'), 'doc1')
-        self.assertEqual(result[2].get('id'), 'doc3')
-
-        result = gae_search_services.search('k:abc', 'index', sort='-k')[0]
-        self.assertEqual(result[0].get('id'), 'doc3')
-        self.assertEqual(result[1].get('id'), 'doc1')
-        self.assertEqual(result[2].get('id'), 'doc2')
-
-    def test_raise_error_when_sort_starts_with_invalid_character(self):
-        doc = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
-        gae_search_services.add_documents_to_index([doc], 'index')
-        # Fields in the sort expression need to start with '+' or '-'
-        # to indicate sort direction. If no such indicator is there, it will
-        # raise ValueError.
-        sort_expression = 'invalid_sort_symbol'
-        with self.assertRaisesRegexp(
-            ValueError,
-            r'Fields in the sort expression must start with "\+"'
-            ' or "-" to indicate sort direction. The field %s has no such '
-            'indicator in expression "%s".'
-            % (sort_expression, sort_expression)):
-            gae_search_services.search('k:abc', 'index', sort=sort_expression)
-
-    def test_search_using_multiple_sort_expressions(self):
-        doc1 = {'id': 'doc1', 'k1': 2, 'k2': 'abc ghi'}
-        doc2 = {'id': 'doc2', 'k1': 1, 'k2': 'abc def'}
-        doc3 = {'id': 'doc3', 'k1': 1, 'k2': 'abc jkl'}
-        gae_search_services.add_documents_to_index([doc1, doc2, doc3], 'index')
-
-        result = gae_search_services.search(
-            'k2:abc', 'index', sort='+k1 -k2')[0]
-        self.assertEqual(result[0].get('id'), 'doc3')
-        self.assertEqual(result[1].get('id'), 'doc2')
-        self.assertEqual(result[2].get('id'), 'doc1')
 
     def test_use_default_num_retries(self):
         exception = search.TransientError('oops')
