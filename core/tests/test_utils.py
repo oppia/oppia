@@ -100,6 +100,7 @@ NON_TAKEOUT_BASE_MODEL_CLASSES = (
     'VersionedModel',
 )
 
+
 def get_filepath_from_filename(filename, rootdir):
     """Returns filepath using the filename. Different files are present in
     different subdirectories in the rootdir. So, we walk through the rootdir and
