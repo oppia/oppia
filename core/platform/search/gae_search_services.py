@@ -235,7 +235,7 @@ def clear_index(index_name):
 
 
 def search(
-        query_string, index_name, cursor=None,
+        query_string, index_name, offset=None,
         size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents in an index.
 
@@ -244,29 +244,29 @@ def search(
             The syntax used is described here:
             https://developers.google.com/appengine/docs/python/search/query_strings
         index_name: str. The name of the index to search.
-        cursor: str. A cursor string, as returned by this function. Pass this in
+        offset: str. A cursor string, as returned by this function. Pass this in
             to get the next 'page' of results. Leave as None to start at the
             beginning.
         size: int. The maximum number of documents to return.
         ids_only: bool. Whether to only return document ids.
 
     Returns:
-        2-tuple of (result_docs, result_cursor_str). Where:
+        2-tuple of (result_docs, result_cursor_offset). Where:
             result_docs: list(dict). Represents search documents. If ids_only is
                 True, this will be a list of strings, doc_ids.
-            result_cursor_str: str. a cursor that you can pass back in to get
+            result_offset_str: str. a cursor that you can pass back in to get
                 the next page of results. This wil be a web safe string that you
                 can use in urls. It will be None if there is no next page.
     """
 
-    if cursor is None:
-        gae_cursor = gae_search.Cursor()
+    if offset is None:
+        gae_offset = gae_search.Cursor()
     else:
-        gae_cursor = gae_search.Cursor(web_safe_string=cursor)
+        gae_offset = gae_search.Cursor(web_safe_string=offset)
 
     options = gae_search.QueryOptions(
         limit=size,
-        cursor=gae_cursor,
+        cursor=gae_offset,
         ids_only=ids_only)
 
     try:
@@ -286,9 +286,9 @@ def search(
         logging.exception('something went wrong while searching.')
         raise SearchFailureError(e)
 
-    result_cursor_str = None
+    result_offset_str = None
     if results.cursor:
-        result_cursor_str = results.cursor.web_safe_string
+        result_offset_str = results.cursor.web_safe_string
 
     if ids_only:
         result_docs = [doc.doc_id for doc in results.results]
@@ -296,7 +296,7 @@ def search(
         result_docs = [
             _search_document_to_dict(doc) for doc in results.results]
 
-    return result_docs, result_cursor_str
+    return result_docs, result_offset_str
 
 
 def get_document_from_index(doc_id, index_name):

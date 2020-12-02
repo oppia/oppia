@@ -29,11 +29,11 @@ import python_utils
 import elasticsearch
 
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-max-result-window
-# This is the maximum number of pages to page through using the from and size
-# parameters to page through any given index. This number is equal to the size
-# index.max_result_window and defines the maximum the sum of the parameters
-# (size + from) can be. If needed, we will have to change this to use the
-# search_after parameter or scrolling option as mentioned in the link above.
+# This is the maximum number of results to search through using the from and
+# size parameters to search through any given index. This number is equal to the
+# size 'index.max_result_window' and defines the maximum the sum of the
+# parameters (size + from) can be. If needed, we will have to change this to use
+# the search_after parameter or scrolling option as mentioned in the link above.
 MAXIMUM_NUMBER_OF_RESULTS = 10000
 ES = elasticsearch.Elasticsearch()
 
@@ -106,19 +106,21 @@ def clear_index(index_name):
 
 
 def search(
-        query_string, index_name, cursor=0,
+        query_string, index_name, offset=0,
         size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents matching the given query in the given index.
-    NOTE: We cannot search through more than 10,000 pages from a search by
+    NOTE: We cannot search through more than 10,000 results from a search by
     paginating using size and offset. If the number of items to search through
     is greater that 10,000, use the elasticsearch scroll API instead.
 
     Args:
         query_string: str. A JSON-encoded string representation of the
-            dictionary search definition that uses Query DSL.
+            dictionary search definition that uses Query DSL. More details about
+            Query DSL can be found here:
+            https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
         index_name: str. The name of the index. Use '_all' or empty string to
             perform the operation on all indices.
-        cursor: int. The offset into the index. Pass this in to start at the
+        offset: int. The offset into the index. Pass this in to start at the
             'offset' when searching through a list of results of max length
             'size'. Leave as None to start at the beginning.
         size: int. The maximum number of documents to return.
@@ -133,27 +135,27 @@ def search(
                 elastic search instance will be returned. The document id will
                 be contained as the '_id' attribute in each document.
             resulting_offset: int. The resulting offset to start at for the next
-                section of the resulting pages. Return None if there are no more
-                pages.
+                section of the results. Returns None if there are no more
+                results.
     """
-    assert cursor + size < MAXIMUM_NUMBER_OF_RESULTS
+    assert offset + size < MAXIMUM_NUMBER_OF_RESULTS
     query_definiton = json.loads(query_string)
     response = ES.search(
         body=query_definiton, index=index_name,
         params={
             'size': size,
-            'from': cursor
+            'from': offset
         })
-    resulting_cursor = None
+    resulting_offset = None
     if len(response['hits']['hits']) != 0:
-        resulting_cursor = cursor + size
+        resulting_offset = offset + size
     if ids_only:
         result_docs = [doc['_id'] for doc in response['hits']['hits']]
     else:
         # Each dictionary(document) stored in doc['_source'] also contains an
         # attribute '_id' which contains the document id.
         result_docs = [doc['_source'] for doc in response['hits']['hits']]
-    return result_docs, resulting_cursor
+    return result_docs, resulting_offset
 
 
 def get_document_from_index(doc_id, index_name):

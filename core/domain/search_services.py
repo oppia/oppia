@@ -182,7 +182,8 @@ def search_explorations(query, limit, cursor=None):
               web-safe string that can be used in URLs.
     """
     return search_services.search(
-        query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, ids_only=True)
+        query, SEARCH_INDEX_EXPLORATIONS, offset=cursor,
+        size=limit, ids_only=True)
 
 
 def delete_explorations_from_search_index(exploration_ids):
@@ -222,7 +223,8 @@ def search_collections(query, limit, cursor=None):
               that can be used in URLs.
     """
     return search_services.search(
-        query, SEARCH_INDEX_COLLECTIONS, cursor, limit, ids_only=True)
+        query, SEARCH_INDEX_COLLECTIONS, offset=cursor,
+        size=limit, ids_only=True)
 
 
 def delete_collections_from_search_index(collection_ids):

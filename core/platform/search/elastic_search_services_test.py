@@ -217,7 +217,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_search:
             result, new_offset = (
                 elastic_search_services.search(
-                    json_str, correct_index_name, cursor=offset,
+                    json_str, correct_index_name, offset=offset,
                     size=size, ids_only=True))
         self.assertEqual(new_offset, size + offset)
         self.assertEqual(result, [1, 12])
@@ -262,7 +262,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_search:
             result, new_offset = (
                 elastic_search_services.search(
-                    json_str, correct_index_name, cursor=offset,
+                    json_str, correct_index_name, offset=offset,
                     size=size, ids_only=False))
         self.assertEqual(new_offset, offset + size)
         self.assertEqual(
@@ -292,7 +292,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_search:
             result, new_offset = (
                 elastic_search_services.search(
-                    json_str, correct_index_name, cursor=offset,
+                    json_str, correct_index_name, offset=offset,
                     size=size, ids_only=False))
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
