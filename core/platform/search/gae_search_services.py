@@ -42,7 +42,6 @@ def _dict_to_search_document(d):
     Raises:
         ValueError. The given document is not in the dict format.
     """
-
     if not isinstance(d, dict):
         raise ValueError('document should be a dictionary, got %s' % type(d))
 
@@ -254,7 +253,7 @@ def search(
         2-tuple of (result_docs, result_cursor_offset). Where:
             result_docs: list(dict). Represents search documents. If ids_only is
                 True, this will be a list of strings, doc_ids.
-            result_offset_str: str. a cursor that you can pass back in to get
+            result_offset_str: str. A cursor that you can pass back in to get
                 the next page of results. This wil be a web safe string that you
                 can use in urls. It will be None if there is no next page.
     """
