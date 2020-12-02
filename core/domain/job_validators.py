@@ -27,6 +27,16 @@ import utils
 
 (job_models,) = models.Registry.import_models([models.NAMES.job])
 
+ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
+    'DashboardRecentUpdatesAggregator',
+    'ExplorationRecommendationsAggregator',
+    'FeedbackAnalyticsAggregator',
+    'InteractionAnswerSummariesAggregator',
+    'SearchRanker',
+    'StatisticsAggregator',
+    'UserImpactAggregator',
+    'UserStatsAggregator']
+
 class JobModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating JobModels."""
 
