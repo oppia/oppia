@@ -38,7 +38,14 @@ def _dict_to_search_document(d):
 
     Returns:
         Document. The document containing fields.
+
+    Raises:
+        ValueError. The given document is not in the dict format.
     """
+
+    if not isinstance(d, dict):
+        raise ValueError('document should be a dictionary, got %s' % type(d))
+
     doc_id = d.get('id')
 
     rank = d.get('rank')
@@ -229,7 +236,7 @@ def clear_index(index_name):
 
 def search(
         query_string, index_name, cursor=None,
-        limit=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
+        size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents in an index.
 
     Args:
@@ -240,7 +247,7 @@ def search(
         cursor: str. A cursor string, as returned by this function. Pass this in
             to get the next 'page' of results. Leave as None to start at the
             beginning.
-        limit: int. The maximum number of documents to return.
+        size: int. The maximum number of documents to return.
         ids_only: bool. Whether to only return document ids.
 
     Returns:
@@ -258,7 +265,7 @@ def search(
         gae_cursor = gae_search.Cursor(web_safe_string=cursor)
 
     options = gae_search.QueryOptions(
-        limit=limit,
+        limit=size,
         cursor=gae_cursor,
         ids_only=ids_only)
 

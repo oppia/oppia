@@ -125,12 +125,12 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, cursor=None, limit=20, sort='',
+                query_string, index, cursor=None, size=20, sort='',
                 ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(cursor, expected_cursor)
-            self.assertEqual(limit, expected_limit)
+            self.assertEqual(size, expected_limit)
             self.assertEqual(sort, expected_sort)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
@@ -157,13 +157,13 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, cursor=None, limit=20, sort='',
+                query_string, index, cursor=None, size=20, sort='',
                 ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)
             self.assertEqual(cursor, expected_cursor)
-            self.assertEqual(limit, expected_limit)
+            self.assertEqual(size, expected_limit)
             self.assertEqual(sort, expected_sort)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)

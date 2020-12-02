@@ -12,7 +12,7 @@
 # distributed under the License is distributed on an 'AS-IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
+# sizeations under the License.
 
 """Tests for the python elastic search wrapper."""
 
@@ -184,7 +184,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_index_name = 'index1'
         json_str = json.dumps(query)
         offset = 30
-        limit = 50
+        size = 50
         documents = [
             {
                 '_id': 1,
@@ -204,7 +204,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         def mock_search(body, index, params):
             self.assertEqual(body, query)
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params['size'], limit)
+            self.assertEqual(params['size'], size)
             self.assertEqual(params['from'], offset)
             return {
                 'hits': {
@@ -218,8 +218,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             result, new_offset = (
                 elastic_search_services.search(
                     json_str, correct_index_name, cursor=offset,
-                    limit=limit, ids_only=True))
-        self.assertEqual(new_offset, limit + offset)
+                    size=size, ids_only=True))
+        self.assertEqual(new_offset, size + offset)
         self.assertEqual(result, [1, 12])
 
     def test_search_returns_full_response(self):
@@ -229,7 +229,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_index_name = 'index1'
         json_str = json.dumps(query)
         offset = 30
-        limit = 50
+        size = 50
         documents = [
             {
                 '_id': 1,
@@ -249,7 +249,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         def mock_search(body, index, params):
             self.assertEqual(body, query)
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params['size'], limit)
+            self.assertEqual(params['size'], size)
             self.assertEqual(params['from'], offset)
             return {
                 'hits': {
@@ -263,8 +263,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             result, new_offset = (
                 elastic_search_services.search(
                     json_str, correct_index_name, cursor=offset,
-                    limit=limit, ids_only=False))
-        self.assertEqual(new_offset, offset + limit)
+                    size=size, ids_only=False))
+        self.assertEqual(new_offset, offset + size)
         self.assertEqual(
             result, [document['_source'] for document in documents])
 
@@ -275,11 +275,11 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_index_name = 'index1'
         json_str = json.dumps(query)
         offset = 30
-        limit = 50
+        size = 50
         def mock_search(body, index, params):
             self.assertEqual(body, query)
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params['size'], limit)
+            self.assertEqual(params['size'], size)
             self.assertEqual(params['from'], offset)
             return {
                 'hits': {
@@ -293,6 +293,6 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             result, new_offset = (
                 elastic_search_services.search(
                     json_str, correct_index_name, cursor=offset,
-                    limit=limit, ids_only=False))
+                    size=size, ids_only=False))
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])

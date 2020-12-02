@@ -30,11 +30,11 @@ import elasticsearch
 
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-max-result-window
 # This is the maximum number of pages to page through using the from and size
-# parameters to page through any given index. This number is equal to the limit
+# parameters to page through any given index. This number is equal to the size
 # index.max_result_window and defines the maximum the sum of the parameters
 # (size + from) can be. If needed, we will have to change this to use the
 # search_after parameter or scrolling option as mentioned in the link above.
-MAXIMUM_NUMBER_OF_PAGES = 10000
+MAXIMUM_NUMBER_OF_RESULTS = 10000
 ES = elasticsearch.Elasticsearch()
 
 
@@ -107,10 +107,10 @@ def clear_index(index_name):
 
 def search(
         query_string, index_name, cursor=0,
-        limit=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
+        size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 pages from a search by
-    paginating using limit and offset. If the number of items to search through
+    paginating using size and offset. If the number of items to search through
     is greater that 10,000, use the elasticsearch scroll API instead.
 
     Args:
@@ -120,8 +120,8 @@ def search(
             perform the operation on all indices.
         cursor: int. The offset into the index. Pass this in to start at the
             'offset' when searching through a list of results of max length
-            'limit'. Leave as None to start at the beginning.
-        limit: int. The maximum number of documents to return.
+            'size'. Leave as None to start at the beginning.
+        size: int. The maximum number of documents to return.
         ids_only: bool. Whether to only return document ids.
 
     Returns:
@@ -136,17 +136,17 @@ def search(
                 section of the resulting pages. Return None if there are no more
                 pages.
     """
-    assert cursor + limit < MAXIMUM_NUMBER_OF_PAGES
+    assert cursor + size < MAXIMUM_NUMBER_OF_RESULTS
     query_definiton = json.loads(query_string)
     response = ES.search(
         body=query_definiton, index=index_name,
         params={
-            'size': limit,
+            'size': size,
             'from': cursor
         })
     resulting_cursor = None
     if len(response['hits']['hits']) != 0:
-        resulting_cursor = cursor + limit
+        resulting_cursor = cursor + size
     if ids_only:
         result_docs = [doc['_id'] for doc in response['hits']['hits']]
     else:

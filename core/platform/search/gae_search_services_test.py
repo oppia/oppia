@@ -337,7 +337,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
-        result = gae_search_services.search('k:abc', 'my_index', limit=2)[0]
+        result = gae_search_services.search('k:abc', 'my_index', size=2)[0]
         self.assertEqual(len(result), 2)
 
     def test_use_cursor(self):
@@ -350,7 +350,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
         result1, cursor = gae_search_services.search(
-            'k:abc', 'my_index', limit=2)
+            'k:abc', 'my_index', size=2)
         result2, cursor = gae_search_services.search(
             'k:abc', 'my_index', cursor=cursor)
         self.assertEqual(len(result1), 2)
