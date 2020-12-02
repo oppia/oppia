@@ -95,6 +95,7 @@ def clear_index(index_name):
     assert isinstance(index_name, python_utils.BASESTRING)
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
+    # https://stackoverflow.com/questions/57778438/delete-all-documents-from-elasticsearch-index-in-python-3-x
     ES.delete_by_query(
         index_name,
         {
