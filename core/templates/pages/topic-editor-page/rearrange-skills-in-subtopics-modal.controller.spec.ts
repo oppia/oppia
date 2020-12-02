@@ -32,7 +32,9 @@ describe('Rearrange Skills In Subtopic Modal Controller', function() {
   var TopicObjectFactory;
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
+
   importAllAngularServices();
+
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     TopicEditorStateService = $injector.get('TopicEditorStateService');

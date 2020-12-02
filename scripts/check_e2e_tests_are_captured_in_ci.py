@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A script to check that travis.yml file & protractor.conf.js have the
-same e2e test suites.
+"""A script to check that the CI config files & protractor.conf.js have
+the same e2e test suites.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -25,60 +25,38 @@ import re
 import python_utils
 import utils
 
-# These 4 test suites are not present in travis ci.
-# One is extra (ie. (full: [*.js])) and three other test suites are
-# are being run by CircleCI.
-TEST_SUITES_NOT_RUN_ON_TRAVIS = [
-    'full', 'accessibility', 'adminPage', 'classroomPage',
+# These test suites are not present in CI. One is extra
+# (ie. (full: [*.js])) and other test suites are being run by CircleCI.
+TEST_SUITES_NOT_RUN_IN_CI = [
+    'full', 'accessibility', 'adminPage',
     'classroomPageFileUploadFeatures', 'collections', 'contributorDashboard',
-    'fileUploadExtensions', 'fileUploadFeatures', 'library', 'navigation',
-    'playVoiceovers', 'preferences', 'profileFeatures', 'profileMenu',
-    'publication', 'subscriptions', 'topicsAndSkillsDashboard',
-    'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users']
+    'featureGating', 'fileUploadExtensions', 'fileUploadFeatures', 'library',
+    'navigation', 'playVoiceovers', 'preferences', 'profileFeatures',
+    'profileMenu', 'publication', 'subscriptions', 'topicsAndSkillsDashboard',
+    'topicAndStoryEditor', 'topicAndStoryEditorFileUploadFeatures', 'users',
+    'topicAndStoryViewer', 'wipeout']
 
 
-TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
 PROTRACTOR_CONF_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'protractor.conf.js')
 SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'coreEditorAndPlayerFeatures'
+CI_PATH = os.path.join(os.getcwd(), '.github', 'workflows')
 
 
-def get_e2e_suite_names_from_jobs_travis_yml_file():
-    """Extracts the test suites from env/jobs section from
-    the .travis.yml file.
-
-    Returns:
-        list(str). An alphabetically-sorted list of names of test suites
-        from the jobs section in the .travis.yml file.
-    """
-    travis_file_content = read_and_parse_travis_yml_file()
-    jobs_str = python_utils.convert_to_bytes(travis_file_content['env']['jobs'])
-    suites_from_jobs = []
-    # The following line extracts the test suite name from the jobs section
-    # that is in the form RUN_E2E_TESTS_ACCESSIBILITY=true.
-    test_regex = re.compile(r'RUN_E2E_TESTS_([A-Z_]*)=')
-    jobs = test_regex.findall(jobs_str)
-    for job in jobs:
-        suites_from_jobs.append(
-            utils.snake_case_to_camel_case(job.lower()))
-
-    return sorted(suites_from_jobs)
-
-
-def get_e2e_suite_names_from_script_travis_yml_file():
-    """Extracts the script section from the .travis.yml file.
+def get_e2e_suite_names_from_ci_config_file():
+    """Extracts the script section from the CI config files.
 
     Returns:
         list(str). An alphabetically-sorted list of names of test suites
-        from the script section in the .travis.yml file.
+        from the script section in the CI config files.
     """
-    travis_file_content = read_and_parse_travis_yml_file()
-    script_str = python_utils.convert_to_bytes(travis_file_content['script'])
+    suites_list = []
     # The following line extracts the test suites from patterns like
     # python -m scripts.run_e2e_tests --suite="accessibility".
     e2e_test_suite_regex = re.compile(r'--suite="([a-zA-Z_-]*)"')
-    suites_list = e2e_test_suite_regex.findall(script_str)
-
+    file_contents = read_and_parse_ci_config_files()
+    for file_content in file_contents:
+        suites_list.extend(e2e_test_suite_regex.findall(file_content))
     return sorted(suites_list)
 
 
@@ -113,16 +91,19 @@ def read_protractor_conf_file():
     return protractor_config_file_content
 
 
-def read_and_parse_travis_yml_file():
-    """Returns the contents of .travis.yml, as a dict.
+def read_and_parse_ci_config_files():
+    """Returns the contents of CI config files.
 
     Returns:
-        dict. Contents of the .travis.yml file parsed as a dict.
+        list(str). Contents of the CI config files.
     """
-    travis_ci_file_content = python_utils.open_file(
-        TRAVIS_CI_FILE_PATH, 'r').read()
-    travis_ci_dict = utils.dict_from_yaml(travis_ci_file_content)
-    return travis_ci_dict
+    ci_dicts = []
+    for filepath in os.listdir(CI_PATH):
+        if re.search(r'e2e_.*\.yml', filepath):
+            ci_file_content = python_utils.open_file(
+                os.path.join(CI_PATH, filepath), 'r').read()
+            ci_dicts.append(ci_file_content)
+    return ci_dicts
 
 
 def get_e2e_test_filenames_from_protractor_dir():
@@ -164,7 +145,7 @@ def get_e2e_test_filenames_from_protractor_conf_file():
 
 
 def main():
-    """Test the travis ci file and protractor.conf.js to have same
+    """Test the CI config files and protractor.conf.js to have same
     e2e test suites.
     """
     python_utils.PRINT(
@@ -180,32 +161,28 @@ def main():
             'directory is missing from protractor.conf.js')
     python_utils.PRINT('Done!')
 
-    python_utils.PRINT('Checking e2e tests are captured in .travis.yml...')
+    python_utils.PRINT(
+        'Checking e2e tests are captured in CI config files...')
     protractor_test_suites = get_e2e_suite_names_from_protractor_file()
-    travis_e2e_suites = get_e2e_suite_names_from_jobs_travis_yml_file()
-    travis_e2e_scripts = get_e2e_suite_names_from_script_travis_yml_file()
+    ci_suite_names = get_e2e_suite_names_from_ci_config_file()
 
-    for excluded_test in TEST_SUITES_NOT_RUN_ON_TRAVIS:
+    for excluded_test in TEST_SUITES_NOT_RUN_IN_CI:
         protractor_test_suites.remove(excluded_test)
 
-    if not travis_e2e_suites:
+    if not ci_suite_names:
         raise Exception(
             'The e2e test suites that have been extracted from '
-            'jobs section from travis.ci are empty.')
-    if not travis_e2e_scripts:
-        raise Exception(
-            'The e2e test suites that have been extracted from '
-            'script section from travis.ci are empty.')
+            'script section from CI config files are empty.')
     if not protractor_test_suites:
         raise Exception(
             'The e2e test suites that have been extracted from '
             'protractor.conf.js are empty.')
 
-    if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in travis_e2e_scripts:
+    if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in ci_suite_names:
         raise Exception(
             '{} is expected to be in the e2e test suites '
-            'extracted from the script section of .travis.yml '
-            'file, but it is missing.'
+            'extracted from the script section of CI config '
+            'files, but it is missing.'
             .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
     if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in protractor_test_suites:
@@ -215,9 +192,12 @@ def main():
             'but it is missing.'
             .format(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST))
 
-    if protractor_test_suites != travis_e2e_scripts:
+    if protractor_test_suites != ci_suite_names:
         raise Exception(
-            'Protractor test suites and Travis Ci test suites are not in sync.')
+            'Protractor test suites and CI test suites are not in sync. '
+            'Following suites are not in sync: {}'.format(
+                utils.compute_list_difference(
+                    protractor_test_suites, ci_suite_names)))
 
     python_utils.PRINT('Done!')
 

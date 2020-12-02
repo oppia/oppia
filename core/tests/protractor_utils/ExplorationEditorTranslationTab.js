@@ -17,9 +17,10 @@
  * use in Protractor tests.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var waitFor = require('../protractor_utils/waitFor.js');
+var action = require('./action.js');
+var forms = require('./forms.js');
+var general = require('./general.js');
+var waitFor = require('./waitFor.js');
 var path = require('path');
 var action = require('./action');
 
@@ -220,6 +221,7 @@ var ExplorationEditorTranslationTab = function() {
     await waitFor.visibilityOf(
       languageSelectorElement,
       'Language selector takes too long to appear.');
+
     var languageSelectorElementOption = await languageSelectorElement.element(
       by.cssContainingText('option', language));
     await action.click(
@@ -238,6 +240,7 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.uploadAudioRecord = async function(audioPath) {
+<<<<<<< HEAD
     await action.click('Upload Audio Button', uploadAudioButton);
     absPath = path.resolve(__dirname, audioPath);
     await waitFor.visibilityOf(
@@ -248,6 +251,16 @@ var ExplorationEditorTranslationTab = function() {
 
   this.saveAudioRecord = async function() {
     await action.click('Save Uploaded Audio Button', saveUploadedAudioButton);
+=======
+    await action.click('Audio Record Button', uploadAudioButton);
+    absPath = path.resolve(__dirname, audioPath);
+    await action.sendKeys(
+      'Audio upload input', audioUploadInput, absPath, false);
+  };
+
+  this.saveAudioRecord = async function() {
+    await action.click('Save uploaded audio button', saveUploadedAudioButton);
+>>>>>>> upstream/develop
     await waitFor.pageToFullyLoad();
   };
 
@@ -308,8 +321,13 @@ var ExplorationEditorTranslationTab = function() {
     var audioAbsolutePath = path.resolve(
       __dirname, relativePathOfAudioToUpload);
     await action.sendKeys(
+<<<<<<< HEAD
       'Audio Upload Input', audioUploadInput, audioAbsolutePath);
     await action.click('Save Uploaded Audio Button', saveUploadedAudioButton);
+=======
+      'Audio upload input', audioUploadInput, audioAbsolutePath, false);
+    await action.click('Save uploaded audio button', saveUploadedAudioButton);
+>>>>>>> upstream/develop
     await waitFor.invisibilityOf(
       saveUploadedAudioButton,
       'Upload Audio modal takes too long to disappear');
@@ -344,7 +362,11 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   this.openUploadAudioModal = async function() {
+<<<<<<< HEAD
     await action.click('Upload Audio Button', uploadAudioButton);
+=======
+    await action.click('Upload Audio button', uploadAudioButton);
+>>>>>>> upstream/develop
   };
 
   this.closeUploadAudioModal = async function() {

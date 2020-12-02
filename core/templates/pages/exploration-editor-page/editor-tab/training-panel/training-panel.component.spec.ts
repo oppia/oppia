@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-interaction-id.service';
@@ -38,8 +39,13 @@ import { StateCustomizationArgsService } from
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Training Panel Component', function() {
+  importAllAngularServices();
+
   var ctrl = null;
   var $scope = null;
   var explorationStatesService = null;
@@ -110,6 +116,11 @@ describe('Training Panel Component', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
 
   beforeEach(function() {
     generateContentIdService = TestBed.get(GenerateContentIdService);
@@ -134,6 +145,9 @@ describe('Training Panel Component', function() {
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
     $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
