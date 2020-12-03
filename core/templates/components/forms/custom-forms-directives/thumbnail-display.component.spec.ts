@@ -106,4 +106,10 @@ describe('Thumbnail Component', () => {
     component.ngOnChanges();
     expect(component.imgSrc).toBe(null);
   }));
+
+  it('should accept URLs as src', fakeAsync(() => {
+    component.imgSrc = 'https://oppia.org/some.svg';
+    component.ngOnChanges();
+    expect(component.imageSource).toBe('https://oppia.org/some.svg');
+  }));
 });
