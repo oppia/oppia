@@ -1711,23 +1711,6 @@ class WrittenTranslations(python_utils.OBJECT):
         else:
             self.translations_mapping.pop(content_id, None)
 
-    def get_translation_counts(self):
-        """Return a dict representing the number of translation available in a
-        languages in which there exist at least one translation in the
-        WrittenTranslation object.
-
-        Returns:
-            dict(str, int). A dict with language code as a key and number of
-            translation available in that language as the value.
-        """
-        translation_counts = collections.defaultdict(int)
-        for translations in self.translations_mapping.values():
-            for language, translation in translations.items():
-                if not translation.needs_update:
-                    translation_counts[language] += 1
-
-        return translation_counts
-
     def get_all_html_content_strings(self):
         """Gets all html content strings used in the WrittenTranslations.
 
@@ -2547,11 +2530,22 @@ class State(python_utils.OBJECT):
         languages in which there exists at least one translation in the state
         object.
 
+        Note: This method only counts the translations which are translatable as
+        per _get_all_translatable_content method.
+
         Returns:
             dict(str, int). A dict with language code as a key and number of
             translations available in that language as the value.
         """
-        return self.written_translations.get_translation_counts()
+        translation_counts = collections.defaultdict(int)
+        translations_mapping = self.written_translations.translations_mapping
+
+        for content_id in self._get_all_translatable_content():
+            for language_code, translation in (
+                    translations_mapping[content_id].items()):
+                if not translation.needs_update:
+                    translation_counts[language_code] += 1
+        return translation_counts
 
     def get_translatable_content_count(self):
         """Returns the number of content fields available for translation in
@@ -2889,6 +2883,10 @@ class State(python_utils.OBJECT):
 
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
+
+        Note: Currently, we don't support interaction translation through
+        contributor dashboard, this method only returns content which are
+        translatable through the contributor dashboard.
 
         Returns:
             dict(str, str). Returns a dict with key as content id and content
