@@ -637,7 +637,8 @@ class ValidateSnapshotMetadataModelsJob(jobs.BaseMapReduceOneOffJobManager):
 class AddMissingCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that adds the missing commit log entry model for the corresponding
     snapshot models. These commit log entry model were found missing on running
-    a validation job introduced in the PR #10770.
+    a validation job introduced in the PR #10770. This job needs to be run once
+    only to fill the missing data.
     """
 
     # This list consists of the snapshot models whose associated commit log
