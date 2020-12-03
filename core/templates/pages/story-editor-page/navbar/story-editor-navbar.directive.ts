@@ -56,11 +56,11 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           ctrl.isStoryPublished = function() {
             return StoryEditorStateService.isStoryPublished();
-          }
+          };
 
           ctrl.isSaveInProgress = function() {
             return StoryEditorStateService.isSavingStory();
-          }
+          };
 
           $scope.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
