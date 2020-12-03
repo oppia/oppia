@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable max-len */
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,6 +50,7 @@ export class SkillUpdateService {
     const changeObj = new Change(changeDict, apply, reverse);
     this.undoRedoService.applyChange(changeObj, skill);
   };
+
   private _applyPropertyChange = (
       skill,
       propertyName: string,
@@ -191,7 +190,7 @@ export class SkillUpdateService {
         return workedExample.toBackendDict();
       }),
       oldWorkedExamples.map((workedExample) => workedExample.toBackendDict()),
-      (changeDict, skill) =>{
+      (changeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
       (changeDict, skill) => {
@@ -205,7 +204,6 @@ export class SkillUpdateService {
       skill.getConceptCard().getWorkedExamples()
     );
     const newWorkedExamples = cloneDeep(oldWorkedExamples);
-
     newWorkedExamples.splice(index, 1);
     this._applySkillContentsPropertyChange(
       skill,
@@ -220,7 +218,6 @@ export class SkillUpdateService {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
       (changeDict, skill) => {
-        console.log(skill.getConceptCard(), "==========skill.getConceptCard()")
         skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
       }
     );
@@ -284,6 +281,7 @@ export class SkillUpdateService {
     const params = {
       new_misconception_dict: newMisconception.toBackendDict(),
     };
+
     const misconceptionId = newMisconception.getId();
     this._applyChange(
       skill,
@@ -469,6 +467,5 @@ export class SkillUpdateService {
   }
 }
 
-angular
-  .module('oppia')
+angular.module('oppia')
   .factory('SkillUpdateService', downgradeInjectable(SkillUpdateService));

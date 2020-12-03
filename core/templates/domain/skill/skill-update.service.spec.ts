@@ -1,5 +1,4 @@
-/* eslint-disable max-len */
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,9 +24,8 @@ import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
-import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 
-fdescribe('Skill update service', () => {
+describe('Skill update service', () => {
   let skillUpdateService: SkillUpdateService = null;
   let skillObjectFactory: SkillObjectFactory = null;
   let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
@@ -39,7 +37,6 @@ fdescribe('Skill update service', () => {
   let skillContentsDict = null;
   let example1 = null;
   let example2 = null;
-  let newExample = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -104,17 +101,6 @@ fdescribe('Skill update service', () => {
       },
     };
 
-    newExample = {
-      question: {
-        html: 'worked example question 3',
-        content_id: 'worked_example_q_3',
-      },
-      explanation: {
-        html: 'worked example explanation 3',
-        content_id: 'worked_example_e_3',
-      },
-    };
-
     skillContentsDict = {
       explanation: {
         html: 'test explanation',
@@ -158,6 +144,11 @@ fdescribe('Skill update service', () => {
     ]);
 
     expect(skill.getDescription()).toEqual('new description');
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.getDescription()).toEqual('test description');
   });
@@ -187,6 +178,11 @@ fdescribe('Skill update service', () => {
     expect(skill.getConceptCard().getExplanation()).toEqual(
       subtitledHtmlObjectFactory.createDefault('new explanation', 'explanation')
     );
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getExplanation()).toEqual(
       subtitledHtmlObjectFactory.createDefault(
@@ -213,10 +209,15 @@ fdescribe('Skill update service', () => {
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
         cmd: 'add_skill_misconception',
-        new_misconception_dict: aNewMisconceptionDict
+        new_misconception_dict: aNewMisconceptionDict,
       },
     ]);
     expect(skill.getMisconceptions().length).toEqual(3);
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.getMisconceptions().length).toEqual(2);
   });
@@ -228,10 +229,15 @@ fdescribe('Skill update service', () => {
     expect(undoRedoService.getCommittableChangeList()).toEqual([
       {
         cmd: 'delete_skill_misconception',
-        misconception_id: '2'
+        misconception_id: '2',
       },
     ]);
     expect(skill.getMisconceptions().length).toEqual(1);
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.getMisconceptions().length).toEqual(2);
   });
@@ -247,6 +253,11 @@ fdescribe('Skill update service', () => {
       },
     ]);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(2);
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
   });
@@ -262,6 +273,11 @@ fdescribe('Skill update service', () => {
       },
     ]);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(0);
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
   });
@@ -286,6 +302,11 @@ fdescribe('Skill update service', () => {
       'new explanation 1',
       'new explanation 2',
     ]);
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.getRubrics().length).toEqual(1);
     expect(skill.getRubrics()[0].getExplanations()).toEqual(['explanation']);
@@ -310,6 +331,11 @@ fdescribe('Skill update service', () => {
       },
     ]);
     expect(skill.findMisconceptionById('2').getName()).toEqual('new name');
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById('2').getName()).toEqual('test name');
   });
@@ -333,6 +359,11 @@ fdescribe('Skill update service', () => {
       },
     ]);
     expect(skill.findMisconceptionById('2').getNotes()).toEqual('new notes');
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById('2').getNotes()).toEqual('test notes');
   });
@@ -358,6 +389,11 @@ fdescribe('Skill update service', () => {
     expect(skill.findMisconceptionById('2').getFeedback()).toEqual(
       'new feedback'
     );
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById('2').getFeedback()).toEqual(
       'test feedback'
@@ -383,6 +419,11 @@ fdescribe('Skill update service', () => {
       },
     ]);
     expect(skill.findMisconceptionById('2').isMandatory()).toEqual(false);
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById('2').isMandatory()).toEqual(true);
   });
@@ -390,84 +431,93 @@ fdescribe('Skill update service', () => {
   it('should add a worked example', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
 
-    const addWorkedExample: BackendChangeObject = {
-      cmd: 'update_skill_contents_property',
-      property_name: 'worked_examples',
-      old_value: example1,
-      new_value: newExample,
+    const newExample = {
+      question: {
+        html: 'worked example question 3',
+        content_id: 'worked_example_q_3'
+      },
+      explanation: {
+        html: 'worked example explanation 3',
+        content_id: 'worked_example_e_3'
+      }
     };
-    const addWorkedExample2: BackendChangeObject = {
-      cmd: 'update_skill_contents_property',
-      property_name: 'worked_examples',
-      old_value: example2,
-      new_value: newExample,
-    };
+
     skillUpdateService.addWorkedExample(
       skill,
       workedExampleObjectFactory.createFromBackendDict(newExample)
     );
+    // This throws No overload matches this call.
+    // Overload 1 of 2, '(expected: Expected<ArrayLike<BackendChangeObject>>,
+    // expectationFailOutput?: any): Promise<void>', gave the following error.
+    // Type '{ cmd: string; property_name: string; old_value: { question:
+    // { html: string; content_id: string; }; explanation: {
+    // html: string; content_id: string; }; }[]; new_value: {
+    // question: { html: string; content_id: string; }; explanation: { ...; };
+    // }[]; }' is not assignable to type
+    // 'ExpectedRecursive<BackendChangeObject>'.
+    // Property ''subtopic_id'' is missing ...'.
+    // @ts-ignore
     expect(undoRedoService.getCommittableChangeList()).toEqual([
-      addWorkedExample,
-      addWorkedExample2
+      {
+        cmd: 'update_skill_contents_property',
+        property_name: 'worked_examples',
+        old_value: skillContentsDict.worked_examples,
+        new_value: [example1, example2, newExample]
+      }
     ]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example1),
       workedExampleObjectFactory.createFromBackendDict(example2),
       workedExampleObjectFactory.createFromBackendDict(newExample),
     ]);
-    undoRedoService.undoChange(addWorkedExample);
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
+    undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example1),
       workedExampleObjectFactory.createFromBackendDict(example2),
     ]);
   });
 
-  fit('should delete a worked example', () => {
+  it('should delete a worked example', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
 
-    const test: SkillContentsWorkedExamplesChange = {
-      cmd: 'update_skill_contents_property',
-      property_name: 'worked_examples',
-      old_value: skillContentsDict.worked_examples,
-      new_value: skillContentsDict.worked_examples[1],
-    };
-
     skillUpdateService.deleteWorkedExample(skill, 0);
-    expect(undoRedoService.getCommittableChangeList()).toEqual(
-      test,
-    );
+    // This throws  Argument of type '{ cmd: string; property_name: string;
+    // old_value: any; new_value: any; }' is not assignable
+    // to parameter of type 'Expected<ArrayLike<BackendChangeObject>>'.
+    // Property 'length' is missing in type '{ cmd: string;
+    // property_name: string; old_value: any; new_value: any; }'
+    // but required in type '{ [x: number]:
+    // @ts-ignore
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      {
+        cmd: 'update_skill_contents_property',
+        property_name: 'worked_examples',
+        old_value: skillContentsDict.worked_examples,
+        new_value: [skillContentsDict.worked_examples[1]],
+      }
+    ]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example2),
     ]);
-    undoRedoService.undoChange(test);
-    // expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-    //   workedExampleObjectFactory.createFromBackendDict(example1),
-    //   workedExampleObjectFactory.createFromBackendDict(example2),
-    // ]);
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
+    undoRedoService.undoChange(skill);
+    expect(skill.getConceptCard().getWorkedExamples()).toEqual([
+      workedExampleObjectFactory.createFromBackendDict(example1),
+      workedExampleObjectFactory.createFromBackendDict(example2),
+    ]);
   });
 
   it('should update a worked example', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
-    const example1 = {
-      question: {
-        html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
-      },
-      explanation: {
-        html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
-      }
-    };
-    const example2 = {
-      question: {
-        html: 'worked example question 2',
-        content_id: 'worked_example_q_2'
-      },
-      explanation: {
-        html: 'worked example explanation 2',
-        content_id: 'worked_example_e_2'
-      }
-    };
 
     const modifiedExample1 = {
       question: {
@@ -487,17 +537,35 @@ fdescribe('Skill update service', () => {
       'new explanation 1'
     );
 
-    const RskillContentsDict = {
+    const workedExamples = {
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
-      old_value: [example1, example2],
-      new_value: [modifiedExample1, example2]
+      old_value: skillContentsDict.worked_examples,
+      new_value: [modifiedExample1, example2],
     };
-    expect(undoRedoService.getCommittableChangeList()).toEqual([RskillContentsDict]);
+
+    // This throws No overload matches this call.
+    // Overload 1 of 2, '(expected: Expected<ArrayLike<BackendChangeObject>>,
+    // expectationFailOutput?: any): Promise<void>', gave the following error.
+    // Type '{ cmd: string; property_name: string; old_value: { question:
+    // { html: string; content_id: string; }; explanation: {
+    // html: string; content_id: string; }; }[]; new_value: {
+    // question: { html: string; content_id: string; }; explanation: { ...; };
+    // }[]; }' is not assignable to type
+    // 'ExpectedRecursive<BackendChangeObject>'.
+    // Property ''subtopic_id'' is missing ...'.
+    // @ts-ignore
+    // eslint-disable-next-line max-len
+    expect(undoRedoService.getCommittableChangeList()).toEqual([workedExamples]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(modifiedExample1),
       workedExampleObjectFactory.createFromBackendDict(example2),
     ]);
+    // This throws "Type 'Skill' is not assignable to parameter of type
+    // 'BackendChangeObject'.".
+    // Type 'Skill' is not assignable to type
+    // 'TopicRemoveUncategorizedSkillChange'
+    // @ts-ignore
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example1),
