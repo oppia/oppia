@@ -121,7 +121,7 @@
 /CONTRIBUTORS @BenHenning
 /LICENSE @BenHenning
 /NOTICE @BenHenning
-/core/templates/pages/about-page/ @DubeySandeep
+/core/templates/pages/about-page/ @DubeySandeep @dchen97
 # TODO(#11220): Add @seanlip as codeowner after 2020-11-29.
 /core/templates/pages/about-page/about-page.constants.ts @BenHenning
 /core/templates/pages/privacy-page/ @DubeySandeep
@@ -415,7 +415,7 @@
 /core/templates/domain/subtopic_viewer/ @kevintab95
 /core/templates/domain/topic/ @kevintab95
 /core/templates/domain/topic_viewer @kevintab95
-/core/templates/pages/classroom-page/ @kevintab95
+/core/templates/pages/classroom-page/ @kevintab95 @dchen97
 /core/templates/pages/subtopic-viewer-page/ @kevintab95
 /core/templates/pages/topic-editor-page/ @kevintab95
 /core/templates/pages/topic-viewer-page/ @kevintab95
@@ -546,15 +546,15 @@
 /core/controllers/custom_landing_pages*.py @jameesjohn @vojtechjelinek
 /core/templates/pages/contact-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/delete-account-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/donate-page/ @jameesjohn @vojtechjelinek
+/core/templates/pages/donate-page/ @jameesjohn @vojtechjelinek @dchen97
 /core/templates/pages/error-pages/ @jameesjohn @vojtechjelinek
 /core/templates/pages/get-started-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/landing-pages/ @jameesjohn @vojtechjelinek
+/core/templates/pages/landing-pages/ @jameesjohn @vojtechjelinek @dchen97
 /core/templates/pages/maintenance-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/preferences-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/signup-page/ @jameesjohn @vojtechjelinek
-/core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek
+/core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek @dchen97
 /core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek
 /core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek
 
