@@ -33,7 +33,7 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   @Input() imgSrc: string;
   @Input() height: string;
   @Input() width: string;
-  @Input() classes: unknown;
+  @Input() classes: string[];
   @Input() background: string;
   imageSource = null;
 
@@ -49,6 +49,7 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
    * SVG data for possible XSS vulnerabilities.
    */
   checkSVGData(): void {
+    const DATA_URL_PATTERN = /^data:image\/svg\+xml;base64,[a-z0-9+\/]+=*$/i;
     // If the SVG image is passed as base64 data.
     if (this.imgSrc.indexOf('data:image/svg+xml;base64') !== -1) {
       // Check for malicious SVG.
@@ -56,12 +57,14 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
         this.imageUploadHelperService.getInvalidSvgTagsAndAttrs(this.imgSrc));
 
       // If the data is malicious don't display the SVG.
-      if (invalidTags.length > 0 || invalidAttributes.length > 0) {
+      if (
+        invalidTags.length > 0 || invalidAttributes.length > 0 ||
+        !this.imgSrc.match(DATA_URL_PATTERN)) {
         this.imgSrc = null;
         return;
       }
 
-      // If the the SVG is safe, display the SVG.
+      // If the SVG is safe, display the SVG.
       this.imageSource = this.sanitizer.bypassSecurityTrustResourceUrl(
         this.imgSrc);
     } else {

@@ -63,6 +63,7 @@ export class ImageUploadHelperService {
     return null;
   }
 
+  // TODO(#11313): Refactor SVG sanitization into a new service file.
   getInvalidSvgTagsAndAttrs(
       dataURI: string): {tags: string[], attrs: string[]} {
     // Convert base64/URLEncoded data component to raw binary data

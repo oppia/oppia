@@ -63,6 +63,8 @@ describe('Thumbnail Component', () => {
     'JsZSB0byBYU1MgYXR0YWNrcyEnKTsKICA8L3NjcmlwdD4KPC9zdmc+'
   );
 
+
+  const invalidBase64data = 'data:image/svg+xml;base64,This is invalid %3D';
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -84,7 +86,7 @@ describe('Thumbnail Component', () => {
   it('should not render malicious SVG\'s on Init', fakeAsync(() => {
     component.imgSrc = maliciousSvg;
     component.ngOnInit();
-    expect(component.imageSource).toBe(null);
+    expect(component.imgSrc).toBe(null);
     component.imgSrc = safeSvg;
     component.ngOnInit();
     expect(component.imageSource).toBe(safeSvg);
@@ -93,9 +95,15 @@ describe('Thumbnail Component', () => {
   it('should not render malicious SVG\'s on value change', fakeAsync(() => {
     component.imgSrc = maliciousSvg;
     component.ngOnChanges();
-    expect(component.imageSource).toBe(null);
+    expect(component.imgSrc).toBe(null);
     component.imgSrc = safeSvg;
     component.ngOnChanges();
     expect(component.imageSource).toBe(safeSvg);
+  }));
+
+  it('should not try to render invalid base64 images', fakeAsync(() => {
+    component.imgSrc = invalidBase64data;
+    component.ngOnChanges();
+    expect(component.imgSrc).toBe(null);
   }));
 });

@@ -41,7 +41,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
     });
-    $scope.bgColor = '#fff';
+    $scope.bgColor = allowedBgColors.length > 0 ? allowedBgColors[0] : '#fff';
     $scope.uploadedImage = uploadedImage;
     $scope.invalidImageWarningIsShown = false;
     $scope.invalidTagsAndAttributes = {
