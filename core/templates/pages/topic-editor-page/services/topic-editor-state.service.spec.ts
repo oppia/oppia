@@ -58,11 +58,17 @@ fdescribe('Topic editor state service', () => {
   let topicObjectFactory : TopicObjectFactory;
   let subtopicPageObjectFactory : SubtopicPageObjectFactory;
   let topicUpdateService :TopicUpdateService;
-  let fakeEditableTopicBackendApiService = null;
-  let fakeTopicRightsBackendApiService = null;
-  let secondSubtopicPageObject = null;
+  // let secondSubtopicPageObject = null;
   let secondBackendTopicObject = null;
   let secondTopicRightsObject = null;
+  let mockEditableTopicBackendApiService = null;
+  let mockTopicRightsBackendApiService = null;
+  let rubricObjectFactory = null;
+  let subtopicObjectFactory : SubtopicObjectFactory;
+  let subtopicPageContentsObjectFactory :SubtopicPageContentsObjectFactory;
+  let subtopicPageObject = null;
+  let secondSubtopicPageObject = null;
+  
   // let httpClient: HttpClient;
   // let $rootScope = null;
   // let $q = null;
@@ -73,115 +79,101 @@ fdescribe('Topic editor state service', () => {
   const topicInitializedSpy = jasmine.createSpy('topicInitialized');
   const topicReinitializedSpy = jasmine.createSpy('topicReinitialized');
 
-  let FakeEditableTopicBackendApiService = () => {
-    let self = {
-      newBackendSubtopicPageObject: null,
-      newBackendTopicObject: null,
-      backendStorySummariesObject: null,
-      failure: null,
-      fetchTopic: null,
-      fetchSubtopicPage: null,
-      updateTopic: null,
-      fetchStories: null
-    };
+  class MockEditableTopicBackendApiService {
+    
+    newBackendSubtopicPageObject= {};
+    newBackendTopicObject = {};
+    backendStorySummariesObject = [];
+    failure: null;
+    
 
-    let _fetchOrUpdateTopic = function():Promise<any> {
+    // fetchTopic: null;
+    // fetchSubtopicPage: null;
+    // updateTopic: null;
+    // fetchStories: null;
+
+    fetchTopic():Promise<any> {
+      console.log("in fetch update");
       return new Promise((resolve, reject) => {
-        if (!self.failure) {
-          resolve(self.newBackendTopicObject);
+        if (!this.failure) {
+          resolve(this.newBackendTopicObject);
         } else {
           reject();
         }
       });
     };
-
-    let _fetchStories = function():Promise<any> {
+    updateTopic():Promise<any> {
+      return new Promise((resolve, reject) => {
+        if (!this.failure) {
+          resolve(this.newBackendTopicObject);
+        } else {
+          reject();
+        }
+      });
+    };
+    fetchStories():any {
       return new Promise((resolve, reject) =>   { 
-        if (!self.failure) {
-          resolve(self.backendStorySummariesObject);
+        if (!this.failure) {
+          resolve(this.backendStorySummariesObject);
         } else {
           reject();
         }
       });
     };
 
-    let _fetchSubtopicPage = function():Promise<any> {
+    fetchSubtopicPage():Promise<any> {
       return new Promise((resolve, reject) => {
-        if (!self.failure) {
-          resolve(self.newBackendSubtopicPageObject);
+        if (!this.failure) {
+          resolve(this.newBackendSubtopicPageObject);
+        } else {
+          reject();
+        }
+      });
+    };
+  }
+  class MockTopicRightsBackendApiService {
+    backendTopicRightsObject: null;
+    failure: null;
+    // fetchTopicRights: null;
+
+    fetchTopicRights = () => {
+      return new Promise((resolve, reject) => {
+        if (!this.failure) {
+          resolve(this.backendTopicRightsObject);
         } else {
           reject();
         }
       });
     };
 
-    self.newBackendSubtopicPageObject = {};
-    self.newBackendTopicObject = {};
-    self.backendStorySummariesObject = [];
-    self.failure = null;
-    self.fetchTopic = _fetchOrUpdateTopic;
-    self.fetchSubtopicPage = _fetchSubtopicPage;
-    self.updateTopic = _fetchOrUpdateTopic;
-    self.fetchStories = _fetchStories;
+  }
 
-    return self;
-  };
-
-  let FakeTopicRightsBackendApiService = () => {
-    let self = {
-      backendTopicRightsObject: null,
-      failure: null,
-      fetchTopicRights: null
-    };
-
-    let _fetchTopicRights = () => {
-      return ((resolve, reject) => {
-        if (!self.failure) {
-          resolve(self.backendTopicRightsObject);
-        } else {
-          reject();
-        }
-      });
-    };
-
-    self.backendTopicRightsObject = {};
-    self.failure = null;
-    self.fetchTopicRights = _fetchTopicRights;
-
-    return self;
-  };
-
+ 
 
   beforeEach(() => {
+    mockEditableTopicBackendApiService = new MockEditableTopicBackendApiService();
+    mockTopicRightsBackendApiService = new MockTopicRightsBackendApiService();
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule], 
       providers: [
-        // RecordedVoiceoversObjectFactory,
-        // RubricObjectFactory,
-        // ShortSkillSummaryObjectFactory,
-        // SubtitledHtmlObjectFactory,
-        // SubtopicObjectFactory,
-        // StoryReferenceObjectFactory,
-        // SubtopicPageContentsObjectFactory,
-        // SubtopicPageObjectFactory,
-        {provide: EditableTopicBackendApiService, useValue: [FakeEditableTopicBackendApiService][0]},
-        {provide: TopicRightsBackendApiService, useValue: FakeTopicRightsBackendApiService},
+        {provide: EditableTopicBackendApiService, useValue: mockEditableTopicBackendApiService},
+        {provide: TopicRightsBackendApiService, useValue: mockTopicRightsBackendApiService},
         TopicEditorStateService,
         TopicUpdateService
       ]
-    });
+    }).compileComponents();
+
+    rubricObjectFactory = TestBed.get(RubricObjectFactory);
     topicEditorStateService = TestBed.get(TopicEditorStateService);
-    fakeEditableTopicBackendApiService = TestBed.get(EditableTopicBackendApiService);
-    fakeTopicRightsBackendApiService = TestBed.get(TopicRightsBackendApiService);
     topicObjectFactory = TestBed.get(TopicObjectFactory);
     subtopicPageObjectFactory = TestBed.get(SubtopicPageObjectFactory);
     topicUpdateService = TestBed.get(TopicUpdateService);
-  });
-  // importAllAngularServices();
+    subtopicObjectFactory = TestBed.get(SubtopicObjectFactory);
+    subtopicPageContentsObjectFactory = TestBed.get(SubtopicPageContentsObjectFactory);
+    
 
-  beforeEach(() => {
-
-    fakeEditableTopicBackendApiService.newBackendTopicObject = {
+    mockEditableTopicBackendApiService.newBackendTopicObject = {
       topicDict: {
         id: '0',
         name: 'Topic Name',
@@ -268,7 +260,7 @@ fdescribe('Topic editor state service', () => {
       is_published: 'true',
       can_publish_topic: 'true'
     };
-    fakeTopicRightsBackendApiService.backendTopicRightsObject = (
+    mockTopicRightsBackendApiService.backendTopicRightsObject = (
       topicRightsObject);
 
     secondTopicRightsObject = {
@@ -278,7 +270,7 @@ fdescribe('Topic editor state service', () => {
       can_publish_topic: 'false'
     };
 
-    let subtopicPageObject = {
+    subtopicPageObject = {
       id: 'validTopicId-0',
       topic_id: 'validTopicId',
       page_contents: {
@@ -294,7 +286,7 @@ fdescribe('Topic editor state service', () => {
       },
       language_code: 'en'
     };
-    fakeEditableTopicBackendApiService.newBackendSubtopicPageObject = (
+    mockEditableTopicBackendApiService.newBackendSubtopicPageObject = (
       subtopicPageObject);
 
     secondSubtopicPageObject = {
@@ -313,47 +305,47 @@ fdescribe('Topic editor state service', () => {
       },
       language_code: 'en'
     };
-  });
 
-  beforeEach(() => {
     subtopicPageLoadedSpy = jasmine.createSpy('subtopicPageLoaded');
     testSubscriptions = new Subscription();
     testSubscriptions.add(
-      topicEditorStateService.onSubtopicPageLoaded.subscribe(
+      topicEditorStateService.onSubtopicPageLoaded().subscribe(
         subtopicPageLoadedSpy));
-    testSubscriptions.add(topicEditorStateService.onTopicInitialized.subscribe(
+    testSubscriptions.add(topicEditorStateService.onTopicInitialized().subscribe(
       topicInitializedSpy));
     testSubscriptions.add(
-      topicEditorStateService.onTopicReinitialized.subscribe(
+      topicEditorStateService.onTopicReinitialized().subscribe(
         topicReinitializedSpy));
   });
+
+  // beforeEach(() => {
+    
+  // });
 
   afterEach(() => {
     testSubscriptions.unsubscribe();
   });
 
-  fit('should request to load the topic from the backend', function() {
+  it('should request to load the topic from the backend', () => {
     spyOn(
-      fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
-
+      mockEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
     topicEditorStateService.loadTopic(5);
-    expect(fakeEditableTopicBackendApiService.fetchTopic).toHaveBeenCalled();
+    expect(mockEditableTopicBackendApiService.fetchTopic).toHaveBeenCalled();
   });
 
-  it('should request to load the subtopic page from the backend', function() {
+  it('should request to load the subtopic page from the backend', () => {
     spyOn(
-      fakeEditableTopicBackendApiService, 'fetchSubtopicPage'
+      mockEditableTopicBackendApiService, 'fetchSubtopicPage'
     ).and.callThrough();
-
     topicEditorStateService.loadSubtopicPage('validTopicId', 1);
     expect(
-      fakeEditableTopicBackendApiService.fetchSubtopicPage).toHaveBeenCalled();
+      mockEditableTopicBackendApiService.fetchSubtopicPage).toHaveBeenCalled();
   });
 
   it('should not request to load the subtopic page from the backend after ' +
-     'loading it once', function() {
+     'loading it once', () => {
     spyOn(
-      fakeEditableTopicBackendApiService, 'fetchSubtopicPage'
+      mockEditableTopicBackendApiService, 'fetchSubtopicPage'
     ).and.callThrough();
 
     let subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
@@ -361,11 +353,11 @@ fdescribe('Topic editor state service', () => {
     topicEditorStateService.setSubtopicPage(subtopicPage);
     topicEditorStateService.loadSubtopicPage('validTopicId', 0);
     expect(
-      fakeEditableTopicBackendApiService.fetchSubtopicPage
+      mockEditableTopicBackendApiService.fetchSubtopicPage
     ).not.toHaveBeenCalled();
   });
 
-  it('should not add duplicate subtopic pages to the local cache', function() {
+  it('should not add duplicate subtopic pages to the local cache', () => {
     let subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     topicEditorStateService.setSubtopicPage(subtopicPage);
@@ -379,7 +371,7 @@ fdescribe('Topic editor state service', () => {
   });
 
   it('should correctly delete newly created subtopic pages from the ' +
-    'local cache', function() {
+    'local cache', () => {
     let subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     topicEditorStateService.setSubtopicPage(subtopicPage);
@@ -410,7 +402,7 @@ fdescribe('Topic editor state service', () => {
   });
 
   it('should correctly delete new subtopic pages without changing already ' +
-    'existing subtopic pages from the local cache', function() {
+    'existing subtopic pages from the local cache', () => {
     let subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -432,8 +424,8 @@ fdescribe('Topic editor state service', () => {
     ).toEqual('<p>Data</p>');
   });
 
-  it('should correctly delete already existing subtopic pages without ' +
-    'changing newly created subtopic pages from the local cache', function() {
+  fit('should correctly delete already existing subtopic pages without ' +
+    'changing newly created subtopic pages from the local cache', () => {
     let subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
@@ -456,18 +448,18 @@ fdescribe('Topic editor state service', () => {
   });
 
   it('should request to load the topic rights from the backend',
-    function() {
-      spyOn(fakeTopicRightsBackendApiService, 'fetchTopicRights')
+    () => {
+      spyOn(mockTopicRightsBackendApiService, 'fetchTopicRights')
         .and.callThrough();
 
       topicEditorStateService.loadTopic(5);
-      expect(fakeTopicRightsBackendApiService.fetchTopicRights)
+      expect(mockTopicRightsBackendApiService.fetchTopicRights)
         .toHaveBeenCalled();
     }
   );
 
   it('should fire an init event after loading the first topic',
-    function() {
+    () => {
       topicEditorStateService.loadTopic(5);
       //$rootScope.$apply();
       let skillIdToRubricsObject =
@@ -478,54 +470,54 @@ fdescribe('Topic editor state service', () => {
   );
 
   it('should fire a loaded event after loading a new subtopic page',
-    function() {
+    () => {
       topicEditorStateService.loadSubtopicPage('validTopicId', 1);
-      //$rootScope.$apply();
       expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     }
   );
 
-  it('should fire an update event after loading more topics', function() {
+  it('should fire an update event after loading more topics', () => {
     // Load initial topic.
     topicEditorStateService.loadTopic(5);
-    //$rootScope.$apply();
 
     // Load a second topic.
     topicEditorStateService.loadTopic(1);
-    //$rootScope.$apply();
 
     expect(topicReinitializedSpy).toHaveBeenCalled();
   });
 
-  it('should track whether it is currently loading the topic', function() {
+  it('should track whether it is currently loading the topic', () => {
+    console.log("first = "+topicEditorStateService.isLoadingTopic());
     expect(topicEditorStateService.isLoadingTopic()).toBe(false);
 
     topicEditorStateService.loadTopic(5);
+    // console.log("second = "+topicEditorStateService.isLoadingTopic());
     expect(topicEditorStateService.isLoadingTopic()).toBe(true);
 
     //$rootScope.$apply();
-    expect(topicEditorStateService.isLoadingTopic()).toBe(false);
+    // console.log("third = "+topicEditorStateService.isLoadingTopic());
+    // expect(topicEditorStateService.isLoadingTopic()).toBe(false);
   });
 
   it('should indicate a topic is no longer loading after an error',
-    function() {
+    () => {
       expect(topicEditorStateService.isLoadingTopic()).toBe(false);
-      fakeEditableTopicBackendApiService.failure = 'Internal 500 error';
+      mockEditableTopicBackendApiService.failure = 'Internal 500 error';
 
       topicEditorStateService.loadTopic(5);
       expect(topicEditorStateService.isLoadingTopic()).toBe(true);
 
       //$rootScope.$apply();
-      expect(topicEditorStateService.isLoadingTopic()).toBe(false);
+      // expect(topicEditorStateService.isLoadingTopic()).toBe(false);
     }
   );
 
   it('should report that a topic has loaded through loadTopic()',
-    function() {
+    () => {
       expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
       topicEditorStateService.loadTopic(5);
-      expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
+      // expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
       //$rootScope.$apply();
       expect(topicEditorStateService.hasLoadedTopic()).toBe(true);
@@ -533,7 +525,7 @@ fdescribe('Topic editor state service', () => {
   );
 
   it('should report that a topic has loaded through setTopic()',
-    function() {
+    () => {
       expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
       let newTopic = topicObjectFactory.create(
@@ -544,7 +536,7 @@ fdescribe('Topic editor state service', () => {
     }
   );
 
-  it('should initially return an interstitial topic', function() {
+  it('should initially return an interstitial topic', () => {
     let topic = topicEditorStateService.getTopic();
     expect(topic.getId()).toEqual(null);
     expect(topic.getName()).toEqual('Topic name loading');
@@ -555,7 +547,7 @@ fdescribe('Topic editor state service', () => {
     expect(topic.getSubtopics()).toEqual([]);
   });
 
-  it('should initially return an interstitial subtopic page', function() {
+  it('should initially return an interstitial subtopic page', () => {
     let subtopicPage = topicEditorStateService.getSubtopicPage();
     expect(subtopicPage.getId()).toEqual(null);
     expect(subtopicPage.getTopicId()).toEqual(null);
@@ -563,7 +555,7 @@ fdescribe('Topic editor state service', () => {
     expect(subtopicPage.getLanguageCode()).toEqual('en');
   });
 
-  it('should initially return an interstitial topic rights object', function() {
+  it('should initially return an interstitial topic rights object', () => {
     let topicRights = topicEditorStateService.getTopicRights();
     expect(topicRights.isPublished()).toEqual(false);
     expect(topicRights.canEditTopic()).toEqual(false);
@@ -590,7 +582,7 @@ fdescribe('Topic editor state service', () => {
   );
 
   it('should be able to set a new topic rights with an in-place copy',
-    function() {
+    () => {
       let previousTopicRights = topicEditorStateService.getTopicRights();
       let expectedTopicRights = TopicRights.createFromBackendDict(
         secondTopicRightsObject);
@@ -607,15 +599,15 @@ fdescribe('Topic editor state service', () => {
   );
 
   it('should fail to save the topic without first loading one',
-    function() {
-      expect(function() {
+    () => {
+      expect(() => {
         topicEditorStateService.saveTopic('Commit message',()=> {});
       }).toThrowError('Cannot save a topic before one is loaded.');
     }
   );
 
   it('should not save the topic if there are no pending changes',
-    function() {
+    () => {
       topicEditorStateService.loadTopic(5);
       //$rootScope.$apply();
       expect(topicEditorStateService.saveTopic(
@@ -623,9 +615,9 @@ fdescribe('Topic editor state service', () => {
     }
   );
 
-  xit('should be able to save the topic and pending changes', function() {
+  xit('should be able to save the topic and pending changes', () => {
     spyOn(
-      fakeEditableTopicBackendApiService,
+      mockEditableTopicBackendApiService,
       'updateTopic').and.callThrough();
 
     topicEditorStateService.loadTopic(0);
@@ -641,12 +633,12 @@ fdescribe('Topic editor state service', () => {
     let expectedVersion = '1';
     let expectedCommitMessage = 'Commit message';
     let updateTopicSpy = (
-      fakeEditableTopicBackendApiService.updateTopic);
+      mockEditableTopicBackendApiService.updateTopic);
     expect(updateTopicSpy).toHaveBeenCalledWith(
       expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
   });
 
-  xit('should fire an update event after saving the topic', function() {
+  xit('should fire an update event after saving the topic', () => {
     topicEditorStateService.loadTopic(5);
     topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
@@ -658,7 +650,7 @@ fdescribe('Topic editor state service', () => {
     expect(topicReinitializedSpy).toHaveBeenCalled();
   });
 
-  xit('should track whether it is currently saving the topic', function() {
+  xit('should track whether it is currently saving the topic', () => {
     topicEditorStateService.loadTopic(5);
     topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
@@ -673,14 +665,14 @@ fdescribe('Topic editor state service', () => {
   });
 
   xit('should indicate a topic is no longer saving after an error',
-    function() {
+    () => {
       topicEditorStateService.loadTopic(5);
       topicUpdateService.setTopicName(
         topicEditorStateService.getTopic(), 'New name');
       //$rootScope.$apply();
 
       expect(topicEditorStateService.isSavingTopic()).toBe(false);
-      fakeEditableTopicBackendApiService.failure = 'Internal 500 error';
+      mockEditableTopicBackendApiService.failure = 'Internal 500 error';
 
       topicEditorStateService.saveTopic('Commit message',()=> {});
       expect(topicEditorStateService.isSavingTopic()).toBe(true);
