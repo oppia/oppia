@@ -118,9 +118,9 @@ def search(
 
     Args:
         query_string: str. A JSON-encoded string representation of the
-            dictionary search definition that uses Query DSL. More details about
-            Query DSL can be found on this page:
-            https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
+            dictionary search definition that uses Query DSL. See
+            elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
+            for more details about Query DSL.
         index_name: str. The name of the index. Use '_all' or empty string to
             perform the operation on all indices.
         cursor: str|None. Not used in this implementation.

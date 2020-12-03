@@ -350,7 +350,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         index.put([doc1, doc2, doc3])
         result1, result1_cursor = gae_search_services.search(
             'k:abc', 'my_index', size=2)
-        result2, result2_cursor = gae_search_services.search(
+        result2, _ = gae_search_services.search(
             'k:abc', 'my_index', cursor=result1_cursor)
         self.assertEqual(len(result1), 2)
         self.assertEqual(len(result2), 1)
