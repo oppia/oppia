@@ -39,7 +39,7 @@ export class TopicEditorRoutingService {
   // in testing or in server. If running in testing mode the whole
   // URL of the window is not used (ex-URL : /questions),
   // which clashes with running on the server where whole URL is used.
-  // (ex-URL : http://localhost:8181/topic_editor/6xposGcAZShX#/questions). 
+  // (ex-URL : http://localhost:8181/topic_editor/6xposGcAZShX#/questions).
   inSpecMode: boolean = false;
 
   activeTabName: string = this.MAIN_TAB;
