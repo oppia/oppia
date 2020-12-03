@@ -342,6 +342,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'suggestion-modal-for-exploration-player.service.ts',
     'summary-list-header.directive.ts',
     'supplemental-card.directive.ts',
+    'svg-sanitizer.service.ts',
     'svm-prediction.service.ts',
     'teacher.ts',
     'teacher2.ts',
