@@ -146,7 +146,7 @@ export class QuestionPlayerEngineService {
     return this.questions[this.currentIndex].getStateData();
   }
 
-  private getNextStateData = function() {
+  private getNextStateData() {
     return this.questions[this.nextIndex].getStateData();
   };
 
