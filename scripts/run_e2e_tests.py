@@ -22,7 +22,6 @@ import atexit
 import contextlib
 import os
 import re
-import shutil
 import signal
 import subprocess
 import sys
@@ -168,14 +167,6 @@ _PARSER.add_argument(
 # This list contains the sub process triggered by this script. This includes
 # the oppia web server.
 SUBPROCESSES = []
-
-
-def ensure_screenshots_dir_is_removed():
-    """Check if screenshot directory exists, if so, delete it."""
-    screenshots_dir = os.path.join(os.pardir, 'protractor-screenshots')
-    if not os.path.isdir(screenshots_dir):
-        return
-    shutil.rmtree(screenshots_dir)
 
 
 def cleanup():
@@ -708,7 +699,6 @@ def run_tests(args=None):
 
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
-    ensure_screenshots_dir_is_removed()
     for count in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('\n\n###### RUN COUNT %d ######\n\n' % (count + 1))
         flake_state = run_tests(args=args)

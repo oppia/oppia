@@ -380,39 +380,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         assert resource_values.update_called
         assert resource_values.updater.execute_called
 
-    def test_check_screenhost_when_not_exist(self):
-        def mock_isdir(unused_path):
-            return False
-
-        exist_swap = self.swap_with_checks(
-            os.path, 'isdir', mock_isdir,
-            expected_args=[(os.path.join(os.pardir, 'protractor-screenshots'),)]
-        )
-        print_swap = self.print_swap(called=False)
-        with print_swap, exist_swap:
-            run_e2e_tests.ensure_screenshots_dir_is_removed()
-
-    def test_check_screenhost_when_exist(self):
-        screenshot_dir = os.path.join(os.pardir, 'protractor-screenshots')
-        def mock_isdir(unused_path):
-            return True
-
-        def mock_rmdir(unused_path):
-            return True
-
-        exist_swap = self.swap_with_checks(
-            os.path, 'isdir', mock_isdir, expected_args=[(screenshot_dir,)])
-        rmdir_swap = self.swap_with_checks(
-            os, 'rmdir', mock_rmdir, expected_args=[(screenshot_dir,)])
-        expected_output = (
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
-            'core/tests/protractor.conf.js, you can view screenshots'
-            'of the failed tests in ../protractor-screenshots/')
-
-        print_swap = self.print_swap(expected_args=[(expected_output,)])
-        with print_swap, exist_swap, rmdir_swap:
-            run_e2e_tests.ensure_screenshots_dir_is_removed()
-
     def test_cleanup_when_no_subprocess(self):
 
         def mock_kill_process_based_on_regex(unused_regex):
