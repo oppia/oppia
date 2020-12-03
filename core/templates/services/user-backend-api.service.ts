@@ -83,12 +83,12 @@ export class UserBackendApiService {
     }
 
     setProfileImageDataUrlAsync(
-        newProfileImageDataUrl: string): void {
+        newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
       const profileImageUpdateUrlData = {
         update_type: 'profile_picture_data_url',
         data: newProfileImageDataUrl
       };
-      this.http.put<PreferencesBackendDict>(
+      return this.http.put<PreferencesBackendDict>(
         this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();
     }
 
