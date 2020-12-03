@@ -19,7 +19,7 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Component({
   selector: 'oppia-svg-thumbnail-display',
@@ -29,7 +29,7 @@ import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   constructor(
     private sanitizer: DomSanitizer,
-    private imageUploadHelperService: ImageUploadHelperService) {}
+    private svgSanitizerService: SvgSanitizerService) {}
   @Input() imgSrc: string;
   @Input() height: string;
   @Input() width: string;
@@ -52,14 +52,18 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
     const DATA_URL_PATTERN = /^data:image\/svg\+xml;base64,[a-z0-9+\/]+=*$/i;
     // If the SVG image is passed as base64 data.
     if (this.imgSrc.indexOf('data:image/svg+xml;base64') !== -1) {
+      // Don't display the image if it is not a valid base64 image.
+      if (!this.imgSrc.match(DATA_URL_PATTERN)) {
+        this.imgSrc = null;
+        return;
+      }
+
       // Check for malicious SVG.
       const { tags: invalidTags, attrs: invalidAttributes } = (
-        this.imageUploadHelperService.getInvalidSvgTagsAndAttrs(this.imgSrc));
+        this.svgSanitizerService.getInvalidSvgTagsAndAttrs(this.imgSrc));
 
       // If the data is malicious don't display the SVG.
-      if (
-        invalidTags.length > 0 || invalidAttributes.length > 0 ||
-        !this.imgSrc.match(DATA_URL_PATTERN)) {
+      if (invalidTags.length > 0 || invalidAttributes.length > 0) {
         this.imgSrc = null;
         return;
       }
