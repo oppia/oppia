@@ -4767,6 +4767,9 @@ export = {
     "code": "da",
     "description": "dansk (Danish)"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)"
+  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)"
   }, {
