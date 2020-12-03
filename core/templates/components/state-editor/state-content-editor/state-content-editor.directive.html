@@ -34,6 +34,12 @@
     <div class="oppia-editable-section-mask protractor-test-state-edit-content">
     </div>
   </div>
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown">
+    <span class="oppia-card-height-limit-warning">
+      <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xE88F;</i>
+      <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
+    </span>
+  </div>
 </div>
 
 <div ng-if="contentEditorIsOpen" class="protractor-test-state-content-editor">
@@ -41,8 +47,13 @@
   <schema-based-editor schema="HTML_SCHEMA" local-value="StateContentService.displayed._html">
   </schema-based-editor>
 
-  <div>
-    <button type="button"
+  <div class="pt-2">
+    <button type="button" ng-if="isCardHeightLimitReached()"
+            class="btn btn-warning oppia-save-state-item-button protractor-test-save-state-content float-right"
+            ng-click="onSaveContentButtonClicked()">
+      <[getStateContentSaveButtonPlaceholder()]>
+    </button>
+    <button type="button" ng-if="!isCardHeightLimitReached()"
             class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content float-right"
             ng-click="onSaveContentButtonClicked()">
       <[getStateContentSaveButtonPlaceholder()]>
@@ -59,14 +70,19 @@
 </div>
 
 <style>
+  .btn-warning{
+    background-color: #FFE401;
+    border-color: #FFDC00;
+    color: #000000;
+  }
   .oppia-card-height-limit-warning {
-    color: #0277BD;
+    color:#FF4500;
   }
 
   .oppia-shadow-preview-card {
-    left: -30000px;
-    max-width: 560px;
+    left: -1,875rem;
+    max-width: 35rem;
     position: fixed;
-    top: -30000px;
+    top: -1,875rem;
   }
 </style>
