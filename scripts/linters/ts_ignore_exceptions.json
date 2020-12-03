@@ -4,7 +4,7 @@
   ],
   "core/templates/domain/skill/skill-update.service.spec.ts": [
     "undoRedoService.undoChange(skill);",
-    "expect(undoRedoService.getCommittableChangeList()).toEqual(workedExample)"
+    "[workedExamplesObject]);"
   ],
   "core/templates/services/request-interceptor.service.ts": [
     "request.body = body;",

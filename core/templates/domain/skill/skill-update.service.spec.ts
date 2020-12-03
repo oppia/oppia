@@ -446,25 +446,26 @@ describe('Skill update service', () => {
       skill,
       workedExampleObjectFactory.createFromBackendDict(newExample)
     );
-    // This throws No overload matches this call.
-    // Overload 1 of 2, '(expected: Expected<ArrayLike<BackendChangeObject>>,
-    // expectationFailOutput?: any): Promise<void>', gave the following error.
-    // Type '{ cmd: string; property_name: string; old_value: { question:
-    // { html: string; content_id: string; }; explanation: {
-    // html: string; content_id: string; }; }[]; new_value: {
-    // question: { html: string; content_id: string; }; explanation: { ...; };
-    // }[]; }' is not assignable to type
-    // 'ExpectedRecursive<BackendChangeObject>'.
-    // Property ''subtopic_id'' is missing ...'.
-    // @ts-ignore
-    expect(undoRedoService.getCommittableChangeList()).toEqual([
-      {
-        cmd: 'update_skill_contents_property',
-        property_name: 'worked_examples',
-        old_value: skillContentsDict.worked_examples,
-        new_value: [example1, example2, newExample]
-      }
-    ]);
+    const workedExamplesObject = {
+      cmd: 'update_skill_contents_property',
+      property_name: 'worked_examples',
+      old_value: skillContentsDict.worked_examples,
+      new_value: [example1, example2, newExample]
+    };
+
+    expect(undoRedoService.getCommittableChangeList()).toEqual(
+      // This throws No overload matches this call.
+      // Overload 1 of 2, '(expected: Expected<ArrayLike<BackendChangeObject>>,
+      // expectationFailOutput?: any): Promise<void>', gave the following error.
+      // Type '{ cmd: string; property_name: string; old_value: { question:
+      // { html: string; content_id: string; }; explanation: {
+      // html: string; content_id: string; }; }[]; new_value: {
+      // question: { html: string; content_id: string; }; explanation: { ...; };
+      // }[]; }' is not assignable to type
+      // 'ExpectedRecursive<BackendChangeObject>'.
+      // Property ''subtopic_id'' is missing ...'.
+      // @ts-ignore
+      [workedExamplesObject]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example1),
       workedExampleObjectFactory.createFromBackendDict(example2),
@@ -486,21 +487,24 @@ describe('Skill update service', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
 
     skillUpdateService.deleteWorkedExample(skill, 0);
-    // This throws  Argument of type '{ cmd: string; property_name: string;
-    // old_value: any; new_value: any; }' is not assignable
-    // to parameter of type 'Expected<ArrayLike<BackendChangeObject>>'.
-    // Property 'length' is missing in type '{ cmd: string;
-    // property_name: string; old_value: any; new_value: any; }'
-    // but required in type '{ [x: number]:
-    // @ts-ignore
-    expect(undoRedoService.getCommittableChangeList()).toEqual([
-      {
-        cmd: 'update_skill_contents_property',
-        property_name: 'worked_examples',
-        old_value: skillContentsDict.worked_examples,
-        new_value: [skillContentsDict.worked_examples[1]],
-      }
-    ]);
+
+    const workedExamplesObject = {
+      cmd: 'update_skill_contents_property',
+      property_name: 'worked_examples',
+      old_value: skillContentsDict.worked_examples,
+      new_value: [skillContentsDict.worked_examples[1]],
+    };
+
+
+    expect(undoRedoService.getCommittableChangeList()).toEqual(
+      // This throws  Argument of type '{ cmd: string; property_name: string;
+      // old_value: any; new_value: any; }' is not assignable
+      // to parameter of type 'Expected<ArrayLike<BackendChangeObject>>'.
+      // Property 'length' is missing in type '{ cmd: string;
+      // property_name: string; old_value: any; new_value: any; }'
+      // but required in type '{ [x: number]:
+      // @ts-ignore
+      [workedExamplesObject]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example2),
     ]);
@@ -537,26 +541,26 @@ describe('Skill update service', () => {
       'new explanation 1'
     );
 
-    const workedExamples = {
+    const workedExamplesObject = {
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
       old_value: skillContentsDict.worked_examples,
       new_value: [modifiedExample1, example2],
     };
 
-    // This throws No overload matches this call.
-    // Overload 1 of 2, '(expected: Expected<ArrayLike<BackendChangeObject>>,
-    // expectationFailOutput?: any): Promise<void>', gave the following error.
-    // Type '{ cmd: string; property_name: string; old_value: { question:
-    // { html: string; content_id: string; }; explanation: {
-    // html: string; content_id: string; }; }[]; new_value: {
-    // question: { html: string; content_id: string; }; explanation: { ...; };
-    // }[]; }' is not assignable to type
-    // 'ExpectedRecursive<BackendChangeObject>'.
-    // Property ''subtopic_id'' is missing ...'.
-    // @ts-ignore
-    // eslint-disable-next-line max-len
-    expect(undoRedoService.getCommittableChangeList()).toEqual([workedExamples]);
+    expect(undoRedoService.getCommittableChangeList()).toEqual(
+      // This throws No overload matches this call.
+      // Overload 1 of 2, '(expected: Expected<ArrayLike<BackendChangeObject>>,
+      // expectationFailOutput?: any): Promise<void>', gave the following error.
+      // Type '{ cmd: string; property_name: string; old_value: { question:
+      // { html: string; content_id: string; }; explanation: {
+      // html: string; content_id: string; }; }[]; new_value: {
+      // question: { html: string; content_id: string; }; explanation: { ...; };
+      // }[]; }' is not assignable to type
+      // 'ExpectedRecursive<BackendChangeObject>'.
+      // Property ''subtopic_id'' is missing ...'.
+      // @ts-ignore
+      [workedExamplesObject]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(modifiedExample1),
       workedExampleObjectFactory.createFromBackendDict(example2),

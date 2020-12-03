@@ -47,7 +47,6 @@ import { StateWrittenTranslationsService } from 'components/state-editor/state-e
 import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
-import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 import { EditableCollectionBackendApiService } from 'domain/collection/editable-collection-backend-api.service';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
@@ -352,7 +351,6 @@ export const angularServices: [string, unknown][] = [
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
-  ['CollectionUpdateService', CollectionUpdateService],
   ['CollectionValidationService', CollectionValidationService],
   ['ComputeGraphService', ComputeGraphService],
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
