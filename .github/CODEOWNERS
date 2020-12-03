@@ -73,9 +73,12 @@
 # Answer classification team.
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
+/proto/ @prasanna08
 /core/storage/classifier/ @prasanna08
 /core/templates/domain/classifier/ @prasanna08
 /extensions/classifiers/ @prasanna08
+/buf.yaml @prasanna08
+/buf.gen.yaml @prasanna08
 
 
 # Audio and Translation team.
@@ -148,27 +151,26 @@
 
 # Dev workflow team.
 /.circleci/ @BenHenning @U8NWXD @kevintab95 @vinitamurthi
-/.eslintignore @DubeySandeep @Hudda
-/.eslintrc @DubeySandeep @Hudda
-/.htmllintrc @DubeySandeep @Hudda
-/.coveragerc @DubeySandeep @Hudda
+/.eslintignore @DubeySandeep
+/.eslintrc @DubeySandeep
+/.htmllintrc @DubeySandeep
+/.coveragerc @DubeySandeep
 /.gitattributes @DubeySandeep
 /.gitignore @DubeySandeep
-/.isort.cfg @DubeySandeep @Hudda
-/.pylintrc @DubeySandeep @Hudda
-/.stylelintrc @DubeySandeep @Hudda
-/.travis.yml @BenHenning @vinitamurthi @U8NWXD @kevintab95
+/.isort.cfg @DubeySandeep
+/.pylintrc @DubeySandeep
+/.stylelintrc @DubeySandeep
 /.yarnrc @DubeySandeep
 /codecov.yml @nithusha21
-/core/templates/css/.stylelintrc @DubeySandeep @Hudda
-/tox.ini @DubeySandeep @Hudda
+/core/templates/css/.stylelintrc @DubeySandeep
+/tox.ini @DubeySandeep
 /scripts/*.py @DubeySandeep
 /scripts/check_e2e_tests_are_captured_in_ci*.py @kevintab95 @DubeySandeep
 /scripts/check_frontend_coverage*.py @DubeySandeep @nithusha21
 /scripts/create_topological_sort_of_all_services*.py @DubeySandeep
 /scripts/install_prerequisites.sh @DubeySandeep
 /scripts/typescript_checks*.py @nishantwrp @DubeySandeep
-/scripts/linters/ @DubeySandeep @Hudda
+/scripts/linters/ @DubeySandeep
 /scripts/linters/ts_ignore_exceptions.json @nishantwrp
 /ubuntu_dockerfile @DubeySandeep
 
@@ -592,6 +594,7 @@
 /core/templates/domain/user/ @vojtechjelinek
 /core/templates/pages/profile-page/ @vojtechjelinek
 /core/templates/services/user.service*.ts @vojtechjelinek
+/core/templates/services/user-backend-api.service*.ts @vojtechjelinek
 
 
 # Service constants
