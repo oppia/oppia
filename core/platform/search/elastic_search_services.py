@@ -23,9 +23,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 
-import elasticsearch
 import feconf
 import python_utils
+
+import elasticsearch
 
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-max-result-window
 # This is the maximum number of results that can be returned for any given
