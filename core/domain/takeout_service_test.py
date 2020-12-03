@@ -404,7 +404,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_1, creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
-            activity_ids=self.ACTIVITY_IDS,
+            exploration_ids=self.ACTIVITY_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATE).put()
 
@@ -825,7 +825,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         stats_data = {}
         story_progress_data = {}
         subscriptions_data = {
-            'activity_ids': [],
+            'exploration_ids': [],
             'collection_ids': [],
             'creator_usernames': [],
             'feedback_thread_ids': [],
@@ -1299,7 +1299,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_subscriptions_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
+            'exploration_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
                                            [thread_id],
             'last_checked_msec': self.GENERIC_EPOCH
