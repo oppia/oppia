@@ -148,7 +148,7 @@ export class QuestionPlayerEngineService {
 
   private getNextStateData() {
     return this.questions[this.nextIndex].getStateData();
-  };
+  }
 
   private getNextInteractionHtml(labelForFocusTarget: string): string {
     var interactionId = this.getNextStateData().interaction.id;
