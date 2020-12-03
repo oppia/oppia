@@ -19,7 +19,6 @@
 
 var until = protractor.ExpectedConditions;
 var fs = require('fs');
-var path = require('path');
 var Constants = require('./ProtractorConstants');
 // When running tests on mobile via browserstack, the localhost
 // might take some time to establish a connection with the
@@ -163,10 +162,10 @@ var modalPopupToAppear = async function() {
  * Check if a file has been downloaded
  */
 var fileToBeDownloaded = async function(filename) {
-    var name = Constants.DOWNLOAD_PATH + '/' + filename;
-    browser.driver.wait(function() {
-      return fs.existsSync(name);
-    }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');
+  var name = Constants.DOWNLOAD_PATH + '/' + filename;
+  browser.driver.wait(function() {
+    return fs.existsSync(name);
+  }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');
 };
 
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;

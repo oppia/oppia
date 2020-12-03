@@ -173,7 +173,7 @@ describe('Preferences', function() {
       await preferencesPage.clickExportAccountButton();
       await waitFor.fileToBeDownloaded('oppia_takeout_data.zip');
     }
-  )
+  );
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
