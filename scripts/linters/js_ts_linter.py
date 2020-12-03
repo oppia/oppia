@@ -61,8 +61,8 @@ INJECTABLES_TO_IGNORE = [
     'MockIgnoredService', # This file is required for the js-ts-linter-test.
     # We don't want this service to be present in the index.
     'UpgradedServices',
-    # This file has location injected in the constructor,
-    # and may cause errors as it alters URL in windows.
+    # This file has location used in the constructor,
+    # which if injected causes a full page reload during Jasmine tests.
     'TopicEditorRoutingService'
 ]
 
