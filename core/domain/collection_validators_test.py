@@ -341,6 +341,28 @@ class CollectionSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_with_commiter_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated CollectionSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated CollectionSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
@@ -861,6 +883,28 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_commiter_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

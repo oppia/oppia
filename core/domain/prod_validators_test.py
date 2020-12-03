@@ -278,8 +278,6 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 class ExplorationSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
-
     def setUp(self):
         super(ExplorationSnapshotMetadataModelValidatorTests, self).setUp()
 
@@ -840,8 +838,6 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class ExplorationRightsSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
-
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
 
     def setUp(self):
         super(ExplorationRightsSnapshotMetadataModelValidatorTests, self).setUp(
@@ -1708,8 +1704,6 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
-
     def setUp(self):
         super(GeneralFeedbackThreadModelValidatorTests, self).setUp()
 
@@ -1947,8 +1941,6 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
 
 class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
-
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
 
     def setUp(self):
         super(GeneralFeedbackMessageModelValidatorTests, self).setUp()
@@ -2842,8 +2834,6 @@ class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
 
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
-
     def setUp(self):
         super(GeneralSuggestionModelValidatorTests, self).setUp()
 
@@ -2906,6 +2896,17 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_model_with_pseudo_author_id(self):
         self.model_instance.author_ids = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_final_reviewer_id_migration_bot(self):
+        self.model_instance.final_reviewer_id = feconf.MIGRATION_BOT_USER_ID
         self.model_instance.update_timestamps(update_last_updated_time=False)
         self.model_instance.put()
 
@@ -3161,8 +3162,6 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class GeneralVoiceoverApplicationModelValidatorTests(
         test_utils.AuditJobsTestBase):
-
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
 
     def setUp(self):
         super(GeneralVoiceoverApplicationModelValidatorTests, self).setUp()
@@ -4040,8 +4039,6 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class SubtopicPageSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
-
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
 
     def setUp(self):
         super(SubtopicPageSnapshotMetadataModelValidatorTests, self).setUp()

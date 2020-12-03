@@ -393,8 +393,6 @@ class TopicModelValidatorTests(test_utils.AuditJobsTestBase):
 class TopicSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
-
     def setUp(self):
         super(TopicSnapshotMetadataModelValidatorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -976,8 +974,6 @@ class TopicRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class TopicRightsSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
-
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
 
     def setUp(self):
         super(TopicRightsSnapshotMetadataModelValidatorTests, self).setUp()

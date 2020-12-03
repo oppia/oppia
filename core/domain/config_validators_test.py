@@ -124,8 +124,6 @@ class ConfigPropertyModelValidatorTests(test_utils.AuditJobsTestBase):
 class ConfigPropertySnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
-
     def setUp(self):
         super(ConfigPropertySnapshotMetadataModelValidatorTests, self).setUp()
 
@@ -489,8 +487,6 @@ class PlatformParameterModelValidatorTests(test_utils.AuditJobsTestBase):
 
 class PlatformParameterSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
-
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
 
     def setUp(self):
         super(

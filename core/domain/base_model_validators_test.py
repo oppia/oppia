@@ -109,9 +109,6 @@ class MockBaseUserModelValidator(
 
 class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
-    system_user_id = feconf.MIGRATION_BOT_USER_ID
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
-
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
         self.invalid_model = MockModel(id='mockmodel')
@@ -198,7 +195,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_remove_system_users(self):
         external_model = base_model_validators.ExternalModelFetcherDetails(
             'committer_ids', MockModel,
-            [self.system_user_id, 'User-1', self.PSEUDONYMOUS_ID],
+            [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
             remove_system_user_ids=True
         )
 
@@ -208,9 +205,9 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_remove_pseudonymous_users(self):
         external_model = base_model_validators.ExternalModelFetcherDetails(
             'committer_ids', MockModel,
-            [self.system_user_id, 'User-1', self.PSEUDONYMOUS_ID],
+            [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
             remove_pseudonymous_ids=True
         )
 
         self.assertItemsEqual(
-            external_model.model_ids, [self.system_user_id, 'User-1'])
+            external_model.model_ids, [feconf.MIGRATION_BOT_USER_ID, 'User-1'])

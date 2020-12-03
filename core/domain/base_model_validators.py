@@ -87,9 +87,9 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
             remove_system_user_ids: bool. Whether to remove the system user IDs
-                in the model_ids.
+                from the model_ids.
             remove_pseudonymous_ids: bool. Whether to remove pseudonymous user
-                IDs in the model_ids.
+                IDs from the model_ids.
         """
         filtered_model_ids = model_ids
         if remove_system_user_ids:

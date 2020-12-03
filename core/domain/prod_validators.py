@@ -1044,6 +1044,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                 base_model_validators.ExternalModelFetcherDetails(
                     'reviewer_ids', user_models.UserSettingsModel,
                     [item.final_reviewer_id],
+                    remove_system_user_ids=True,
                     remove_pseudonymous_ids=True
                 ))
         return field_name_to_external_model_references

@@ -289,8 +289,6 @@ class SkillModelValidatorTests(test_utils.AuditJobsTestBase):
 class SkillSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
-
     def setUp(self):
         super(SkillSnapshotMetadataModelValidatorTests, self).setUp()
 

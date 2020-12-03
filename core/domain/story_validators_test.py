@@ -269,8 +269,6 @@ class StoryModelValidatorTests(test_utils.AuditJobsTestBase):
 class StorySnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
-    PSEUDONYMOUS_ID = 'pid_' + 'a' * 32
-
     def setUp(self):
         super(StorySnapshotMetadataModelValidatorTests, self).setUp()
 
