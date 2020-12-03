@@ -152,6 +152,42 @@ describe('Skills List Directive', function() {
       expect(tasdReinitializedSpy).toHaveBeenCalled();
     }));
 
+  it('should reinitialize the page after failing to deleting a skill',
+    fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+
+      spyOn(SkillBackendApiService, 'deleteSkill').and.returnValue(
+        $q.reject('Subtopic does not have any skills linked'));
+
+      var skillId = 'CdjnJUE332dd';
+      ctrl.deleteSkill(skillId);
+
+      $timeout.flush();
+      tick(100);
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
+    }));
+
+  it(
+    'should reinitialize the page after failing to deleting a skill with ' +
+    'questions',
+    fakeAsync(() => {
+      spyOn($uibModal, 'open').and.returnValue({
+        result: $q.resolve()
+      });
+
+      spyOn(SkillBackendApiService, 'deleteSkill').and.returnValue(
+        $q.reject('Please delete all questions from skills first.'));
+
+      var skillId = 'CdjnJUE332dd';
+      ctrl.deleteSkill(skillId);
+
+      $timeout.flush();
+      tick(100);
+      expect(tasdReinitializedSpy).toHaveBeenCalled();
+    }));
+
   it('should select and show edit options for a skill', function() {
     const skillId1 = 'uXcdsad3f42';
     const skillId2 = 'aEdf44DGfre';
