@@ -376,8 +376,6 @@ import { SkillMasteryBackendApiService } from
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillRightsBackendApiService} from
   'domain/skill/skill-rights-backend-api.service.ts';
-import { SkillUpdateService} from
-  'domain/skill/skill-update.service';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -715,7 +713,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static skillMasteryBackendApiService: SkillMasteryBackendApiService;
   static skillObjectFactory: SkillObjectFactory;
   static skillRightsBackendApiService: SkillRightsBackendApiService;
-  static skillUpdateService: SkillUpdateService;
   static solutionObjectFactory: SolutionObjectFactory;
   static solutionValidityService: SolutionValidityService;
   static speechSynthesisChunkerService: SpeechSynthesisChunkerService;
@@ -1011,7 +1008,6 @@ private skillCreationBackendApiService: SkillCreationBackendApiService,
 private skillMasteryBackendApiService: SkillMasteryBackendApiService,
 private skillObjectFactory: SkillObjectFactory,
 private skillRightsBackendApiService: SkillRightsBackendApiService,
-private skillUpdateService: SkillUpdateService,
 private solutionObjectFactory: SolutionObjectFactory,
 private solutionValidityService: SolutionValidityService,
 private speechSynthesisChunkerService: SpeechSynthesisChunkerService,
