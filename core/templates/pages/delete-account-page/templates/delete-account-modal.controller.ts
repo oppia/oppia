@@ -22,8 +22,10 @@ require(
 require('services/user.service.ts');
 
 angular.module('oppia').controller('DeleteAccountModalController', [
-  '$controller', '$scope', '$uibModalInstance', 'UserService',
-  function($controller, $scope, $uibModalInstance, UserService) {
+  '$controller', '$rootScope', '$scope', '$uibModalInstance',
+  'UserService', function(
+      $controller, $rootScope, $scope, $uibModalInstance,
+      UserService) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance
@@ -32,6 +34,9 @@ angular.module('oppia').controller('DeleteAccountModalController', [
     let expectedUsername = null;
     UserService.getUserInfoAsync().then(function(userInfo) {
       expectedUsername = userInfo.getUsername();
+      // TODO(#8521): Remove the use of $rootScope.$apply()
+      // once the controller is migrated to angular.
+      $rootScope.$applyAsync();
     });
 
     $scope.isValid = function() {

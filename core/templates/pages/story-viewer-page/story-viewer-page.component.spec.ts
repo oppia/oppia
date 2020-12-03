@@ -27,6 +27,7 @@ import { ReadOnlyStoryNode } from
 import { StoryNode } from 'domain/story/story-node.model';
 import { PageTitleService } from 'services/page-title.service';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
+import { UserService } from 'services/user.service.ts';
 
 describe('Story Viewer Page component', function() {
   var ctrl = null;
@@ -61,6 +62,7 @@ describe('Story Viewer Page component', function() {
     };
 
     $provide.value('$window', mockWindow);
+    $provide.value('UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

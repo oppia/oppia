@@ -25,9 +25,10 @@ require('./email-dashboard-data.service');
 angular.module('oppia').component('emailDashboardPage', {
   template: require('./email-dashboard-page.component.html'),
   controller: [
-    '$rootScope', 'EmailDashboardDataService', 'LoaderService', 'UserService',
-    function(
-        $rootScope, EmailDashboardDataService, LoaderService, UserService) {
+    '$rootScope', 'EmailDashboardDataService', 'LoaderService',
+    'UserService', function(
+        $rootScope, EmailDashboardDataService, LoaderService,
+        UserService) {
       var ctrl = this;
       ctrl.resetForm = function() {
         ctrl.hasNotLoggedInForNDays = null;
@@ -110,6 +111,9 @@ angular.module('oppia').component('emailDashboardPage', {
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
           LoaderService.hideLoadingScreen();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         ctrl.currentPageOfQueries = [];

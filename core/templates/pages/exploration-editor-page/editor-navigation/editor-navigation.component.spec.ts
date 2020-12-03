@@ -18,7 +18,10 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, Subscription } from 'rxjs';
+
+import { UserService } from 'services/user.service.ts';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
@@ -60,10 +63,17 @@ describe('Editor Navigation Component', function() {
   };
   var isImprovementsTabEnabledAsyncSpy = null;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
   importAllAngularServices();
 
   beforeEach(function() {
     windowDimensionsService = TestBed.get(WindowDimensionsService);
+    userService = TestBed.get(UserService);
   });
 
   describe('when screen is large', function() {
@@ -82,7 +92,6 @@ describe('Editor Navigation Component', function() {
       explorationImprovementsService = $injector.get(
         'ExplorationImprovementsService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
-      userService = $injector.get('UserService');
       threadDataBackendApiService = (
         $injector.get('ThreadDataBackendApiService'));
       stateTutorialFirstTimeService = (
@@ -93,7 +102,8 @@ describe('Editor Navigation Component', function() {
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(1200);
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
+      spyOn(userService, 'getUserInfoAsync').
+        and.returnValue(userInfo);
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
         explorationImprovementsService, 'isImprovementsTabEnabledAsync');
@@ -356,7 +366,6 @@ describe('Editor Navigation Component', function() {
       explorationImprovementsService = $injector.get(
         'ExplorationImprovementsService');
       explorationWarningsService = $injector.get('ExplorationWarningsService');
-      userService = $injector.get('UserService');
       threadDataBackendApiService = (
         $injector.get('ThreadDataBackendApiService'));
       stateTutorialFirstTimeService = (
@@ -367,7 +376,8 @@ describe('Editor Navigation Component', function() {
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(768);
 
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(userInfo);
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue(userInfo);
 
       spyOnProperty(
         stateTutorialFirstTimeService,

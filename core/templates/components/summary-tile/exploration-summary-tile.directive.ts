@@ -67,11 +67,11 @@ angular.module('oppia').directive('explorationSummaryTile', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary-tile/exploration-summary-tile.directive.html'),
       controller: [
-        '$scope', '$window', 'DateTimeFormatService',
+        '$rootScope', '$scope', '$window', 'DateTimeFormatService',
         'RatingComputationService', 'UrlService', 'UserService',
         'WindowDimensionsService', 'ACTIVITY_TYPE_EXPLORATION',
         function(
-            $scope, $window, DateTimeFormatService,
+            $rootScope, $scope, $window, DateTimeFormatService,
             RatingComputationService, UrlService, UserService,
             WindowDimensionsService, ACTIVITY_TYPE_EXPLORATION) {
           var ctrl = this;
@@ -154,6 +154,9 @@ angular.module('oppia').directive('explorationSummaryTile', [
             $scope.userIsLoggedIn = null;
             UserService.getUserInfoAsync().then(function(userInfo) {
               $scope.userIsLoggedIn = userInfo.isLoggedIn();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
             $scope.ACTIVITY_TYPE_EXPLORATION = ACTIVITY_TYPE_EXPLORATION;
             var contributorsSummary = $scope.getContributorsSummary() || {};

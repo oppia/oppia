@@ -42,7 +42,7 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('editorNavigation', {
   template: require('./editor-navigation.component.html'),
   controller: [
-    '$q', '$scope', '$timeout', '$uibModal', 'ChangeListService',
+    '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ChangeListService',
     'ContextService', 'EditabilityService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationSaveService',
@@ -52,7 +52,7 @@ angular.module('oppia').component('editorNavigation', {
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService',
     function(
-        $q, $scope, $timeout, $uibModal, ChangeListService,
+        $q, $rootScope, $scope, $timeout, $uibModal, ChangeListService,
         ContextService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationSaveService,
@@ -220,6 +220,9 @@ angular.module('oppia').component('editorNavigation', {
         $q.when(UserService.getUserInfoAsync())
           .then(userInfo => {
             this.userIsLoggedIn = userInfo.isLoggedIn();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           });
         $scope.isUserLoggedIn = () => this.userIsLoggedIn;
       };

@@ -45,19 +45,20 @@ angular.module('oppia').component('preferencesPage', {
   },
   template: require('./preferences-page.component.html'),
   controller: [
-    '$http', '$q', '$timeout', '$translate', '$uibModal', '$window',
-    'AlertsService', 'I18nLanguageCodeService',
+    '$http', '$q', '$rootScope', '$timeout', '$translate', '$uibModal',
+    '$window', 'AlertsService', 'I18nLanguageCodeService',
     'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
-    'UserService', 'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
-    'ENABLE_ACCOUNT_DELETION', 'ENABLE_ACCOUNT_EXPORT',
-    'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
-    function(
-        $http, $q, $timeout, $translate, $uibModal, $window,
-        AlertsService, I18nLanguageCodeService,
+    'UserService', 'DASHBOARD_TYPE_CREATOR',
+    'DASHBOARD_TYPE_LEARNER', 'ENABLE_ACCOUNT_DELETION',
+    'ENABLE_ACCOUNT_EXPORT', 'SUPPORTED_AUDIO_LANGUAGES',
+    'SUPPORTED_SITE_LANGUAGES', function(
+        $http, $q, $rootScope, $timeout, $translate, $uibModal,
+        $window, AlertsService, I18nLanguageCodeService,
         LanguageUtilService, LoaderService, UrlInterpolationService,
-        UserService, DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
-        ENABLE_ACCOUNT_DELETION, ENABLE_ACCOUNT_EXPORT,
-        SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
+        UserService, DASHBOARD_TYPE_CREATOR,
+        DASHBOARD_TYPE_LEARNER, ENABLE_ACCOUNT_DELETION,
+        ENABLE_ACCOUNT_EXPORT, SUPPORTED_AUDIO_LANGUAGES,
+        SUPPORTED_SITE_LANGUAGES) {
       var ctrl = this;
       var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
@@ -180,6 +181,9 @@ angular.module('oppia').component('preferencesPage', {
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
           ctrl.email = userInfo.getEmail();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(

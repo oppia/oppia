@@ -17,6 +17,7 @@
  */
 
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -26,7 +27,7 @@ import { PageTitleService } from 'services/page-title.service';
 import { of } from 'rxjs';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { UserService } from 'services/user.service';
 
 
 describe('Library controller', function() {
@@ -48,7 +49,8 @@ describe('Library controller', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-
+  });
+  beforeEach(function() {
     classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
     i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
     OppiaAngularRootComponent.pageTitleService = (
@@ -59,6 +61,8 @@ describe('Library controller', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'KeyboardShortcutService', TestBed.get(KeyboardShortcutService));
+    $provide.value(
+      'UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -97,9 +101,10 @@ describe('Library controller', function() {
 
       logErrorSpy = spyOn($log, 'error');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
 
       $httpBackend.expectGET('/libraryindexhandler').respond({
         activity_summary_dicts_by_category: [{
@@ -362,9 +367,10 @@ describe('Library controller', function() {
 
       logErrorSpy = spyOn($log, 'error');
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => false
-      }));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => false
+        }));
 
       $httpBackend.expectGET('/libraryindexhandler').respond({
         activity_summary_dicts_by_category: [{
@@ -465,14 +471,14 @@ describe('Library controller', function() {
       var $rootScope = $injector.get('$rootScope');
       csrfTokenService = $injector.get('CsrfTokenService');
       userService = $injector.get('UserService');
-
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
       spyOn(OppiaAngularRootComponent.pageTitleService, 'setPageTitle');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
 
       $httpBackend.expectGET('/librarygrouphandler?group_name=top-rated')
         .respond({

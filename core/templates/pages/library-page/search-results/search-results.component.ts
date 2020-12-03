@@ -30,10 +30,10 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('searchResults', {
   template: require('./search-results.component.html'),
   controller: [
-    '$timeout', '$window', 'LoaderService', 'SearchService',
+    '$rootScope', '$timeout', '$window', 'LoaderService', 'SearchService',
     'SiteAnalyticsService', 'UrlInterpolationService', 'UserService',
     function(
-        $timeout, $window, LoaderService, SearchService,
+        $rootScope, $timeout, $window, LoaderService, SearchService,
         SiteAnalyticsService, UrlInterpolationService, UserService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -56,6 +56,9 @@ angular.module('oppia').component('searchResults', {
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         // Called when the first batch of search results is retrieved from

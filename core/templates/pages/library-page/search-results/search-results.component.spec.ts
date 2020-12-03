@@ -16,9 +16,11 @@
  * @fileoverview Unit tests for searchResults.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { EventEmitter } from '@angular/core';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Search Results component', function() {
   var ctrl = null;
@@ -34,6 +36,14 @@ describe('Search Results component', function() {
     location: ''
   };
   var initialSearchResultsLoadedEmitter = new EventEmitter();
+
+  importAllAngularServices();
+
+  beforeEach(function() {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
@@ -52,9 +62,10 @@ describe('Search Results component', function() {
 
     spyOnProperty(searchService, 'onInitialSearchResultsLoaded').and
       .returnValue(initialSearchResultsLoadedEmitter);
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
 
     $scope = $rootScope.$new();
     ctrl = $componentController('searchResults', {

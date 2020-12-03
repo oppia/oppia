@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for Audio Translation Bar directive.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AnswerGroupsCacheService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
@@ -48,13 +48,14 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { EditabilityService } from 'services/editability.service';
 import { AlertsService } from 'services/alerts.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { UserService } from 'services/user.service';
 
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
@@ -152,6 +153,7 @@ describe('Audio translation bar directive', function() {
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value('UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
@@ -749,9 +751,10 @@ describe('Audio translation bar directive', function() {
         'UserExplorationPermissionsService');
       userService = $injector.get('UserService');
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
       spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
         .returnValue($q.resolve({
           canVoiceover: true

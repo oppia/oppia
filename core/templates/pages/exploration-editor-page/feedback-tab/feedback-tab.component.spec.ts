@@ -16,17 +16,19 @@
  * @fileoverview Unit tests for feedbackTab.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { AlertsService } from 'services/alerts.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { UserService } from 'services/user.service';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -72,6 +74,8 @@ describe('Feedback Tab Component', function() {
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.get(ReadOnlyExplorationBackendApiService));
+    $provide.value(
+      'UserService', TestBed.get(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
