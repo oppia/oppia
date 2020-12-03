@@ -165,8 +165,7 @@ describe('Full exploration editor', function() {
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
     var backButton = element(by.css('.protractor-test-back-button'));
-    expect(await backButton.isPresent()).toEqual(
-      true, 'Back button is not present');
+    expect(await backButton.isPresent()).toEqual(true);
     await explorationPlayerPage.submitAnswer('LogicProof');
     await waitFor.invisibilityOf(
       backButton, 'Back button takes too long to disappear.');
