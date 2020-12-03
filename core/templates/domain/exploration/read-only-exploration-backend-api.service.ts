@@ -22,7 +22,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { AppConstants } from 'app.constants';
-import { ClassifierBackendDict } from 'domain/classifier/classifier.model';
 import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
 import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactory';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
@@ -47,7 +46,6 @@ export interface FetchExplorationBackendResponse {
   'session_id': string;
   'version': number;
   'preferred_audio_language_code': string;
-  'state_classifier_mapping': Record<string, ClassifierBackendDict>;
   'auto_tts_enabled': boolean;
   'correctness_feedback_enabled': boolean;
   'record_playthrough_probability': number;

@@ -22,6 +22,7 @@ import os
 import shutil
 import subprocess
 import sys
+import zipfile
 
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
@@ -68,6 +69,32 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
     common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
     'configparser.py')
 
+# Download locations for buf binary.
+BUF_BASE_URL = (
+    'https://github.com/bufbuild/buf/releases/download/v0.29.0/')
+
+BUF_LINUX_FILES = [
+    'buf-Linux-x86_64', 'protoc-gen-buf-check-lint-Linux-x86_64',
+    'protoc-gen-buf-check-breaking-Linux-x86_64']
+BUF_DARWIN_FILES = [
+    'buf-Darwin-x86_64', 'protoc-gen-buf-check-lint-Darwin-x86_64',
+    'protoc-gen-buf-check-breaking-Darwin-x86_64']
+
+# Download URL of protoc compiler.
+PROTOC_URL = (
+    'https://github.com/protocolbuffers/protobuf/releases/download/v%s' %
+    common.PROTOC_VERSION)
+PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common.PROTOC_VERSION)
+PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
+
+# Path of the buf executable.
+BUF_DIR = os.path.join(
+    common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
+PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
+# Path of files which needs to be compiled by protobuf.
+PROTO_FILES_PATHS = [
+    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
+
 
 def tweak_yarn_executable():
     """When yarn is run on Windows, the file yarn will be executed by default.
@@ -87,6 +114,60 @@ def get_yarn_command():
     if common.is_windows_os():
         return 'yarn.cmd'
     return 'yarn'
+
+
+def install_buf_and_protoc():
+    """Installs buf and protoc for Linux or Darwin, depending upon the
+    platform.
+    """
+    buf_files = BUF_DARWIN_FILES if common.is_mac_os() else BUF_LINUX_FILES
+    protoc_file = (
+        PROTOC_DARWIN_FILE if common.is_mac_os() else PROTOC_LINUX_FILE)
+    buf_path = os.path.join(BUF_DIR, buf_files[0])
+    protoc_path = os.path.join(PROTOC_DIR, 'bin', 'protoc')
+
+    if os.path.isfile(buf_path) and os.path.isfile(protoc_path):
+        return
+
+    common.ensure_directory_exists(BUF_DIR)
+    for bin_file in buf_files:
+        python_utils.url_retrieve('%s/%s' % (
+            BUF_BASE_URL, bin_file), filename=os.path.join(BUF_DIR, bin_file))
+    python_utils.url_retrieve('%s/%s' % (
+        PROTOC_URL, protoc_file), filename=os.path.join(BUF_DIR, protoc_file))
+    try:
+        with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
+            zfile.extractall(path=PROTOC_DIR)
+        os.remove(os.path.join(BUF_DIR, protoc_file))
+    except Exception:
+        raise Exception('Error installing protoc binary')
+    common.recursive_chmod(buf_path, 0o744)
+    common.recursive_chmod(protoc_path, 0o744)
+
+
+def compile_protobuf_files(proto_files_paths):
+    """Compiles protobuf files using buf.
+
+    Raises:
+        Exception. If there is any error in compiling the proto files.
+    """
+    proto_env = os.environ.copy()
+    proto_env['PATH'] += '%s%s/bin' % (os.pathsep, PROTOC_DIR)
+    buf_path = os.path.join(
+        BUF_DIR,
+        BUF_DARWIN_FILES[0] if common.is_mac_os() else BUF_LINUX_FILES[0])
+    for path in proto_files_paths:
+        command = [
+            buf_path, 'generate', path]
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            env=proto_env)
+        stdout, stderr = process.communicate()
+        if process.returncode == 0:
+            python_utils.PRINT(stdout)
+        else:
+            python_utils.PRINT(stderr)
+            raise Exception('Error compiling proto files at %s' % path)
 
 
 def ensure_pip_library_is_installed(package, version, path):
@@ -143,6 +224,7 @@ def main():
         ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
         ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
         ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
+        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
         ('simple-crypt', common.SIMPLE_CRYPT_VERSION, common.OPPIA_TOOLS_DIR),
@@ -236,6 +318,12 @@ def main():
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.
                 pass
+
+    # Compile protobuf files.
+    python_utils.PRINT('Installing buf and protoc binary.')
+    install_buf_and_protoc()
+    python_utils.PRINT('Compiling protobuf files.')
+    compile_protobuf_files(PROTO_FILES_PATHS)
 
     if common.is_windows_os():
         tweak_yarn_executable()
