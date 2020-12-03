@@ -339,7 +339,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         result = gae_search_services.search('k:abc', 'my_index', size=2)[0]
         self.assertEqual(len(result), 2)
 
-    def test_use_offset(self):
+    def test_use_cursor(self):
         doc1 = search.Document(doc_id='doc1', language='en', rank=1, fields=[
             search.TextField(name='k', value='abc def ghi')])
         doc2 = search.Document(doc_id='doc2', language='en', rank=1, fields=[
@@ -348,10 +348,10 @@ class SearchQueryTests(test_utils.GenericTestBase):
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
-        result1, offset = gae_search_services.search(
+        result1, result1_cursor = gae_search_services.search(
             'k:abc', 'my_index', size=2)
-        result2, offset = gae_search_services.search(
-            'k:abc', 'my_index', offset=offset)
+        result2, result2_cursor = gae_search_services.search(
+            'k:abc', 'my_index', cursor=result1_cursor)
         self.assertEqual(len(result1), 2)
         self.assertEqual(len(result2), 1)
         dict1 = {'id': 'doc1', 'k': 'abc def ghi', 'language_code': 'en',
@@ -379,7 +379,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertIn('doc2', result)
         self.assertIn('doc3', result)
 
-    def test_offset_is_none_if_no_more_results(self):
+    def test_cursor_is_none_if_no_more_results(self):
         doc1 = search.Document(doc_id='doc1', fields=[
             search.TextField(name='k', value='abc def ghi')])
         doc2 = search.Document(doc_id='doc2', fields=[
@@ -388,8 +388,8 @@ class SearchQueryTests(test_utils.GenericTestBase):
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
-        offset = gae_search_services.search('k:abc', 'my_index')[1]
-        self.assertIsNone(offset)
+        cursor = gae_search_services.search('k:abc', 'my_index')[1]
+        self.assertIsNone(cursor)
 
     def test_default_rank_is_descending_date(self):
         # Time is only saved with 1 second accuracy,

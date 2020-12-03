@@ -124,11 +124,11 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, offset=None, size=20,
+                query_string, index, cursor=None, size=20,
                 ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(offset, expected_cursor)
+            self.assertEqual(cursor, expected_cursor)
             self.assertEqual(size, expected_size)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
@@ -136,13 +136,13 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             return doc_ids, expected_result_cursor
 
         with self.swap(gae_search_services, 'search', mock_search):
-            result, cursor = search_services.search_explorations(
+            result, result_cursor = search_services.search_explorations(
                 expected_query_string,
                 expected_size,
                 cursor=expected_cursor,
             )
 
-        self.assertEqual(cursor, expected_result_cursor)
+        self.assertEqual(result_cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
     def test_search_collections(self):
@@ -153,12 +153,12 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, offset=None, size=20,
+                query_string, index, cursor=None, size=20,
                 ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)
-            self.assertEqual(offset, expected_cursor)
+            self.assertEqual(cursor, expected_cursor)
             self.assertEqual(size, expected_size)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
@@ -166,13 +166,13 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             return doc_ids, expected_result_cursor
 
         with self.swap(gae_search_services, 'search', mock_search):
-            result, cursor = search_services.search_collections(
+            result, result_cursor = search_services.search_collections(
                 expected_query_string,
                 expected_size,
                 cursor=expected_cursor,
             )
 
-        self.assertEqual(cursor, expected_result_cursor)
+        self.assertEqual(result_cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
     def test_demo_collections_are_added_to_search_index(self):

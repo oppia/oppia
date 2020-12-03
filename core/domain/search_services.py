@@ -181,8 +181,11 @@ def search_explorations(query, limit, cursor=None):
               fetch, None otherwise. If a cursor is returned, it will be a
               web-safe string that can be used in URLs.
     """
+    # TODO(#11314): Change this (and callers of this function) to use an offset
+    # instead once the underlying search service is migrated over to
+    # elasticsearch.
     return search_services.search(
-        query, SEARCH_INDEX_EXPLORATIONS, offset=cursor,
+        query, SEARCH_INDEX_EXPLORATIONS, cursor=cursor,
         size=limit, ids_only=True)
 
 
@@ -222,8 +225,11 @@ def search_collections(query, limit, cursor=None):
               otherwise. If a cursor is returned, it will be a web-safe string
               that can be used in URLs.
     """
+    # TODO(#11314): Change this (and callers of this function) to use an offset
+    # instead once the underlying search service is migrated over to
+    # elasticsearch.
     return search_services.search(
-        query, SEARCH_INDEX_COLLECTIONS, offset=cursor,
+        query, SEARCH_INDEX_COLLECTIONS, cursor=cursor,
         size=limit, ids_only=True)
 
 

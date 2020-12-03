@@ -28,11 +28,11 @@ import feconf
 import python_utils
 
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-max-result-window
-# This is the maximum number of results to search through using the from and
-# size parameters to search through any given index. This number is equal to the
-# size 'index.max_result_window' and defines the maximum the sum of the
-# parameters (size + from) can be. If needed, we will have to change this to use
-# the search_after parameter or scrolling option as mentioned in the link above.
+# This is the maximum number of results that can be returned for any given
+# search query. This number is equal to the size 'index.max_result_window' and
+# defines the maximum the sum of the parameters (size + from) can be. If
+# needed, we will have to change this to use the search_after parameter or
+# scrolling option as mentioned in the link above.
 MAXIMUM_NUMBER_OF_RESULTS = 10000
 ES = elasticsearch.Elasticsearch()
 
@@ -106,20 +106,24 @@ def clear_index(index_name):
 
 
 def search(
-        query_string, index_name, offset=0,
+        query_string, index_name, cursor=None, offset=0,
         size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 results from a search by
     paginating using size and offset. If the number of items to search through
     is greater that 10,000, use the elasticsearch scroll API instead.
 
+    TODO(#11314): Get rid of the cursor argument completely once the dependency
+    on gae_search_services.py is removed from the codebase.
+
     Args:
         query_string: str. A JSON-encoded string representation of the
             dictionary search definition that uses Query DSL. More details about
-            Query DSL below.
+            Query DSL can be found on this page:
             https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
         index_name: str. The name of the index. Use '_all' or empty string to
             perform the operation on all indices.
+        cursor: str|None. Not used in this implementation.
         offset: int. The offset into the index. Pass this in to start at the
             'offset' when searching through a list of results of max length
             'size'. Leave as None to start at the beginning.
@@ -138,6 +142,7 @@ def search(
                 section of the results. Returns None if there are no more
                 results.
     """
+    assert cursor is None
     assert offset + size < MAXIMUM_NUMBER_OF_RESULTS
     query_definiton = json.loads(query_string)
     response = ES.search(
