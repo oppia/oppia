@@ -164,10 +164,12 @@ describe('Full exploration editor', function() {
 
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
-    var buttons = element.all(by.css('.protractor-test-back-button'));
-    expect(await buttons.count()).toBe(1);
+    var backButton = element(by.css('.protractor-test-back-button'));
+    expect(await backButton.isPresent()).toEqual(
+      true, 'Back button is not present');
     await explorationPlayerPage.submitAnswer('LogicProof');
-    expect(await buttons.count()).toBe(0);
+    await waitFor.invisibilityOf(
+      backButton, 'Back button takes too long to disappear.');
 
     await explorationPlayerPage.clickThroughToNextCard();
     await explorationPlayerPage.expectExplorationToBeOver();
