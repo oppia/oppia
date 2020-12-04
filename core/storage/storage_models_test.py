@@ -44,7 +44,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
         """
 
         for clazz in test_utils.get_storage_model_classes():
-            if clazz.__name__ in test_utils.NON_TAKEOUT_BASE_MODEL_CLASSES:
+            if (clazz.__name__ in
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_TAKEOUT_POLICIES):
                 continue
             yield clazz
 
@@ -94,7 +95,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
         all_models = [
             clazz
             for clazz in test_utils.get_storage_model_classes()
-            if not clazz.__name__ in test_utils.NON_TAKEOUT_BASE_MODEL_CLASSES
+            if (not clazz.__name__ in
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_TAKEOUT_POLICIES)
         ]
         models_with_export = (
             takeout_service.get_models_which_should_be_exported())
@@ -112,7 +114,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
         all_models = [
             clazz
             for clazz in test_utils.get_storage_model_classes()
-            if not clazz.__name__ in test_utils.NON_TAKEOUT_BASE_MODEL_CLASSES
+            if (not clazz.__name__ in
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_TAKEOUT_POLICIES)
         ]
         for model in all_models:
             export_policy = model.get_export_policy()

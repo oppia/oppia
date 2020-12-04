@@ -94,7 +94,7 @@ LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 # List of model classes that don't have Takeout related class methods
 # defined because they're not used directly but only as a base classes for
 # the other models.
-NON_TAKEOUT_BASE_MODEL_CLASSES = (
+BASE_MODEL_CLASSES_WITHOUT_TAKEOUT_POLICIES = (
     'BaseCommitLogEntryModel',
     'BaseMapReduceBatchResultsModel',
     'BaseModel',
