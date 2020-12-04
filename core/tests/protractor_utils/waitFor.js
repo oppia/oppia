@@ -163,7 +163,7 @@ var modalPopupToAppear = async function() {
  */
 var fileToBeDownloaded = async function(filename) {
   var name = Constants.DOWNLOAD_PATH + '/' + filename;
-  await browser.driver.wait(function() {
+  browser.driver.wait(function() {
     return fs.existsSync(name);
   }, DEFAULT_WAIT_TIME_MSECS, 'File was not downloaded!');
 };
