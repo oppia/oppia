@@ -2117,3 +2117,21 @@ class ResetExplorationIssuesOneOffJobTests(OneOffJobTestBase):
             ['Referenced PlaythroughModel(s) deleted', 3],
             ['Existing ExplorationIssuesModel(s) reset', 1],
         ])
+
+    def test_exploration_with_missing_versions(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, [], 'Trivial change')
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, [], 'Trivial change')
+
+        stats_models.ExplorationIssuesModel.delete_multi([
+            stats_models.ExplorationIssuesModel.get_model(self.EXP_ID, 2),
+            stats_models.ExplorationIssuesModel.get_model(self.EXP_ID, 3),
+        ])
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['Existing ExplorationIssuesModel(s) reset', 1],
+            ['Missing ExplorationIssuesModel(s) regenerated',
+             'eid versions=[2, 3]'],
+        ])

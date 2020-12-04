@@ -1600,43 +1600,44 @@ class ResetExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exp_versions = list(python_utils.RANGE(1, latest_exp_model.version + 1))
 
         issues_model_cls = stats_models.ExplorationIssuesModel
-        issues_model_ids = (
-            issues_model_cls.get_entity_id(exp_id, v) for v in exp_versions)
-        issues_models = (
-            issues_model_cls.get_multi(issues_model_ids, include_deleted=True))
+        issues_models = issues_model_cls.get_multi(
+            [issues_model_cls.get_entity_id(exp_id, v) for v in exp_versions],
+            include_deleted=True)
 
-        deleted = set()
-        missing = list()
-        reset = list()
+        models_to_reset = list()
+        playthroughs_to_delete = set()
+        versions_without_models = list()
         for exp_version, issues_model in enumerate(issues_models, start=1):
             if issues_model is not None:
                 for issue in issues_model.unresolved_issues:
-                    deleted.update(issue['playthrough_ids'])
+                    playthroughs_to_delete.update(issue['playthrough_ids'])
                 issues_model.unresolved_issues = []
-                reset.append(issues_model)
+                models_to_reset.append(issues_model)
             else:
                 stats_services.create_exp_issues_for_new_exploration(
                     exp_id, exp_version)
-                missing.append(python_utils.UNICODE(exp_version))
+                versions_without_models.append(
+                    python_utils.UNICODE(exp_version))
 
-        if deleted:
+        if playthroughs_to_delete:
             stats_models.PlaythroughModel.delete_multi(
-                stats_models.PlaythroughModel.get_multi(deleted))
+                stats_models.PlaythroughModel.get_multi(playthroughs_to_delete))
             yield (
                 ResetExplorationIssuesOneOffJob.REDUCE_KEY_DELETED,
-                len(deleted))
+                len(playthroughs_to_delete))
 
-        if reset:
-            issues_model_cls.update_timestamps_multi(reset)
-            issues_model_cls.put_multi(reset)
+        if models_to_reset:
+            issues_model_cls.update_timestamps_multi(models_to_reset)
+            issues_model_cls.put_multi(models_to_reset)
             yield (
                 ResetExplorationIssuesOneOffJob.REDUCE_KEY_RESET,
-                len(reset))
+                len(models_to_reset))
 
-        if missing:
+        if versions_without_models:
             yield (
                 ResetExplorationIssuesOneOffJob.REDUCE_KEY_MISSING,
-                '%s versions=[%s]' % (exp_id, ', '.join(missing)))
+                '%s versions=[%s]' % (
+                    exp_id, ', '.join(versions_without_models)))
 
     @staticmethod
     def reduce(key, values):
