@@ -28,6 +28,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 EXCLUDED_BYPASS_SECURITY_TRUST_FILES = (
     'core/templates/components/forms/custom-forms-directives/thumbnail-display.component.spec.ts', # pylint: disable=line-too-long
-    'core/templates/services/svg-sanitizer.service.ts',
-    'core/templates/services/svg-sanitizer.service.spec.ts')
+    'core/templates/services/svg-sanitizer.service.spec.ts',
+    'core/templates/services/svg-sanitizer.service.ts')
 EXCLUDED_BYPASS_SECURITY_TRUST_DIRECTORIES = ()
