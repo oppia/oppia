@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for user info.
+ * @fileoverview Unit tests for promo bar model.
  */
 
 import { PromoBar } from 'domain/promo_bar/promo-bar.model';
