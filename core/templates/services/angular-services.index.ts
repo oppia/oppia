@@ -244,6 +244,7 @@ import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-ba
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service.ts';
 import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
+import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service'
 import { AlertsService } from 'services/alerts.service';
 import { AppService } from 'services/app.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -618,6 +619,7 @@ export const angularServices: [string, unknown][] = [
   ['TopicUpdateService', TopicUpdateService],
   ['TopicsAndSkillsDashboardBackendApiService',
     TopicsAndSkillsDashboardBackendApiService],
+  ['TopicEditorStateService', TopicEditorStateService],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
   ['TranslationLanguageService', TranslationLanguageService],
   ['TranslateService', TranslateService],

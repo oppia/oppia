@@ -66,7 +66,7 @@ export class TopicEditorStateService {
     _topicIsBeingSaved = false;
     _topicWithNameExists = false;
     _topicWithUrlFragmentExists = false;
-    _canonicalStorySummaries = [];
+    _canonicalStorySummaries = []; 
     _skillIdToRubricsObject;
     _skillQuestionCountDict = {};
     _groupedSkillSummaries = {
@@ -120,9 +120,9 @@ export class TopicEditorStateService {
       }
     };
      _getSubtopicPageIndex = (subtopicPageId) => {
-      console.log("this._cachedSubtopicPages = "+this._cachedSubtopicPages.length);// doubt
+      //console.log("this._cachedSubtopicPages = "+this._cachedSubtopicPages.length);// doubt
       for (let i = 0; i < this._cachedSubtopicPages.length; i++) {
-        console.log("id = "+(this._cachedSubtopicPages[i].getId()));
+        //console.log("id = "+(this._cachedSubtopicPages[i].getId()));
         if (this._cachedSubtopicPages[i].getId() === subtopicPageId) {
           return i;
         }
@@ -254,19 +254,19 @@ export class TopicEditorStateService {
        * specified topic ID and subtopic ID.
        */
       loadSubtopicPage(topicId, subtopicId) {
-        // console.log("Topicid= "+topicId);
-        // console.log("subtopic id= "+subtopicId);
+        // //console.log("Topicid= "+topicId);
+        // //console.log("subtopic id= "+subtopicId);
 
         let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
-        // console.log("subtopic id = "+subtopicPageId);
-        console.log("this._getSubtopicPageIndex(subtopicPageId) = "+this._getSubtopicPageIndex(subtopicPageId));
+        // //console.log("subtopic id = "+subtopicPageId);
+        //console.log("this._getSubtopicPageIndex(subtopicPageId) = "+this._getSubtopicPageIndex(subtopicPageId));
         if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
           this._subtopicPage = angular.copy(
             this._cachedSubtopicPages[this._getSubtopicPageIndex(subtopicPageId)]);
           this._subtopicPageLoadedEventEmitter.emit();
           return;
         }
-        // console.log("editable = " +this.editableStoryBackendApiService);
+        // //console.log("editable = " +this.editableStoryBackendApiService);
         this.editableTopicBackendApiService.fetchSubtopicPage(
           topicId, subtopicId).then(
           (newBackendSubtopicPageObject) => {
@@ -373,7 +373,9 @@ export class TopicEditorStateService {
       deleteSubtopicPage(topicId, subtopicId) {
         let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
         let index = this._getSubtopicPageIndex(subtopicPageId);
+        //console.log("index = "+index);
         let newIndex = this._newSubtopicPageIds.indexOf(subtopicPageId);
+        //console.log("newIndex ="+newIndex);
         // If index is null, that means the corresponding subtopic page was
         // never loaded from the backend and not that the subtopic page doesn't
         // exist at all. So, not required to throw an error here.
@@ -552,7 +554,7 @@ export class TopicEditorStateService {
       }
 
       onSubtopicPageLoaded(): EventEmitter<any> {
-        console.log("called");
+        //console.log("called");
         return this._subtopicPageLoadedEventEmitter;
       }
 }
