@@ -2049,15 +2049,19 @@ class ResetExplorationIssuesOneOffJobTests(OneOffJobTestBase):
             for output in self.ONE_OFF_JOB_CLASS.get_output(job_id)
         ]
 
-    def append_exp_issue(self, playthrough_ids, exp_version=1):
-        """Appends a new ExplorationIssue to a specific exploration's version.
+    def get_exp_issues(self, exp_version=1):
+        """Fetches the ExplorationIssuesModel for the given version."""
+        return stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID, exp_version)
+
+    def append_exp_issue(self, exp_issues_model, playthrough_ids):
+        """Appends a new ExplorationIssue to the given model.
 
         Args:
+            exp_issues_model: ExplorationIssuesModel. The model to append a new
+                issue to.
             playthrough_ids: list(str). The playthrough ids to include.
-            exp_version: int. The version of exploration being targeted.
         """
-        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-            self.EXP_ID, exp_version)
         issue_type = 'EarlyQuit'
         issue_customization_args = {
             'state_name': {'value': ''},
@@ -2111,10 +2115,16 @@ class ResetExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
 
         self.append_exp_issue(
+            self.get_exp_issues(),
             [self.create_playthrough_model() for _ in python_utils.RANGE(3)])
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['Referenced PlaythroughModel(s) deleted', 3],
+            ['Existing ExplorationIssuesModel(s) reset', 1],
+        ])
+
+        # Running job again should only report cleared items.
+        self.assertItemsEqual(self.run_one_off_job(), [
             ['Existing ExplorationIssuesModel(s) reset', 1],
         ])
 
@@ -2133,5 +2143,10 @@ class ResetExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         self.assertItemsEqual(self.run_one_off_job(), [
             ['Existing ExplorationIssuesModel(s) reset', 1],
             ['Missing ExplorationIssuesModel(s) regenerated',
-             'eid versions=[2, 3]'],
+             'exp_id=\'eid\' exp_version(s)=[2, 3]'],
+        ])
+
+        # Running job again should only report cleared items.
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['Existing ExplorationIssuesModel(s) reset', 3],
         ])

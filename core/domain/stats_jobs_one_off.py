@@ -1604,40 +1604,44 @@ class ResetExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             [issues_model_cls.get_entity_id(exp_id, v) for v in exp_versions],
             include_deleted=True)
 
-        models_to_reset = list()
-        playthroughs_to_delete = set()
-        versions_without_models = list()
-        for exp_version, issues_model in enumerate(issues_models, start=1):
+        num_models_reset = 0
+        playthrough_ids_referenced = set()
+        exp_versions_without_models = list()
+
+        for i, issues_model in enumerate(issues_models):
             if issues_model is not None:
                 for issue in issues_model.unresolved_issues:
-                    playthroughs_to_delete.update(issue['playthrough_ids'])
+                    playthrough_ids_referenced.update(issue['playthrough_ids'])
                 issues_model.unresolved_issues = []
-                models_to_reset.append(issues_model)
+                num_models_reset += 1
             else:
-                stats_services.create_exp_issues_for_new_exploration(
-                    exp_id, exp_version)
-                versions_without_models.append(
-                    python_utils.UNICODE(exp_version))
+                issues_models[i] = issues_model_cls(
+                    id=issues_model_cls.get_entity_id(exp_id, exp_versions[i]),
+                    exp_id=exp_id, exp_version=exp_versions[i],
+                    unresolved_issues=[])
+                exp_versions_without_models.append(exp_versions[i])
 
-        if playthroughs_to_delete:
+        issues_model_cls.update_timestamps_multi(issues_models)
+        issues_model_cls.put_multi(issues_models)
+
+        if playthrough_ids_referenced:
             stats_models.PlaythroughModel.delete_multi(
-                stats_models.PlaythroughModel.get_multi(playthroughs_to_delete))
+                stats_models.PlaythroughModel.get_multi(
+                    playthrough_ids_referenced))
             yield (
                 ResetExplorationIssuesOneOffJob.REDUCE_KEY_DELETED,
-                len(playthroughs_to_delete))
+                len(playthrough_ids_referenced))
 
-        if models_to_reset:
-            issues_model_cls.update_timestamps_multi(models_to_reset)
-            issues_model_cls.put_multi(models_to_reset)
+        if num_models_reset:
             yield (
                 ResetExplorationIssuesOneOffJob.REDUCE_KEY_RESET,
-                len(models_to_reset))
+                num_models_reset)
 
-        if versions_without_models:
+        if exp_versions_without_models:
             yield (
                 ResetExplorationIssuesOneOffJob.REDUCE_KEY_MISSING,
-                '%s versions=[%s]' % (
-                    exp_id, ', '.join(versions_without_models)))
+                'exp_id=%r exp_version(s)=%r' % (
+                    exp_id, exp_versions_without_models))
 
     @staticmethod
     def reduce(key, values):
