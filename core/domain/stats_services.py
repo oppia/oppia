@@ -334,11 +334,8 @@ def update_exp_issues_for_new_exp_version(
         playthrough_model.actions = [
             action.to_dict() for action in playthrough.actions]
 
-    # Run in transaction to help prevent data-races between operations that may
-    # update the playthroughs concurrently.
     stats_models.PlaythroughModel.update_timestamps_multi(playthrough_models)
-    transaction_services.run_in_transaction(
-        stats_models.PlaythroughModel.put_multi, playthrough_models)
+    stats_models.PlaythroughModel.put_multi(playthrough_models)
 
     for exp_issue in exp_issues.unresolved_issues:
         if 'state_names' in exp_issue.issue_customization_args:
