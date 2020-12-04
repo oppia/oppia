@@ -119,66 +119,60 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
     def test_search_explorations(self):
         expected_query_string = 'a query string'
         expected_cursor = 'cursor'
-        expected_sort = 'title'
-        expected_limit = 30
+        expected_size = 30
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, cursor=None, limit=20, sort='',
+                query_string, index, cursor=None, size=20,
                 ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(cursor, expected_cursor)
-            self.assertEqual(limit, expected_limit)
-            self.assertEqual(sort, expected_sort)
+            self.assertEqual(size, expected_size)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
             return doc_ids, expected_result_cursor
 
         with self.swap(gae_search_services, 'search', mock_search):
-            result, cursor = search_services.search_explorations(
+            result, result_cursor = search_services.search_explorations(
                 expected_query_string,
-                expected_limit,
-                sort=expected_sort,
+                expected_size,
                 cursor=expected_cursor,
             )
 
-        self.assertEqual(cursor, expected_result_cursor)
+        self.assertEqual(result_cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
     def test_search_collections(self):
         expected_query_string = 'a query string'
         expected_cursor = 'cursor'
-        expected_sort = 'title'
-        expected_limit = 30
+        expected_size = 30
         expected_result_cursor = 'rcursor'
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, cursor=None, limit=20, sort='',
+                query_string, index, cursor=None, size=20,
                 ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)
             self.assertEqual(cursor, expected_cursor)
-            self.assertEqual(limit, expected_limit)
-            self.assertEqual(sort, expected_sort)
+            self.assertEqual(size, expected_size)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
             return doc_ids, expected_result_cursor
 
         with self.swap(gae_search_services, 'search', mock_search):
-            result, cursor = search_services.search_collections(
+            result, result_cursor = search_services.search_collections(
                 expected_query_string,
-                expected_limit,
-                sort=expected_sort,
+                expected_size,
                 cursor=expected_cursor,
             )
 
-        self.assertEqual(cursor, expected_result_cursor)
+        self.assertEqual(result_cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
     def test_demo_collections_are_added_to_search_index(self):
