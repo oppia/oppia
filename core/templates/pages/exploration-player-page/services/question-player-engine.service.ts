@@ -28,12 +28,12 @@ import { StateCard, StateCardObjectFactory } from 'domain/state_card/StateCardOb
 import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -61,9 +61,9 @@ export class QuestionPlayerEngineService {
       private stateCardObjectFactory: StateCardObjectFactory,
       private urlService: UrlService) {
     contextService.setQuestionPlayerIsOpen();
-    this.explorationId = this.contextService.getExplorationId();
-    this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
-    this.version = this.urlService.getExplorationVersionFromUrl();
+    this.explorationId = contextService.getExplorationId();
+    this.questionPlayerMode = contextService.isInQuestionPlayerMode();
+    this.version = urlService.getExplorationVersionFromUrl();
 
     if (!this.questionPlayerMode) {
       readOnlyExplorationBackendApiService
@@ -131,9 +131,7 @@ export class QuestionPlayerEngineService {
 
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
-        interactionId,
-        interaction.customizationArgs,
-        true, nextFocusLabel);
+        interactionId, interaction.customizationArgs, true, nextFocusLabel);
     }
     var initialCard =
       this.stateCardObjectFactory.createNewCard(
