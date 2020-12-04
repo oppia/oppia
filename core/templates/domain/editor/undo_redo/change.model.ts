@@ -550,7 +550,6 @@ export interface TopicMoveSkillToSubtopicChange {
   'old_subtopic_id': number;
   'new_subtopic_id': number;
   'skill_id': string;
-  'subtopic_id': number;
 }
 
 export interface TopicRemoveSkillFromSubtopicChange {

@@ -391,7 +391,7 @@ export class TopicUpdateService {
         let _backendChangeDict =
           currentChangeList[i].getBackendChangeObject();
         let backendChangeDict =
-        _backendChangeDict as TopicMoveSkillToSubtopicChange;
+        _backendChangeDict;
         if (backendChangeDict.hasOwnProperty('subtopic_id')) {
           if (backendChangeDict.subtopic_id === subtopicId) {
             // The indices in the change list corresponding to changes to
@@ -409,13 +409,11 @@ export class TopicUpdateService {
         if (backendChangeDict.hasOwnProperty('old_subtopic_id')) {
           if (backendChangeDict.old_subtopic_id > subtopicId) {
             backendChangeDict.old_subtopic_id--;
-            backendChangeDict.subtopic_id = null;
           }
         }
         if (backendChangeDict.hasOwnProperty('new_subtopic_id')) {
           if (backendChangeDict.new_subtopic_id > subtopicId) {
             backendChangeDict.new_subtopic_id--;
-            backendChangeDict.subtopic_id = null;
           }
         }
         // Apply the above id reduction changes to the backend change.
@@ -463,7 +461,6 @@ export class TopicUpdateService {
       TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC, {
         old_subtopic_id: oldSubtopicId,
         new_subtopic_id: newSubtopicId, skill_id: skillSummary.getId(),
-        subtopic_id: null
       }, (changeDict, topic) => {
         // ---- Apply ----
         if (!oldSubtopicId) {
