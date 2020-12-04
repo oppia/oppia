@@ -19,8 +19,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
+
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classifier_domain
+from core.domain import classifier_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -34,6 +39,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 import webapp2
 import webtest
@@ -3429,3 +3435,89 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
+
+
+class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
+    """Tests for oppia_ml_access decorator."""
+
+    class MockHandler(base.OppiaMLVMHandler):
+        REQUIRE_PAYLOAD_CSRF_CHECK = False
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        def extract_request_message_vm_id_and_signature(self):
+            """Returns message, vm_id and signature retrived from incoming
+            request.
+
+            Returns:
+                tuple(str). Message at index 0, vm_id at index 1 and signature
+                at index 2.
+            """
+            signature = self.payload.get('signature')
+            vm_id = self.payload.get('vm_id')
+            message = self.payload.get('message')
+            return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
+
+        @acl_decorators.is_from_oppia_ml
+        def post(self):
+            self.render_json({'job_id': 'new_job'})
+
+    def setUp(self):
+        super(OppiaMLAccessDecoratorTest, self).setUp()
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_unauthorized_vm_cannot_fetch_jobs(self):
+        payload = {}
+        payload['vm_id'] = 'fake_vm'
+        secret = 'fake_secret'
+        payload['message'] = json.dumps('malicious message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            payload['message'], payload['vm_id'])
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/ml/nextjobhandler', payload,
+                expected_status_int=401)
+
+    def test_default_vm_id_raises_exception_in_prod_mode(self):
+        payload = {}
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        payload['message'] = json.dumps('malicious message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            payload['message'], payload['vm_id'])
+        with self.swap(self, 'testapp', self.mock_testapp):
+            with self.swap(constants, 'DEV_MODE', False):
+                self.post_json(
+                    '/ml/nextjobhandler', payload, expected_status_int=401)
+
+    def test_that_invalid_signature_raises_exception(self):
+        payload = {}
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        payload['message'] = json.dumps('malicious message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            'message', payload['vm_id'])
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.post_json(
+                '/ml/nextjobhandler', payload, expected_status_int=401)
+
+    def test_that_no_excpetion_is_raised_when_valid_vm_access(self):
+        payload = {}
+        payload['vm_id'] = feconf.DEFAULT_VM_ID
+        secret = feconf.DEFAULT_VM_SHARED_SECRET
+        payload['message'] = json.dumps('message')
+        payload['signature'] = classifier_services.generate_signature(
+            python_utils.convert_to_bytes(secret),
+            payload['message'], payload['vm_id'])
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            json_response = self.post_json('/ml/nextjobhandler', payload)
+
+        self.assertEqual(json_response['job_id'], 'new_job')
