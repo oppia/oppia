@@ -120,7 +120,7 @@ class TaskEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Model contains data to delete corresponding to a a user:
+        """Model contains data to delete corresponding to a user:
         resolver_id field.
 
         It is okay to delete task entries since, after they are resolved, they

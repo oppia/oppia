@@ -64,7 +64,8 @@ SCHEMA_OBJ_TYPE_SUBTITLED_UNICODE = 'SubtitledUnicode'
 EMAIL_REGEX = r'[\w\.\+\-]+\@[\w]+\.[a-z]{2,3}'
 
 
-def normalize_against_schema(obj, schema, apply_custom_validators=True):
+def normalize_against_schema(
+        obj, schema, apply_custom_validators=True, global_validators=None):
     """Validate the given object using the schema, normalizing if necessary.
 
     Args:
@@ -73,6 +74,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             against.
         apply_custom_validators: bool. Whether to validate the normalized
             object using the validators defined in the schema.
+        global_validators: list(dict). List of additional validators that will
+            verify all the values in the schema.
 
     Returns:
         *. The normalized object.
@@ -110,7 +113,10 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
             key = prop[SCHEMA_KEY_NAME]
             normalized_obj[key] = normalize_against_schema(
-                obj[key], prop[SCHEMA_KEY_SCHEMA])
+                obj[key],
+                prop[SCHEMA_KEY_SCHEMA],
+                global_validators=global_validators
+            )
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
         try:
             obj = float(obj)
@@ -148,7 +154,9 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
                 'Expected length of %s got %s' % (
                     schema[SCHEMA_KEY_LEN], len(obj)))
         normalized_obj = [
-            normalize_against_schema(item, item_schema) for item in obj
+            normalize_against_schema(
+                item, item_schema, global_validators=global_validators
+            ) for item in obj
         ]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         assert isinstance(obj, python_utils.BASESTRING), (
@@ -198,6 +206,15 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
                     validator['id'])(normalized_obj, **kwargs), (
                         'Validation failed: %s (%s) for object %s' % (
                             validator['id'], kwargs, normalized_obj))
+
+    if global_validators is not None:
+        for validator in global_validators:
+            kwargs = dict(validator)
+            del kwargs['id']
+            assert get_validator(
+                validator['id'])(normalized_obj, **kwargs), (
+                    'Validation failed: %s (%s) for object %s' % (
+                        validator['id'], kwargs, normalized_obj))
 
     return normalized_obj
 
@@ -418,16 +435,19 @@ class _Validators(python_utils.OBJECT):
         return obj <= max_value
 
     @staticmethod
-    def is_valid_email(obj):
-        """Ensures that `obj` (a string) is a valid email.
+    def does_not_contain_email(obj):
+        """Ensures that obj doesn't contain a valid email.
 
         Args:
-            obj: str. A string.
+            obj: object. The object to validate.
 
         Returns:
-            bool. Whether the given object is a valid email.
+            bool. Whether the given object doesn't contain a valid email.
         """
-        return bool(re.search(r'^' + EMAIL_REGEX + r'$', obj))
+        string_types = (python_utils.BASESTRING, python_utils.UNICODE)
+        if isinstance(obj, string_types):
+            return not bool(re.search(EMAIL_REGEX, obj))
+        return True
 
     @staticmethod
     def is_valid_user_id(obj):

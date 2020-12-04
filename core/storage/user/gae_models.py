@@ -127,7 +127,9 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Model contains data to delete corresponding to a user: id field."""
+        """Model contains data to delete corresponding to a user: id, model,
+        username, normalized_username, and display_alias fields.
+        """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
@@ -1927,7 +1929,7 @@ class UserQueryModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user:
-        user_ids field.
+        user_ids and submitter_id fields.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -2530,7 +2532,9 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Model contains data to delete corresponding to a user: id field."""
+        """Model contains data to delete corresponding to a user: id, email,
+        and normalized_long_term_username fields.
+        """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod

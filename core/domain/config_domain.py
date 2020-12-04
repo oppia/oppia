@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import re
-
 from constants import constants
 from core.domain import caching_services
 from core.domain import change_domain
@@ -28,7 +26,6 @@ from core.platform import models
 import feconf
 import python_utils
 import schema_utils
-import utils
 
 (config_models, suggestion_models,) = models.Registry.import_models(
     [models.NAMES.config, models.NAMES.suggestion])
@@ -299,12 +296,9 @@ class ConfigProperty(python_utils.OBJECT):
         Returns:
             instance. The normalized object.
         """
-        string_types = (python_utils.BASESTRING, python_utils.UNICODE)
-        regex = re.compile(schema_utils.EMAIL_REGEX)
-        if isinstance(value, string_types) and regex.search(value):
-            raise utils.ValidationError(
-                'The config contains email address, this is not allowed.')
-        return schema_utils.normalize_against_schema(value, self._schema)
+        email_validators = [{'id': 'does_not_contain_email'}]
+        return schema_utils.normalize_against_schema(
+            value, self._schema, global_validators=email_validators)
 
 
 class Registry(python_utils.OBJECT):

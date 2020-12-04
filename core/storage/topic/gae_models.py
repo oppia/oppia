@@ -359,7 +359,7 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     @staticmethod
     def get_deletion_policy():
         """Model contains data corresponding to a user: inside the content field
-        there is manager_ids field.
+        there is a manager_ids field.
 
         The pseudonymization of this model is handled in the wipeout_service
         in the _pseudonymize_activity_models_with_associated_rights_models(),
