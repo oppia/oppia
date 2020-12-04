@@ -18,6 +18,7 @@
  */
 
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
@@ -78,10 +79,7 @@ var CreatorDashboardPage = function() {
   };
 
   this.clickCreateActivityButton = async function() {
-    await waitFor.elementToBeClickable(
-      createActivityButton,
-      'Create Activity button takes too long to be clickable');
-    await createActivityButton.click();
+    await action.click('Create Activity button', createActivityButton);
     await waitFor.pageToFullyLoad();
   };
 
