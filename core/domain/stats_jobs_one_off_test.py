@@ -2049,7 +2049,13 @@ class ResetExplorationIssuesOneOffJobTests(OneOffJobTestBase):
             for output in self.ONE_OFF_JOB_CLASS.get_output(job_id)
         ]
 
-    def append_playthrough_ids(self, playthrough_ids, exp_version=1):
+    def append_exp_issue(self, playthrough_ids, exp_version=1):
+        """Appends a new ExplorationIssue to a specific exploration's version.
+
+        Args:
+            playthrough_ids: list(str). The playthrough ids to include.
+            exp_version: int. The version of exploration being targeted.
+        """
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             self.EXP_ID, exp_version)
         issue_type = 'EarlyQuit'
@@ -2067,7 +2073,12 @@ class ResetExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         exp_issues_model.put()
 
     def create_playthrough_model(self, exp_version=1):
-        """Creates a new playthrough model and returns its ID."""
+        """Creates a new playthrough model and returns its ID.
+
+        Args:
+            exp_version: int. The exploration version the playthrough was
+                recorded within.
+        """
         return stats_models.PlaythroughModel.create(
             exp_id=self.EXP_ID,
             exp_version=exp_version,
@@ -2096,7 +2107,7 @@ class ResetExplorationIssuesOneOffJobTests(OneOffJobTestBase):
     def test_exploration_with_referenced_playthrough(self):
         self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
 
-        self.append_playthrough_ids(
+        self.append_exp_issue(
             [self.create_playthrough_model() for _ in python_utils.RANGE(3)])
 
         self.assertItemsEqual(self.run_one_off_job(), [
