@@ -25,10 +25,10 @@ import json
 from core.domain import taskqueue_services
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
-import feconf
 import python_utils
 
 from google.api_core import retry as retry_lib
+from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
 
@@ -61,9 +61,10 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             self.assertEqual(
                 task,
                 {
-                    'http_request': {
-                        'http_method': 1,
-                        'url': '%s%s' % (feconf.OPPIA_SITE_URL, dummy_url),
+                    'app_engine_http_request': {
+                        'http_method': (
+                            tasks_v2.types.target_pb2.HttpMethod.POST),
+                        'relative_uri': dummy_url,
                         'headers': {
                             'Content-type': 'application/json'
                         },
@@ -101,9 +102,10 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             self.assertEqual(
                 task,
                 {
-                    'http_request': {
-                        'http_method': 1,
-                        'url': '%s%s' % (feconf.OPPIA_SITE_URL, dummy_url),
+                    'app_engine_http_request': {
+                        'http_method': (
+                            tasks_v2.types.target_pb2.HttpMethod.POST),
+                        'relative_uri': dummy_url,
                         'headers': {
                             'Content-type': 'application/json'
                         },

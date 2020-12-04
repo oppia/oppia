@@ -60,6 +60,8 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         story = story_fetchers.get_story_by_id(item.id)
         try:
             story.validate()
+            story_services.validate_prerequisite_skills_in_story_contents(
+                story.corresponding_topic_id, story.story_contents)
         except Exception as e:
             logging.error(
                 'Story %s failed validation: %s' % (item.id, e))
