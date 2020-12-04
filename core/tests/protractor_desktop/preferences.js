@@ -167,8 +167,8 @@ describe('Preferences', function() {
 
   it('should export account data',
     async function() {
-      await users.createUser('export@account.com', 'exportAccount');
-      await users.login('export@account.com');
+      await users.createUser('export@preferences.com', 'exportPreferences');
+      await users.login('export@preferences.com');
       await preferencesPage.get();
       await preferencesPage.clickExportAccountButton();
       await waitFor.fileToBeDownloaded('oppia_takeout_data.zip');
