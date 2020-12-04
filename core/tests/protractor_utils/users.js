@@ -20,7 +20,7 @@
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var AdminPage = require('./AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
 var login = async function(
