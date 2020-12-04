@@ -52,11 +52,12 @@ describe('Contributions and review component', function() {
       spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
       misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
-      spyOn(userService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve({
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true
+        }));
+      spyOn(userService, 'getUserContributionRightsData')
+        .and.returnValue($q.resolve({
           can_review_translation_for_language_codes: [{}],
           can_review_questions: true
         }));
@@ -260,14 +261,16 @@ describe('Contributions and review component', function() {
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
-      spyOn(userService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve({
-          can_review_translation_for_language_codes: [],
-          can_review_questions: false
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true
         }));
+      spyOn(userService, 'getUserContributionRightsData')
+        .and.returnValue(
+          $q.resolve({
+            can_review_translation_for_language_codes: [],
+            can_review_questions: false
+          }));
       spyOn(
         contributionAndReviewService, 'getUserCreatedQuestionSuggestions')
         .and.callFake(callback => callback({
@@ -455,14 +458,16 @@ describe('Contributions and review component', function() {
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
-      spyOn(userService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve({
-          can_review_translation_for_language_codes: [],
-          can_review_questions: false
+      spyOn(userService, 'getUserInfoAsync')
+        .and.returnValue($q.resolve({
+          isLoggedIn: () => true
         }));
+      spyOn(userService, 'getUserContributionRightsData')
+        .and.returnValue(
+          $q.resolve({
+            can_review_translation_for_language_codes: [],
+            can_review_questions: false
+          }));
       spyOn(
         contributionAndReviewService, 'getUserCreatedQuestionSuggestions')
         .and.callFake(callback => callback({
