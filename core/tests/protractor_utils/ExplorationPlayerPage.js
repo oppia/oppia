@@ -175,7 +175,7 @@ var ExplorationPlayerPage = function() {
 
   this.viewHint = async function() {
     // We need to wait some time for the solution to activate.
-    var until = protractor.ExpectedConditions;	
+    var until = protractor.ExpectedConditions;
     const WAIT_FOR_FIRST_HINT_MSEC = 60000;
     await browser.wait(
       until.elementToBeClickable(viewHintButton), WAIT_FOR_FIRST_HINT_MSEC,
@@ -185,7 +185,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.viewSolution = async function() {
-    var until = protractor.ExpectedConditions;	
+    var until = protractor.ExpectedConditions;
     const WAIT_FOR_SUBSEQUENT_HINTS = 30000;
     // We need to wait some time for the solution to activate.
     await browser.wait(
