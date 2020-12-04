@@ -765,7 +765,7 @@ angular.module('oppia').directive('filepathEditor', [
             });
           } else if (mimeType === 'data:image/svg+xml') {
             ctrl.invalidTagsAndAttributes = (
-              SvgSanitizerService.getInvalidSvgTagsAndAttrs(
+              SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
                 imageDataURI));
             var tags = ctrl.invalidTagsAndAttributes.tags;
             var attrs = ctrl.invalidTagsAndAttributes.attrs;

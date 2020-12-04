@@ -139,7 +139,7 @@ describe('SvgFilenameEditor', function() {
   };
 
   var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrs: function(dataUri) {
+    getInvalidSvgTagsAndAttrsFromDataUri: function(dataUri) {
       return { tags: [], attrs: [] };
     }
   };
@@ -679,7 +679,7 @@ describe('SvgFilenameEditor with image save destination as ' +
   };
 
   var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrs: function(dataUri) {
+    getInvalidSvgTagsAndAttrsFromDataUri: function(dataUri) {
       return { tags: [], attrs: [] };
     }
   };
@@ -777,7 +777,7 @@ describe('SvgFilenameEditor with image save destination as ' +
 describe('should fail svg tag validation', function() {
   var svgFilenameCtrl = null;
   var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrs: function(dataURI) {
+    getInvalidSvgTagsAndAttrsFromDataUri: function(dataURI) {
       return { tags: ['script'], attrs: [] };
     }
   };
@@ -809,7 +809,7 @@ describe('should fail svg tag validation', function() {
 describe('should fail svg attribute validation', function() {
   var svgFilenameCtrl = null;
   var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrs: function(dataURI) {
+    getInvalidSvgTagsAndAttrsFromDataUri: function(dataURI) {
       return { tags: [], attrs: ['widht'] };
     }
   };

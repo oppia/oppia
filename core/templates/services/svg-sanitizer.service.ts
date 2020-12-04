@@ -17,6 +17,7 @@
  */
 
 import { Injectable } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import constants from 'assets/constants';
@@ -25,6 +26,8 @@ import constants from 'assets/constants';
   providedIn: 'root'
 })
 export class SvgSanitizerService {
+  constructor(private sanitizer: DomSanitizer) {}
+
   cleanMathExpressionSvgString(svgString: string): string {
     // We need to modify/remove unnecessary attributes added by mathjax
     // from the svg tag.
@@ -64,9 +67,9 @@ export class SvgSanitizerService {
     let doc = domParser.parseFromString(svgString, 'image/svg+xml');
     doc.querySelectorAll('*').forEach((node) => {
       // Mathjax SVGs have relative dimensions in the unit of 'ex' rather
-      // than 'px'(pixels). Hence the dimesions have decimal points in them,
+      // than 'px'(pixels). Hence the dimensions have decimal points in them,
       // we need to replace these decimals with a letter so that it's easier
-      // to process and validate the filnames.
+      // to process and validate the filenames.
       if (node.tagName.toLowerCase() === 'svg') {
         dimensions.height = (
           (node.getAttribute('height').match(/\d+\.*\d*/g)[0]).replace(
@@ -74,9 +77,9 @@ export class SvgSanitizerService {
         dimensions.width = (
           (node.getAttribute('width').match(/\d+\.*\d*/g)[0]).replace(
             '.', 'd'));
-        // This attribute is useful for the vertical allignment of the
+        // This attribute is useful for the vertical alignment of the
         // Math SVG while displaying inline with other text.
-        // Math SVGs don't necessarily have a vertical allignment, in that
+        // Math SVGs don't necessarily have a vertical alignment, in that
         // case we assign it zero.
         let styleValue = node.getAttribute('style').match(/\d+\.*\d*/g);
         if (styleValue) {
@@ -89,18 +92,12 @@ export class SvgSanitizerService {
     return dimensions;
   }
 
-  getInvalidSvgTagsAndAttrs(
-      dataURI: string): {tags: string[], attrs: string[]} {
-    // Convert base64/URLEncoded data component to raw binary data
-    // held in a string.
-    let svgString = atob(dataURI.split(',')[1]);
-    let domParser = new DOMParser();
-    let doc = domParser.parseFromString(svgString, 'image/svg+xml');
+  getInvalidSvgTagsAndAttrs(svg: Document): {tags: string[], attrs: string[]} {
     let invalidTags = [];
     let invalidAttrs = [];
     let allowedTags = Object.keys(constants.SVG_ATTRS_WHITELIST);
     let nodeTagName = null;
-    doc.querySelectorAll('*').forEach((node) => {
+    svg.querySelectorAll('*').forEach((node) => {
       nodeTagName = node.tagName.toLowerCase();
       if (allowedTags.indexOf(nodeTagName) !== -1) {
         for (let i = 0; i < node.attributes.length; i++) {
@@ -115,6 +112,66 @@ export class SvgSanitizerService {
       }
     });
     return { tags: invalidTags, attrs: invalidAttrs };
+  }
+
+  getInvalidSvgTagsAndAttrsFromDataUri(
+      dataURI: string): {tags: string[], attrs: string[]} {
+    // Convert base64/URLEncoded data component to raw binary data
+    // held in a string.
+    let svgString = atob(dataURI.split(',')[1]);
+    let domParser = new DOMParser();
+    let doc = domParser.parseFromString(svgString, 'image/svg+xml');
+    return this.getInvalidSvgTagsAndAttrs(doc);
+  }
+
+  /**
+   * Checks the input for malicious or invalid SVG code.
+   * The checks:
+   * 1. Is base64 encoded.
+   * 2. Has no invalid tags or attributes. This check is performed by the
+   *    getInvalidSvgTagsAndAttrsFromDataUri function in this file.
+   *
+   * @returns {boolean} True if all the checks pass. False Otherwise.
+   */
+  isValidBase64Svg(base64ImageData: string): boolean {
+    const DATA_URL_PATTERN = /^data:image\/svg\+xml;base64,[a-z0-9+\/]+=*$/i;
+    // If the SVG image is passed as base64 data.
+    if (base64ImageData.indexOf('data:image/svg+xml;base64') !== -1) {
+      // Don't display the image if it is not a valid base64 image.
+      if (!base64ImageData.match(DATA_URL_PATTERN)) {
+        return false;
+      }
+
+      // Check for malicious SVG.
+      const { tags: invalidTags, attrs: invalidAttributes } = (
+        this.getInvalidSvgTagsAndAttrsFromDataUri(base64ImageData));
+
+      // If the data is malicious don't display the SVG.
+      if (invalidTags.length > 0 || invalidAttributes.length > 0) {
+        return false;
+      }
+
+      // If the SVG is safe, display the SVG.
+      return true;
+    }
+  }
+
+  /**
+   * Checks the input for malicious or invalid SVG code.
+   * Angular by default treats svg+xml data as unsafe. In order to show the SVG
+   * we need to check the SVG data for possible XSS attacks. The spec file for
+   * this component showcases some scenarios where XSS attacks are possible if
+   * the SVG is not checked for such attacks. The following function checks the
+   * SVG data for possible XSS vulnerabilities.
+   *
+   * @returns {SafeResourceUrl | null} SafeResourceUrl if the SVG is valid and
+   * trusted. Otherwise returns null.
+   */
+  getTrustedSvgResourceUrl(base64ImageData: string): SafeResourceUrl | null {
+    if (this.isValidBase64Svg(base64ImageData)) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData);
+    }
+    return null;
   }
 }
 

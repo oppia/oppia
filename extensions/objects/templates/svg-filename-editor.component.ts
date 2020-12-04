@@ -335,7 +335,7 @@ angular.module('oppia').component('svgFilenameEditor', {
           'data:image/svg+xml;base64,' +
           btoa(unescape(encodeURIComponent(svgString))));
         var invalidTagsAndAttr = (
-          SvgSanitizerService.getInvalidSvgTagsAndAttrs(dataURI));
+          SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(dataURI));
         if (invalidTagsAndAttr.tags.length !== 0) {
           var errorText = (
             'Invalid tags in svg:' + invalidTagsAndAttr.tags.join());

@@ -102,7 +102,7 @@ angular.module('oppia').controller('EditThumbnailModalController', [
             };
             img.src = imgSrc;
             $scope.invalidTagsAndAttributes = (
-              SvgSanitizerService.getInvalidSvgTagsAndAttrs(
+              SvgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
                 imgSrc));
             var tags = $scope.invalidTagsAndAttributes.tags;
             var attrs = $scope.invalidTagsAndAttributes.attrs;

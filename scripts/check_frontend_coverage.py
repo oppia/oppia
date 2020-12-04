@@ -31,7 +31,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # manually.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
-# @marianazangrossi first.
+# @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'admin-config-tab.directive.ts',
     'admin-dev-mode-activities-tab.directive.ts',
