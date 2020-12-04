@@ -25,6 +25,7 @@ import { ContributionOpportunitiesBackendApiService } from
 import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { AlertsService } from 'services/alerts.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { UserService } from 'services/user.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
@@ -39,6 +40,7 @@ describe('Question opportunities component', function() {
   var alertsService = null;
   var contributionOpportunitiesService = null;
   var questionUndoRedoService = null;
+  var siteAnalyticsService = null;
   var skillObjectFactory = null;
   var userService = null;
 
@@ -51,6 +53,7 @@ describe('Question opportunities component', function() {
     });
 
     alertsService = TestBed.get(AlertsService);
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
     skillObjectFactory = TestBed.get(SkillObjectFactory);
     userService = TestBed.get(UserService);
   });
@@ -135,6 +138,23 @@ describe('Question opportunities component', function() {
 
     ctrl.onLoadMoreOpportunities();
     expect(getMoreSkillOpportunitiesSpy).not.toHaveBeenCalled();
+  });
+
+  it('should register Contributor Dashboard suggest event when clicking on' +
+    ' suggest question button', function() {
+    spyOn($uibModal, 'open').and.callThrough();
+    spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
+    ctrl.$onInit();
+    $rootScope.$apply();
+
+    ctrl.onClickSuggestQuestionButton('1');
+    $rootScope.$apply();
+
+    expect(siteAnalyticsService.registerContributorDashboardSuggestEvent)
+      .toHaveBeenCalledWith('Question');
   });
 
   it('should open requires login modal when trying to select a question and' +

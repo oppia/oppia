@@ -36,6 +36,7 @@ require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
 require('pages/contributor-dashboard-page/services/translate-text.service.ts');
+require('services/site-analytics.service.ts');
 
 import { Subscription } from 'rxjs';
 
@@ -43,12 +44,12 @@ angular.module('oppia').component('translationOpportunities', {
   template: require('./translation-opportunities.component.html'),
   controller: [
     '$rootScope', '$uibModal', 'ContributionOpportunitiesService',
-    'TranslationLanguageService', 'UrlInterpolationService',
-    'UserService',
+    'SiteAnalyticsService', 'TranslationLanguageService',
+    'UrlInterpolationService', 'UserService',
     function(
         $rootScope, $uibModal, ContributionOpportunitiesService,
-        TranslationLanguageService, UrlInterpolationService,
-        UserService) {
+        SiteAnalyticsService, TranslationLanguageService,
+        UrlInterpolationService, UserService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       var userIsLoggedIn = false;
@@ -100,6 +101,8 @@ angular.module('oppia').component('translationOpportunities', {
           ContributionOpportunitiesService.showRequiresLoginModal();
           return;
         }
+        SiteAnalyticsService.registerContributorDashboardSuggestEvent(
+          'Translation');
         var opportunity = getOpportunitySummary(expId);
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

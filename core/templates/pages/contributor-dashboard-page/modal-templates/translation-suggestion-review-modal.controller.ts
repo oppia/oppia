@@ -16,14 +16,15 @@
  * @fileoverview Controller for translation suggestion review modal.
  */
 
+require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$scope', '$uibModalInstance', 'SuggestionModalService',
-    'contentHtml', 'reviewable', 'translationHtml',
+    '$scope', '$uibModalInstance', 'SiteAnalyticsService',
+    'SuggestionModalService', 'contentHtml', 'reviewable', 'translationHtml',
     function(
-        $scope, $uibModalInstance, SuggestionModalService,
+        $scope, $uibModalInstance, SiteAnalyticsService, SuggestionModalService,
         contentHtml, reviewable, translationHtml) {
       $scope.translationHtml = translationHtml;
       $scope.contentHtml = contentHtml;
@@ -31,7 +32,15 @@ angular.module('oppia').controller(
       $scope.commitMessage = '';
       $scope.reviewMessage = '';
 
+      if (reviewable) {
+        // eslint-disable-next-line max-len
+        SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview(
+          'Translation');
+      }
+
       $scope.accept = function() {
+        SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
+          'Translation');
         SuggestionModalService.acceptSuggestion(
           $uibModalInstance,
           {
@@ -42,6 +51,8 @@ angular.module('oppia').controller(
       };
 
       $scope.reject = function() {
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
+          'Translation');
         SuggestionModalService.rejectSuggestion(
           $uibModalInstance,
           {

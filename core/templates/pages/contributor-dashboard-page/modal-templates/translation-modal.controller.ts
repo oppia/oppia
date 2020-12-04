@@ -28,16 +28,17 @@ require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('components/ck-editor-helpers/ck-editor-copy-content-service.ts');
 require('services/image-local-storage.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
-  'TranslateTextService', 'TranslationLanguageService',
+  'SiteAnalyticsService', 'TranslateTextService', 'TranslationLanguageService',
   'opportunity', 'ENTITY_TYPE',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
-      TranslateTextService, TranslationLanguageService,
+      SiteAnalyticsService, TranslateTextService, TranslationLanguageService,
       opportunity, ENTITY_TYPE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -97,6 +98,8 @@ angular.module('oppia').controller('TranslationModalController', [
 
     $scope.suggestTranslatedText = function() {
       if (!$scope.uploadingTranslation && !$scope.loadingData) {
+        SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
+          'Translation');
         $scope.uploadingTranslation = true;
         var imagesData = ImageLocalStorageService.getStoredImagesData();
         ImageLocalStorageService.flushStoredImagesData();
