@@ -1581,3 +1581,67 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class ResetExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to reset all ExplorationIssues to a valid/empty state."""
+
+    REDUCE_KEY_DELETED = 'Referenced PlaythroughModel(s) deleted'
+    REDUCE_KEY_MISSING = 'Missing ExplorationIssuesModel(s) regenerated'
+    REDUCE_KEY_RESET = 'Existing ExplorationIssuesModel(s) reset'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(latest_exp_model):
+        exp_id = latest_exp_model.id
+        exp_versions = list(python_utils.RANGE(1, latest_exp_model.version + 1))
+
+        issues_model_cls = stats_models.ExplorationIssuesModel
+        issues_model_ids = (
+            issues_model_cls.get_entity_id(exp_id, v) for v in exp_versions)
+        issues_models = (
+            issues_model_cls.get_multi(issues_model_ids, include_deleted=True))
+
+        deleted = set()
+        missing = list()
+        reset = list()
+        for exp_version, issues_model in enumerate(issues_models, start=1):
+            if issues_model is not None:
+                for issue in issues_model.unresolved_issues:
+                    deleted.update(issue['playthrough_ids'])
+                issues_model.unresolved_issues = []
+                reset.append(issues_model)
+            else:
+                stats_services.create_exp_issues_for_new_exploration(
+                    exp_id, exp_version)
+                missing.append(python_utils.UNICODE(exp_version))
+
+        if deleted:
+            stats_models.PlaythroughModel.delete_multi(
+                stats_models.PlaythroughModel.get_multi(deleted))
+            yield (
+                ResetExplorationIssuesOneOffJob.REDUCE_KEY_DELETED,
+                len(deleted))
+
+        if reset:
+            issues_model_cls.update_timestamps_multi(reset)
+            issues_model_cls.put_multi(reset)
+            yield (
+                ResetExplorationIssuesOneOffJob.REDUCE_KEY_RESET,
+                len(reset))
+
+        if missing:
+            yield (
+                ResetExplorationIssuesOneOffJob.REDUCE_KEY_MISSING,
+                '%s versions=[%s]' % (exp_id, ', '.join(missing)))
+
+    @staticmethod
+    def reduce(key, values):
+        if key == ResetExplorationIssuesOneOffJob.REDUCE_KEY_MISSING:
+            for value in values:
+                yield (key, value)
+        else:
+            yield (key, sum(int(v) for v in values))

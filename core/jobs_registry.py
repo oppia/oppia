@@ -100,6 +100,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.RegenerateMissingStateStatsOneOffJob,
     stats_jobs_one_off.RegenerateMissingV1StatsModelsOneOffJob,
     stats_jobs_one_off.RegenerateMissingV2StatsModelsOneOffJob,
+    stats_jobs_one_off.ResetExplorationIssuesOneOffJob,
     stats_jobs_one_off.StatisticsAuditV1,
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,

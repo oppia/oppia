@@ -2020,3 +2020,86 @@ class StatisticsCustomizationArgsAuditTests(OneOffJobTestBase):
                 u'[u\'Playthrough Issue -- SUCCESS\', 1]'
             ]
         )
+
+
+class ResetExplorationIssuesOneOffJobTests(OneOffJobTestBase):
+
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.ResetExplorationIssuesOneOffJob
+
+    EXP_ID = 'eid'
+    OWNER_ID = 'uid'
+
+    def run_one_off_job(self):
+        """Begins the one off job and asserts it completes as expected.
+
+        Assumes the existence of a class constant ONE_OFF_JOB_CLASS, pointing
+        to the queue under test.
+
+        Returns:
+            *. The output of the one off job.
+        """
+        job_id = self.ONE_OFF_JOB_CLASS.create_new()
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(self.count_one_off_jobs_in_queue(), 0)
+        return [
+            ast.literal_eval(output)
+            for output in self.ONE_OFF_JOB_CLASS.get_output(job_id)
+        ]
+
+    def append_playthrough_ids(self, playthrough_ids, exp_version=1):
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID, exp_version)
+        issue_type = 'EarlyQuit'
+        issue_customization_args = {
+            'state_name': {'value': ''},
+            'time_spent_in_exp_in_msecs': {'value': 0},
+        }
+        schema_version = 1
+        is_valid = True
+        exp_issues_model.unresolved_issues.append(
+            stats_domain.ExplorationIssue(
+                issue_type, issue_customization_args, playthrough_ids,
+                schema_version, is_valid).to_dict())
+        exp_issues_model.update_timestamps()
+        exp_issues_model.put()
+
+    def create_playthrough_model(self, exp_version=1):
+        """Creates a new playthrough model and returns its ID."""
+        return stats_models.PlaythroughModel.create(
+            exp_id=self.EXP_ID,
+            exp_version=exp_version,
+            issue_type='EarlyQuit',
+            issue_customization_args={
+                'state_name': {'value': ''},
+                'time_spent_in_exp_in_msecs': {'value': 0},
+            },
+            actions=[{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {'state_name': {'value': ''}},
+                'schema_version': 1,
+            }]
+        )
+
+    def test_when_nothing_exists(self):
+        self.assertEqual(self.run_one_off_job(), [])
+
+    def test_when_everything_is_ok(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['Existing ExplorationIssuesModel(s) reset', 1],
+        ])
+
+    def test_exploration_with_referenced_playthrough(self):
+        self.save_new_valid_exploration(self.EXP_ID, self.OWNER_ID)
+
+        self.append_playthrough_ids(
+            [self.create_playthrough_model() for _ in python_utils.RANGE(3)])
+
+        self.assertItemsEqual(self.run_one_off_job(), [
+            ['Referenced PlaythroughModel(s) deleted', 3],
+            ['Existing ExplorationIssuesModel(s) reset', 1],
+        ])
