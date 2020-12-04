@@ -68,10 +68,10 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve(userContributionRights));
+      spyOn(UserService, 'getProfileImageDataUrlAsync')
+        .and.returnValue($q.resolve(userProfileImage));
+      spyOn(UserService, 'getUserContributionRightsData')
+        .and.returnValue($q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();
@@ -139,10 +139,10 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve(userContributionRights));
+      spyOn(UserService, 'getProfileImageDataUrlAsync')
+        .and.returnValue($q.resolve(userProfileImage));
+      spyOn(UserService, 'getUserContributionRightsData')
+        .and.returnValue($q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();

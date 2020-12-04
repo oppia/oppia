@@ -142,6 +142,9 @@ angular.module('oppia').component('translationOpportunities', {
 
         UserService.getUserInfoAsync().then(function(userInfo) {
           userIsLoggedIn = userInfo.isLoggedIn();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
         ContributionOpportunitiesService.getTranslationOpportunities(
           TranslationLanguageService.getActiveLanguageCode(),
