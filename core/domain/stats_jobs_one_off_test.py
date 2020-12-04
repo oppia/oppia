@@ -2078,6 +2078,9 @@ class ResetExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         Args:
             exp_version: int. The exploration version the playthrough was
                 recorded within.
+
+        Returns:
+            str. The ID of the newly created playthrough.
         """
         return stats_models.PlaythroughModel.create(
             exp_id=self.EXP_ID,
