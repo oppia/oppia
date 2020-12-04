@@ -45,7 +45,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
 
         for clazz in test_utils.get_storage_model_classes():
             if (clazz.__name__ in
-                test_utils.BASE_MODEL_CLASSES_WITHOUT_TAKEOUT_POLICIES):
+                    test_utils.BASE_MODEL_CLASSES_WITHOUT_TAKEOUT_POLICIES):
                 continue
             yield clazz
 
