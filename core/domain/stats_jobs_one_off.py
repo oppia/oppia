@@ -1584,26 +1584,35 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
 
 
 class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job to wipe all `ExplorationIssuesModel`s to an empty state.
-    The playthroughs referenced by each of the issues will also be deleted so
-    that no dangling references are introduced to the database.
+    """A one-off job to wipe all `ExplorationIssuesModel`s and make them empty.
+    Any playthroughs referenced by the models are deleted as well to prevent
+    memory leaks.
 
-    `ExplorationIssuesModel`(s) in production have been corrupted by a bug in
-    the November 2020 release (see: https://github.com/oppia/oppia/pull/11320).
+    This job addresses a bug discovered in the November 2020 release. The bug
+    made it to production, and corrupted a non-trivial amount of models.
+    For details, see: https://github.com/oppia/oppia/pull/11320.
 
-    Instead of recovering them, we've decided to wipe them out because:
+    Instead of recovering the corrupted models, we've decided to simply wipe
+    them all out because:
     -   `PlaythroughModel`/`ExplorationIssuesModel` instances are not being read
-        by the frontend yet; they're only being written.
+        by the frontend yet, they are only being written.
         -   They will be read once the Improvements tab has launched, but that
-            project has been delayed to H1 2021 due to the Cloud NDB migration.
-    -   `PlaythroughModel`'s schema was introduced with bugs. This is a good
-        opportunity to fix them without having a non-trivial schema migration.
+            project has been delayed by the Cloud NDB migration.
+    -   `PlaythroughModel`s current (and only) schema has bugs.
+        -   This gives us an opportunity to fix it without going through a
+            schema migration process.
+    -   `PlaythroughModel`s have new privacy requirements to meet, and there are
+        old models that do not satisfy them.
+        -   Playthroughs do not hold enough data to identify privacy-adherent
+            models without including false-positives.
+    -   Non-trivial amount of effort required to identify corrupted models due
+        to lack of debug information.
     """
 
-    REDUCE_KEY_DANGLING = 'Dangling PlaythroughModel(s) discovered'
-    REDUCE_KEY_DELETED = 'Referenced PlaythroughModel(s) deleted'
-    REDUCE_KEY_MISSING = 'Missing ExplorationIssuesModel(s) regenerated'
-    REDUCE_KEY_RESET = 'Existing ExplorationIssuesModel(s) wiped out'
+    EXP_ISSUES_WIPED_KEY = 'Existing ExplorationIssuesModel(s) wiped out'
+    EXP_ISSUES_MISSING_KEY = 'Missing ExplorationIssuesModel(s) regenerated'
+    PLAYTHROUGH_DELETED_KEY = 'Referenced PlaythroughModel(s) deleted'
+    PLAYTHROUGH_DANGLING_KEY = 'Dangling PlaythroughModel(s) discovered'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -1614,62 +1623,63 @@ class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exp_id = latest_exp_model.id
         exp_versions = list(python_utils.RANGE(1, latest_exp_model.version + 1))
 
-        issues_model_cls = stats_models.ExplorationIssuesModel
-        issues_models = issues_model_cls.get_multi(
-            [issues_model_cls.get_entity_id(exp_id, v) for v in exp_versions],
-            include_deleted=True)
+        exp_issues_model_cls = stats_models.ExplorationIssuesModel
+        exp_issues_models = exp_issues_model_cls.get_multi([
+            exp_issues_model_cls.get_entity_id(exp_id, exp_version)
+            for exp_version in exp_versions
+        ])
 
-        num_models_reset = 0
-        playthrough_ids_referenced = set()
-        exp_versions_without_models = list()
+        num_exp_issues_wiped = 0
+        missing_exp_versions = list()
+        referenced_playthrough_ids = set()
 
-        for i, issues_model in enumerate(issues_models):
-            if issues_model is not None:
-                for issue in issues_model.unresolved_issues:
-                    playthrough_ids_referenced.update(issue['playthrough_ids'])
-                issues_model.unresolved_issues = []
-                num_models_reset += 1
+        for i, exp_issues_model in enumerate(exp_issues_models):
+            if exp_issues_model is not None:
+                for issue in exp_issues_model.unresolved_issues:
+                    referenced_playthrough_ids.update(issue['playthrough_ids'])
+                exp_issues_model.unresolved_issues = []
+                num_exp_issues_wiped += 1
             else:
-                issues_models[i] = issues_model_cls(
-                    id=issues_model_cls.get_entity_id(exp_id, exp_versions[i]),
-                    exp_id=exp_id, exp_version=exp_versions[i],
+                exp_version = exp_versions[i]
+                exp_issues_models[i] = exp_issues_model_cls(
+                    id=exp_issues_model_cls.get_entity_id(exp_id, exp_version),
+                    exp_id=exp_id, exp_version=exp_version,
                     unresolved_issues=[])
-                exp_versions_without_models.append(exp_versions[i])
+                missing_exp_versions.append(exp_version)
 
-        issues_model_cls.update_timestamps_multi(issues_models)
-        issues_model_cls.put_multi(issues_models)
+        exp_issues_model_cls.update_timestamps_multi(exp_issues_models)
+        exp_issues_model_cls.put_multi(exp_issues_models)
 
-        if playthrough_ids_referenced:
-            referenced_models = stats_models.PlaythroughModel.get_multi(
-                playthrough_ids_referenced)
-            existing_models = [m for m in referenced_models if m is not None]
-            num_dangling_models = len(referenced_models) - len(existing_models)
-
-            if existing_models:
-                stats_models.PlaythroughModel.delete_multi(existing_models)
-                yield (
-                    WipeExplorationIssuesOneOffJob.REDUCE_KEY_DELETED,
-                    len(existing_models))
-
-            if num_dangling_models:
-                yield (
-                    WipeExplorationIssuesOneOffJob.REDUCE_KEY_DANGLING,
-                    num_dangling_models)
-
-        if num_models_reset:
+        if num_exp_issues_wiped:
             yield (
-                WipeExplorationIssuesOneOffJob.REDUCE_KEY_RESET,
-                num_models_reset)
+                WipeExplorationIssuesOneOffJob.EXP_ISSUES_WIPED_KEY,
+                num_exp_issues_wiped)
 
-        if exp_versions_without_models:
+        if missing_exp_versions:
             yield (
-                WipeExplorationIssuesOneOffJob.REDUCE_KEY_MISSING,
-                'exp_id=%r exp_version(s)=%r' % (
-                    exp_id, exp_versions_without_models))
+                WipeExplorationIssuesOneOffJob.EXP_ISSUES_MISSING_KEY,
+                'exp_id=%r exp_version(s)=%r' % (exp_id, missing_exp_versions))
+
+        if referenced_playthrough_ids:
+            references = stats_models.PlaythroughModel.get_multi(
+                referenced_playthrough_ids)
+
+            existing_references = [r for r in references if r is not None]
+            if existing_references:
+                stats_models.PlaythroughModel.delete_multi(existing_references)
+                yield (
+                    WipeExplorationIssuesOneOffJob.PLAYTHROUGH_DELETED_KEY,
+                    len(existing_references))
+
+            num_dangling_references = len(references) - len(existing_references)
+            if num_dangling_references:
+                yield (
+                    WipeExplorationIssuesOneOffJob.PLAYTHROUGH_DANGLING_KEY,
+                    num_dangling_references)
 
     @staticmethod
     def reduce(key, values):
-        if key == WipeExplorationIssuesOneOffJob.REDUCE_KEY_MISSING:
+        if key == WipeExplorationIssuesOneOffJob.EXP_ISSUES_MISSING_KEY:
             for value in values:
                 yield (key, value)
         else:

@@ -2091,21 +2091,18 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
                 issue to.
             playthrough_ids: list(str). The playthrough ids to include.
         """
-        issue_type = 'EarlyQuit'
-        issue_customization_args = {
-            'state_name': {'value': ''},
-            'time_spent_in_exp_in_msecs': {'value': 0},
-        }
-        schema_version = 1
-        is_valid = True
-        exp_issues_model.unresolved_issues.append(
-            stats_domain.ExplorationIssue(
-                issue_type, issue_customization_args, playthrough_ids,
-                schema_version, is_valid).to_dict())
+        new_exp_issue = stats_domain.ExplorationIssue(
+            issue_type='EarlyQuit',
+            issue_customization_args={
+                'state_name': {'value': ''},
+                'time_spent_in_exp_in_msecs': {'value': 0},
+            },
+            playthrough_ids=playthrough_ids, schema_version=1, is_valid=True)
+        exp_issues_model.unresolved_issues.append(new_exp_issue.to_dict())
         exp_issues_model.update_timestamps()
         exp_issues_model.put()
 
-    def create_playthrough_model(self, exp_version=1):
+    def create_playthrough_model(self, exp_id=EXP_ID, exp_version=1):
         """Creates a new playthrough model and returns its ID.
 
         Args:
@@ -2116,7 +2113,7 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
             str. The ID of the newly created playthrough.
         """
         return stats_models.PlaythroughModel.create(
-            exp_id=self.EXP_ID,
+            exp_id=exp_id,
             exp_version=exp_version,
             issue_type='EarlyQuit',
             issue_customization_args={
