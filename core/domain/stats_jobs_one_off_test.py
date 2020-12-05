@@ -2145,11 +2145,11 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         self.assertItemsEqual(self.run_one_off_job(), [
             ['Existing ExplorationIssuesModel(s) wiped out', 1],
         ])
+
         self.assert_exp_issues_empty()
 
     def test_run_job_with_issues_that_reference_a_playthrough(self):
         self.create_exp_and_exp_issues()
-
         self.append_exp_issue(
             self.get_exp_issues(),
             [self.create_playthrough_model() for _ in python_utils.RANGE(3)])
@@ -2158,6 +2158,7 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
             ['Existing ExplorationIssuesModel(s) wiped out', 1],
             ['Referenced PlaythroughModel(s) deleted', 3],
         ])
+
         self.assert_exp_issues_empty()
         self.assert_playthroughs_deleted()
 
@@ -2165,6 +2166,7 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         self.assertItemsEqual(self.run_one_off_job(), [
             ['Existing ExplorationIssuesModel(s) wiped out', 1],
         ])
+
         self.assert_exp_issues_empty()
         self.assert_playthroughs_deleted()
 
@@ -2174,7 +2176,6 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
             feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, [], 'Trivial change')
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, [], 'Trivial change')
-
         stats_models.ExplorationIssuesModel.delete_multi([
             stats_models.ExplorationIssuesModel.get_model(self.EXP_ID, 2),
             stats_models.ExplorationIssuesModel.get_model(self.EXP_ID, 3),
@@ -2185,12 +2186,14 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
             ['Missing ExplorationIssuesModel(s) regenerated',
              'exp_id=\'eid\' exp_version(s)=[2, 3]'],
         ])
+
         self.assert_exp_issues_empty()
 
         # Running job again should only report cleared items.
         self.assertItemsEqual(self.run_one_off_job(), [
             ['Existing ExplorationIssuesModel(s) wiped out', 3],
         ])
+
         self.assert_exp_issues_empty()
 
     def test_run_job_with_unowned_playthrough_does_not_delete_it(self):
