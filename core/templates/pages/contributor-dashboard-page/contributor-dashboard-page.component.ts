@@ -51,15 +51,15 @@ require(
 angular.module('oppia').component('contributorDashboardPage', {
   template: require('./contributor-dashboard-page.component.html'),
   controller: [
-    'LanguageUtilService', 'LocalStorageService',
-    'TranslationLanguageService', 'UrlInterpolationService', 'UserService',
-    'CONTRIBUTOR_DASHBOARD_TABS_DETAILS', 'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
-    'OPPIA_AVATAR_LINK_URL',
+    '$rootScope', 'LanguageUtilService', 'LocalStorageService',
+    'TranslationLanguageService', 'UrlInterpolationService',
+    'UserService', 'CONTRIBUTOR_DASHBOARD_TABS_DETAILS',
+    'DEFAULT_OPPORTUNITY_LANGUAGE_CODE', 'OPPIA_AVATAR_LINK_URL',
     function(
-        LanguageUtilService, LocalStorageService,
-        TranslationLanguageService, UrlInterpolationService, UserService,
-        CONTRIBUTOR_DASHBOARD_TABS_DETAILS, DEFAULT_OPPORTUNITY_LANGUAGE_CODE,
-        OPPIA_AVATAR_LINK_URL) {
+        $rootScope, LanguageUtilService, LocalStorageService,
+        TranslationLanguageService, UrlInterpolationService,
+        UserService, CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
+        DEFAULT_OPPORTUNITY_LANGUAGE_CODE, OPPIA_AVATAR_LINK_URL) {
       var ctrl = this;
 
       var prevSelectedLanguageCode = (
@@ -102,11 +102,15 @@ angular.module('oppia').component('contributorDashboardPage', {
         ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
         ctrl.userCanReviewQuestions = false;
 
-        UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-          ctrl.profilePictureDataUrl = dataUrl;
-        });
+        UserService.getProfileImageDataUrlAsync().then(
+          function(dataUrl) {
+            ctrl.profilePictureDataUrl = dataUrl;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
+          });
 
-        UserService.getUserContributionRightsData().then(
+        UserService.getUserContributionRightsDataAsync().then(
           function(userContributionRights) {
             ctrl.userCanReviewTranslationSuggestionsInLanguages = (
               getLanguageDescriptions(
@@ -127,6 +131,9 @@ angular.module('oppia').component('contributorDashboardPage', {
               ctrl.userCanReviewVoiceoverSuggestionsInLanguages
                 .length > 0 ||
               ctrl.userCanReviewQuestions);
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           });
 
         UserService.getUserInfoAsync().then(function(userInfo) {
@@ -138,6 +145,9 @@ angular.module('oppia').component('contributorDashboardPage', {
             ctrl.userIsLoggedIn = false;
             ctrl.username = '';
           }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         ctrl.languageCode = (
