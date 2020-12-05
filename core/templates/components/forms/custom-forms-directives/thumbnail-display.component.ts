@@ -44,7 +44,7 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
    */
   updateSvgInViewIfSafe(): void {
     // If the SVG image is passed as base64 data.
-    if (this.imgSrc.indexOf('data:image/svg+xml;base64') !== -1) {
+    if (this.imgSrc.indexOf('data:image/svg+xml;base64') === 0) {
       const safeResourceUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
         this.imgSrc);
       if (safeResourceUrl !== null) {
