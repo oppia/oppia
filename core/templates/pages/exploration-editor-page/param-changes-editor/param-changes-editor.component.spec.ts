@@ -128,7 +128,7 @@ describe('Param Changes Editor Component', function() {
     }, {
       paramChangesService: stateParamChangesService,
       postSaveHook: postSaveHookSpy,
-      isCurrentlyInSettingsTab: () => false
+      isCurrentlyInSettingsTab: false
     });
     ctrl.$onInit();
   }));
