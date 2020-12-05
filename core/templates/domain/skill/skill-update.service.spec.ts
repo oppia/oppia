@@ -18,12 +18,14 @@
 
 import { TestBed } from '@angular/core/testing';
 
+import { ConceptCardBackendDict } from './ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { SkillContentsWorkedExamplesChange } from 'domain/editor/undo_redo/change.model';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { WorkedExampleObjectFactory } from 'domain/skill/WorkedExampleObjectFactory';
+import { WorkedExampleObjectFactory, WorkedExampleBackendDict } from 'domain/skill/WorkedExampleObjectFactory';
 
 describe('Skill update service', () => {
   let skillUpdateService: SkillUpdateService = null;
@@ -34,9 +36,9 @@ describe('Skill update service', () => {
   let undoRedoService: UndoRedoService = null;
 
   let skillDict = null;
-  let skillContentsDict = null;
-  let example1 = null;
-  let example2 = null;
+  let skillContentsDict: ConceptCardBackendDict = null;
+  let example1: WorkedExampleBackendDict = null;
+  let example2: WorkedExampleBackendDict = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -431,41 +433,32 @@ describe('Skill update service', () => {
   it('should add a worked example', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
 
-    const newExample = {
+    const newExample: WorkedExampleBackendDict = {
       question: {
         html: 'worked example question 3',
-        content_id: 'worked_example_q_3'
+        content_id: 'worked_example_q_3',
       },
       explanation: {
         html: 'worked example explanation 3',
-        content_id: 'worked_example_e_3'
-      }
+        content_id: 'worked_example_e_3',
+      },
     };
 
     skillUpdateService.addWorkedExample(
       skill,
       workedExampleObjectFactory.createFromBackendDict(newExample)
     );
-    const workedExamplesObject = {
+
+    const workedExamplesObject: SkillContentsWorkedExamplesChange = {
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
       old_value: skillContentsDict.worked_examples,
-      new_value: [example1, example2, newExample]
+      new_value: [...skillContentsDict.worked_examples, newExample],
     };
 
-    expect(undoRedoService.getCommittableChangeList()).toEqual(
-      // This throws No overload matches this call.
-      // Overload 1 of 2, '(expected: Expected<ArrayLike<BackendChangeObject>>,
-      // expectationFailOutput?: any): Promise<void>', gave the following error.
-      // Type '{ cmd: string; property_name: string; old_value: { question:
-      // { html: string; content_id: string; }; explanation: {
-      // html: string; content_id: string; }; }[]; new_value: {
-      // question: { html: string; content_id: string; }; explanation: { ...; };
-      // }[]; }' is not assignable to type
-      // 'ExpectedRecursive<BackendChangeObject>'.
-      // Property ''subtopic_id'' is missing ...'.
-      // @ts-ignore
-      [workedExamplesObject]);
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      workedExamplesObject,
+    ]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example1),
       workedExampleObjectFactory.createFromBackendDict(example2),
@@ -488,23 +481,16 @@ describe('Skill update service', () => {
 
     skillUpdateService.deleteWorkedExample(skill, 0);
 
-    const workedExamplesObject = {
+    const workedExamplesObject: SkillContentsWorkedExamplesChange = {
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
       old_value: skillContentsDict.worked_examples,
       new_value: [skillContentsDict.worked_examples[1]],
     };
 
-
     expect(undoRedoService.getCommittableChangeList()).toEqual(
-      // This throws  Argument of type '{ cmd: string; property_name: string;
-      // old_value: any; new_value: any; }' is not assignable
-      // to parameter of type 'Expected<ArrayLike<BackendChangeObject>>'.
-      // Property 'length' is missing in type '{ cmd: string;
-      // property_name: string; old_value: any; new_value: any; }'
-      // but required in type '{ [x: number]:
-      // @ts-ignore
-      [workedExamplesObject]);
+      [workedExamplesObject]
+    );
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example2),
     ]);
@@ -541,7 +527,7 @@ describe('Skill update service', () => {
       'new explanation 1'
     );
 
-    const workedExamplesObject = {
+    const workedExamplesObject: SkillContentsWorkedExamplesChange = {
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
       old_value: skillContentsDict.worked_examples,
@@ -549,18 +535,8 @@ describe('Skill update service', () => {
     };
 
     expect(undoRedoService.getCommittableChangeList()).toEqual(
-      // This throws No overload matches this call.
-      // Overload 1 of 2, '(expected: Expected<ArrayLike<BackendChangeObject>>,
-      // expectationFailOutput?: any): Promise<void>', gave the following error.
-      // Type '{ cmd: string; property_name: string; old_value: { question:
-      // { html: string; content_id: string; }; explanation: {
-      // html: string; content_id: string; }; }[]; new_value: {
-      // question: { html: string; content_id: string; }; explanation: { ...; };
-      // }[]; }' is not assignable to type
-      // 'ExpectedRecursive<BackendChangeObject>'.
-      // Property ''subtopic_id'' is missing ...'.
-      // @ts-ignore
-      [workedExamplesObject]);
+      [workedExamplesObject]
+    );
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(modifiedExample1),
       workedExampleObjectFactory.createFromBackendDict(example2),
