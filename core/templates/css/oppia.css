@@ -4085,12 +4085,12 @@ oppia-noninteractive-link {
 }
 
 .oppia-about-otter-speech-bubble:after {
-  background: #eee;
+  background: #e8e7e3;
   border-bottom-right-radius: 40px 50px;
   bottom: -1.7em;
   content: "";
   display: block;
-  height: 30px;
+  height: 27px;
   left: 1em;
   position: absolute;
   width: 20px;
