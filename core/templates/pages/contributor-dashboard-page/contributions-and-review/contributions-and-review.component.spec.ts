@@ -56,7 +56,7 @@ describe('Contributions and review component', function() {
         .and.returnValue($q.resolve({
           isLoggedIn: () => true
         }));
-      spyOn(userService, 'getUserContributionRightsData')
+      spyOn(userService, 'getUserContributionRightsDataAsync')
         .and.returnValue($q.resolve({
           can_review_translation_for_language_codes: [{}],
           can_review_questions: true
@@ -265,7 +265,7 @@ describe('Contributions and review component', function() {
         .and.returnValue($q.resolve({
           isLoggedIn: () => true
         }));
-      spyOn(userService, 'getUserContributionRightsData')
+      spyOn(userService, 'getUserContributionRightsDataAsync')
         .and.returnValue(
           $q.resolve({
             can_review_translation_for_language_codes: [],
@@ -462,7 +462,7 @@ describe('Contributions and review component', function() {
         .and.returnValue($q.resolve({
           isLoggedIn: () => true
         }));
-      spyOn(userService, 'getUserContributionRightsData')
+      spyOn(userService, 'getUserContributionRightsDataAsync')
         .and.returnValue(
           $q.resolve({
             can_review_translation_for_language_codes: [],

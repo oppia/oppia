@@ -333,7 +333,7 @@ angular.module('oppia').component('contributionsAndReview', {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           ctrl.userDetailsLoading = false;
           if (ctrl.userIsLoggedIn) {
-            UserService.getUserContributionRightsData().then(
+            UserService.getUserContributionRightsDataAsync().then(
               function(userContributionRights) {
                 var userCanReviewTranslationSuggestionsInLanguages = (
                   userContributionRights

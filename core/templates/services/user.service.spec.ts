@@ -326,7 +326,7 @@ describe('User Api Service', () => {
       question: true
     };
 
-    userService.getUserContributionRightsData().then(
+    userService.getUserContributionRightsDataAsync().then(
       (userContributionRights) => {
         expect(userContributionRights).
           toEqual(sampleUserContributionRightsDict);
@@ -347,12 +347,12 @@ describe('User Api Service', () => {
         question: true
       };
 
-      userService.getUserContributionRightsData().then(
+      userService.getUserContributionRightsDataAsync().then(
         (userContributionRights) => {
           expect(userContributionRights)
             .toEqual(sampleUserContributionRightsDict);
           // Fetch userCommunityRightsInfo again.
-          userService.getUserContributionRightsData().then((
+          userService.getUserContributionRightsDataAsync().then((
               sameUserContributionRights) => {
             expect(sameUserContributionRights).toEqual(
               sampleUserContributionRightsDict);

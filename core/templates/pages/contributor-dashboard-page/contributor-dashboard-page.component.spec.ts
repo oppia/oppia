@@ -70,7 +70,7 @@ describe('Contributor dashboard page', function() {
     beforeEach(function() {
       spyOn(UserService, 'getProfileImageDataUrlAsync')
         .and.returnValue($q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsData')
+      spyOn(UserService, 'getUserContributionRightsDataAsync')
         .and.returnValue($q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
@@ -141,7 +141,7 @@ describe('Contributor dashboard page', function() {
     beforeEach(function() {
       spyOn(UserService, 'getProfileImageDataUrlAsync')
         .and.returnValue($q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsData')
+      spyOn(UserService, 'getUserContributionRightsDataAsync')
         .and.returnValue($q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));

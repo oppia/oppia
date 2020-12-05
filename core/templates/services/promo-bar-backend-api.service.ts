@@ -19,13 +19,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { PromoBar, PromoBarBackendDict } from 'domain/promo_bar/promo-bar.model';
 
 import { ServicesConstants } from 'services/services.constants';
-
-export interface PromoBar {
-  promoBarEnabled: boolean;
-  promoBarMessage: string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -34,20 +30,17 @@ export class PromoBarBackendApiService {
   constructor(private http: HttpClient) {}
 
   async getPromoBarDataAsync(): Promise<PromoBar> {
-    const promoBar = {
-      promoBarEnabled: false,
-      promoBarMessage: ''
-    };
     if (!ServicesConstants.ENABLE_PROMO_BAR) {
       return new Promise((resolve, reject) => {
-        resolve(promoBar);
+        resolve(PromoBar.createEmpty());
       });
     }
+
     return new Promise((resolve, reject) => {
-      this.http.get<PromoBar>(
+      this.http.get<PromoBarBackendDict>(
         ServicesConstants.PROMO_BAR_URL, {}
-      ).toPromise().then(response => {
-        resolve(response);
+      ).toPromise().then((response: PromoBarBackendDict) => {
+        resolve(PromoBar.createFromBackendDict(response));
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
