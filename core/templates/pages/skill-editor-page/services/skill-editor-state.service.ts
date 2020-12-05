@@ -19,7 +19,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-// import { Change } from 'domain/editor/undo_redo/change.model';
+// Import { Change } from 'domain/editor/undo_redo/change.model';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 
@@ -32,6 +32,10 @@ import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-
 import cloneDeep from 'lodash/cloneDeep';
 
 
+interface groupedSummaries {
+  current: unknown[],
+  others: unknown[]
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -45,29 +49,29 @@ export class SkillEditorStateService {
     private undoRedoService: UndoRedoService
   ) {}
   private _skill = this.skillObjectFactory.createInterstitialSkill();
-  private _skillRights = (
-      SkillRights.createInterstitialSkillRights());
-      private _skillIsInitialized = false;
-      private assignedSkillTopicData = null;
-      private _skillIsBeingLoaded = false;
-      private _skillIsBeingSaved = false;
-      private _groupedSkillSummaries = {
-        current: [],
-        others: []
-      };
+  private _skillRights = (SkillRights.createInterstitialSkillRights());
+  private _skillIsInitialized = false;
+  private assignedSkillTopicData = null;
+  private _skillIsBeingLoaded = false;
+  private _skillIsBeingSaved = false;
+  private _groupedSkillSummaries: groupedSummaries = {
+    current: [],
+    others: []
+  };
   private _skillChangedEventEmitter = new EventEmitter();
 
-  private _setSkill = (skill) => {
+  private _setSkill = (skill: Skill) => {
     this._skill.copyFromSkill(skill);
     this._skillChangedEventEmitter.emit();
     this._skillIsInitialized = true;
   };
 
-  private _updateSkill = (skill) => {
+  private _updateSkill = (skill: Skill) => {
     this._setSkill(skill);
   };
 
   private _updateGroupedSkillSummaries = (groupedSkillSummaries) => {
+    console.log(groupedSkillSummaries, '==========groupedSkillSummaries=====_updateGroupedSkillSummaries');
     var topicName = null;
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
@@ -84,6 +88,7 @@ export class SkillEditorStateService {
         break;
       }
     }
+    console.log(topicName, '==========topicName=====_updateGroupedSkillSummaries');
     for (var idx in groupedSkillSummaries[topicName]) {
       this._groupedSkillSummaries.current.push(
         groupedSkillSummaries[topicName][idx]);
@@ -99,11 +104,11 @@ export class SkillEditorStateService {
     }
   };
 
-  private _setSkillRights = (skillRights) => {
+  private _setSkillRights = (skillRights: SkillRights) => {
     this._skillRights.copyFromSkillRights(skillRights);
   };
 
-  private _updateSkillRights = (newSkillRightsObject) => {
+  private _updateSkillRights = (newSkillRightsObject: SkillRights) => {
     this._setSkillRights(newSkillRightsObject);
   };
 
@@ -115,27 +120,29 @@ export class SkillEditorStateService {
   loadSkill(skillId: string): void {
     this._skillIsBeingLoaded = true;
     this.skillBackendApiService.fetchSkill(
-      skillId).then(
-      function(newBackendSkillObject) {
-        this.assignedSkillTopicData = (
-          newBackendSkillObject.assignedSkillTopicData);
-        this._updateSkill(newBackendSkillObject.skill);
-        this._updateGroupedSkillSummaries(
-          newBackendSkillObject.groupedSkillSummaries);
-        this.questionsListService.getQuestionSummariesAsync(
-          skillId, true, false
-        );
-        this._skillIsBeingLoaded = false;
-        // $rootScope.$apply();
-      }, function(error) {
-        this.alertsService.addWarning();
-        this._skillIsBeingLoaded = false;
-      });
+      skillId).then(newBackendSkillObject => {
+        console.log(newBackendSkillObject, '==========newBackendSkillObject=====newBackendSkillObject');
+      this.assignedSkillTopicData = (
+        newBackendSkillObject.assignedSkillTopicData);
+      this._updateSkill(newBackendSkillObject.skill);
+      this._updateGroupedSkillSummaries(
+        newBackendSkillObject.groupedSkillSummaries);
+      this.questionsListService.getQuestionSummariesAsync(
+        skillId, true, false
+      );
+      this._skillIsBeingLoaded = false;
+      // $rootScope.$apply();
+    }, (error) => {
+      console.log(error, '==========error=====loadSkill fetchSkill');
+      this.alertsService.addWarning(error);
+      this._skillIsBeingLoaded = false;
+    });
     this.skillRightsBackendApiService.fetchSkillRightsAsync(
-      skillId).then(function(newSkillRightsObject) {
+      skillId).then((newSkillRightsObject)=> {
       this._updateSkillRights(newSkillRightsObject);
       this._skillIsBeingLoaded = false;
-    }, function(error) {
+    }, (error) => {
+      console.log(error, '==========error=====loadSkill fetchSkillRightsAsync');
       this.alertsService.addWarning(
         error ||
           'There was an error when loading the skill rights.');
@@ -151,10 +158,11 @@ export class SkillEditorStateService {
   }
 
   getAssignedSkillTopicData() {
+    console.log(this.assignedSkillTopicData, '==========this.assignedSkillTopicData=====getAssignedSkillTopicData');
     return this.assignedSkillTopicData;
   }
 
-  getGroupedSkillSummaries() {
+  getGroupedSkillSummaries(): groupedSummaries {
     return cloneDeep(this._groupedSkillSummaries);
   }
   /**
@@ -183,28 +191,29 @@ export class SkillEditorStateService {
      * will clear the UndoRedoService of pending changes. This function also
      * shares behavior with setSkill(), when it succeeds.
      */
-  saveSkill(commitMessage, successCallback) {
+  saveSkill(commitMessage: string, successCallback: Function): boolean {
     if (!this._skillIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a skill before one is loaded.');
     }
     // Don't attempt to save the skill if there are no changes pending.
-    if (!UndoRedoService.hasChanges()) {
+    if (!this.undoRedoService.hasChanges()) {
       return false;
     }
     this._skillIsBeingSaved = true;
     this.skillBackendApiService.updateSkill(
       this._skill.getId(), this._skill.getVersion(), commitMessage,
-      UndoRedoService.getCommittableChangeList()).then(
-      function(skill) {
+      this.undoRedoService.getCommittableChangeList()).then(
+      (skill) => {
         this._updateSkill(skill);
-        UndoRedoService.clearChanges();
+        this.undoRedoService.clearChanges();
         this._skillIsBeingSaved = false;
         if (successCallback) {
           successCallback();
         }
         // $rootScope.$apply();
-      }, function(error) {
+      }, (error) => {
+        console.log(error, '==========error=====saveSkill');
         this.alertsService.addWarning(
           error || 'There was an error when saving the skill');
         this._skillIsBeingSaved = false;
@@ -224,7 +233,7 @@ export class SkillEditorStateService {
     return this._skillIsBeingSaved;
   }
 
-  setSkillRights(skillRights){
+  setSkillRights(skillRights: SkillRights): void {
     this._setSkillRights(skillRights);
   }
 }
