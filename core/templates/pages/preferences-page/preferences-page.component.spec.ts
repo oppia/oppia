@@ -36,7 +36,7 @@ describe('Preferences Controller', function() {
   var UserService = null;
   var userInfo = {
     getUsername: () => 'myUsername',
-    email: () => 'myusername@email.com'
+    getEmail: () => 'myusername@email.com'
   };
   var mockWindow = {
     location: {
@@ -244,8 +244,9 @@ describe('Preferences Controller', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.resolve(newPicture)
     });
-    spyOn(UserService, 'setProfileImageDataUrlAsync').and.returnValue(
-      $q.resolve());
+    spyOn(
+      UserService, 'setProfileImageDataUrlAsync'
+    ).and.returnValue($q.resolve());
 
     ctrl.showEditProfilePictureModal();
     $rootScope.$apply();

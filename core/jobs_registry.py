@@ -109,6 +109,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     story_jobs_one_off.OrphanStoriesAuditJob,
+    suggestion_jobs_one_off.DeleteAllQuestionAndInvalidSuggestionsOneOffJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     suggestion_jobs_one_off.PopulateFinalReviewerIdOneOffJob,
     suggestion_jobs_one_off.PopulateSuggestionLanguageCodeMigrationOneOffJob,
@@ -258,7 +259,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .TrainingJobExplorationMappingModelAuditOneOffJob
+        .StateTrainingJobsMappingModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
