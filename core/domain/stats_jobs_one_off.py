@@ -1583,12 +1583,27 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class ResetExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job to reset all ExplorationIssues to a valid/empty state."""
+class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to wipe all `ExplorationIssuesModel`s to an empty state.
+    The playthroughs referenced by each of the issues will also be deleted so
+    that no dangling references are introduced to the database.
 
+    `ExplorationIssuesModel`(s) in production have been corrupted by a bug in
+    the November 2020 release (see: https://github.com/oppia/oppia/pull/11320).
+
+    Instead of recovering them, we've decided to wipe them out because:
+    -   `PlaythroughModel`/`ExplorationIssuesModel` instances are not being read
+        by the frontend yet; they're only being written.
+        -   They will be read once the Improvements tab has launched, but that
+            project has been delayed to H1 2021 due to the Cloud NDB migration.
+    -   `PlaythroughModel`'s schema was introduced with bugs. This is a good
+        opportunity to fix them without having a non-trivial schema migration.
+    """
+
+    REDUCE_KEY_DANGLING = 'Dangling PlaythroughModel(s) discovered'
     REDUCE_KEY_DELETED = 'Referenced PlaythroughModel(s) deleted'
     REDUCE_KEY_MISSING = 'Missing ExplorationIssuesModel(s) regenerated'
-    REDUCE_KEY_RESET = 'Existing ExplorationIssuesModel(s) reset'
+    REDUCE_KEY_RESET = 'Existing ExplorationIssuesModel(s) wiped out'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -1625,27 +1640,36 @@ class ResetExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         issues_model_cls.put_multi(issues_models)
 
         if playthrough_ids_referenced:
-            stats_models.PlaythroughModel.delete_multi(
-                stats_models.PlaythroughModel.get_multi(
-                    playthrough_ids_referenced))
-            yield (
-                ResetExplorationIssuesOneOffJob.REDUCE_KEY_DELETED,
-                len(playthrough_ids_referenced))
+            referenced_models = stats_models.PlaythroughModel.get_multi(
+                playthrough_ids_referenced)
+            existing_models = [m for m in referenced_models if m is not None]
+            num_dangling_models = len(referenced_models) - len(existing_models)
+
+            if existing_models:
+                stats_models.PlaythroughModel.delete_multi(existing_models)
+                yield (
+                    WipeExplorationIssuesOneOffJob.REDUCE_KEY_DELETED,
+                    len(existing_models))
+
+            if num_dangling_models:
+                yield (
+                    WipeExplorationIssuesOneOffJob.REDUCE_KEY_DANGLING,
+                    num_dangling_models)
 
         if num_models_reset:
             yield (
-                ResetExplorationIssuesOneOffJob.REDUCE_KEY_RESET,
+                WipeExplorationIssuesOneOffJob.REDUCE_KEY_RESET,
                 num_models_reset)
 
         if exp_versions_without_models:
             yield (
-                ResetExplorationIssuesOneOffJob.REDUCE_KEY_MISSING,
+                WipeExplorationIssuesOneOffJob.REDUCE_KEY_MISSING,
                 'exp_id=%r exp_version(s)=%r' % (
                     exp_id, exp_versions_without_models))
 
     @staticmethod
     def reduce(key, values):
-        if key == ResetExplorationIssuesOneOffJob.REDUCE_KEY_MISSING:
+        if key == WipeExplorationIssuesOneOffJob.REDUCE_KEY_MISSING:
             for value in values:
                 yield (key, value)
         else:
