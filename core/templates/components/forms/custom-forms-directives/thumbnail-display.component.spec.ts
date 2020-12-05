@@ -17,15 +17,15 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
-import { DomSanitizer } from '@angular/platform-browser';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 import { ThumbnailDisplayComponent } from './thumbnail-display.component';
 
 describe('Thumbnail Component', () => {
   let component: ThumbnailDisplayComponent;
   let fixture: ComponentFixture<ThumbnailDisplayComponent>;
-  class MockDomSanitizer {
-    bypassSecurityTrustResourceUrl(str: string): string {
+  class MockSvgSanitizerService {
+    getTrustedSvgResourceUrl(str: string): string {
       return str;
     }
   }
@@ -73,8 +73,8 @@ describe('Thumbnail Component', () => {
       ],
       providers: [
         {
-          provide: DomSanitizer,
-          useClass: MockDomSanitizer
+          provide: SvgSanitizerService,
+          useClass: MockSvgSanitizerService
         }
       ]
     }).compileComponents();
@@ -86,30 +86,30 @@ describe('Thumbnail Component', () => {
   it('should not render malicious SVG\'s on Init', fakeAsync(() => {
     component.imgSrc = maliciousSvg;
     component.ngOnInit();
-    expect(component.imgSrc).toBe(null);
+    expect(component.imageSourceInView).toBe(null);
     component.imgSrc = safeSvg;
     component.ngOnInit();
-    expect(component.imageSource).toBe(safeSvg);
+    expect(component.imageSourceInView).toBe(safeSvg);
   }));
 
   it('should not render malicious SVG\'s on value change', fakeAsync(() => {
     component.imgSrc = maliciousSvg;
     component.ngOnChanges();
-    expect(component.imgSrc).toBe(null);
+    expect(component.imageSourceInView).toBe(null);
     component.imgSrc = safeSvg;
     component.ngOnChanges();
-    expect(component.imageSource).toBe(safeSvg);
+    expect(component.imageSourceInView).toBe(safeSvg);
   }));
 
   it('should not try to render invalid base64 images', fakeAsync(() => {
     component.imgSrc = invalidBase64data;
     component.ngOnChanges();
-    expect(component.imgSrc).toBe(null);
+    expect(component.imageSourceInView).toBe(null);
   }));
 
   it('should accept URLs as src', fakeAsync(() => {
     component.imgSrc = 'https://oppia.org/some.svg';
     component.ngOnChanges();
-    expect(component.imageSource).toBe('https://oppia.org/some.svg');
+    expect(component.imageSourceInView).toBe('https://oppia.org/some.svg');
   }));
 });

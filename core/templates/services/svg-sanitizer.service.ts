@@ -38,7 +38,7 @@ export class SvgSanitizerService {
         node.removeAttribute('xmlns:xlink');
         node.removeAttribute('role');
         // We are removing this attribute, because currently it is not in
-        // the white list of valid attributes.
+        // the allowlist of valid attributes.
         node.removeAttribute('aria-hidden');
         node.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       }
@@ -92,7 +92,8 @@ export class SvgSanitizerService {
     return dimensions;
   }
 
-  getInvalidSvgTagsAndAttrs(svg: Document): {tags: string[], attrs: string[]} {
+  private _getInvalidSvgTagsAndAttrs(
+      svg: Document): {tags: string[], attrs: string[]} {
     let invalidTags = [];
     let invalidAttrs = [];
     let allowedTags = Object.keys(constants.SVG_ATTRS_WHITELIST);
@@ -114,6 +115,10 @@ export class SvgSanitizerService {
     return { tags: invalidTags, attrs: invalidAttrs };
   }
 
+  getInvalidSvgTagsAndAttrs(svg: Document): {tags: string[], attrs: string[]} {
+    return this._getInvalidSvgTagsAndAttrs(svg);
+  }
+
   getInvalidSvgTagsAndAttrsFromDataUri(
       dataURI: string): {tags: string[], attrs: string[]} {
     // Convert base64/URLEncoded data component to raw binary data
@@ -121,7 +126,7 @@ export class SvgSanitizerService {
     let svgString = atob(dataURI.split(',')[1]);
     let domParser = new DOMParser();
     let doc = domParser.parseFromString(svgString, 'image/svg+xml');
-    return this.getInvalidSvgTagsAndAttrs(doc);
+    return this._getInvalidSvgTagsAndAttrs(doc);
   }
 
   /**
@@ -135,25 +140,21 @@ export class SvgSanitizerService {
    */
   isValidBase64Svg(base64ImageData: string): boolean {
     const DATA_URL_PATTERN = /^data:image\/svg\+xml;base64,[a-z0-9+\/]+=*$/i;
-    // If the SVG image is passed as base64 data.
-    if (base64ImageData.indexOf('data:image/svg+xml;base64') !== -1) {
-      // Don't display the image if it is not a valid base64 image.
-      if (!base64ImageData.match(DATA_URL_PATTERN)) {
-        return false;
-      }
-
-      // Check for malicious SVG.
-      const { tags: invalidTags, attrs: invalidAttributes } = (
-        this.getInvalidSvgTagsAndAttrsFromDataUri(base64ImageData));
-
-      // If the data is malicious don't display the SVG.
-      if (invalidTags.length > 0 || invalidAttributes.length > 0) {
-        return false;
-      }
-
-      // If the SVG is safe, display the SVG.
-      return true;
+    // Check if data passed is a valid bse64 SVG.
+    if (!base64ImageData.match(DATA_URL_PATTERN)) {
+      return false;
     }
+
+    // Check for malicious SVG.
+    const { tags: invalidTags, attrs: invalidAttributes } = (
+      this.getInvalidSvgTagsAndAttrsFromDataUri(base64ImageData));
+
+    if (invalidTags.length > 0 || invalidAttributes.length > 0) {
+      return false;
+    }
+
+    // The SVG is safe and valid.
+    return true;
   }
 
   /**

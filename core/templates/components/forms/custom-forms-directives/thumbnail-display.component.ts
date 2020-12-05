@@ -17,8 +17,8 @@
  */
 
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
+
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Component({
@@ -27,40 +27,36 @@ import { SvgSanitizerService } from 'services/svg-sanitizer.service';
   styleUrls: []
 })
 export class ThumbnailDisplayComponent implements OnInit, OnChanges {
-  constructor(
-    private sanitizer: DomSanitizer,
-    private svgSanitizerService: SvgSanitizerService) {}
+  constructor(private svgSanitizerService: SvgSanitizerService) {}
   @Input() imgSrc: string;
   @Input() height: string;
   @Input() width: string;
   @Input() classes: string[];
   @Input() background: string;
-  imageSource = null;
+  imageSourceInView = null;
 
   ngOnInit(): void {
-    this.checkSvgData();
+    this.updateSvgInViewIfSafe();
   }
 
   /**
-   * Check if the SVG data is valid or not.
+   * Update the SVG data if the SVG  given is valid.
    */
-  checkSvgData(): void {
+  updateSvgInViewIfSafe(): void {
     // If the SVG image is passed as base64 data.
     if (this.imgSrc.indexOf('data:image/svg+xml;base64') !== -1) {
-      const safeResoruceUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+      const safeResourceUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
         this.imgSrc);
-      if (safeResoruceUrl === null) {
-        this.imgSrc = null;
-      } else {
-        this.imageSource = safeResoruceUrl;
+      if (safeResourceUrl !== null) {
+        this.imageSourceInView = safeResourceUrl;
       }
     } else {
-      this.imageSource = this.imgSrc;
+      this.imageSourceInView = this.imgSrc;
     }
   }
 
   ngOnChanges(): void {
-    this.checkSvgData();
+    this.updateSvgInViewIfSafe();
   }
 }
 
