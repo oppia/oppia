@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import collections
 import copy
+import itertools
 
 from core import jobs
 from core.domain import action_registry
@@ -1635,16 +1636,20 @@ class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         for i, exp_issues_model in enumerate(exp_issues_models):
             if exp_issues_model is not None:
-                for issue in exp_issues_model.unresolved_issues:
-                    referenced_playthrough_ids.update(issue['playthrough_ids'])
+                referenced_playthrough_ids.update(itertools.chain.from_iterable(
+                    exp_issue['playthrough_ids']
+                    for exp_issue in exp_issues_model.unresolved_issues))
                 exp_issues_model.unresolved_issues = []
+
                 num_exp_issues_wiped += 1
+
             else:
                 exp_version = exp_versions[i]
                 exp_issues_models[i] = exp_issues_model_cls(
                     id=exp_issues_model_cls.get_entity_id(exp_id, exp_version),
                     exp_id=exp_id, exp_version=exp_version,
                     unresolved_issues=[])
+
                 missing_exp_versions.append(exp_version)
 
         exp_issues_model_cls.update_timestamps_multi(exp_issues_models)
@@ -1664,14 +1669,14 @@ class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             references = stats_models.PlaythroughModel.get_multi(
                 referenced_playthrough_ids)
 
-            existing_references = [r for r in references if r is not None]
-            if existing_references:
-                stats_models.PlaythroughModel.delete_multi(existing_references)
+            active_references = [r for r in references if r is not None]
+            if active_references:
+                stats_models.PlaythroughModel.delete_multi(active_references)
                 yield (
                     WipeExplorationIssuesOneOffJob.PLAYTHROUGH_DELETED_KEY,
-                    len(existing_references))
+                    len(active_references))
 
-            num_dangling_references = len(references) - len(existing_references)
+            num_dangling_references = len(references) - len(active_references)
             if num_dangling_references:
                 yield (
                     WipeExplorationIssuesOneOffJob.PLAYTHROUGH_DANGLING_KEY,
