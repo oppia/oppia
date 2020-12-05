@@ -65,9 +65,9 @@ export class SiteAnalyticsService {
   registerNewSignupEvent(): void {
     this._sendEventToGoogleAnalytics('SignupButton', 'click', '');
   }
-  registerClickBrowseLibraryButtonEvent(): void {
+  registerClickBrowseLessonsButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
-      'BrowseLibraryButton', 'click',
+      'BrowseLessonsButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
   registerGoToDonationSiteEvent(donationSiteName: string): void {
@@ -225,6 +225,29 @@ export class SiteAnalyticsService {
   registerUploadAudioEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'UploadRecordedAudio', 'click', explorationId);
+  }
+  // Contributor Dashboard Events.
+  registerContributorDashboardSuggestEvent(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardSuggest', 'click', contributionType);
+  }
+  registerContributorDashboardSubmitSuggestionEvent(
+      contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardSubmitSuggestion', 'click', contributionType);
+  }
+  registerContributorDashboardViewSuggestionForReview(
+      contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardViewSuggestionForReview', 'click', contributionType);
+  }
+  registerContributorDashboardAcceptSuggestion(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardAcceptSuggestion', 'click', contributionType);
+  }
+  registerContributorDashboardRejectSuggestion(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardRejectSuggestion', 'click', contributionType);
   }
 }
 
