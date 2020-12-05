@@ -4767,6 +4767,9 @@ export = {
     "code": "da",
     "description": "dansk (Danish)"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)"
+  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)"
   }, {
@@ -5459,7 +5462,7 @@ export = {
 
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],
-  "PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES": ["Web", "Android", "Backend"],
+  "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
   // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
   // of corresponding flavors, which is used in app_version_flavor filter for
   // order comparison, with ordering: 'test' < 'alpha' < 'beta' < 'release'.

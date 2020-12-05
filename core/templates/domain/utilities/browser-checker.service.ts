@@ -94,7 +94,7 @@ export class BrowserCheckerService {
       return 'Safari';
     }
 
-    return 'Unknown';
+    return 'Others';
   }
 }
 
