@@ -331,7 +331,13 @@ class ExplorationCommitLogEntryModelValidator(
         external_id_relationships = [
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
-                exp_models.ExplorationModel, [item.exploration_id])]
+                exp_models.ExplorationModel, [item.exploration_id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_id',
+                user_models.UserSettingsModel, [item.user_id],
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
+            )]
         if item.id.startswith('rights'):
             external_id_relationships.append(
                 base_model_validators.ExternalModelFetcherDetails(
@@ -1622,7 +1628,13 @@ class SubtopicPageCommitLogEntryModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_ids',
                 subtopic_models.SubtopicPageModel,
-                [item.subtopic_page_id])]
+                [item.subtopic_page_id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_id',
+                user_models.UserSettingsModel, [item.user_id],
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
+            )]
 
 
 class UserSettingsModelValidator(base_model_validators.BaseUserModelValidator):

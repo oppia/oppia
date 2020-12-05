@@ -161,7 +161,13 @@ class SkillCommitLogEntryModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'skill_ids', skill_models.SkillModel, [item.skill_id])]
+                'skill_ids', skill_models.SkillModel, [item.skill_id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_id',
+                user_models.UserSettingsModel, [item.user_id],
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
+            )]
 
 
 class SkillSummaryModelValidator(

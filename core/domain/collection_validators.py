@@ -254,7 +254,13 @@ class CollectionCommitLogEntryModelValidator(
         external_id_relationships = [
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids',
-                collection_models.CollectionModel, [item.collection_id])]
+                collection_models.CollectionModel, [item.collection_id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_id',
+                user_models.UserSettingsModel, [item.user_id],
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
+            )]
         if item.id.startswith('rights'):
             external_id_relationships.append(
                 base_model_validators.ExternalModelFetcherDetails(

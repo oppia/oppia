@@ -379,7 +379,7 @@ class SkillSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
-    def test_model_with_commiter_id_migration_bot(self):
+    def test_model_with_committer_id_migration_bot(self):
         self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
         self.model_instance_1.update_timestamps(update_last_updated_time=False)
         self.model_instance_1.put()
@@ -764,6 +764,28 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
         expected_output = [
             u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
         self.process_and_flush_pending_mapreduce_tasks()
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_user_id_migration_bot(self):
+        self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_user_id(self):
+        self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 

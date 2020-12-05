@@ -151,7 +151,10 @@ class QuestionSnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+                [item.committer_id],
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
+            )]
 
 
 class QuestionSnapshotContentModelValidator(
@@ -198,7 +201,13 @@ class QuestionCommitLogEntryModelValidator(
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'question_ids', question_models.QuestionModel,
-                [item.question_id])]
+                [item.question_id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_id',
+                user_models.UserSettingsModel, [item.user_id],
+                remove_system_user_ids=True,
+                remove_pseudonymous_ids=True
+            )]
 
 
 class QuestionSummaryModelValidator(
