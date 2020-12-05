@@ -2046,15 +2046,21 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         return [ast.literal_eval(output)
                 for output in self.ONE_OFF_JOB_CLASS.get_output(job_id)]
 
-    def assert_playthrough_exists(self, playthrough_id):
+    def assert_playthroughs_exist(self, playthrough_ids):
         """Asserts that the given playthrough exists.
 
         Args:
-            playthrough_id: str. The playthrough to check.
+            playthrough_ids: list(str). The playthroughs to check.
         """
-        playthrough = stats_models.PlaythroughModel.get_by_id(playthrough_id)
-        self.assertIsNotNone(playthrough)
-        self.assertFalse(playthrough.deleted)
+        playthrough_models = (
+            stats_models.PlaythroughModel.get_multi(playthrough_ids))
+        models_deleted = [
+            playthrough_id
+            for playthrough_id, playthrough_model in python_utils.ZIP(
+                playthrough_ids, playthrough_models)
+            if not playthrough_model or playthrough_model.deleted
+        ]
+        self.assertEqual(models_deleted, [])
 
     def assert_playthroughs_deleted(self, playthrough_ids=None):
         """Asserts that all playthroughs are deleted.
@@ -2131,7 +2137,7 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         # is created, no need for us to do anything else.
         self.save_new_valid_exploration(exp_id, feconf.SYSTEM_COMMITTER_ID)
 
-    def publish_next_exp_version(self, exp_id=EXP_ID):
+    def create_next_exp_version(self, exp_id=EXP_ID):
         """Publishes a new version of the given exploration."""
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, exp_id, [], 'Trivial change')
@@ -2139,7 +2145,7 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
     def test_run_job_with_empty_environment_does_nothing(self):
         self.assertEqual(self.run_one_off_job(), [])
 
-    def test_run_job_with_trivial_exp_and_exp_issues_are_wiped(self):
+    def test_run_job_with_trivial_exp_and_exp_issues_wipes_them(self):
         self.create_exp_and_exp_issues()
 
         self.assertItemsEqual(self.run_one_off_job(), [
@@ -2148,7 +2154,7 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
 
         self.assert_exp_issues_empty()
 
-    def test_run_job_with_issues_with_playthrough_references_are_deleted(self):
+    def test_run_job_with_playthrough_references_deletes_them(self):
         self.create_exp_and_exp_issues()
         self.append_exp_issue(
             self.get_exp_issues(),
@@ -2170,10 +2176,10 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         self.assert_exp_issues_empty()
         self.assert_playthroughs_deleted()
 
-    def test_run_job_with_issues_missing_are_regenerated(self):
+    def test_run_job_with_missing_issues_regenerates_them(self):
         self.create_exp_and_exp_issues()
-        self.publish_next_exp_version()
-        self.publish_next_exp_version()
+        self.create_next_exp_version()
+        self.create_next_exp_version()
         stats_models.ExplorationIssuesModel.delete_multi([
             self.get_exp_issues(exp_version=2),
             self.get_exp_issues(exp_version=3),
@@ -2194,22 +2200,24 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
 
         self.assert_exp_issues_empty()
 
-    def test_run_job_with_unowned_playthrough_is_left_alone(self):
+    def test_run_job_with_unowned_playthroughs_leaves_them_alone(self):
         self.create_exp_and_exp_issues()
-        owned_playthrough_id = self.create_playthrough_model()
-        unowned_playthrough_id = self.create_playthrough_model()
-        self.append_exp_issue(self.get_exp_issues(), [owned_playthrough_id])
+        owned_playthrough_ids = [
+            self.create_playthrough_model(), self.create_playthrough_model()]
+        unowned_playthrough_ids = [
+            self.create_playthrough_model(), self.create_playthrough_model()]
+        self.append_exp_issue(self.get_exp_issues(), owned_playthrough_ids)
 
         self.assertItemsEqual(self.run_one_off_job(), [
             ['Existing ExplorationIssuesModel(s) wiped out', 1],
-            ['Referenced PlaythroughModel(s) deleted', 1],
+            ['Referenced PlaythroughModel(s) deleted', 2],
         ])
 
         self.assert_exp_issues_empty()
-        self.assert_playthrough_exists(unowned_playthrough_id)
-        self.assert_playthroughs_deleted(playthrough_ids=[owned_playthrough_id])
+        self.assert_playthroughs_exist(unowned_playthrough_ids)
+        self.assert_playthroughs_deleted(playthrough_ids=owned_playthrough_ids)
 
-    def test_run_job_with_dangling_playthrough_is_reported(self):
+    def test_run_job_with_dangling_playthrough_reports_it(self):
         self.create_exp_and_exp_issues()
         playthrough_id = self.create_playthrough_model()
         self.append_exp_issue(self.get_exp_issues(), [playthrough_id])
