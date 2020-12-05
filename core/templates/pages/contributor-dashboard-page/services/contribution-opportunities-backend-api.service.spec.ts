@@ -185,7 +185,7 @@ describe('Contribution Opportunities backend API service', function() {
       const failHandler = jasmine.createSpy('fail');
 
       contributionOpportunitiesBackendApiService
-        .fetchFeaturedTranslationLanguages()
+        .fetchFeaturedTranslationLanguagesAsync()
         .then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
