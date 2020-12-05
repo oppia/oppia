@@ -167,7 +167,7 @@ describe('User Backend Api Service', () => {
       question: true
     };
 
-    userBackendApiService.getUserContributionRightsData().then(
+    userBackendApiService.getUserContributionRightsDataAsync().then(
       (userContributionRights) => {
         expect(userContributionRights).
           toEqual(sampleUserContributionRightsDict);
