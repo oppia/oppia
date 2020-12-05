@@ -2081,7 +2081,7 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
     def get_exp_issues(self, exp_id=EXP_ID, exp_version=1):
         """Fetches the ExplorationIssuesModel for the given version."""
         return stats_models.ExplorationIssuesModel.get_model(
-            self.EXP_ID, exp_version)
+            exp_id, exp_version)
 
     def append_exp_issue(self, exp_issues_model, playthrough_ids):
         """Appends a new ExplorationIssue to the given model.
