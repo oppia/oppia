@@ -178,11 +178,11 @@ interface SkillContentsExplanationChange {
   'old_value': SubtitledHtmlBackendDict;
 }
 
-interface SkillContentsWorkedExamplesChange {
+export interface SkillContentsWorkedExamplesChange {
   'cmd': 'update_skill_contents_property';
   'property_name': 'worked_examples';
-  'new_value': WorkedExampleBackendDict;
-  'old_value': WorkedExampleBackendDict;
+  'new_value': WorkedExampleBackendDict[];
+  'old_value': WorkedExampleBackendDict[];
 }
 
 type SkillContentsChange = (
