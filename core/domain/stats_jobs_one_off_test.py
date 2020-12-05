@@ -2103,15 +2103,7 @@ class WipeExplorationIssuesOneOffJobTests(OneOffJobTestBase):
         exp_issues_model.put()
 
     def create_playthrough_model(self, exp_id=EXP_ID, exp_version=1):
-        """Creates a new playthrough model and returns its ID.
-
-        Args:
-            exp_version: int. The exploration version the playthrough was
-                recorded within.
-
-        Returns:
-            str. The ID of the newly created playthrough.
-        """
+        """Creates a new playthrough model and returns its ID."""
         return stats_models.PlaythroughModel.create(
             exp_id=exp_id,
             exp_version=exp_version,
