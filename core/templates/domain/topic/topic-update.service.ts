@@ -27,11 +27,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import {
-  TopicRemoveSkillFromSubtopicChange,
-  TopicChange,
-  Change }
-  from 'domain/editor/undo_redo/change.model';
+import { TopicRemoveSkillFromSubtopicChange, TopicChange, Change } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
 import { Topic } from 'core/templates/domain/topic/TopicObjectFactory';
@@ -337,7 +333,7 @@ export class TopicUpdateService {
     }
     if (newlyCreated) {
       // Get the current change list.
-      let currentChangeList:Change[] = this.undoRedoService.getChangeList();
+      let currentChangeList :Change[] = this.undoRedoService.getChangeList();
       let indicesToDelete = [];
       // Loop over the current changelist and handle all the cases where
       // a skill moved into the subtopic or moved out of it.
