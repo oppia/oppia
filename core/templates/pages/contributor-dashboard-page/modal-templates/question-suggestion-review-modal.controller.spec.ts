@@ -28,6 +28,7 @@ describe('Question Suggestion Review Modal Controller', function() {
   let $scope = null;
   let $uibModalInstance = null;
   let QuestionObjectFactory = null;
+  let SiteAnalyticsService = null;
   let SuggestionModalService = null;
 
   const authorName = 'Username 1';
@@ -55,11 +56,15 @@ describe('Question Suggestion Review Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+      SiteAnalyticsService = $injector.get('SiteAnalyticsService');
       SuggestionModalService = $injector.get('SuggestionModalService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardViewSuggestionForReview');
       spyOnAllFunctions(SuggestionModalService);
 
       question = QuestionObjectFactory.createFromBackendDict({
@@ -159,6 +164,14 @@ describe('Question Suggestion Review Modal Controller', function() {
         expect($scope.skillRubricExplanations).toEqual(['explanation']);
       });
 
+    it('should register Contributor Dashboard view suggestion for review' +
+      ' event after controller is initialized', function() {
+      expect(
+        // eslint-disable-next-line max-len
+        SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview)
+        .toHaveBeenCalledWith('Question');
+    });
+
     it('should reset validation error message when user updates question',
       function() {
         $scope.validationError = 'This is an error message';
@@ -168,9 +181,16 @@ describe('Question Suggestion Review Modal Controller', function() {
 
     it('should accept suggestion in suggestion modal when clicking accept' +
       ' suggestion', function() {
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardAcceptSuggestion');
       $scope.reviewMessage = 'Review message example';
+
       $scope.accept();
 
+      expect(
+        SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+        .toHaveBeenCalledWith('Question');
       expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalledWith(
         $uibModalInstance, {
           action: 'accept',
@@ -181,9 +201,16 @@ describe('Question Suggestion Review Modal Controller', function() {
 
     it('should reject suggestion in suggestion modal when clicking reject' +
     ' suggestion button', function() {
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardRejectSuggestion');
       $scope.reviewMessage = 'Review message example';
+
       $scope.reject();
 
+      expect(
+        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        .toHaveBeenCalledWith('Question');
       expect(SuggestionModalService.rejectSuggestion).toHaveBeenCalledWith(
         $uibModalInstance, {
           action: 'reject',

@@ -30,11 +30,11 @@ const splashConstants = require('constants.ts');
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
-    '$timeout', 'LoaderService', 'SiteAnalyticsService',
+    '$rootScope', '$timeout', 'LoaderService', 'SiteAnalyticsService',
     'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
     'WindowRef',
     function(
-        $timeout, LoaderService, SiteAnalyticsService,
+        $rootScope, $timeout, LoaderService, SiteAnalyticsService,
         UrlInterpolationService, UserService, WindowDimensionsService,
         WindowRef) {
       var ctrl = this;
@@ -139,6 +139,9 @@ angular.module('oppia').component('splashPage', {
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
       };
     }
