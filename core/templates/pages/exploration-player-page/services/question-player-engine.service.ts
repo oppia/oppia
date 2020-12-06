@@ -60,18 +60,7 @@ export class QuestionPlayerEngineService {
         ReadOnlyExplorationBackendApiService,
       private stateCardObjectFactory: StateCardObjectFactory,
       private urlService: UrlService) {
-    contextService.setQuestionPlayerIsOpen();
-    this.explorationId = contextService.getExplorationId();
-    this.questionPlayerMode = contextService.isInQuestionPlayerMode();
-    this.version = urlService.getExplorationVersionFromUrl();
 
-    if (!this.questionPlayerMode) {
-      readOnlyExplorationBackendApiService
-        .loadExploration(this.explorationId, this.version)
-        .then(function(exploration) {
-          this.version = exploration.version;
-        });
-    }
   }
 
   // Evaluate feedback.
@@ -161,6 +150,19 @@ export class QuestionPlayerEngineService {
       questionDicts: QuestionBackendDict[],
       successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
       errorCallback: () => void): void {
+    this.contextService.setQuestionPlayerIsOpen();
+    this.explorationId = this.contextService.getExplorationId();
+    this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+    this.version = this.urlService.getExplorationVersionFromUrl();
+
+    if (!this.questionPlayerMode) {
+      this.readOnlyExplorationBackendApiService
+        .loadExploration(this.explorationId, this.version)
+        .then(function(exploration) {
+          this.version = exploration.version;
+        });
+    }
+
     this.answerIsBeingProcessed = false;
     for (var i = 0; i < questionDicts.length; i++) {
       this.questions.push(
