@@ -22,6 +22,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Exploration Graph Modal Controller', function() {
   var $scope = null;
@@ -32,6 +33,7 @@ describe('Exploration Graph Modal Controller', function() {
   var isEditable = true;
   var graphData = {};
   var stateName = 'Introduction';
+  importAllAngularServices();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
