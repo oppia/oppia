@@ -30,51 +30,18 @@ const splashConstants = require('constants.ts');
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
-    '$rootScope', '$timeout', 'LoaderService', 'SiteAnalyticsService',
+    '$rootScope', 'LoaderService', 'SiteAnalyticsService',
     'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
-    'WindowRef',
     function(
-        $rootScope, $timeout, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UserService, WindowDimensionsService,
-        WindowRef) {
+        $rootScope, LoaderService, SiteAnalyticsService,
+        UrlInterpolationService, UserService, WindowDimensionsService) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
-      ctrl.getStaticSubjectImageUrl = function(subjectName) {
-        return UrlInterpolationService.getStaticImageUrl(
-          '/subjects/' + subjectName + '.svg');
-      };
-
-      ctrl.onRedirectToLogin = function(destinationUrl) {
-        SiteAnalyticsService.registerStartLoginEvent(
-          'splashPageCreateExplorationButton');
-        $timeout(function() {
-          WindowRef.nativeWindow.location = destinationUrl;
-        }, 150);
-        return false;
-      };
 
       ctrl.onClickBrowseLessonsButton = function() {
         SiteAnalyticsService.registerClickBrowseLessonsButtonEvent();
-        $timeout(function() {
-          WindowRef.nativeWindow.location = (
-            `/learn/${splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
-        }, 150);
-        return false;
-      };
-
-      ctrl.onClickLearnMoreStudentsButton = function() {
-        $timeout(function() {
-          WindowRef.nativeWindow.location = '/learn/math';
-        }, 150);
-        return false;
-      };
-
-      ctrl.onClickLearnMoreTeachersButton = function() {
-        $timeout(function() {
-          WindowRef.nativeWindow.location = '/teach';
-        }, 150);
         return false;
       };
 
@@ -90,52 +57,48 @@ angular.module('oppia').component('splashPage', {
         return WindowDimensionsService.isWindowNarrow();
       };
 
-      ctrl.onClickStartContributingButton = function() {
-        $timeout(function() {
-          WindowRef.nativeWindow.location = (
-            'https://www.oppiafoundation.org/volunteer');
-        }, 150);
-        return false;
-      };
-
-      ctrl.onClickCreateExplorationButton = function() {
-        SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
-        $timeout(function() {
-          WindowRef.nativeWindow.location = '/creator-dashboard?mode=create';
-        }, 150);
-        return false;
-      };
-
+      // The 2 functions below are to cycle between values: 0, 1, 2 for
+      // testimonialId.
       ctrl.incrementTestimonialId = function() {
+        // This makes sure that incrementing from 2, returns 0 instead of 3,
+        // since we want the testimonials to cycle through.
         ctrl.testimonialId = (ctrl.testimonialId + 1) % 3;
       };
 
       ctrl.decrementTestimonialId = function() {
+        // This makes sure that decrementing from 0, returns 2 instead of -1,
+        // since we want the testimonials to cycle through.
         ctrl.testimonialId = (((ctrl.testimonialId - 1) % 3) + 3) % 3;
+      };
+
+      ctrl.getTestimonialBackgroundUrl = function() {
+        if (ctrl.isWindowNarrow()) {
+          return (
+            'url(' + ctrl.getStaticImageUrl(
+              '/splash/m_testimonial_background.png') + ')');
+        }
+        return (
+          'url(' + ctrl.getStaticImageUrl(
+            '/splash/dsk_testimonial_background.png') + ')');
+      };
+
+      ctrl.getCommunityBackgroundUrl = function() {
+        if (ctrl.isWindowNarrow()) {
+          return (
+            'url(' + ctrl.getStaticImageUrl(
+              '/splash/m_community_background.png') + ')');
+        }
+        return (
+          'url(' + ctrl.getStaticImageUrl(
+            '/splash/dsk_community_background.png') + ')');
       };
 
       ctrl.$onInit = function() {
         ctrl.userIsLoggedIn = null;
         ctrl.testimonialId = 0;
+        ctrl.classroomUrl = (
+          '/learn/' + splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT);
         LoaderService.showLoadingScreen('Loading');
-        var communityBackgroundImageName = 'dsk_community_background.png';
-        var testimonialBackgroundImageName = 'dsk_testimonial_background.png';
-        if (ctrl.isWindowNarrow()) {
-          communityBackgroundImageName = 'm_community_background.png';
-          testimonialBackgroundImageName = 'm_testimonial_background.png';
-        }
-        Array.from(
-          document.getElementsByClassName(
-            'oppia-splash-section-five') as HTMLCollectionOf<HTMLElement>
-        )[0].style.backgroundImage = (
-          'url(' + ctrl.getStaticImageUrl(
-            '/splash/' + testimonialBackgroundImageName) + ')');
-        Array.from(
-          document.getElementsByClassName(
-            'oppia-splash-section-seven') as HTMLCollectionOf<HTMLElement>
-        )[0].style.backgroundImage = (
-          'url(' + ctrl.getStaticImageUrl(
-            '/splash/' + communityBackgroundImageName) + ')');
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
