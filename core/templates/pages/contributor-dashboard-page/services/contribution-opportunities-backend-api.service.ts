@@ -179,7 +179,7 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  async fetchFeaturedTranslationLanguages():
+  async fetchFeaturedTranslationLanguagesAsync():
   Promise<FeaturedTranslationLanguage[]> {
     try {
       const response = await this.http
