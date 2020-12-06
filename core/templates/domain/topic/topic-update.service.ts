@@ -333,7 +333,7 @@ export class TopicUpdateService {
     }
     if (newlyCreated) {
       // Get the current change list.
-      let currentChangeList :Change[] = this.undoRedoService.getChangeList();
+      let currentChangeList: Change[] = this.undoRedoService.getChangeList();
       let indicesToDelete = [];
       // Loop over the current changelist and handle all the cases where
       // a skill moved into the subtopic or moved out of it.
