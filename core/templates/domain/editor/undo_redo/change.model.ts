@@ -166,9 +166,9 @@ type SkillMisconceptionPropertyChange = (
   SkillMisconceptionsFeedbackChange);
 
 interface SkillRubricsChange {
-  cmd: 'update_rubrics';
-  difficulty: string;
-  explanations: string[];
+  'cmd': 'update_rubrics';
+  'difficulty': string;
+  'explanations': string[];
 }
 
 interface SkillContentsExplanationChange {
@@ -417,6 +417,12 @@ interface TopicAbbreviatedNameChange {
   'new_value': string;
   'old_value': string;
 }
+interface TopicPracticeTabChange {
+  'cmd': 'update_topic_property';
+  'property_name': 'practice_tab_is_displayed';
+  'new_value': boolean;
+  'old_value': boolean;
+}
 
 interface TopicThumbnailFilenameChange {
   'cmd': 'update_topic_property';
@@ -439,6 +445,20 @@ interface TopicDescriptionChange {
   'old_value': string;
 }
 
+interface TopicUrlFragmentChange {
+  'cmd': 'update_topic_property';
+  'property_name': 'url_fragment';
+  'new_value': string;
+  'old_value': string;
+}
+
+interface TopicMetaTagContentChange {
+  'cmd': 'update_topic_property';
+  'property_name': 'meta_tag_content';
+  'new_value': string;
+  'old_value': string;
+}
+
 interface TopicLanguageCodeChange {
   'cmd': 'update_topic_property';
   'property_name': 'language_code';
@@ -452,6 +472,9 @@ type TopicPropertyChange = (
   TopicThumbnailFilenameChange |
   TopicThumbnailBgColorChange |
   TopicDescriptionChange |
+  TopicPracticeTabChange |
+  TopicUrlFragmentChange |
+  TopicMetaTagContentChange |
   TopicLanguageCodeChange);
 
 interface TopicSubtopicThumbnailFilenameChange {
@@ -459,7 +482,7 @@ interface TopicSubtopicThumbnailFilenameChange {
   'property_name': 'thumbnail_filename';
   'new_value': string;
   'old_value': string;
-  'subtopic_id': string;
+  'subtopic_id': number;
 }
 
 interface TopicSubtopicThumbnailBgColorChange {
@@ -467,7 +490,7 @@ interface TopicSubtopicThumbnailBgColorChange {
   'property_name': 'thumbnail_bg_color';
   'new_value': string;
   'old_value': string;
-  'subtopic_id': string;
+  'subtopic_id': number;
 }
 
 interface TopicSubtopicTitleChange {
@@ -475,7 +498,7 @@ interface TopicSubtopicTitleChange {
   'property_name': 'title';
   'new_value': string;
   'old_value': string;
-  'subtopic_id': string;
+  'subtopic_id': number;
 }
 
 interface TopicSubtopicUrlFragmentChange {
@@ -483,10 +506,10 @@ interface TopicSubtopicUrlFragmentChange {
   'property_name': 'url_fragment';
   'new_value': string;
   'old_value': string;
-  'subtopic_id': string;
+  'subtopic_id': number;
 }
 
-type TopicSubtopicPropertyChange = (
+export type TopicSubtopicPropertyChange = (
   TopicSubtopicThumbnailFilenameChange |
   TopicSubtopicThumbnailBgColorChange |
   TopicSubtopicTitleChange |
@@ -497,7 +520,7 @@ interface TopicSubtopicPageHtmlChange {
   'property_name': 'page_contents_html';
   'new_value': SubtitledHtmlBackendDict;
   'old_value': SubtitledHtmlBackendDict;
-  'subtopic_id': string;
+  'subtopic_id': number;
 }
 
 interface TopicSubtopicPageAudioChange {
@@ -505,7 +528,7 @@ interface TopicSubtopicPageAudioChange {
   'property_name': 'page_contents_audio';
   'new_value': RecordedVoiceOverBackendDict;
   'old_value': RecordedVoiceOverBackendDict;
-  'subtopic_id': string;
+  'subtopic_id': number;
 }
 
 type TopicSubtopicPagePropertyChange = (
@@ -514,25 +537,25 @@ type TopicSubtopicPagePropertyChange = (
 
 interface TopicAddSubtopicChange {
   'cmd': 'add_subtopic';
-  'subtopic_id': string;
+  'subtopic_id': number;
   'title': string;
 }
 
 interface TopicDeleteSubtopicChange {
   'cmd': 'delete_subtopic';
-  'subtopic_id': string;
+  'subtopic_id': number;
 }
 
-interface TopicMoveSkillToSubtopicChange {
+export interface TopicMoveSkillToSubtopicChange {
   'cmd': 'move_skill_id_to_subtopic';
-  'old_subtopic_id': string;
-  'new_subtopic_id': string;
+  'old_subtopic_id': number;
+  'new_subtopic_id': number;
   'skill_id': string;
 }
 
-interface TopicRemoveSkillFromSubtopicChange {
+export interface TopicRemoveSkillFromSubtopicChange {
   'cmd': 'remove_skill_id_from_subtopic';
-  'subtopic_id': string;
+  'subtopic_id': number;
   'skill_id': string;
 }
 
@@ -554,7 +577,7 @@ interface TopicRearrangeCanonicalStoryChange {
 
 interface TopicRearrangeSkillInSubtopicChange {
   'cmd': 'rearrange_skill_in_subtopic';
-  'subtopic_id': string;
+  'subtopic_id': number;
   'from_index': number;
   'to_index': number;
 }
@@ -570,7 +593,7 @@ interface TopicRemoveUncategorizedSkillChange {
   'uncategorized_skill_id': string;
 }
 
-type TopicChange = (
+export type TopicChange = (
   TopicPropertyChange |
   TopicSubtopicPropertyChange |
   TopicSubtopicPagePropertyChange |

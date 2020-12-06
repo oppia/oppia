@@ -28,6 +28,9 @@ import { BackendChangeObject, Change } from './change.model';
  * not currently supported.
  */
 export class BaseUndoRedo {
+  constructor() {
+    this.init();
+  }
   private _appliedChanges: Change[] = [];
   private _undoneChanges: Change[] = [];
   _undoRedoChangeEventEmitter: EventEmitter<void> = new EventEmitter();
