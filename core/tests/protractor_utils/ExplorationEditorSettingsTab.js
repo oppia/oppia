@@ -135,9 +135,9 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setTitle = async function(title) {
     await general.scrollToTop();
-    await action.clear('Exploration title input', explorationTitleInput);
+    await action.clear('Exploration Title Input', explorationTitleInput);
     await action.sendKeys(
-      'Exploration title input', explorationTitleInput, title);
+      'Exploration Title Input', explorationTitleInput, title);
   };
 
   this.expectCategoryToBe = async function(category) {

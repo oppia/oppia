@@ -2936,7 +2936,12 @@ class State(python_utils.OBJECT):
             .get_content_ids_that_are_correctly_translated(language_code))
 
         for content_id in available_translation_content_ids:
-            del content_id_to_html[content_id]
+            # Interactions can be translated through editor pages but
+            # _get_all_translatable_content returns contents which are only
+            # translatable through the contributor dashboard page, we are
+            # ignoring the content ids related to interaction translation below
+            # if it doesn't exist in content_id_to_html.
+            content_id_to_html.pop(content_id, None)
 
         # TODO(#7571): Add functionality to return the list of
         # translations which needs update.
