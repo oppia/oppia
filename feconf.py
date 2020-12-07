@@ -582,9 +582,6 @@ MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 # questions.
 MAX_NUMBER_OF_SKILL_IDS = 20
 
-# The prefix for an 'accepted suggestion' commit message.
-COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
-
 # User id and username for exploration migration bot. Commits made by this bot
 # are not reflected in the exploration summary models, but are recorded in the
 # exploration commit log.

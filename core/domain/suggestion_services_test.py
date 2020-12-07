@@ -202,6 +202,33 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(
             expected_suggestion_dict, observed_suggestion.to_dict())
 
+    def test_get_commit_message_for_suggestion_for_translation(self):
+        message = suggestion_services.get_commit_message_for_suggestion(
+            'author', 'Translation',
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT, 'hi')
+
+        self.assertEqual(
+            message,
+            'Accepted Hindi translation suggestion by author: Translation')
+
+    def test_get_commit_message_for_suggestion_for_question(self):
+        message = suggestion_services.get_commit_message_for_suggestion(
+            'author', 'Good question',
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION, None)
+
+        self.assertEqual(
+            message,
+            'Accepted question suggestion by author: Good question')
+
+    def test_get_commit_message_for_suggestion_for_state_content(self):
+        message = suggestion_services.get_commit_message_for_suggestion(
+            'author', 'Looks good!',
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT, None)
+
+        self.assertEqual(
+            message,
+            'Accepted edit content suggestion by author: Looks good!')
+
     def test_cannot_create_suggestion_with_invalid_suggestion_type(self):
         with self.assertRaisesRegexp(Exception, 'Invalid suggestion type'):
             suggestion_services.create_suggestion(
@@ -261,7 +288,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             commit_message, is_suggestion):
         self.assertTrue(is_suggestion)
         self.assertEqual(
-            commit_message, 'Accepted suggestion by %s: %s' % (
+            commit_message, 'Accepted edit content suggestion by %s: %s' % (
                 'author', self.COMMIT_MESSAGE))
 
     def test_cannot_reject_suggestion_with_empty_review_message(self):

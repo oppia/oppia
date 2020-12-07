@@ -34,6 +34,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (feedback_models, suggestion_models, user_models) = (
     models.Registry.import_models(
@@ -308,20 +309,33 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_models_to_update)
 
 
-def get_commit_message_for_suggestion(author_username, commit_message):
+def get_commit_message_for_suggestion(
+        author_username, commit_message, suggestion_type, language_code):
     """Returns a modified commit message for an accepted suggestion.
 
     Args:
         author_username: str. Username of the suggestion author.
         commit_message: str. The original commit message submitted by the
             suggestion author.
+        suggestion_type: str. The type of the suggestion.
+        language_code: str|None. The language code of the suggestion.
 
     Returns:
         str. The modified commit message to be used in the exploration commit
         logs.
     """
-    return '%s %s: %s' % (
-        feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX,
+    suggestion_type_to_redable_text = {
+        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT: (
+            lambda _: 'edit content'),
+        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+            lambda language_code: '%s translation' % (
+                utils.get_supported_audio_language_description(language_code))),
+        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+            lambda language_code: 'question')
+    }
+
+    return 'Accepted %s suggestion by %s: %s' % (
+        suggestion_type_to_redable_text[suggestion_type](language_code),
         author_username, commit_message)
 
 
@@ -373,7 +387,8 @@ def accept_suggestion(
 
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
-        author_name, commit_message)
+        author_name, commit_message, suggestion.suggestion_type,
+        suggestion.language_code)
     suggestion.accept(commit_message)
 
     _update_suggestion(suggestion)
