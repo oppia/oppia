@@ -242,6 +242,7 @@ import { StatsReportingService } from 'pages/exploration-player-page/services/st
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service.ts';
 import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
+import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { AlertsService } from 'services/alerts.service';
 import { AppService } from 'services/app.service';
@@ -589,6 +590,7 @@ export const angularServices: [string, unknown][] = [
   ['StatsReportingService', StatsReportingService],
   ['StoryContentsObjectFactory', StoryContentsObjectFactory],
   ['StoryEditorNavigationService', StoryEditorNavigationService],
+  ['StoryEditorStateService', StoryEditorStateService],
   ['StoryObjectFactory', StoryObjectFactory],
   ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
   ['StoryValidationService', StoryValidationService],
@@ -624,6 +626,7 @@ export const angularServices: [string, unknown][] = [
   ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TruncatePipe', TruncatePipe],
+  ['UndoRedoService', UndoRedoService],
   ['UnitsObjectFactory', UnitsObjectFactory],
   ['UrlInterpolationService', UrlInterpolationService],
   ['UrlService', UrlService],
