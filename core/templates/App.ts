@@ -146,7 +146,7 @@ angular.module('oppia').config([
       'SkillRightsBackendApiService', 'SolutionObjectFactory',
       'SolutionValidityService', 'SpeechSynthesisChunkerService',
       'StateCardObjectFactory', 'StateClassifierMappingService',
-      'StateEditorService', 'StateInteractionStatsService',
+      'StateInteractionStatsService',
       'StateObjectFactory', 'StateTopAnswersStatsBackendApiService',
       'StateTopAnswersStatsService', 'StatesObjectFactory',
       'StopwatchObjectFactory', 'StoryContentsObjectFactory',

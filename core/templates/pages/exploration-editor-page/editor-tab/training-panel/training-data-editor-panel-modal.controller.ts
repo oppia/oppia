@@ -15,6 +15,9 @@
 /**
  * @fileoverview Controller for TrainingDataEditorPanelService modal.
  */
+// require(
+//   'components/state-editor/state-editor-properties-services/' +
+//   'state-editor.service.ts');
 
 angular.module('oppia').controller(
   'TrainingDataEditorPanelServiceModalController', [

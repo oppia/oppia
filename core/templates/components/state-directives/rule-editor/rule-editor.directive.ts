@@ -20,6 +20,9 @@ require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
