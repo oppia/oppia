@@ -33,7 +33,6 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 
 import { Subscription } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;

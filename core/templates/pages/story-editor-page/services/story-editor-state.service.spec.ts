@@ -27,7 +27,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
 import { Subscription } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
