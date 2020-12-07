@@ -237,6 +237,7 @@ import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-playe
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
@@ -523,6 +524,7 @@ export const angularServices: [string, unknown][] = [
   ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionBackendApiService', QuestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
+  ['QuestionPlayerEngineService', QuestionPlayerEngineService],
   ['QuestionSummaryForOneSkillObjectFactory',
     QuestionSummaryForOneSkillObjectFactory],
   ['QuestionSummaryObjectFactory', QuestionSummaryObjectFactory],
