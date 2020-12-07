@@ -52,7 +52,15 @@ angular.module('oppia').component('translationOpportunities', {
         UrlInterpolationService, UserService) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
+      var opportunitiesTemporaryContainer = [];
       var userIsLoggedIn = false;
+
+      var swapOpportunities = function() {
+        var temp = opportunitiesTemporaryContainer;
+        opportunitiesTemporaryContainer = ctrl.opportunities;
+        ctrl.opportunities = temp;
+      };
+
       var getOpportunitySummary = function(expId) {
         for (var index in ctrl.opportunities) {
           if (ctrl.opportunities[index].id === expId) {
@@ -104,6 +112,10 @@ angular.module('oppia').component('translationOpportunities', {
         SiteAnalyticsService.registerContributorDashboardSuggestEvent(
           'Translation');
         var opportunity = getOpportunitySummary(expId);
+
+        // Clearing the UI opportunities to avoid lag in ck-editor.
+        swapOpportunities();
+
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/contributor-dashboard-page/modal-templates/' +
@@ -116,10 +128,10 @@ angular.module('oppia').component('translationOpportunities', {
             }
           },
           controller: 'TranslationModalController'
-        }).result.then(function() {}, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
+        }).result.then(function() {
+          swapOpportunities();
+        }, function() {
+          swapOpportunities();
         });
       };
       ctrl.$onInit = function() {

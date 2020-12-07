@@ -74,6 +74,13 @@ angular.module('oppia').component('questionOpportunities', {
         UrlInterpolationService, UserService, MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
       let userIsLoggedIn = false;
+      var opportunitiesTemporaryContainer = [];
+
+      var swapOpportunities = function() {
+        var temp = opportunitiesTemporaryContainer;
+        opportunitiesTemporaryContainer = ctrl.opportunities;
+        ctrl.opportunities = temp;
+      };
 
       const updateWithNewOpportunities = function(opportunities, more) {
         for (const index in opportunities) {
@@ -115,6 +122,9 @@ angular.module('oppia').component('questionOpportunities', {
         SiteAnalyticsService.registerContributorDashboardSuggestEvent(
           'Question');
 
+        // Clearing the UI opportunities to avoid lag in ck-editor.
+        swapOpportunities();
+
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
@@ -130,9 +140,7 @@ angular.module('oppia').component('questionOpportunities', {
             ctrl.createQuestion(result.skill, result.skillDifficulty);
           }
         }, function() {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
+          swapOpportunities();
         });
       };
 
@@ -158,8 +166,11 @@ angular.module('oppia').component('questionOpportunities', {
             skillDifficulty: () => skillDifficulty
           },
           controller: 'QuestionSuggestionEditorModalController'
-        }).result.then(function() {}, function() {
+        }).result.then(function() {
+          swapOpportunities();
+        }, function() {
           ContextService.resetImageSaveDestination();
+          swapOpportunities();
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
