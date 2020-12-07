@@ -4167,10 +4167,6 @@ oppia-noninteractive-link {
   text-align: center;
 }
 
-.participation h2:not(:first-child) {
-  margin-top: 2.5em;
-}
-
 .oppia-about-tabs {
   border-bottom: 1px solid #eee;
   display: -webkit-flex;
