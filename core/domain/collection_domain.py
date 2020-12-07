@@ -1304,7 +1304,7 @@ class CollectionSummary(python_utils.OBJECT):
             user_id in self.viewer_ids
         )
 
-    def add_new_contribution_for_user(self, contributor_id):
+    def add_contribution_by_user(self, contributor_id):
         """Add a new contributor to the contributors summary.
 
         Args:

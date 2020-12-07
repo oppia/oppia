@@ -977,7 +977,7 @@ def regenerate_collection_summary_with_new_contributor(
     """
     collection = get_collection_by_id(collection_id)
     collection_summary = _compute_summary_of_collection(collection)
-    collection_summary.add_new_contribution_for_user(contributor_id)
+    collection_summary.add_contribution_by_user(contributor_id)
     save_collection_summary(collection_summary)
 
 
