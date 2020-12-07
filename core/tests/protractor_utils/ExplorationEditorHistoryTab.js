@@ -86,7 +86,8 @@ var ExplorationEditorHistoryTab = function() {
         var matched = false;
         for (var i = 0; i < listOfNames.length; i++) {
           if (listOfNames[i] === stateName) {
-            await stateNodes.get(i).click();
+            var getStateNodes = stateNodes.get(i);
+            await action.click('Get State Nodes', getStateNodes);
             matched = true;
           }
         }
@@ -100,7 +101,7 @@ var ExplorationEditorHistoryTab = function() {
           closeStateHistoryButton,
           'Close State History button is not clickable');
         expect(await closeStateHistoryButton.isDisplayed()).toBe(true);
-        await closeStateHistoryButton.click();
+        await action.click("Closes State History button", closeStateHistoryButton);
         await waitFor.invisibilityOf(
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
