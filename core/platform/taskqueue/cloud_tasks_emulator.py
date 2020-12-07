@@ -244,7 +244,7 @@ class Emulator(python_utils.OBJECT):
             taskqueue.
         """
         if queue_name:
-            return self._queues[queue_name]
+            return self._queues.get(queue_name, [])
         else:
             tasks_list = []
             for items in self._queues.items():

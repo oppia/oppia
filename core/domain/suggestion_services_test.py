@@ -33,6 +33,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import taskqueue_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -1458,6 +1459,89 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
+
+    def test_accepting_question_suggestions_adds_email_tasks(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, description='description')
+        score_category = (
+            suggestion_models.SCORE_TYPE_QUESTION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + skill_id)
+        change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'language_code': 'en',
+                'linked_skill_ids': [skill_id],
+                'inapplicable_skill_misconception_ids': []
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+
+        can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        with can_send_emails_ctx, can_send_feedback_email_ctx:
+            suggestion = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+                suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+                self.author_id, change, 'test description')
+
+            tasks = self.get_pending_tasks(
+                queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
+            self.assertEqual(len(tasks), 0)
+
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id, self.reviewer_id,
+                'Good question', 'LGTM!')
+
+        tasks = self.get_pending_tasks(
+            queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
+        self.assertEqual(len(tasks), 2)
+        self.assertEqual(
+            tasks[0].url, feconf.TASK_URL_FEEDBACK_STATUS_EMAILS)
+        self.assertEqual(
+            tasks[1].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
+
+    def test_accepting_translation_suggestions_adds_email_tasks(self):
+        change = {
+            'cmd': exp_domain.CMD_ADD_TRANSLATION,
+            'state_name': 'State 1',
+            'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
+            'language_code': 'hi',
+            'content_html': '<p>old content</p>',
+            'translation_html': '<p>This is translated html.</p>'
+        }
+
+        can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        can_send_feedback_email_ctx = self.swap(
+            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        with can_send_emails_ctx, can_send_feedback_email_ctx:
+            suggestion = suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+                self.author_id, change, 'test description')
+
+            tasks = self.get_pending_tasks(
+                queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
+            self.assertEqual(len(tasks), 0)
+
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id, self.reviewer_id,
+                'Good question', 'LGTM!')
+
+        tasks = self.get_pending_tasks(
+            queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
+        self.assertEqual(len(tasks), 2)
+        self.assertEqual(
+            tasks[0].url, feconf.TASK_URL_FEEDBACK_STATUS_EMAILS)
+        self.assertEqual(
+            tasks[1].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
 
     def test_delete_skill_rejects_question_suggestion(self):
         skill_id = skill_services.get_new_skill_id()

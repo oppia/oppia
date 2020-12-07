@@ -85,11 +85,9 @@ def create_suggestion(
     """
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT
-    thread_id = feedback_services.create_thread(
-        target_type, target_id, author_id, description,
-        DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True)
 
     status = suggestion_models.STATUS_IN_REVIEW
+    should_send_emails = False
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         exploration = exp_fetchers.get_exploration_by_id(target_id)
@@ -100,6 +98,7 @@ def create_suggestion(
         # Suggestions of this type do not have an associated language code,
         # since they are not queryable by language.
         language_code = None
+        should_send_emails = True
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
@@ -125,6 +124,13 @@ def create_suggestion(
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
+    # TOD(#11338): Create thread models only after validating the suggestion
+    # object.
+    thread_id = feedback_services.create_thread(
+        target_type, target_id, author_id, description,
+        DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True,
+        should_send_emails=should_send_emails)
+
     suggestion_domain_class = (
         suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
             suggestion_type])
@@ -132,6 +138,7 @@ def create_suggestion(
         thread_id, target_id, target_version_at_submission, status, author_id,
         None, change, score_category, language_code)
     suggestion.validate()
+
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,

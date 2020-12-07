@@ -63,7 +63,7 @@ def get_exp_id_from_thread_id(thread_id):
 
 def _create_models_for_thread_and_first_message(
         entity_type, entity_id, original_author_id, subject, text,
-        has_suggestion):
+        has_suggestion, should_send_emails):
     """Creates a feedback thread and its first message.
 
     Args:
@@ -74,6 +74,7 @@ def _create_models_for_thread_and_first_message(
         text: str. The text of the feedback message. This may be ''.
         has_suggestion: bool. Whether this thread has a related learner
             suggestion.
+        should_send_emails: bool. Whether to send emails for the new messages.
 
     Returns:
         str. The id of the new thread.
@@ -96,13 +97,13 @@ def _create_models_for_thread_and_first_message(
     thread.put()
     create_message(
         thread_id, original_author_id, feedback_models.STATUS_CHOICES_OPEN,
-        subject, text)
+        subject, text, should_send_emails=should_send_emails)
     return thread_id
 
 
 def create_thread(
         entity_type, entity_id, original_author_id, subject, text,
-        has_suggestion=False):
+        has_suggestion=False, should_send_emails=True):
     """Creates a thread and its first message.
 
     Args:
@@ -113,18 +114,20 @@ def create_thread(
         text: str. The text of the feedback message. This may be ''.
         has_suggestion: bool. Whether the thread has a suggestion attached to
             it.
+        should_send_emails: bool. Whether to send emails. The default value is
+            True.
 
     Returns:
         str. The id of the new thread.
     """
     return _create_models_for_thread_and_first_message(
         entity_type, entity_id, original_author_id, subject, text,
-        has_suggestion)
+        has_suggestion, should_send_emails)
 
 
 def create_message(
         thread_id, author_id, updated_status, updated_subject, text,
-        received_via_email=False):
+        received_via_email=False, should_send_emails=True):
     """Creates a new message for the thread and subscribes the author to the
     thread.
 
@@ -140,6 +143,8 @@ def create_message(
         text: str. The text of the feedback message. This may be ''.
         received_via_email: bool. Whether new message is received via email or
             web.
+        should_send_emails: bool. Whether to send emails for the new messages.
+            The default value is True.
 
     Returns:
         FeedbackMessage. The domain object representing the new message added
@@ -150,12 +155,13 @@ def create_message(
     """
     return create_messages(
         [thread_id], author_id, updated_status, updated_subject, text,
-        received_via_email=received_via_email)[0]
+        received_via_email=received_via_email,
+        should_send_emails=should_send_emails)[0]
 
 
 def create_messages(
         thread_ids, author_id, updated_status, updated_subject, text,
-        received_via_email=False):
+        received_via_email=False, should_send_emails=True):
     """Creates a new message for each of the distinct threads in thread_ids and
     for each message, subscribes the author to the thread.
 
@@ -172,6 +178,8 @@ def create_messages(
         text: str. The text of the feedback message. This may be ''.
         received_via_email: bool. Whether the new message(s) are received via
             email or web.
+        should_send_emails: bool. Whether to send emails for the new messages.
+            The default value is True.
 
     Returns:
         list(FeedbackMessage). The domain objects representing the new messages
@@ -310,9 +318,10 @@ def create_messages(
     suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_update)
 
-    if (feconf.CAN_SEND_EMAILS and (
+    if (should_send_emails and feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
             user_services.is_user_registered(author_id))):
+        print "Checkkkkkkkkkkkkkkk"*100
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],
@@ -1004,13 +1013,21 @@ def _get_all_recipient_ids(exploration_id, thread_id, author_id):
                 in this thread, excluding owners of the exploration and the
                 given author.
     """
-    exploration_rights = rights_manager.get_exploration_rights(exploration_id)
-
-    owner_ids = set(exploration_rights.owner_ids)
     participant_ids = {
         message.author_id for message in get_messages(thread_id)
         if user_services.is_user_registered(message.author_id)
     }
+
+    suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
+        thread_id)
+    owner_ids = set([])
+
+    if suggestion_model is None or (
+        suggestion_model.suggestion_type == (
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        owner_ids = set(exploration_rights.owner_ids)
 
     batch_recipient_ids = owner_ids - {author_id}
     other_recipient_ids = participant_ids - batch_recipient_ids - {author_id}
@@ -1148,6 +1165,7 @@ def _add_message_to_email_buffer(
             new_status, exploration_id, has_suggestion)
 
     if message_length:
+        print "Checkkkkkkkkkkkkkkk"*100
         # Send feedback message email only if message text is non empty (the
         # message text can be empty in the case when only status is changed).
         _send_batch_emails(
