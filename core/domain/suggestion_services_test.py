@@ -1490,9 +1490,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     def test_accepting_question_suggestions_adds_email_tasks(self):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.author_id, description='description')
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + skill_id)
+
         change = {
             'cmd': (
                 question_domain

@@ -140,7 +140,6 @@ def create_suggestion(
         None, change, score_category, language_code)
     suggestion.validate()
 
-
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,

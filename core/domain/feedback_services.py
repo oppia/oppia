@@ -321,7 +321,7 @@ def create_messages(
     if (should_send_emails and feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
             user_services.is_user_registered(author_id))):
-        print "Checkkkkkkkkkkkkkkk"*100
+
         for index, thread_model in enumerate(thread_models):
             _add_message_to_email_buffer(
                 author_id, thread_model.id, message_ids[index],
@@ -1023,8 +1023,8 @@ def _get_all_recipient_ids(exploration_id, thread_id, author_id):
     owner_ids = set([])
 
     if suggestion_model is None or (
-        suggestion_model.suggestion_type == (
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
+            suggestion_model.suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
         owner_ids = set(exploration_rights.owner_ids)
@@ -1165,7 +1165,6 @@ def _add_message_to_email_buffer(
             new_status, exploration_id, has_suggestion)
 
     if message_length:
-        print "Checkkkkkkkkkkkkkkk"*100
         # Send feedback message email only if message text is non empty (the
         # message text can be empty in the case when only status is changed).
         _send_batch_emails(
