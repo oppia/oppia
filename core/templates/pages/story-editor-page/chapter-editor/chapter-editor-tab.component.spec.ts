@@ -27,8 +27,6 @@ import { StoryEditorNavigationService } from
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
-
 describe('Chapter Editor tab', function() {
   var $scope = null;
   var ctrl = null;

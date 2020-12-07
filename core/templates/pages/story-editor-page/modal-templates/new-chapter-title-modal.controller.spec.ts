@@ -32,8 +32,6 @@ import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service.ts';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
-import { importAllAngularServices } from 'tests/unit-test-utils';
-
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
   var $q = null;
