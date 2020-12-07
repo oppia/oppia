@@ -2076,7 +2076,8 @@ tags: []
             subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False, page_title_for_web='topic page title'):
+            practice_tab_is_displayed=False,
+            page_title_for_web='topic page title'):
         """Creates an Oppia Topic and saves it.
 
         Args:

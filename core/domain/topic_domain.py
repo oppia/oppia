@@ -54,7 +54,7 @@ TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 TOPIC_PROPERTY_URL_FRAGMENT = 'url_fragment'
 TOPIC_PROPERTY_META_TAG_CONTENT = 'meta_tag_content'
 TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED = 'practice_tab_is_displayed'
-TOPIC_PROPERTY_page_title_for_web = 'page_title_for_web'
+TOPIC_PROPERTY_PAGE_TITLE_FOR_WEB = 'page_title_for_web'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
@@ -119,7 +119,7 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_URL_FRAGMENT,
         TOPIC_PROPERTY_META_TAG_CONTENT,
         TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
-        TOPIC_PROPERTY_page_title_for_web)
+        TOPIC_PROPERTY_PAGE_TITLE_FOR_WEB)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.

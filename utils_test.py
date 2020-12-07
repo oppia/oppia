@@ -431,7 +431,8 @@ class UtilsTests(test_utils.GenericTestBase):
         invalid_type_error = (
             'Expected page title to be a string, received 0')
         with self.assertRaisesRegexp(Exception, invalid_type_error):
-            utils.require_valid_page_title_for_web(non_string_page_title_for_web)
+            utils.require_valid_page_title_for_web(
+                non_string_page_title_for_web)
         lengthy_page_title_for_web = 'a' * 60
         max_length_error = (
             'Page title should not be longer than %s characters.'

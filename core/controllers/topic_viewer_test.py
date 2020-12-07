@@ -270,7 +270,8 @@ class TopicPageDataHandlerTests(
             '%s/staging/%s' % (
                 feconf.TOPIC_DATA_HANDLER, 'topic-page-title'))
         expected_page_title_for_web = 'topic page title'
-        self.assertEqual(expected_page_title_for_web, json_response['page_title_for_web'])
+        self.assertEqual(
+            expected_page_title_for_web, json_response['page_title_for_web'])
 
     def test_get_with_no_skills_ids(self):
         self.topic = topic_domain.Topic.create_default_topic(

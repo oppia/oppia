@@ -386,7 +386,7 @@ def apply_change_list(topic_id, change_list):
                       topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED):
                     topic.update_practice_tab_is_displayed(change.new_value)
                 elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_page_title_for_web):
+                      topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FOR_WEB):
                     topic.update_page_title_for_web(change.new_value)
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):

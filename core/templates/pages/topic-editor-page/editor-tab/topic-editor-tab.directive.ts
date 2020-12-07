@@ -92,7 +92,8 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_TOPIC_DESCRIPTION = (
             MAX_CHARS_IN_TOPIC_DESCRIPTION);
           $scope.MAX_CHARS_IN_META_TAG_CONTENT = MAX_CHARS_IN_META_TAG_CONTENT;
-          $scope.MAX_CHARS_IN_PAGE_TITLE_FOR_WEB = MAX_CHARS_IN_PAGE_TITLE_FOR_WEB;
+          $scope.MAX_CHARS_IN_PAGE_TITLE_FOR_WEB = (
+            MAX_CHARS_IN_PAGE_TITLE_FOR_WEB);
           ctrl.initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.skillQuestionCountDict = (

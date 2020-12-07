@@ -725,7 +725,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'new_value': True
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_page_title_for_web,
+            'property_name': topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FOR_WEB,
             'old_value': '',
             'new_value': 'topic page title'
         })]
