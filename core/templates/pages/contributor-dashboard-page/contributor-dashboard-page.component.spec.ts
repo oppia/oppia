@@ -20,6 +20,7 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
@@ -37,6 +38,8 @@ describe('Contributor dashboard page', function() {
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
     can_review_questions: true
   };
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -65,10 +68,10 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve(userContributionRights));
+      spyOn(UserService, 'getProfileImageDataUrlAsync')
+        .and.returnValue($q.resolve(userProfileImage));
+      spyOn(UserService, 'getUserContributionRightsDataAsync')
+        .and.returnValue($q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();
@@ -136,10 +139,10 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(UserService, 'getProfileImageDataUrlAsync').and.returnValue(
-        $q.resolve(userProfileImage));
-      spyOn(UserService, 'getUserContributionRightsData').and.returnValue(
-        $q.resolve(userContributionRights));
+      spyOn(UserService, 'getProfileImageDataUrlAsync')
+        .and.returnValue($q.resolve(userProfileImage));
+      spyOn(UserService, 'getUserContributionRightsDataAsync')
+        .and.returnValue($q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(
         $q.resolve(userInfo));
       ctrl.$onInit();

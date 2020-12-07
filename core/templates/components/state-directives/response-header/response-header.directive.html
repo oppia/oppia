@@ -13,17 +13,16 @@
         Correct
       </div>
     </div>
-    <span ng-attr-title="<[$ctrl.getSummary()]>">
-      <[$ctrl.getShortSummary()]>
+    <span class="oppia-response-summary" ng-attr-title="<[$ctrl.getSummary()]>">
+      <span class="oppia-response-short-summary"><[$ctrl.getShortSummary()]></span>
       <span ng-if="$ctrl.getNumRules() > 1" class="badge badge-primary position-relative oppia-num-rules">
         +<[$ctrl.getNumRules() - 1]>
       </span>
     </span>
-    <span>&nbsp;</span>
   </div>
 
   <br class="break-in-mobile">
-  <span ng-if="$ctrl.getOutcome()">→</span>
+  <span ng-if="$ctrl.getOutcome()"> →</span>
   <span ng-if="$ctrl.isCorrect() && $ctrl.isInQuestionMode()">
     Correct
   </span>
@@ -85,7 +84,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 80%;
+    width: 78%;
   }
   response-header .oppia-response-tick-cross {
     margin-bottom: 7px;
@@ -96,8 +95,16 @@
   response-header .oppia-response-tick {
     color: #00645C;
   }
-  response-header .oppia-num-rules {
-    bottom: 4px;
+  response-header .oppia-response-summary {
+    display: flex;
+    flex-flow: row;
+  }
+  response-header .oppia-response-short-summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  response-header .badge {
+    vertical-align: bottom;
   }
   /* This is to break the line only when screen is too narrow to have both divs
      in same line.*/

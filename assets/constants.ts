@@ -4767,6 +4767,9 @@ export = {
     "code": "da",
     "description": "dansk (Danish)"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)"
+  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)"
   }, {
@@ -5443,7 +5446,7 @@ export = {
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
   // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": false,
+  "ENABLE_ACCOUNT_DELETION": true,
 
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": true,
@@ -5456,7 +5459,7 @@ export = {
 
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],
-  "PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES": ["Web", "Android", "Backend"],
+  "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
   // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
   // of corresponding flavors, which is used in app_version_flavor filter for
   // order comparison, with ordering: 'test' < 'alpha' < 'beta' < 'release'.

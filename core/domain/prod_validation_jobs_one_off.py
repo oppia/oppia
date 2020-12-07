@@ -172,13 +172,13 @@ class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [classifier_models.ClassifierTrainingJobModel]
 
 
-class TrainingJobExplorationMappingModelAuditOneOffJob(
+class StateTrainingJobsMappingModelAuditOneOffJob(
         ProdValidationAuditOneOffJob):
-    """Job that audits and validates TrainingJobExplorationMappingModel."""
+    """Job that audits and validates StateTrainingJobsMappingModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [classifier_models.TrainingJobExplorationMappingModel]
+        return [classifier_models.StateTrainingJobsMappingModel]
 
 
 class CollectionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -943,6 +943,14 @@ class DeletedUserModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.DeletedUserModel]
+
+
+class DeletedUsernameModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates DeletedUsernameModels."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.DeletedUsernameModel]
 
 
 class TaskEntryModelAuditOneOffJob(ProdValidationAuditOneOffJob):

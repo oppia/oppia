@@ -37,6 +37,8 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
@@ -59,6 +61,7 @@ import feconf
 import main
 import main_mail
 import main_taskqueue
+from proto import text_classifier_pb2
 import python_utils
 import requests_mock
 import schema_utils
@@ -70,10 +73,13 @@ from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 import webtest
 
-(exp_models, question_models, skill_models, story_models, topic_models,) = (
-    models.Registry.import_models([
-        models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
-        models.NAMES.story, models.NAMES.topic]))
+(
+    exp_models, feedback_models, question_models, skill_models, story_models,
+    suggestion_models, topic_models,) = (
+        models.Registry.import_models([
+            models.NAMES.exploration, models.NAMES.feedback,
+            models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+            models.NAMES.suggestion, models.NAMES.topic]))
 
 current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -2259,6 +2265,51 @@ tags: []
             owner_id, 'New question created',
             [{'cmd': question_domain.CMD_CREATE_NEW}])
 
+    def save_new_question_suggestion_with_state_data_schema_v27(
+            self, author_id, skill_id, suggestion_id=None,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Saves a new question suggestion with a default version 27 state data
+        dict.
+
+        This function should only be used for creating question suggestion in
+        tests involving migration of datastore question suggestions that use an
+        old state data schema version.
+
+        Note that it makes an explicit commit to the datastore instead of using
+        the usual functions for updating and creating questions. This is because
+        the latter approach would result in an question with the *current* state
+        data schema version.
+        """
+        score_category = (
+            suggestion_models.SCORE_TYPE_QUESTION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + skill_id)
+        change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self.VERSION_27_STATE_DICT,
+                'question_state_data_schema_version': 27,
+                'language_code': language_code,
+                'linked_skill_ids': [skill_id],
+                'inapplicable_skill_misconception_ids': []
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        if suggestion_id is None:
+            suggestion_id = (
+                feedback_models.GeneralFeedbackThreadModel.
+                generate_new_thread_id(
+                    suggestion_models.TARGET_TYPE_SKILL, skill_id))
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            suggestion_models.STATUS_IN_REVIEW, author_id, None, change,
+            score_category, suggestion_id, language_code)
+
+        return suggestion_id
+
     def save_new_skill(
             self, skill_id, owner_id, description='description',
             misconceptions=None, rubrics=None, skill_contents=None,
@@ -2767,6 +2818,78 @@ class GenericEmailTestBase(GenericTestBase):
 
 
 EmailTestBase = GenericEmailTestBase
+
+
+class ClassifierTestBase(GenericEmailTestBase):
+    """Base class for classifier test classes that need common functions
+    for related to reading classifier data and mocking the flow of the
+    storing the trained models through post request.
+
+    This class is derived from GenericEmailTestBase because the
+    TrainedClassifierHandlerTests test suite requires email services test
+    functions in addition to the classifier functions defined below.
+    """
+
+    def post_blob(self, url, payload, expected_status_int=200):
+        """Post a BLOB object to the server; return the received object.
+
+        Note that this method should only be used for
+        classifier.TrainedClassifierHandler handler and for no one else. The
+        reason being, we don't have any general mechanism for security for
+        transferring binary data. TrainedClassifierHandler implements a
+        specific mechanism which is restricted to the handler.
+
+        Args:
+            url: str. The URL to which BLOB object in payload should be sent
+                through a post request.
+            payload: bytes. Binary data which needs to be sent.
+            expected_status_int: int. The status expected as a response of post
+                request.
+
+        Returns:
+            dict. Parsed JSON response received upon invoking the post request.
+        """
+        data = payload
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
+        response = self._send_post_request(
+            self.testapp, url, data,
+            expect_errors, expected_status_int=expected_status_int,
+            headers={b'content-type': b'application/octet-stream'})
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+
+        self.assertEqual(response.status_int, expected_status_int)
+        return self._parse_json_response(response, expect_errors)
+
+    def _get_classifier_data_from_classifier_training_job(
+            self, classifier_training_job):
+        """Retrieves classifier training job from GCS using metadata stored in
+        classifier_training_job.
+
+        Args:
+            classifier_training_job: ClassifierTrainingJob. Domain object
+                containing metadata of the training job which is used to
+                retrieve the trained model.
+
+        Returns:
+            FrozenModel. Protobuf object containing classifier data.
+        """
+        filename = classifier_training_job.classifier_data_filename
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
+        classifier_data = utils.decompress_from_zlib(fs.get(filename))
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.ParseFromString(classifier_data)
+        return classifier_data_proto
 
 
 class FunctionWrapper(python_utils.OBJECT):
