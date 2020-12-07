@@ -61,7 +61,7 @@ export class UrlService {
   So exact type of this function can not be determined
   https://github.com/oppia/oppia/pull/7834#issuecomment-547896982 */
   getUrlParams(): UrlParamsType {
-    let params = {};
+    let params: {[key: string]: string} = {};
     this.getCurrentQueryString().replace(
       /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
         return params[decodeURIComponent(key)] = decodeURIComponent(value);
@@ -115,7 +115,7 @@ export class UrlService {
     throw new Error('Invalid URL for topic');
   }
 
-  getStoryUrlFragmentFromLearnerUrl(): string {
+  getStoryUrlFragmentFromLearnerUrl(): string | null {
     let pathname = this.getPathname();
     // The following segment is for getting the fragment from the new learner
     // pages.

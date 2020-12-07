@@ -70,14 +70,15 @@ export class UtilsService {
    * @param {Object} b - the second object to be compared.
    * @return {boolean} - true if a is equivalent to b, false otherwise.
    */
-  isEquivalent(a: Object, b: Object): boolean {
+  isEquivalent(a: Object, b: Object):
+  boolean {
     if (a === null || b === null) {
       return a === b;
     }
     if (typeof a !== typeof b) {
       return false;
     }
-    if (typeof a !== 'object') {
+    if (typeof a !== 'object' || typeof b !== 'object') {
       return a === b;
     }
     // Create arrays of property names.
@@ -88,7 +89,9 @@ export class UtilsService {
     }
     for (var i = 0; i < aProps.length; i++) {
       var propName = aProps[i];
-      if (!this.isEquivalent(a[propName], b[propName])) {
+      const aObj = a as {[index: string]: Object};
+      const bObj = b as {[index: string]: Object};
+      if (!this.isEquivalent(aObj[propName], bObj[propName])) {
         return false;
       }
     }
