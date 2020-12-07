@@ -133,6 +133,6 @@ class TopicPageDataHandler(base.BaseHandler):
             'skill_descriptions': skill_descriptions,
             'practice_tab_is_displayed': topic.practice_tab_is_displayed,
             'meta_tag_content': topic.meta_tag_content,
-            'page_title': topic.page_title
+            'page_title_for_web': topic.page_title_for_web
         })
         self.render_json(self.values)

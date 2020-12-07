@@ -63,7 +63,7 @@ describe('Topic object factory', () => {
       language_code: 'en',
       meta_tag_content: 'topic meta tag content',
       practice_tab_is_displayed: false,
-      page_title: 'topic page title'
+      page_title_for_web: 'topic page title'
     };
     let skillIdToDescriptionDict = {
       skill_1: 'Description 1',
@@ -150,7 +150,7 @@ describe('Topic object factory', () => {
       }],
       practice_tab_is_displayed: false,
       meta_tag_content: 'second topic meta tag content',
-      page_title: 'topic page title'
+      page_title_for_web: 'topic page title'
     }, {
       skill_1: 'Description 1',
       skill_2: 'Description 2',

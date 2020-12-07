@@ -67,7 +67,7 @@ describe('Topic viewer page', () => {
     skill_descriptions: {},
     practice_tab_is_displayed: true,
     meta_tag_content: 'Topic Meta Tag',
-    page_title: 'Topic page title'
+    page_title_for_web: 'Topic page title'
   };
 
   beforeEach(() => {

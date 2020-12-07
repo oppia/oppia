@@ -53,7 +53,7 @@ export interface TopicBackendDict {
   'url_fragment': string;
   'practice_tab_is_displayed': boolean;
   'meta_tag_content': string;
-  'page_title': string;
+  'page_title_for_web': string;
 }
 
 const constants = require('constants.ts');
@@ -75,7 +75,7 @@ export class Topic {
   _urlFragment: string;
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
-  _pageTitle: string;
+  _pageTitleForWeb: string;
   skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
@@ -93,7 +93,7 @@ export class Topic {
       subtopicObjectFactory: SubtopicObjectFactory,
       storyReferenceObjectFactory: StoryReferenceObjectFactory,
       practiceTabIsDisplayed: boolean,
-      metaTagContent: string, pageTitle: string) {
+      metaTagContent: string, pageTitleForWeb: string) {
     this._id = id;
     this._name = name;
     this._abbreviatedName = abbreviatedName;
@@ -117,7 +117,7 @@ export class Topic {
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
-    this._pageTitle = pageTitle;
+    this._pageTitleForWeb = pageTitleForWeb;
   }
 
   // ---- Instance methods ----
@@ -157,12 +157,12 @@ export class Topic {
     this._metaTagContent = metaTagContent;
   }
 
-  getPageTitle(): string {
-    return this._pageTitle;
+  getPageTitleForWeb(): string {
+    return this._pageTitleForWeb;
   }
 
-  setPageTitle(pageTitle: string): void {
-    this._pageTitle = pageTitle;
+  setPageTitleForWeb(pageTitleForWeb: string): void {
+    this._pageTitleForWeb = pageTitleForWeb;
   }
 
   getUrlFragment(): string {
@@ -285,6 +285,7 @@ export class Topic {
 
   prepublishValidate(): string[] {
     const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
+    const pageTitleForWebCharLimit = constants.MAX_CHARS_IN_PAGE_TITLE_FOR_WEB;
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
@@ -296,12 +297,12 @@ export class Topic {
           ' does not have any skill IDs linked.');
       }
     }
-    if (!this._pageTitle) {
+    if (!this._pageTitleForWeb) {
       issues.push('Topic should have page title.');
-    } else if (this._pageTitle.length > constants.MAX_CHARS_IN_PAGE_TITLE) {
+    } else if (this._pageTitleForWeb.length > pageTitleForWebCharLimit) {
       issues.push(
         'Topic page title should not be longer than ' +
-        `${constants.MAX_CHARS_IN_PAGE_TITLE} characters.`);
+        `${constants.MAX_CHARS_IN_PAGE_TITLE_FOR_WEB} characters.`);
     }
     if (!this._metaTagContent) {
       issues.push('Topic should have meta tag content.');
@@ -545,7 +546,7 @@ export class Topic {
     this.setLanguageCode(otherTopic.getLanguageCode());
     this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
     this.setMetaTagContent(otherTopic.getMetaTagContent());
-    this.setPageTitle(otherTopic.getPageTitle());
+    this.setPageTitleForWeb(otherTopic.getPageTitleForWeb());
     this._version = otherTopic.getVersion();
     this._nextSubtopicId = otherTopic.getNextSubtopicId();
     this.clearAdditionalStoryReferences();
@@ -610,7 +611,7 @@ export class TopicObjectFactory {
       skillIdToDescriptionDict, this.skillSummaryObjectFactory,
       this.subtopicObjectFactory, this.storyReferenceObjectFactory,
       topicBackendDict.practice_tab_is_displayed,
-      topicBackendDict.meta_tag_content, topicBackendDict.page_title
+      topicBackendDict.meta_tag_content, topicBackendDict.page_title_for_web
     );
   }
 

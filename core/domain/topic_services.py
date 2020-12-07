@@ -196,7 +196,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         subtopics=[subtopic.to_dict() for subtopic in topic.subtopics],
         meta_tag_content=topic.meta_tag_content,
         practice_tab_is_displayed=topic.practice_tab_is_displayed,
-        page_title=topic.page_title
+        page_title_for_web=topic.page_title_for_web
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -386,8 +386,8 @@ def apply_change_list(topic_id, change_list):
                       topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED):
                     topic.update_practice_tab_is_displayed(change.new_value)
                 elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_PAGE_TITLE):
-                    topic.update_page_title(change.new_value)
+                      topic_domain.TOPIC_PROPERTY_page_title_for_web):
+                    topic.update_page_title_for_web(change.new_value)
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 subtopic_page_id = (
@@ -516,7 +516,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.language_code = topic.language_code
     topic_model.meta_tag_content = topic.meta_tag_content
     topic_model.practice_tab_is_displayed = topic.practice_tab_is_displayed
-    topic_model.page_title = topic.page_title
+    topic_model.page_title_for_web = topic.page_title_for_web
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(

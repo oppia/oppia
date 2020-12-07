@@ -70,7 +70,7 @@ describe('Topic editor page', function() {
     topic._canonicalStoryReferences = [story1, story2];
     topic.setName('New Name');
     topic.setUrlFragment('topic-url-fragment');
-    topic.setPageTitle('topic page title');
+    topic.setPageTitleForWeb('topic page title');
     TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     $scope = $rootScope.$new();

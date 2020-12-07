@@ -193,19 +193,19 @@ export class TopicUpdateService {
    * Changes the page title of a topic and records the change in the
    * undo/redo service.
    */
-  setPageTitle(topic: Topic, pageTitle: string): void {
-    let oldPageTitle = cloneDeep(topic.getPageTitle());
+  setPageTitleForWeb(topic: Topic, pageTitleForWeb: string): void {
+    let oldPageTitleForWeb = cloneDeep(topic.getPageTitleForWeb());
     this._applyTopicPropertyChange(
-      topic, TopicDomainConstants.TOPIC_PROPERTY_PAGE_TITLE,
-      pageTitle, oldPageTitle,
-      function(changeDict, topic) {
+      topic, TopicDomainConstants.TOPIC_PROPERTY_PAGE_TITLE_FOR_WEB,
+      pageTitleForWeb, oldPageTitleForWeb,
+      (changeDict, topic) => {
         // ---- Apply ----
-        var pageTitle = this._getNewPropertyValueFromChangeDict(
+        var pageTitleForWeb = this._getNewPropertyValueFromChangeDict(
           changeDict);
-        topic.setPageTitle(pageTitle);
-      }, function(changeDict, topic) {
+        topic.setPageTitleForWeb(pageTitleForWeb);
+      }, (changeDict, topic) => {
         // ---- Undo ----
-        topic.setPageTitle(oldPageTitle);
+        topic.setPageTitleForWeb(oldPageTitleForWeb);
       });
   }
 
