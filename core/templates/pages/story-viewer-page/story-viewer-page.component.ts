@@ -135,6 +135,9 @@ angular.module('oppia').component('storyViewerPage', {
         ctrl.isLoggedIn = false;
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.isLoggedIn = userInfo.isLoggedIn();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
         LoaderService.showLoadingScreen('Loading');
         var topicUrlFragment = (

@@ -1,5 +1,111 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.0.5 (02 Dec 2020)
+------------------------
+Contributor Pages
+* Fix part of #10687: Make it possible to get the top 5 suggestions that have been waiting longest for review per reviewer. (#10860)
+* Fix #10955: Make the updates to the CommunityContributionStatsModel transactional in the PopulateContributionStatsOneOffJob (#10956)
+* Fix #10687: Make it possible to notify Contributor Dashboard reviewers that there are suggestions waiting for review. (#10943)
+* Fix translation count issue for the exploration opportunity models (#11290)
+* Add job to delete invalid suggestion models on server (#11274)
+* Add job to rename the ExplorationOpportunitySummaryModel properties (#11093)
+* Fix #10707, #10969: Notify admins about bottlenecks on the Contributor Dashboard causing a longer review turnaround time (#10963)
+
+Cloud NDB Migration
+* Improve code health of test_utils (#11080)
+
+Bug fixes
+* Fix #11200: Fix browser detection mismatch between frontend and backend (#11211)
+* Fix part of #11202: Enable logging and add retry for create task (#11209)
+* Bug fixes: enable signup button after usernamehandler/data call has completed; login redirection must include search params (#11115)
+* Fix #11023: Improve robustness of platform parameter evaluation (#11074)
+
+Translations
+* Add new site languages Kabyle & Turkish (#11109)
+* Fix #11032: Adds customization args content-id for state color status for voiceover (#11094)
+* Migrate text input rules from NormalizedString to SetOfNormalizedString (#10882)
+
+Developer UX
+* Implement admin control panel for dynamic feature gating (#10334)
+* Use merge-base when determining diffs in pre_push_hook (#10978)
+* Fix #10617: Refactor the js_ts_linter to run eslint checks on all files at once (#10632)
+* Fix #10552: Add test coverage for eslint checks (#11024)
+* Fix #10633: Refactored linter to fail if one of the sub-linter fails and exit (#10895)
+* Fix #10802: Moved _check_http_request to general_purpose_linter (#10877)
+* Refactor the linter to log more helpful messages (#10705)
+* Fix part of #8423: Add pylint check for a single space after keyword (`if`, `elif`, `while`, `yield`) (#10486)
+* Fix part of #10863: Replace overrides of put with _pre_put_hook (#10890)
+
+Data handling
+* Fix hard-deletion cron job for versioned models (#11204)
+* Wipeout 8.16: Save the username of deleted user so it cannot be reused (#11168)
+* Wipeout 8.15: Fix removal of user from contributors (#11151)
+* Fix #10951: Create a new model that is used to retrieve the user ID from the GAE ID (#11134)
+* Fix issues with ExplorationSnapshotMetadataModelAuditOneOffJob due to large output (#11127)
+* Wipeout 4.5: Add username confirmation field into the delete account modal (#11082)
+* Wipeout 8.14: Hard deletion for models marked as deleted and other small stuff (#11071)
+* Wipeout 8.13: Fix deletion policies in various models (#11069)
+* Fix part of #10951: Only allow creating users on the signup page (#11050)
+* Fix 10178: Remove gae_id attribute from UserSettingsModel (#10994)
+* Fix part of #10463: Add profile picture verification job (#10961)
+* Fix part of #5914: Add testing for Takeout export policies (#10944)
+* Remove creation of contribution model for migration bot (#10927)
+* Wipeout 8.11: Various fixes (#10864)
+* Wipeout 9.1: Add tests for wipeout and modify the release for wipeout (#10830)
+* Fix part of #5914: Enable Takeout (#10825)
+* Add one off job to fix issues with exploration model (#10821)
+* Fix #10811: Add one off jobs to fix issues with user models (#10794)
+* Validate whether all the metadataSnapshot has a commitLog pair (#10770)
+* Add one-off job for question suggestion migration (#11169)
+* Wipeout 8.12: Edit deletion page texts and modify the wipeout process (#10993)
+* Fix #10863: Explicitly update the timestamps of models (#10981)
+* Add one-off job for question suggestion migration (#11169)
+* Enforce index config for StringProperty and TextProperty (#10869)
+
+Learner/Creator Pages
+* Fix #10788 and add a 'Coming Soon' topic card to classroom page. (#10939)
+* Fix #11242: Show appropriate error message when skill deletion fails (#11284)
+* Fix #11055: Modify validation for prereq skills (#11258)
+* Redirect /learn -> /learn/math and "browse our lessons" button to redirect to classroom instead of library (#11213)
+* Story viewer signup flow (#11139)
+* Add customization arg for Numeric Expression Input Interaction (#10815)
+
+Release team
+* Fix #9415: Adds feature to update version in package.json with each release (#11008)
+* Fix terms page path in update configs script (#11001)
+* Fix workflows for changelog update PRs (#10998)
+
+QA Team
+* Improve rating and feedback (#10965)
+* Fix help card hiding the submit button in e2e tests (#10819)
+* Topics and skills dashboard e2e refactor (#10782)
+* Custom e2e logging 2 (#11056)
+* Implement e2e flow test for dynamic feature gating (#10372)
+* Install Chrome 77 in e2e tests on Github Actions (#11009)
+* Fix part of #10798: Fixing End-to-End Tests with action.js and waitFor.js (#10954)
+* Fix end to end tests for ContributorDashboard Page.js with action.js and waitFor.js (#10928)
+* Rewriting the Extensions Suite (#10776)
+
+Angular Migration
+* Fix part of #8472: Migrate solution verification service (#11135)
+* Fix part of #9749: Migrates collection-navbar.component.ts (#11053)
+* Fix part of #8472: Migrate EditableQuestionBackendApiService to Angular8 (#11040)
+* Fix part of #8472: Migrate Expression Interpolation Service (#10991)
+* Fix part of #9749: Migrates state-param-changes-editor.component to Angular (#10962)
+* Fix part of #8472: Migrate exploration-summary-backend-api.service.ts and exploration-id-validation.service.ts (#10908)
+* Fix part of #10700: Refactor Object Factories with Dependencies (#10868)
+* Migrate QuestionsListService to Angular (#10867)
+* Fix part of #10700: Refactor Object Factories (#10838)
+* Fix part of #8472 : Migrate TranslationTabActiveModeService to Angular8 (#10813)
+* Fix part of #10700: Refactor Object Factories (#10701)
+* Fix part of #8472: Migrate editable-story-backend-api.service.ts file to angular 8 (#10378)
+* Fix part of #8472: Migrate admin-config-tab-backend-api.service.ts file to angular 8 (#11058)
+* Fix part of #8472: Migrate learner answer info service to angular 8 (#11021)
+* Fix part of #8472: Migrate EditableTopicBackendApiService to Angular 8 (#10997)
+* Fix #8038: Http calls moved from promo-bar.service.ts to *backend.api.service  (#11067)
+* Fix #10398: Remove services from app and add require (#10725)
+
+
 v3.0.4 (17 Oct 2020)
 ------------------------
 Contributor Pages
