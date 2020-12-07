@@ -30,6 +30,7 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
   var AlertsService = null;
   var CollectionEditorStateService = null;
   var CollectionUpdateService = null;
+  importAllAngularServices();
 
   importAllAngularServices();
 
