@@ -23,6 +23,7 @@ import { Collection } from
 import { CollectionRights } from
   'domain/collection/collection-rights.model';
 import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
@@ -102,6 +103,7 @@ describe('Collection editor state service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
