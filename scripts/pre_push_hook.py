@@ -34,6 +34,7 @@ import argparse
 import collections
 import os
 import pprint
+import re
 import shutil
 import subprocess
 import sys
@@ -61,7 +62,7 @@ PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 FRONTEND_TEST_CMDS = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
-TRAVIS_CI_PROTRACTOR_CHECK_CMDS = [
+CI_PROTRACTOR_CHECK_CMDS = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
 TYPESCRIPT_CHECKS_CMDS = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
 STRICT_TYPESCRIPT_CHECKS_CMDS = [
@@ -418,19 +419,19 @@ def does_diff_include_ts_files(diff_files):
     return False
 
 
-def does_diff_include_travis_yml_or_js_files(diff_files):
-    """Returns true if diff includes .travis.yml or Javascript files.
+def does_diff_include_ci_config_or_js_files(diff_files):
+    """Returns true if diff includes CI config or Javascript files.
 
     Args:
         diff_files: list(str). List of files changed.
 
     Returns:
-        bool. Whether the diff contains changes in travis.yml or
+        bool. Whether the diff contains changes in CI config or
         Javascript files.
     """
 
     for file_path in diff_files:
-        if file_path.endswith('.js') or file_path.endswith('.travis.yml'):
+        if file_path.endswith('.js') or re.search(r'e2e_.*\.yml', file_path):
             return True
     return False
 
@@ -526,7 +527,7 @@ def main(args=None):
                 sys.exit(1)
 
             frontend_status = 0
-            travis_ci_check_status = 0
+            ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = run_script_and_get_returncode(
                     FRONTEND_TEST_CMDS)
@@ -534,10 +535,10 @@ def main(args=None):
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
-            if does_diff_include_travis_yml_or_js_files(files_to_lint):
-                travis_ci_check_status = run_script_and_get_returncode(
-                    TRAVIS_CI_PROTRACTOR_CHECK_CMDS)
-            if travis_ci_check_status != 0:
+            if does_diff_include_ci_config_or_js_files(files_to_lint):
+                ci_check_status = run_script_and_get_returncode(
+                    CI_PROTRACTOR_CHECK_CMDS)
+            if ci_check_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)

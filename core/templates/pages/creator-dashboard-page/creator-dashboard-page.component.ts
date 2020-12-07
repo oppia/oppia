@@ -52,7 +52,7 @@ require('pages/creator-dashboard-page/creator-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('creatorDashboardPage', {
   template: require('./creator-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$window', 'AlertsService',
+    '$http', '$q', '$rootScope', '$window', 'AlertsService',
     'CreatorDashboardBackendApiService', 'DateTimeFormatService',
     'ExplorationCreationService', 'LoaderService',
     'RatingComputationService', 'SuggestionModalForCreatorDashboardService',
@@ -65,7 +65,7 @@ angular.module('oppia').component('creatorDashboardPage', {
     'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
     'SUBSCRIPTION_SORT_BY_KEYS',
     function(
-        $http, $q, $window, AlertsService,
+        $http, $q, $rootScope, $window, AlertsService,
         CreatorDashboardBackendApiService, DateTimeFormatService,
         ExplorationCreationService, LoaderService,
         RatingComputationService, SuggestionModalForCreatorDashboardService,
@@ -257,6 +257,9 @@ angular.module('oppia').component('creatorDashboardPage', {
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.canCreateCollections = userInfo.canCreateCollections();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         var dashboardDataPromise = (
