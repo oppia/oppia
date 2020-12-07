@@ -39,6 +39,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$scope', '$uibModal', 'EditableStoryBackendApiService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
@@ -52,6 +53,14 @@ angular.module('oppia').directive('storyEditorNavbar', [
           var PREVIEW = 'Preview';
           ctrl.directiveSubscriptions = new Subscription();
           $scope.explorationValidationIssues = [];
+
+          ctrl.isStoryPublished = function() {
+            return StoryEditorStateService.isStoryPublished();
+          };
+
+          ctrl.isSaveInProgress = function() {
+            return StoryEditorStateService.isSavingStory();
+          };
 
           $scope.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
@@ -222,8 +231,6 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.showNavigationOptions = false;
             $scope.showStoryEditOptions = false;
             $scope.story = StoryEditorStateService.getStory();
-            $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
-            $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             ctrl.directiveSubscriptions.add(

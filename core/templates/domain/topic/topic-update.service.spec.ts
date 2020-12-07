@@ -104,7 +104,6 @@ describe('Topic update service', function() {
     language_code: 'en'
   };
 
-
   beforeEach(() => {
     recordedVoiceoversObjectFactory = TestBed.get(
       RecordedVoiceoversObjectFactory);

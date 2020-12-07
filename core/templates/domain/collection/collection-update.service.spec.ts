@@ -22,7 +22,6 @@ import { Change } from
   'domain/editor/undo_redo/change.model';
 import { Collection, CollectionBackendDict } from
   'domain/collection/collection.model';
-import { UpgradedServices } from 'services/UpgradedServices';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -38,16 +37,12 @@ describe('Collection update service', function() {
     status: 'public'
   };
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', Change);
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
