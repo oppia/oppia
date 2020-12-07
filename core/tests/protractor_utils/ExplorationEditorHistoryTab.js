@@ -101,7 +101,8 @@ var ExplorationEditorHistoryTab = function() {
           closeStateHistoryButton,
           'Close State History button is not clickable');
         expect(await closeStateHistoryButton.isDisplayed()).toBe(true);
-        await action.click("Closes State History button", closeStateHistoryButton);
+        await action.click('Closes State History button',
+            closeStateHistoryButton);
         await waitFor.invisibilityOf(
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
