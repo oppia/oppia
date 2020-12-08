@@ -32,7 +32,7 @@ import {
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AppConstants } from 'app.constants';
-import {ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { LoggerService } from 'services/contextual/logger.service';
