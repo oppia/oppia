@@ -17,7 +17,7 @@
  */
 
 
-import { async, TestBed } from '@angular/core/testing';
+import { async, fakeAsync, TestBed } from '@angular/core/testing';
 import { ExplorationRecommendationsService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/exploration-recommendations.service';
@@ -27,10 +27,11 @@ import { UrlService } from 'services/contextual/url.service';
 import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 
 
 
-describe('Exploration Recommendations Service', () => {
+fdescribe('Exploration Recommendations Service', () => {
   let expRecsService: ExplorationRecommendationsService;
   let urlService: UrlService;
   let contextService: ContextService;
@@ -39,7 +40,16 @@ describe('Exploration Recommendations Service', () => {
   const COLLECTION_ID = '2';
   const NODE_ID = '3';
   const EXPLORATION_ID = '4';
-  const AUTHOR_REC_EXP_IDS = ['5', '6'];
+  const AUTHOR_REC_IDS = ['5', '6'];
+  const SYSTEM_REC_IDS = ['7', '8'];
+  class MockExplorationSummary {
+    id: string;
+    constructor(id?: string) {
+      this.id = id;
+    }
+  }
+  let authorRecommendations: LearnerExplorationSummary[];
+  let systemRecommendations: LearnerExplorationSummary[];
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -55,9 +65,6 @@ describe('Exploration Recommendations Service', () => {
   beforeEach(() => {
     urlService = TestBed.get(UrlService);
     contextService = TestBed.get(ContextService);
-    expRecsBackendApiService = TestBed.get(
-      ExplorationRecommendationsBackendApiService
-    );
 
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       COLLECTION_ID);
@@ -68,9 +75,6 @@ describe('Exploration Recommendations Service', () => {
     });
 
     spyOn(contextService, 'getExplorationId').and.returnValue(EXPLORATION_ID);
-
-    spyOn(
-      expRecsBackendApiService, 'getRecommendedSummaryDicts').and.resolveTo([]);
   });
 
   describe('when used in the editor', () => {
@@ -91,30 +95,11 @@ describe('Exploration Recommendations Service', () => {
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW
         );
       });
+
       it('should initialize with editor preview context', () => {
         expRecsService = TestBed.get(ExplorationRecommendationsService);
         expect(expRecsService.isInEditorPage).toBeTrue();
         expect(expRecsService.isInEditorPreviewMode).toBeTrue();
-      });
-    });
-    describe('getRecommendendedSummaryDicts', () => {
-      beforeEach(() => {
-        expRecsService = TestBed.get(ExplorationRecommendationsService);
-      });
-      it('should not include system recommendations', () => {
-        expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_EXP_IDS, true, (val)=>val
-        );
-        expect(
-          expRecsBackendApiService.getRecommendedSummaryDicts
-        ).toHaveBeenCalledWith(
-          AUTHOR_REC_EXP_IDS,
-          'false',
-          COLLECTION_ID,
-          STORY_ID,
-          NODE_ID,
-          EXPLORATION_ID
-        );
       });
     });
   });
@@ -130,24 +115,90 @@ describe('Exploration Recommendations Service', () => {
       expRecsService = TestBed.get(ExplorationRecommendationsService);
       expect(expRecsService.isInEditorPage).toBeFalse();
     });
+  });
 
-    describe('getRecommendendedSummaryDicts', () => {
+  describe('getRecommendendedSummaryDicts', () => {
+    beforeEach(() => {
+      systemRecommendations = SYSTEM_REC_IDS.map((id) => {
+        return new MockExplorationSummary(id) as LearnerExplorationSummary;
+      });
+
+      authorRecommendations = AUTHOR_REC_IDS.map((id) => {
+        return new MockExplorationSummary(id) as LearnerExplorationSummary;
+      });
+
+      expRecsBackendApiService = TestBed.get(
+        ExplorationRecommendationsBackendApiService
+      );
+
+      spyOn(
+        expRecsBackendApiService, 'getRecommendedSummaryDicts').and.callFake(
+        (_, includeSystemRecommendations: string) => {
+          return new Promise((resolve, reject) => {
+            if (includeSystemRecommendations === 'true') {
+              resolve(
+                authorRecommendations.concat(systemRecommendations)
+              );
+            } else {
+              resolve(authorRecommendations);
+            }
+          });
+        });
+    });
+
+    describe('when used outside of the editor', () => {
       beforeEach(() => {
+        spyOn(contextService, 'getPageContext').and.returnValue(
+          ServicesConstants.PAGE_CONTEXT.OTHER
+        );
         expRecsService = TestBed.get(ExplorationRecommendationsService);
       });
+      it('should include author recommendations', () => {
+        expRecsService.getRecommendedSummaryDicts(
+          AUTHOR_REC_IDS, true, (expSummaries) => {
+            authorRecommendations.forEach((rec) => {
+              expect(expSummaries).toContain(rec);
+            });
+          }
+        );
+      });
+
       it('should include system recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_EXP_IDS, true, (val)=>val
+          AUTHOR_REC_IDS, true, (expSummaries) => {
+            systemRecommendations.forEach((rec) => {
+              expect(expSummaries).toContain(rec);
+            });
+          }
         );
-        expect(
-          expRecsBackendApiService.getRecommendedSummaryDicts
-        ).toHaveBeenCalledWith(
-          AUTHOR_REC_EXP_IDS,
-          'true',
-          COLLECTION_ID,
-          STORY_ID,
-          NODE_ID,
-          EXPLORATION_ID
+      });
+    });
+
+    describe('when used in the editor', () => {
+      beforeEach(() => {
+        spyOn(contextService, 'getPageContext').and.returnValue(
+          ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
+        );
+        expRecsService = TestBed.get(ExplorationRecommendationsService);
+      });
+
+      it('should include author recommendations', () => {
+        expRecsService.getRecommendedSummaryDicts(
+          AUTHOR_REC_IDS, true, (expSummaries) => {
+            authorRecommendations.forEach((rec) => {
+              expect(expSummaries).toContain(rec);
+            });
+          }
+        );
+      });
+
+      it('should not include system recommendations', () => {
+        expRecsService.getRecommendedSummaryDicts(
+          AUTHOR_REC_IDS, true, (expSummaries) => {
+            systemRecommendations.forEach((rec) => {
+              expect(expSummaries).not.toContain(rec);
+            });
+          }
         );
       });
     });
