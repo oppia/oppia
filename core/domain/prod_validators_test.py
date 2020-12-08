@@ -68,7 +68,6 @@ USER_NAME = 'username'
     story_models, subtopic_models,
     suggestion_models, topic_models,
     user_models
-
 ) = models.Registry.import_models([
     models.NAMES.collection,
     models.NAMES.email, models.NAMES.exploration,
@@ -1657,8 +1656,6 @@ class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-
-
 
 
 class JobModelValidatorTests(test_utils.AuditJobsTestBase):

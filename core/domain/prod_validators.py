@@ -49,13 +49,13 @@ import utils
     email_models, exp_models, feedback_models, 
     job_models, question_models, 
     skill_models, story_models, subtopic_models, 
-    suggestion_models, topic_models, user_models) = models.Registry.import_models([
+    suggestion_models, topic_models, user_models
+) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection,
     models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
     models.NAMES.job, models.NAMES.question, models.NAMES.skill,
     models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
-
 ])
 
 ALLOWED_AUDIO_EXTENSIONS = list(feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
@@ -491,6 +491,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_exploration_model_last_updated]
+
 
 class JobModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating JobModels."""

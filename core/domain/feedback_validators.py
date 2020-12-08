@@ -24,10 +24,13 @@ from core.domain import user_services
 from core.platform import models
 import python_utils
 
-(base_models, exp_models, feedback_models, suggestion_models, user_models) = 
-    models.Registry.import_models([
+(
+    base_models, exp_models, feedback_models, suggestion_models, user_models
+) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.suggestion, models.NAMES.user])
+    models.NAMES.suggestion, models.NAMES.user
+])
+
 
 class GeneralFeedbackThreadModelValidator(
         base_model_validators.BaseModelValidator):

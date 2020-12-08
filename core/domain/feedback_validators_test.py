@@ -32,17 +32,16 @@ import feconf
 
 datastore_services = models.Registry.import_datastore_services()
 
-
 (
     exp_models, feedback_models,
     suggestion_models, user_models
-
 ) = models.Registry.import_models([
     models.NAMES.exploration,
     models.NAMES.feedback,
     models.NAMES.suggestion, 
     models.NAMES.user
 ])
+
 
 class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
 
