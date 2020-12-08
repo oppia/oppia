@@ -73,25 +73,25 @@ describe('Exploration Recommendations Service', () => {
       expRecsBackendApiService, 'getRecommendedSummaryDicts').and.resolveTo([]);
   });
 
-  describe('when context is in editor page', () => {
+  describe('when used in the editor', () => {
     beforeEach(() => {
       spyOn(contextService, 'getPageContext').and.returnValue(
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
       );
     });
 
-    it('should initialize with correct context', () => {
+    it('should initialize with editor context', () => {
       expRecsService = TestBed.get(ExplorationRecommendationsService);
       expect(expRecsService.isInEditorPage).toBeTrue();
     });
 
-    describe('in preview mode', () => {
+    describe('in the Preview tab', () => {
       beforeEach(() => {
         spyOn(contextService, 'getEditorTabContext').and.returnValue(
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW
         );
       });
-      it('should initialize with correct context', () => {
+      it('should initialize with editor preview context', () => {
         expRecsService = TestBed.get(ExplorationRecommendationsService);
         expect(expRecsService.isInEditorPage).toBeTrue();
         expect(expRecsService.isInEditorPreviewMode).toBeTrue();
@@ -119,14 +119,14 @@ describe('Exploration Recommendations Service', () => {
     });
   });
 
-  describe('when not in editor page', () => {
+  describe('when used outside of the editor', () => {
     beforeEach(() => {
       spyOn(contextService, 'getPageContext').and.returnValue(
         ServicesConstants.PAGE_CONTEXT.OTHER
       );
     });
 
-    it('should initialize with correct context', () => {
+    it('should not initialize with editor context', () => {
       expRecsService = TestBed.get(ExplorationRecommendationsService);
       expect(expRecsService.isInEditorPage).toBeFalse();
     });
