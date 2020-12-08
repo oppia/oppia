@@ -30,12 +30,6 @@ import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
-
-
-// interface groupedSummaries {
-//   current: unknown[],
-//   others: unknown[]
-// }
 @Injectable({
   providedIn: 'root'
 })

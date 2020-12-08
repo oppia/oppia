@@ -339,9 +339,8 @@ fdescribe('Skill editor state service', () => {
 
   it('should not save the skill if there are no pending changes',
     () => {
-      const skillloaded = skillEditorStateService.loadSkill('skill_id_1');
+      skillEditorStateService.loadSkill('skill_id_1');
 
-      console.log(skillloaded, "======skillloaded")
       expect(skillEditorStateService.saveSkill(
         'commit message', ()=> {})).toBe(false);
     });
@@ -393,7 +392,7 @@ fdescribe('Skill editor state service', () => {
       fakeSkillBackendApiService.failure = 'Internal 500 error';
 
 
-      skillEditorStateService.saveSkill('commit message');
+      skillEditorStateService.saveSkill('commit message', () => {});
 
       expect(skillEditorStateService.isSavingSkill()).toBe(true);
       tick(1000);
