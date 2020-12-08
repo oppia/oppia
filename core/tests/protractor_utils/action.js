@@ -59,6 +59,9 @@ var sendKeys = async function(
     inputName, inputElement, keys, clickInputElement = true) {
   if (clickInputElement) {
     await click(inputName, inputElement);
+  } else {
+    await waitFor.visibilityOf(
+      inputElement, `${inputName} is not visible.`);
   }
   await inputElement.sendKeys(keys);
 };
