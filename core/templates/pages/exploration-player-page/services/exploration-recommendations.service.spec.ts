@@ -30,14 +30,16 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 
 
-fdescribe('Exploration Recommendations Service', () => {
+describe('Exploration Recommendations Service', () => {
   let expRecsService: ExplorationRecommendationsService;
   let urlService: UrlService;
   let contextService: ContextService;
   let expRecsBackendApiService: ExplorationRecommendationsBackendApiService;
   const STORY_ID = '1';
+  const COLLECTION_ID = '2';
   const NODE_ID = '3';
   const EXPLORATION_ID = '4';
+  const AUTHOR_REC_EXP_IDS = ['5', '6'];
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -57,7 +59,9 @@ fdescribe('Exploration Recommendations Service', () => {
       ExplorationRecommendationsBackendApiService
     );
 
-    spyOn(urlService, 'getCollectionIdFromExplorationUrl');
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      COLLECTION_ID);
+
     spyOn(urlService, 'getUrlParams').and.returnValue({
       story_id: STORY_ID,
       node_id: NODE_ID
@@ -65,7 +69,8 @@ fdescribe('Exploration Recommendations Service', () => {
 
     spyOn(contextService, 'getExplorationId').and.returnValue(EXPLORATION_ID);
 
-    spyOn(expRecsBackendApiService, 'getRecommendedSummaryDicts');
+    spyOn(
+      expRecsBackendApiService, 'getRecommendedSummaryDicts').and.resolveTo([]);
   });
 
   describe('when context is in editor page', () => {
@@ -92,6 +97,26 @@ fdescribe('Exploration Recommendations Service', () => {
         expect(expRecsService.isInEditorPreviewMode).toBeTrue();
       });
     });
+    describe('getRecommendendedSummaryDicts', () => {
+      beforeEach(() => {
+        expRecsService = TestBed.get(ExplorationRecommendationsService);
+      });
+      it('should not include system recommendations', () => {
+        expRecsService.getRecommendedSummaryDicts(
+          AUTHOR_REC_EXP_IDS, true, (val)=>val
+        );
+        expect(
+          expRecsBackendApiService.getRecommendedSummaryDicts
+        ).toHaveBeenCalledWith(
+          AUTHOR_REC_EXP_IDS,
+          'false',
+          COLLECTION_ID,
+          STORY_ID,
+          NODE_ID,
+          EXPLORATION_ID
+        );
+      });
+    });
   });
 
   describe('when not in editor page', () => {
@@ -104,6 +129,27 @@ fdescribe('Exploration Recommendations Service', () => {
     it('should initialize with correct context', () => {
       expRecsService = TestBed.get(ExplorationRecommendationsService);
       expect(expRecsService.isInEditorPage).toBeFalse();
+    });
+
+    describe('getRecommendendedSummaryDicts', () => {
+      beforeEach(() => {
+        expRecsService = TestBed.get(ExplorationRecommendationsService);
+      });
+      it('should include system recommendations', () => {
+        expRecsService.getRecommendedSummaryDicts(
+          AUTHOR_REC_EXP_IDS, true, (val)=>val
+        );
+        expect(
+          expRecsBackendApiService.getRecommendedSummaryDicts
+        ).toHaveBeenCalledWith(
+          AUTHOR_REC_EXP_IDS,
+          'true',
+          COLLECTION_ID,
+          STORY_ID,
+          NODE_ID,
+          EXPLORATION_ID
+        );
+      });
     });
   });
 });
