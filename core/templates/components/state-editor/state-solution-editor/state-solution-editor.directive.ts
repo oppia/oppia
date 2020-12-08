@@ -56,6 +56,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-verification.service');
 require('services/alerts.service.ts');
 require('services/editability.service.ts');
 require('services/exploration-html-formatter.service.ts');

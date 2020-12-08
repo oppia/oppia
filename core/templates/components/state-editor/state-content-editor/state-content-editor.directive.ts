@@ -18,6 +18,9 @@
 
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');

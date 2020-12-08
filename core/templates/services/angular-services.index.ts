@@ -305,6 +305,7 @@ import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answer
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
@@ -541,6 +542,7 @@ export const angularServices: [string, unknown][] = [
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],
+  ['ResponsesService', ResponsesService],
   ['RubricObjectFactory', RubricObjectFactory],
   ['RuleObjectFactory', RuleObjectFactory],
   ['SVMPredictionService', SVMPredictionService],

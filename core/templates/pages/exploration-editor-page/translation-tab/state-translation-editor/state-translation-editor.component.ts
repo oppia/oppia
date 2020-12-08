@@ -22,6 +22,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('services/external-save.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),

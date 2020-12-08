@@ -535,6 +535,9 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { SolutionVerificationService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -1156,6 +1159,11 @@ export class UpgradedServices {
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['SolutionVerificationService'] =
+      new SolutionVerificationService(
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['StateEditorService']);
     upgradedServices['SkillCreationBackendApiService'] =
       new SkillCreationBackendApiService(
         upgradedServices['HttpClient']);

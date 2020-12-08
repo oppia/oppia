@@ -19,6 +19,14 @@ require(
   'components/state-directives/outcome-editor/' +
   'outcome-feedback-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 
 angular.module('oppia').component('trainingPanel', {
   bindings: {

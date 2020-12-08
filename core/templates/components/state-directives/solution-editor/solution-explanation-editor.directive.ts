@@ -23,6 +23,9 @@ require(
 require('services/context.service.ts');
 require('services/editability.service.ts');
 require('services/external-save.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+ 'state-solution.service');
 
 import { Subscription } from 'rxjs';
 
