@@ -5786,6 +5786,21 @@ class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+    def test_audit_with_missing_user_identifiers_model_fails(self):
+        user_models.UserIdentifiersModel.get_by_user_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_identifiers_ids '
+                'field check of UserAuthDetailsModel\', '
+                '[u"Entity id %s: based on '
+                'field user_identifiers_ids having value '
+                '%s, expected model UserIdentifiersModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.user_id, self.gae_id, self.gae_id),
+            u'[u\'fully-validated UserAuthDetailsModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
 
 class UserIdentifiersModelValidatorTests(test_utils.AuditJobsTestBase):
 
@@ -5854,6 +5869,21 @@ class UserIdentifiersModelValidatorTests(test_utils.AuditJobsTestBase):
                 '[u"Entity id %s: based on '
                 'field user_settings_ids having value '
                 '%s, expected model UserSettingsModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.gae_id, self.user_id, self.user_id),
+            u'[u\'fully-validated UserIdentifiersModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_audit_with_missing_user_auth_details_model_fails(self):
+        user_models.UserAuthDetailsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_auth_details_ids '
+                'field check of UserIdentifiersModel\', '
+                '[u"Entity id %s: based on '
+                'field user_auth_details_ids having value '
+                '%s, expected model UserAuthDetailsModel '
                 'with id %s but it doesn\'t exist"]]') % (
                     self.gae_id, self.user_id, self.user_id),
             u'[u\'fully-validated UserIdentifiersModel\', 1]']
