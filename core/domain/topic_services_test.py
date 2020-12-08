@@ -725,7 +725,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'new_value': True
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FOR_WEB,
+            'property_name': topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB,
             'old_value': '',
             'new_value': 'topic page title'
         })]
@@ -742,7 +742,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic.practice_tab_is_displayed, True)
         self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
-        self.assertEqual(topic.page_title_for_web, 'topic page title')
+        self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')

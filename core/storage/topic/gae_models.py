@@ -107,8 +107,12 @@ class TopicModel(base_models.VersionedModel):
     # The content of the meta tag in the Topic viewer page.
     meta_tag_content = datastore_services.StringProperty(
         indexed=True, default='')
-    # The page title used in the Topic viewer page.
-    page_title_for_web = datastore_services.StringProperty(
+    # The page title fragment used in the Topic viewer web page.
+    # For example, if the full Topic viewer web page title is
+    # 'Learn Fractions | Add, Subtract, Multiply and Divide | Oppia'
+    # the page title fragment field represents the middle value 'Add, Subtract,
+    # Multiply and Divide'.
+    page_title_fragment_for_web = datastore_services.StringProperty(
         indexed=True, default='')
 
     @staticmethod
@@ -213,7 +217,7 @@ class TopicModel(base_models.VersionedModel):
             'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'page_title_for_web': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'page_title_fragment_for_web': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'practice_tab_is_displayed':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,

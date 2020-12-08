@@ -729,24 +729,24 @@ def require_valid_meta_tag_content(meta_tag_content):
             % constants.MAX_CHARS_IN_META_TAG_CONTENT)
 
 
-def require_valid_page_title_for_web(page_title_for_web):
-    """Generic page title validation.
+def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
+    """Generic page title fragment validation.
 
     Args:
-        page_title_for_web: str. The page title to validate.
+        page_title_fragment_for_web: str. The page title fragment to validate.
 
     Raises:
-        Exception. Page title is not a string.
-        Exception. Page title is too lengthy.
+        Exception. Page title fragment is not a string.
+        Exception. Page title fragment is too lengthy.
     """
-    if not isinstance(page_title_for_web, python_utils.BASESTRING):
+    if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
         raise ValidationError(
-            'Expected page title to be a string, received %s'
-            % page_title_for_web)
-    if len(page_title_for_web) > constants.MAX_CHARS_IN_PAGE_TITLE_FOR_WEB:
+            'Expected page title fragment to be a string, received %s'
+            % page_title_fragment_for_web)
+    if len(page_title_fragment_for_web) > constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB:
         raise ValidationError(
-            'Page title should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FOR_WEB)
+            'Page title fragment should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
 
 
 def capitalize_string(input_string):

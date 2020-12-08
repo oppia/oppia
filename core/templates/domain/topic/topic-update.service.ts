@@ -190,22 +190,22 @@ export class TopicUpdateService {
   }
 
   /**
-   * Changes the page title of a topic and records the change in the
+   * Changes the page title fragment of a topic and records the change in the
    * undo/redo service.
    */
-  setPageTitleForWeb(topic: Topic, pageTitleForWeb: string): void {
-    let oldPageTitleForWeb = cloneDeep(topic.getPageTitleForWeb());
+  setPageTitleFragmentForWeb(topic: Topic, pageTitleFragmentForWeb: string): void {
+    let oldPageTitleFragmentForWeb = cloneDeep(topic.getPageTitleFragmentForWeb());
     this._applyTopicPropertyChange(
-      topic, TopicDomainConstants.TOPIC_PROPERTY_PAGE_TITLE_FOR_WEB,
-      pageTitleForWeb, oldPageTitleForWeb,
+      topic, TopicDomainConstants.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB,
+      pageTitleFragmentForWeb, oldPageTitleFragmentForWeb,
       (changeDict, topic) => {
         // ---- Apply ----
-        var pageTitleForWeb = this._getNewPropertyValueFromChangeDict(
+        var pageTitleFragmentForWeb = this._getNewPropertyValueFromChangeDict(
           changeDict);
-        topic.setPageTitleForWeb(pageTitleForWeb);
+        topic.setPageTitleFragmentForWeb(pageTitleFragmentForWeb);
       }, (changeDict, topic) => {
         // ---- Undo ----
-        topic.setPageTitleForWeb(oldPageTitleForWeb);
+        topic.setPageTitleFragmentForWeb(oldPageTitleFragmentForWeb);
       });
   }
 

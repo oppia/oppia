@@ -48,7 +48,7 @@ export interface ReadOnlyTopicBackendDict {
   'topic_description': string;
   'practice_tab_is_displayed': boolean;
   'meta_tag_content': string;
-  'page_title_for_web': string;
+  'page_title_fragment_for_web': string;
 }
 
 export class ReadOnlyTopic {
@@ -63,7 +63,7 @@ export class ReadOnlyTopic {
   _skillDescriptions: SkillIdToDescriptionMap;
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
-  _pageTitleForWeb: string;
+  _pageTitleFragmentForWeb: string;
 
   constructor(
       topicName: string, topicId: string, topicDescription: string,
@@ -74,7 +74,7 @@ export class ReadOnlyTopic {
       degreesOfMastery: DegreesOfMastery,
       skillDescriptions: SkillIdToDescriptionMap,
       practiceTabIsDisplayed: boolean,
-      metaTagContent: string, pageTitleForWeb: string) {
+      metaTagContent: string, pageTitleFragmentForWeb: string) {
     this._topicName = topicName;
     this._topicId = topicId;
     this._topicDescription = topicDescription;
@@ -86,7 +86,7 @@ export class ReadOnlyTopic {
     this._skillDescriptions = skillDescriptions;
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
-    this._pageTitleForWeb = pageTitleForWeb;
+    this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
   getTopicName(): string {
@@ -133,8 +133,8 @@ export class ReadOnlyTopic {
     return this._metaTagContent;
   }
 
-  getPageTitleForWeb(): string {
-    return this._pageTitleForWeb;
+  getPageTitleFragmentForWeb(): string {
+    return this._pageTitleFragmentForWeb;
   }
 }
 
@@ -191,7 +191,7 @@ export class ReadOnlyTopicObjectFactory {
       topicDataDict.topic_description, canonicalStories,
       additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,
       skillDescriptions, topicDataDict.practice_tab_is_displayed,
-      topicDataDict.meta_tag_content, topicDataDict.page_title_for_web);
+      topicDataDict.meta_tag_content, topicDataDict.page_title_fragment_for_web);
   }
 }
 

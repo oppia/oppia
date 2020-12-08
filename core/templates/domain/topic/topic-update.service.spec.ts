@@ -310,20 +310,20 @@ describe('Topic update service', function() {
   });
 
   it('should set/unset changes to a topic\'s page title', function() {
-    expect(_sampleTopic.getPageTitleForWeb()).toBeUndefined();
-    topicUpdateService.setPageTitleForWeb(_sampleTopic, 'new page title');
-    expect(_sampleTopic.getPageTitleForWeb()).toEqual('new page title');
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
+    topicUpdateService.setPageTitleFragmentForWeb(_sampleTopic, 'new page title');
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toEqual('new page title');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getPageTitleForWeb()).toBeUndefined();
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
   });
 
   it('should create a proper backend change dict ' +
     'for changing a topic\'s page title', function() {
-    topicUpdateService.setPageTitleForWeb(_sampleTopic, 'new page title');
+    topicUpdateService.setPageTitleFragmentForWeb(_sampleTopic, 'new page title');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_topic_property',
-      property_name: 'page_title_for_web',
+      property_name: 'page_title_fragment_for_web',
       new_value: 'new page title',
       old_value: null
     }]);

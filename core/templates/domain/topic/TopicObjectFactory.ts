@@ -53,7 +53,7 @@ export interface TopicBackendDict {
   'url_fragment': string;
   'practice_tab_is_displayed': boolean;
   'meta_tag_content': string;
-  'page_title_for_web': string;
+  'page_title_fragment_for_web': string;
 }
 
 const constants = require('constants.ts');
@@ -75,7 +75,7 @@ export class Topic {
   _urlFragment: string;
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
-  _pageTitleForWeb: string;
+  _pageTitleFragmentForWeb: string;
   skillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
@@ -93,7 +93,7 @@ export class Topic {
       subtopicObjectFactory: SubtopicObjectFactory,
       storyReferenceObjectFactory: StoryReferenceObjectFactory,
       practiceTabIsDisplayed: boolean,
-      metaTagContent: string, pageTitleForWeb: string) {
+      metaTagContent: string, pageTitleFragmentForWeb: string) {
     this._id = id;
     this._name = name;
     this._abbreviatedName = abbreviatedName;
@@ -117,7 +117,7 @@ export class Topic {
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
-    this._pageTitleForWeb = pageTitleForWeb;
+    this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
   // ---- Instance methods ----
@@ -157,12 +157,12 @@ export class Topic {
     this._metaTagContent = metaTagContent;
   }
 
-  getPageTitleForWeb(): string {
-    return this._pageTitleForWeb;
+  getPageTitleFragmentForWeb(): string {
+    return this._pageTitleFragmentForWeb;
   }
 
-  setPageTitleForWeb(pageTitleForWeb: string): void {
-    this._pageTitleForWeb = pageTitleForWeb;
+  setPageTitleFragmentForWeb(pageTitleFragmentForWeb: string): void {
+    this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
   }
 
   getUrlFragment(): string {
@@ -285,7 +285,7 @@ export class Topic {
 
   prepublishValidate(): string[] {
     const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
-    const pageTitleForWebCharLimit = constants.MAX_CHARS_IN_PAGE_TITLE_FOR_WEB;
+    const pageTitleFragmentForWebCharLimit = constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
@@ -297,12 +297,12 @@ export class Topic {
           ' does not have any skill IDs linked.');
       }
     }
-    if (!this._pageTitleForWeb) {
-      issues.push('Topic should have page title.');
-    } else if (this._pageTitleForWeb.length > pageTitleForWebCharLimit) {
+    if (!this._pageTitleFragmentForWeb) {
+      issues.push('Topic should have page title fragment.');
+    } else if (this._pageTitleFragmentForWeb.length > pageTitleFragmentForWebCharLimit) {
       issues.push(
-        'Topic page title should not be longer than ' +
-        `${constants.MAX_CHARS_IN_PAGE_TITLE_FOR_WEB} characters.`);
+        'Topic page title fragment should not be longer than ' +
+        `${constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB} characters.`);
     }
     if (!this._metaTagContent) {
       issues.push('Topic should have meta tag content.');
@@ -546,7 +546,7 @@ export class Topic {
     this.setLanguageCode(otherTopic.getLanguageCode());
     this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
     this.setMetaTagContent(otherTopic.getMetaTagContent());
-    this.setPageTitleForWeb(otherTopic.getPageTitleForWeb());
+    this.setPageTitleFragmentForWeb(otherTopic.getPageTitleFragmentForWeb());
     this._version = otherTopic.getVersion();
     this._nextSubtopicId = otherTopic.getNextSubtopicId();
     this.clearAdditionalStoryReferences();
@@ -611,7 +611,7 @@ export class TopicObjectFactory {
       skillIdToDescriptionDict, this.skillSummaryObjectFactory,
       this.subtopicObjectFactory, this.storyReferenceObjectFactory,
       topicBackendDict.practice_tab_is_displayed,
-      topicBackendDict.meta_tag_content, topicBackendDict.page_title_for_web
+      topicBackendDict.meta_tag_content, topicBackendDict.page_title_fragment_for_web
     );
   }
 

@@ -358,19 +358,19 @@ describe('Topic editor tab directive', function() {
 
   it('should call the TopicUpdateService if topic page title is updated',
     function() {
-      var topicPageTitleForWebSpy = spyOn(
-        TopicUpdateService, 'setPageTitleForWeb');
-      $scope.updateTopicPageTitleForWeb('new page title');
-      expect(topicPageTitleForWebSpy).toHaveBeenCalled();
+      var topicPageTitleFragmentForWebSpy = spyOn(
+        TopicUpdateService, 'setPageTitleFragmentForWeb');
+      $scope.updateTopicPageTitleFragmentForWeb('new page title');
+      expect(topicPageTitleFragmentForWebSpy).toHaveBeenCalled();
     });
 
   it('should not call the TopicUpdateService if topic page title is same',
     function() {
-      $scope.updateTopicPageTitleForWeb('New page title');
-      var topicPageTitleForWebSpy = spyOn(
-        TopicUpdateService, 'setPageTitleForWeb');
-      $scope.updateTopicPageTitleForWeb('New page title');
-      expect(topicPageTitleForWebSpy).not.toHaveBeenCalled();
+      $scope.updateTopicPageTitleFragmentForWeb('New page title');
+      var topicPageTitleFragmentForWebSpy = spyOn(
+        TopicUpdateService, 'setPageTitleFragmentForWeb');
+      $scope.updateTopicPageTitleFragmentForWeb('New page title');
+      expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
     });
 
   it('should call the TopicUpdateService if practice tab is displayed ' +

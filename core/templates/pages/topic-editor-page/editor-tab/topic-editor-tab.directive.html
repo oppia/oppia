@@ -82,17 +82,17 @@
                 What does this topic contain?
               </span>
             </div>
-            <div class="topic-page-title" ng-class="{'has-error': editablePageTitleForWeb.length === 0}">
-              <label for="topicPageTitleForWeb" class="form-heading protractor-test-topic-page-title-label">Page Title For Web</label>
-              <textarea type="text" class="form-control topic-description protractor-test-topic-meta-tag-content-field"
-                        ng-model="editablePageTitleForWeb" maxlength="<[MAX_CHARS_IN_PAGE_TITLE_FOR_WEB]>"
-                        ng-blur="updateTopicPageTitleForWeb(editablePageTitleForWeb)"
+            <div class="topic-page-title" ng-class="{'has-error': editablePageTitleFragmentForWeb.length === 0}">
+              <label for="topicPageTitleFragmentForWeb" class="form-heading protractor-test-topic-page-title-fragment-label">Page Title Fragment For Web</label>
+              <textarea type="text" class="form-control topic-description protractor-test-topic-page-title-fragment-field"
+                        ng-model="editablePageTitleFragmentForWeb" maxlength="<[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]>"
+                        ng-blur="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
                         placeholder="Enter the page title for the topic">
               </textarea>
               <span class="oppia-input-box-subtitle">
                 <em>
-                  Page title will appear in the browser tab for relevant learner facing pages.
-                  Topic page title should be at most <[MAX_CHARS_IN_PAGE_TITLE_FOR_WEB]> characters.
+                  Page title fragment will appear in the browser tab for relevant learner facing pages.
+                  Topic page title fragment should be at most <[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> characters.
                 </em>
               </span>
             </div>
