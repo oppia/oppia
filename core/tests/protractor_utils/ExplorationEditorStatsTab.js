@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var action = require('./action.js');
+var waitFor = require('./waitFor.js');
+
 /**
  * @fileoverview Page object for the exploration editor's stats tab, for use in
  * Protractor tests.
@@ -30,14 +33,20 @@ var ExplorationEditorStatsTab = function() {
      * Workflows
      */
   var _getNumPassersby = async function() {
+    await waitFor.visibilityOf(
+      numPassersby);
     return await numPassersby.getText();
   };
 
   var _getIssueText = async function(issueIndex) {
+    await waitFor.visibilityOf(
+      _getIssueElement(issueIndex));
     return await _getIssueElement(issueIndex).getText();
   };
 
   var _getIssueTitle = async function() {
+    await waitFor.visibilityOf(
+      issueTitle);
     return await issueTitle.getText();
   };
 
@@ -51,7 +60,10 @@ var ExplorationEditorStatsTab = function() {
 
   this.clickIssue = async function(issueIndex, expectedIssueText) {
     expect(await _getIssueText(issueIndex)).toMatch(expectedIssueText);
-    await _getIssueElement(issueIndex).click();
+    // await _getIssueElement(issueIndex).click();
+    var issueButton = await (
+      _getIssueElement(issueIndex));
+    await action.click(issueIndex.toString(),issueButton);
   };
 
   this.expectIssueTitleToBe = async function(issueTitle) {
@@ -59,7 +71,8 @@ var ExplorationEditorStatsTab = function() {
   };
 
   this.markResolved = async function() {
-    await resolveBtn.click();
+    // await resolveBtn.click();
+    await action.click('Resolve button', resolveBtn);
   };
 };
 
