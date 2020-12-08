@@ -43,7 +43,6 @@ import python_utils
         models.NAMES.skill, models.NAMES.user, models.NAMES.question,
         models.NAMES.topic]))
 datastore_services = models.Registry.import_datastore_services()
-transaction_services = models.Registry.import_transaction_services()
 
 
 # Repository GET methods.
