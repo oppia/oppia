@@ -117,9 +117,8 @@ angular.module('oppia').component('translationOpportunities', {
       };
 
       ctrl.loadMoreOpportunities = function() {
-        // Replace it with getMoreTranslationOpportunitiesAsync.
         return ContributionOpportunitiesService
-          .getTranslationOpportunitiesAsync(
+          .getMoreTranslationOpportunitiesAsync(
             TranslationLanguageService.getActiveLanguageCode()).then(
             getPresentableOpportunitiesData);
       };
