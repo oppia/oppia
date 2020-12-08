@@ -24,6 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 describe('Translation Suggestion Review Modal Controller', function() {
   let $scope = null;
   let $uibModalInstance = null;
+  let SiteAnalyticsService = null;
   let SuggestionModalService = null;
 
   const contentHtml = 'Content html';
@@ -39,11 +40,15 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     const $rootScope = $injector.get('$rootScope');
+    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     SuggestionModalService = $injector.get('SuggestionModalService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
 
+    spyOn(
+      SiteAnalyticsService,
+      'registerContributorDashboardViewSuggestionForReview');
     spyOnAllFunctions(SuggestionModalService);
 
     $scope = $rootScope.$new();
@@ -65,12 +70,27 @@ describe('Translation Suggestion Review Modal Controller', function() {
       expect($scope.reviewMessage).toBe('');
     });
 
+  it('should register Contributor Dashboard view suggestion for review event' +
+    ' after controller is initialized', function() {
+    expect(
+      // eslint-disable-next-line max-len
+      SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview)
+      .toHaveBeenCalledWith('Translation');
+  });
+
   it('should accept suggestion in suggestion modal service when clicking on' +
     ' accept suggestion button', function() {
+    spyOn(
+      SiteAnalyticsService,
+      'registerContributorDashboardAcceptSuggestion');
     $scope.reviewMessage = 'Review message example';
     $scope.commitMessage = 'Commit message example';
+
     $scope.accept();
 
+    expect(
+      SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+      .toHaveBeenCalledWith('Translation');
     expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalledWith(
       $uibModalInstance, {
         action: 'accept',
@@ -81,9 +101,16 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
   it('should reject suggestion in suggestion modal service when clicking on' +
     ' reject suggestion button', function() {
+    spyOn(
+      SiteAnalyticsService,
+      'registerContributorDashboardRejectSuggestion');
     $scope.reviewMessage = 'Review message example';
+
     $scope.reject();
 
+    expect(
+      SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+      .toHaveBeenCalledWith('Translation');
     expect(SuggestionModalService.rejectSuggestion).toHaveBeenCalledWith(
       $uibModalInstance, {
         action: 'reject',
