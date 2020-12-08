@@ -29,12 +29,11 @@ import feconf
 
 (
     base_models, exp_models, feedback_models, question_models,
-    suggestion_models, skill_models, topic_models, user_models
+    skill_models, suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
-    models.NAMES.question, models.NAMES.suggestion, models.NAMES.topic,
-    models.NAMES.user
+    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
 ])
 
 TARGET_TYPE_TO_TARGET_MODEL = {

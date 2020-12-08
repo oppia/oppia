@@ -277,16 +277,16 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_with_invalid_target_type(self):
-        expected_output = [
-            (
-                u'[u\'failed validation check for target type check '
-                'of GeneralSuggestionModel\', [u\'Entity id %s: Target '
-                'type exploration is not allowed\']]'
-            ) % self.model_instance.id]
-        with self.swap(
-            prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
-            self.run_job_and_check_output(
+    def test_model_with_invalid_target_type(self):	
+        expected_output = [	
+            (	
+                u'[u\'failed validation check for target type check '	
+                'of GeneralSuggestionModel\', [u\'Entity id %s: Target '	
+                'type exploration is not allowed\']]'	
+            ) % self.model_instance.id]	
+        with self.swap(	
+            prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):	
+            self.run_job_and_check_output(	
                 expected_output, sort=True, literal_eval=False)
 
     def test_validate_score_category_for_question_suggestion(self):
