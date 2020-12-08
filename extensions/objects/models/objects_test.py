@@ -461,7 +461,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.CheckedProof, mappings, invalid_values_with_error_messages)
 
-    def test_logic_question_validation(self):
+    def test_logic_question_validation_for_variables(self):
         """Tests objects of type LogicQuestion."""
         p_expression = {
             'top_kind_name': 'variable',
@@ -488,6 +488,40 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                 'results': {
                     'top_kind_name': 'variable',
                     'top_operator_name': 'p'
+                }
+            }, 'Cannot convert to a logic question')]
+
+        self.check_normalization(
+            objects.LogicQuestion, mappings, invalid_values_with_error_messages)
+
+    def test_logic_question_validation_for_constants(self):
+        """Tests objects of type LogicQuestion."""
+        numeric_expression = {
+            'top_kind_name': 'constant',
+            'top_operator_name': 1,
+            'arguments': [],
+            'dummies': [],
+            'type': 'integer'
+        }
+
+        valid_example = {
+            'assumptions': [numeric_expression],
+            'results': [numeric_expression],
+            'default_proof_string': 'a proof'
+        }
+        mappings = [(valid_example, valid_example)]
+
+        invalid_values_with_error_messages = [
+            ({}, 'Cannot convert to a logic question {}'),
+            (None, 'Cannot convert to a logic question None'),
+            (
+                {'assumptions': numeric_expression},
+                'Cannot convert to a logic question'),
+            ({
+                'assumptions': numeric_expression,
+                'results': {
+                    'top_kind_name': 'constant',
+                    'top_operator_name': 1
                 }
             }, 'Cannot convert to a logic question')]
 
@@ -815,7 +849,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEqual(count, 49)
+        self.assertEqual(count, 50)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
