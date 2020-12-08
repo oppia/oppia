@@ -199,7 +199,8 @@ var RichTextEditor = async function(elem) {
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
-      elem.element(by.css('.' + buttonName)), 'Toolbar button takes too long to be clickable.');
+      elem.element(
+        by.css('.' + buttonName)), 'Toolbar button takes too long.');
     await action.click(
       'Test Tool Bar Button', elem.element(by.css('.' + buttonName)));
   };
@@ -367,8 +368,8 @@ var AutocompleteMultiDropdownEditor = function(elem) {
         var select2ContainerButton = elem.element(by.css('.select2-container'));
         await action.click('Test Container Button', select2ContainerButton);
         var select2SearchField = elem.element(by.css('.select2-search__field'));
-        await action.sendKeys('Select 2 Search Field',
-          select2SearchField, texts[i] + '\n');
+        await action.sendKeys(
+          'Select 2 Search Field', select2SearchField, texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
