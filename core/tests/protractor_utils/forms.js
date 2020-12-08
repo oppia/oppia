@@ -199,10 +199,9 @@ var RichTextEditor = async function(elem) {
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
-      elem.element(by.css('.' + buttonName)),
-        'Toolbar button takes too long to be clickable.');
-    await action.click('Test Tool Bar Button',
-      elem.element(by.css('.' + buttonName)));
+      elem.element(by.css('.' + buttonName)), 'Toolbar button takes too long to be clickable.');
+    await action.click(
+      'Test Tool Bar Button', elem.element(by.css('.' + buttonName)));
   };
   var _clearContent = async function() {
     expect(
