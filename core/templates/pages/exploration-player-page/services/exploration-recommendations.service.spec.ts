@@ -35,21 +35,11 @@ describe('Exploration Recommendations Service', () => {
   let expRecsService: ExplorationRecommendationsService;
   let urlService: UrlService;
   let contextService: ContextService;
-  let expRecsBackendApiService: ExplorationRecommendationsBackendApiService;
+
   const STORY_ID = '1';
   const COLLECTION_ID = '2';
   const NODE_ID = '3';
   const EXPLORATION_ID = '4';
-  const AUTHOR_REC_IDS = ['5', '6'];
-  const SYSTEM_REC_IDS = ['7', '8'];
-  class MockExplorationSummary {
-    id: string;
-    constructor(id?: string) {
-      this.id = id;
-    }
-  }
-  let authorRecommendations: LearnerExplorationSummary[];
-  let systemRecommendations: LearnerExplorationSummary[];
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -117,15 +107,30 @@ describe('Exploration Recommendations Service', () => {
     });
   });
 
+  let expRecsBackendApiService: ExplorationRecommendationsBackendApiService;
+  const AUTHOR_REC_IDS = ['5', '6'];
+
+  class MockExplorationSummary {
+    id: string;
+    constructor(id?: string) {
+      this.id = id;
+    }
+  }
+
+  let authorRecommendations: LearnerExplorationSummary[];
+  let systemRecommendations: LearnerExplorationSummary[];
+
   describe('getRecommendendedSummaryDicts', () => {
     beforeEach(() => {
-      systemRecommendations = SYSTEM_REC_IDS.map((id) => {
-        return new MockExplorationSummary(id) as LearnerExplorationSummary;
-      });
+      systemRecommendations = [
+        new MockExplorationSummary('7') as LearnerExplorationSummary,
+        new MockExplorationSummary('8') as LearnerExplorationSummary
+      ];
 
-      authorRecommendations = AUTHOR_REC_IDS.map((id) => {
-        return new MockExplorationSummary(id) as LearnerExplorationSummary;
-      });
+      authorRecommendations = [
+        new MockExplorationSummary('5') as LearnerExplorationSummary,
+        new MockExplorationSummary('6') as LearnerExplorationSummary
+      ];
 
       expRecsBackendApiService = TestBed.get(
         ExplorationRecommendationsBackendApiService
@@ -134,15 +139,10 @@ describe('Exploration Recommendations Service', () => {
       spyOn(
         expRecsBackendApiService, 'getRecommendedSummaryDicts').and.callFake(
         (_, includeSystemRecommendations: string) => {
-          return new Promise((resolve, reject) => {
-            if (includeSystemRecommendations === 'true') {
-              resolve(
-                authorRecommendations.concat(systemRecommendations)
-              );
-            } else {
-              resolve(authorRecommendations);
-            }
-          });
+          return Promise.resolve(
+            includeSystemRecommendations === 'true' ?
+            systemRecommendations.concat(authorRecommendations) :
+            authorRecommendations);
         });
     });
 
@@ -155,20 +155,20 @@ describe('Exploration Recommendations Service', () => {
       });
       it('should include author recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_IDS, true, (expSummaries) => {
-            authorRecommendations.forEach((rec) => {
-              expect(expSummaries).toContain(rec);
-            });
+          AUTHOR_REC_IDS, true,
+          (expSummaries) => {
+            expect(expSummaries).toEqual(
+              jasmine.arrayContaining(authorRecommendations));
           }
         );
       });
 
       it('should include system recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_IDS, true, (expSummaries) => {
-            systemRecommendations.forEach((rec) => {
-              expect(expSummaries).toContain(rec);
-            });
+          AUTHOR_REC_IDS, true,
+          (expSummaries) => {
+            expect(expSummaries).toEqual(
+              jasmine.arrayContaining(systemRecommendations));
           }
         );
       });
@@ -184,20 +184,20 @@ describe('Exploration Recommendations Service', () => {
 
       it('should include author recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_IDS, true, (expSummaries) => {
-            authorRecommendations.forEach((rec) => {
-              expect(expSummaries).toContain(rec);
-            });
+          AUTHOR_REC_IDS, true,
+          (expSummaries) => {
+            expect(expSummaries).toEqual(
+              jasmine.arrayContaining(authorRecommendations));
           }
         );
       });
 
       it('should not include system recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_IDS, true, (expSummaries) => {
-            systemRecommendations.forEach((rec) => {
-              expect(expSummaries).not.toContain(rec);
-            });
+          AUTHOR_REC_IDS, true,
+          (expSummaries) => {
+            expect(expSummaries).not.toEqual(
+              jasmine.arrayContaining(systemRecommendations));
           }
         );
       });
