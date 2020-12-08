@@ -12,12 +12,6 @@
                ng-attr-placeholder="<[$ctrl.searchBarPlaceholder]>" ng-model="$ctrl.searchQuery"
                ng-change="$ctrl.classroomPageIsActive ? null : $ctrl.onSearchQueryChangeExec()"
                ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }" aria-label="Search bar">
-        <div ng-if="$ctrl.classroomPageIsActive"
-             class="oppia-search-button protractor-test-search-button"
-             ng-click="$ctrl.onSearchQueryChangeExec()"
-             title="Click here to search">
-          Go!
-        </div>
       </div>
     </div>
   </form>
@@ -115,22 +109,34 @@
     </li>
   </ul>
 </div>
+<div class="oppia-same-row-container">
+  <div class="float-left oppia-navbar-button-container">
+    <div ng-if="$ctrl.classroomPageIsActive"
+         class="oppia-search-button protractor-test-search-button"
+         ng-click="$ctrl.onSearchQueryChangeExec()"
+         title="Click here to search">
+         Go!
+    </div>
+  </div>
+</div>
 
 <style>
   search-bar .oppia-search-bar-input,
   search-bar .oppia-search-button {
     background: #257D76;
-    border: 1px solid #257D76;
+    border-color: #257D76;
     border-radius: 0;
+    border-style: solid;
+    border-width: 1px 1px 1px 0;
     color: white;
     font-size: 15px;
     height: 35px;
   }
 
   search-bar .oppia-search-button {
-    border-left: 1px solid #00645C;
-    border-right: 1px solid #00645C;
-    padding: 5px 15px 0 15px;
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    padding: 6px 15px 0 15px;
   }
 
   search-bar .oppia-search-button:hover {
@@ -146,7 +152,9 @@
   }
   search-bar .oppia-search-bar-icon {
     background: #257D76;
-    border: 1px solid #257D76;
+    border-color: #257D76;
+    border-style: solid;
+    border-width: 1px 0 1px 1px;
     color: rgba(255,255,255,0.95);
   }
   search-bar .oppia-search-bar-input.btn:hover,
@@ -176,6 +184,7 @@
     width: 17em;
   }
   search-bar .oppia-search-bar-dropdown-toggle {
+    border-radius: 0;
     max-width: 130px;
   }
   search-bar .oppia-search-bar-dropdown-menu-section {
@@ -186,8 +195,7 @@
     margin: 2px;
   }
   search-bar .oppia-search-bar-dropdown-toggle-button {
-    border-bottom-right-radius: 4px;
-    border-top-right-radius: 4px;
+    border-radius: 0;
     max-width: 130px;
   }
 

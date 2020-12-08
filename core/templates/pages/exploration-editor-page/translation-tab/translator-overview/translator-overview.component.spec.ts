@@ -29,6 +29,13 @@ import { StateRecordedVoiceoversService } from
   'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
+
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+// ^^^ This block is to be removed.
 
 var MockWindow = function() {
   var language = 'en';
@@ -52,6 +59,9 @@ describe('Translator Overview component', function() {
   var translationTabActiveModeService = null;
 
   var mockWindow = null;
+  beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
@@ -63,6 +73,9 @@ describe('Translator Overview component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', languageUtilService);
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
     $provide.value(
       'StateRecordedVoiceoversService',
       TestBed.get(StateRecordedVoiceoversService));

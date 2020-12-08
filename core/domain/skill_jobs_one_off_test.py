@@ -318,6 +318,7 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
             'old_value': '', 'property_name': 'description'
         }]
         self.model_instance_1.deleted = True
+        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
         job_id = (
             skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob.create_new())
@@ -336,6 +337,7 @@ class SkillCommitCmdMigrationOneOffJobTests(test_utils.GenericTestBase):
             'cmd': 'update_skill_property', 'new_value': 'Test description',
             'old_value': '', 'property_name': 'description'
         }]
+        self.model_instance_1.update_timestamps()
         self.model_instance_1.put()
 
         self.assertEqual(
@@ -419,6 +421,7 @@ class MissingSkillMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     def test_migration_job_skips_deleted_model(self):
         self.model_instance.deleted = True
+        self.model_instance.update_timestamps()
         self.model_instance.put()
 
         def mock_get_skill_by_id(unused_skill_id, strict=True, version=None): # pylint: disable=unused-argument

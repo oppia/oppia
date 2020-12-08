@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import heapq
 import re
 
+from constants import constants
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import feedback_services
@@ -115,8 +116,12 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
+        change['question_dict']['language_code'] = (
+            constants.DEFAULT_LANGUAGE_CODE)
+        change['question_dict']['question_state_data_schema_version'] = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         # The language code of the question, used for querying purposes.
-        language_code = change['question_dict']['language_code']
+        language_code = constants.DEFAULT_LANGUAGE_CODE
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
 
@@ -289,9 +294,11 @@ def _update_suggestions(suggestions, update_last_updated_time=True):
         suggestion_model.score_category = suggestion.score_category
         suggestion_model.language_code = suggestion.language_code
 
-    suggestion_models.GeneralSuggestionModel.put_multi(
+    suggestion_models.GeneralSuggestionModel.update_timestamps_multi(
         suggestion_models_to_update,
         update_last_updated_time=update_last_updated_time)
+    suggestion_models.GeneralSuggestionModel.put_multi(
+        suggestion_models_to_update)
 
 
 def get_commit_message_for_suggestion(author_username, commit_message):
@@ -943,6 +950,7 @@ def _update_user_proficiency(user_proficiency):
             user_proficiency.onboarding_email_sent
         )
 
+        user_proficiency_model.update_timestamps()
         user_proficiency_model.put()
 
     else:
@@ -1214,6 +1222,7 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
     stats = create_community_contribution_stats_from_model(stats_model)
     stats.validate()
 
+    stats_model.update_timestamps()
     stats_model.put()
 
 

@@ -22,10 +22,9 @@ import { Injectable } from '@angular/core';
 
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import {
-  SkillMasteryObjectFactory,
   SkillMastery,
   SkillMasteryBackendDict
-} from 'domain/skill/SkillMasteryObjectFactory';
+} from 'domain/skill/skill-mastery.model';
 
 interface SkillMasteryBackendResponse {
   'degrees_of_mastery': SkillMasteryBackendDict;
@@ -36,8 +35,7 @@ interface SkillMasteryBackendResponse {
 })
 export class SkillMasteryBackendApiService {
   constructor(
-    private httpClient: HttpClient,
-    private skillMasteryObjectFactory: SkillMasteryObjectFactory) {}
+    private httpClient: HttpClient) {}
 
   _fetchSkillMasteryDegrees(
       skillIds: string[],
@@ -51,7 +49,7 @@ export class SkillMasteryBackendApiService {
       }).toPromise().then(response => {
       if (successCallback) {
         let skillMastery = (
-          this.skillMasteryObjectFactory.createFromBackendDict(
+          SkillMastery.createFromBackendDict(
             response.degrees_of_mastery));
         successCallback(skillMastery);
       }
@@ -83,13 +81,14 @@ export class SkillMasteryBackendApiService {
     });
   }
 
-  fetchSkillMasteryDegrees(skillIds: string[]): Promise<SkillMastery> {
+  async fetchSkillMasteryDegreesAsync(skillIds: string[]):
+   Promise<SkillMastery> {
     return new Promise((resolve, reject) => {
       this._fetchSkillMasteryDegrees(skillIds, resolve, reject);
     });
   }
 
-  updateSkillMasteryDegrees(
+  async updateSkillMasteryDegreesAsync(
       masteryPerSkillMapping: {[key: string]: number}): Promise<void> {
     return new Promise((resolve, reject) => {
       this._updateSkillMasteryDegrees(masteryPerSkillMapping, resolve, reject);

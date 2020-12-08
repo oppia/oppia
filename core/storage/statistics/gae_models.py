@@ -120,6 +120,11 @@ class StateCounterModel(base_models.BaseModel):
             counter = cls(id=instance_id)
         return counter
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -184,8 +189,14 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
             time_spent_in_state_secs=time_spent_in_state_secs,
             is_feedback_useful=is_feedback_useful,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        answer_submitted_event_entity.update_timestamps()
         answer_submitted_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -249,8 +260,14 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
             state_name=state_name,
             session_id=session_id,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        actual_start_event_entity.update_timestamps()
         actual_start_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -313,8 +330,14 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        solution_hit_event_entity.update_timestamps()
         solution_hit_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -432,8 +455,14 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        start_event_entity.update_timestamps()
         start_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -568,7 +597,13 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        leave_event_entity.update_timestamps()
         leave_event_entity.put()
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -696,8 +731,14 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        complete_event_entity.update_timestamps()
         complete_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -786,6 +827,11 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             old_rating=old_rating,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ).put()
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -897,8 +943,14 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             params=params,
             play_type=play_type,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        state_event_entity.update_timestamps()
         state_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -964,8 +1016,14 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        state_finish_event_entity.update_timestamps()
         state_finish_event_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1033,8 +1091,14 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
             session_id=session_id,
             time_spent_in_state_secs=time_spent_in_state_secs,
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        leave_for_refresher_exp_entity.update_timestamps()
         leave_for_refresher_exp_entity.put()
         return entity_id
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1162,6 +1226,7 @@ class ExplorationStatsModel(base_models.BaseModel):
             num_completions_v1=num_completions_v1,
             num_completions_v2=num_completions_v2,
             state_stats_mapping=state_stats_mapping)
+        stats_instance.update_timestamps()
         stats_instance.put()
         return instance_id
 
@@ -1232,7 +1297,13 @@ class ExplorationStatsModel(base_models.BaseModel):
                 state_stats_mapping=exploration_stats_dict[
                     'state_stats_mapping'])
             exploration_stats_models.append(stats_instance)
+        cls.update_timestamps_multi(exploration_stats_models)
         cls.put_multi(exploration_stats_models)
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1321,8 +1392,18 @@ class ExplorationIssuesModel(base_models.BaseModel):
         exp_issues_instance = cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             unresolved_issues=unresolved_issues)
+        exp_issues_instance.update_timestamps()
         exp_issues_instance.put()
         return instance_id
+
+    @staticmethod
+    def get_model_association_to_user():
+        """All playthrough issue data is anonymized and contains no data
+        directly corresponding to users. For specifics on the data included in
+        this model, see:
+        https://github.com/oppia/oppia/tree/develop/extensions/issues.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1362,6 +1443,15 @@ class PlaythroughModel(base_models.BaseModel):
         individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """All playthrough data is anonymized and contains no data directly
+        corresponding to users. For specifics on the data included in this
+        model, see:
+        https://github.com/oppia/oppia/tree/develop/extensions/actions.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1415,12 +1505,11 @@ class PlaythroughModel(base_models.BaseModel):
             str. ID of the new PlaythroughModel instance.
         """
         instance_id = cls._generate_id(exp_id)
-        playthrough_instance = cls(
+        cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             issue_type=issue_type,
             issue_customization_args=issue_customization_args,
-            actions=actions)
-        playthrough_instance.put()
+            actions=actions).put()
         return instance_id
 
     @classmethod
@@ -1562,6 +1651,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 learner_answer_info_schema_version),
             accumulated_answer_info_json_size_bytes=(
                 accumulated_answer_info_json_size_bytes))
+        answer_details_instance.update_timestamps()
         answer_details_instance.put()
 
     @classmethod
@@ -1589,6 +1679,11 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         if model_instance:
             return model_instance
         return None
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1689,6 +1784,11 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             annotations.version for annotations in cls.get_all().filter(
                 cls.exploration_id == exploration_id
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -1942,6 +2042,7 @@ class StateAnswersModel(base_models.BaseModel):
             if last_shard_updated:
                 entities_to_put.append(last_shard)
 
+        cls.update_timestamps_multi(entities_to_put)
         cls.put_multi(entities_to_put)
 
     @classmethod
@@ -2053,6 +2154,11 @@ class StateAnswersModel(base_models.BaseModel):
         """
         return sys.getsizeof(json.dumps(answer_dict))
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
         """Model does not contain user data."""
@@ -2138,6 +2244,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
 
         try:
             # This may fail if calculation_output is too large.
+            instance.update_timestamps()
             instance.put()
         except Exception:
             logging.exception(
@@ -2186,6 +2293,11 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         return ':'.join([
             exploration_id, python_utils.UNICODE(exploration_version),
             state_name, calculation_id])
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):

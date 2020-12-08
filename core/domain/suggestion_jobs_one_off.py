@@ -24,14 +24,66 @@ import logging
 
 from constants import constants
 from core import jobs
+from core.domain import feedback_services
 from core.domain import html_validation_service
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
 
-(suggestion_models, user_models,) = models.Registry.import_models(
-    [models.NAMES.suggestion, models.NAMES.user])
+(email_models, feedback_models, suggestion_models, user_models,) = (
+    models.Registry.import_models([
+        models.NAMES.email, models.NAMES.feedback, models.NAMES.suggestion,
+        models.NAMES.user]))
+
+datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
+
+
+class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
+    """A reusable one-time job that can be used to migrate state schema
+    versions of question suggestions.
+
+    This job will create domain objects out of the models. The object conversion
+    process of a suggestion automatically performs schema updating. This
+    job persists that conversion work, keeping question suggestions up-to-date
+    and improving the load time of question suggestions.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted or item.suggestion_type != (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            return
+
+        try:
+            # Suggestion class itself updates the question state dict of the
+            # suggestion while initializing the object.
+            suggestion = suggestion_services.get_suggestion_from_model(item)
+        except Exception as e:
+            yield ('MIGRATION_FAILURE', (item.id, e))
+            return
+
+        try:
+            suggestion.validate()
+        except Exception as e:
+            yield ('POST_MIGRATION_VALIDATION_FALIURE', (item.id, e))
+            return
+
+        item.change_cmd = suggestion.change.to_dict()
+        item.update_timestamps(update_last_updated_time=False)
+        item.put()
+
+        yield ('SUCCESS', item.id)
+
+    @staticmethod
+    def reduce(key, value):
+        if key == 'SUCCESS':
+            value = len(value)
+        yield (key, value)
 
 
 class SuggestionMathRteAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -168,7 +220,8 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         item.id, e))
                 return
             item.change_cmd = suggestion.change.to_dict()
-            item.put(update_last_updated_time=False)
+            item.update_timestamps(update_last_updated_time=False)
+            item.put()
             yield ('suggestion_migrated', 1)
 
     @staticmethod
@@ -213,8 +266,9 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
         if suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
             # Set the language code to be the language of the question.
-            suggestion.language_code = suggestion.change.question_dict[
-                'language_code']
+            suggestion.change.question_dict['language_code'] = (
+                constants.DEFAULT_LANGUAGE_CODE)
+            suggestion.language_code = constants.DEFAULT_LANGUAGE_CODE
         elif suggestion.suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             # Set the language code to be the language of the translation.
@@ -233,6 +287,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
                     item.id, e))
             return
         item.language_code = suggestion.language_code
+        item.update_timestamps()
         item.put()
         yield ('%s_suggestion_migrated' % item.suggestion_type, item.id)
 
@@ -356,6 +411,7 @@ class PopulateContributionStatsOneOffJob(
                             language_code]
                     ) = count_value
 
+            stats_model.update_timestamps()
             stats_model.put()
             return key, count_value
 
@@ -366,3 +422,135 @@ class PopulateContributionStatsOneOffJob(
 
         # Only yield the values from the transactions.
         yield (key_from_transaction, count_value_from_transaction)
+
+
+class PopulateFinalReviewerIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate final_reviewer_id property in the
+    suggestion models which do not have but are expected to have one.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield ('DELETED_MODELS', item.id)
+            return
+
+        if not (item.status in [
+                suggestion_models.STATUS_ACCEPTED,
+                suggestion_models.STATUS_REJECTED] and (
+                    item.final_reviewer_id is None)):
+            yield ('UNCHANGED_MODELS', item.id)
+            return
+
+        message_status = feedback_models.STATUS_CHOICES_FIXED
+        if item.status == suggestion_models.STATUS_REJECTED:
+            message_status = feedback_models.STATUS_CHOICES_IGNORED
+
+        message_model_class = feedback_models.GeneralFeedbackMessageModel
+        message_models = message_model_class.query(
+            message_model_class.thread_id == item.id,
+            message_model_class.updated_status == message_status).fetch()
+
+        if not message_models:
+            yield ('FAILED_NONE_MESSAGE_MODEL', (item.id, item.status))
+            return
+
+        if len(message_models) != 1:
+            yield ('FAILED_MULTIPLE_MESSAGE_MODEL', (item.id, item.status))
+            return
+
+        item.final_reviewer_id = message_models[0].author_id
+
+        item.update_timestamps(update_last_updated_time=False)
+        item.put()
+        yield ('CHANGED_MODELS', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if key in ['CHANGED_MODELS', 'UNCHANGED_MODELS', 'DELETED_MODELS']:
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class DeleteAllQuestionAndInvalidSuggestionsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to delete all questions and invalid suggestion models in the
+    server.
+
+    This job is only needed once and should not be kept after the problem
+    is fixed.
+
+    This job deletes following suggestion and connected models:
+        - Deletes all the question suggestions as the old question suggestions
+          have invalid state schema version number and deleting this model will
+          be fine as questions suggestion is an unreleased feature.
+        - Delete all suggestions which does not have corresponding feedback
+          models. This deletion is only required in the test server.
+
+    TODO(#11300): This job is only needed once and we are expecting to remove it
+    once it's used.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            yield ('SUGGESTION_ALREADY_DELETED', 1)
+            return
+
+        feedback_model = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            item.id)
+
+        if feedback_model is not None and item.suggestion_type != (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            yield ('SUGGESTION_IGNORED', 1)
+            return
+
+        model_keys = []
+        model_keys.append(datastore_services.Key(
+            suggestion_models.GeneralSuggestionModel, item.id))
+
+        if feedback_model is not None:
+            model_keys.append(datastore_services.Key(
+                feedback_models.GeneralFeedbackThreadModel, item.id))
+
+        for message in feedback_services.get_messages(item.id):
+            model_keys.append(
+                datastore_services.Key(
+                    feedback_models.GeneralFeedbackMessageModel, message.id))
+
+        reply_to_id_models = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.query(
+                email_models.GeneralFeedbackEmailReplyToIdModel.thread_id == (
+                    item.id)).fetch())
+
+        model_keys += [
+            datastore_services.Key(
+                email_models.GeneralFeedbackEmailReplyToIdModel,
+                reply_to_id_model.id)
+            for reply_to_id_model in reply_to_id_models]
+
+        model_keys += feedback_models.GeneralFeedbackThreadUserModel.query(
+            feedback_models.GeneralFeedbackThreadUserModel.thread_id == item.id
+        ).fetch(keys_only=True)
+
+        if item.target_type == feconf.ENTITY_TYPE_EXPLORATION:
+            model_keys.append(
+                datastore_services.Key(
+                    feedback_models.FeedbackAnalyticsModel, item.target_id))
+
+        transaction_services.run_in_transaction(
+            datastore_services.delete_multi, model_keys)
+        yield ('SUGGESTION_DELETED', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

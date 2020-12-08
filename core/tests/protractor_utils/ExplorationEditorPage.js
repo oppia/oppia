@@ -212,14 +212,12 @@ var ExplorationEditorPage = function() {
 
   this.saveChanges = async function(commitMessage) {
     var toastSuccessElement = element(by.css('.toast-success'));
-    expect(await saveChangesButton.isDisplayed()).toBe(true);
-    await saveChangesButton.click();
+    await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
-      await commitMessageInput.sendKeys(commitMessage);
+      await action.sendKeys(
+        'Commit message input', commitMessageInput, commitMessage);
     }
-    await waitFor.elementToBeClickable(
-      saveDraftButton, 'Save Draft button is not clickable');
-    await saveDraftButton.click();
+    await action.click('Save draft button', saveDraftButton);
 
     // This is necessary to give the page time to record the changes,
     // so that it does not attempt to stop the user leaving.
@@ -230,9 +228,10 @@ var ExplorationEditorPage = function() {
   };
 
   this.discardChanges = async function() {
-    await saveDiscardToggleButton.click();
-    await discardChangesButton.click();
-    await confirmDiscardChangesButton.click();
+    await action.click('Save Discard Toggle button', saveDiscardToggleButton);
+    await action.click('Discard Changes button', discardChangesButton);
+    await action.click(
+      'Confirm Discard Changes button', confirmDiscardChangesButton);
     await waitFor.invisibilityOf(
       loadingModal, 'Loading modal taking too long to disappear');
     await waitFor.invisibilityOfInfoToast(

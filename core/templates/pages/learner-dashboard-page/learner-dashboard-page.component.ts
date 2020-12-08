@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
  * @fileoverview Component for the creator dashboard.
  */
+import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -30,7 +32,6 @@ require(
   'remove-activity-from-learner-dashboard-modal.controller.ts');
 
 require('directives/angular-html-bind.directive.ts');
-require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/learner_dashboard/learner-dashboard-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
@@ -48,26 +49,26 @@ require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$scope', '$uibModal', 'AlertsService',
+    '$http', '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'DateTimeFormatService', 'DeviceInfoService',
-    'FeedbackMessageSummaryObjectFactory', 'LearnerDashboardBackendApiService',
-    'LoaderService', 'SuggestionModalForLearnerDashboardService',
-    'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
-    'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
-    'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
-    'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
+    'LearnerDashboardBackendApiService', 'LoaderService',
+    'SuggestionModalForLearnerDashboardService',
+    'ThreadStatusDisplayService', 'UrlInterpolationService',
+    'UserService', 'ACTIVITY_TYPE_COLLECTION',
+    'ACTIVITY_TYPE_EXPLORATION', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+    'FATAL_ERROR_CODES', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
     'LEARNER_DASHBOARD_SECTION_I18N_IDS',
     'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
-        $http, $q, $scope, $uibModal, AlertsService,
+        $http, $q, $rootScope, $scope, $uibModal, AlertsService,
         DateTimeFormatService, DeviceInfoService,
-        FeedbackMessageSummaryObjectFactory, LearnerDashboardBackendApiService,
-        LoaderService, SuggestionModalForLearnerDashboardService,
-        ThreadStatusDisplayService, UrlInterpolationService, UserService,
-        ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
-        EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
-        FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
+        LearnerDashboardBackendApiService, LoaderService,
+        SuggestionModalForLearnerDashboardService,
+        ThreadStatusDisplayService, UrlInterpolationService,
+        UserService, ACTIVITY_TYPE_COLLECTION,
+        ACTIVITY_TYPE_EXPLORATION, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+        FATAL_ERROR_CODES, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
         LEARNER_DASHBOARD_SECTION_I18N_IDS,
         LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
         SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS) {
@@ -298,7 +299,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           ctrl.messageSummaries = [];
           for (index = 0; index < messageSummaryDicts.length; index++) {
             ctrl.messageSummaries.push(
-              FeedbackMessageSummaryObjectFactory.createFromBackendDict(
+              FeedbackMessageSummary.createFromBackendDict(
                 messageSummaryDicts[index]));
           }
           ctrl.loadingFeedbacks = false;
@@ -328,7 +329,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           ctrl.messageSendingInProgress = false;
           ctrl.newMessage.text = null;
           var newMessageSummary = (
-            FeedbackMessageSummaryObjectFactory.createNewMessage(
+            FeedbackMessageSummary.createNewMessage(
               ctrl.threadSummary.totalMessageCount, newMessage,
               ctrl.username, ctrl.profilePictureDataUrl));
           ctrl.messageSummaries.push(newMessageSummary);
@@ -402,6 +403,10 @@ angular.module('oppia').component('learnerDashboardPage', {
               }
             }
           }
+        }, () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       };
 
@@ -431,15 +436,22 @@ angular.module('oppia').component('learnerDashboardPage', {
         };
         ctrl.PAGE_SIZE = 8;
         ctrl.Math = window.Math;
-        UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-          ctrl.profilePictureDataUrl = dataUrl;
-        });
+        UserService.getProfileImageDataUrlAsync().then(
+          function(dataUrl) {
+            ctrl.profilePictureDataUrl = dataUrl;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
+          });
 
         LoaderService.showLoadingScreen('Loading');
         ctrl.username = '';
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {
           ctrl.username = userInfo.getUsername();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         var dashboardDataPromise = (

@@ -44,15 +44,15 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
         'outcome-destination-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
-        'StateEditorService', 'StateGraphLayoutService', 'UserService',
-        'ENABLE_PREREQUISITE_SKILLS', 'EXPLORATION_AND_SKILL_ID_PATTERN',
-        'PLACEHOLDER_OUTCOME_DEST',
+        '$rootScope', '$scope', 'EditorFirstTimeEventsService',
+        'FocusManagerService', 'StateEditorService', 'StateGraphLayoutService',
+        'UserService', 'ENABLE_PREREQUISITE_SKILLS',
+        'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-            $scope, EditorFirstTimeEventsService, FocusManagerService,
-            StateEditorService, StateGraphLayoutService, UserService,
-            ENABLE_PREREQUISITE_SKILLS, EXPLORATION_AND_SKILL_ID_PATTERN,
-            PLACEHOLDER_OUTCOME_DEST) {
+            $rootScope, $scope, EditorFirstTimeEventsService,
+            FocusManagerService, StateEditorService, StateGraphLayoutService,
+            UserService, ENABLE_PREREQUISITE_SKILLS,
+            EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var currentStateName = null;
@@ -174,6 +174,9 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
               // development.
               ctrl.canEditRefresherExplorationId = (
                 userInfo.isAdmin() || userInfo.isModerator());
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
 
             ctrl.explorationAndSkillIdPattern =

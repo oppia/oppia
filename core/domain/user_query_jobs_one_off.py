@@ -47,41 +47,46 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(user_settings_model):
+        user_id = user_settings_model.id
+
+        email_preferences = user_services.get_email_preferences(user_id)
+        if not email_preferences.can_receive_email_updates:
+            return
+
         query_id = (
             jobs.BaseMapReduceOneOffJobManager.get_mapper_param('query_id'))
         query_model = user_models.UserQueryModel.get(query_id)
-        user_id = user_settings_model.id
         user_contributions = user_models.UserContributionsModel.get(user_id)
 
         if (user_id == query_model.submitter_id or
                 user_services.is_at_least_moderator(user_id)):
             return
 
+        query_criteria_satisfied = True
         if query_model.has_not_logged_in_for_n_days is not None:
             if user_settings_model.last_logged_in:
                 difference = (
                     datetime.datetime.utcnow() -
                     user_settings_model.last_logged_in).days
-                if difference < query_model.has_not_logged_in_for_n_days:
-                    return
+                query_criteria_satisfied &= (
+                    difference >= query_model.has_not_logged_in_for_n_days)
 
         if query_model.inactive_in_last_n_days is not None:
             if user_settings_model.last_created_an_exploration:
                 difference = (
                     datetime.datetime.utcnow() -
                     user_settings_model.last_created_an_exploration).days
-                if difference < query_model.inactive_in_last_n_days:
-                    return
+                query_criteria_satisfied &= (
+                    difference >= query_model.inactive_in_last_n_days)
             elif user_settings_model.last_edited_an_exploration:
                 difference = (
                     datetime.datetime.utcnow() -
                     user_settings_model.last_edited_an_exploration).days
-                if difference < query_model.inactive_in_last_n_days:
-                    return
+                query_criteria_satisfied &= (
+                    difference >= query_model.inactive_in_last_n_days)
             else:
-                return
+                query_criteria_satisfied = False
 
-        query_criteria_satisfied = True
         if query_model.created_at_least_n_exps is not None:
             query_criteria_satisfied &= (
                 len(user_contributions.created_exploration_ids) >=
@@ -112,6 +117,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_model = user_models.UserQueryModel.get(query_model_id)
         query_model.user_ids = [
             python_utils.UNICODE(user_id) for user_id in stringified_user_ids]
+        query_model.update_timestamps()
         query_model.put()
 
     @classmethod
@@ -120,6 +126,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_COMPLETED
+        query_model.update_timestamps()
         query_model.put()
         email_manager.send_query_completion_email(
             query_model.submitter_id, query_id)
@@ -130,6 +137,7 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         query_id = job_model.additional_job_params['query_id']
         query_model = user_models.UserQueryModel.get(query_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_FAILED
+        query_model.update_timestamps()
         query_model.put()
 
         query_params = {

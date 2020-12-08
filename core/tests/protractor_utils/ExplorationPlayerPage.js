@@ -17,9 +17,11 @@
  * tests.
  */
 
+var action = require('./action.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
+var action = require('./action.js');
 
 var ExplorationPlayerPage = function() {
   var conversationInput = element(
@@ -84,48 +86,41 @@ var ExplorationPlayerPage = function() {
   var pauseButton = element(by.css('.protractor-test-pause-circle'));
 
   this.expandAudioBar = async function() {
-    await waitFor.elementToBeClickable(
-      audioBarExpandButton, 'Audio bar taking too long to be clickable');
-    await audioBarExpandButton.click();
+    await action.click('Audio bar expand button', audioBarExpandButton);
   };
 
   this.pressPlayButton = async function() {
-    await waitFor.elementToBeClickable(
-      playButton, 'Play button taking too long to be clickable');
-    await playButton.click();
+    await action.click('Play button', playButton);
   };
 
   this.expectAudioToBePlaying = async function() {
-    expect(await pauseButton.isPresent()).toBeTruthy();
+    await waitFor.visibilityOf(
+      pauseButton, 'Pause button taking too long to show up.');
   };
 
   this.pressPauseButton = async function() {
-    await waitFor.elementToBeClickable(
-      pauseButton, 'Pause button taking too long to be clickable');
-    await pauseButton.click();
+    await action.click('Pause button', pauseButton);
   };
 
   this.expectAudioToBePaused = async function() {
-    expect(await playButton.isPresent()).toBeTruthy();
+    await waitFor.visibilityOf(
+      playButton, 'Play button taking too long to show up.');
   };
 
   this.changeVoiceoverLanguage = async function(language) {
     await waitFor.visibilityOf(
       voiceoverLanguageSelector, 'Language selector takes too long to appear.');
-    await voiceoverLanguageSelector.element(
-      by.cssContainingText('option', language)).click();
+    var languageButton = voiceoverLanguageSelector.element(
+      by.cssContainingText('option', language));
+    await action.click('Language button', languageButton);
   };
 
   this.clickThroughToNextCard = async function() {
-    await waitFor.elementToBeClickable(
-      nextCardButton, '"Next Card" button takes too long to be clickable');
-    await nextCardButton.click();
+    await action.click('Next Card button', nextCardButton);
   };
 
   this.clickSuggestChangesButton = async function() {
-    await waitFor.elementToBeClickable(
-      suggestionPopupLink, 'Suggest changes button taking too long to appear');
-    await suggestionPopupLink.click();
+    await action.click('Suggestion Popup link', suggestionPopupLink);
   };
 
   this.expectNextCardButtonTextToBe = async function(text) {
@@ -178,17 +173,22 @@ var ExplorationPlayerPage = function() {
   };
 
   this.viewHint = async function() {
+    var until = protractor.ExpectedConditions;
+    const WAIT_FOR_FIRST_HINT_MSEC = 60000;
     // We need to wait some time for the solution to activate.
-    await waitFor.elementToBeClickable(
-      viewHintButton, '"View Hint" button takes too long to be clickable');
+    await browser.wait(
+      until.elementToBeClickable(viewHintButton), WAIT_FOR_FIRST_HINT_MSEC,
+      '"View Hint" button takes too long to be clickable');
     await viewHintButton.click();
     await clickGotItButton();
   };
 
   this.viewSolution = async function() {
+    var until = protractor.ExpectedConditions;
+    const WAIT_FOR_SUBSEQUENT_HINTS = 30000;
     // We need to wait some time for the solution to activate.
-    await waitFor.elementToBeClickable(
-      viewSolutionButton,
+    await browser.wait(
+      until.elementToBeClickable(viewSolutionButton), WAIT_FOR_SUBSEQUENT_HINTS,
       '"View Solution" button takes too long to be clickable');
     await viewSolutionButton.click();
     await waitFor.elementToBeClickable(
@@ -243,6 +243,8 @@ var ExplorationPlayerPage = function() {
   this.expectContentToMatch = async function(richTextInstructions) {
     await waitFor.visibilityOf(
       await conversationContent.first(), 'Conversation not visible');
+    await waitFor.visibilityOf(
+      await conversationContent.last(), 'Conversation not fully present');
     await forms.expectRichText(
       await conversationContent.last()
     ).toMatch(richTextInstructions);
@@ -288,6 +290,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationNameToBe = async function(name) {
+    await waitFor.visibilityOf(
+      explorationHeader, 'Exploration Header taking too long to appear.');
     expect(
       await explorationHeader.getText()
     ).toBe(name);
@@ -319,6 +323,8 @@ var ExplorationPlayerPage = function() {
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
   this.submitAnswer = async function(interactionId, answerData) {
+    await waitFor.visibilityOf(
+      conversationInput, 'Conversation input takes too long to appear.');
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
     await interactions.getInteraction(interactionId).submitAnswer(

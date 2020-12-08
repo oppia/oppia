@@ -25,8 +25,7 @@ import { Warning, baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
 import { RatioExpressionInputCustomizationArgs } from
   'extensions/interactions/customization-args-defs';
-import { RatioObjectFactory, Ratio } from
-  'domain/objects/RatioObjectFactory';
+import { Ratio } from 'domain/objects/ratio.model';
 import { RatioExpressionInputRulesService } from
   './ratio-expression-input-rules.service';
 import { Outcome } from
@@ -38,7 +37,6 @@ import { AppConstants } from 'app.constants';
 })
 export class RatioExpressionInputValidationService {
   constructor(
-    private rof: RatioObjectFactory,
     private baseInteractionValidationServiceInstance:
       baseInteractionValidationService) {}
 
@@ -80,7 +78,7 @@ export class RatioExpressionInputValidationService {
       defaultOutcome: Outcome): Warning[] {
     let warningsList = [];
     let ratioRulesService = (
-      new RatioExpressionInputRulesService(this.rof));
+      new RatioExpressionInputRulesService());
     var expectedNumberOfTerms = customizationArgs.numberOfTerms.value;
     warningsList = warningsList.concat(
       this.getCustomizationArgsWarnings(customizationArgs));
@@ -88,21 +86,6 @@ export class RatioExpressionInputValidationService {
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
         answerGroups, defaultOutcome, stateName));
-
-    let rulesService = this;
-
-    // Checks whether currentInput is in simplest form or not.
-    let isInSimplestForm = function(
-        currentRuleType: string,
-        ratio: Ratio,
-        currentInput: number[]
-    ): boolean {
-      return (
-        currentRuleType === 'IsEquivalent' &&
-        !rulesService.rof.arrayEquals(
-          ratio.convertToSimplestForm(), currentInput)
-      );
-    };
 
     // Checks whether currentInput has less number of terms than seenInput.
     let hasLessNumberOfTerms = function(
@@ -151,7 +134,7 @@ export class RatioExpressionInputValidationService {
               });
             }
           } else {
-            ratio = rulesService.rof.fromList(<number[]> currentInput);
+            ratio = Ratio.fromList(<number[]> currentInput);
             if (ratio.getNumberOfTerms() !== expectedNumberOfTerms) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
@@ -164,21 +147,14 @@ export class RatioExpressionInputValidationService {
             }
           }
         }
-        ratio = rulesService.rof.fromList(<number[]> currentInput);
-        if (isInSimplestForm(currentRuleType, ratio, currentInput)) {
-          warningsList.push({
-            type: AppConstants.WARNING_TYPES.ERROR,
-            message: (
-              `Rule ${j + 1} from answer group ${i + 1} will never be` +
-              ' matched because provided input is not in its simplest form.')
-          });
-        }
+        ratio = Ratio.fromList(<number[]> currentInput);
         for (let seenRule of seenRules) {
           let seenInput = seenRule.inputs.x || seenRule.inputs.y;
           let seenRuleType = <string> seenRule.type;
 
           if (
             seenRuleType === 'Equals' &&
+            currentRuleType !== 'IsEquivalent' &&
             currentRuleType !== 'HasNumberOfTermsEqualTo' && (
               ratioRulesService.Equals(
                 seenInput, {x: currentInput}))) {

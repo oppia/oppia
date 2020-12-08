@@ -184,9 +184,20 @@ class BaseHandler(webapp2.RequestHandler):
             user_settings = user_services.get_user_settings_by_gae_id(
                 self.gae_id, strict=False)
             if user_settings is None:
+                # If the user settings are not yet created and the request leads
+                # to signup page create a new user settings. Otherwise logout
+                # the not-fully registered user.
                 email = current_user_services.get_current_user_email()
-                user_settings = user_services.create_new_user(
-                    self.gae_id, email)
+                if 'signup?' in self.request.uri:
+                    user_settings = user_services.create_new_user(
+                        self.gae_id, email)
+                else:
+                    logging.error(
+                        'Cannot find user %s with email %s on page %s'
+                        % (self.gae_id, email, self.request.uri))
+                    _clear_login_cookies(self.response.headers)
+                    return
+
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 
@@ -635,3 +646,25 @@ class CsrfTokenHandler(BaseHandler):
         self.render_json({
             'token': csrf_token,
         })
+
+
+class OppiaMLVMHandler(BaseHandler):
+    """Base class for the handlers that communicate with Oppia-ML VM instances.
+    """
+
+    def extract_request_message_vm_id_and_signature(self):
+        """Returns the OppiaMLAuthInfo domain object containing
+        information from the incoming request that is necessary for
+        authentication.
+
+        Since incoming request can be either a protobuf serialized binary or
+        a JSON object, the derived classes must implement the necessary
+        logic to decode the incoming request and return a tuple of size 3
+        where message is at index 0, vm_id is at index 1 and signature is at
+        index 2.
+
+        Raises:
+            NotImplementedError. The derived child classes must implement the
+                necessary logic as described above.
+        """
+        raise NotImplementedError

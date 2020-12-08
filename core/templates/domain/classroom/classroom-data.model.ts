@@ -28,8 +28,8 @@ export class ClassroomData {
   _topicListIntro: string;
 
   constructor(
-      name: string, topicSummaries: TopicSummary[], courseDetails: string,
-      topicListIntro: string) {
+      name: string, topicSummaries: TopicSummary[],
+      courseDetails: string, topicListIntro: string) {
     this._name = name;
     this._topicSummaries = topicSummaries;
     this._courseDetails = courseDetails;
@@ -46,8 +46,7 @@ export class ClassroomData {
       }
     );
     return new ClassroomData(
-      name, topicSummaries, courseDetails, topicListIntro
-    );
+      name, topicSummaries, courseDetails, topicListIntro);
   }
 
   getName(): string {

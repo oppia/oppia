@@ -24,6 +24,7 @@ require(
 require('domain/editor/undo_redo/base-undo-redo.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');
+require('domain/story/story-validation.service');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('pages/story-editor-page/services/story-editor-navigation.service.ts');
@@ -38,19 +39,28 @@ angular.module('oppia').directive('storyEditorNavbar', [
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-editor-page/navbar/story-editor-navbar.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'EditableStoryBackendApiService',
+        '$rootScope', '$scope', '$uibModal', 'EditableStoryBackendApiService',
         'StoryEditorNavigationService', 'StoryEditorStateService',
-        'UndoRedoService',
+        'StoryValidationService', 'UndoRedoService',
         function(
-            $scope, $uibModal, EditableStoryBackendApiService,
+            $rootScope, $scope, $uibModal, EditableStoryBackendApiService,
             StoryEditorNavigationService, StoryEditorStateService,
-            UndoRedoService) {
+            StoryValidationService, UndoRedoService) {
           var ctrl = this;
           var EDITOR = 'Editor';
           var PREVIEW = 'Preview';
           ctrl.directiveSubscriptions = new Subscription();
           $scope.explorationValidationIssues = [];
+
+          ctrl.isStoryPublished = function() {
+            return StoryEditorStateService.isStoryPublished();
+          };
+
+          ctrl.isSaveInProgress = function() {
+            return StoryEditorStateService.isSavingStory();
+          };
 
           $scope.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
@@ -87,13 +97,25 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
           var _validateStory = function() {
             $scope.validationIssues = $scope.story.validate();
+            let nodes = $scope.story.getStoryContents().getNodes();
+            let skillIdsInTopic = (
+              StoryEditorStateService.getSkillSummaries().map(
+                skill => skill.id));
+            if ($scope.validationIssues.length === 0 && nodes.length > 0) {
+              let prerequisiteSkillValidationIssues = (
+                StoryValidationService
+                  .validatePrerequisiteSkillsInStoryContents(
+                    skillIdsInTopic, $scope.story.getStoryContents()));
+              $scope.validationIssues = (
+                $scope.validationIssues.concat(
+                  prerequisiteSkillValidationIssues));
+            }
             if (StoryEditorStateService.getStoryWithUrlFragmentExists()) {
               $scope.validationIssues.push(
                 'Story URL fragment already exists.');
             }
             $scope.forceValidateExplorations = true;
             _validateExplorations();
-            var nodes = $scope.story.getStoryContents().getNodes();
             var storyPrepublishValidationIssues = (
               $scope.story.prepublishValidate());
             var nodePrepublishValidationIssues = (
@@ -127,6 +149,9 @@ angular.module('oppia').directive('storyEditorNavbar', [
                 ).then(function(validationIssues) {
                   $scope.explorationValidationIssues =
                     $scope.explorationValidationIssues.concat(validationIssues);
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the directive is migrated to angular.
+                  $rootScope.$apply();
                 });
               }
             }
@@ -206,8 +231,6 @@ angular.module('oppia').directive('storyEditorNavbar', [
             $scope.showNavigationOptions = false;
             $scope.showStoryEditOptions = false;
             $scope.story = StoryEditorStateService.getStory();
-            $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
-            $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
             $scope.validationIssues = [];
             $scope.prepublishValidationIssues = [];
             ctrl.directiveSubscriptions.add(

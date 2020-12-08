@@ -34,6 +34,14 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
 
+class DefaultClassroomRedirectPageTests(BaseClassroomControllerTests):
+
+    def test_redirect_to_default_classroom(self):
+        response = self.get_html_response('/learn', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost/learn/math', response.headers['location'])
+
+
 class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
@@ -99,12 +107,18 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
         json_response = self.get_json(
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
-        topic_summary_dict = (
+        public_topic_summary_dict = (
             topic_services.get_topic_summary_by_id(topic_id_2).to_dict())
+        public_topic_summary_dict['is_published'] = True
+        private_topic_summary_dict = (
+            topic_services.get_topic_summary_by_id(topic_id_1).to_dict())
+        private_topic_summary_dict['is_published'] = False
 
         expected_dict = {
             'name': 'math',
-            'topic_summary_dicts': [topic_summary_dict],
+            'topic_summary_dicts': [
+                private_topic_summary_dict, public_topic_summary_dict
+            ],
             'course_details': 'Course details for classroom.',
             'topic_list_intro': 'Topics covered for classroom'
         }

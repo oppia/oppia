@@ -30,6 +30,7 @@ import string
 import sys
 import time
 import unicodedata
+import zlib
 
 from constants import constants
 import feconf
@@ -41,6 +42,7 @@ sys.path.insert(0, _YAML_PATH)
 import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
+PNG_DATA_URL_PREFIX = 'data:image/png;base64,'
 SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
@@ -267,21 +269,44 @@ def get_random_choice(alist):
     return alist[index]
 
 
+def convert_png_data_url_to_binary(image_data_url):
+    """Converts a PNG base64 data URL to a PNG binary data.
+
+    Args:
+        image_data_url: str. A string that is to be interpreted as a PNG
+            data URL.
+
+    Returns:
+        str. Binary content of the PNG created from the data URL.
+
+    Raises:
+        Exception. The given string does not represent a PNG data URL.
+    """
+    if image_data_url.startswith(PNG_DATA_URL_PREFIX):
+        return base64.b64decode(
+            python_utils.urllib_unquote(
+                image_data_url[len(PNG_DATA_URL_PREFIX):]))
+    else:
+        raise Exception('The given string does not represent a PNG data URL.')
+
+
 def convert_png_binary_to_data_url(content):
-    """Converts a png image string (represented by 'content') to a data URL.
+    """Converts a PNG image string (represented by 'content') to a data URL.
 
     Args:
         content: str. PNG binary file content.
 
     Returns:
-        str. Data url created from the binary content of the PNG.
+        str. Data URL created from the binary content of the PNG.
 
     Raises:
-        Exception. If the given binary string is not of a PNG image.
+        Exception. The given binary string does not represent a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % python_utils.url_quote(
-            base64.b64encode(content))
+        return '%s%s' % (
+            PNG_DATA_URL_PREFIX,
+            python_utils.url_quote(base64.b64encode(content))
+        )
     else:
         raise Exception('The given string does not represent a PNG image.')
 
@@ -882,6 +907,30 @@ def get_hashable_value(value):
             (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
+
+
+def compress_to_zlib(data):
+    """Compress the data to zlib format for efficient storage and communication.
+
+    Args:
+        data: str. Data to be compressed.
+
+    Returns:
+        str. Compressed data string.
+    """
+    return zlib.compress(data)
+
+
+def decompress_from_zlib(data):
+    """Decompress the zlib compressed data.
+
+    Args:
+        data: str. Data to be decompressed.
+
+    Returns:
+        str. Decompressed data string.
+    """
+    return zlib.decompress(data)
 
 
 def compute_list_difference(list_a, list_b):

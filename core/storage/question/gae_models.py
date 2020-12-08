@@ -42,7 +42,12 @@ class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """QuestionSnapshotContentModel doesn't contain any data directly
+        corresponding to a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class QuestionModel(base_models.VersionedModel):
@@ -80,8 +85,15 @@ class QuestionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question should be kept but the creator should be anonymized."""
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        """QuestionModel doesn't contain any data directly corresponding to
+        a user.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -95,19 +107,6 @@ class QuestionModel(base_models.VersionedModel):
             'inapplicable_skill_misconception_ids':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether QuestionModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def _get_new_id(cls):
@@ -160,6 +159,7 @@ class QuestionModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
+        question_commit_log.update_timestamps()
         question_commit_log.put()
 
     @classmethod
@@ -205,6 +205,7 @@ class QuestionModel(base_models.VersionedModel):
             questions: list(Question). The list of question objects
                 to put into the datastore.
         """
+        cls.update_timestamps_multi(questions)
         cls.put_multi(questions)
 
 
@@ -229,6 +230,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         anonymized and are not deleted whe user is deleted.
         """
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -622,6 +628,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_skill_links: list(QuestionSkillLink). The list of
                 question skill link domain objects to put into the datastore.
         """
+        cls.update_timestamps_multi(question_skill_links)
         cls.put_multi(question_skill_links)
 
     @classmethod
@@ -648,11 +655,11 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     question_id = datastore_services.StringProperty(indexed=True, required=True)
 
     @staticmethod
-    def get_deletion_policy():
-        """Question commit log is deleted only if the corresponding collection
-        is not public.
+    def get_model_association_to_user():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -716,10 +723,18 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question summary should be kept but the creator should be
-        anonymized.
+        """QuestionSummaryModel doesn't contain any data directly corresponding
+        to a user.
         """
-        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model data has already been exported as a part of the QuestionModel
+        export_data function, and thus a new export_data function does not
+        need to be defined here.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
@@ -736,17 +751,3 @@ class QuestionSummaryModel(base_models.BaseModel):
             'interaction_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether any existing QuestionSummaryModel refers to the given
-        user_id.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user_id.
-        """
-        return False
