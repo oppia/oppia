@@ -17,7 +17,7 @@
  */
 
 
-import { async, fakeAsync, TestBed } from '@angular/core/testing';
+import { async, TestBed } from '@angular/core/testing';
 import { ExplorationRecommendationsService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/exploration-recommendations.service';
@@ -31,7 +31,7 @@ import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-su
 
 
 
-fdescribe('Exploration Recommendations Service', () => {
+describe('Exploration Recommendations Service', () => {
   let expRecsService: ExplorationRecommendationsService;
   let urlService: UrlService;
   let contextService: ContextService;
