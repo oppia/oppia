@@ -3920,13 +3920,15 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 })
             ],
             'Changed title.')
-        exp_services.regenerate_exploration_summary(self.EXP_ID_1, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.EXP_ID_1)
 
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 1})
 
         user_services.mark_user_for_deletion(self.bob_id)
-        exp_services.regenerate_exploration_summary(self.EXP_ID_1, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.EXP_ID_1)
 
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1})
