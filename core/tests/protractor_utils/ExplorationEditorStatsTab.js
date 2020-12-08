@@ -60,10 +60,9 @@ var ExplorationEditorStatsTab = function() {
 
   this.clickIssue = async function(issueIndex, expectedIssueText) {
     expect(await _getIssueText(issueIndex)).toMatch(expectedIssueText);
-    // await _getIssueElement(issueIndex).click();
     var issueButton = await (
       _getIssueElement(issueIndex));
-    await action.click(issueIndex.toString(),issueButton);
+    await action.click(issueIndex.toString(), issueButton);
   };
 
   this.expectIssueTitleToBe = async function(issueTitle) {
@@ -71,7 +70,6 @@ var ExplorationEditorStatsTab = function() {
   };
 
   this.markResolved = async function() {
-    // await resolveBtn.click();
     await action.click('Resolve button', resolveBtn);
   };
 };
