@@ -1586,8 +1586,13 @@ class StatisticsCustomizationArgsAudit(jobs.BaseMapReduceOneOffJobManager):
 
 class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job to wipe all `ExplorationIssuesModel`s and make them empty.
-    Any playthroughs referenced by the models are deleted as well to prevent
-    memory leaks.
+    The job also regenerates models when they are missing, and deletes
+    playthroughs referenced by models before wiping them clean.
+
+    IMPORTANT: This job only deletes playthroughs referenced by
+    `ExplorationIssuesModel`s. If there are `PlaythroughModel`s that still exist
+    after running this job, then they are *unreachable* and should be deleted
+    manually.
 
     This job addresses a bug discovered in the November 2020 release. The bug
     made it to production, and corrupted a non-trivial amount of models.
