@@ -537,7 +537,8 @@ var ExplorationEditorMainTab = function() {
       by.css('.protractor-test-hint-text')).all(by.tagName('p')).last();
     await action.click('Hint Text Box', hintButton);
     await action.sendKeys(
-      'Hint RTE Element', browser.switchTo().activeElement(), hint);
+      'Hint RTE Element', await browser.switchTo().activeElement(),
+      hint);
 
     await action.click('Save Hint button', saveHintButton);
     await waitFor.invisibilityOf(
