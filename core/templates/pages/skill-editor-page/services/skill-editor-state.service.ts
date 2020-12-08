@@ -61,17 +61,19 @@ export class SkillEditorStateService {
   private _skillChangedEventEmitter = new EventEmitter();
 
   private _setSkill = (skill: Skill) => {
+    console.log(this._skill, "================this._skill")
+    console.log(skill, "================this._skill.copyFromSkill(skill)")
     this._skill.copyFromSkill(skill);
     this._skillChangedEventEmitter.emit();
     this._skillIsInitialized = true;
   };
 
   private _updateSkill = (skill: Skill) => {
+    console.log(this._setSkill(skill), "================this._setSkill(skill)")
     this._setSkill(skill);
   };
 
   private _updateGroupedSkillSummaries = (groupedSkillSummaries) => {
-    console.log(groupedSkillSummaries, '==========groupedSkillSummaries=====_updateGroupedSkillSummaries');
     var topicName = null;
     this._groupedSkillSummaries.current = [];
     this._groupedSkillSummaries.others = [];
@@ -88,7 +90,6 @@ export class SkillEditorStateService {
         break;
       }
     }
-    console.log(topicName, '==========topicName=====_updateGroupedSkillSummaries');
     for (var idx in groupedSkillSummaries[topicName]) {
       this._groupedSkillSummaries.current.push(
         groupedSkillSummaries[topicName][idx]);
@@ -118,10 +119,11 @@ export class SkillEditorStateService {
      * additional behavior of this function.
      */
   loadSkill(skillId: string): void {
+    console.log(skillId, "=====SkillId")
     this._skillIsBeingLoaded = true;
     this.skillBackendApiService.fetchSkill(
       skillId).then(newBackendSkillObject => {
-        console.log(newBackendSkillObject, '==========newBackendSkillObject=====newBackendSkillObject');
+        console.log(newBackendSkillObject, "=====newBackendSkillObject")
       this.assignedSkillTopicData = (
         newBackendSkillObject.assignedSkillTopicData);
       this._updateSkill(newBackendSkillObject.skill);
@@ -131,18 +133,19 @@ export class SkillEditorStateService {
         skillId, true, false
       );
       this._skillIsBeingLoaded = false;
-      // $rootScope.$apply();
     }, (error) => {
-      console.log(error, '==========error=====loadSkill fetchSkill');
+      console.log(error, "=====error")
       this.alertsService.addWarning(error);
       this._skillIsBeingLoaded = false;
     });
+    console.log(this.skillRightsBackendApiService, "=====this.skillRightsBackendApiService")
     this.skillRightsBackendApiService.fetchSkillRightsAsync(
-      skillId).then((newSkillRightsObject)=> {
+      skillId).then((newSkillRightsObject) => {
+        console.log(newSkillRightsObject, "=====newSkillRightsObject")
       this._updateSkillRights(newSkillRightsObject);
       this._skillIsBeingLoaded = false;
     }, (error) => {
-      console.log(error, '==========error=====loadSkill fetchSkillRightsAsync');
+      console.log(error, "=====error2")
       this.alertsService.addWarning(
         error ||
           'There was an error when loading the skill rights.');
@@ -157,8 +160,7 @@ export class SkillEditorStateService {
     return this._skillIsBeingLoaded;
   }
 
-  getAssignedSkillTopicData() {
-    console.log(this.assignedSkillTopicData, '==========this.assignedSkillTopicData=====getAssignedSkillTopicData');
+  getAssignedSkillTopicData(): string {
     return this.assignedSkillTopicData;
   }
 
@@ -181,6 +183,7 @@ export class SkillEditorStateService {
      * loaded for this editor instance.
      */
   getSkill(): Skill {
+    console.log(this._skill, "======this._skill")
     return this._skill;
   }
   /**
@@ -192,6 +195,8 @@ export class SkillEditorStateService {
      * shares behavior with setSkill(), when it succeeds.
      */
   saveSkill(commitMessage: string, successCallback: Function): boolean {
+    console.log(commitMessage, "========COmmit message")
+    console.log(this._skillIsInitialized, "========this._skillIsInitialized")
     if (!this._skillIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a skill before one is loaded.');
@@ -201,10 +206,15 @@ export class SkillEditorStateService {
       return false;
     }
     this._skillIsBeingSaved = true;
+    console.log(this._skill.getId(), "========this._skill.getId()============")
+    console.log(this._skill.getVersion(), "========this._skill.getVersion()============")
+    console.log(commitMessage, "========commitMessage============")
+
     this.skillBackendApiService.updateSkill(
       this._skill.getId(), this._skill.getVersion(), commitMessage,
       this.undoRedoService.getCommittableChangeList()).then(
       (skill) => {
+        console.log(skill, "========skill====getCommittableChangeList========")
         this._updateSkill(skill);
         this.undoRedoService.clearChanges();
         this._skillIsBeingSaved = false;
@@ -213,7 +223,6 @@ export class SkillEditorStateService {
         }
         // $rootScope.$apply();
       }, (error) => {
-        console.log(error, '==========error=====saveSkill');
         this.alertsService.addWarning(
           error || 'There was an error when saving the skill');
         this._skillIsBeingSaved = false;
@@ -230,6 +239,7 @@ export class SkillEditorStateService {
   }
 
   isSavingSkill(): boolean {
+    console.log(this._skillIsBeingSaved, "========this._skillIsBeingSaved")
     return this._skillIsBeingSaved;
   }
 
