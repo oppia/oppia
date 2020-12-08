@@ -81,34 +81,40 @@
 
 <div class="oppia-splash-section-five" ng-style="{'background-image': '<[$ctrl.getTestimonialBackgroundUrl()]>'}">
   <div class="oppia-splash-section-five-image" ng-if="$ctrl.isWindowNarrow()">
-    <img ng-if="$ctrl.testimonialId === 0" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/mira.png')]>" alt="">
-    <img ng-if="$ctrl.testimonialId === 1" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/sama.png')]>" alt="">
-    <img ng-if="$ctrl.testimonialId === 2" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/sara.png')]>" alt="">
+    <img ng-if="$ctrl.displayedTestimonialId === 0" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/mira.png')]>" alt="">
+    <img ng-if="$ctrl.displayedTestimonialId === 1" class="splash-student-image image-with-border" ng-src="<[$ctrl.getStaticImageUrl('/splash/Dheeraj_3.jpeg')]>" alt="">
+    <img ng-if="$ctrl.displayedTestimonialId === 2" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/sama.png')]>" alt="">
+    <img ng-if="$ctrl.displayedTestimonialId === 3" class="splash-student-image image-with-border" ng-src="<[$ctrl.getStaticImageUrl('/splash/Gaurav_2.jpeg')]>" alt="">
   </div>
   <div class="oppia-splash-section-five-left">
-    <div ng-if="$ctrl.testimonialId === 0">
+    <div ng-if="$ctrl.displayedTestimonialId === 0">
       <h2 translate="I18N_SPLASH_TESTIMONIAL_1"></h2>
       <h3 translate="I18N_SPLASH_STUDENT_DETAILS_1"></h3>
     </div>
-    <div ng-if="$ctrl.testimonialId === 1">
+    <div ng-if="$ctrl.displayedTestimonialId === 1">
       <h2 translate="I18N_SPLASH_TESTIMONIAL_2"></h2>
       <h3 translate="I18N_SPLASH_STUDENT_DETAILS_2"></h3>
     </div>
-    <div ng-if="$ctrl.testimonialId === 2">
+    <div ng-if="$ctrl.displayedTestimonialId === 2">
       <h2 translate="I18N_SPLASH_TESTIMONIAL_3"></h2>
       <h3 translate="I18N_SPLASH_STUDENT_DETAILS_3"></h3>
     </div>
-    <span ng-click="$ctrl.decrementTestimonialId()" class="material-icons">
+    <div ng-if="$ctrl.displayedTestimonialId === 3">
+      <h2 translate="I18N_SPLASH_TESTIMONIAL_4"></h2>
+      <h3 translate="I18N_SPLASH_STUDENT_DETAILS_4"></h3>
+    </div>
+    <span ng-click="$ctrl.decrementDisplayedTestimonialId()" class="material-icons">
       arrow_back_ios
     </span>
-    <span ng-click="$ctrl.incrementTestimonialId()" class="material-icons">
+    <span ng-click="$ctrl.incrementDisplayedTestimonialId()" class="material-icons">
       arrow_forward_ios
     </span>
   </div>
   <div class="oppia-splash-section-five-right" ng-if="!$ctrl.isWindowNarrow()">
-    <img ng-if="$ctrl.testimonialId === 0" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/mira.png')]>" alt="">
-    <img ng-if="$ctrl.testimonialId === 1" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/sama.png')]>" alt="">
-    <img ng-if="$ctrl.testimonialId === 2" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/sara.png')]>" alt="">
+    <img ng-if="$ctrl.displayedTestimonialId === 0" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/mira.png')]>" alt="">
+    <img ng-if="$ctrl.displayedTestimonialId === 1" class="splash-student-image image-with-border" ng-src="<[$ctrl.getStaticImageUrl('/splash/Dheeraj_3.jpeg')]>" alt="">
+    <img ng-if="$ctrl.displayedTestimonialId === 2" class="splash-student-image" ng-src="<[$ctrl.getStaticImageUrl('/splash/sama.png')]>" alt="">
+    <img ng-if="$ctrl.displayedTestimonialId === 3" class="splash-student-image image-with-border" ng-src="<[$ctrl.getStaticImageUrl('/splash/Gaurav_2.jpeg')]>" alt="">
   </div>
 </div>
 
@@ -160,6 +166,10 @@
     padding-bottom: 50px;
     padding-top: 40px;
     width: 100vw;
+  }
+
+  splash-page .image-with-border {
+    border-radius: 11em;
   }
 
   splash-page .oppia-splash-section-one-left {

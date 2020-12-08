@@ -57,18 +57,24 @@ angular.module('oppia').component('splashPage', {
         return WindowDimensionsService.isWindowNarrow();
       };
 
-      // The 2 functions below are to cycle between values: 0, 1, 2 for
-      // testimonialId.
-      ctrl.incrementTestimonialId = function() {
-        // This makes sure that incrementing from 2, returns 0 instead of 3,
-        // since we want the testimonials to cycle through.
-        ctrl.testimonialId = (ctrl.testimonialId + 1) % 3;
+      // The 2 functions below are to cycle between values:
+      // 0 to testimonialCount - 1 for displayedTestimonialId.
+      ctrl.incrementDisplayedTestimonialId = function() {
+        // This makes sure that incrementing from testimonialCount - 1, returns
+        // 0 instead of testimonialCount,since we want the testimonials to cycle
+        // through.
+        ctrl.displayedTestimonialId = (
+          ctrl.displayedTestimonialId + 1) % ctrl.testimonialCount;
       };
 
-      ctrl.decrementTestimonialId = function() {
-        // This makes sure that decrementing from 0, returns 2 instead of -1,
-        // since we want the testimonials to cycle through.
-        ctrl.testimonialId = (((ctrl.testimonialId - 1) % 3) + 3) % 3;
+      ctrl.decrementDisplayedTestimonialId = function() {
+        // This makes sure that decrementing from 0, returns
+        // testimonialCount - 1 instead of -1, since we want the testimonials to
+        // cycle through.
+        ctrl.displayedTestimonialId = (
+          ((ctrl.displayedTestimonialId - 1) % ctrl.testimonialCount) +
+          ctrl.testimonialCount
+        ) % ctrl.testimonialCount;
       };
 
       ctrl.getTestimonialBackgroundUrl = function() {
@@ -95,7 +101,8 @@ angular.module('oppia').component('splashPage', {
 
       ctrl.$onInit = function() {
         ctrl.userIsLoggedIn = null;
-        ctrl.testimonialId = 0;
+        ctrl.displayedTestimonialId = 0;
+        ctrl.testimonialCount = 4;
         ctrl.classroomUrl = (
           '/learn/' + splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT);
         LoaderService.showLoadingScreen('Loading');

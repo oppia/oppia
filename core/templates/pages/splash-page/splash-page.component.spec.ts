@@ -92,17 +92,17 @@ describe('Splash Page', function() {
 
   it('should increment and decrement testimonial IDs correctly', function() {
     ctrl.$onInit();
-    expect(ctrl.testimonialId).toBe(0);
-    ctrl.incrementTestimonialId();
-    expect(ctrl.testimonialId).toBe(1);
-    ctrl.incrementTestimonialId();
-    ctrl.incrementTestimonialId();
-    expect(ctrl.testimonialId).toBe(0);
+    expect(ctrl.displayedTestimonialId).toBe(0);
+    ctrl.incrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(1);
+    ctrl.incrementDisplayedTestimonialId();
+    ctrl.incrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(0);
 
-    ctrl.decrementTestimonialId();
-    expect(ctrl.testimonialId).toBe(2);
-    ctrl.decrementTestimonialId();
-    expect(ctrl.testimonialId).toBe(1);
+    ctrl.decrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(2);
+    ctrl.decrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(1);
   });
 
   it('should get correct background URLs', function() {
