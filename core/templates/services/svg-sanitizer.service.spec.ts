@@ -169,7 +169,7 @@ describe('SvgSanitizerService', () => {
     expect(dimensions).toEqual(expectedDimension);
   });
 
-  describe('should return false when SVG uses', () => {
+  describe('when SVG is malicious', () => {
     const testCases: {
       title: string, payload: string, expected: [number, number]}[] = [
       {
@@ -272,7 +272,7 @@ describe('SvgSanitizerService', () => {
       }
     ];
     testCases.forEach((testCase, index) => {
-      it(`${testCase.title} is used in SVGs (testcase: ${index + 1})`, () => {
+      it(`should return false. Case: ${testCase.title} used in SVGs)`, () => {
         const testCaseResult = svgSanitizerService.getInvalidSvgTagsAndAttrs(
           domParser.parseFromString(testCase.payload, 'image/svg+xml'));
         expect(testCaseResult.attrs.length).toEqual(testCase.expected[0]);
