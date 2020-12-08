@@ -2126,7 +2126,8 @@ tags: []
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            meta_tag_content, practice_tab_is_displayed, page_title_fragment_for_web)
+            meta_tag_content, practice_tab_is_displayed,
+            page_title_fragment_for_web)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 

@@ -193,8 +193,10 @@ export class TopicUpdateService {
    * Changes the page title fragment of a topic and records the change in the
    * undo/redo service.
    */
-  setPageTitleFragmentForWeb(topic: Topic, pageTitleFragmentForWeb: string): void {
-    let oldPageTitleFragmentForWeb = cloneDeep(topic.getPageTitleFragmentForWeb());
+  setPageTitleFragmentForWeb(
+      topic: Topic, pageTitleFragmentForWeb: string): void {
+    let oldPageTitleFragmentForWeb = cloneDeep(
+      topic.getPageTitleFragmentForWeb());
     this._applyTopicPropertyChange(
       topic, TopicDomainConstants.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB,
       pageTitleFragmentForWeb, oldPageTitleFragmentForWeb,

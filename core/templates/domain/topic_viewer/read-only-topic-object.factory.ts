@@ -191,7 +191,8 @@ export class ReadOnlyTopicObjectFactory {
       topicDataDict.topic_description, canonicalStories,
       additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,
       skillDescriptions, topicDataDict.practice_tab_is_displayed,
-      topicDataDict.meta_tag_content, topicDataDict.page_title_fragment_for_web);
+      topicDataDict.meta_tag_content,
+      topicDataDict.page_title_fragment_for_web);
   }
 }
 

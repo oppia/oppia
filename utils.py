@@ -739,11 +739,13 @@ def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
         Exception. Page title fragment is not a string.
         Exception. Page title fragment is too lengthy.
     """
+    max_chars_in_page_title_frag_for_web = (
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
     if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
             % page_title_fragment_for_web)
-    if len(page_title_fragment_for_web) > constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB:
+    if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)

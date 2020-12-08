@@ -311,8 +311,10 @@ describe('Topic update service', function() {
 
   it('should set/unset changes to a topic\'s page title', function() {
     expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
-    topicUpdateService.setPageTitleFragmentForWeb(_sampleTopic, 'new page title');
-    expect(_sampleTopic.getPageTitleFragmentForWeb()).toEqual('new page title');
+    topicUpdateService.setPageTitleFragmentForWeb(
+      _sampleTopic, 'new page title');
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toEqual(
+      'new page title');
 
     undoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
@@ -320,7 +322,8 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict ' +
     'for changing a topic\'s page title', function() {
-    topicUpdateService.setPageTitleFragmentForWeb(_sampleTopic, 'new page title');
+    topicUpdateService.setPageTitleFragmentForWeb(
+      _sampleTopic, 'new page title');
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_topic_property',
       property_name: 'page_title_fragment_for_web',

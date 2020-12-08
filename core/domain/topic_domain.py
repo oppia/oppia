@@ -482,7 +482,8 @@ class Topic(python_utils.OBJECT):
             uncategorized_skill_ids, subtopics, subtopic_schema_version,
             next_subtopic_id, language_code, version,
             story_reference_schema_version, meta_tag_content,
-            practice_tab_is_displayed, page_title_fragment_for_web, created_on=None,
+            practice_tab_is_displayed, page_title_fragment_for_web,
+            created_on=None,
             last_updated=None):
         """Constructs a Topic domain object.
 
@@ -985,7 +986,8 @@ class Topic(python_utils.OBJECT):
                 'Practice tab is displayed property should be a boolean.'
                 'Received %s.' % self.practice_tab_is_displayed)
         utils.require_valid_meta_tag_content(self.meta_tag_content)
-        utils.require_valid_page_title_fragment_for_web(self.page_title_fragment_for_web)
+        utils.require_valid_page_title_fragment_for_web(
+            self.page_title_fragment_for_web)
         if self.thumbnail_bg_color is not None and not (
                 self.require_valid_thumbnail_bg_color(self.thumbnail_bg_color)):
             raise utils.ValidationError(
@@ -1299,7 +1301,8 @@ class Topic(python_utils.OBJECT):
         """
         self.meta_tag_content = new_meta_tag_content
 
-    def update_page_title_fragment_for_web(self, new_page_title_fragment_for_web):
+    def update_page_title_fragment_for_web(
+            self, new_page_title_fragment_for_web):
         """Updates the page title fragment of a topic object.
 
         Args:

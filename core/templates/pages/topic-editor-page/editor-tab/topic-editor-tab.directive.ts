@@ -72,7 +72,8 @@ angular.module('oppia').directive('topicEditorTab', [
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
         'UndoRedoService', 'UrlInterpolationService',
         'WindowDimensionsService', 'WindowRef',
-        'MAX_CHARS_IN_META_TAG_CONTENT', 'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
+        'MAX_CHARS_IN_META_TAG_CONTENT',
+        'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
         function(
             $rootScope, $scope, $uibModal, ContextService,
@@ -82,7 +83,8 @@ angular.module('oppia').directive('topicEditorTab', [
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
             UndoRedoService, UrlInterpolationService,
             WindowDimensionsService, WindowRef,
-            MAX_CHARS_IN_META_TAG_CONTENT, MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
+            MAX_CHARS_IN_META_TAG_CONTENT,
+            MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
             MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
@@ -106,7 +108,8 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             $scope.editableName = $scope.topic.getName();
             $scope.editableMetaTagContent = $scope.topic.getMetaTagContent();
-            $scope.editablePageTitleFragmentForWeb = $scope.topic.getPageTitleFragmentForWeb();
+            $scope.editablePageTitleFragmentForWeb = (
+              $scope.topic.getPageTitleFragmentForWeb());
             $scope.editablePracticeIsDisplayed = (
               $scope.topic.getPracticeTabIsDisplayed());
             $scope.initialTopicName = $scope.topic.getName();
@@ -305,7 +308,8 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.updateTopicPageTitleFragmentForWeb = function(
               newTopicPageTitleFragmentForWeb) {
-            if (newTopicPageTitleFragmentForWeb !== $scope.topic.getPageTitleFragmentForWeb()) {
+            let currentValue = $scope.topic.getPageTitleFragmentForWeb();
+            if (newTopicPageTitleFragmentForWeb !== currentValue) {
               TopicUpdateService.setPageTitleFragmentForWeb(
                 $scope.topic, newTopicPageTitleFragmentForWeb);
             }

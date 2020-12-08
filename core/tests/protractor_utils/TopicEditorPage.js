@@ -447,7 +447,7 @@ var TopicEditorPage = function() {
       topicPageTitleFragmentField, newPageTitleFragment);
     await action.click(
       'Page Title Fragment label', topicPageTitleFragmentLabel);
-  }
+  };
 
   this.updateMetaTagContent = async function(newMetaTagContent) {
     await action.sendKeys(

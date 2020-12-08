@@ -285,7 +285,8 @@ export class Topic {
 
   prepublishValidate(): string[] {
     const metaTagContentCharLimit = constants.MAX_CHARS_IN_META_TAG_CONTENT;
-    const pageTitleFragmentForWebCharLimit = constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+    const pageTitleFragForWebCharLimit = (
+      constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
     let issues = [];
     if (!this._thumbnailFilename) {
       issues.push('Topic should have a thumbnail.');
@@ -297,9 +298,10 @@ export class Topic {
           ' does not have any skill IDs linked.');
       }
     }
+    let pageTitleFragForWebNumChars = this._pageTitleFragmentForWeb.length;
     if (!this._pageTitleFragmentForWeb) {
       issues.push('Topic should have page title fragment.');
-    } else if (this._pageTitleFragmentForWeb.length > pageTitleFragmentForWebCharLimit) {
+    } else if (pageTitleFragForWebNumChars > pageTitleFragForWebCharLimit) {
       issues.push(
         'Topic page title fragment should not be longer than ' +
         `${constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB} characters.`);
@@ -611,7 +613,8 @@ export class TopicObjectFactory {
       skillIdToDescriptionDict, this.skillSummaryObjectFactory,
       this.subtopicObjectFactory, this.storyReferenceObjectFactory,
       topicBackendDict.practice_tab_is_displayed,
-      topicBackendDict.meta_tag_content, topicBackendDict.page_title_fragment_for_web
+      topicBackendDict.meta_tag_content,
+      topicBackendDict.page_title_fragment_for_web
     );
   }
 
