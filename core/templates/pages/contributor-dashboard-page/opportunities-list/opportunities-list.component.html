@@ -1,5 +1,5 @@
 <div class="oppia-opportunities-list">
-  <div ng-repeat="opportunity in $ctrl.visibleOpportunities">
+  <div ng-repeat="opportunity in $ctrl.visibleOpportunities track by $index">
     <opportunities-list-item opportunity="opportunity"
                              on-click-action-button="$ctrl.onClickActionButton"
                              progress-bar-required="$ctrl.progressBarRequired"
