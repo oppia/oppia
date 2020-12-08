@@ -63,9 +63,13 @@ var GraphEditor = function(graphInputContainer) {
     var addEdgeButton = graphInputContainer.element(
       by.css('.protractor-test-Add-Edge-button'));
     await action.click('Test Add Edge Button', addEdgeButton);
+    await waitFor.visibilityOf(
+      vertexElement(vertexIndex1), 'Vertex element taking too long to appear');
     await browser.actions().mouseMove(
       vertexElement(vertexIndex1)).perform();
     await browser.actions().mouseDown().perform();
+    await waitFor.visibilityOf(
+      vertexElement(vertexIndex2), 'Vertex element taking too long to appear');
     await browser.actions().mouseMove(
       vertexElement(vertexIndex2)).perform();
     await browser.actions().mouseUp().perform();
@@ -93,7 +97,7 @@ var GraphEditor = function(graphInputContainer) {
       await action.click('Test delete Button', deleteButton);
       // Sample graph comes with 3 vertices.
       for (var i = 2; i >= 0; i--) {
-        await vertexElement(i).click();
+        await action.click('Test vertex element', vertexElement(i));
       }
     },
     expectCurrentGraphToBe: async function(graphDict) {
@@ -103,6 +107,8 @@ var GraphEditor = function(graphInputContainer) {
         // Expecting total no. of vertices on the graph matches with the given
         // dict's vertices.
         for (var i = 0; i < nodeCoordinatesList.length; i++) {
+          await waitFor.visibilityOf(
+            vertexElement(i), 'Vertex element taking too long to appear');
           expect(await vertexElement(i).isDisplayed()).toBe(true);
         }
       }
@@ -143,9 +149,10 @@ var ListEditor = function(elem) {
     }
   };
   var deleteItem = async function(index) {
-    await _elem.element(
+    var deleteEntryButton = _elem.element(
       await by.repeater('item in localValue track by $index').row(index)
-    ).element(by.css('.protractor-test-delete-list-entry')).click();
+        ).element(by.css('.protractor-test-delete-list-entry'))
+    await action.click('Test delete List Entry Button', deleteEntryButton);
   };
 
   return {
@@ -194,13 +201,13 @@ var RichTextEditor = async function(elem) {
     await waitFor.elementToBeClickable(
       elem.element(by.css('.' + buttonName)),
       'Toolbar button takes too long to be clickable.');
-    await elem.element(by.css('.' + buttonName)).click();
+    await action.click('Test Tool Bar Button', elem.element(by.css('.' + buttonName)));
   };
   var _clearContent = async function() {
     expect(
       await (await elem.all(by.css('.oppia-rte')).first()).isPresent()
     ).toBe(true);
-    var oppiaRte = (await elem.all(by.css('.oppia-rte')).first());
+    var oppiaRte = await elem.all(by.css('.oppia-rte').first());
     await action.clear('oppia Rte', oppiaRte);
   };
   return {
@@ -269,17 +276,16 @@ var RichTextEditor = async function(elem) {
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
+      var oppiaRte = elem.all(by.css('.oppia-rte')).first();
       if (
         [
           'Video', 'Image', 'Collapsible', 'Tabs', 'Svgdiagram'
         ].includes(componentName)) {
-        var oppiaRte = elem.all(by.css('.oppia-rte')).first();
         await action.sendKeys('Oppia Rte', oppiaRte, protractor.Key.DOWN);
       }
-
       // Ensure that the cursor is at the end of the RTE.
-      await elem.all(by.css('.oppia-rte')).first().sendKeys(
-        protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
+      var protractorChord = protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END);
+      await action.sendKeys('Oppia Rte', oppiaRte, protractorChord);
     }
   };
 };
@@ -325,11 +331,11 @@ var AutocompleteDropdownEditor = function(elem) {
       var actualOptions = await element(by.css('.select2-dropdown'))
         .all(by.tagName('li')).map(
           async function(optionElem) {
+            await waitFor.visibilityOf(
+              optionElem, 'Option elements taking too long to appear');
             return await optionElem.getText();
           }
         );
-      await waitFor.visibilityOf(
-        actualOptions, 'Actual options taking too long to appear');
       expect(actualOptions).toEqual(expectedOptions);
       // Re-close the dropdown.
       var select2DropDown = element(by.css('.select2-dropdown')).element(
@@ -353,20 +359,22 @@ var AutocompleteMultiDropdownEditor = function(elem) {
       // removes the element from the DOM. We also omit the last element
       // because it is the field for new input.
       for (var i = deleteButtons.length - 2; i >= 0; i--) {
-        await deleteButtons[i].click();
+        await action.click('Test delete button', deleteButtons[i]);
       }
 
       for (var i = 0; i < texts.length; i++) {
         var select2ContainerButton = elem.element(by.css('.select2-container'));
         await action.click('Test Container Button', select2ContainerButton);
         var select2SearchField = elem.element(by.css('.select2-search__field'));
-        await action.sendKeys('Field', select2SearchField, texts[i] + '\n');
+        await action.sendKeys('Select 2 Search Field', select2SearchField, texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       actualSelection = await elem.element(
         by.css('.select2-selection__rendered')
       ).all(by.tagName('li')).map(async function(choiceElem) {
+        await waitFor.visibilityOf(
+          choiceElem, 'Choice element taking too long to appear');
         return await choiceElem.getText();
       });
       // Remove the element corresponding to the last <li>, which actually
@@ -432,6 +440,8 @@ var MultiSelectEditor = function(elem) {
         by.css('.protractor-test-search-bar-dropdown-menu')
       ).all(by.css('.protractor-test-selected'))
         .map(async function(selectedElem) {
+          await waitFor.visibilityOf(
+            selectedElem, 'Selected element taking too long to appear');
           return await selectedElem.getText();
         });
       expect(actualSelection).toEqual(expectedCurrentSelection);
@@ -471,6 +481,8 @@ var expectRichText = function(elem) {
         // applying .getText() while the RichTextChecker is running would be
         // asynchronous and so not allow us to update the textPointer
         // synchronously.
+        await waitFor.visibilityOf(
+          entry, 'Entry element taking too long to appear');
         return await entry.getText();
       });
     // We re-derive the array of elements as we need it too.
