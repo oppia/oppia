@@ -31,6 +31,8 @@
     }
   },
   "files": [
+    "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
+    "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.spec.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.ts",
