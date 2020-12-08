@@ -809,13 +809,18 @@ class SchemaValidityTests(test_utils.GenericTestBase):
 
     def test_schemas_used_to_define_objects_are_valid(self):
         count = 0
-        for _, member in inspect.getmembers(objects):
+        for name, member in inspect.getmembers(objects):
             if inspect.isclass(member):
+                # Since BaseTranslatableObject acts as an interface, it will
+                # throw an NotImplementedError exception on get_schema().
+                if name == 'BaseTranslatableObject':
+                    continue
+
                 if hasattr(member, 'get_schema'):
                     schema_utils_test.validate_schema(member.get_schema())
                     count += 1
 
-        self.assertEqual(count, 49)
+        self.assertEqual(count, 51)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
@@ -866,3 +871,17 @@ class CodeStringTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             TypeError, 'Unexpected tab characters in code string: \t'):
             code_string.normalize('\t')
+
+class BaseTranslatableObjectTests(test_utils.GenericTestBase):
+
+    def test_translatable_objects_naming(self):
+        for name, member in inspect.getmembers(objects):
+            if not inspect.isclass(member):
+                continue
+
+            if isinstance(member(), objects.BaseTranslatableObject):
+                if name == 'BaseTranslatableObject':
+                    continue
+                self.assertEqual(name.index('Translatable'), 0)
+            else:
+                self.assertTrue('Translatable' not in name)

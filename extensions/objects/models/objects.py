@@ -62,6 +62,30 @@ class BaseObject(python_utils.OBJECT):
         return schema_utils.normalize_against_schema(raw, cls.get_schema())
 
 
+class BaseTranslatableObject(BaseObject):
+    """Base translatable object class.
+
+    This is a superclass for objects that are translatable and thus require a
+    content id. This class enforces that the object is a dictionary with a
+    content id field. The schema of actual value is determined by the
+    _get_value_schema() method.
+    """
+
+    @staticmethod
+    def _get_value_schema():
+        raise NotImplementedError("Please Implement this method")
+
+    @classmethod
+    def get_schema(cls):
+        return {
+            'type': 'dict',
+            'properties': [{
+                'name': 'content_id',
+                'schema': {'type': 'unicode'}
+            }] + cls._get_value_schema()
+        }
+
+
 class Boolean(BaseObject):
     """Class for booleans."""
 
@@ -765,6 +789,7 @@ class Graph(BaseObject):
             'schema': Int.get_schema()
         }]
     }
+
     @classmethod
     def get_schema(cls):
         return {
@@ -1331,3 +1356,25 @@ class CustomOskLetters(BaseObject):
                 'id': 'is_uniquified'
             }]
         }
+
+
+class TranslatableSetOfNormalizedString(BaseTranslatableObject):
+    """Class for translatable sets of NormalizedStrings."""
+
+    @staticmethod
+    def _get_value_schema():
+        return [{
+            'name': 'normalized_str_set',
+            'schema': SetOfNormalizedString.get_schema()
+        }]
+
+
+class TranslatableSetOfUnicodeString(BaseTranslatableObject):
+    """Class for translatable sets of UnicodeStrings."""
+
+    @staticmethod
+    def _get_value_schema():
+        return [{
+            'name': 'unicode_str_set',
+            'schema': SetOfUnicodeString.get_schema()
+        }]
