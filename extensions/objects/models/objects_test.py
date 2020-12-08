@@ -872,6 +872,7 @@ class CodeStringTests(test_utils.GenericTestBase):
             TypeError, 'Unexpected tab characters in code string: \t'):
             code_string.normalize('\t')
 
+
 class BaseTranslatableObjectTests(test_utils.GenericTestBase):
 
     def test_translatable_objects_naming(self):

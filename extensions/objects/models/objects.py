@@ -73,10 +73,20 @@ class BaseTranslatableObject(BaseObject):
 
     @staticmethod
     def _get_value_schema():
-        raise NotImplementedError("Please Implement this method")
+        """Returns a list of properties that store the object value.
+
+        Returns:
+            list(dict). A list of properties that store the object value.
+        """
+        raise NotImplementedError('Please Implement this method')
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
@@ -94,6 +104,11 @@ class Boolean(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'bool'
         }
@@ -123,6 +138,11 @@ class Real(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'float'
         }
@@ -136,6 +156,11 @@ class Int(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'int'
         }
@@ -149,6 +174,11 @@ class UnicodeString(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
         }
@@ -161,6 +191,11 @@ class Html(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'html',
         }
@@ -173,14 +208,19 @@ class SubtitledUnicode(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
                 'name': 'content_id',
                 'schema': {
                     # The default content id is none. However, it should be
-                    # populated before being saved (SubtitledUnicode in state_domain
-                    # has validation checks for this).
+                    # populated before being saved (SubtitledUnicode in
+                    # state_domain has validation checks for this).
                     'type': 'unicode_or_none'
                 }
             }, {
@@ -199,14 +239,19 @@ class SubtitledHtml(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
                 'name': 'content_id',
                 'schema': {
                     # The default content id is none. However, it should be
-                    # populated before being saved (SubtitledHtml in state_domain
-                    # has validation checks for this).
+                    # populated before being saved (SubtitledHtml in
+                    # state_domain has validation checks for this).
                     'type': 'unicode_or_none'
                 }
             }, {
@@ -226,6 +271,11 @@ class NonnegativeInt(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'int',
             'validators': [{
@@ -243,6 +293,11 @@ class PositiveInt(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'int',
             'validators': [{
@@ -262,6 +317,11 @@ class CodeString(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'ui_config': {
@@ -293,6 +353,11 @@ class CodeEvaluation(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
@@ -319,6 +384,11 @@ class ListOfCodeEvaluation(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': CodeEvaluation.get_schema()
@@ -333,6 +403,11 @@ class CoordTwoDim(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'len': 2,
@@ -348,6 +423,11 @@ class ListOfCoordTwoDim(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': CoordTwoDim.get_schema()
@@ -361,6 +441,11 @@ class ListOfUnicodeString(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': UnicodeString.get_schema()
@@ -375,6 +460,11 @@ class SetOfUnicodeString(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': UnicodeString.get_schema(),
@@ -392,6 +482,11 @@ class NormalizedString(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'post_normalizers': [{
@@ -409,6 +504,11 @@ class SetOfNormalizedString(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': NormalizedString.get_schema(),
@@ -429,6 +529,11 @@ class MathExpressionContent(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
@@ -454,6 +559,11 @@ class SanitizedUrl(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'validators': [{
@@ -475,6 +585,11 @@ class SkillSelector(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'ui_config': {
@@ -504,6 +619,11 @@ class MusicPhrase(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': {
@@ -545,6 +665,11 @@ class ListOfTabs(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': {
@@ -585,6 +710,11 @@ class Filepath(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return UnicodeString.get_schema()
 
 
@@ -597,6 +727,11 @@ class SvgFilename(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return UnicodeString.get_schema()
 
 
@@ -742,6 +877,11 @@ class LogicErrorCategory(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'choices': [
@@ -792,6 +932,11 @@ class Graph(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
@@ -873,6 +1018,11 @@ class GraphProperty(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'choices': [
@@ -889,6 +1039,11 @@ class ListOfGraph(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': Graph.get_schema()
@@ -904,6 +1059,11 @@ class NormalizedRectangle2D(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'len': 2,
@@ -965,6 +1125,11 @@ class ImageRegion(BaseObject):
     # Origin is top-left, increasing x is to the right, increasing y is down.
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
@@ -984,6 +1149,11 @@ class ImageWithRegions(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
@@ -1015,6 +1185,11 @@ class ClickOnImage(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
@@ -1044,6 +1219,11 @@ class ParameterName(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
         }
@@ -1057,6 +1237,11 @@ class SetOfHtmlString(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': Html.get_schema(),
@@ -1079,6 +1264,11 @@ class Fraction(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
@@ -1110,6 +1300,11 @@ class Units(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': {
@@ -1142,6 +1337,11 @@ class NumberWithUnits(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'dict',
             'properties': [{
@@ -1172,6 +1372,11 @@ class ListOfSetsOfHtmlStrings(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': SetOfHtmlString.get_schema(),
@@ -1187,6 +1392,11 @@ class DragAndDropHtmlString(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'html'
         }
@@ -1204,6 +1414,11 @@ class DragAndDropPositiveInt(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return PositiveInt.get_schema()
 
 
@@ -1217,12 +1432,17 @@ class AlgebraicExpression(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
-        'type': 'unicode',
-        'validators': [{
-            'id': 'is_valid_algebraic_expression'
-        }]
-    }
+            'type': 'unicode',
+            'validators': [{
+                'id': 'is_valid_algebraic_expression'
+            }]
+        }
 
 
 class AlgebraicIdentifier(BaseObject):
@@ -1236,6 +1456,11 @@ class AlgebraicIdentifier(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'choices': constants.VALID_ALGEBRAIC_IDENTIFIERS
@@ -1251,6 +1476,11 @@ class SetOfAlgebraicIdentifier(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': AlgebraicIdentifier.get_schema(),
@@ -1270,6 +1500,11 @@ class MathEquation(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'validators': [{
@@ -1288,6 +1523,11 @@ class NumericExpression(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'validators': [{
@@ -1308,6 +1548,11 @@ class PositionOfTerms(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'unicode',
             'choices': ['lhs', 'rhs', 'both', 'irrelevant']
@@ -1324,6 +1569,11 @@ class RatioExpression(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': PositiveInt.get_schema(),
@@ -1349,6 +1599,11 @@ class CustomOskLetters(BaseObject):
 
     @classmethod
     def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
         return {
             'type': 'list',
             'items': AlgebraicIdentifier.get_schema(),
@@ -1363,6 +1618,11 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
 
     @staticmethod
     def _get_value_schema():
+        """Returns a list of properties that store the object value.
+
+        Returns:
+            list(dict). A list of properties that store the object value.
+        """
         return [{
             'name': 'normalized_str_set',
             'schema': SetOfNormalizedString.get_schema()
@@ -1374,6 +1634,11 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
 
     @staticmethod
     def _get_value_schema():
+        """Returns a list of properties that store the object value.
+
+        Returns:
+            list(dict). A list of properties that store the object value.
+        """
         return [{
             'name': 'unicode_str_set',
             'schema': SetOfUnicodeString.get_schema()
