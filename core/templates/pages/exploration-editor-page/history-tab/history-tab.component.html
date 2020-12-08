@@ -36,13 +36,16 @@
         <i class="fa fa-search"></i>
       </div>
       <div class="history-table-header">
+        <div class="history-table-header-version">
+          <span>Ver.#</span>
+        </div>
         <div class="history-table-header-message">
           <span>Notes</span>
         </div>
         <div class="history-table-header-profile">
           <span>User</span>
         </div>
-        <div class="history-table-header-version" ng-click="$ctrl.reverseDateOrder()">
+        <div class="history-table-header-date" ng-click="$ctrl.reverseDateOrder()">
           <span>Date</span>
         </div>
       </div>
@@ -51,7 +54,7 @@
       </div>
       <div ng-repeat="metadata in $ctrl.explorationVersionMetadata track by $index" class="history-list-item protractor-test-history-list-item">
         <div class="history-table-index">
-          <[$index +1]>.
+          <[metadata.versionNumber]>.
         </div>
         <div class="history-table-message">
           <[metadata.commitMessage]>
@@ -142,20 +145,21 @@
     border-bottom: 2px solid #000;
     display: flex;
   }
+  history-tab .history-table-header-date,
   history-tab .history-table-header-message,
   history-tab .history-table-header-profile,
   history-tab .history-table-header-version {
     font-weight: bold;
   }
   history-tab  .history-table-header-message {
-    padding-left: 5%;
-    width: 60%;
+    padding-left: 6%;
+    width: 54%;
   }
   history-tab .history-table-header-profile,
-  history-tab .history-table-header-version {
+  history-tab .history-table-header-date {
     width: 20%;
   }
-  history-tab .history-table-header-version {
+  history-tab .history-table-header-date {
     cursor: pointer;
   }
   history-tab .history-list-item {
@@ -166,10 +170,10 @@
     position: relative;
   }
   history-tab .history-table-index {
-    width: 5%;
+    width: 10%;
   }
   history-tab .history-table-message {
-    width: 55%;
+    width: 50%;
   }
   history-tab .history-table-profile {
     width: 20%;
