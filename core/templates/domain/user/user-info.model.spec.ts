@@ -31,7 +31,7 @@ describe('User info model', () => {
     user_is_logged_in: true
   };
 
-  it('should create correct UserInfo obeject from backend dict', () => {
+  it('should create correct UserInfo object from backend dict', () => {
     var userInfo = UserInfo.createFromBackendDict(
       sampleUserInfoBackendObject);
 

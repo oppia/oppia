@@ -121,8 +121,9 @@ var ExplorationEditorSettingsTab = function() {
   this.setLanguage = async function(language) {
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
-    await element(by.css('.protractor-test-exploration-language-select')).
-      element(by.cssContainingText('option', language)).click();
+    var languageButton = explorationLanguageInput.element(
+      by.cssContainingText('option', language));
+    await action.click('Language button', languageButton);
   };
 
   this.setObjective = async function(objective) {
@@ -134,9 +135,9 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setTitle = async function(title) {
     await general.scrollToTop();
-    await action.clear('Exploration title input', explorationTitleInput);
+    await action.clear('Exploration Title Input', explorationTitleInput);
     await action.sendKeys(
-      'Exploration title input', explorationTitleInput, title);
+      'Exploration Title Input', explorationTitleInput, title);
   };
 
   this.expectCategoryToBe = async function(category) {
