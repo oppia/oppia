@@ -42,7 +42,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
       },
       template: '<div><div></div>' +
                 '<div contenteditable="true" ' +
-                'class="oppia-rte-resizer oppia-rte">' +
+                'class="oppia-rte-resizer oppia-rte protractor-test-rte">' +
                 '</div></div>',
       require: '?ngModel',
 
