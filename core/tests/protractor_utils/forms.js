@@ -151,7 +151,7 @@ var ListEditor = function(elem) {
   var deleteItem = async function(index) {
     var deleteEntryButton = _elem.element(
       await by.repeater('item in localValue track by $index').row(index)
-        ).element(by.css('.protractor-test-delete-list-entry'));
+    ).element(by.css('.protractor-test-delete-list-entry'));
     await action.click('Test delete List Entry Button', deleteEntryButton);
   };
 
@@ -200,7 +200,7 @@ var RichTextEditor = async function(elem) {
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
       elem.element(by.css('.' + buttonName)),
-      'Toolbar button takes too long to be clickable.');
+        'Toolbar button takes too long to be clickable.');
     await action.click('Test Tool Bar Button',
       elem.element(by.css('.' + buttonName)));
   };
