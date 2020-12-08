@@ -150,8 +150,8 @@ var ListEditor = function(elem) {
   };
   var deleteItem = async function(index) {
     var deleteEntryButton = _elem.element(
-      await by.repeater('item in localValue track by $index').row(index)
-        ).element(by.css('.protractor-test-delete-list-entry'))
+    await by.repeater('item in localValue track by $index').row(index)
+      ).element(by.css('.protractor-test-delete-list-entry'));
     await action.click('Test delete List Entry Button', deleteEntryButton);
   };
 
@@ -284,7 +284,8 @@ var RichTextEditor = async function(elem) {
         await action.sendKeys('Oppia Rte', oppiaRte, protractor.Key.DOWN);
       }
       // Ensure that the cursor is at the end of the RTE.
-      var protractorChord = protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END);
+      var protractorChord = protractor.Key.chord(
+        protractor.Key.CONTROL, protractor.Key.END);
       await action.sendKeys('Oppia Rte', oppiaRte, protractorChord);
     }
   };
@@ -366,7 +367,8 @@ var AutocompleteMultiDropdownEditor = function(elem) {
         var select2ContainerButton = elem.element(by.css('.select2-container'));
         await action.click('Test Container Button', select2ContainerButton);
         var select2SearchField = elem.element(by.css('.select2-search__field'));
-        await action.sendKeys('Select 2 Search Field', select2SearchField, texts[i] + '\n');
+        await action.sendKeys('Select 2 Search Field',
+          select2SearchField, texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
