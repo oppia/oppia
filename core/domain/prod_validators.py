@@ -3197,7 +3197,13 @@ class UserAuthDetailsModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id])]
+                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_identifiers_ids',
+                user_models.UserIdentifiersModel,
+                [item.gae_id]
+            )
+        ]
 
 
 class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
@@ -3223,6 +3229,11 @@ class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'user_settings_ids',
                 user_models.UserSettingsModel,
+                [item.user_id]
+            ),
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_auth_details_ids',
+                user_models.UserAuthDetailsModel,
                 [item.user_id]
             )
         ]
