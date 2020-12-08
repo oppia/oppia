@@ -1591,7 +1591,7 @@ class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     IMPORTANT: This job only deletes playthroughs referenced by
     `ExplorationIssuesModel`s. If there are `PlaythroughModel`s that still exist
-    after running this job, then they are *unreachable* and should be deleted
+    after running this job, then they are *unreachable* and must be deleted
     manually.
 
     This job addresses a bug discovered in the November 2020 release. The bug
