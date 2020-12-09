@@ -22,9 +22,11 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import itertools
 import re
 
+from constants import constants
 from core.domain import base_model_validators
 from core.domain import suggestion_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 import feconf
 
@@ -277,3 +279,283 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         return [
             cls._validate_target_version_at_submission,
             cls._validate_score_category]
+
+class GeneralVoiceoverApplicationModelValidator(
+        base_model_validators.BaseModelValidator):
+    """Class for validating GeneralVoiceoverApplicationModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        """Returns a domain object instance created from the model.
+
+        Args:
+            item: GeneralVoiceoverApplicationModel. Entity to validate.
+
+        Returns:
+            *. A domain object to validate.
+        """
+        return voiceover_services.get_voiceover_application_by_id(item.id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        field_name_to_external_model_references = []
+        if user_services.is_user_id_valid(item.author_id):
+            field_name_to_external_model_references.append(
+                base_model_validators.ExternalModelFetcherDetails(
+                    'author_ids',
+                    user_models.UserSettingsModel,
+                    [item.author_id]
+                )
+            )
+        if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
+            field_name_to_external_model_references.append(
+                base_model_validators.ExternalModelFetcherDetails(
+                    '%s_ids' % item.target_type,
+                    TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
+                    [item.target_id]))
+        if (
+                item.final_reviewer_id and
+                user_services.is_user_id_valid(item.final_reviewer_id)
+        ):
+            field_name_to_external_model_references.append(
+                base_model_validators.ExternalModelFetcherDetails(
+                    'final_reviewer_ids', user_models.UserSettingsModel,
+                    [item.final_reviewer_id]))
+        return field_name_to_external_model_references
+
+    @classmethod
+    def _validate_final_reviewer_id(cls, item):
+        """Validate that final reviewer ID is in correct format.
+
+        Args:
+            item: GeneralSuggestionModel. The model to validate.
+        """
+        if not user_services.is_user_or_pseudonymous_id(item.final_reviewer_id):
+            cls._add_error(
+                'final %s' % (
+                    base_model_validators.ERROR_CATEGORY_REVIEWER_CHECK),
+                'Entity id %s: Final reviewer ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.'
+                % (item.id, item.final_reviewer_id))
+
+    @classmethod
+    def _validate_author_id(cls, item):
+        """Validate that author ID is in correct format.
+
+        Args:
+            item: GeneralSuggestionModel. The model to validate.
+        """
+        if not user_services.is_user_or_pseudonymous_id(item.author_id):
+            cls._add_error(
+                'final %s' % (
+                    base_model_validators.ERROR_CATEGORY_AUTHOR_CHECK),
+                'Entity id %s: Author ID %s is in a wrong format. '
+                'It should be either pid_<32 chars> or uid_<32 chars>.'
+                % (item.id, item.author_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_final_reviewer_id, cls._validate_author_id]
+
+
+class CommunityContributionStatsModelValidator(
+        base_model_validators.BaseModelValidator):
+    """Class for validating CommunityContributionStatsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        # Since this is a singleton model, it has only one valid ID:
+        # community_contribution_stats.
+        return '^%s$' % (
+            suggestion_models.COMMUNITY_CONTRIBUTION_STATS_MODEL_ID)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return []
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return (
+            suggestion_services
+            .create_community_contribution_stats_from_model(item)
+        )
+
+    @classmethod
+    def _validate_translation_reviewer_counts(cls, item):
+        """For each language code, validate that the translation reviewer
+        count matches the number of translation reviewers in the datastore.
+
+        Args:
+            item: datastore_services.Model. CommunityContributionStatsModel to
+                validate.
+        """
+        supported_language_codes = [
+            language_code['id'] for language_code in
+            constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        all_user_contribution_rights_models = (
+            user_models.UserContributionRightsModel.get_all()
+        )
+        for language_code in supported_language_codes:
+            expected_translation_reviewer_count = (
+                all_user_contribution_rights_models.filter(
+                    (
+                        user_models.UserContributionRightsModel
+                        .can_review_translation_for_language_codes
+                    ) == language_code)
+                .count()
+            )
+            if language_code in item.translation_reviewer_counts_by_lang_code:
+                model_translation_reviewer_count = (
+                    item.translation_reviewer_counts_by_lang_code[
+                        language_code]
+                )
+                if model_translation_reviewer_count != (
+                        expected_translation_reviewer_count):
+                    cls._add_error(
+                        'translation reviewer %s' % (
+                            base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                        'Entity id %s: Translation reviewer count for language'
+                        ' code %s: %s does not match the expected translation '
+                        'reviewer count for language code %s: %s' % (
+                            item.id, language_code,
+                            model_translation_reviewer_count, language_code,
+                            expected_translation_reviewer_count)
+                        )
+            elif expected_translation_reviewer_count != 0:
+                cls._add_error(
+                    'translation reviewer count %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: The translation reviewer count for '
+                    'language code %s is %s, expected model '
+                    'CommunityContributionStatsModel to have the language code '
+                    '%s in its translation reviewer counts but it doesn\'t '
+                    'exist.' % (
+                        item.id, language_code,
+                        expected_translation_reviewer_count, language_code)
+                )
+
+    @classmethod
+    def _validate_translation_suggestion_counts(cls, item):
+        """For each language code, validate that the translation suggestion
+        count matches the number of translation suggestions in the datastore
+        that are currently in review.
+
+        Args:
+            item: datastore_services.Model. CommunityContributionStatsModel to
+                validate.
+        """
+        supported_language_codes = [
+            language_code['id'] for language_code in
+            constants.SUPPORTED_AUDIO_LANGUAGES
+        ]
+        all_translation_suggestion_models_in_review = (
+            suggestion_models.GeneralSuggestionModel.get_all()
+            .filter(suggestion_models.GeneralSuggestionModel.status == (
+                suggestion_models.STATUS_IN_REVIEW))
+            .filter(
+                suggestion_models.GeneralSuggestionModel.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT))
+        )
+        for language_code in supported_language_codes:
+            expected_translation_suggestion_count = (
+                all_translation_suggestion_models_in_review.filter(
+                    suggestion_models.GeneralSuggestionModel.language_code == (
+                        language_code))
+                .count()
+            )
+            if language_code in item.translation_suggestion_counts_by_lang_code:
+                model_translation_suggestion_count = (
+                    item.translation_suggestion_counts_by_lang_code[
+                        language_code]
+                )
+                if model_translation_suggestion_count != (
+                        expected_translation_suggestion_count):
+                    cls._add_error(
+                        'translation suggestion %s' % (
+                            base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                        'Entity id %s: Translation suggestion count for '
+                        'language code %s: %s does not match the expected '
+                        'translation suggestion count for language code %s: '
+                        '%s' % (
+                            item.id, language_code,
+                            model_translation_suggestion_count, language_code,
+                            expected_translation_suggestion_count)
+                        )
+            elif expected_translation_suggestion_count != 0:
+                cls._add_error(
+                    'translation suggestion count %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: The translation suggestion count for '
+                    'language code %s is %s, expected model '
+                    'CommunityContributionStatsModel to have the language code '
+                    '%s in its translation suggestion counts but it doesn\'t '
+                    'exist.' % (
+                        item.id, language_code,
+                        expected_translation_suggestion_count, language_code)
+                )
+
+    @classmethod
+    def _validate_question_reviewer_count(cls, item):
+        """Validate that the question reviewer count matches the number of
+        question reviewers in the datastore.
+
+        Args:
+            item: datastore_services.Model. CommunityContributionStatsModel to
+                validate.
+        """
+        expected_question_reviewer_count = (
+            user_models.UserContributionRightsModel.query(
+                ( # pylint: disable=singleton-comparison
+                    user_models.UserContributionRightsModel
+                    .can_review_questions
+                ) == True)
+            .count()
+        )
+        if item.question_reviewer_count != expected_question_reviewer_count:
+            cls._add_error(
+                'question reviewer %s' % (
+                    base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                'Entity id %s: Question reviewer count: %s does not '
+                'match the expected question reviewer count: %s.' % (
+                    item.id, item.question_reviewer_count,
+                    expected_question_reviewer_count)
+            )
+
+    @classmethod
+    def _validate_question_suggestion_count(cls, item):
+        """Validate that the question suggestion count matches the number of
+        question suggestions in the datastore that are currently in review.
+
+        Args:
+            item: datastore_services.Model. CommunityContributionStatsModel to
+                validate.
+        """
+        expected_question_suggestion_count = (
+            suggestion_models.GeneralSuggestionModel.get_all()
+            .filter(
+                suggestion_models.GeneralSuggestionModel.status == (
+                    suggestion_models.STATUS_IN_REVIEW))
+            .filter(
+                suggestion_models.GeneralSuggestionModel.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION))
+            .count()
+        )
+        if item.question_suggestion_count != expected_question_suggestion_count:
+            cls._add_error(
+                'question suggestion %s' % (
+                    base_model_validators.ERROR_CATEGORY_COUNT_CHECK),
+                'Entity id %s: Question suggestion count: %s does not '
+                'match the expected question suggestion count: %s.' % (
+                    item.id, item.question_suggestion_count,
+                    expected_question_suggestion_count)
+            )
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_translation_reviewer_counts,
+            cls._validate_translation_suggestion_counts,
+            cls._validate_question_reviewer_count,
+            cls._validate_question_suggestion_count
+        ]
