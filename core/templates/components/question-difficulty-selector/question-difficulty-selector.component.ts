@@ -20,6 +20,9 @@ import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 @Component({
   selector: 'question-difficulty-selector',
   templateUrl: './question-difficulty-selector.component.html',
@@ -29,7 +32,8 @@ import { AppConstants } from 'app.constants';
 export class QuestionDifficultySelectorComponent implements OnInit {
   availableDifficultyValues = [];
 
-  constructor() {}
+  constructor(
+    private urlInterpolationService: UrlInterpolationService) {}
 
   ngOnInit(): void {
     this.availableDifficultyValues = [];
