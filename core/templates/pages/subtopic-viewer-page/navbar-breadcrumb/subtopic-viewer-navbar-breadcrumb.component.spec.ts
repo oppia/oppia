@@ -45,7 +45,7 @@ class MockUrlService {
 let component: SubtopicViewerNavbarBreadcrumbComponent;
 let fixture: ComponentFixture<SubtopicViewerNavbarBreadcrumbComponent>;
 
-describe('Subtopic viewer navbar breadcrumb component', function() {
+describe('Subtopic viewer navbar breadcrumb component', async function() {
   let readOnlySubtopicPageObjectFactory = null;
 
   beforeEach(async(() => {

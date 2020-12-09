@@ -45,7 +45,7 @@ describe('Subtopic editor tab', function() {
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(async function($injector, $componentController) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
