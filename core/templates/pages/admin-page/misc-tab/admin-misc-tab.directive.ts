@@ -16,20 +16,20 @@
  * @fileoverview Directive for the miscellaneous tab in the admin panel.
  */
 
+require('domain/admin/admin-backend-api.service');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
-require('pages/admin-page/services/admin-misc-tab-backend-api.service');
 
 require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$window','AdminMiscTabBackendApiService',
+  '$rootScope','$window','AdminBackendApiService',
   'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $window,AdminMiscTabBackendApiService,
+      $rootScope,$window,AdminBackendApiService,
       AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
@@ -61,11 +61,11 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.setStatusMessage('Clearing search index...');
 
           AdminTaskManagerService.startTask();
-          AdminMiscTabBackendApiService.clearSearchIndex()
+          AdminBackendApiService.clearSearchIndex()
             .then(function() {
             ctrl.setStatusMessage('Index successfully cleared.');
             AdminTaskManagerService.finishTask();
-          },function(errorResponse) {
+          }, function(errorResponse) {
             ctrl.setStatusMessage(
               'Server error: ' + errorResponse.error.error);
             AdminTaskManagerService.finishTask();
@@ -80,15 +80,16 @@ angular.module('oppia').directive('adminMiscTab', [
             return;
           }
           ctrl.regenerationMessage = 'Regenerating opportunities...';
-          AdminMiscTabBackendApiService.regenerateTopicRelatedOpportunities
-          (ctrl.topicIdForRegeneratingOpportunities)
-            .then(function(response) {
+          AdminBackendApiService.regenerateTopicRelatedOpportunities(
+            ctrl.topicIdForRegeneratingOpportunities).then(function(response) {
             ctrl.regenerationMessage = (
               'No. of opportunities model created: ' +
               response.opportunities_count);
+              $rootScope.$apply();
           }, function(errorResponse) {
             ctrl.regenerationMessage = (
               'Server error: ' + errorResponse.error.error);
+              $rootScope.$apply();
           });
         };
 
@@ -99,7 +100,7 @@ angular.module('oppia').directive('adminMiscTab', [
           var reader = new FileReader();
           reader.onload = function(e) {
             var data = (<FileReader>e.target).result;
-            AdminMiscTabBackendApiService.uploadTopicSimilarities(data)
+            AdminBackendApiService.uploadTopicSimilarities(data)
               .then(function() {
               ctrl.setStatusMessage(
                 'Topic similarities uploaded successfully.');
@@ -121,18 +122,17 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         ctrl.sendDummyMailToAdmin = function() {
-          AdminMiscTabBackendApiService.sendDummyMail()
+          AdminBackendApiService.sendDummyMail()
             .then(function(response) {
               ctrl.setStatusMessage('Success! Mail sent to admin.');
             }, function(errorResponse) {
-              console.log(errorResponse)
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.error.error);
             });
         };
 
         ctrl.flushMemoryCache = function() {
-          AdminMiscTabBackendApiService.flushCache()
+          AdminBackendApiService.flushCache()
             .then(function(response) {
               ctrl.setStatusMessage('Success! Memory Cache Flushed.');
             }, function(errorResponse) {
@@ -142,12 +142,12 @@ angular.module('oppia').directive('adminMiscTab', [
         };
 
         ctrl.getMemoryCacheProfile = function() {
-          AdminMiscTabBackendApiService.getMemoryCacheProfile()
-            .then(function(response) {
+          AdminBackendApiService.getMemoryCacheProfile()
+            .then(function(memoryCacheProfile) {
               ctrl.result = {
-                totalAllocatedInBytes: response.total_allocation,
-                peakAllocatedInBytes: response.peak_allocation,
-                totalKeysStored: response.total_keys_stored
+                totalAllocatedInBytes: memoryCacheProfile.total_allocation,
+                peakAllocatedInBytes: memoryCacheProfile.peak_allocation,
+                totalKeysStored: memoryCacheProfile.total_keys_stored
               };
               ctrl.memoryCacheDataFetched = true;
               ctrl.setStatusMessage('Success!');
@@ -159,7 +159,7 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.updateUsername = function() {
           ctrl.setStatusMessage('Updating username...');
-          AdminMiscTabBackendApiService.updateUserName
+          AdminBackendApiService.updateUserName
           (ctrl.oldUsername,ctrl.newUsername)
             .then(
             function(response) {
@@ -176,7 +176,7 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.getNumberOfPendingDeletionRequestModels = function() {
           ctrl.setStatusMessage(
             'Getting the number of users that are being deleted...');
-            AdminMiscTabBackendApiService.numberOfPendingDeletionRequest()
+            AdminBackendApiService.numberOfPendingDeletionRequest()
             .then(
             function(response) {
               ctrl.setStatusMessage(

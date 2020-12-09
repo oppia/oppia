@@ -27,6 +27,7 @@ import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { TopicSummary } from 'domain/topic/topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
@@ -198,3 +199,176 @@ describe('Admin backend api service', () => {
     })
   );
 });
+
+describe('Admin Backend API service for Misc Tab', () => {
+  let adminBackendApiService: AdminBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [AdminBackendApiService]
+    });
+    httpTestingController = TestBed.get(HttpTestingController);
+    adminBackendApiService = TestBed.get(AdminBackendApiService);
+    csrfService = TestBed.get(CsrfTokenService);
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('sample-csrf-token');
+    });
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+  
+  it('should flush the memory cache',
+    fakeAsync(() => {
+      adminBackendApiService.flushCache()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/memorycacheadminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should clear search index',
+    fakeAsync(() => {
+      adminBackendApiService.clearSearchIndex()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+    it('should not regenerate topic related oppurtunities if id is incorrect',
+    fakeAsync(() => {
+      let topicId = 'topic_1';
+      let errorMessage='Server error: Entity for class TopicModel with id '
+        + topicId +' not found'
+      adminBackendApiService.regenerateTopicRelatedOpportunities(
+        topicId
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(
+        { error: errorMessage },
+        { status: 500, statusText: ''}
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+      console.log(failHandler)
+    }
+    ));
+    
+    it('should upload topic similarities',
+    fakeAsync(() => {
+      let data = 'topic_similarities.csv';
+      adminBackendApiService.uploadTopicSimilarities(data)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+    
+    it('should send dummy mail to admin',
+    fakeAsync(() => {
+      let errorMessage='Server error: This app cannot send emails.'
+      adminBackendApiService.sendDummyMail()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/senddummymailtoadminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(
+        { error: errorMessage },
+        { status: 400, statusText: ''}
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }
+    ));
+
+    it('should get data of memory cache profile',
+    fakeAsync(() => {
+      adminBackendApiService.getMemoryCacheProfile()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/memorycacheadminhandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+    it('should update the username of oppia account',
+    fakeAsync(() => {
+      let oldUsername = 'old name'
+      let newUsername = 'new name'
+      adminBackendApiService.updateUserName(oldUsername,newUsername)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/updateusernamehandler');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+    
+    it('should get the data of number of pending delete requests',
+    fakeAsync(() => {
+      adminBackendApiService.numberOfPendingDeletionRequest()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/numberofdeletionrequestshandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+      }
+    ));
+    
+  });
+
