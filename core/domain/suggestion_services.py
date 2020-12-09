@@ -635,7 +635,7 @@ def get_translation_suggestions_waiting_longest_for_review(
 
     Args:
         language_code: str. The ISO 639-1 language code of the translation
-            suggestions.
+        suggestions.
 
     Returns:
         list(Suggestion). A list of translation suggestions, sorted in

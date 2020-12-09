@@ -253,7 +253,7 @@ class TranslatableTextHandler(base.BaseHandler):
 
         Returns:
             bool. True if suggestion exists in suggestions with a change dict
-                matching state_name and content_id, False otherwise.
+            matching state_name and content_id, False otherwise.
         """
         return any(
             s.change.state_name == state_name and
