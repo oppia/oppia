@@ -334,7 +334,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
 
-        suggestions = (suggestion_models.GeneralSuggestionModel
+        suggestions = (
+            suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_in_review_by_exp_id('exp1'))
 
         self.assertEqual(len(suggestions), 2)
@@ -355,7 +356,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_translation_suggestions_in_review_by_exp_id_with_invalid_exp(
             self):
-        suggestions = (suggestion_models.GeneralSuggestionModel
+        suggestions = (
+            suggestion_models.GeneralSuggestionModel
             .get_translation_suggestions_in_review_by_exp_id('invalid_exp'))
         self.assertEqual(len(suggestions), 0)
 
