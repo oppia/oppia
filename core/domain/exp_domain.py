@@ -474,8 +474,8 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
         }
 
 
-class StateVersionMapping(python_utils.OBJECT):
-    """Mapping from exploration versions to states with equivalent content.
+class StateVersionSpan(python_utils.OBJECT):
+    """Span of exploration versions where a state has equivalent content.
 
     Equivalence between state contents is determined by the user-defined
     predicate passed in to the constructor. By default, state contents are
@@ -485,29 +485,15 @@ class StateVersionMapping(python_utils.OBJECT):
     match between versions. If the state's name has changed in between versions,
     then an ExplorationVersionsDiff must be used to resolve the discrepancy.
 
-    Mappings can only be extended using the extend_or_split() method. It
-    enforces the invariant: all versions of the state in a mapping are
-    equivalent. Mappings must be extended in increasing and consecutive
-    version-order.
-
-    This class implements a dict interface. It can be iterated and accessed like
-    a normal dict. For example:
-
-        >>> state_name, state = self[3] # Returns version 3 of the state.
-
-        >>> if 5 in self: # Version 5 is included in the mapping.
-        ...     pass
-
-        >>> for exp_version, (state_name, state) in self.items():
-        ...     pass
-
-        >>> len(self) # Returns the number of versions in the mapping.
+    Spans can only be extended using the extend_or_split() method. It enforces
+    the invariant: all versions of the state in a span are equivalent. Spans
+    must be extended in increasing and consecutive version-order.
     """
 
     def __init__(
             self, exp_version, state_name, state_content,
             state_equality_predicate=None):
-        """Initializes mapping with the given version of an exploration's state.
+        """Initializes span with the given version of an exploration's state.
 
         Args:
             exp_version: int. The version the state corresponds to.
@@ -518,41 +504,29 @@ class StateVersionMapping(python_utils.OBJECT):
                 callable(state_domain.State, state_domain.State) -> bool | None.
                 Returns True when two states are "equal". The predicate is used
                 to enforce the following invariant: all versions of the state in
-                a mapping are equivalent. If None, then uses a predicate that
+                a span are equivalent. If None, then uses a predicate that
                 unconditionally returns True.
         """
         self._version_start, self._version_end = exp_version, exp_version + 1
         self._versioned_states = [(state_name, state_content)]
         self._are_states_equal = (
             state_equality_predicate or
-            StateVersionMapping._default_state_equality_predicate)
+            StateVersionSpan._default_state_equality_predicate)
 
-    def __iter__(self):
-        """Returns an iterator over the exploration versions in the mapping."""
-        return iter(python_utils.RANGE(self._version_start, self._version_end))
-
-    def __len__(self):
-        """Returns the number of versions within the mapping."""
-        return self._version_end - self._version_start
-
-    def __contains__(self, version):
-        """Returns whether the mapping includes the given version."""
+    def has_version(self, version):
+        """Returns whether the span includes the given version."""
         return self._version_start <= version < self._version_end
 
-    def __getitem__(self, version):
+    def get_version(self, version):
         """Returns the name and content of the state at the given version."""
-        if version not in self:
-            raise KeyError('Mapping does not contain version=%r' % version)
+        if not self.has_version(version):
+            raise KeyError('Span does not contain version=%r' % version)
         return self._versioned_states[version - self._version_start]
-
-    def __setitem__(self, unused_version, unused_snapshot):
-        """Raises an exception. Only `extend_or_split` can mutate a mapping."""
-        raise Exception('Only `extend_or_split` can mutate a mapping')
 
     def extend_or_split(
             self, exp_version, state_name, state_content, exp_version_diff):
-        """Extends the mapping to include the given state, unless it fails to
-        pass the mapping's equality predicate, in which case a new mapping is
+        """Extends the span to include the given state, unless it fails to
+        pass the span's equality predicate, in which case a new span is
         created and returned instead.
 
         Args:
@@ -564,12 +538,12 @@ class StateVersionMapping(python_utils.OBJECT):
                 exploration since its previous version.
 
         Returns:
-            StateVersionMapping. The mapping chosen to hold the state.
+            StateVersionSpan. The span chosen to hold the state.
 
         Raises:
             Exception. When any of the following occurs:
                 -   The given version is not "previously-added version + 1".
-                -   The name of the mapping's state does not map to the given
+                -   The name of the span's state does not map to the given
                 name, as defined by exp_version_diff.new_to_old_state_names.
         """
         if exp_version != self._version_end:
@@ -586,9 +560,9 @@ class StateVersionMapping(python_utils.OBJECT):
 
         if actual_prev_state_name != expected_prev_state_name:
             raise Exception(
-                'State has no mapping from v%d to v%d (previous name of the '
+                'State has no span from v%d to v%d (previous name of the '
                 'state is different; input exploration diff thinks that the '
-                'previous name was %r, but this mapping thinks that the '
+                'previous name was %r, but this span thinks that the '
                 'previous name was %r)' % (
                     prev_exp_version, exp_version,
                     actual_prev_state_name, expected_prev_state_name))
@@ -598,21 +572,17 @@ class StateVersionMapping(python_utils.OBJECT):
             self._version_end = exp_version + 1
             return self
         else:
-            return StateVersionMapping(
+            return StateVersionSpan(
                 exp_version, state_name, state_content,
                 state_equality_predicate=self._are_states_equal)
 
-    def items(self):
-        """Returns an iterable over the {version: state content} items."""
-        return enumerate(self._versioned_states, start=self._version_start)
-
     def state_names(self):
-        """Yields all state names held by the mapping."""
+        """Yields all state names held by the span."""
         for state_name, _ in self._versioned_states:
             yield state_name
 
     def state_contents(self):
-        """Yields all state contents held by the mapping."""
+        """Yields all state contents held by the span."""
         for _, state_content in self._versioned_states:
             yield state_content
 
@@ -632,8 +602,8 @@ class StateVersionMapping(python_utils.OBJECT):
             ValueError. The input range is out-of-bounds.
         """
         return [
-            state_name for state_name, _ in self._get_multi(
-                version_start, version_end)
+            state_name
+            for state_name, _ in self._get_multi(version_start, version_end)
         ]
 
     def get_multi_contents(self, version_start, version_end):
@@ -652,8 +622,8 @@ class StateVersionMapping(python_utils.OBJECT):
             ValueError. The input range is out-of-bounds.
         """
         return [
-            state_content for _, state_content in self._get_multi(
-                version_start, version_end)
+            state_content
+            for _, state_content in self._get_multi(version_start, version_end)
         ]
 
     def _get_multi(self, version_start, version_end):
@@ -718,25 +688,25 @@ class ExplorationStatesHistory(python_utils.OBJECT):
                     ', '.join(
                         python_utils.UNICODE(v) for v in actual_versions)))
 
-        self._state_mappings = []
+        self._state_spans = []
         for exp, diff in python_utils.ZIP(exps, exp_version_diffs):
-            new_state_mappings = dict()
+            new_state_spans = dict()
             for state_name, state_content in exp.states.items():
                 if exp.version == 1 or state_name in diff.added_state_names:
-                    new_state_mappings[state_name] = StateVersionMapping(
+                    new_state_spans[state_name] = StateVersionSpan(
                         exp.version, state_name, state_content,
                         state_equality_predicate=state_equality_predicate)
                 elif state_name not in diff.deleted_state_names:
-                    prev_state_mappings, prev_state_name = (
-                        self._state_mappings[-1],
+                    prev_state_spans, prev_state_name = (
+                        self._state_spans[-1],
                         diff.new_to_old_state_names.get(state_name, state_name))
-                    new_state_mappings[state_name] = (
-                        prev_state_mappings[prev_state_name].extend_or_split(
+                    new_state_spans[state_name] = (
+                        prev_state_spans[prev_state_name].extend_or_split(
                             exp.version, state_name, state_content, diff))
-            self._state_mappings.append(new_state_mappings)
+            self._state_spans.append(new_state_spans)
 
     def get_state_span(self, exp_version, state_name):
-        """Returns the mapping of versions for the given state which includes
+        """Returns the span of versions for the given state which includes
         the given exploration version.
 
         Args:
@@ -745,11 +715,11 @@ class ExplorationStatesHistory(python_utils.OBJECT):
                 version.
 
         Returns:
-            StateVersionMapping | None. The mapping of versions for the given
+            StateVersionSpan | None. The span of versions for the given
             state which includes the given exploration version. Returns None if
             the state did not exist at that version.
         """
-        return self._state_mappings[exp_version - 1].get(state_name, None)
+        return self._state_spans[exp_version - 1].get(state_name, None)
 
     def has_state(self, exp_version, state_name):
         """Returns whether the given exploration version had a state with the
@@ -762,7 +732,7 @@ class ExplorationStatesHistory(python_utils.OBJECT):
         Returns:
             bool. Whether a state with the given name existed at given version.
         """
-        return state_name in self._state_mappings[exp_version - 1]
+        return state_name in self._state_spans[exp_version - 1]
 
 
 class Exploration(python_utils.OBJECT):
