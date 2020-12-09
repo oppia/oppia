@@ -33,6 +33,7 @@ from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
 from core.domain import prod_validators
+from core.domain import question_domain
 from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
