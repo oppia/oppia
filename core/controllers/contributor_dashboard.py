@@ -217,7 +217,7 @@ class TranslatableTextHandler(base.BaseHandler):
         self.render_json(self.values)
 
     def _get_state_names_to_not_in_review_content_id_mapping(
-        self, state_names_to_content_id_mapping, suggestions):
+            self, state_names_to_content_id_mapping, suggestions):
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents found in suggestions.
 

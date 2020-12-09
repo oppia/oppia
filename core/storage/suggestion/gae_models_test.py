@@ -339,14 +339,18 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(suggestions), 2)
         self.assertEqual(suggestions[0].target_id, 'exp1')
-        self.assertEqual(suggestions[0].suggestion_type,
+        self.assertEqual(
+            suggestions[0].suggestion_type,
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
-        self.assertEqual(suggestions[0].status,
+        self.assertEqual(
+            suggestions[0].status,
             suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(suggestions[1].target_id, 'exp1')
-        self.assertEqual(suggestions[1].suggestion_type,
+        self.assertEqual(
+            suggestions[1].suggestion_type,
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
-        self.assertEqual(suggestions[1].status,
+        self.assertEqual(
+            suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
 
     def test_get_translation_suggestions_in_review_by_exp_id_with_invalid_exp(
