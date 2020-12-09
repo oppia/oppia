@@ -226,7 +226,6 @@ describe('Admin Backend API service for Misc Tab', () => {
   afterEach(() => {
     httpTestingController.verify();
   });
-  
   it('should flush the memory cache',
     fakeAsync(() => {
       adminBackendApiService.flushCache()
@@ -259,11 +258,11 @@ describe('Admin Backend API service for Misc Tab', () => {
     }
     ));
 
-    it('should not regenerate topic related oppurtunities if id is incorrect',
+  it('should not regenerate topic related oppurtunities if id is incorrect',
     fakeAsync(() => {
       let topicId = 'topic_1';
-      let errorMessage='Server error: Entity for class TopicModel with id '
-        + topicId +' not found'
+      let errorMessage = 'Server error: Entity for class TopicModel with id ' +
+       topicId + ' not found';
       adminBackendApiService.regenerateTopicRelatedOpportunities(
         topicId
       ).then(successHandler, failHandler);
@@ -279,11 +278,9 @@ describe('Admin Backend API service for Misc Tab', () => {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-      console.log(failHandler)
     }
     ));
-    
-    it('should upload topic similarities',
+  it('should upload topic similarities',
     fakeAsync(() => {
       let data = 'topic_similarities.csv';
       adminBackendApiService.uploadTopicSimilarities(data)
@@ -299,13 +296,11 @@ describe('Admin Backend API service for Misc Tab', () => {
       expect(failHandler).not.toHaveBeenCalled();
     }
     ));
-    
-    it('should send dummy mail to admin',
+  it('should send dummy mail to admin',
     fakeAsync(() => {
-      let errorMessage='Server error: This app cannot send emails.'
+      let errorMessage = 'Server error: This app cannot send emails.';
       adminBackendApiService.sendDummyMail()
         .then(successHandler, failHandler);
-
       let req = httpTestingController.expectOne(
         '/senddummymailtoadminhandler');
       expect(req.request.method).toEqual('POST');
@@ -320,11 +315,10 @@ describe('Admin Backend API service for Misc Tab', () => {
     }
     ));
 
-    it('should get data of memory cache profile',
+  it('should get data of memory cache profile',
     fakeAsync(() => {
       adminBackendApiService.getMemoryCacheProfile()
         .then(successHandler, failHandler);
-
       let req = httpTestingController.expectOne(
         '/memorycacheadminhandler');
       expect(req.request.method).toEqual('GET');
@@ -336,13 +330,12 @@ describe('Admin Backend API service for Misc Tab', () => {
     }
     ));
 
-    it('should update the username of oppia account',
+  it('should update the username of oppia account',
     fakeAsync(() => {
-      let oldUsername = 'old name'
-      let newUsername = 'new name'
-      adminBackendApiService.updateUserName(oldUsername,newUsername)
+      let oldUsername = 'old name';
+      let newUsername = 'new name';
+      adminBackendApiService.updateUserName(oldUsername, newUsername)
         .then(successHandler, failHandler);
-
       let req = httpTestingController.expectOne(
         '/updateusernamehandler');
       expect(req.request.method).toEqual('PUT');
@@ -353,12 +346,11 @@ describe('Admin Backend API service for Misc Tab', () => {
       expect(failHandler).not.toHaveBeenCalled();
     }
     ));
-    
-    it('should get the data of number of pending delete requests',
+
+  it('should get the data of number of pending delete requests',
     fakeAsync(() => {
       adminBackendApiService.numberOfPendingDeletionRequest()
         .then(successHandler, failHandler);
-
       let req = httpTestingController.expectOne(
         '/numberofdeletionrequestshandler');
       expect(req.request.method).toEqual('GET');
@@ -367,8 +359,6 @@ describe('Admin Backend API service for Misc Tab', () => {
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-      }
+    }
     ));
-    
-  });
-
+});

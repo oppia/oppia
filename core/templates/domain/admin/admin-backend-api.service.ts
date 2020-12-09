@@ -140,71 +140,69 @@ export class AdminBackendApiService {
       });
     });
   }
+  flushCache():Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.MEMORY_CACHE_HANDLER_URL, {}
+    ).toPromise();
+  }
 
+  clearSearchIndex():Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_HANDLER_URL, {}
+    ).toPromise();
+  }
 
-flushCache ():Promise<void> {
-  return this.http.post<void>(
-      AdminPageConstants.MEMORY_CACHE_HANDLER_URL,{}
-  ).toPromise();
-}
-
-clearSearchIndex ():Promise<void> {
-  return this.http.post<void>(
-      AdminPageConstants.ADMIN_HANDLER_URL,{}
-  ).toPromise();
-}
-
-regenerateTopicRelatedOpportunities(topicId:string):Promise<void> {
-  return this.http.post<void>(
+  regenerateTopicRelatedOpportunities(topicId:string):Promise<void> {
+    return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
-          action: 'regenerate_topic_related_opportunities',
-          topic_id: topicId
-        }
-  ).toPromise();
-}
-
-uploadTopicSimilarities (data:string | ArrayBuffer):Promise<void> {
-  return this.http.post<void>(
-      AdminPageConstants.ADMIN_HANDLER_URL,{
-              action: 'upload_topic_similarities',
-              data: data   
+        action: 'regenerate_topic_related_opportunities',
+        topic_id: topicId
       }
-  ).toPromise();
-}
+    ).toPromise();
+  }
 
-sendDummyMail():Promise<void> {
-  return this.http.post<void>(
-      AdminPageConstants.SEND_DUMMY_MAIL_HANDLER_URL,{}
-  ).toPromise();
-}
+  uploadTopicSimilarities(data:string | ArrayBuffer):Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'upload_topic_similarities',
+        data: data,
+      }
+    ).toPromise();
+  }
 
-getMemoryCacheProfile ():Promise<void> {
-  let memoryCacheProfile=null;
-  return new Promise((resolve, reject) => {
+  sendDummyMail():Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.SEND_DUMMY_MAIL_HANDLER_URL, {}
+    ).toPromise();
+  }
+
+  getMemoryCacheProfile():Promise<void> {
+    let memoryCacheProfile = null;
+    return new Promise((resolve, reject) => {
       this.http.get<void>(
-        AdminPageConstants.MEMORY_CACHE_HANDLER_URL,{}
+        AdminPageConstants.MEMORY_CACHE_HANDLER_URL, {}
       ).toPromise()
         .then(responce =>{
-          memoryCacheProfile=responce;
+          memoryCacheProfile = responce;
           resolve(memoryCacheProfile);
-      }, errorResponse => reject(errorResponse));
+        }, errorResponse => reject(errorResponse));
     }
-  )}
-updateUserName (oldUsername:string,newUsername:string):Promise<void> {
-  return this.http.put<void>(
-      AdminPageConstants.UPDATE_USERNAME_HANDLER_URL,{
-          old_username: oldUsername,
-          new_username: newUsername
-        }
-  ).toPromise();
-}
+    );
+  }
+  updateUserName(oldUsername:string, newUsername:string):Promise<void> {
+    return this.http.put<void>(
+      AdminPageConstants.UPDATE_USERNAME_HANDLER_URL, {
+        old_username: oldUsername,
+        new_username: newUsername
+      }
+    ).toPromise();
+  }
 
-numberOfPendingDeletionRequest ():Promise<void> {
-  return this.http.get<void>(
-      AdminPageConstants.NUMBER_OF_DELETION_REQUEST_HANDLER_URL,{}
-  ).toPromise();
-}
-
+  numberOfPendingDeletionRequest():Promise<void> {
+    return this.http.get<void>(
+      AdminPageConstants.NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {}
+    ).toPromise();
+  }
 }
 angular.module('oppia').factory(
   'AdminBackendApiService',

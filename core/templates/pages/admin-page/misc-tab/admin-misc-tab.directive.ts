@@ -25,12 +25,12 @@ require('constants.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
-  '$rootScope','$window','AdminBackendApiService',
-  'AdminTaskManagerService', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  '$rootScope', '$window', 'AdminBackendApiService',
+  'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', 'MAX_USERNAME_LENGTH',
   function(
-      $rootScope,$window,AdminBackendApiService,
-      AdminTaskManagerService, UrlInterpolationService, ADMIN_HANDLER_URL,
+      $rootScope, $window, AdminBackendApiService,
+      AdminTaskManagerService, UrlInterpolationService,
       ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL, MAX_USERNAME_LENGTH) {
     return {
       restrict: 'E',
@@ -63,13 +63,13 @@ angular.module('oppia').directive('adminMiscTab', [
           AdminTaskManagerService.startTask();
           AdminBackendApiService.clearSearchIndex()
             .then(function() {
-            ctrl.setStatusMessage('Index successfully cleared.');
-            AdminTaskManagerService.finishTask();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.error.error);
-            AdminTaskManagerService.finishTask();
-          });
+              ctrl.setStatusMessage('Index successfully cleared.');
+              AdminTaskManagerService.finishTask();
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
+              AdminTaskManagerService.finishTask();
+            });
         };
 
         ctrl.regenerateOpportunitiesRelatedToTopic = function() {
@@ -85,11 +85,11 @@ angular.module('oppia').directive('adminMiscTab', [
             ctrl.regenerationMessage = (
               'No. of opportunities model created: ' +
               response.opportunities_count);
-              $rootScope.$apply();
+            $rootScope.$apply();
           }, function(errorResponse) {
             ctrl.regenerationMessage = (
               'Server error: ' + errorResponse.error.error);
-              $rootScope.$apply();
+            $rootScope.$apply();
           });
         };
 
@@ -102,12 +102,12 @@ angular.module('oppia').directive('adminMiscTab', [
             var data = (<FileReader>e.target).result;
             AdminBackendApiService.uploadTopicSimilarities(data)
               .then(function() {
-              ctrl.setStatusMessage(
-                'Topic similarities uploaded successfully.');
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
-            });
+                ctrl.setStatusMessage(
+                  'Topic similarities uploaded successfully.');
+              }, function(errorResponse) {
+                ctrl.setStatusMessage(
+                  'Server error: ' + errorResponse.error.error);
+              });
           };
           reader.readAsText(file);
         };
@@ -159,35 +159,35 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.updateUsername = function() {
           ctrl.setStatusMessage('Updating username...');
-          AdminBackendApiService.updateUserName
-          (ctrl.oldUsername,ctrl.newUsername)
+          AdminBackendApiService.updateUserName(
+            ctrl.oldUsername, ctrl.newUsername)
             .then(
-            function(response) {
-              ctrl.setStatusMessage(
-                'Successfully renamed ' + ctrl.oldUsername + ' to ' +
-                  ctrl.newUsername + '!');
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
-            }
-          );
+              function(response) {
+                ctrl.setStatusMessage(
+                  'Successfully renamed ' + ctrl.oldUsername + ' to ' +
+                    ctrl.newUsername + '!');
+              }, function(errorResponse) {
+                ctrl.setStatusMessage(
+                  'Server error: ' + errorResponse.error.error);
+              }
+            );
         };
 
         ctrl.getNumberOfPendingDeletionRequestModels = function() {
           ctrl.setStatusMessage(
             'Getting the number of users that are being deleted...');
-            AdminBackendApiService.numberOfPendingDeletionRequest()
+          AdminBackendApiService.numberOfPendingDeletionRequest()
             .then(
-            function(response) {
-              ctrl.setStatusMessage(
-                'The number of users that are being deleted is: ' +
+              function(response) {
+                ctrl.setStatusMessage(
+                  'The number of users that are being deleted is: ' +
                 response.number_of_pending_deletion_models);
-            },
-            function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
-            }
-          );
+              },
+              function(errorResponse) {
+                ctrl.setStatusMessage(
+                  'Server error: ' + errorResponse.error.error);
+              }
+            );
         };
 
         ctrl.submitQuery = function() {
