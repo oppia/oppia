@@ -30,17 +30,16 @@ import { UrlInterpolationService } from
   templateUrl: './collection-local-nav.component.html',
   styleUrls: []
 })
-export class CollectionLocalNav implements OnInit, OnDestroy {
-  private collectionId: string;
-  private directiveSubscriptions = new Subscription();
-  private canEdit: boolean;
+export class CollectionLocalNavComponent implements OnInit, OnDestroy {
   constructor(
       private readOnlyCollectionBackendApiService:
        ReadOnlyCollectionBackendApiService,
       private urlService: UrlService,
       private urlInterpolationService: UrlInterpolationService,
+      private collectionId: string,
+      private directiveSubscriptions = new Subscription(),
+      private canEdit: boolean
   ) {}
-
   ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
     this.directiveSubscriptions.add(
@@ -54,11 +53,10 @@ export class CollectionLocalNav implements OnInit, OnDestroy {
       )
     );
   }
-
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }
 angular.module('oppia').directive(
-  'conceptCard', downgradeComponent(
-    {component: CollectionLocalNav}));
+  'collectionLocalNav',
+  downgradeComponent({component: CollectionLocalNavComponent}));
