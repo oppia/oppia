@@ -244,7 +244,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'promo-bar-backend-api.service.ts',
     'promo-bar.directive.ts',
     'python-program.tokenizer.ts',
-    'question-difficulty-selector.directive.ts',
+    'question-difficulty-selector.component.ts',
     'question-editor.directive.ts',
     'question-player-engine.service.ts',
     'question-player.directive.ts',

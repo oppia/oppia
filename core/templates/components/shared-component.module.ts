@@ -53,6 +53,8 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+import { QuestionDifficultySelectorComponent } from
+  'components/question-difficulty-selector/question-difficulty-selector.component';
 
 
 @NgModule({
@@ -68,6 +70,7 @@ import { ProfileLinkTextComponent } from
     LoadingDotsComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
+    QuestionDifficultySelectorComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
     StorySummaryTileDirective,
@@ -82,6 +85,7 @@ import { ProfileLinkTextComponent } from
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
+    QuestionDifficultySelectorComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,

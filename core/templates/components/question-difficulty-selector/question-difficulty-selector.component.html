@@ -1,0 +1,16 @@
+<mat-radio-group [(ngModel)] = "skillWithDifficulty._difficulty">
+  <mat-radio-button *ngFor="let rubric of getSkillIdToRubricsObject()[skillWithDifficulty.getId()]"
+                   [ngValue]="availableDifficultyValues[$index]"
+                   class="protractor-test-skill-difficulty-{{ rubric.getDifficulty().toLowerCase() }}">
+    <strong> {{ rubric.getDifficulty() }} </strong>
+    <mat-list>
+      <mat-list-item *ngFor="let explanation of rubric.getExplanations()">
+        <angular-html-bind html-data="explanation">
+        </angular-html-bind>
+        <div *ngIf="explanation === '' || explanation === '<p></p>'">
+          <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </mat-radio-button>
+</mat-radio-group>
