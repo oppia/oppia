@@ -33,7 +33,7 @@ export class QuestionDifficultySelectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.availableDifficultyValues = [];
-    for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT ){
+    for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
       this.availableDifficultyValues.push(
         AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
     }
