@@ -1303,3 +1303,16 @@ class CollectionSummary(python_utils.OBJECT):
             user_id in self.editor_ids or
             user_id in self.viewer_ids
         )
+
+    def add_contribution_by_user(self, contributor_id):
+        """Add a new contributor to the contributors summary.
+
+        Args:
+            contributor_id: str. ID of the contributor to be added.
+        """
+        # We don't want to record the contributions of system users.
+        if contributor_id not in constants.SYSTEM_USER_IDS:
+            self.contributors_summary[contributor_id] = (
+                self.contributors_summary.get(contributor_id, 0) + 1)
+
+        self.contributor_ids = list(self.contributors_summary.keys())

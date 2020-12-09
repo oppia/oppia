@@ -31,6 +31,9 @@ require(
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require('services/editability.service.ts');
