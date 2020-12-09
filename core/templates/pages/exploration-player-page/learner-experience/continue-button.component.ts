@@ -27,7 +27,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class ContinueButtonComponent {
   @Input() focusLabel: string;
-  @Input() isLearnAgainButton: boolean = false;
+  @Input() isLearnAgainButton: () => boolean;
   @Output() continueButtonClick: EventEmitter<void> = new EventEmitter();
 }
 

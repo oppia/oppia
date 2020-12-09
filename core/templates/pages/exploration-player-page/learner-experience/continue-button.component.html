@@ -2,12 +2,12 @@
         [oppiaFocusOn]="'::' + focusLabel"
         (click)="continueButtonClick.emit()"
         aria-label="Continue">
-  <div *ngIf="!isLearnAgainButton">
+  <div *ngIf="!isLearnAgainButton()">
     <span class="protractor-test-next-card-button" [innerHTML]="'I18N_PLAYER_CONTINUE_BUTTON' | translate"></span>
     <i class="fas fa-arrow-right icon">
     </i>
   </div>
-  <div *ngIf="isLearnAgainButton">
+  <div *ngIf="isLearnAgainButton()">
     <span class="protractor-test-next-card-button" [innerHTML]="'I18N_PLAYER_LEARN_AGAIN_BUTTON' | translate"></span>
     <i class="fas fa-redo icon">
     </i>
