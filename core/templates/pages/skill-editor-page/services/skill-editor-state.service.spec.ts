@@ -255,14 +255,16 @@ describe('Skill editor state service', () => {
     }).toThrowError('Cannot save a skill before one is loaded.');
   });
 
-  it('should not save the skill if there are no pending changes', () => {
-    skillEditorStateService.loadSkill('skill_id_1');
-    expect(skillEditorStateService.saveSkill(
-      'commit message',
-      () => 'Cannot save a skill before one is loaded.')).toBe(
-      false
-    );
-  });
+  it('should not save the skill if there are no pending changes',
+    fakeAsync(() => {
+      skillEditorStateService.loadSkill('skill_id_1');
+      tick(1000);
+      expect(skillEditorStateService.saveSkill(
+        'commit message',
+        () => 'Cannot save a skill before one is loaded.')).toBe(
+        false
+      );
+    }));
 
   it('should be able to save the collection and pending changes', fakeAsync(
     () => {
@@ -303,6 +305,7 @@ describe('Skill editor state service', () => {
       skillEditorStateService.getSkill(),
       'new description'
     );
+    tick(1000);
 
     expect(skillEditorStateService.isSavingSkill()).toBe(false);
     skillEditorStateService.saveSkill('commit message', () => {});
