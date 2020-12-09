@@ -19,7 +19,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
-import { RubricBackendDict } from 'domain/skill/RubricObjectFactory';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillRights } from 'domain/skill/skill-rights.model';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
@@ -30,98 +29,71 @@ import {
 } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 
-const constants = require('constants.ts');
+const skillContentsDict = {
+  explanation: {
+    html: 'test explanation',
+    content_id: 'explanation',
+  },
+  worked_examples: [],
+  recorded_voiceovers: {
+    voiceovers_mapping: {
+      explanation: {},
+      worked_example_q_1: {},
+      worked_example_e_1: {},
+      worked_example_q_2: {},
+      worked_example_e_2: {},
+    },
+  },
+};
+
+const skillDict: SkillBackendDict = {
+  id: 'skill_id_1',
+  description: 'Description',
+  misconceptions: [{
+    id: '2',
+    name: 'test name',
+    notes: 'test notes',
+    feedback: 'test feedback',
+    must_be_addressed: true,
+  }],
+  rubrics: [{
+    difficulty: 'Easy',
+    explanations: ['explanation'],
+  }],
+  skill_contents: skillContentsDict,
+  language_code: 'en',
+  version: 3,
+  prerequisite_skill_ids: [],
+  all_questions_merged: true,
+  superseding_skill_id: '2',
+  next_misconception_id: 3,
+};
 
 class FakeSkillBackendApiService {
-  skillContentsDict = {
-    explanation: {
-      html: 'test explanation',
-      content_id: 'explanation',
-    },
-    worked_examples: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {
-        explanation: {},
-        worked_example_q_1: {},
-        worked_example_e_1: {},
-        worked_example_q_2: {},
-        worked_example_e_2: {},
-      },
-    },
+  skillDictProp = {
+    ...skillDict,
+    getId: () => skillDict.id,
+    getDescription: () => skillDict.description,
+    getMisconceptions: () => skillDict.misconceptions,
+    getRubrics: () => skillDict.rubrics,
+    getConceptCard: () => skillDict.skill_contents,
+    getLanguageCode: () => skillDict.language_code,
+    getVersion: () => skillDict.version,
+    getPrerequisiteSkillIds: () => skillDict.prerequisite_skill_ids,
+    getNextMisconceptionId: () => skillDict.next_misconception_id,
+    getSupersedingSkillId: () => skillDict.superseding_skill_id,
+    getAllQuestionsMerged: () => skillDict.all_questions_merged,
   };
 
-  skillDict = {
-    id: '1',
-    description: 'Description',
-    misconceptions: [],
-    rubrics: [],
-    skill_contents: this.skillContentsDict,
-    language_code: 'en',
-    version: 3,
-    prerequisite_skill_ids: ['skill_1'],
-    getId: () => 'skill_id_1',
-    getDescription: () => 'Description',
-    getMisconceptions: () => [{
-      _id: '2',
-      _name: 'test name',
-      _notes: 'test notes',
-      _feedback: 'test feedback',
-      _must_be_addressed: true,
-    }],
-    getRubrics: () => [
-      {
-        _difficulty: 'Easy',
-        _explanations: ['explanation'],
-      },
-    ],
-    getConceptCard: () => [
-      {
-        _explanation: {
-          _html: 'test explanation',
-          _contentId: 'explanation',
-        },
-        _workedExamples: [
-          {
-            _question: {
-              _html: 'worked example question 1',
-              _contentId: 'worked_example_q_1',
-            },
-            _explanation: {
-              _html: 'worked example explanation 1',
-              _contentId: 'worked_example_e_1',
-            },
-          }
-        ],
-        _recordedVoiceovers: {
-          voiceoversMapping: {
-            explanation: {},
-            worked_example_1: {},
-            worked_example_2: {},
-          },
-          _voiceoverObjectFactory: {},
-        },
-      }],
-    getLanguageCode: () => 'en',
-    getVersion: () => 3,
-    getPrerequisiteSkillIds: () => [],
-    getNextMisconceptionId: () => 3,
-    getSupersedingSkillId: () => '2',
-    getAllQuestionsMerged: () => true,
-  };
-
-  self = {
-    newBackendSkillObject: null,
-    skillObject: this.skillDict,
-    failure: null,
-    fetchSkill: null,
-    updateSkill: null,
-  };
+  newBackendSkillObject = null;
+  skillObject = null;
+  failure = null;
 
   fetchSkill() {
     return new Promise((resolve, reject) => {
-      if (!this.self.failure) {
+      if (!this.failure) {
         resolve({
-          skill: this.self.skillObject,
+          skill: this.skillObject,
           groupedSkillSummaries: {
             Name: [
               {
@@ -146,8 +118,8 @@ class FakeSkillBackendApiService {
 
   updateSkill() {
     return new Promise((resolve, reject) => {
-      if (!this.self.failure) {
-        resolve(this.self.skillObject);
+      if (!this.failure) {
+        resolve(this.skillObject);
       } else {
         reject();
       }
@@ -178,10 +150,9 @@ class FakeSkillRightsBackendApiService {
   }
 }
 
-fdescribe('Skill editor state service', () => {
+describe('Skill editor state service', () => {
   let fakeSkillBackendApiService = null;
   let fakeSkillRightsBackendApiService = null;
-  let skillDifficulties = null;
   let skillEditorStateService: SkillEditorStateService = null;
   let skillObjectFactory: SkillObjectFactory = null;
   let skillRightsObject = null;
@@ -208,61 +179,6 @@ fdescribe('Skill editor state service', () => {
     skillEditorStateService = TestBed.get(SkillEditorStateService);
     skillObjectFactory = TestBed.get(SkillObjectFactory);
     skillUpdateService = TestBed.get(SkillUpdateService);
-
-    skillDifficulties = constants.SKILL_DIFFICULTIES;
-
-    const misconceptionDict1 = {
-      id: '2',
-      name: 'test name',
-      notes: 'test notes',
-      feedback: 'test feedback',
-      must_be_addressed: true,
-    };
-
-    const rubricDict: RubricBackendDict = {
-      difficulty: skillDifficulties[0],
-      explanations: ['explanation'],
-    };
-
-    const example1 = {
-      question: {
-        html: 'worked example question 1',
-        content_id: 'worked_example_q_1',
-      },
-      explanation: {
-        html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1',
-      },
-    };
-
-    const skillContentsDict = {
-      explanation: {
-        html: 'test explanation',
-        content_id: 'explanation',
-      },
-      worked_examples: [example1],
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          explanation: {},
-          worked_example_1: {},
-          worked_example_2: {},
-        },
-      },
-    };
-
-    const skillDict: SkillBackendDict = {
-      id: 'skill_id_1',
-      description: 'Description',
-      misconceptions: [misconceptionDict1],
-      rubrics: [rubricDict],
-      skill_contents: skillContentsDict,
-      language_code: 'en',
-      version: 3,
-      prerequisite_skill_ids: [],
-      all_questions_merged: true,
-      superseding_skill_id: '2',
-      next_misconception_id: 3,
-    };
 
     skillRightsObject = {
       skill_id: 'skill_id_1',
@@ -318,20 +234,20 @@ fdescribe('Skill editor state service', () => {
       expect(groupedSkillSummaries.current[1].id).toEqual('skill_id_2');
     }));
 
-  fit('should return the last skill loaded as the same object',
-  fakeAsync(() => {
-    const previousSkill = skillEditorStateService.getSkill();
-    const expectedSkill = skillObjectFactory.createFromBackendDict(
-      fakeSkillBackendApiService.newBackendSkillObject
-    );
-    expect(previousSkill).not.toEqual(expectedSkill);
-    skillEditorStateService.loadSkill('skill_id_1');
-    tick(1000);
-    const actualSkill = skillEditorStateService.getSkill();
-    expect(actualSkill).toEqual(expectedSkill);
-    expect(actualSkill).toBe(previousSkill);
-    expect(actualSkill).not.toBe(expectedSkill);
-  }));
+  it('should return the last skill loaded as the same object',
+    fakeAsync(() => {
+      const previousSkill = skillEditorStateService.getSkill();
+      const expectedSkill = skillObjectFactory.createFromBackendDict(
+        fakeSkillBackendApiService.newBackendSkillObject
+      );
+      expect(previousSkill).not.toEqual(expectedSkill);
+      skillEditorStateService.loadSkill('skill_id_1');
+      tick(1000);
+      const actualSkill = skillEditorStateService.getSkill();
+      expect(actualSkill).toEqual(expectedSkill);
+      expect(actualSkill).toBe(previousSkill);
+      expect(actualSkill).not.toBe(expectedSkill);
+    }));
 
   it('should fail to load a skill without first loading one', () => {
     expect(() => {
@@ -339,7 +255,7 @@ fdescribe('Skill editor state service', () => {
     }).toThrowError('Cannot save a skill before one is loaded.');
   });
 
-  fit('should not save the skill if there are no pending changes', () => {
+  it('should not save the skill if there are no pending changes', () => {
     skillEditorStateService.loadSkill('skill_id_1');
     expect(skillEditorStateService.saveSkill(
       'commit message',
@@ -381,19 +297,18 @@ fdescribe('Skill editor state service', () => {
       );
     }));
 
-  fit('should track whether it is currently saving the skill', fakeAsync(() => {
-    
+  it('should track whether it is currently saving the skill', fakeAsync(() => {
     skillEditorStateService.loadSkill('skill_id_1');
-    // skillUpdateService.setSkillDescription(
-    //   skillEditorStateService.getSkill(),
-    //   'new description'
-    // );
+    skillUpdateService.setSkillDescription(
+      skillEditorStateService.getSkill(),
+      'new description'
+    );
 
-    // expect(skillEditorStateService.isSavingSkill()).toBe(false);
-    // skillEditorStateService.saveSkill('commit message', () => {});
-    // expect(skillEditorStateService.isSavingSkill()).toBe(true);
-    // tick(1000);
-    // expect(skillEditorStateService.isSavingSkill()).toBe(false);
+    expect(skillEditorStateService.isSavingSkill()).toBe(false);
+    skillEditorStateService.saveSkill('commit message', () => {});
+    expect(skillEditorStateService.isSavingSkill()).toBe(true);
+    tick(1000);
+    expect(skillEditorStateService.isSavingSkill()).toBe(false);
   }));
 
   it('should indicate a skill is no longer saving after an error',

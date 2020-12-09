@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-/* eslint-disable max-len */
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +22,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { SkillChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillRights } from 'domain/skill/skill-rights.model';
@@ -32,6 +29,14 @@ import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
+
+interface gsummaries {
+  current: {
+    id: string,
+    description: string,
+  }[],
+  others: unknown[]
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -52,7 +57,7 @@ export class SkillEditorStateService {
   private assignedSkillTopicData = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
-  private _groupedSkillSummaries = {
+  private _groupedSkillSummaries: gsummaries = {
     current: [],
     others: []
   };
@@ -120,7 +125,8 @@ export class SkillEditorStateService {
       this.assignedSkillTopicData = (
         newBackendSkillObject.assignedSkillTopicData);
       this._updateSkill(newBackendSkillObject.skill);
-      this._updateGroupedSkillSummaries(newBackendSkillObject.groupedSkillSummaries);
+      this._updateGroupedSkillSummaries(
+        newBackendSkillObject.groupedSkillSummaries);
       this.questionsListService.getQuestionSummariesAsync(
         skillId, true, false
       );
@@ -152,7 +158,7 @@ export class SkillEditorStateService {
     return this.assignedSkillTopicData;
   }
 
-  getGroupedSkillSummaries() {
+  getGroupedSkillSummaries(): gsummaries {
     return cloneDeep(this._groupedSkillSummaries);
   }
   /**
@@ -196,7 +202,7 @@ export class SkillEditorStateService {
 
     this.skillBackendApiService.updateSkill(
       this._skill.getId(), this._skill.getVersion(), commitMessage,
-      <SkillChange[]> this.undoRedoService.getCommittableChangeList()).then(
+      this.undoRedoService.getCommittableChangeList()).then(
       (skill) => {
         this._updateSkill(skill);
         this.undoRedoService.clearChanges();
