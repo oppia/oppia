@@ -2000,6 +2000,27 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.assertFalse(
             self.exp_summary.is_solely_owned_by_user('contributor_id'))
 
+    def test_add_new_contribution_for_user_adds_user_to_contributors(self):
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.exp_summary.contributors_summary)
+        self.assertEqual(self.exp_summary.contributors_summary['user_id'], 1)
+        self.assertIn('user_id', self.exp_summary.contributor_ids)
+
+    def test_add_new_contribution_for_user_increases_score_in_contributors(
+            self):
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.exp_summary.contributors_summary)
+        self.assertEqual(self.exp_summary.contributors_summary['user_id'], 2)
+
+    def test_add_new_contribution_for_user_does_not_add_system_user(self):
+        self.exp_summary.add_contribution_by_user(
+            feconf.SYSTEM_COMMITTER_ID)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributors_summary)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributor_ids)
+
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
