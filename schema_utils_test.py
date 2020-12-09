@@ -362,6 +362,28 @@ def validate_schema(schema):
 class SchemaValidationUnitTests(test_utils.GenericTestBase):
     """Test validation of schemas."""
 
+    GLOBAL_VALIDATORS_SCHEMA = {
+        'type': schema_utils.SCHEMA_TYPE_DICT,
+        'properties': [{
+            'name': 'unicodeListProp',
+            'schema': {
+                'type': schema_utils.SCHEMA_TYPE_LIST,
+                'items': {
+                    'type': schema_utils.SCHEMA_TYPE_UNICODE
+                }
+            },
+        }, {
+            'name': 'unicodeProp',
+            'schema': {
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
+            },
+        }]
+    }
+
+    GLOBAL_VALIDATORS = [{
+        'id': 'does_not_contain_email'
+    }]
+
     def test_schemas_are_correctly_validated(self):
         """Test validation of schemas."""
         invalid_schemas_with_error_messages = [
@@ -646,6 +668,45 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(validate_url_fragment(''))
         self.assertFalse(validate_url_fragment('Abc'))
         self.assertFalse(validate_url_fragment('!@#$%^&*()_+='))
+
+    def test_global_validators_raise_exception_when_error_in_dict(self):
+        with self.assertRaisesRegexp(
+            AssertionError,
+            r'^Validation failed: does_not_contain_email .* email@email.com$'
+        ):
+            obj = {
+                'unicodeListProp': ['not email', 'not email 2'],
+                'unicodeProp': 'email@email.com'
+            }
+            schema_utils.normalize_against_schema(
+                obj, self.GLOBAL_VALIDATORS_SCHEMA,
+                global_validators=self.GLOBAL_VALIDATORS
+            )
+
+    def test_global_validators_raise_exception_when_error_in_list(self):
+        with self.assertRaisesRegexp(
+            AssertionError,
+            r'^Validation failed: does_not_contain_email .* email2@email.com$'
+        ):
+            obj = {
+                'unicodeListProp': ['email2@email.com', 'not email 2'],
+                'unicodeProp': 'not email'
+            }
+            schema_utils.normalize_against_schema(
+                obj, self.GLOBAL_VALIDATORS_SCHEMA,
+                global_validators=self.GLOBAL_VALIDATORS
+            )
+
+    def test_global_validators_pass_when_no_error(self):
+        obj = {
+            'unicodeListProp': ['not email', 'not email 2'],
+            'unicodeProp': 'not email'
+        }
+        normalized_obj = schema_utils.normalize_against_schema(
+            obj, self.GLOBAL_VALIDATORS_SCHEMA,
+            global_validators=self.GLOBAL_VALIDATORS
+        )
+        self.assertEqual(obj, normalized_obj)
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
