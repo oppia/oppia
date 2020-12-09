@@ -1346,7 +1346,6 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], 'Version a cannot be converted to int.')
 
-
     def test_that_handler_raises_exception(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         payload = {
