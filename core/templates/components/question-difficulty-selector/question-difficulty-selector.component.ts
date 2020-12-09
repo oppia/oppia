@@ -29,13 +29,13 @@ import { AppConstants } from 'app.constants';
 export class QuestionDifficultySelectorComponent implements OnInit {
   availableDifficultyValues = [];
 
-  constructor(){}
-  
+  constructor() {}
+
   ngOnInit(): void {
     this.availableDifficultyValues = [];
-    for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT ) {
-     this.availableDifficultyValues.push(
-      AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
+    for (var difficulty in AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT ){
+      this.availableDifficultyValues.push(
+        AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[difficulty]);
     }
   }
 }
