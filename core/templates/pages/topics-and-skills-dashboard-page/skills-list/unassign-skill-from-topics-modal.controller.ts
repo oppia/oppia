@@ -35,7 +35,8 @@ angular.module('oppia').controller('UnassignSkillFromTopicModalController', [
       $uibModalInstance: $uibModalInstance
     });
     $scope.fetchTopicAssignmentsForSkill = function() {
-      TopicsAndSkillsDashboardBackendApiService.fetchTopicAssignmentsForSkill(
+      TopicsAndSkillsDashboardBackendApiService
+        .fetchTopicAssignmentsForSkillAsync(
         skillId).then((response) => {
         $scope.topicsAssignments = {};
         response.map((topic) => {
