@@ -19,7 +19,6 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { Subscription } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';

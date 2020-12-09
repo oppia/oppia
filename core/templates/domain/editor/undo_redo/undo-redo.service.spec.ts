@@ -25,8 +25,9 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Undo/Redo Service', function() {
   var UndoRedoService = null;
-  importAllAngularServices();
 
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
