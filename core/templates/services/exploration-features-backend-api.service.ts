@@ -43,7 +43,7 @@ export class ExplorationFeaturesBackendApiService {
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {}
 
-  fetchExplorationFeatures(
+  asyncfetchExplorationFeaturesAsync(
       explorationId: string): Promise<ExplorationFeatures> {
     return this.http.get<ExplorationFeaturesBackendDict>(
       this.urlInterpolationService.interpolateUrl(
