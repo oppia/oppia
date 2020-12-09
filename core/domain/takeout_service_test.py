@@ -933,7 +933,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             clazz
             for clazz in test_utils.get_storage_model_classes()
             if (not clazz.__name__ in
-                test_utils.BASE_MODEL_CLASSES_WITHOUT_TAKEOUT_POLICIES)
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
 
         for model in all_models:
@@ -998,7 +998,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             clazz
             for clazz in test_utils.get_storage_model_classes()
             if (not clazz.__name__ in
-                test_utils.BASE_MODEL_CLASSES_WITHOUT_TAKEOUT_POLICIES)
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
 
         # Iterate over models and test export policies.
