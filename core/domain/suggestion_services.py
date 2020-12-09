@@ -627,8 +627,7 @@ def get_question_suggestions_waiting_longest_for_review():
     ]
 
 
-def get_translation_suggestions_waiting_longest_for_review(
-        language_code):
+def get_translation_suggestions_waiting_longest_for_review(language_code):
     """Returns MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS
     number of translation suggestions in the specified language code,
     sorted in descending order by review wait time.
@@ -659,7 +658,7 @@ def get_translation_suggestions_in_review_by_exploration(exp_id):
 
     Returns:
         list(Suggestion). A list of translation suggestions in review with
-            target_id == exp_id.
+        target_id == exp_id.
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
