@@ -58,19 +58,20 @@ require(
   'contribution-opportunities.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').component('questionOpportunities', {
   template: require('./question-opportunities.component.html'),
   controller: [
     '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
     'ContributionOpportunitiesService', 'QuestionObjectFactory',
-    'QuestionUndoRedoService', 'UrlInterpolationService',
-    'UserService', 'MAX_QUESTIONS_PER_SKILL',
+    'QuestionUndoRedoService', 'SiteAnalyticsService',
+    'UrlInterpolationService', 'UserService', 'MAX_QUESTIONS_PER_SKILL',
     function(
         $rootScope, $uibModal, AlertsService, ContextService,
         ContributionOpportunitiesService, QuestionObjectFactory,
-        QuestionUndoRedoService, UrlInterpolationService,
-        UserService, MAX_QUESTIONS_PER_SKILL) {
+        QuestionUndoRedoService, SiteAnalyticsService,
+        UrlInterpolationService, UserService, MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
       let userIsLoggedIn = false;
 
@@ -110,6 +111,9 @@ angular.module('oppia').component('questionOpportunities', {
           ContributionOpportunitiesService.showRequiresLoginModal();
           return;
         }
+
+        SiteAnalyticsService.registerContributorDashboardSuggestEvent(
+          'Question');
 
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
