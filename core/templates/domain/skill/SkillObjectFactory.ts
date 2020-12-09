@@ -74,7 +74,6 @@ export class Skill {
     this._prerequisiteSkillIds = prerequisiteSkillIds;
   }
   copyFromSkill(skill: Skill): void {
-    console.log(skill, "============skill")
     this._id = skill.getId();
     this._description = skill.getDescription();
     this._misconceptions = skill.getMisconceptions();
@@ -88,8 +87,6 @@ export class Skill {
     this._prerequisiteSkillIds = skill.getPrerequisiteSkillIds();
   }
   getId(): string {
-    console.log("=========id")
-    console.log(this._id,"=========this._id")
     return this._id;
   }
 

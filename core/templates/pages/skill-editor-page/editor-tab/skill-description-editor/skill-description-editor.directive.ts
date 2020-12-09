@@ -53,7 +53,6 @@ angular.module('oppia').directive('skillDescriptionEditor', [
           };
 
           $scope.saveSkillDescription = function(newSkillDescription) {
-            console.log(newSkillDescription, "==========saveSkillDescription")
             if (newSkillDescription === $scope.skill.getDescription()) {
               return;
             }

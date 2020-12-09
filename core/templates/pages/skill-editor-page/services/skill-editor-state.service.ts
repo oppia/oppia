@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable max-len */
 // Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,8 +120,7 @@ export class SkillEditorStateService {
       this.assignedSkillTopicData = (
         newBackendSkillObject.assignedSkillTopicData);
       this._updateSkill(newBackendSkillObject.skill);
-      this._updateGroupedSkillSummaries(
-        newBackendSkillObject.groupedSkillSummaries);
+      this._updateGroupedSkillSummaries(newBackendSkillObject.groupedSkillSummaries);
       this.questionsListService.getQuestionSummariesAsync(
         skillId, true, false
       );

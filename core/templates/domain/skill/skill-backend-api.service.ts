@@ -67,17 +67,14 @@ export class SkillBackendApiService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   fetchSkill(skillId: string): Promise<FetchSkillResponse> {
-    console.log(skillId, "=====SkillIdfetchSkill")
     return new Promise((resolve, reject) => {
       const skillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {
           skill_id: skillId
         });
 
-        console.log(skillDataUrl, "=====skillDataUrlfetchSkill")
       this.http.get<FetchSkillBackendResponse>(skillDataUrl).toPromise()
         .then(response => {
-          console.log(response, "=====sresponsefetchSkill")
           resolve({
             skill: this.skillObjectFactory.createFromBackendDict(
               response.skill),

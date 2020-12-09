@@ -86,7 +86,6 @@ export class EditableQuestionBackendApiService {
       questionId: string,
       successCallback: (value: Question) => void,
       errorCallback: (reason?: string) => void): Promise<Question> {
-        console.log(questionId, "============questionId")
     return new Promise((resolve, reject) => {
       const questionDataUrl = this.urlInterpolationService.interpolateUrl(
         QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE, {

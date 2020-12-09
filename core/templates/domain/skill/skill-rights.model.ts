@@ -50,7 +50,7 @@ export class SkillRights {
     return this._canEditSkillDescription;
   }
 
-  copyFromSkillRights(otherSkillRights: SkillRights):void {
+  copyFromSkillRights(otherSkillRights: SkillRights): void {
     this._skillId = otherSkillRights.getSkillId();
     this._canEditSkillDescription =
       otherSkillRights.canEditSkillDescription();
