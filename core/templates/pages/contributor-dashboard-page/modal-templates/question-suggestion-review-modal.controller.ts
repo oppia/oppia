@@ -16,18 +16,19 @@
  * @fileoverview Controller for question suggestion review modal.
  */
 
+require('services/site-analytics.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
-  '$scope', '$uibModalInstance', 'SuggestionModalService',
-  'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
-  'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
-  'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
+  '$scope', '$uibModalInstance', 'SiteAnalyticsService',
+  'SuggestionModalService', 'authorName', 'contentHtml',
+  'misconceptionsBySkill', 'question', 'questionHeader', 'reviewable',
+  'skillDifficulty', 'skillRubrics', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $scope, $uibModalInstance, SuggestionModalService,
-      authorName, contentHtml, misconceptionsBySkill, question,
-      questionHeader, reviewable, skillDifficulty, skillRubrics,
-      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
+      $scope, $uibModalInstance, SiteAnalyticsService,
+      SuggestionModalService, authorName, contentHtml,
+      misconceptionsBySkill, question, questionHeader, reviewable,
+      skillDifficulty, skillRubrics, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     const getSkillDifficultyLabel = () => {
       const skillDifficultyFloatToLabel = invertMap(
         SKILL_DIFFICULTY_LABEL_TO_FLOAT);
@@ -67,11 +68,18 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     $scope.skillRubricExplanations = getRubricExplanation(
       $scope.skillDifficultyLabel);
 
+    if (reviewable) {
+      SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview(
+        'Question');
+    }
+
     $scope.questionChanged = function() {
       $scope.validationError = null;
     };
 
     $scope.accept = function() {
+      SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
+        'Question');
       SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
         {
@@ -82,6 +90,8 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     };
 
     $scope.reject = function() {
+      SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
+        'Question');
       SuggestionModalService.rejectSuggestion(
         $uibModalInstance,
         {
