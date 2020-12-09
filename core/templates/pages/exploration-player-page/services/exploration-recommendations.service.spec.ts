@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import { ExplorationRecommendationsBackendApiService } from
   'domain/recommendations/exploration-recommendations-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
-
 
 
 describe('Exploration Recommendations Service', () => {
@@ -107,29 +106,30 @@ describe('Exploration Recommendations Service', () => {
     });
   });
 
-  let expRecsBackendApiService: ExplorationRecommendationsBackendApiService;
-  const AUTHOR_REC_IDS = ['5', '6'];
-
-  class MockExplorationSummary {
-    id: string;
-    constructor(id?: string) {
-      this.id = id;
-    }
-  }
-
-  let authorRecommendations: LearnerExplorationSummary[];
-  let systemRecommendations: LearnerExplorationSummary[];
 
   describe('getRecommendendedSummaryDicts', () => {
+    let expRecsBackendApiService: ExplorationRecommendationsBackendApiService;
+    const AUTHOR_REC_IDS = ['author_rec_1', 'author_rec_2'];
+
+    class MockExplorationSummary {
+      id: string;
+      constructor(id?: string) {
+        this.id = id;
+      }
+    }
+
+    let authorRecommendations: LearnerExplorationSummary[];
+    let systemRecommendations: LearnerExplorationSummary[];
+
     beforeEach(() => {
       systemRecommendations = [
-        new MockExplorationSummary('7') as LearnerExplorationSummary,
-        new MockExplorationSummary('8') as LearnerExplorationSummary
+        new MockExplorationSummary('system_rec_1') as LearnerExplorationSummary,
+        new MockExplorationSummary('system_rec_2') as LearnerExplorationSummary
       ];
 
       authorRecommendations = [
-        new MockExplorationSummary('5') as LearnerExplorationSummary,
-        new MockExplorationSummary('6') as LearnerExplorationSummary
+        new MockExplorationSummary('author_rec_1') as LearnerExplorationSummary,
+        new MockExplorationSummary('author_rec_2') as LearnerExplorationSummary
       ];
 
       expRecsBackendApiService = TestBed.get(
