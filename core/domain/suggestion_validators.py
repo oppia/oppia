@@ -19,7 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import itertools
 import re
 
 from constants import constants
@@ -279,6 +278,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         return [
             cls._validate_target_version_at_submission,
             cls._validate_score_category]
+
 
 class GeneralVoiceoverApplicationModelValidator(
         base_model_validators.BaseModelValidator):

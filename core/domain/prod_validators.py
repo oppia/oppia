@@ -21,9 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import itertools
-import re
 
-from constants import constants
 from core.domain import base_model_validators
 from core.domain import cron_services
 from core.domain import exp_domain
@@ -34,10 +32,8 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import suggestion_services
 from core.domain import user_domain
 from core.domain import user_services
-from core.domain import voiceover_services
 from core.domain import wipeout_service
 from core.platform import models
 import feconf
