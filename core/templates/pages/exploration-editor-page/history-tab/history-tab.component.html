@@ -37,7 +37,7 @@
       </div>
       <div class="history-table-header">
         <div class="history-table-header-version">
-          <span>Ver. #</span>
+          <span>Version No.</span>
         </div>
         <div class="history-table-header-message">
           <span>Notes</span>
@@ -144,6 +144,7 @@
   history-tab .history-table-header {
     border-bottom: 2px solid #000;
     display: flex;
+    padding-left: 0.5em;
   }
   history-tab .history-table-header-date,
   history-tab .history-table-header-message,
@@ -152,11 +153,11 @@
     font-weight: bold;
   }
   history-tab  .history-table-header-message {
-    padding-left: 5%;
-    width: 54%;
+    width: 39%;
   }
   history-tab .history-table-header-profile,
-  history-tab .history-table-header-date {
+  history-tab .history-table-header-date,
+  history-tab .history-table-header-version {
     width: 20%;
   }
   history-tab .history-table-header-date {
@@ -169,13 +170,12 @@
     padding: 16px 10px;
     position: relative;
   }
-  history-tab .history-table-index {
-    width: 10%;
-  }
   history-tab .history-table-message {
-    width: 50%;
+    width: 40%;
   }
-  history-tab .history-table-profile {
+  history-tab .history-table-index,
+  history-tab .history-table-profile,
+  history-tab .history-table-version {
     width: 20%;
   }
   history-tab .pagination-page,
