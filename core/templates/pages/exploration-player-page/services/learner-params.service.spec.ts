@@ -24,7 +24,7 @@ import { LearnerParamsService } from
 
 describe('Learner parameters service', () => {
   describe('learner params service', () => {
-    let learnerParamsService: LearnerParamsService = null;
+    let learnerParamsService: LearnerParamsService;
 
     beforeEach(() => {
       learnerParamsService = new LearnerParamsService();
