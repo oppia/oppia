@@ -491,7 +491,7 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         span = exp_domain.StateVersionSpan(1, 'A', state)
 
         with self.assertRaisesRegexp(Exception, 'does not contain version=5'):
-            span.get_version(5)
+            span.get(5)
 
     def test_newly_constructed_span(self):
         state = self.new_state_domain_obj()
@@ -499,33 +499,31 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         span = exp_domain.StateVersionSpan(1, 'A', state)
 
         self.assertTrue(span.has_version(1))
-        self.assertEqual(list(span.state_names()), ['A'])
-        self.assertEqual(list(span.state_contents()), [state])
+        self.assertEqual(span.get_name(1), 'A')
+        self.assertEqual(span.get_content(1), state)
 
     def test_extended_span(self):
-        state_v1, state_v2, state_v3 = (
-            self.new_state_domain_obj() for _ in python_utils.RANGE(3))
+        state_contents = [
+            self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
-        (span,) = self.get_state_version_spans(
-            'A', None, state_v1, state_v2, state_v3)
+        (span,) = self.get_state_version_spans('A', None, *state_contents)
 
-        self.assertEqual(list(span.state_names()), ['A', 'A', 'A'])
-        self.assertEqual(
-            list(span.state_contents()), [state_v1, state_v2, state_v3])
+        self.assertEqual(span.get_versions(), [1, 2, 3])
+        self.assertEqual(span.get_multi_names(1, 4), ['A', 'A', 'A'])
+        self.assertEqual(span.get_multi_contents(1, 4), state_contents)
 
-    def test_get_version(self):
-        state_v1, state_v2, state_v3 = (
-            self.new_state_domain_obj() for _ in python_utils.RANGE(3))
+    def test_get(self):
+        state_contents = [
+            self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
-        (span,) = self.get_state_version_spans(
-            'A', None, state_v1, state_v2, state_v3)
+        (span,) = self.get_state_version_spans('A', None, *state_contents)
 
-        self.assertEqual(span.get_version(1), ('A', state_v1))
-        self.assertEqual(span.get_version(2), ('A', state_v2))
-        self.assertEqual(span.get_version(3), ('A', state_v3))
+        self.assertEqual(span.get(1), ('A', state_contents[0]))
+        self.assertEqual(span.get(2), ('A', state_contents[1]))
+        self.assertEqual(span.get(3), ('A', state_contents[2]))
 
     def test_multi_spans(self):
-        distinct_states = [
+        state_contents = [
             self.new_state_domain_obj(interaction_id='MathEquationInput'),
             self.new_state_domain_obj(interaction_id='TextInput'),
             self.new_state_domain_obj(interaction_id='ItemSelectionInput'),
@@ -534,11 +532,12 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         spans = self.get_state_version_spans(
             'A',
             lambda s1, s2: s1.interaction.id == s2.interaction.id,
-            *distinct_states)
+            *state_contents)
+
         span1, span2, span3 = spans[0], spans[1], spans[2]
-        self.assertEqual(span1.get_version(1), ('A', distinct_states[0]))
-        self.assertEqual(span2.get_version(2), ('A', distinct_states[1]))
-        self.assertEqual(span3.get_version(3), ('A', distinct_states[2]))
+        self.assertEqual(span1.get(1), ('A', state_contents[0]))
+        self.assertEqual(span2.get(2), ('A', state_contents[1]))
+        self.assertEqual(span3.get(3), ('A', state_contents[2]))
 
     def test_get_multi_with_newly_constructed_span(self):
         state = self.new_state_domain_obj()
@@ -549,17 +548,16 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         self.assertEqual(span.get_multi_names(1, 2), ['A'])
 
     def test_get_multi_with_extended_span(self):
-        distinct_states = [
+        state_contents = [
             self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
-        (span,) = (
-            self.get_state_version_spans('A', None, *distinct_states))
+        (span,) = self.get_state_version_spans('A', None, *state_contents)
 
-        self.assertEqual(span.get_multi_contents(1, 4), distinct_states)
+        self.assertEqual(span.get_multi_contents(1, 4), state_contents)
         self.assertEqual(span.get_multi_names(1, 4), ['A', 'A', 'A'])
 
     def test_get_multi_with_multi_spans(self):
-        distinct_states = [
+        state_contents = [
             self.new_state_domain_obj(interaction_id='MathEquationInput'),
             self.new_state_domain_obj(interaction_id='TextInput'),
             self.new_state_domain_obj(interaction_id='ItemSelectionInput'),
@@ -568,38 +566,39 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         spans = self.get_state_version_spans(
             'A',
             lambda s1, s2: s1.interaction.id == s2.interaction.id,
-            *distinct_states)
+            *state_contents)
+
         span1, span2, span3 = spans[0], spans[1], spans[2]
-        self.assertEqual(
-            span1.get_multi_contents(1, 2), distinct_states[0:1])
-        self.assertEqual(
-            span2.get_multi_contents(2, 3), distinct_states[1:2])
-        self.assertEqual(
-            span3.get_multi_contents(3, 4), distinct_states[2:3])
+        self.assertEqual(span1.get_versions(), [1])
+        self.assertEqual(span2.get_versions(), [2])
+        self.assertEqual(span3.get_versions(), [3])
+        self.assertEqual(span1.get_multi_contents(1, 2), state_contents[0:1])
+        self.assertEqual(span2.get_multi_contents(2, 3), state_contents[1:2])
+        self.assertEqual(span3.get_multi_contents(3, 4), state_contents[2:3])
         self.assertEqual(span1.get_multi_names(1, 2), ['A'])
         self.assertEqual(span2.get_multi_names(2, 3), ['A'])
         self.assertEqual(span3.get_multi_names(3, 4), ['A'])
 
     def test_get_multi(self):
-        distinct_states = [
+        state_contents = [
             self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
         (span,) = self.get_state_version_spans(
             'A',
             lambda s1, s2: s1.interaction.id == s2.interaction.id,
-            *distinct_states)
+            *state_contents)
 
-        self.assertEqual(span.get_multi_contents(1, 3), distinct_states[0:2])
+        self.assertEqual(span.get_multi_contents(1, 3), state_contents[0:2])
         self.assertEqual(span.get_multi_names(1, 3), ['A', 'A'])
 
     def test_get_multi_rejects_out_of_bounds_ranges(self):
-        distinct_states = [
+        state_contents = [
             self.new_state_domain_obj() for _ in python_utils.RANGE(3)]
 
         (span,) = self.get_state_version_spans(
             'A',
             lambda s1, s2: s1.interaction.id == s2.interaction.id,
-            *distinct_states)
+            *state_contents)
 
         with self.assertRaisesRegexp(ValueError, 'out-of-bounds'):
             span.get_multi_contents(0, 20)
@@ -636,8 +635,9 @@ class StateVersionSpanTests(test_utils.GenericTestBase):
         span = exp_domain.StateVersionSpan(1, 'A', state_v1)
         span.extend_or_split(2, 'B', state_v2, diff)
 
-        self.assertEqual(list(span.state_names()), ['A', 'B'])
-        self.assertEqual(list(span.state_contents()), [state_v1, state_v2])
+        self.assertEqual(span.get_multi_names(1, 3), ['A', 'B'])
+        self.assertEqual(
+            span.get_multi_contents(1, 3), [state_v1, state_v2])
 
     def test_extend_or_split_with_unexpected_rename(self):
         (span,) = self.get_state_version_spans(
@@ -699,8 +699,8 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
 
         state_a_span = history.get_state_span(1, 'A')
         state_b_span = history.get_state_span(1, 'B')
-        self.assertEqual(list(state_a_span.state_names()), ['A'])
-        self.assertEqual(list(state_b_span.state_names()), ['B'])
+        self.assertEqual(list(state_a_span.get_multi_names(1, 2)), ['A'])
+        self.assertEqual(list(state_b_span.get_multi_names(1, 2)), ['B'])
 
     def test_create_from_exploration_with_renamed_states(self):
         self.save_new_linear_exp_with_state_names_and_interactions(
@@ -735,7 +735,7 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
 
         state_c_span = history.get_state_span(2, 'C')
 
-        self.assertEqual(list(state_c_span.state_names()), ['C'])
+        self.assertEqual(list(state_c_span.get_multi_names(2, 3)), ['C'])
 
     def test_create_from_exploration_with_deleted_states(self):
         self.save_new_linear_exp_with_state_names_and_interactions(

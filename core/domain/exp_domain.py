@@ -475,19 +475,21 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
 
 
 class StateVersionSpan(python_utils.OBJECT):
-    """Span of exploration versions where a state has equivalent content.
+    """A span of exploration versions where a state has equivalent content.
+
+    Spans can only be modified by the `extend_or_split` method. It enforces the
+    invariant: all versions of the state held by a span are equivalent.
+    Furthermore, spans must be extended in increasing and consecutive
+    version-order.
 
     Equivalence between state contents is determined by the user-defined
-    predicate passed in to the constructor. By default, state contents are
+    predicate passed into the constructor. By default, state contents are
     unconditionally equal.
 
     In addition to state content equivalence, the names of the state must also
     match between versions. If the state's name has changed in between versions,
-    then an ExplorationVersionsDiff must be used to resolve the discrepancy.
-
-    Spans can only be extended using the extend_or_split() method. It enforces
-    the invariant: all versions of the state in a span are equivalent. Spans
-    must be extended in increasing and consecutive version-order.
+    then `extend_or_split` will try to use its `ExplorationVersionsDiff`
+    argument to resolve the discrepancy.
     """
 
     def __init__(
@@ -513,21 +515,11 @@ class StateVersionSpan(python_utils.OBJECT):
             state_equality_predicate or
             StateVersionSpan._default_state_equality_predicate)
 
-    def has_version(self, version):
-        """Returns whether the span includes the given version."""
-        return self._version_start <= version < self._version_end
-
-    def get_version(self, version):
-        """Returns the name and content of the state at the given version."""
-        if not self.has_version(version):
-            raise KeyError('Span does not contain version=%r' % version)
-        return self._versioned_states[version - self._version_start]
-
     def extend_or_split(
             self, exp_version, state_name, state_content, exp_version_diff):
-        """Extends the span to include the given state, unless it fails to
-        pass the span's equality predicate, in which case a new span is
-        created and returned instead.
+        """Extends the span to include the given state, unless it fails to pass
+        the span's equality predicate, in which case a new span is created and
+        returned instead.
 
         Args:
             exp_version: int. The exploration version being added.
@@ -543,8 +535,8 @@ class StateVersionSpan(python_utils.OBJECT):
         Raises:
             Exception. When any of the following occurs:
                 -   The given version is not "previously-added version + 1".
-                -   The name of the span's state does not map to the given
-                name, as defined by exp_version_diff.new_to_old_state_names.
+                -   The name of the span's state does not map to the given name,
+                as defined by exp_version_diff.new_to_old_state_names.
         """
         if exp_version != self._version_end:
             raise Exception(
@@ -576,57 +568,31 @@ class StateVersionSpan(python_utils.OBJECT):
                 exp_version, state_name, state_content,
                 state_equality_predicate=self._are_states_equal)
 
-    def state_names(self):
-        """Yields all state names held by the span."""
-        for state_name, _ in self._versioned_states:
-            yield state_name
+    def has_version(self, version):
+        """Returns whether the span includes the given version."""
+        return self._version_start <= version < self._version_end
 
-    def state_contents(self):
-        """Yields all state contents held by the span."""
-        for _, state_content in self._versioned_states:
-            yield state_content
+    def get_versions(self):
+        """Returns the versions included in the span."""
+        return list(python_utils.RANGE(self._version_start, self._version_end))
 
-    def get_multi_names(self, version_start, version_end):
-        """Returns the state names corresponding to the given half-open range of
-        exploration versions.
+    def get(self, version):
+        """Returns the name and content of the state at the given version."""
+        if not self.has_version(version):
+            raise KeyError('Span does not contain version=%r' % version)
+        return self._versioned_states[version - self._version_start]
 
-        Args:
-            version_start: int. The lower bound of versions to get (inclusive).
-            version_end: int. The upper bound of versions to get (exclusive).
+    def get_name(self, version):
+        """Returns the name of the state at the given version."""
+        state_name, _ = self.get(version)
+        return state_name
 
-        Returns:
-            list(str). The state names corresponding to the given half-open
-            range of exploration versions.
+    def get_content(self, version):
+        """Returns the content of the state at the given version."""
+        _, state_content = self.get(version)
+        return state_content
 
-        Raises:
-            ValueError. The input range is out-of-bounds.
-        """
-        return [
-            state_name
-            for state_name, _ in self._get_multi(version_start, version_end)
-        ]
-
-    def get_multi_contents(self, version_start, version_end):
-        """Returns the state contents corresponding to the given half-open range
-        of exploration versions.
-
-        Args:
-            version_start: int. The lower bound of versions to get (inclusive).
-            version_end: int. The upper bound of versions to get (exclusive).
-
-        Returns:
-            list(state_domain.State). The state contents corresponding to the
-            given half-open range of exploration versions.
-
-        Raises:
-            ValueError. The input range is out-of-bounds.
-        """
-        return [
-            state_content
-            for _, state_content in self._get_multi(version_start, version_end)
-        ]
-
-    def _get_multi(self, version_start, version_end):
+    def get_multi(self, version_start, version_end):
         """Returns state names and contents for the given half-open range of
         exploration versions.
 
@@ -648,6 +614,46 @@ class StateVersionSpan(python_utils.OBJECT):
             version_start - self._version_start,
             version_end - self._version_start)
         return self._versioned_states[slice_start:slice_end]
+
+    def get_multi_names(self, version_start, version_end):
+        """Returns the state names corresponding to the given half-open range of
+        exploration versions.
+
+        Args:
+            version_start: int. The lower bound of versions to get (inclusive).
+            version_end: int. The upper bound of versions to get (exclusive).
+
+        Returns:
+            list(str). The state names corresponding to the given half-open
+            range of exploration versions.
+
+        Raises:
+            ValueError. The input range is out-of-bounds.
+        """
+        return [
+            state_name for state_name, _ in self.get_multi(
+                version_start, version_end)
+        ]
+
+    def get_multi_contents(self, version_start, version_end):
+        """Returns the state contents corresponding to the given half-open range
+        of exploration versions.
+
+        Args:
+            version_start: int. The lower bound of versions to get (inclusive).
+            version_end: int. The upper bound of versions to get (exclusive).
+
+        Returns:
+            list(state_domain.State). The state contents corresponding to the
+            given half-open range of exploration versions.
+
+        Raises:
+            ValueError. The input range is out-of-bounds.
+        """
+        return [
+            state_content for _, state_content in self.get_multi(
+                version_start, version_end)
+        ]
 
     @staticmethod
     def _default_state_equality_predicate(unused_state1, unused_state2):
