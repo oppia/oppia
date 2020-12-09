@@ -651,6 +651,26 @@ def get_translation_suggestions_waiting_longest_for_review(
     ]
 
 
+def get_translation_suggestions_in_review_by_exploration(exp_id):
+    """Returns translation suggestions in review by exploration ID.
+
+    Args:
+        exp_id: str. Exploration ID.
+
+    Returns:
+        list(Suggestion). A list of translation suggestions in review with
+            target_id == exp_id.
+    """
+    suggestion_models_in_review = (
+        suggestion_models.GeneralSuggestionModel
+        .get_translation_suggestions_in_review_by_exp_id(exp_id)
+    )
+    return [
+        get_suggestion_from_model(model) if model else None
+        for model in suggestion_models_in_review
+    ]
+
+
 def _get_plain_text_from_html_content_string(html_content_string):
     """Retrieves the plain text from the given html content string. RTE element
     occurrences in the html are replaced by their corresponding rte component

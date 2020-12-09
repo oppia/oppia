@@ -318,6 +318,43 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
                 queries)), 1)
 
+    def test_get_translation_suggestions_in_review_by_exp_id_happy_case(self):
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_6', self.translation_language_code)
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            'exp1', self.target_version_at_submission,
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
+            'reviewer_2', self.change_cmd, self.score_category,
+            'exploration.exp1.thread_7', self.translation_language_code)
+
+        suggestions = (suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_in_review_by_exp_id('exp1'))
+
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(suggestions[0].target_id, 'exp1')
+        self.assertEqual(suggestions[0].suggestion_type,
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(suggestions[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(suggestions[1].target_id, 'exp1')
+        self.assertEqual(suggestions[1].suggestion_type,
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(suggestions[1].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
+    def test_get_translation_suggestions_in_review_by_exp_id_with_invalid_exp(
+            self):
+        suggestions = (suggestion_models.GeneralSuggestionModel
+            .get_translation_suggestions_in_review_by_exp_id('invalid_exp'))
+        self.assertEqual(len(suggestions), 0)
+
     def test_get_translation_suggestion_ids_with_exp_ids_with_one_exp(self):
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
