@@ -18,9 +18,9 @@
 
 import { Subscription } from 'rxjs';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from  '@angular/upgrade/static';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { ReadOnlyCollectionBackendApiService } from
-      'domain/collection/read-only-collection-backend-api.service';
+  'domain/collection/read-only-collection-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -35,22 +35,23 @@ export class CollectionLocalNav implements OnInit, OnDestroy {
   private directiveSubscriptions = new Subscription();
   private canEdit: boolean;
   constructor(
-      private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
+      private readOnlyCollectionBackendApiService:
+       ReadOnlyCollectionBackendApiService,
       private urlService: UrlService,
       private urlInterpolationService: UrlInterpolationService,
   ) {}
 
-  ngOnInit(): void { 
+  ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
     this.directiveSubscriptions.add(
-        this.readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
-            () => {
-              var collectionDetails = (
-                  this.readOnlyCollectionBackendApiService.getCollectionDetails(
-                      this.collectionId));
-              this.canEdit = collectionDetails.canEdit;
-            }
-        )
+      this.readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
+        () => {
+          var collectionDetails = (
+            this.readOnlyCollectionBackendApiService.getCollectionDetails(
+              this.collectionId));
+          this.canEdit = collectionDetails.canEdit;
+        }
+      )
     );
   }
 
@@ -59,5 +60,5 @@ export class CollectionLocalNav implements OnInit, OnDestroy {
   }
 }
 angular.module('oppia').directive(
-    'conceptCard', downgradeComponent(
-        {component: CollectionLocalNav}));
+  'conceptCard', downgradeComponent(
+    {component: CollectionLocalNav}));
