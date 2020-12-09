@@ -28,6 +28,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/editability.service.ts');
