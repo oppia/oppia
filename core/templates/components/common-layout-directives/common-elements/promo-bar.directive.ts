@@ -18,11 +18,11 @@
  * dismissible.
  */
 
-require('services/promo-bar.service.ts');
+require('services/promo-bar-backend-api.service.ts');
 
 angular.module('oppia').directive('promoBar', [
-  '$window', 'PromoBarService',
-  function($window, PromoBarService) {
+  '$window', 'PromoBarBackendApiService',
+  function($window, PromoBarBackendApiService) {
     return {
       restrict: 'E',
       scope: {},
@@ -62,10 +62,11 @@ angular.module('oppia').directive('promoBar', [
             setPromoDismissed(true);
           };
           ctrl.$onInit = function() {
-            PromoBarService.getPromoBarData().then(function(promoBarObject) {
-              ctrl.promoBarIsEnabled = promoBarObject.promoBarEnabled;
-              ctrl.promoBarMessage = promoBarObject.promoBarMessage;
-            });
+            PromoBarBackendApiService.getPromoBarDataAsync()
+              .then(function(promoBar) {
+                ctrl.promoBarIsEnabled = promoBar.isPromoBarEnabled();
+                ctrl.promoBarMessage = promoBar.getPromoBarMessage();
+              });
 
             ctrl.promoIsVisible = !isPromoDismissed();
           };

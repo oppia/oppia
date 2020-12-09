@@ -40,11 +40,11 @@ angular.module('oppia').directive('learnerViewInfo', [
       template: require('./learner-view-info.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$uibModal', 'ContextService',
+        '$http', '$log', '$rootScope', '$uibModal', 'ContextService',
         'ReadOnlyExplorationBackendApiService', 'UrlService',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
-            $http, $log, $uibModal, ContextService,
+            $http, $log, $rootScope, $uibModal, ContextService,
             ReadOnlyExplorationBackendApiService, UrlService,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var ctrl = this;
@@ -84,6 +84,10 @@ angular.module('oppia').directive('learnerViewInfo', [
                 }
               },
               controller: 'InformationCardModalController'
+            }).result.then(null, () => {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
           ctrl.$onInit = function() {
@@ -92,6 +96,7 @@ angular.module('oppia').directive('learnerViewInfo', [
               explorationId, UrlService.getExplorationVersionFromUrl())
               .then(function(response) {
                 ctrl.explorationTitle = response.exploration.title;
+                $rootScope.$applyAsync();
               });
           };
         }

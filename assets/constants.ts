@@ -4767,6 +4767,9 @@ export = {
     "code": "da",
     "description": "dansk (Danish)"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)"
+  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)"
   }, {
@@ -5387,6 +5390,16 @@ export = {
     "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
 
+  // Allowed letters in the OSK.
+  "VALID_CUSTOM_OSK_LETTERS": [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
+    "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+    "T", "U", "V", "W", "X", "Y", "Z",
+    "α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι", "κ", "λ", "μ", "ν", "ξ", "π",
+    "ρ", "σ", "τ", "υ", "φ", "χ", "ψ", "ω", "Γ", "Δ", "Θ", "Λ", "Ξ", "Π", "Σ",
+    "Φ", "Ψ", "Ω"],
+
   // Number of custom letters allowed in the on-screen keyboard for math
   // interactions.
   "MAX_CUSTOM_LETTERS_FOR_OSK": 10,
@@ -5443,7 +5456,7 @@ export = {
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
   // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": false,
+  "ENABLE_ACCOUNT_DELETION": true,
 
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": true,
@@ -5454,9 +5467,12 @@ export = {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
+  // Maximum allowed length of a state name.
+  "MAX_STATE_NAME_LENGTH": 50,
+
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],
-  "PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES": ["Web", "Android", "Backend"],
+  "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
   // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
   // of corresponding flavors, which is used in app_version_flavor filter for
   // order comparison, with ordering: 'test' < 'alpha' < 'beta' < 'release'.

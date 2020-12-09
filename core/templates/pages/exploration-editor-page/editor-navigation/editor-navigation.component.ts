@@ -19,7 +19,8 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require(
-  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-data-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/modal-templates/help-modal.controller.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
@@ -41,23 +42,23 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('editorNavigation', {
   template: require('./editor-navigation.component.html'),
   controller: [
-    '$q', '$scope', '$timeout', '$uibModal', 'ChangeListService',
+    '$q', '$rootScope', '$scope', '$timeout', '$uibModal', 'ChangeListService',
     'ContextService', 'EditabilityService',
     'ExplorationImprovementsService', 'ExplorationRightsService',
     'ExplorationSaveService',
     'ExplorationWarningsService', 'RouterService', 'SiteAnalyticsService',
     'StateTutorialFirstTimeService',
-    'ThreadDataService', 'UrlInterpolationService',
+    'ThreadDataBackendApiService', 'UrlInterpolationService',
     'UserExplorationPermissionsService', 'UserService',
     'WindowDimensionsService',
     function(
-        $q, $scope, $timeout, $uibModal, ChangeListService,
+        $q, $rootScope, $scope, $timeout, $uibModal, ChangeListService,
         ContextService, EditabilityService,
         ExplorationImprovementsService, ExplorationRightsService,
         ExplorationSaveService,
         ExplorationWarningsService, RouterService, SiteAnalyticsService,
         StateTutorialFirstTimeService,
-        ThreadDataService, UrlInterpolationService,
+        ThreadDataBackendApiService, UrlInterpolationService,
         UserExplorationPermissionsService, UserService,
         WindowDimensionsService) {
       this.directiveSubscriptions = new Subscription();
@@ -167,7 +168,7 @@ angular.module('oppia').component('editorNavigation', {
       $scope.selectHistoryTab = () => RouterService.navigateToHistoryTab();
       $scope.selectFeedbackTab = () => RouterService.navigateToFeedbackTab();
       $scope.getOpenThreadsCount = (
-        () => ThreadDataService.getOpenThreadsCount());
+        () => ThreadDataBackendApiService.getOpenThreadsCount());
 
       this.$onInit = () => {
         $scope.ExplorationRightsService = ExplorationRightsService;
@@ -219,6 +220,9 @@ angular.module('oppia').component('editorNavigation', {
         $q.when(UserService.getUserInfoAsync())
           .then(userInfo => {
             this.userIsLoggedIn = userInfo.isLoggedIn();
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();
           });
         $scope.isUserLoggedIn = () => this.userIsLoggedIn;
       };
