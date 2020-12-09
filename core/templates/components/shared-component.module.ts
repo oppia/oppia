@@ -54,7 +54,7 @@ import { ProfileLinkImageComponent } from
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
 import { QuestionDifficultySelectorComponent } from
-  'components/question-difficulty-selector/question-difficulty-selector.component';
+  './question-difficulty-selector/question-difficulty-selector.component';
 
 
 @NgModule({
