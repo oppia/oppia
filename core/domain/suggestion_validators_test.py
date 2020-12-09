@@ -26,10 +26,10 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import prod_validation_jobs_one_off
-from core.domain import prod_validators
 from core.domain import question_domain
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import suggestion_validators
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -277,16 +277,16 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_model_with_invalid_target_type(self):	
-        expected_output = [	
-            (	
-                u'[u\'failed validation check for target type check '	
-                'of GeneralSuggestionModel\', [u\'Entity id %s: Target '	
-                'type exploration is not allowed\']]'	
-            ) % self.model_instance.id]	
-        with self.swap(	
-            prod_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):	
-            self.run_job_and_check_output(	
+    def test_model_with_invalid_target_type(self):
+        expected_output = [
+            (
+                u'[u\'failed validation check for target type check '
+                'of GeneralSuggestionModel\', [u\'Entity id %s: Target '
+                'type exploration is not allowed\']]'
+            ) % self.model_instance.id]
+        with self.swap(
+            suggestion_validators, 'TARGET_TYPE_TO_TARGET_MODEL', {}):
+            self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
 
     def test_validate_score_category_for_question_suggestion(self):
