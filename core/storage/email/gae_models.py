@@ -101,8 +101,9 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Users already have access to this data since emails were sent
-        to them.
+        """Model contains data corresponding to a user, but this isn't exported
+        because users already have access to noteworthy details of this data
+        (since emails were sent to them).
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'recipient_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -337,8 +338,9 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Users already have access to this data since the emails were sent
-        to them.
+        """Model contains data corresponding to a user, but this isn't exported
+        because users already have access to noteworthy details of this data
+        (since emails were sent to them).
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -422,7 +424,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thread_id':

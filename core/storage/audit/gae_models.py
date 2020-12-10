@@ -55,12 +55,18 @@ class RoleQueryAuditModel(base_models.BaseModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """Model does not contain user data."""
+        """Model contains data corresponding to a user: user_id and username
+        fields, but it isn't exported because it is only used for auditing
+        purposes.
+        """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model contains data corresponding to a user: user_id and username
+        fields, but it isn't exported because it is only used for auditing
+        purposes.
+        """
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'intent': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -112,7 +118,10 @@ class UsernameChangeAuditModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model contains data corresponding to a user: committer_id,
+        old_username, new_username, but this isn't exported because this model
+        is only used temporarily for username changes.
+        """
         return dict(super(cls, cls).get_export_policy(), **{
             'committer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'old_username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
