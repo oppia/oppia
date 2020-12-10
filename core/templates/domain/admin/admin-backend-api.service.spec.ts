@@ -332,7 +332,7 @@ describe('Admin Backend API service for Misc Tab', () => {
 
   it('should fail tp get data of memory cache profile',
     fakeAsync(() => {
-      let errorMessage ='Internal Server Error'
+      let errorMessage = 'Internal Server Error';
       adminBackendApiService.getMemoryCacheProfile()
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
