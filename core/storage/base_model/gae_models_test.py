@@ -67,6 +67,24 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             base_models.BaseModel.get('Invalid id', strict=False))
 
+    def test_get_deleted_model_returns_none(self):
+        base_model = base_models.BaseModel(id='id', deleted=True)
+        base_model.update_timestamps()
+        base_model.put()
+
+        self.assertIsNone(
+            base_models.BaseModel.get('id', strict=False))
+
+    def test_get_deleted_model_with_return_deleted_returns_model(self):
+        base_model = base_models.BaseModel(id='id', deleted=True)
+        base_model.update_timestamps()
+        base_model.put()
+
+        self.assertEqual(
+            base_model,
+            base_models.BaseModel.get('id', strict=False, return_deleted=True)
+        )
+
     def test_base_model_export_data_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
