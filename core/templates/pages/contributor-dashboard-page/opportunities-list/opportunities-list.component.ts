@@ -57,9 +57,9 @@ angular.module('oppia').component('opportunitiesList', {
         'removeOpportunityEventEmitter')) {
         ctrl.directiveSubscriptions.add(
           $scope.$parent.$ctrl.removeOpportunityEventEmitter.subscribe(
-            (opportunityId) => {
+            (opportunityIds) => {
               opportunities = opportunities.filter(function(opportunity) {
-                return opportunity.id !== opportunityId;
+                return opportunityIds.indexOf(opportunity.id) < 0;
               });
               ctrl.visibleOpportunities = opportunities.slice(
                 0, OPPORTUNITIES_PAGE_SIZE);
