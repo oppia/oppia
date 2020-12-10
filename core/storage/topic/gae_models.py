@@ -197,7 +197,7 @@ class TopicModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -258,7 +258,8 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -340,7 +341,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -527,7 +528,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
             'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE

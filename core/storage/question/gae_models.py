@@ -97,7 +97,7 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'question_state_data': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_state_data_schema_version':
@@ -238,7 +238,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'question_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -663,7 +663,8 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -738,9 +739,10 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model data has already been exported as a part of the QuestionModel
-        export_data function, and thus a new export_data function does not
-        need to be defined here.
+        """Model contains data corresponding to a user, but this isn't exported
+        because because noteworthy details that belong to this model have
+        already been exported as a part of the QuestionModel export_data
+        function.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'question_model_last_updated':

@@ -147,7 +147,7 @@ class SkillModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconceptions_schema_version':
@@ -201,7 +201,8 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -259,7 +260,7 @@ class SkillSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,

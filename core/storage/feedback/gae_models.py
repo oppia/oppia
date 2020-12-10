@@ -105,7 +105,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'entity_type': base_models.EXPORT_POLICY.EXPORTED,
             'entity_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -290,7 +290,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'thread_id': base_models.EXPORT_POLICY.EXPORTED,
             'message_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -582,7 +582,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thread_id':
@@ -751,7 +751,7 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'num_open_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'num_total_threads': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -810,7 +810,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'feedback_message_references':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,

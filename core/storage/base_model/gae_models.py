@@ -199,7 +199,7 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get_export_policy(cls):
-        """Model creation time is not relevant to user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return {
             'created_on': EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': EXPORT_POLICY.NOT_APPLICABLE,
@@ -462,7 +462,7 @@ class BaseCommitLogEntryModel(BaseModel):
     @staticmethod
     def get_model_association_to_user():
         """The history of commits is not relevant for the purposes of
-        Takeout.
+        Takeout, since commits do not contain any personal data of the user.
         """
         return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -475,8 +475,10 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """The history of commits is not relevant for the purposes of
-        Takeout.
+        """Model contains data corresponding to a user,
+        but this isn't exported because the history of commits is not
+        relevant to a user for the purposes of Takeout, since commits do not
+        contain any personal user data.
         """
         return dict(BaseModel.get_export_policy(), **{
             'user_id': EXPORT_POLICY.NOT_APPLICABLE,
@@ -1174,14 +1176,15 @@ class VersionedModel(BaseModel):
     @staticmethod
     def get_model_association_to_user():
         """The history of commits is not relevant for the purposes of
-        Takeout.
+        Takeout, since commits do not contain any personal user data.
         """
         return MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """The history of commits is not relevant for the purposes of
-        Takeout.
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits is not relevant for the purposes of
+        Takeout, since commits do not contain any personal user data.
         """
         return dict(BaseModel.get_export_policy(), **{
             'version': EXPORT_POLICY.NOT_APPLICABLE
@@ -1230,7 +1233,7 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Snapshot Metadata is relevant to the user for Takeout."""
+        """Model contains data to export/delete corresponding to a user."""
         return dict(BaseModel.get_export_policy(), **{
             'committer_id': EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': EXPORT_POLICY.EXPORTED,
@@ -1336,7 +1339,8 @@ class BaseSnapshotContentModel(BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """The contents of snapshots are not relevant to the user for
+        """Model contains data corresponding to a user, but this isn't exported
+        because the contents of snapshots are note relevant to the user for
         Takeout.
         """
         return dict(BaseModel.get_export_policy(), **{

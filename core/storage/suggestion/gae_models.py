@@ -201,7 +201,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -645,7 +645,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -765,8 +765,8 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
+        """Model doesn't contain any data directly corresponding to a user
+        because the data is aggregated.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'translation_reviewer_counts_by_lang_code':

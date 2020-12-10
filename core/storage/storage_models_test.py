@@ -17,8 +17,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import inspect
-
 from core.domain import takeout_service
 from core.platform import models
 from core.tests import test_utils
@@ -39,53 +37,21 @@ import python_utils
 class StorageModelsTest(test_utils.GenericTestBase):
     """Tests for Oppia storage models."""
 
-    def _get_model_module_names(self):
-        """Get all module names in storage."""
-        # As models.NAMES is an enum, it cannot be iterated. So we use the
-        # __dict__ property which can be iterated.
-        for name in models.NAMES.__dict__:
-            if '__' not in name:
-                yield name
-
-    def _get_model_classes(self):
-        """Get all model classes in storage."""
-        for module_name in self._get_model_module_names():
-            (module,) = models.Registry.import_models([module_name])
-            for member_name, member_obj in inspect.getmembers(module):
-                if inspect.isclass(member_obj):
-                    clazz = getattr(module, member_name)
-                    all_base_classes = [
-                        base_class.__name__ for base_class in inspect.getmro(
-                            clazz)]
-                    if 'Model' in all_base_classes:
-                        yield clazz
-
-    # List of model classes that don't have Wipeout related class methods
-    # defined because they're not used directly but only as a base classes for
-    # the other models.
-    BASE_CLASSES = (
-        'BaseCommitLogEntryModel',
-        'BaseMapReduceBatchResultsModel',
-        'BaseModel',
-        'BaseSnapshotContentModel',
-        'BaseSnapshotMetadataModel',
-        'VersionedModel',
-    )
-
     def _get_base_or_versioned_model_child_classes(self):
         """Get child model classes that inherit directly from BaseModel or
         VersionedModel, these are classes that are used directly for saving data
         and not just inherited from.
         """
 
-        for clazz in self._get_model_classes():
-            if clazz.__name__ in self.BASE_CLASSES:
+        for clazz in test_utils.get_storage_model_classes():
+            if (clazz.__name__ in
+                    test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES):
                 continue
             yield clazz
 
     def test_all_model_module_names_unique(self):
         names_of_ndb_model_subclasses = [
-            clazz.__name__ for clazz in self._get_model_classes()]
+            clazz.__name__ for clazz in test_utils.get_storage_model_classes()]
 
         self.assertEqual(
             len(set(names_of_ndb_model_subclasses)),
@@ -128,8 +94,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
         """
         all_models = [
             clazz
-            for clazz in self._get_model_classes()
-            if not clazz.__name__ in self.BASE_CLASSES
+            for clazz in test_utils.get_storage_model_classes()
+            if (not clazz.__name__ in
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
         models_with_export = (
             takeout_service.get_models_which_should_be_exported())
@@ -146,8 +113,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
         """Ensure every field in every model has an export policy defined."""
         all_models = [
             clazz
-            for clazz in self._get_model_classes()
-            if not clazz.__name__ in self.BASE_CLASSES
+            for clazz in test_utils.get_storage_model_classes()
+            if (not clazz.__name__ in
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
         for model in all_models:
             export_policy = model.get_export_policy()

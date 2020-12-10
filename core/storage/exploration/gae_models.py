@@ -127,7 +127,7 @@ class ExplorationModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -253,7 +253,7 @@ class ExplorationContextModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'story_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
@@ -370,7 +370,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -633,7 +633,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user. This
+        model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -931,9 +932,9 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model data has already been exported as a part of the
-        ExplorationModel and thus does not need a separate export_data
-        function.
+        """Model contains data corresponding to a user, but this isn't exported
+        because because noteworthy details that belong to this model have
+        already been exported as a part of the ExplorationModel.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,

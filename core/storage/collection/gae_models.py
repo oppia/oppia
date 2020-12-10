@@ -100,7 +100,7 @@ class CollectionModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -312,7 +312,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export/delete corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -544,14 +544,15 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     @staticmethod
     def get_model_association_to_user():
         """The history of commits is not relevant for the purposes of
-        Takeout.
+        Takeout, since commits do not contain any personal user data.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """The history of commits is not relevant for the purposes of
-        Takeout.
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits is not relevant for the purposes of
+        Takeout, since commits do not contain any personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -713,9 +714,9 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model data has already been exported as a part of the
-        CollectionRightsModel, and thus does not need an export_data
-        function.
+        """Model contains data corresponding to a user, but this isn't exported
+        because noteworthy details that belong to this model have already been
+        exported as a part of the CollectionRightsModel.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
