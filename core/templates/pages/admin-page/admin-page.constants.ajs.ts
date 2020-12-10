@@ -38,4 +38,3 @@ angular.module('oppia').constant(
 
 angular.module('oppia').constant(
   'PROFILE_URL_TEMPLATE', AdminPageConstants.PROFILE_URL_TEMPLATE);
-  
