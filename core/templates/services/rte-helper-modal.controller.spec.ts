@@ -19,6 +19,8 @@
 import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { ContextService } from './context.service';
+import { CsrfTokenService } from './csrf-token.service';
 
 describe('Rte Helper Modal Controller', function() {
   var $scope = null;
@@ -100,7 +102,7 @@ describe('Rte Helper Modal Controller', function() {
     var $q = null;
     var AssetsBackendApiService = null;
     var ImageUploadHelperService = null;
-    var ContextService = null;
+    var contextService = null;
     beforeEach(angular.mock.module('oppia'));
 
     beforeEach(angular.mock.module('oppia', function($provide) {
@@ -117,7 +119,7 @@ describe('Rte Helper Modal Controller', function() {
 
       AssetsBackendApiService = $injector.get('AssetsBackendApiService');
       ImageUploadHelperService = $injector.get('ImageUploadHelperService');
-      ContextService = $injector.get('ContextService');
+      contextService = $injector.get('contextService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
@@ -135,6 +137,16 @@ describe('Rte Helper Modal Controller', function() {
           customizationArgSpecs: customizationArgSpecs,
         });
     }));
+    afterEach(() => {
+      CsrfTokenService.tokenPromise = null;
+      ContextService._pageContext = null;
+      ContextService._explorationIsLinkedToStory = false;
+      ContextService._explorationId = null;
+      ContextService._questionPlayerIsManuallySet = false;
+      ContextService._questionId = null;
+      ContextService._editorContext = null;
+      ContextService._customEntityContext = null;
+    });
 
     it('should load modal correctly', function() {
       expect($scope.customizationArgSpecs).toEqual(customizationArgSpecs);
@@ -255,7 +267,7 @@ describe('Rte Helper Modal Controller', function() {
         }];
 
         var imageFile = new Blob();
-        spyOn(ContextService, 'getImageSaveDestination').and.returnValue(
+        spyOn(contextService, 'getImageSaveDestination').and.returnValue(
           AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
         spyOn(
           ImageUploadHelperService,
