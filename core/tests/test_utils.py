@@ -91,8 +91,8 @@ platform_taskqueue_services = models.Registry.import_taskqueue_services()
 # We are using the b' prefix as all the stdouts are in bytes.
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 
-# List of model classes that don't have Wipeout or Takeout, related class 
-# methods defined because they're not used directly but only as 
+# List of model classes that don't have Wipeout or Takeout, related class
+# methods defined because they're not used directly but only as
 # base classes for the other models.
 BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES = (
     'BaseCommitLogEntryModel',
