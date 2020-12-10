@@ -33,5 +33,9 @@ export const AdminPageConstants = {
     MISC: '#misc'
   },
 
-  PROFILE_URL_TEMPLATE: '/profile/<username>'
+  NUMBER_OF_DELETION_REQUEST_HANDLER_URL:'/numberofdeletionrequestshandler',
+  MEMORY_CACHE_HANDLER_URL: '/memorycacheadminhandler',
+  PROFILE_URL_TEMPLATE: '/profile/<username>',
+  SEND_DUMMY_MAIL_HANDLER_URL: '/senddummymailtoadminhandler',
+  UPDATE_USERNAME_HANDLER_URL: '/updateusernamehandler'
 } as const;
