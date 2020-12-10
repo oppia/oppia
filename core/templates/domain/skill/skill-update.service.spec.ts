@@ -40,6 +40,8 @@ describe('Skill update service', function() {
     workedExampleObjectFactory = null;
   var skillDict = null;
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {

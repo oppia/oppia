@@ -22,7 +22,6 @@ import { Change } from
   'domain/editor/undo_redo/change.model';
 import { Collection, CollectionBackendDict } from
   'domain/collection/collection.model';
-
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -37,6 +36,8 @@ describe('Collection update service', function() {
     title: 'Title',
     status: 'public'
   };
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();

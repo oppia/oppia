@@ -37,6 +37,8 @@ describe('Collection linearizer service', function() {
   var secondCollectionNode = null;
   var thirdCollectionNode = null;
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {

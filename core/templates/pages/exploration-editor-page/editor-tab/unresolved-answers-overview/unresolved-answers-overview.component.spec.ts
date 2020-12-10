@@ -44,6 +44,8 @@ describe('Unresolved Answers Overview Component', function() {
 
   var stateName = 'State1';
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();

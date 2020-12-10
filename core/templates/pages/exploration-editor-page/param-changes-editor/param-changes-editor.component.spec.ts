@@ -45,7 +45,7 @@ import { AngularNameService } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
-import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
+import { importAllAngularServices, setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
 import { ParamChangesEditorDirective } from './param-changes-editor.component';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 

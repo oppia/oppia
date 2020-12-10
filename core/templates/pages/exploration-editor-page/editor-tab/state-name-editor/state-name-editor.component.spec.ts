@@ -55,6 +55,8 @@ describe('State Name Editor component', function() {
     is_version_of_draft_valid: true
   };
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('directiveTemplates'));
   importAllAngularServices();
   beforeEach(function() {
