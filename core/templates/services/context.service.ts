@@ -32,24 +32,25 @@ export class ContextService {
   constructor(
     private urlService: UrlService) {}
 
-  pageContext = null;
-  explorationIsLinkedToStory = false;
-  explorationId = null;
-  questionPlayerIsManuallySet = false;
-  questionId = null;
-  editorContext = null;
-  customEntityContext = null;
-  imageSaveDestination: string = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
+  static pageContext = null;
+  static explorationIsLinkedToStory = false;
+  static explorationId = null;
+  static questionPlayerIsManuallySet = false;
+  static questionId = null;
+  static editorContext = null;
+  static customEntityContext = null;
+  static imageSaveDestination: string = (
+    AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
 
   init(editorName: string): void {
-    this.editorContext = editorName;
+    ContextService.editorContext = editorName;
   }
   // Following method helps to know the whether the context of editor is
   // question editor or exploration editor. The variable editorContext is
   // set from the init function that is called upon initialization in the
   // respective editors.
   getEditorContext(): string {
-    return this.editorContext;
+    return ContextService.editorContext;
   }
   // Returns a string representing the current tab of the editor (either
   // 'editor' or 'preview'), or null if the current tab is neither of these,
@@ -70,45 +71,53 @@ export class ContextService {
   // If the current page is not one in either EXPLORATION_EDITOR or
   // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER.
   getPageContext(): string {
-    if (this.pageContext) {
-      return this.pageContext;
+    if (ContextService.pageContext) {
+      return ContextService.pageContext;
     } else {
       let pathnameArray = this.urlService.getPathname().split('/');
       for (let i = 0; i < pathnameArray.length; i++) {
         if (pathnameArray[i] === 'explore' ||
             (pathnameArray[i] === 'embed' &&
                 pathnameArray[i + 1] === 'exploration')) {
-          this.pageContext = ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER;
+          ContextService.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
           return ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER;
         } else if (pathnameArray[i] === 'create') {
-          this.pageContext = ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR;
+          ContextService.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
           return ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR;
         } else if (pathnameArray[i] === 'question_editor') {
-          this.pageContext = ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR;
+          ContextService.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR);
           return ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR;
         } else if (pathnameArray[i] === 'topic_editor') {
-          this.pageContext = ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR;
+          ContextService.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR);
           return ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR;
         } else if (pathnameArray[i] === 'story_editor') {
-          this.pageContext = ServicesConstants.PAGE_CONTEXT.STORY_EDITOR;
+          ContextService.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.STORY_EDITOR);
           return ServicesConstants.PAGE_CONTEXT.STORY_EDITOR;
         } else if (pathnameArray[i] === 'skill_editor') {
-          this.pageContext = ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
+          ContextService.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR);
           return ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
         } else if (
           pathnameArray[i] === 'session' ||
             pathnameArray[i] === 'review-test') {
-          this.pageContext = ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
+          ContextService.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER);
           return ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
         } else if (pathnameArray[i] === 'collection_editor') {
-          this.pageContext = ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
+          ContextService.pageContext = (
+            ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR);
           return ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
         } else if (pathnameArray[i] === 'topics-and-skills-dashboard') {
-          this.pageContext = (
+          ContextService.pageContext = (
             ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
         } else if (pathnameArray[i] === 'contributor-dashboard') {
-          this.pageContext = (
+          ContextService.pageContext = (
             ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD);
           return ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD;
         }
@@ -120,15 +129,15 @@ export class ContextService {
   // This is required in cases like when we need to access question player
   // from the skill editor preview tab.
   setQuestionPlayerIsOpen(): void {
-    this.questionPlayerIsManuallySet = true;
+    ContextService.questionPlayerIsManuallySet = true;
   }
 
   clearQuestionPlayerIsOpen(): void {
-    this.questionPlayerIsManuallySet = false;
+    ContextService.questionPlayerIsManuallySet = false;
   }
 
   getQuestionPlayerIsManuallySet(): boolean {
-    return this.questionPlayerIsManuallySet;
+    return ContextService.questionPlayerIsManuallySet;
   }
 
   canEntityReferToSkills(): boolean {
@@ -138,13 +147,13 @@ export class ContextService {
       (
         this.getPageContext() === (
           ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR) &&
-        this.explorationIsLinkedToStory
+        ContextService.explorationIsLinkedToStory
       )
     );
   }
 
   setExplorationIsLinkedToStory(): void {
-    this.explorationIsLinkedToStory = true;
+    ContextService.explorationIsLinkedToStory = true;
   }
 
   isInExplorationContext(): boolean {
@@ -159,17 +168,17 @@ export class ContextService {
   // correct context for some case. eg: Viewing a skill's concept card on
   // any page via the RTE.
   setCustomEntityContext(entityType: string, entityId: string): void {
-    this.customEntityContext = new EntityContext(
+    ContextService.customEntityContext = new EntityContext(
       entityId, entityType);
   }
 
   removeCustomEntityContext(): void {
-    this.customEntityContext = null;
+    ContextService.customEntityContext = null;
   }
 
   getEntityId(): string {
-    if (this.customEntityContext !== null) {
-      return this.customEntityContext.getId();
+    if (ContextService.customEntityContext !== null) {
+      return ContextService.customEntityContext.getId();
     }
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
@@ -186,8 +195,8 @@ export class ContextService {
 
   // Add constants for entity type.
   getEntityType(): string {
-    if (this.customEntityContext !== null) {
-      return this.customEntityContext.getType();
+    if (ContextService.customEntityContext !== null) {
+      return ContextService.customEntityContext.getType();
     }
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
@@ -218,8 +227,8 @@ export class ContextService {
   // Returns a string representing the explorationId (obtained from the
   // URL).
   getExplorationId(): string {
-    if (this.explorationId) {
-      return this.explorationId;
+    if (ContextService.explorationId) {
+      return ContextService.explorationId;
     } else if (!this.isInQuestionPlayerMode()) {
       // The pathname should be one of /explore/{exploration_id} or
       // /create/{exploration_id} or /embed/exploration/{exploration_id}.
@@ -227,12 +236,12 @@ export class ContextService {
       for (let i = 0; i < pathnameArray.length; i++) {
         if (pathnameArray[i] === 'explore' ||
             pathnameArray[i] === 'create') {
-          this.explorationId = pathnameArray[i + 1];
+          ContextService.explorationId = pathnameArray[i + 1];
           return pathnameArray[i + 1];
         }
         if (pathnameArray[i] === 'embed') {
-          this.explorationId = pathnameArray[i + 2];
-          return this.explorationId;
+          ContextService.explorationId = pathnameArray[i + 2];
+          return ContextService.explorationId;
         }
       }
 
@@ -256,7 +265,7 @@ export class ContextService {
     return (
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER ||
-        this.questionPlayerIsManuallySet);
+        ContextService.questionPlayerIsManuallySet);
   }
 
   isInExplorationPlayerPage(): boolean {
@@ -290,16 +299,17 @@ export class ContextService {
   // value, new images can be either saved in the localStorage or uploaded
   // directly to the datastore.
   resetImageSaveDestination(): void {
-    this.imageSaveDestination = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
+    ContextService.imageSaveDestination = (
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
   }
 
   setImageSaveDestinationToLocalStorage(): void {
-    this.imageSaveDestination = (
+    ContextService.imageSaveDestination = (
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
   }
 
   getImageSaveDestination(): string {
-    return this.imageSaveDestination;
+    return ContextService.imageSaveDestination;
   }
 }
 

@@ -25,16 +25,16 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class BackgroundMaskService {
-  maskIsActive: boolean = false;
+  static maskIsActive: boolean = false;
 
   isMaskActive(): boolean {
-    return this.maskIsActive;
+    return BackgroundMaskService.maskIsActive;
   }
   activateMask(): void {
-    this.maskIsActive = true;
+    BackgroundMaskService.maskIsActive = true;
   }
   deactivateMask(): void {
-    this.maskIsActive = false;
+    BackgroundMaskService.maskIsActive = false;
   }
 }
 

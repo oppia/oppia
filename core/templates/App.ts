@@ -97,18 +97,9 @@ require(
 require(
   'pages/exploration-editor-page/services/user-exploration-permissions.service'
 );
-require('pages/exploration-player-page/services/current-interaction.service');
-require('services/assets-backend-api.service');
-require('services/compute-graph.service');
-require('services/contextual/device-info.service');
-require('services/date-time-format.service');
-require('services/editability.service');
-require('services/loader.service');
-require('services/local-storage.service');
-require('services/site-analytics.service');
-require('services/stateful/focus-manager.service');
-
-
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { BackgroundMaskService } from 'services/stateful/background-mask.service';
+import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 angular.module('oppia').config([
@@ -127,6 +118,10 @@ angular.module('oppia').config([
     var alertsService = new AlertsService(loggerService);
     var htmlEscaperService = new HtmlEscaperService(loggerService);
     var urlService = new UrlService(windowRef);
+    var windowDimensionsService = new WindowDimensionsService(windowRef);
+    var backgroundMaskService = new BackgroundMaskService();
+    var sidebarStatusService = new SidebarStatusService(
+      windowDimensionsService);
     var contextService = new ContextService(urlService);
     var urlInterpolationService = new UrlInterpolationService(
       alertsService, urlService, utilsService);
@@ -136,16 +131,21 @@ angular.module('oppia').config([
       htmlEscaperService,
       contextService,
       urlInterpolationService,
+      urlService,
+      sidebarStatusService,
+      backgroundMaskService
     };
     var servicesToProvide = [
-      'AlertsService', 'CsrfTokenService', 'ContextService',
-      'HtmlEscaperService',
+      'AlertsService', 'BackgroundMaskService',
+      'CsrfTokenService', 'ContextService',
+      'HtmlEscaperService', 'SidebarStatusService', 'UrlService',
       'UrlInterpolationService', 'UtilsService'
     ];
     for (let service of servicesToProvide) {
       $provide.value(service, servicesToProvideInstances[(
         service[0].toLowerCase() + service.substring(1))]);
     }
+
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from
