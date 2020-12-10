@@ -24,6 +24,11 @@ export const AdminPageConstants = {
 
   ADMIN_JOB_OUTPUT_URL_TEMPLATE: '/adminjoboutput?job_id=<jobId>',
 
+  NUMBER_OF_DELETION_REQUEST_HANDLER_URL:'/numberofdeletionrequestshandler',
+  MEMORY_CACHE_HANDLER_URL: '/memorycacheadminhandler',
+  SEND_DUMMY_MAIL_HANDLER_URL: '/senddummymailtoadminhandler',
+  UPDATE_USERNAME_HANDLER_URL: '/updateusernamehandler',
+
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#activities',
     JOBS: '#jobs',

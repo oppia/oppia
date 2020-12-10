@@ -330,6 +330,25 @@ describe('Admin Backend API service for Misc Tab', () => {
     }
     ));
 
+  it('should fail tp get data of memory cache profile',
+    fakeAsync(() => {
+      let errorMessage ='Internal Server Error'
+      adminBackendApiService.getMemoryCacheProfile()
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/memorycacheadminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(
+        { error: errorMessage },
+        { status: 500, statusText: ''}
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }
+    ));
+
   it('should update the username of oppia account',
     fakeAsync(() => {
       let oldUsername = 'old name';
