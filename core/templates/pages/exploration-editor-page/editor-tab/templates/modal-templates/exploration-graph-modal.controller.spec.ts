@@ -18,6 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ReadOnlyExplorationBackendApiService } from
@@ -33,6 +34,8 @@ describe('Exploration Graph Modal Controller', function() {
   var isEditable = true;
   var graphData = {};
   var stateName = 'Introduction';
+  importAllAngularServices();
+
   importAllAngularServices();
 
   beforeEach(() => {
