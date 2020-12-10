@@ -482,7 +482,7 @@ angular.module('oppia').directive('questionsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/modal-templates/' +
                 'change-question-difficulty-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 linkedSkillsWithDifficulty: () => linkedSkillsWithDifficulty,
                 skillIdToRubricsObject: () => skillIdToRubricsObject
@@ -568,7 +568,7 @@ angular.module('oppia').directive('questionsList', [
                   UrlInterpolationService.getDirectiveTemplateUrl(
                     '/components/skill-selector/' +
                       'select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
@@ -632,7 +632,7 @@ angular.module('oppia').directive('questionsList', [
                         '/components/question-directives' +
                           '/modal-templates/' +
                           'question-editor-save-modal.template.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controller: 'ConfirmOrCancelModalController'
               }).result.then(function(commitMessage) {
                 if (ctrl.skillLinkageModificationsArray &&

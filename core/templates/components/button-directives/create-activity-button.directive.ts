@@ -70,7 +70,7 @@ angular.module('oppia').directive('createActivityButton', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/creator-dashboard-page/modal-templates/' +
                   'create-activity-modal.directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controller: 'CreateActivityModalController',
                 windowClass: 'oppia-creation-modal'
               }).result.then(function() {}, function() {
