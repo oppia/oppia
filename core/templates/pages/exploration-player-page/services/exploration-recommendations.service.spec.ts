@@ -16,18 +16,15 @@
  * @fileoverview Unit tests for ExplorationRecommendationsService.
  */
 
-
-import { async, TestBed } from '@angular/core/testing';
-import { ExplorationRecommendationsService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/exploration-recommendations.service';
-import { ContextService } from 'services/context.service';
-import { ServicesConstants } from 'services/services.constants';
-import { UrlService } from 'services/contextual/url.service';
-import { ExplorationRecommendationsBackendApiService } from
-  'domain/recommendations/exploration-recommendations-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { async, TestBed } from '@angular/core/testing';
+
+import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
+import { ExplorationRecommendationsService } from 'pages/exploration-player-page/services/exploration-recommendations.service';
+import { ContextService } from 'services/context.service';
+import { UrlService } from 'services/contextual/url.service';
+import { ServicesConstants } from 'services/services.constants';
 
 
 describe('Exploration Recommendations Service', () => {
@@ -66,7 +63,7 @@ describe('Exploration Recommendations Service', () => {
     spyOn(contextService, 'getExplorationId').and.returnValue(EXPLORATION_ID);
   });
 
-  describe('when used in the editor', () => {
+  describe('when used in the editor page', () => {
     beforeEach(() => {
       spyOn(contextService, 'getPageContext').and.returnValue(
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
@@ -106,7 +103,7 @@ describe('Exploration Recommendations Service', () => {
     });
   });
 
-  describe('getRecommendendedSummaryDicts', () => {
+  describe('getRecommendedSummaryDicts', () => {
     let expRecsBackendApiService: ExplorationRecommendationsBackendApiService;
     const AUTHOR_REC_IDS = ['author_rec_1', 'author_rec_2'];
 
@@ -145,7 +142,7 @@ describe('Exploration Recommendations Service', () => {
         });
     });
 
-    describe('when used outside of the editor', () => {
+    describe('when used in other page context', () => {
       beforeEach(() => {
         spyOn(contextService, 'getPageContext').and.returnValue(
           ServicesConstants.PAGE_CONTEXT.OTHER
