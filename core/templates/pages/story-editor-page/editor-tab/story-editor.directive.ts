@@ -168,7 +168,7 @@ angular.module('oppia').directive('storyEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story-editor-page/modal-templates/' +
                 'new-chapter-title-modal.template.html'),
-            backdrop: 'static',
+              backdrop: 'static',
               resolve: {
                 nodeTitles: () => nodeTitles
               },
