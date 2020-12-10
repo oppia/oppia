@@ -337,7 +337,7 @@ describe('Admin Backend API service for Misc Tab', () => {
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/memorycacheadminhandler');
-      expect(req.request.method).toEqual('POST');
+      expect(req.request.method).toEqual('GET');
       req.flush(
         { error: errorMessage },
         { status: 500, statusText: ''}
