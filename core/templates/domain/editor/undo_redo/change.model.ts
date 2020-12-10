@@ -466,6 +466,13 @@ interface TopicLanguageCodeChange {
   'old_value': string;
 }
 
+interface TopicPageTitleFragmentForWebChange {
+  'cmd': 'update_topic_property',
+  'property_name': 'page_title_fragment_for_web',
+  'new_value': string;
+  'old_value': string;
+}
+
 type TopicPropertyChange = (
   TopicNameChange |
   TopicAbbreviatedNameChange |
@@ -475,7 +482,8 @@ type TopicPropertyChange = (
   TopicPracticeTabChange |
   TopicUrlFragmentChange |
   TopicMetaTagContentChange |
-  TopicLanguageCodeChange);
+  TopicLanguageCodeChange |
+  TopicPageTitleFragmentForWebChange);
 
 interface TopicSubtopicThumbnailFilenameChange {
   'cmd': 'update_subtopic_property';
