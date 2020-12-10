@@ -32,8 +32,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class CollectionCreationService {
-  // TODO(#9154): Remove static when migration is complete.
-  static collectionCreationInProgress: boolean = false;
+  collectionCreationInProgress: boolean = false;
 
   constructor(
     private collectionCreationBackendService: CollectionCreationBackendService,
@@ -48,11 +47,11 @@ export class CollectionCreationService {
       '/collection_editor/create/<collection_id>');
 
   createNewCollection(): void {
-    if (CollectionCreationService.collectionCreationInProgress) {
+    if (this.collectionCreationInProgress) {
       return;
     }
 
-    CollectionCreationService.collectionCreationInProgress = true;
+    this.collectionCreationInProgress = true;
     this.alertsService.clearWarnings();
 
     this.loaderService.showLoadingScreen('Creating collection');
@@ -69,11 +68,11 @@ export class CollectionCreationService {
                 collection_id: response.collectionId
               }
             );
-          CollectionCreationService.collectionCreationInProgress = false;
+          this.collectionCreationInProgress = false;
         }, 150);
       }, () => {
         this.loaderService.hideLoadingScreen();
-        CollectionCreationService.collectionCreationInProgress = false;
+        this.collectionCreationInProgress = false;
       });
   }
 }

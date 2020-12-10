@@ -16,7 +16,8 @@
  * @fileoverview Unit test for CollectionCreationService.
  */
 
-import { HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController }
+  from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks, tick }
   from '@angular/core/testing';
 
@@ -25,7 +26,6 @@ import { CollectionCreationService } from
 import { LoaderService } from 'services/loader.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Collection Creation service', () => {
   let collectionCreationService: CollectionCreationService = null;
@@ -36,8 +36,13 @@ describe('Collection Creation service', () => {
   let SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
   let ERROR_STATUS_CODE = 500;
 
-  importAllAngularServices();
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+      ],
+    });
+
     collectionCreationService = TestBed.get(CollectionCreationService);
     loaderService = TestBed.get(LoaderService);
     analyticsService = TestBed.get(SiteAnalyticsService);
