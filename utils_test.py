@@ -423,6 +423,25 @@ class UtilsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, max_length_error):
             utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
 
+    def test_require_valid_page_title_fragment_for_web(self):
+        page_title_fragment_for_web = 'name'
+        utils.require_valid_page_title_fragment_for_web(
+            page_title_fragment_for_web)
+
+        non_string_page_title_fragment_for_web = 0
+        invalid_type_error = (
+            'Expected page title fragment to be a string, received 0')
+        with self.assertRaisesRegexp(Exception, invalid_type_error):
+            utils.require_valid_page_title_fragment_for_web(
+                non_string_page_title_fragment_for_web)
+        lengthy_page_title_fragment_for_web = 'a' * 60
+        max_length_error = (
+            'Page title fragment should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+        with self.assertRaisesRegexp(Exception, max_length_error):
+            utils.require_valid_page_title_fragment_for_web(
+                lengthy_page_title_fragment_for_web)
+
     def test_require_valid_url_fragment(self):
         name = 'name'
         utils.require_valid_url_fragment(name, 'name-type', 20)

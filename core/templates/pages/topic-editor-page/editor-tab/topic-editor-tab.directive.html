@@ -82,6 +82,20 @@
                 What does this topic contain?
               </span>
             </div>
+            <div class="topic-page-title" ng-class="{'has-error': editablePageTitleFragmentForWeb.length === 0}">
+              <label for="topicPageTitleFragmentForWeb" class="form-heading protractor-test-topic-page-title-fragment-label">Page Title Fragment For Web</label>
+              <textarea type="text" class="form-control topic-description protractor-test-topic-page-title-fragment-field"
+                        ng-model="editablePageTitleFragmentForWeb" maxlength="<[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]>"
+                        ng-blur="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
+                        placeholder="Enter the page title for the topic">
+              </textarea>
+              <span class="oppia-input-box-subtitle">
+                <em>
+                  Page title fragment will appear in the browser tab for relevant learner facing pages.
+                  Topic page title fragment should be at most <[MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB]> characters.
+                </em>
+              </span>
+            </div>
             <div class="topic-meta-tag-content" ng-class="{'has-error': editableMetaTagContent.length === 0}">
               <label for="topicMetaTagContent" class="form-heading protractor-test-topic-meta-tag-content-label">Meta Tag Content</label>
               <textarea type="text" class="form-control topic-description protractor-test-topic-meta-tag-content-field"
@@ -435,7 +449,8 @@
 
   .topic-editor .topic-name,
   .topic-editor .topic-url-fragment,
-  .topic-editor .topic-meta-tag-content {
+  .topic-editor .topic-meta-tag-content,
+  .topic-editor .topic-page-title {
     margin-bottom: 25px;
     margin-top: 32px;
   }

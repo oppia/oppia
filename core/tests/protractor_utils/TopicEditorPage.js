@@ -106,6 +106,10 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-topic-meta-tag-content-field'));
   var topicMetaTagContentLabel = element(
     by.css('.protractor-test-topic-meta-tag-content-label'));
+  var topicPageTitleFragmentField = element(
+    by.css('.protractor-test-topic-page-title-fragment-field'));
+  var topicPageTitleFragmentLabel = element(
+    by.css('.protractor-test-topic-page-title-fragment-label'));
   var easyRubricDifficulty = element(
     by.css('.protractor-test-skill-difficulty-easy'));
   var storyTitleClassname = '.protractor-test-story-title';
@@ -435,6 +439,14 @@ var TopicEditorPage = function() {
       'Confirm Create Story button takes too long to be clickable');
     await confirmStoryCreationButton.click();
     await waitFor.pageToFullyLoad();
+  };
+
+  this.updatePageTitleFragment = async function(newPageTitleFragment) {
+    await action.sendKeys(
+      'Update Page Title Fragment',
+      topicPageTitleFragmentField, newPageTitleFragment);
+    await action.click(
+      'Page Title Fragment label', topicPageTitleFragmentLabel);
   };
 
   this.updateMetaTagContent = async function(newMetaTagContent) {

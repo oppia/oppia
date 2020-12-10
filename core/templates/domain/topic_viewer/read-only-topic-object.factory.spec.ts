@@ -93,6 +93,7 @@ describe('Read only topic object Factory', () => {
       },
       practice_tab_is_displayed: false,
       meta_tag_content: 'Topic meta tag content',
+      page_title_fragment_for_web: 'topic page title'
     };
 
     _sampleReadOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
@@ -107,6 +108,8 @@ describe('Read only topic object Factory', () => {
     expect(_sampleReadOnlyTopic.getPracticeTabIsDisplayed()).toEqual(false);
     expect(_sampleReadOnlyTopic.getMetaTagContent()).toEqual(
       'Topic meta tag content');
+    expect(_sampleReadOnlyTopic.getPageTitleFragmentForWeb()).toEqual(
+      'topic page title');
   });
 
   it('should return correct value of uncategorized skill summary object',

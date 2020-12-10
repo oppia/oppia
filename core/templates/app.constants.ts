@@ -21,16 +21,16 @@ import commonConstants from 'assets/constants';
 export const AppConstants = {
   ...commonConstants,
   DEFAULT_TRANSLATIONS: {
-    I18N_LIBRARY_PAGE_TITLE: 'Library',
+    I18N_LIBRARY_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Library',
     I18N_LIBRARY_LOADING: 'Loading',
     I18N_SIGNUP_PAGE_SUBTITLE: 'Registration',
-    I18N_SIGNUP_PAGE_TITLE: 'Oppia',
+    I18N_SIGNUP_PAGE_TITLE_FRAGMENT_FOR_WEB: 'Oppia',
     I18N_LIBRARY_SEARCH_PLACEHOLDER: 'What are you curious about?',
     I18N_LIBRARY_ALL_LANGUAGES: 'All Languages',
     I18N_LIBRARY_LANGUAGES_EN: 'English',
     I18N_LIBRARY_ALL_CATEGORIES: 'All Categories',
     I18N_TOPNAV_SIGN_IN: 'Sign in',
-    I18N_SPLASH_PAGE_TITLE:
+    I18N_SPLASH_PAGE_TITLE_FRAGMENT_FOR_WEB:
       'Oppia | Free, Online and Interactive Lessons for Anyone',
     I18N_SIGNUP_REGISTRATION: 'Registration',
     I18N_SIGNUP_LOADING: 'Loading',

@@ -2076,7 +2076,8 @@ tags: []
             subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False):
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='topic page title'):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -2103,6 +2104,8 @@ tags: []
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
+            page_title_fragment_for_web: str. The page title fragment for the
+                topic.
 
         Returns:
             Topic. A newly-created topic.
@@ -2123,7 +2126,8 @@ tags: []
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            meta_tag_content, practice_tab_is_displayed)
+            meta_tag_content, practice_tab_is_displayed,
+            page_title_fragment_for_web)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
@@ -2134,7 +2138,8 @@ tags: []
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False):
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='topic page title'):
         """Saves a new topic with a default version 1 subtopic data dict.
 
         This function should only be used for creating topics in tests involving
@@ -2170,6 +2175,8 @@ tags: []
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
+            page_title_fragment_for_web: str. The page title fragment for the
+                topic.
         """
         topic_rights_model = topic_models.TopicRightsModel(
             id=topic_id, manager_ids=[], topic_is_published=True)
@@ -2188,7 +2195,8 @@ tags: []
             next_subtopic_id=next_subtopic_id,
             subtopics=[self.VERSION_1_SUBTOPIC_DICT],
             meta_tag_content=meta_tag_content,
-            practice_tab_is_displayed=practice_tab_is_displayed)
+            practice_tab_is_displayed=practice_tab_is_displayed,
+            page_title_fragment_for_web=page_title_fragment_for_web)
         commit_message = 'New topic created with name \'%s\'.' % name
         topic_rights_model.commit(
             committer_id=owner_id,

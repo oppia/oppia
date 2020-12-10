@@ -80,6 +80,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
             topic_domain.StoryReference.create_default_story_reference(
                 self.story_id_2))
         self.topic.meta_tag_content = 'topic meta content'
+        self.topic.page_title_fragment_for_web = 'topic page title'
 
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story_1)
@@ -257,6 +258,21 @@ class TopicPageDataHandlerTests(
         expected_meta_tag_content = 'meta content'
         self.assertEqual(
             expected_meta_tag_content, json_response['meta_tag_content'])
+
+    def test_get_with_page_title_fragment_for_web(self):
+        self.topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'topic_with_page_title_fragment_for_web',
+            'topic-page-title', 'description')
+        self.topic.page_title_fragment_for_web = 'topic page title'
+        topic_services.save_new_topic(self.admin_id, self.topic)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        json_response = self.get_json(
+            '%s/staging/%s' % (
+                feconf.TOPIC_DATA_HANDLER, 'topic-page-title'))
+        expected_page_title_fragment_for_web = 'topic page title'
+        self.assertEqual(
+            expected_page_title_fragment_for_web,
+            json_response['page_title_fragment_for_web'])
 
     def test_get_with_no_skills_ids(self):
         self.topic = topic_domain.Topic.create_default_topic(

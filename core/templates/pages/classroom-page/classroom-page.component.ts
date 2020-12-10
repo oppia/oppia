@@ -35,15 +35,16 @@ require('pages/library-page/search-bar/search-bar.component.ts');
 angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),
   controller: [
-    '$filter', 'AlertsService', 'LoaderService', 'PageTitleService',
+    '$filter', 'AlertsService', 'LoaderService',
     'UrlInterpolationService', 'UrlService', 'FATAL_ERROR_CODES',
     function(
-        $filter, AlertsService, LoaderService, PageTitleService,
+        $filter, AlertsService, LoaderService,
         UrlInterpolationService, UrlService, FATAL_ERROR_CODES) {
       var ctrl = this;
 
       ctrl.classroomBackendApiService = (
         OppiaAngularRootComponent.classroomBackendApiService);
+      ctrl.pageTitleService = OppiaAngularRootComponent.pageTitleService;
 
       ctrl.getStaticImageUrl = function(imagePath) {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -62,8 +63,8 @@ angular.module('oppia').component('classroomPage', {
           ctrl.classroomData = classroomData;
           ctrl.classroomDisplayName = (
             $filter('capitalize')(classroomData.getName()));
-          PageTitleService.setPageTitle(
-            ctrl.classroomDisplayName + ' Classroom | Oppia');
+          ctrl.pageTitleService.setPageTitle(
+            `Learn ${ctrl.classroomDisplayName} with Oppia | Oppia`);
           LoaderService.hideLoadingScreen();
           ctrl.classroomBackendApiService.onInitializeTranslation.emit();
         }, function(errorResponse) {
