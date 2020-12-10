@@ -37,8 +37,6 @@ describe('Test Interaction Panel directive', function() {
     }
   };
 
-  importAllAngularServices();
-
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
