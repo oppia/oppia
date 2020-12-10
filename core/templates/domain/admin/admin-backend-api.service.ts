@@ -142,7 +142,7 @@ export class AdminBackendApiService {
   }
   flushCache():Promise<void> {
     return this.http.post<void>(
-      AdminPageConstants.MEMORY_CACHE_HANDLER_URL, {}
+      AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL, {}
     ).toPromise();
   }
 
@@ -172,7 +172,7 @@ export class AdminBackendApiService {
 
   sendDummyMail():Promise<void> {
     return this.http.post<void>(
-      AdminPageConstants.SEND_DUMMY_MAIL_HANDLER_URL, {}
+      AdminPageConstants.ADMIN_SEND_DUMMY_MAIL_HANDLER_URL, {}
     ).toPromise();
   }
 
@@ -180,7 +180,7 @@ export class AdminBackendApiService {
     let memoryCacheProfile = null;
     return new Promise((resolve, reject) => {
       this.http.get<void>(
-        AdminPageConstants.MEMORY_CACHE_HANDLER_URL, {}
+        AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL, {}
       ).toPromise()
         .then(responce =>{
           memoryCacheProfile = responce;
@@ -191,7 +191,7 @@ export class AdminBackendApiService {
   }
   updateUserName(oldUsername:string, newUsername:string):Promise<void> {
     return this.http.put<void>(
-      AdminPageConstants.UPDATE_USERNAME_HANDLER_URL, {
+      AdminPageConstants.ADMIN_UPDATE_USERNAME_HANDLER_URL, {
         old_username: oldUsername,
         new_username: newUsername
       }
@@ -200,7 +200,7 @@ export class AdminBackendApiService {
 
   numberOfPendingDeletionRequest():Promise<void> {
     return this.http.get<void>(
-      AdminPageConstants.NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {}
+      AdminPageConstants.ADMIN_NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {}
     ).toPromise();
   }
 }
