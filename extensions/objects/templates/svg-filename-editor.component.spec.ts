@@ -19,6 +19,7 @@
 import { fabric } from 'fabric';
 import { AppConstants } from 'app.constants';
 import { SvgFilenameEditorConstants } from './svg-filename-editor.constants';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 var initializeMockDocument = function(svgFilenameCtrl) {
   var mockDocument = document.createElement('div');
@@ -49,6 +50,7 @@ var initializeMockDocument = function(svgFilenameCtrl) {
 };
 
 describe('SvgFilenameEditor', function() {
+  importAllAngularServices();
   var alertSpy = null;
   var contextService = null;
   var CsrfService = null;
@@ -624,6 +626,7 @@ describe('SvgFilenameEditor initialized with value attribute',
       }
     };
     beforeEach(angular.mock.module('oppia'));
+    importAllAngularServices();
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
       $provide.value('ImagePreloaderService', mockImagePreloaderService);
@@ -732,6 +735,7 @@ describe('SvgFilenameEditor with image save destination as ' +
   }
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', mockilss);
@@ -794,6 +798,7 @@ describe('should fail svg tag validation', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', {});
@@ -826,6 +831,7 @@ describe('should fail svg attribute validation', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', {});

@@ -27,7 +27,8 @@ import { ShortSkillSummaryObjectFactory } from
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 
 describe('Topic viewer backend API service', () => {
   let topicViewerBackendApiService:
@@ -48,12 +49,7 @@ describe('Topic viewer backend API service', () => {
         new ShortSkillSummaryObjectFactory()));
   }));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    let ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(() => {
     TestBed.configureTestingModule({

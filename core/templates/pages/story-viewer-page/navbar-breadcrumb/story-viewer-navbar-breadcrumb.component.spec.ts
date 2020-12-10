@@ -17,6 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Story viewer navbar breadcrumb component', function() {
   var ctrl = null;
@@ -25,6 +26,7 @@ describe('Story viewer navbar breadcrumb component', function() {
   var mockSendStoryDataEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     urlService = $injector.get('UrlService');
     storyViewerBackendApiService = $injector.get(

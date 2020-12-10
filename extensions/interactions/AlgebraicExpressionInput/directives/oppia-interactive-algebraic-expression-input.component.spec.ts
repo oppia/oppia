@@ -18,11 +18,21 @@
  */
 
 import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
+<<<<<<< HEAD
 import { AlgebraicExpressionInputInteractionComponent } from './oppia-interactive-algebraic-expression-input.component';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+=======
+import { GuppyConfigurationService } from
+  'services/guppy-configuration.service.ts';
+import { GuppyInitializationService } from
+  'services/guppy-initialization.service.ts';
+import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { WindowRef } from 'services/contextual/window-ref.service.ts';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+>>>>>>> ee406e9ca... Changes
 
 describe('AlgebraicExpressionInputInteractive', () => {
   let component: AlgebraicExpressionInputInteractionComponent;
@@ -53,6 +63,7 @@ describe('AlgebraicExpressionInputInteractive', () => {
     static 'add_global_symbol'(name: string, symbol: Object): void {}
   }
 
+<<<<<<< HEAD
   let mockCurrentInteractionService = {
     onSubmit: (answer, rulesService) => {},
     registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
@@ -60,6 +71,16 @@ describe('AlgebraicExpressionInputInteractive', () => {
       validateExpressionFn();
     }
   };
+=======
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    guppyConfigurationService = new GuppyConfigurationService(
+      new DeviceInfoService(new WindowRef()));
+    mathInteractionsService = new MathInteractionsService();
+    guppyInitializationService = new GuppyInitializationService();
+    deviceInfoService = new DeviceInfoService(new WindowRef());
+>>>>>>> ee406e9ca... Changes
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule(

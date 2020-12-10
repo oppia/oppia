@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for WelcomeModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Welcome Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -23,7 +23,7 @@ describe('Welcome Modal Controller', function() {
   var SiteAnalyticsService = null;
 
   var explorationId = 'exp1';
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 

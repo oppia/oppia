@@ -16,7 +16,7 @@
  * @fileoverview Unit tests to check that all the relevant rules exist.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // all the rules are upgraded to Angular 8.
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { GraphUtilsService } from
@@ -50,9 +50,10 @@ import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
 import { RatioExpressionInputRulesService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-rules.service';
 import { UtilsService } from 'services/utils.service';
-import { UpgradedServices } from 'services/UpgradedServices';
+
 import { ImageClickAnswer } from './answer-defs';
 import { ImageClickRuleInputs } from './rule-input-defs';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Rule spec services', function() {
@@ -121,12 +122,7 @@ describe('Rule spec services', function() {
     });
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   var getRulesServiceName = function(interactionId) {
     return (

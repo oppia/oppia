@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for subtopic viewer page component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+
 // ^^^ This block is to be removed.
 import { TestBed } from '@angular/core/testing';
 
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { PageTitleService } from 'services/page-title.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/subtopic-viewer-page/subtopic-viewer-page.component.ts');
 
@@ -45,12 +46,7 @@ describe('Subtopic viewer page', function() {
   var subtopicTitle = 'Subtopic Title';
   var subtopicUrlFragment = 'subtopic-title';
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(() => {
     OppiaAngularRootComponent.pageTitleService = (
       TestBed.get(PageTitleService)

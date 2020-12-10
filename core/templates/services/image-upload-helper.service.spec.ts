@@ -16,6 +16,7 @@
  * @fileoverview Unit test for imageUploadHelperService.
  */
 
+<<<<<<< HEAD
 import { HttpClientTestingModule } from
   '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -30,6 +31,26 @@ describe('imageUploadHelperService', () => {
     imageUploadHelperService =
       TestBed.inject(ImageUploadHelperService);
   });
+=======
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
+require('services/assets-backend-api.service.ts');
+require('services/image-upload-helper.service.ts');
+
+describe('ImageUploadHelperService', function() {
+  var ImageUploadHelperService = null;
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AssetsBackendApiService', {});
+  }));
+  importAllAngularServices();
+
+  beforeEach(angular.mock.inject(function($injector) {
+    ImageUploadHelperService = $injector.get('ImageUploadHelperService');
+  }));
+>>>>>>> ee406e9ca... Changes
 
   it('should convert image data to image file', () => {
     const imageFile = (

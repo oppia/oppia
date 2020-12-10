@@ -23,9 +23,10 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory.ts';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -33,7 +34,7 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 describe('Solution Verification Service', () => {
   let ess, siis, scas, sof, svs, see;
   let mockExplorationData, mockInteractionState;
-
+  importAllAngularServices();
   beforeEach(() => {
     mockExplorationData = {
       explorationId: 0,
@@ -63,13 +64,6 @@ describe('Solution Verification Service', () => {
     see = TestBed.get(StateEditorService);
     svs = TestBed.get(SolutionVerificationService);
   });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
   beforeEach(function() {
     mockExplorationData = {
       explorationId: 0,

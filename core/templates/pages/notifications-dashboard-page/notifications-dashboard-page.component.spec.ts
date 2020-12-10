@@ -19,7 +19,7 @@
 require(
   'pages/notifications-dashboard-page/' +
   'notifications-dashboard-page.component.ts');
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Notifications Dashboard Page', function() {
   var $scope, ctrl;
   var $httpBackend = null;
@@ -35,6 +35,7 @@ describe('Notifications Dashboard Page', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRefMock);
   }));

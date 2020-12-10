@@ -16,6 +16,13 @@
  * @fileoverview Tests that search service gets correct collections.
  */
 
+<<<<<<< HEAD
+=======
+
+// The import below is to successfully mock Jquery.
+import $ from 'jquery';
+
+>>>>>>> ee406e9ca... Changes
 import { EventEmitter } from '@angular/core';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
@@ -23,11 +30,65 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { SearchService, SelectionDetails, SelectionList } from 'services/search.service';
 import { Subscription } from 'rxjs';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
+<<<<<<< HEAD
 describe('Search Service', () => {
   let searchService: SearchService;
   let results: SelectionDetails;
   let httpTestingController: HttpTestingController;
+=======
+require('services/search.service.ts');
+
+describe('Search service', function() {
+  var SearchService = null;
+  var $httpBackend = null;
+  var $log = null;
+  var $translate = null;
+  var CsrfService = null;
+  var results = null;
+  var testSubscriptions: Subscription;
+  const initialSearchResultsLoadedSpy = jasmine.createSpy(
+    'initialSearchResultsLoadedSpy');
+
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
+  beforeEach(angular.mock.inject(function($injector, $q) {
+    SearchService = $injector.get('SearchService');
+    $log = $injector.get('$log');
+    $httpBackend = $injector.get('$httpBackend');
+    $translate = $injector.get('$translate');
+
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
+
+    spyOn($translate, 'refresh').and.callThrough();
+
+    results = {
+      categories: {
+        description: '',
+        itemsName: 'categories',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      },
+      languageCodes: {
+        description: '',
+        itemsName: 'languages',
+        masterList: [],
+        numSelections: 0,
+        selections: {},
+        summary: ''
+      }
+    };
+  }));
+>>>>>>> ee406e9ca... Changes
 
   beforeEach(() => {
     TestBed.configureTestingModule({

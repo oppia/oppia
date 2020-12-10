@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for ExplorationMetadataModalController.
+ */
+
 import { TestBed } from '@angular/core/testing';
 
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-
-/**
- * @fileoverview Unit tests for ExplorationMetadataModalController.
- */
-
 describe('Exploration Metadata Modal Controller', function() {
   var $scope = null;
   var $timeout = null;

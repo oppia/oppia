@@ -17,9 +17,9 @@
  */
 
 import { fakeAsync, tick } from '@angular/core/testing';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 describe('Delete account page', function() {
@@ -37,12 +37,7 @@ describe('Delete account page', function() {
     $provide.value('$window', windowMock);
   }));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');

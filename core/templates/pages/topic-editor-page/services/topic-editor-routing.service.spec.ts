@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for TopicEditorRoutingService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
@@ -26,12 +27,7 @@ require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 describe('Topic editor routing service', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   var $rootScope = null;
   var $location = null;

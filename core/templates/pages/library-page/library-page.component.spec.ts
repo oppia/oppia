@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for the component of the library page.
  */
 
-
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
@@ -49,11 +47,7 @@ describe('Library controller', function() {
   var mockWindow = null;
   importAllAngularServices();
 
-  beforeEach(function() {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
+  importAllAngularServices();
   beforeEach(function() {
     classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
     i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);

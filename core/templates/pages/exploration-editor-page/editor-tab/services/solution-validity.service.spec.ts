@@ -17,7 +17,8 @@
  */
 
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Solution Validity Service', function() {
   let svs: SolutionValidityService;
@@ -25,12 +26,7 @@ describe('Solution Validity Service', function() {
   beforeEach(() => {
     svs = new SolutionValidityService();
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   it('should store validity of the solution correctly', () => {
     // Initialize SolutionValidityService.

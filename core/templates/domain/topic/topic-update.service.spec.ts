@@ -16,7 +16,7 @@
  * @fileoverview Tests for Topic update service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // topic-update.service.ts is upgraded to Angular 8.
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';

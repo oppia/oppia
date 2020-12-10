@@ -19,6 +19,7 @@
 
 require('services/nested-directives-recursion-timeout-prevention.service');
 require('services/contextual/logger.service');
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Nested Directives Recursion Timeout Prevention Service',
   function() {
@@ -35,6 +36,7 @@ describe('Nested Directives Recursion Timeout Prevention Service',
     var functions;
 
     beforeEach(angular.mock.module('oppia'));
+    importAllAngularServices();
     beforeEach(angular.mock.inject(function($injector, $rootScope) {
       ndrtps = $injector.get(
         'NestedDirectivesRecursionTimeoutPreventionService');

@@ -58,7 +58,7 @@ describe('State Name Editor component', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('directiveTemplates'));
-
+  importAllAngularServices();
   beforeEach(function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]

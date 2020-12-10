@@ -18,7 +18,6 @@
 
 import { fakeAsync, TestBed } from '@angular/core/testing';
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
-import { UpgradedServices } from 'services/UpgradedServices';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -34,12 +33,6 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
   let collectionUpdateService = null;
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
   describe('when title, objective and category are specified', function() {
     var collectionDict = {

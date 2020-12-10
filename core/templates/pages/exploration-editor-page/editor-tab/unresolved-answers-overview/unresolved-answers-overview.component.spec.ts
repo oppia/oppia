@@ -18,7 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EditabilityService } from 'services/editability.service';
 import { StateInteractionIdService } from
   // eslint-disable-next-line max-len
@@ -49,11 +48,7 @@ describe('Unresolved Answers Overview Component', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
+  importAllAngularServices();
 
   beforeEach(function() {
     editabilityService = TestBed.get(EditabilityService);

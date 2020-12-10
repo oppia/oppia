@@ -16,11 +16,9 @@
  * @fileoverview Unit tests for ChangesInHumanReadableForm directive.
 */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 // This function is a helper to clean the compiled html for each test, in
 // order to make a cleaner assertion.
@@ -83,12 +81,7 @@ describe('Changes in Human Readable Form Directive', function() {
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $rootScope, _$compile_) {
     $compile = _$compile_;
     scope = $rootScope.$new();

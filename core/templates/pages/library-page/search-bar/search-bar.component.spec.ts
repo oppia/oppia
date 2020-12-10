@@ -50,6 +50,7 @@ describe('Search bar component', function() {
   var mockWindow = null;
   importAllAngularServices();
 
+  importAllAngularServices();
   beforeEach(function() {
     constructTranslationIdsService = TestBed.get(
       ConstructTranslationIdsService);

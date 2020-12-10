@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for SuggestionModalForCreatorViewController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Suggestion Modal For Creator View Controller', function() {
@@ -26,12 +27,7 @@ describe('Suggestion Modal For Creator View Controller', function() {
   var $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   describe('when suggestion is handled and it is accepted', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {

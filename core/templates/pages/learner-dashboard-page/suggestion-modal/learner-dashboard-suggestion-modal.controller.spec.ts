@@ -17,7 +17,8 @@
  * @fileoverview Unit tests for LearnerDashboardSuggestionModalController.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Learner Dashboard Suggestion Modal Controller', function() {
   var $scope = null;
@@ -26,12 +27,7 @@ describe('Learner Dashboard Suggestion Modal Controller', function() {
   var newContent = 'new content';
   var oldContent = 'old content';
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

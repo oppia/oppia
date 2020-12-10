@@ -16,7 +16,7 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // translation-status.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
@@ -47,10 +47,10 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
+
 // ^^^ This block is to be removed.
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
@@ -126,12 +126,6 @@ describe('Translation status service', function() {
         is_terminal: true
       }
     });
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
 
   describe('Translation status service', function() {

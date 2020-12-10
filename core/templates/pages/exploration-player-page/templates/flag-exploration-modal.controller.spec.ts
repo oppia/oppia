@@ -16,10 +16,6 @@
  * @fileoverview Unit tests for FlagExplorationModalController.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { PlayerPositionService } from '../services/player-position.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { IdGenerationService } from 'services/id-generation.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Flag Exploration Modal Controller', function() {
@@ -30,16 +26,7 @@ describe('Flag Exploration Modal Controller', function() {
   var playerPositionService = null;
   importAllAngularServices();
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        DeviceInfoService,
-        IdGenerationService,
-        PlayerPositionService
-      ]
-    });
-  });
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');

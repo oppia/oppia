@@ -16,11 +16,12 @@
  * @fileoverview Tests for ParameterizeRuleDescription filter for Oppia.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // parameterize-rule-description.filter.ts is upgraded to Angular 8.
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('filters/parameterize-rule-description.filter.ts');
@@ -33,12 +34,7 @@ describe('Testing filters', function() {
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   it('should have all expected filters', angular.mock.inject(function($filter) {
     expect($filter(filterName)).not.toEqual(null);

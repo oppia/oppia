@@ -24,7 +24,7 @@ describe('Rte Helper Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var $timeout = null;
-
+  importAllAngularServices();
   var mockExternalRteSaveEventEmitter = null;
 
   importAllAngularServices();
@@ -39,7 +39,6 @@ describe('Rte Helper Modal Controller', function() {
     }];
 
     beforeEach(angular.mock.module('oppia'));
-
     beforeEach(angular.mock.module('oppia', function($provide) {
       mockExternalRteSaveEventEmitter = new EventEmitter();
       $provide.value('ExternalRteSaveService', {

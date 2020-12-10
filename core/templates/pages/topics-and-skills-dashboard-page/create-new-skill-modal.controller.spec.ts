@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for the Create new skill modal controller.
  */
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ee406e9ca... Changes
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Create new skill modal', function() {

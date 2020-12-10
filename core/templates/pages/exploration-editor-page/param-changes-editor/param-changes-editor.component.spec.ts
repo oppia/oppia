@@ -62,10 +62,8 @@ describe('Param Changes Editor Component', function() {
 
   var mockExternalSaveEventEmitter = null;
 
-  importAllAngularServices();
-
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
     paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the question misconception selector component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // question-misconception-selector.component.ts is upgraded to Angular 8.
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';

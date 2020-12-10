@@ -16,14 +16,26 @@
  * @fileoverview Unit tests for the topics and skills dashboard controller.
  */
 
+<<<<<<< HEAD
+=======
+// TODO(#7222): Remove the following block of unnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+
+>>>>>>> ee406e9ca... Changes
 import { EventEmitter } from '@angular/core';
 import { SkillSummary, SkillSummaryBackendDict } from
   'domain/skill/skill-summary.model';
 import { TopicsAndSkillsDashboardFilter } from
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
+<<<<<<< HEAD
 import { TopicSummary, TopicSummaryBackendDict } from
   'domain/topic/topic-summary.model';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+=======
+import { TopicSummary, TopicSummaryBackendDict } from 'domain/topic/topic-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
+>>>>>>> ee406e9ca... Changes
 // ^^^ This block is to be removed.
 
 require(

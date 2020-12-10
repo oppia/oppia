@@ -17,7 +17,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 /**
  * @fileoverview Unit tests for HelpModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Help Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -29,6 +29,7 @@ describe('Help Modal Controller', function() {
   var explorationId = 'exp1';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     ContextService = $injector.get('ContextService');

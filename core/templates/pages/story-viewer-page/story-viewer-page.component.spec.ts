@@ -21,11 +21,11 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StoryNode } from 'domain/story/story-node.model';
 import { PageTitleService } from 'services/page-title.service';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
-import { UserService } from 'services/user.service.ts';
+import { UserService } from 'services/user.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Story Viewer Page component', function() {
   var ctrl = null;
@@ -40,12 +40,8 @@ describe('Story Viewer Page component', function() {
   var storyPlaythrough = null;
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-
     OppiaAngularRootComponent.pageTitleService = (
       TestBed.get(PageTitleService)
     );

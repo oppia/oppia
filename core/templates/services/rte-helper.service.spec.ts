@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for RteHelperService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // RteHelperService.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Rte Helper Service', function() {
@@ -29,12 +30,7 @@ describe('Rte Helper Service', function() {
   var $rootScope = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     RteHelperService = $injector.get('RteHelperService');
     $q = $injector.get('$q');

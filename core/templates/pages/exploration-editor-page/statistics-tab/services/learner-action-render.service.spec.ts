@@ -19,7 +19,7 @@
  * jasmine.any(Object).
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // learner-action-render.service.ts is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
