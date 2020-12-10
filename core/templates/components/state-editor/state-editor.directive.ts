@@ -51,6 +51,12 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solicit-answer-details.service.ts');
 require('services/contextual/window-dimensions.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solution.service');
 
 import { Subscription } from 'rxjs';
 
