@@ -709,7 +709,7 @@ angular.module('oppia').directive('conversationSkin', [
             // been fixed.
             try {
               $scope.displayedCard.isTerminal();
-            } catch(error) {
+            } catch (error) {
               let additionalDebugInfo = (
                 `${error.message} \n` +
                 `state name: ${newCard && newCard.getStateName()} \n` +
