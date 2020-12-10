@@ -47,7 +47,6 @@ import { StateEditorRefreshService } from
 import { AlertsService } from 'services/alerts.service';
 import { importAllAngularServices, setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
 import { ParamChangesEditorDirective } from './param-changes-editor.component';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Param Changes Editor Component', function() {
   var ctrl = null;
