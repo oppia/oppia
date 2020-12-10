@@ -37,17 +37,4 @@ angular.module('oppia').constant(
   'ADMIN_TAB_URLS', AdminPageConstants.ADMIN_TAB_URLS);
 
 angular.module('oppia').constant(
-  'NUMBER_OF_DELETION_REQUEST_HANDLER_URL',
-  AdminPageConstants.NUMBER_OF_DELETION_REQUEST_HANDLER_URL);
-
-angular.module('oppia').constant(
-  'MEMORY_CACHE_HANDLER_URL', AdminPageConstants.MEMORY_CACHE_HANDLER_URL);
-
-angular.module('oppia').constant(
   'PROFILE_URL_TEMPLATE', AdminPageConstants.PROFILE_URL_TEMPLATE);
-
-angular.module('oppia').constant(
-  'SEND_DUMMY_MAIL_HANDLER_URL', AdminPageConstants.SEND_DUMMY_MAIL_HANDLER_URL);
-
-angular.module('oppia').constant(
-  'UPDATE_USERNAME_HANDLER_URL', AdminPageConstants.UPDATE_USERNAME_HANDLER_URL);
