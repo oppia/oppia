@@ -98,6 +98,7 @@ angular.module('oppia').config([
     for (let [key, value] of Object.entries(UpgradedServices.ugs)) {
       $provide.value(key, value);
     }
+
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from

@@ -27,25 +27,26 @@ import { WindowDimensionsService } from
 })
 export class SidebarStatusService {
   constructor(private wds: WindowDimensionsService) {}
-  private pendingSidebarClick: boolean = false;
-  private sidebarIsShown: boolean = false;
+  static pendingSidebarClick: boolean = false;
+  static sidebarIsShown: boolean = false;
 
   private _openSidebar(): void {
-    if (this.wds.isWindowNarrow() && !this.sidebarIsShown) {
-      this.sidebarIsShown = true;
-      this.pendingSidebarClick = true;
+    if (
+      this.wds.isWindowNarrow() && !SidebarStatusService.sidebarIsShown) {
+      SidebarStatusService.sidebarIsShown = true;
+      SidebarStatusService.pendingSidebarClick = true;
     }
   }
 
   private _closeSidebar(): void {
-    if (this.sidebarIsShown) {
-      this.sidebarIsShown = false;
-      this.pendingSidebarClick = false;
+    if (SidebarStatusService.sidebarIsShown) {
+      SidebarStatusService.sidebarIsShown = false;
+      SidebarStatusService.pendingSidebarClick = false;
     }
   }
 
   isSidebarShown(): boolean {
-    return this.sidebarIsShown;
+    return SidebarStatusService.sidebarIsShown;
   }
   openSidebar(): void {
     this._openSidebar();
@@ -54,17 +55,17 @@ export class SidebarStatusService {
     this._closeSidebar();
   }
   toggleSidebar(): void {
-    if (!this.sidebarIsShown) {
+    if (!SidebarStatusService.sidebarIsShown) {
       this._openSidebar();
     } else {
       this._closeSidebar();
     }
   }
   onDocumentClick(): void {
-    if (!this.pendingSidebarClick) {
-      this.sidebarIsShown = false;
+    if (!SidebarStatusService.pendingSidebarClick) {
+      SidebarStatusService.sidebarIsShown = false;
     } else {
-      this.pendingSidebarClick = false;
+      SidebarStatusService.pendingSidebarClick = false;
     }
   }
 }
