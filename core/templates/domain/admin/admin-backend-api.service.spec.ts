@@ -330,6 +330,7 @@ describe('Admin Backend API service for Misc Tab', () => {
     }
     ));
 
+<<<<<<< HEAD
   it('should fail tp get data of memory cache profile',
     fakeAsync(() => {
       let errorMessage = 'Internal Server Error';
@@ -349,6 +350,8 @@ describe('Admin Backend API service for Misc Tab', () => {
     }
     ));
 
+=======
+>>>>>>> parent of a7bc80027... re-seted admin constants
   it('should update the username of oppia account',
     fakeAsync(() => {
       let oldUsername = 'old name';
