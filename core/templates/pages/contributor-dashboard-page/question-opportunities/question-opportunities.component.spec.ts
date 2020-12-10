@@ -25,7 +25,9 @@ import { ContributionOpportunitiesBackendApiService } from
 import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { AlertsService } from 'services/alerts.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { UserService } from 'services/user.service';
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -38,6 +40,7 @@ describe('Question opportunities component', function() {
   var alertsService = null;
   var contributionOpportunitiesService = null;
   var questionUndoRedoService = null;
+  var siteAnalyticsService = null;
   var skillObjectFactory = null;
   var userService = null;
 
@@ -50,7 +53,9 @@ describe('Question opportunities component', function() {
     });
 
     alertsService = TestBed.get(AlertsService);
+    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
     skillObjectFactory = TestBed.get(SkillObjectFactory);
+    userService = TestBed.get(UserService);
   });
 
   beforeEach(angular.mock.module(
@@ -67,7 +72,6 @@ describe('Question opportunities component', function() {
     contributionOpportunitiesService = $injector.get(
       'ContributionOpportunitiesService');
     questionUndoRedoService = $injector.get('QuestionUndoRedoService');
-    userService = $injector.get('UserService');
 
     opportunitiesArray = [
       SkillOpportunity.createFromBackendDict({
@@ -136,11 +140,29 @@ describe('Question opportunities component', function() {
     expect(getMoreSkillOpportunitiesSpy).not.toHaveBeenCalled();
   });
 
+  it('should register Contributor Dashboard suggest event when clicking on' +
+    ' suggest question button', function() {
+    spyOn($uibModal, 'open').and.callThrough();
+    spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
+    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
+      isLoggedIn: () => true
+    }));
+    ctrl.$onInit();
+    $rootScope.$apply();
+
+    ctrl.onClickSuggestQuestionButton('1');
+    $rootScope.$apply();
+
+    expect(siteAnalyticsService.registerContributorDashboardSuggestEvent)
+      .toHaveBeenCalledWith('Question');
+  });
+
   it('should open requires login modal when trying to select a question and' +
     ' a skill difficulty and user is not logged', function() {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => false
-    }));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => false
+      }));
     ctrl.$onInit();
     $rootScope.$apply();
 
@@ -157,9 +179,10 @@ describe('Question opportunities component', function() {
   it('should open select skill and skill difficulty modal when clicking' +
     ' on suggesting question button', function() {
     spyOn($uibModal, 'open').and.callThrough();
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
     ctrl.$onInit();
     $rootScope.$apply();
 
@@ -198,9 +221,10 @@ describe('Question opportunities component', function() {
   it('should create a question when closing create question modal',
     function() {
       var openSpy = spyOn($uibModal, 'open');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
       ctrl.$onInit();
       $rootScope.$apply();
       alertsService.clearWarnings();
@@ -244,9 +268,10 @@ describe('Question opportunities component', function() {
   it('should suggest a question when dismissing create question modal',
     function() {
       var openSpy = spyOn($uibModal, 'open');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-        isLoggedIn: () => true
-      }));
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve({
+          isLoggedIn: () => true
+        }));
       ctrl.$onInit();
       $rootScope.$apply();
       alertsService.clearWarnings();
@@ -292,9 +317,10 @@ describe('Question opportunities component', function() {
     spyOn($uibModal, 'open').and.returnValue({
       result: $q.reject()
     });
-    spyOn(userService, 'getUserInfoAsync').and.returnValue($q.resolve({
-      isLoggedIn: () => true
-    }));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      $q.resolve({
+        isLoggedIn: () => true
+      }));
     ctrl.$onInit();
     $rootScope.$apply();
 

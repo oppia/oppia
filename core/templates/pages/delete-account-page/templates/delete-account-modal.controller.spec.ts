@@ -16,13 +16,26 @@
  * @fileoverview Unit tests for the delete account modal.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { UserService } from 'services/user.service';
+
 describe('Delete account modal', function() {
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('UserService', TestBed.get(UserService));
+  }));
 
   var $q = null;
   var $scope = null;
   var $uibModalInstance = null;
-  var UserService = null;
+  var userService = null;
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
@@ -31,8 +44,8 @@ describe('Delete account modal', function() {
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
     $scope = $rootScope.$new();
-    UserService = $injector.get('UserService');
-    spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+    userService = $injector.get('UserService');
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
       $q.resolve({
         getUsername: () => 'username'
       })
