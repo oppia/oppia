@@ -518,6 +518,8 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UtilsService } from 'services/utils.service';
@@ -537,6 +539,9 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { SolutionVerificationService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -1165,6 +1170,11 @@ export class UpgradedServices {
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['SolutionVerificationService'] =
+      new SolutionVerificationService(
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['StateEditorService']);
     upgradedServices['SkillCreationBackendApiService'] =
       new SkillCreationBackendApiService(
         upgradedServices['HttpClient']);
@@ -1233,6 +1243,14 @@ export class UpgradedServices {
     upgradedServices['TranslationsBackendApiService'] =
       new TranslationsBackendApiService(
         upgradedServices['HttpClient']);
+    upgradedServices['UserBackendApiService'] = new UserBackendApiService(
+      upgradedServices['HttpClient']);
+    upgradedServices['UserService'] = new UserService(
+      upgradedServices['UrlInterpolationService'],
+      upgradedServices['UrlService'],
+      upgradedServices['WindowRef'],
+      upgradedServices['UserBackendApiService']
+    );
 
     // Topological level: 4.
     upgradedServices['CollectionCreationService'] =

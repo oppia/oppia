@@ -23,6 +23,7 @@ import functools
 
 from constants import constants
 from core.controllers import base
+from core.domain import classifier_services
 from core.domain import classroom_services
 from core.domain import feedback_services
 from core.domain import question_services
@@ -2850,3 +2851,43 @@ def can_play_entity(handler):
     test_can_play_entity.__wrapped__ = True
 
     return test_can_play_entity
+
+
+def is_from_oppia_ml(handler):
+    """Decorator to check whether the incoming request is from a valid Oppia-ML
+    VM instance.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now can check if incoming
+        request is from a valid VM instance.
+    """
+    def test_request_originates_from_valid_oppia_ml_instance(self, **kwargs):
+        """Checks if the incoming request is from a valid Oppia-ML VM
+        instance.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException. If incoming request is not from a valid
+                Oppia-ML VM instance.
+        """
+        oppia_ml_auth_info = (
+            self.extract_request_message_vm_id_and_signature())
+        if (oppia_ml_auth_info.vm_id == feconf.DEFAULT_VM_ID and
+                not constants.DEV_MODE):
+            raise self.UnauthorizedUserException
+        if not classifier_services.verify_signature(oppia_ml_auth_info):
+            raise self.UnauthorizedUserException
+
+        return handler(self, **kwargs)
+
+    test_request_originates_from_valid_oppia_ml_instance.__wrapped__ = True
+
+    return test_request_originates_from_valid_oppia_ml_instance

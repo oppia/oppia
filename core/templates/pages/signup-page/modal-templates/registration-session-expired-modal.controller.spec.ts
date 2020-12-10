@@ -16,18 +16,30 @@
  * @fileoverview Unit tests for RegistrationSessionExpiredModalController.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { UserService } from 'services/user.service';
+
 describe('Registration Session Expired Modal Controller', function() {
   var $q = null;
   var $scope = null;
   var $timeout = null;
   var $uibModalInstance = null;
-  var UserService = null;
+  var userService: UserService = null;
   var mockWindow = {
     location: {
       reload: () => {}
     }
   };
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('UserService', TestBed.get(UserService));
+  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
   }));
@@ -35,7 +47,7 @@ describe('Registration Session Expired Modal Controller', function() {
     $q = $injector.get('$q');
     var $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
-    UserService = $injector.get('UserService');
+    userService = $injector.get('UserService');
 
     $uibModalInstance = jasmine.createSpyObj(
       '$uibModalInstance', ['close', 'dismiss']);
@@ -56,7 +68,7 @@ describe('Registration Session Expired Modal Controller', function() {
   });
 
   it('should continue registration', function() {
-    spyOn(UserService, 'getLoginUrlAsync').and.returnValue(
+    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       $q.resolve('login-url'));
     $scope.continueRegistration();
     $scope.$apply();
@@ -68,7 +80,7 @@ describe('Registration Session Expired Modal Controller', function() {
 
   it('should not continue registration', function() {
     spyOn(mockWindow.location, 'reload').and.callThrough();
-    spyOn(UserService, 'getLoginUrlAsync').and.returnValue(
+    spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       $q.resolve(''));
     $scope.continueRegistration();
     $scope.$apply();
