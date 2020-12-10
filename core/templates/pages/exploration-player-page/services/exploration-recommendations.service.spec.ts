@@ -106,7 +106,6 @@ describe('Exploration Recommendations Service', () => {
     });
   });
 
-
   describe('getRecommendendedSummaryDicts', () => {
     let expRecsBackendApiService: ExplorationRecommendationsBackendApiService;
     const AUTHOR_REC_IDS = ['author_rec_1', 'author_rec_2'];
@@ -153,6 +152,7 @@ describe('Exploration Recommendations Service', () => {
         );
         expRecsService = TestBed.get(ExplorationRecommendationsService);
       });
+
       it('should include author recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
           AUTHOR_REC_IDS, true,
