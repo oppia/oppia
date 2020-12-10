@@ -29,7 +29,6 @@ import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Exploration data service', function() {
   let explorationDataService : ExplorationDataService = null;
@@ -39,7 +38,6 @@ describe('Exploration data service', function() {
   let csrfService :CsrfTokenService = null;
   let httpTestingController: HttpTestingController;
   let urlService: UrlService;
-  let windowRef: WindowRef;
   let sampleDataResults = {
     draft_change_list_id: 3,
     version: 1,
@@ -84,9 +82,7 @@ describe('Exploration data service', function() {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ExplorationDataService, LocalStorageService,
-        LoggerService, AlertsService, CsrfTokenService]
+      imports: [HttpClientTestingModule]
     });
 
     localStorageService = TestBed.get(LocalStorageService);
@@ -94,31 +90,31 @@ describe('Exploration data service', function() {
     alertService = TestBed.get(AlertsService);
     csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
-    windowRef = TestBed.get(WindowRef);
-    windowRef = jasmine.createSpyObj('WindowRef',windowMock);
     urlService = TestBed.get(UrlService);
     spyOn(urlService, 'getPathname').and.returnValue('/create/0');
+    spyOn(localStorageService, 'saveExplorationDraft').and.callThrough();
+
     explorationDataService = TestBed.get(ExplorationDataService);
-  
+
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');
-    });	    
+    });
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should autosave draft changes when draft ids match', fakeAsync(() => {
+  it('should autosave draft changes when draft ids match -1', fakeAsync(() => {
     let errorCallback = jasmine.createSpy('error');
-    localStorageService = jasmine.createSpyObj('LocalStorageService', {
-      'getExplorationDraft': {
-        isValid: () => {
-          return true;
-        },
-        getChanges: () => {
-          return [];
-        }
+    spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
+      draftChanges: [],
+      draftChangeListId: 0,
+      isValid: function() {
+        return true;
+      },
+      getChanges: function() {
+        return [];
       }
     });
 
@@ -143,17 +139,16 @@ describe('Exploration data service', function() {
   it('should not autosave draft changes when draft is already cached',
     fakeAsync(() => {
       let errorCallback = jasmine.createSpy('error');
-      localStorageService = jasmine.createSpyObj('LocalStorageService', {
-        getExplorationDraft: {
-          isValid: () => {
-            return true;
-          },
-          getChanges: () => {
-            return [];
-          }
+      spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
+        draftChanges: [],
+        draftChangeListId: 0,
+        isValid: function() {
+          return true;
+        },
+        getChanges: function() {
+          return [];
         }
       });
-
       // Save draft.
       explorationDataService.getData(errorCallback).then(function(data) {
         expect(data).toEqual(sampleDataResults);
@@ -171,7 +166,6 @@ describe('Exploration data service', function() {
       req.flush(sampleDataResults);
       flushMicrotasks();
 
-
       let logInfoSpy = spyOn(loggerService, 'info').and.callThrough();
       // Draft is already saved and it's in cache.
       explorationDataService.getData(errorCallback).then(function(data) {
@@ -182,22 +176,21 @@ describe('Exploration data service', function() {
       });
     }));
 
-  it('should autosave draft changes when draft ids match', fakeAsync(() => {
+  it('should autosave draft changes when draft ids match -2', fakeAsync(() => {
     let errorCallback = jasmine.createSpy('error');
-    localStorageService = jasmine.createSpyObj('LocalStorageService', {
-      getExplorationDraft: {
-        isValid: () => {
-          return true;
-        },
-        getChanges: () => {
-          return [];
-        }
+    spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
+      draftChanges: [],
+      draftChangeListId: 0,
+      isValid: () => {
+        return true;
+      },
+      getChanges: () => {
+        return [];
       }
     });
     let windowRefSpy = spyOn(windowMock.nativeWindow.location, 'reload')
       .and.callThrough();
-    explorationDataService.getData(errorCallback).then(function(data) {
-      expect(data).toEqual(sampleDataResults);
+    explorationDataService.getData(errorCallback).then((data) => {
       expect(errorCallback).not.toHaveBeenCalled();
       expect(windowRefSpy).not.toHaveBeenCalled();
     });
@@ -214,18 +207,19 @@ describe('Exploration data service', function() {
   }));
 
   it('should call error callback when draft ids do not match', fakeAsync(() => {
-    localStorageService = jasmine.createSpyObj('LocalStorageService', {
-      getExplorationDraft: {
-        isValid: () => {
-          return false;
-        },
-        getChanges: () => {
-          return [];
-        }
+    spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
+      draftChanges: [],
+      draftChangeListId: 0,
+      isValid: function() {
+        return false;
+      },
+      getChanges: function() {
+        return [];
       }
     });
+
     let errorCallback = jasmine.createSpy('error');
-    explorationDataService.getData(errorCallback).then(function(data) {
+    explorationDataService.getData(errorCallback).then((data) => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).toHaveBeenCalled();
     });
@@ -255,19 +249,21 @@ describe('Exploration data service', function() {
 
   it('should use reject handler when discard draft fails', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
-    let errorCallback = jasmine.createSpy('error');
+    let failHandler = jasmine.createSpy('error');
 
     explorationDataService.discardDraft(
-      successHandler, errorCallback);
+      successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/createhandler/data/0?apply_draft=true');
+      '/createhandler/autosave_draft/0');
     expect(req.request.method).toEqual('POST');
-    req.flush(500);
+    req.flush({
+      error: ''},
+    {status: 500, statusText: 'Internal Server Error'});
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(errorCallback).toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
   }));
 
   it('should get last saved data', fakeAsync(() => {
@@ -284,22 +280,24 @@ describe('Exploration data service', function() {
 
     expect(successHandler).toHaveBeenCalledWith(
       sampleDataResults.exploration);
-    expect(logInfoSpy).toHaveBeenCalledTimes(2);
+    expect(logInfoSpy).toHaveBeenCalledTimes(1);
   }));
 
   it('should resolve answers', fakeAsync(() => {
     let stateName = 'First State';
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
     let clearWarningsSpy = spyOn(
       alertService, 'clearWarnings').and.callThrough();
 
-    explorationDataService.resolveAnswers(stateName, []);
+    explorationDataService.resolveAnswers(
+      stateName, [], successHandler, failHandler);
+    expect(clearWarningsSpy).toHaveBeenCalled();
     let req = httpTestingController.expectOne(
       '/createhandler/resolved_answers/0/' + encodeURIComponent(stateName));
     expect(req.request.method).toEqual('PUT');
     req.flush(200);
     flushMicrotasks();
-
-    expect(clearWarningsSpy).toHaveBeenCalled();
   }));
 
   it('should save an exploration to the backend', fakeAsync(() => {
@@ -307,14 +305,14 @@ describe('Exploration data service', function() {
     let failHandler = jasmine.createSpy('fail');
 
     let errorCallback = jasmine.createSpy('error');
-    localStorageService = jasmine.createSpyObj('LocalStorageService', {
-      getExplorationDraft: {
-        isValid: () => {
-          return true;
-        },
-        getChanges: () => {
-          return [];
-        }
+    spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
+      draftChanges: [],
+      draftChangeListId: 0,
+      isValid: function() {
+        return true;
+      },
+      getChanges: function() {
+        return [];
       }
     });
     let changeList = [];
@@ -347,7 +345,7 @@ describe('Exploration data service', function() {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
-      response.is_version_of_draft_valid, response.draft_changes);
+      response);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -357,11 +355,14 @@ describe('Exploration data service', function() {
     let failHandler = jasmine.createSpy('fail');
 
     let errorCallback = jasmine.createSpy('error');
-    localStorageService = jasmine.createSpyObj('LocalStorageService', {
-      getExplorationDraft: {
-        isValid: () => {
-          return false;
-        }
+    spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
+      draftChanges: [],
+      draftChangeListId: 0,
+      isValid: function() {
+        return false;
+      },
+      getChanges: function() {
+        return [];
       }
     });
     let changeList = [];
@@ -383,7 +384,7 @@ describe('Exploration data service', function() {
     explorationDataService.save(
       changeList, 'Commit Message', successHandler, failHandler);
     req = httpTestingController.expectOne(
-      '/createhandler/data/0?apply_draft=true');
+      '/createhandler/data/0');
     expect(req.request.method).toEqual('PUT');
     req.flush(response);
     flushMicrotasks();
@@ -398,6 +399,16 @@ describe('Exploration data service', function() {
       let failHandler = jasmine.createSpy('fail');
 
       let errorCallback = jasmine.createSpy('error');
+      spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
+        draftChanges: [],
+        draftChangeListId: 0,
+        isValid: () => {
+          return true;
+        },
+        getChanges: function() {
+          return [];
+        }
+      });
       let changeList = [];
       explorationDataService.getData(errorCallback).then(function(data) {
         expect(data).toEqual(sampleDataResults);
@@ -414,12 +425,13 @@ describe('Exploration data service', function() {
       expect(req.request.method).toEqual('PUT');
       req.flush(sampleDataResults);
       flushMicrotasks();
-
       explorationDataService.save(
         changeList, 'Commit Message', successHandler, failHandler);
       req = httpTestingController.expectOne('/createhandler/data/0');
       expect(req.request.method).toEqual('PUT');
-      req.flush(500);
+      req.flush({
+        error: ''},
+      {status: 500, statusText: 'Internal Server Error'});
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -437,23 +449,20 @@ describe('Exploration data service', function() {
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
-
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ExplorationDataService, LoggerService]
+      imports: [HttpClientTestingModule]
     });
     loggerService = TestBed.get(LoggerService);
     urlService = TestBed.get(UrlService);
     spyOn(urlService, 'getPathname').and.returnValue(pathname);
     logErrorSpy = spyOn(loggerService, 'error').and.callThrough();
     explorationDataService = TestBed.get(ExplorationDataService);
-
   });
 
   it('should throw error when pathname is not valid', fakeAsync(() => {
     expect(logErrorSpy).toHaveBeenCalledWith(
-      'Unexpected call to ExplorationDataService for pathname '+ pathname);
+      'Unexpected call to ExplorationDataService for pathname ' + pathname);
 
     let errorCallback = jasmine.createSpy('error');
     expect(() => {

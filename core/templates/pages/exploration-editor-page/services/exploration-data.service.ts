@@ -49,30 +49,28 @@ export interface DraftExplorationResponse{
   providedIn: 'root'
 })
 export class ExplorationDataService {
-  private resolvedAnswersUrlPrefix = null;
-  private explorationDraftAutosaveUrl = null;
-  private draftChangeListId: number;
+  resolvedAnswersUrlPrefix: string = null;
+  explorationDraftAutosaveUrl: string= null;
+  private draftChangeListId: number = null;
   private pathname: string;
   private pathnameArray: string[];
   private explorationData;
-  private explorationId: string;
+  private explorationId: string = null;
 
   constructor(
     private editableExplorationBackendApiService:
     EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
-    private alertsService: AlertsService,
     private localStorageService: LocalStorageService,
     private urlService: UrlService,
+    private alertsService: AlertsService,
     private windowRef: WindowRef,
     private httpClient: HttpClient,
     private loggerService: LoggerService,
   ) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
-    this.draftChangeListId = null;
     this.pathname = urlService.getPathname();
-    console.log("pathname: ",this.pathname);
     this.pathnameArray = this.pathname.split('/');
     for (let i = 0; i < this.pathnameArray.length; i++) {
       if (this.pathnameArray[i] === 'create') {
@@ -82,7 +80,7 @@ export class ExplorationDataService {
     }
 
     if (!this.explorationId) {
-      loggerService.error(
+      this.loggerService.error(
         'Unexpected call to ExplorationDataService for pathname ' + this.pathname);
       // Note: if we do not return anything, Karma unit tests fail.
     }
@@ -91,23 +89,25 @@ export class ExplorationDataService {
       explorationId: this.explorationId,
       data: null
     };
-
-    this.resolvedAnswersUrlPrefix = (
-      '/createhandler/resolved_answers/' + this.explorationId);
-    this.explorationDraftAutosaveUrl = (
-      '/createhandler/autosave_draft/' + this.explorationId);
+    this.resolvedAnswersUrlPrefix =
+      '/createhandler/resolved_answers/' + this.explorationId;
+    this.explorationDraftAutosaveUrl =
+      '/createhandler/autosave_draft/' + this.explorationId;
   }
 
+  // Note that the changeList is the full changeList since the last
+  // committed version (as opposed to the most recent autosave).
   autosaveChangeList(
       changeList: ExplorationChangeList[],
       successCallback: (value: ExplorationAutosaveChangeListResponse) => void,
       errorCallback: (reason?: string) => void)
     : Promise<ExplorationAutosaveChangeListResponse> {
     return new Promise((resolve, reject) => {
-    // First save locally to be retrieved later if save is unsuccessful.
-      this.localStorageService.saveExplorationDraft(
-        this.explorationId, changeList, this.draftChangeListId);
-      console.log("autosaveChangeList "+ this.explorationDraftAutosaveUrl);
+      // First save locally to be retrieved later if save is unsuccessful.
+      if (this.localStorageService && this.localStorageService.saveExplorationDraft) {
+        this.localStorageService.saveExplorationDraft(
+          this.explorationId, changeList, this.draftChangeListId);
+      }
       this.httpClient.put<ExplorationAutosaveChangeListResponse>(
         this.explorationDraftAutosaveUrl, {
           change_list: changeList,
@@ -123,25 +123,29 @@ export class ExplorationDataService {
       });
     });
   }
+
   discardDraft(
       successCallback: (value?: {}) => void,
       errorCallback: (reason?: string) => void)
-    : Promise<{}> {
+    : Promise<Object> {
     return new Promise((resolve, reject) => {
       this.httpClient.post(
         this.explorationDraftAutosaveUrl, {})
         .toPromise()
-        .then((response) => {
-        this.localStorageService.removeExplorationDraft(this.explorationId);
-        successCallback(response);
-      }, (errorResponse ) => {
-        errorCallback(errorResponse.error.error);
-      });
+        .then(response => {
+          this.localStorageService.removeExplorationDraft(this.explorationId);
+          successCallback(response);
+        }, errorResponse => {
+          errorCallback(errorResponse.error.error);
+        });
     });
   }
   // Returns a promise that supplies the data for the current exploration.
   getData(errorCallback: (reason?: string) => void)
-  : Promise<DraftExplorationResponse> {
+  : Promise<DraftExplorationResponse|ExplorationAutosaveChangeListResponse> {
+    if (!this.explorationId) {
+      throw new Error('explorationDataService.getData is not a function');
+    }
     return new Promise((resolve, reject) => {
       if (this.explorationData.data) {
         this.loggerService.info('Found exploration data in cache.');
@@ -165,7 +169,7 @@ export class ExplorationDataService {
             if (draft) {
               if (draft.isValid(this.draftChangeListId)) {
                 let changeList = draft.getChanges();
-                this.explorationData.autosaveChangeList(changeList, () => {
+                this.autosaveChangeList(changeList, resolve, reject).then(response => {
                 // A reload is needed so that the changelist just saved is
                 // loaded as opposed to the exploration returned by this
                 // response.
@@ -189,20 +193,27 @@ export class ExplorationDataService {
   getLastSavedData(): Promise<ReadOnlyExplorationBackendDict> {
     return this.readOnlyExplorationBackendApiService.loadLatestExploration(
       this.explorationId).then((response) => {
-      this.loggerService.info('Retrieved saved exploration data.'+ response);
+      this.loggerService.info('Retrieved saved exploration data.' + response);
       return response.exploration;
     });
   }
   resolveAnswers(
       stateName: string,
-      resolvedAnswersList: string[]): void {
-    this.alertsService.clearWarnings();
-    console.log("request url : ",this.resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName));
-    this.httpClient.put(
-      this.resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
-        resolved_answers: resolvedAnswersList
-      }
-    );
+      resolvedAnswersList: string[],
+      successCallback: (value?: {}) => void,
+      errorCallback: (reason?: string) => void)
+    : Promise<{}> {
+    return new Promise((resolve, reject) => {
+      this.alertsService.clearWarnings();
+      this.httpClient.put(
+        this.resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
+          resolved_answers: resolvedAnswersList
+        }).toPromise().then(response => {
+        successCallback();
+      }, errorResponse => {
+        errorCallback();
+      });
+    });
   }
   /**
    * Saves the exploration to the backend, and, on a success callback,
@@ -230,7 +241,7 @@ export class ExplorationDataService {
           this.explorationData.data = response;
           successCallback(response);
         }, errorResponse => {
-          errorCallback(errorResponse.error.error);
+          errorCallback(errorResponse);
         }
       );
     });
