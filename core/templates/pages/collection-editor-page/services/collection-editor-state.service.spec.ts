@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for CollectionEditorStateService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // collection-editor-state.service.ts is upgraded to Angular 8.
 import { Collection } from
   'domain/collection/collection.model';
 import { CollectionRights } from
   'domain/collection/collection-rights.model';
-import { UpgradedServices } from 'services/UpgradedServices';
+
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -104,12 +104,6 @@ describe('Collection editor state service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {

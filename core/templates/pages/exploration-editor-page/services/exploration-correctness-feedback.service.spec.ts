@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for ExplorationCorrectnessFeedbackService
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 /* eslint-disable-next-line max-len */
 require('pages/exploration-editor-page/services/exploration-correctness-feedback.service');
@@ -32,12 +33,7 @@ describe('Exploration Correctness Feedback Service', function() {
       });
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     ExplorationCorrectnessFeedbackService = $injector.get(
       'ExplorationCorrectnessFeedbackService');

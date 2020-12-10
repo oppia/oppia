@@ -16,10 +16,7 @@
  * @fileoverview Unit tests for AutosaveInfoModalsService.
  */
 
-import { LocalStorageService } from 'services/local-storage.service';
-import { TestBed } from '@angular/core/testing';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('AutosaveInfoModalsService', () => {
   let AutosaveInfoModalsService = null;
@@ -29,14 +26,7 @@ describe('AutosaveInfoModalsService', () => {
   const explorationId = '0';
   const lostChanges = [];
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        LocalStorageService,
-        UrlInterpolationService
-      ]
-    });
-  });
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(($injector) => {

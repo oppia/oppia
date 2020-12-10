@@ -16,7 +16,7 @@
  * @fileoverview Unit tests text input prediction service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // text-input-prediction.service.ts is upgraded to Angular 8.
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { TextInputPredictionService } from

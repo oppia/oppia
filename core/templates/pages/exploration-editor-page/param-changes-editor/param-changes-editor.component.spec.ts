@@ -47,6 +47,7 @@ import { StateEditorRefreshService } from
 import { AlertsService } from 'services/alerts.service';
 import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
 import { ParamChangesEditorDirective } from './param-changes-editor.component';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Param Changes Editor Component', function() {
   var ctrl = null;
@@ -64,9 +65,8 @@ describe('Param Changes Editor Component', function() {
   var postSaveHookSpy = jasmine.createSpy('postSaveHook', () => {});
 
   var mockExternalSaveEventEmitter = null;
-
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
     paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);

@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for the Preferences page.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // preferences-page.component.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/preferences-page/preferences-page.component.ts');
 
@@ -48,12 +49,7 @@ describe('Preferences Controller', function() {
     $provide.value('$window', mockWindow);
   }));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
 

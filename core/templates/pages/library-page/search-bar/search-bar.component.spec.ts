@@ -22,6 +22,7 @@ import { EventEmitter } from '@angular/core';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 var MockWindow = function() {
   this.location = {
@@ -46,6 +47,7 @@ describe('Search bar component', function() {
   var preferredLanguageCodesLoadedEmitter = new EventEmitter();
   var mockWindow = null;
 
+  importAllAngularServices();
   beforeEach(function() {
     constructTranslationIdsService = TestBed.get(
       ConstructTranslationIdsService);

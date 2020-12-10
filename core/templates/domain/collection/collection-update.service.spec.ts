@@ -16,13 +16,13 @@
  * @fileoverview Tests for Collection update service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // collection-update.service.ts is upgraded to Angular 8.
 import { Change } from
   'domain/editor/undo_redo/change.model';
 import { Collection, CollectionBackendDict } from
   'domain/collection/collection.model';
-import { UpgradedServices } from 'services/UpgradedServices';
+
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -43,12 +43,7 @@ describe('Collection update service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ChangeObjectFactory', Change);
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionUpdateService = $injector.get('CollectionUpdateService');

@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for threadTable.
  */
 
-describe('Thread table directive', function() {
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
+describe('Thread table component', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var DateTimeFormatService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     var $rootScope = $injector.get('$rootScope');
     DateTimeFormatService = $injector.get('DateTimeFormatService');

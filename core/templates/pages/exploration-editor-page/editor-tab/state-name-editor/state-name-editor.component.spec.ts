@@ -30,6 +30,7 @@ import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('State Name Editor component', function() {
   var ctrl = null;
@@ -55,7 +56,7 @@ describe('State Name Editor component', function() {
   };
 
   beforeEach(angular.mock.module('directiveTemplates'));
-
+  importAllAngularServices();
   beforeEach(function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]

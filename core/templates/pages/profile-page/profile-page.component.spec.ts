@@ -21,7 +21,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 // TODO(#7222): Remove the following block of unnecessary imports once
 // thread-data-backend-api.service.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+
 import { ProfilePageBackendApiService } from
   './profile-page-backend-api.service';
 import { OppiaAngularRootComponent } from
@@ -29,6 +29,7 @@ import { OppiaAngularRootComponent } from
 import { RatingComputationService } from
   'components/ratings/rating-computation/rating-computation.service';
 import { UserProfile, UserProfileBackendDict } from 'domain/user/user-profile.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/profile-page/profile-page.component.ts');
 
@@ -49,12 +50,7 @@ describe('Profile page', function() {
     }
   };
 
-  beforeEach(angular.mock.module('oppia', $provide => {
-    let ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('UrlService', {

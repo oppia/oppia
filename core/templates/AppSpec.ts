@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for generic services.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // App.ts is upgraded to Angular 8.
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
@@ -27,7 +27,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 const constants = require('constants.ts');
@@ -49,12 +49,7 @@ describe('App', function() {
         new WrittenTranslationsObjectFactory(
           new WrittenTranslationObjectFactory()));
     }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
-    }));
+    importAllAngularServices();
 
     var $injector = null;
     beforeEach(angular.mock.inject(function(_$injector_) {
@@ -74,12 +69,6 @@ describe('App', function() {
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.constant('DEV_MODE', false);
-    }));
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value);
-      }
     }));
 
     var $exceptionHandler = null;

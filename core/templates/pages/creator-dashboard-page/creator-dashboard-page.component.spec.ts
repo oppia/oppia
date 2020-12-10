@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for creator dashboard page component.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // creator-dashboard-page.component.ts is upgraded to Angular 8.
 import { CollectionSummary, CollectionSummaryBackendDict } from 'domain/collection/collection-summary.model';
 import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
 import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 
@@ -69,12 +70,7 @@ describe('Creator dashboard controller', () => {
     canCreateCollections: () => true
   };
 
-  beforeEach(angular.mock.module('oppia', $provide => {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(($injector, $componentController) => {
     $httpBackend = $injector.get('$httpBackend');

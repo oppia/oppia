@@ -17,17 +17,13 @@
  * @fileoverview Unit tests for the preview thumbnail directive.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Preview Thumbnail Directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   var ctrl = null;
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

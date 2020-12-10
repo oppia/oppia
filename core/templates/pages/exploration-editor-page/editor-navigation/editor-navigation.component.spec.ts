@@ -25,7 +25,7 @@ import { UserService } from 'services/user.service.ts';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
-// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Editor Navigation Component', function() {

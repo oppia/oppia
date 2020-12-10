@@ -43,7 +43,7 @@ import { PlaythroughIssuesBackendApiService } from
 import { StateTopAnswersStatsService } from
   'services/state-top-answers-stats.service';
 
-// TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
+
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 /**

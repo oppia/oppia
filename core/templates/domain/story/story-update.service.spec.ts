@@ -16,7 +16,7 @@
  * @fileoverview Tests for Story update service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // story-update.service.ts is upgraded to Angular 8.
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';

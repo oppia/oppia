@@ -20,6 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Multiple Incorrect Issue Component', function() {
   var ctrl = null;
@@ -30,6 +31,7 @@ describe('Multiple Incorrect Issue Component', function() {
 
   var explorationId = 'exp1';
   var explorationVersion = 1;
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
 

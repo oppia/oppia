@@ -23,6 +23,7 @@ import { GuppyConfigurationService } from
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 import { MathInteractionsService } from 'services/math-interactions.service.ts';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 declare global {
   interface Window {
@@ -59,6 +60,7 @@ class MockComponent {
 let guppyConfigurationService: GuppyConfigurationService = null;
 
 describe('GuppyConfigurationService', () => {
+  importAllAngularServices();
   beforeAll(() => {
     guppyConfigurationService = TestBed.get(GuppyConfigurationService);
     window.Guppy = MockGuppy;

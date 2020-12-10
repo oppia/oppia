@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Compare versions Service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // compare-versions.service.ts is upgraded to Angular 8.
 import { ExplorationSnapshot, VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';

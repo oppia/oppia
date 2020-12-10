@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for StoryEditorStateService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // story-editor-state.service.ts is upgraded to Angular 8.
 import { StoryContentsObjectFactory } from
   'domain/story/StoryContentsObjectFactory';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
+
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -107,12 +107,6 @@ describe('Story editor state service', function() {
     $provide.value(
       'StoryObjectFactory', new StoryObjectFactory(
         new StoryContentsObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));

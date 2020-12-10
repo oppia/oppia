@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for loginRequiredMessage.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // file is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Login required message component', function() {
@@ -40,12 +40,7 @@ describe('Login required message component', function() {
     $provide.value('$window', mockWindow);
   }));
 
-  beforeEach(angular.mock.module('oppia', $provide => {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');

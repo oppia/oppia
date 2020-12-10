@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for ExplorationPropertyService.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/exploration-editor-page/services/exploration-property.service');
 require('pages/exploration-editor-page/services/change-list.service');
@@ -41,12 +42,7 @@ describe('Exploration Property Service', function() {
       });
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     ExplorationPropertyService = $injector.get('ExplorationPropertyService');
     ParamChangesObjectFactory = $injector.get('ParamChangesObjectFactory');

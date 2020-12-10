@@ -16,7 +16,8 @@
  * @fileoverview Unit test for ImageUploadHelperService.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('services/assets-backend-api.service.ts');
 require('services/image-upload-helper.service.ts');
@@ -28,12 +29,7 @@ describe('ImageUploadHelperService', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {});
   }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector) {
     ImageUploadHelperService = $injector.get('ImageUploadHelperService');

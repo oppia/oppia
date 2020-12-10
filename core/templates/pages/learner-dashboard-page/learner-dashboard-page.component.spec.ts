@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for learner dashboard parge.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
 import { LearnerExplorationSummary, LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { UpgradedServices } from 'services/UpgradedServices';
+
 // ^^^ This block is to be removed.
 
 import { CollectionSummary } from 'domain/collection/collection-summary.model';
@@ -28,6 +28,7 @@ import { ProfileSummary } from 'domain/user/profile-summary.model';
 import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 import { FeedbackThreadSummary } from
   'domain/feedback_thread/feedback-thread-summary.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/learner-dashboard-page/learner-dashboard-page.component.ts');
@@ -53,12 +54,7 @@ describe('Learner dashboard page', function() {
   };
   var learnerDashboardData = null;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   describe('when succesfully fetching learner dashboard data', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {

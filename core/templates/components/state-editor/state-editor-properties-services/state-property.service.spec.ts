@@ -17,9 +17,10 @@
  *   editor page.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // state-property.service.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -27,12 +28,7 @@ require('pages/exploration-editor-page/services/exploration-title.service.ts');
 
 describe('Change list service', function() {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   describe('change list service', function() {
     var cls = null;
@@ -216,12 +212,7 @@ describe('Change list service', function() {
 
 describe('Exploration title service', function() {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   describe('exploration title service', function() {
     var ets = null;

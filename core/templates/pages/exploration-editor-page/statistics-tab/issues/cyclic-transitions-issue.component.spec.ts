@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for cyclicTransitionsIssue.
+ */
+
 import { TestBed } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
-
-/**
- * @fileoverview Unit tests for cyclicTransitionsIssue.
- */
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Cyclic Transitions Issue Component', function() {
   var $scope = null;
@@ -31,7 +32,7 @@ describe('Cyclic Transitions Issue Component', function() {
   var explorationVersion = 1;
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
     alertsService = TestBed.get(AlertsService);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);

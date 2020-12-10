@@ -16,8 +16,8 @@
  * @fileoverview Unit test for ImageLocalStorageService.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require('services/image-local-storage.service.ts');
 
 describe('ImageLocalStorageService', function() {
@@ -29,14 +29,12 @@ describe('ImageLocalStorageService', function() {
     convertImageDataToImageFile: function(imageData) {}
   };
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'ImageUploadHelperService', [mockImageUploadHelperService][0]);
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

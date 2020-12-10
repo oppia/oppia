@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TestBed } from '@angular/core/testing';
-
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-
 /**
  * @fileoverview Unit tests for ExplorationMetadataModalController.
  */
 
+import { TestBed } from '@angular/core/testing';
+
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Exploration Metadata Modal Controller', function() {
   var $scope = null;
   var $timeout = null;
@@ -32,7 +32,7 @@ describe('Exploration Metadata Modal Controller', function() {
   var ExplorationStatesService = null;
   var ExplorationTagsService = null;
   var ExplorationTitleService = null;
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));

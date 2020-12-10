@@ -60,7 +60,7 @@ import { UserService } from 'services/user.service';
 import WaveSurfer from 'wavesurfer.js';
 import $ from 'jquery';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.

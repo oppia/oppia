@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for PlaythroughIssuesService.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Playthrough Issues Service', function() {
   var PlaythroughIssuesService = null;
@@ -68,12 +69,7 @@ describe('Playthrough Issues Service', function() {
     }]
   };
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     PlaythroughIssuesService = $injector.get('PlaythroughIssuesService');
     PlaythroughIssueObjectFactory = $injector.get(

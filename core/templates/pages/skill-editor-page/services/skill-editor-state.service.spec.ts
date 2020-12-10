@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SkillEditorStateService.js
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // skill-editor-state.service.ts is upgraded to Angular 8.
 import { QuestionSummaryObjectFactory } from
   'domain/question/QuestionSummaryObjectFactory';

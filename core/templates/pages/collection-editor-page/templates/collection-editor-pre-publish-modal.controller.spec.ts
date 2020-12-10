@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for CollectionEditorPrePublishModalController.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
-import { UpgradedServices } from 'services/UpgradedServices';
+
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -32,12 +32,6 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
   var CollectionUpdateService = null;
   importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
   describe('when title, objective and category are specified', function() {
     var collectionDict = {

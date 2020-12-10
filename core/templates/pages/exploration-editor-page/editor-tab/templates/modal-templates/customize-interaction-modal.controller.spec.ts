@@ -45,6 +45,7 @@ import { InteractionObjectFactory } from
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Customize Interaction Modal Controller', function() {
   var $injector = null;
@@ -67,7 +68,7 @@ describe('Customize Interaction Modal Controller', function() {
   var stateName = 'Introduction';
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
     editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
     imageClickInputValidationService = TestBed.get(

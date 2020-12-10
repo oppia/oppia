@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the splash page.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { UserService } from 'services/user.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/splash-page/splash-page.component.ts');
 
@@ -41,11 +41,7 @@ describe('Splash Page', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRefMock);
     $provide.value('UserService', TestBed.get(UserService));

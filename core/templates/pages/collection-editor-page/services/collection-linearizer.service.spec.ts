@@ -16,14 +16,14 @@
  * @fileoverview Tests for CollectionLinearizerService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnecessary imports once
 // collection-linearizer.service.ts is upgraded to Angular 8.
 import { Change } from 'domain/editor/undo_redo/change.model';
 import { CollectionNode, CollectionNodeBackendDict } from
   'domain/collection/collection-node.model';
 import { Collection } from
   'domain/collection/collection.model';
-import { UpgradedServices } from 'services/UpgradedServices';
+
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
@@ -41,12 +41,6 @@ describe('Collection linearizer service', function() {
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('Change', Change);
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
 
   beforeEach(angular.mock.inject(function($injector) {
