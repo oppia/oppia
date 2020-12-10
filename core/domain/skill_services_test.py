@@ -22,10 +22,12 @@ import random
 
 from constants import constants
 from core.domain import config_services
+from core.domain import question_domain
 from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -34,7 +36,8 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models, suggestion_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.suggestion])
 
 
 class SkillServicesUnitTests(test_utils.GenericTestBase):
@@ -774,6 +777,70 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
+
+    def test_delete_skill_marked_deleted(self):
+        skill_models.SkillModel.delete_multi(
+            [self.SKILL_ID], self.USER_ID, '', force_deletion=False)
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertTrue(skill_model.deleted)
+
+        skill_services.delete_skill(
+            self.USER_ID, self.SKILL_ID, force_deletion=True)
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertEqual(skill_model, None)
+        self.assertEqual(
+            skill_services.get_skill_summary_by_id(
+                self.SKILL_ID, strict=False), None)
+
+    def test_delete_skill_model_with_deleted_summary_model(self):
+        skill_summary_model = (
+            skill_models.SkillSummaryModel.get(self.SKILL_ID))
+        skill_summary_model.delete()
+        skill_summary_model = (
+            skill_models.SkillSummaryModel.get(self.SKILL_ID, False))
+        self.assertIsNone(skill_summary_model)
+
+        skill_services.delete_skill(
+            self.USER_ID, self.SKILL_ID, force_deletion=True)
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertEqual(skill_model, None)
+        self.assertEqual(
+            skill_services.get_skill_summary_by_id(
+                self.SKILL_ID, strict=False), None)
+
+    def test_delete_skill_model_with_linked_suggestion(self):
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': self.SKILL_ID,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
+            suggestion_models.TARGET_TYPE_SKILL, self.SKILL_ID, 1,
+            self.user_id_a, suggestion_change, 'test description'
+        )
+        skill_services.delete_skill(
+            self.user_id_a, self.SKILL_ID, force_deletion=True)
+
+        skill_model = skill_models.SkillModel.get_by_id(self.SKILL_ID)
+        self.assertEqual(skill_model, None)
+
+        with self.assertRaisesRegexp(
+            Exception, 'The suggestion with id %s has already been accepted/'
+            'rejected.' % suggestion.suggestion_id):
+            suggestion_services.auto_reject_question_suggestions_for_skill_id(
+                self.SKILL_ID)
 
     def test_cannot_update_skill_with_no_commit_message(self):
         changelist = [

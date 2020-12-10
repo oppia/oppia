@@ -2137,3 +2137,417 @@ class ValidateSnapshotMetadataModelsJobTests(test_utils.GenericTestBase):
         ]
 
         self.assertItemsEqual(expected_output, actual_output)
+
+
+class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    EXP_ID = 'exp_id0'
+    QUESTION_ID = 'question_id0'
+    SKILL_ID = 'skill_id0'
+    DUMMY_COMMIT_CMDS = [
+        {
+            'cmd': 'some_command',
+            'other_field': 'test'
+        }, {
+            'cmd': 'some_other_command',
+            'other_field': 'test',
+            'different_field': 'test'
+        }
+    ]
+    DUMMY_CREATE_COMMIT_CMDS = [
+        {
+            'cmd': 'create_new',
+            'other_field': 'test'
+        }
+    ]
+    DUMMY_CREATE_COMMIT_CMDS = [
+        {
+            'cmd': 'create_new',
+            'other_field': 'test'
+        }
+    ]
+
+    def setUp(self):
+        super(AddMissingCommitLogsOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_tasks()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_class = activity_jobs_one_off.AddMissingCommitLogsOneOffJob
+        job_id = job_class.create_new()
+        activity_jobs_one_off.AddMissingCommitLogsOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            activity_jobs_one_off.AddMissingCommitLogsOneOffJob
+            .get_output(job_id))
+
+        eval_output = [
+            ast.literal_eval(stringified_item) for
+            stringified_item in stringified_output]
+        return eval_output
+
+    def test_validate_model_names_list(self):
+        job_class = activity_jobs_one_off.AddMissingCommitLogsOneOffJob
+        class_names = {
+            cls.__name__ for cls in (
+                job_class.SNAPSHOT_METADATA_MODELS_WITH_MISSING_COMMIT_LOGS)}
+        model_names_with_default_commit_status = set(
+            job_class.MODEL_NAMES_WITH_DEFAULT_COMMIT_STATUS)
+        model_names_with_commit_status_in_rights = set(
+            job_class.MODEL_NAMES_WITH_COMMIT_STATUS_IN_RIGHTS)
+        aggregate_model_names = (
+            model_names_with_default_commit_status |
+            model_names_with_commit_status_in_rights)
+        common_model_names = (
+            model_names_with_default_commit_status &
+            model_names_with_commit_status_in_rights)
+
+        self.assertEqual(len(common_model_names), 0)
+        self.assertItemsEqual(class_names, aggregate_model_names)
+        self.assertItemsEqual(
+            class_names, set(job_class.MODEL_NAMES_TO_PROPERTIES.keys()))
+
+    def test_delete_exp_rights_related_models(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public',
+            version=1,
+            deleted=True
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+        ).put()
+
+        expected_output = [
+            [
+                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'related models-ExplorationRightsSnapshotMetadataModel',
+                ['exp_id0-1']
+            ]
+        ]
+
+        actual_output = self._run_one_off_job()
+
+        parent_model = exp_models.ExplorationRightsModel.get_by_id(
+            self.EXP_ID)
+        snapshot_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                '%s-%s' % (self.EXP_ID, 1)))
+
+        self.assertIsNone(parent_model)
+        self.assertIsNone(snapshot_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_delete_skill_related_models(self):
+        skill_model = skill_models.SkillModel(
+            id=self.SKILL_ID,
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=1,
+            all_questions_merged=False,
+            deleted=True,
+            version=1
+        )
+        base_models.BaseModel.put_multi([skill_model])
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        expected_output = [
+            [
+                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'related models-SkillSnapshotMetadataModel',
+                ['skill_id0-1']
+            ]
+        ]
+
+        actual_output = self._run_one_off_job()
+
+        parent_model = skill_models.SkillModel.get_by_id(
+            self.SKILL_ID)
+        snapshot_model = (
+            skill_models.SkillSnapshotMetadataModel.get_by_id(
+                '%s-%s' % (self.SKILL_ID, 1)))
+
+        self.assertIsNone(parent_model)
+        self.assertIsNone(snapshot_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_delete_question_related_models(self):
+        state = state_domain.State.create_default_state('ABC')
+        question_state_data = state.to_dict()
+        question_model = question_models.QuestionModel(
+            id=self.QUESTION_ID,
+            question_state_data=question_state_data,
+            question_state_data_schema_version=1,
+            language_code='en',
+            deleted=True,
+            version=1
+        )
+        base_models.BaseModel.put_multi([question_model])
+        question_models.QuestionSnapshotMetadataModel(
+            id='%s-1' % self.QUESTION_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        expected_output = [
+            [
+                'SUCCESS-Parent model marked deleted-Deleted all ' +
+                'related models-QuestionSnapshotMetadataModel',
+                ['question_id0-1']
+            ]
+        ]
+
+        actual_output = self._run_one_off_job()
+
+        parent_model = question_models.QuestionModel.get_by_id(
+            self.QUESTION_ID)
+        snapshot_model = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                '%s-%s' % (self.QUESTION_ID, 1)))
+
+        self.assertIsNone(parent_model)
+        self.assertIsNone(snapshot_model)
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_exp_rights_commit_logs(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public'
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+        content_dict = {
+            'status': 'public',
+            'owner_ids': self.albert_id,
+            'editor_ids': self.albert_id,
+            'voice_artist_ids': self.albert_id,
+            'viewer_ids': self.albert_id
+        }
+
+        exp_models.ExplorationRightsSnapshotContentModel(
+            id='%s-1' % self.EXP_ID,
+            content=content_dict
+        ).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'rights-%s-%s' % (self.EXP_ID, 1)))
+
+        expected_output = [
+            [
+                'SUCCESS-Added missing commit log model-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                ['exp_id0-1']
+            ]
+        ]
+        expected_commit_model = exp_models.ExplorationCommitLogEntryModel(
+            exploration_id=self.EXP_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            commit_message=None,
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            post_commit_status='public',
+            post_commit_is_private=False,
+            version=1
+        )
+
+        self.assertIsNotNone(commit_model)
+        self.assertEqual(
+            commit_model.to_dict(exclude=['created_on', 'last_updated']),
+            expected_commit_model.to_dict(
+                exclude=['created_on', 'last_updated'])
+        )
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_exp_rights_with_commit_type_create(self):
+        exp_rights = exp_models.ExplorationRightsModel(
+            id=self.EXP_ID,
+            status='public'
+        )
+        base_models.BaseModel.put_multi([exp_rights])
+        content_dict = {
+            'status': 'public',
+            'owner_ids': self.albert_id,
+            'editor_ids': self.albert_id,
+            'voice_artist_ids': self.albert_id,
+            'viewer_ids': self.albert_id
+        }
+
+        exp_models.ExplorationRightsSnapshotContentModel(
+            id='%s-1' % self.EXP_ID,
+            content=content_dict
+        ).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='%s-1' % self.EXP_ID,
+            committer_id=self.albert_id,
+            commit_type='create',
+            commit_cmds=self.DUMMY_CREATE_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        expected_output = [
+            [
+                'Found commit log model-' +
+                'ExplorationRightsSnapshotMetadataModel',
+                1
+            ]
+        ]
+
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_question_commit_logs(self):
+        state = state_domain.State.create_default_state('ABC')
+        question_state_data = state.to_dict()
+        question_model = question_models.QuestionModel(
+            id=self.QUESTION_ID,
+            question_state_data=question_state_data,
+            question_state_data_schema_version=1,
+            language_code='en'
+        )
+        base_models.BaseModel.put_multi([question_model])
+        question_models.QuestionSnapshotContentModel(
+            id='%s-1' % self.QUESTION_ID).put()
+        question_models.QuestionSnapshotMetadataModel(
+            id='%s-1' % self.QUESTION_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-%s-%s' % (self.QUESTION_ID, 1)))
+
+        expected_output = [
+            [
+                'SUCCESS-Added missing commit log model-' +
+                'QuestionSnapshotMetadataModel',
+                ['question_id0-1']
+            ]
+        ]
+        expected_commit_model = question_models.QuestionCommitLogEntryModel(
+            question_id=self.QUESTION_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            commit_message=None,
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            post_commit_status='public',
+            post_commit_is_private=False,
+            version=1
+        )
+
+        self.assertIsNotNone(commit_model)
+        self.assertEqual(
+            commit_model.to_dict(exclude=['created_on', 'last_updated']),
+            expected_commit_model.to_dict(
+                exclude=['created_on', 'last_updated'])
+        )
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_skill_commit_logs(self):
+        skill_model = skill_models.SkillModel(
+            id=self.SKILL_ID,
+            description='description',
+            language_code='en',
+            misconceptions=[],
+            rubrics=[],
+            next_misconception_id=0,
+            misconceptions_schema_version=1,
+            rubric_schema_version=1,
+            skill_contents_schema_version=1,
+            all_questions_merged=False
+        )
+        base_models.BaseModel.put_multi([skill_model])
+
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-%s-%s' % (self.SKILL_ID, 1)))
+
+        expected_output = [
+            [
+                'SUCCESS-Added missing commit log model-' +
+                'SkillSnapshotMetadataModel',
+                ['skill_id0-1']
+            ]
+        ]
+        expected_commit_model = skill_models.SkillCommitLogEntryModel(
+            skill_id=self.SKILL_ID,
+            user_id=self.albert_id,
+            commit_type='edit',
+            commit_message=None,
+            commit_cmds=self.DUMMY_COMMIT_CMDS,
+            post_commit_status='public',
+            post_commit_is_private=False,
+            version=1
+        )
+
+        self.assertIsNotNone(commit_model)
+        self.assertEqual(
+            commit_model.to_dict(exclude=['created_on', 'last_updated']),
+            expected_commit_model.to_dict(
+                exclude=['created_on', 'last_updated'])
+        )
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_add_missing_skill_parent_model(self):
+        skill_models.SkillSnapshotMetadataModel(
+            id='%s-1' % self.SKILL_ID,
+            committer_id=self.albert_id,
+            commit_type='edit',
+            commit_cmds=self.DUMMY_COMMIT_CMDS
+        ).put()
+
+        actual_output = self._run_one_off_job()
+        commit_model = (
+            skill_models.SkillCommitLogEntryModel.get_by_id(
+                'skill-%s-%s' % (self.SKILL_ID, 1)))
+
+        expected_output = [
+            [
+                'Missing Parent Model-No changes-' +
+                'SkillSnapshotMetadataModel',
+                1
+            ]
+        ]
+
+        self.assertIsNone(commit_model)
+        self.assertItemsEqual(expected_output, actual_output)

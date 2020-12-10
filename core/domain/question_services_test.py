@@ -431,10 +431,39 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id))):
             question_models.QuestionSummaryModel.get(self.question_id)
 
-        with self.assertRaisesRegexp(
-            Exception, 'Entity for class QuestionModel with id question_id '
-            'not found'):
-            question_services.delete_question(self.editor_id, 'question_id')
+    def test_delete_question_marked_deleted(self):
+        question_models.QuestionModel.delete_multi(
+            [self.question_id], self.editor_id,
+            feconf.COMMIT_MESSAGE_QUESTION_DELETED, force_deletion=False)
+        question_model = question_models.QuestionModel.get_by_id(
+            self.question_id)
+        self.assertTrue(question_model.deleted)
+
+        question_services.delete_question(
+            self.editor_id, self.question_id, force_deletion=True)
+        question_model = question_models.QuestionModel.get_by_id(
+            self.question_id)
+        self.assertEqual(question_model, None)
+        self.assertEqual(
+            question_models.QuestionSummaryModel.get(
+                self.question_id, strict=False), None)
+
+    def test_delete_question_model_with_deleted_summary_model(self):
+        question_summary_model = (
+            question_models.QuestionSummaryModel.get(self.question_id))
+        question_summary_model.delete()
+        question_summary_model = (
+            question_models.QuestionSummaryModel.get(self.question_id, False))
+        self.assertIsNone(question_summary_model)
+
+        question_services.delete_question(
+            self.editor_id, self.question_id, force_deletion=True)
+        question_model = question_models.QuestionModel.get_by_id(
+            self.question_id)
+        self.assertEqual(question_model, None)
+        self.assertEqual(
+            question_models.QuestionSummaryModel.get(
+                self.question_id, strict=False), None)
 
     def test_update_question(self):
         new_question_data = self._create_valid_question_data('DEF')
