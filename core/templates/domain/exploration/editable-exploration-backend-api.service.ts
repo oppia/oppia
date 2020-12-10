@@ -67,7 +67,6 @@ export class EditableExplorationBackendApiService {
     return new Promise((resolve, reject) => {
       let editableExplorationDataUrl = this._getExplorationUrl(
         explorationId, applyDraft);
-      console.log("_fetchExploration: "+editableExplorationDataUrl);
       this.httpClient.get<ExplorationBackendDict | DraftExplorationResponse>(
         editableExplorationDataUrl).toPromise().then((response) => {
         let exploration = angular.copy(response);
