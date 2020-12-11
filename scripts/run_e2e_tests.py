@@ -554,7 +554,13 @@ def run_tests(args):
             break
         sys.stdout.write(nextline)
         sys.stdout.flush()
-        output_lines.append(python_utils.UNICODE(nextline.rstrip()))
+        try:
+            output_lines.append(python_utils.UNICODE(nextline.rstrip()))
+        except UnicodeError:
+            # Some characters, like the check-marks next to passing
+            # tests, are not in unicode. This should not affect the
+            # failure messages we are looking for.
+            pass
 
     return output_lines, p.returncode
 
