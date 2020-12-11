@@ -38,6 +38,7 @@ import { Question } from 'domain/question/QuestionObjectFactory';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { Story } from 'domain/story/StoryObjectFactory';
 import { Topic } from 'domain/topic/TopicObjectFactory';
+import { SubtopicPage } from 'domain/topic/SubtopicPageObjectFactory';
 
 interface CollectionTitleChange {
   'cmd': 'edit_collection_property';
@@ -633,16 +634,26 @@ export type DomainObject = (
   Question |
   Skill |
   Story |
-  Topic);
+  Topic |
+  SubtopicPage);
 
 export class Change {
   _backendChangeObject: BackendChangeObject;
-  _applyChangeToObject: Function;
-  _reverseChangeToObject: Function;
+  _applyChangeToObject: (
+    backendChangeObject: BackendChangeObject,
+    domainObject: DomainObject) => void;
+  _reverseChangeToObject: (
+    backendChangeObject: BackendChangeObject,
+    domainObject: DomainObject) => void;
 
   constructor(
-      backendChangeObject: BackendChangeObject, applyChangeToObject: Function,
-      reverseChangeToObject: Function) {
+      backendChangeObject: BackendChangeObject,
+      applyChangeToObject: (
+        backendChangeObject: BackendChangeObject,
+        domainObject: DomainObject) => void,
+      reverseChangeToObject: (
+        backendChangeObject: BackendChangeObject,
+        domainObject: DomainObject) => void) {
     this._backendChangeObject = cloneDeep(backendChangeObject);
     this._applyChangeToObject = applyChangeToObject;
     this._reverseChangeToObject = reverseChangeToObject;
