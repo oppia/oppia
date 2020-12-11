@@ -91,7 +91,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
       }
       if (AllSkillNames.includes($scope.newSkillDescription.toUpperCase())) {
         $scope.errorMsg = (
-          'This description already exists. Please choose a ' + 
+          'This description already exists. Please choose a ' +
             'new name.');
         return false;
       }

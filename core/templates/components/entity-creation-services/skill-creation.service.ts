@@ -75,7 +75,9 @@ angular.module('oppia').factory('SkillCreationService', [
           windowClass: 'create-new-skill-modal',
           controller: 'CreateNewSkillModalController',
           resolve: {
-            AllSkillNames: function() { return allSkillNames; }
+            AllSkillNames: function() {
+              return allSkillNames;
+            }
           }
         }).result.then(function(result) {
           if (skillCreationInProgress) {
