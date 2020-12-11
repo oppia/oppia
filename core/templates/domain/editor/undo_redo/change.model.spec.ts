@@ -30,7 +30,7 @@ describe('Change domain objects model', () => {
       providers: [QuestionObjectFactory]
     });
     questionObjectFactory = TestBed.get(QuestionObjectFactory);
-  })
+  });
 
   it('should invoke no callbacks after creation', () => {
     const applyFunc = jasmine.createSpy('applyChange');

@@ -39,8 +39,10 @@ import { Subtopic } from 'domain/topic/SubtopicObjectFactory';
 
 type TopicUpdateApply = (topicChange: TopicChange, topic: Topic) => void;
 type TopicUpdateReverse = (topicChange: TopicChange, topic: Topic) => void;
-type SubtopicUpdateApply = (topicChange: TopicChange, subtopicPage: SubtopicPage) => void;
-type SubtopicUpdateReverse = (topicChange: TopicChange, subtopicPage: SubtopicPage) => void;
+type SubtopicUpdateApply = (
+  topicChange: TopicChange, subtopicPage: SubtopicPage) => void;
+type SubtopicUpdateReverse = (
+  topicChange: TopicChange, subtopicPage: SubtopicPage) => void;
 
 @Injectable({
   providedIn: 'root'
