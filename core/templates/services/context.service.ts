@@ -30,9 +30,7 @@ import * as angular from 'angular';
 })
 export class ContextService {
   constructor(
-    private urlService: UrlService) {
-    console.log('constructing');
-    }
+    private urlService: UrlService) { }
 
   pageContext = null;
   explorationIsLinkedToStory = false;

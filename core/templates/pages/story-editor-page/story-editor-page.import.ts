@@ -31,7 +31,7 @@ require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
 require('pages/story-editor-page/story-editor-page.component.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { StoryEditorPageModule } from './story-editor-page.module';
 platformBrowserDynamic().bootstrapModule(StoryEditorPageModule);

@@ -33,7 +33,7 @@ require(
   'pages/collection-player-page/collection-navbar/' +
   'collection-navbar.component.ts');
 require('pages/collection-player-page/collection-player-page.directive.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { CollectionPlayerPageModule } from './collection-player-page.module';
 platformBrowserDynamic().bootstrapModule(CollectionPlayerPageModule);

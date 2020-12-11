@@ -26,8 +26,7 @@ require('base-components/oppia-root.directive.ts');
 require(
   'pages/landing-pages/stewards-landing-page/' +
   'stewards-landing-page.component.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { StewardsLandingPageModule } from './stewards-landing-page.module';
 platformBrowserDynamic().bootstrapModule(StewardsLandingPageModule);
-

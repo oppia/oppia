@@ -77,60 +77,15 @@ require('Polyfills.ts');
 
 // Default to passive event listeners.
 require('default-passive-events');
-import { LoggerService } from 'services/contextual/logger.service';
-import { UtilsService } from 'services/utils.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { AlertsService } from 'services/alerts.service';
-import { UrlService } from 'services/contextual/url.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { angularServices } from 'services/angular-services.index';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { HtmlEscaperService } from 'services/html-escaper.service';
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
+  '$interpolateProvider', '$locationProvider', '$sanitizeProvider',
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider, $provide, $sanitizeProvider) {
-    // We need to provide these services and pipes separately since they are
-    // used in the directives imported in this file and cannot be
-    // injected before bootstrapping of oppia module.
-    var loggerService = new LoggerService();
-    var utilsService = new UtilsService();
-    var windowRef = new WindowRef();
-    var alertsService = new AlertsService(loggerService);
-    var urlService = new UrlService(windowRef);
-    var urlInterpolationService = new UrlInterpolationService(
-      alertsService, urlService, utilsService);
-    var htmlEscaperService = new HtmlEscaperService(loggerService);
-    var servicesToProvideInstances = {
-      loggerService,
-      utilsService,
-      alertsService,
-      urlInterpolationService,
-      windowRef,
-      urlService,
-      htmlEscaperService
-    };
-    var servicesToProvide = [
-      'LoggerService',
-      'UtilsService',
-      'AlertsService',
-      'UrlService',
-      'WindowRef',
-      'UrlInterpolationService',
-      'HtmlEscaperService'
-    ];
-    // console.log('zhere');
-    // for (let service of angularServices) {
-    //   $provide.value(service[0], OppiaAngularRootComponent.getService(
-    //     [service[1]]
-    //   ));
-    // }
-    // $provide.value('HtmlEscaperService', 'HtmlEscaperService');
-    // $provide.value('ContextService', 'ContextService');
+      $interpolateProvider, $locationProvider, $sanitizeProvider) {
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from

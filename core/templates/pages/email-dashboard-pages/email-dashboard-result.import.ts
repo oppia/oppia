@@ -23,7 +23,7 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/email-dashboard-pages/email-dashboard-result.component.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { EmailDashboardResultModule } from './email-dashboard-result.module';
 platformBrowserDynamic().bootstrapModule(EmailDashboardResultModule);

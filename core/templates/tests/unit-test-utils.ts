@@ -91,7 +91,7 @@ export const bootstrap = (
     ng1Module: angular.IModule
 ): Promise<UpgradeModule> => {
 // We bootstrap the Angular module first; then when it is ready (async) we
-// bootstrap the AngularJS module on the bootstrap element (also ensuring that
+// Bootstrap the application. the AngularJS module on the bootstrap element (also ensuring that
 // AngularJS errors will fail the test).
   return platform.bootstrapModule(Ng2Module).then(ref => {
     const ngZone = ref.injector.get<NgZone>(NgZone);
@@ -152,7 +152,7 @@ export const setupAndGetUpgradedComponent = (
     ngDoBootstrap() {}
   }
 
-  // Bootstrap.
+  // Bootstrap the application..
   const element = html('<mock-comp></mock-comp>');
   return bootstrap(
     platformBrowserDynamic(), Ng2Module, element, ng1Module).then(

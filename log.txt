@@ -1,0 +1,30 @@
+lease fix the errors below:
+----------------------------------------
+core/templates/pages/delete-account-page/delete-account-page.import.ts --> There should be a single newline at the end of file.
+core/templates/pages/donate-page/donate-page.import.ts --> There should be a single newline at the end of file.
+core/templates/pages/exploration-editor-page/exploration-editor-page.module.ts --> There should be a single newline at the end of file.
+core/templates/pages/exploration-player-page/exploration-player-page.import.ts --> There should be a single newline at the end of file.
+core/templates/pages/get-started-page/get-started-page.import.ts --> There should be a single newline at the end of file.
+core/templates/pages/landing-pages/stewards-landing-page/stewards-landing-page.import.ts --> There should be a single newline at the end of file.
+core/templates/pages/learner-dashboard-page/learner-dashboard-page.import.ts --> There should be a single newline at the end of file.
+core/templates/pages/library-page/library-page.import.ts --> There should be a single newline at the end of file.
+core/templates/pages/maintenance-page/maintenance-page.import.ts --> There should be a single newline at the end of file.
+
+
+/Users/srijan/Documents/oppia/oppia/core/templates/App.ts
+   94:3    Unused injected value $provide                                   angular/
+  108:9    'servicesToProvideInstances' is assigned a value but never used  @typescript-eslint/
+  117:9    'servicesToProvide' is assigned a value but never used           @typescript-eslint/
+  126:5    Comments should not begin with a lowercase character             
+
+/Users/srijan/Documents/oppia/oppia/core/templates/base-components/oppia-root.directive.ts
+  36:13    Unexpected console statement  
+
+/Users/srijan/Documents/oppia/oppia/core/templates/services/context.service.ts
+  34:5    Unexpected console statement                  
+  35:1    Expected indentation of 2 spaces but found 4  
+
+
+---------------------------
+Checks Not Passed.
+---------------------------

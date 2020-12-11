@@ -24,7 +24,7 @@ require('App.ts');
 
 require('base-components/base-content.directive.ts');
 require('base-components/oppia-root.directive.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { ConsoleErrorPageModule } from './console_errors.module';
 platformBrowserDynamic().bootstrapModule(ConsoleErrorPageModule);

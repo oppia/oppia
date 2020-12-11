@@ -21,8 +21,7 @@
 require('pages/maintenance-page/maintenance-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { MaintenancePageModule } from './maintenance-page.module';
 platformBrowserDynamic().bootstrapModule(MaintenancePageModule);
-

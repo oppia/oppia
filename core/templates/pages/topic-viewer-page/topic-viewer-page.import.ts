@@ -27,7 +27,7 @@ require(
   'pages/topic-viewer-page/navbar-breadcrumb/' +
   'topic-viewer-navbar-breadcrumb.component.ts');
 require('pages/topic-viewer-page/topic-viewer-page.component.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { TopicViewerPageModule } from './topic-viewer-page.module';
 platformBrowserDynamic().bootstrapModule(TopicViewerPageModule);

@@ -34,7 +34,7 @@ require(
   'exploration-save-and-publish-buttons.component.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { ExplorationEditorPageModule } from 'pages/exploration-editor-page/exploration-editor-page.module.ts';
 platformBrowserDynamic().bootstrapModule(ExplorationEditorPageModule);

@@ -26,7 +26,7 @@ require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
 require('pages/skill-editor-page/skill-editor-page.component.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { SkillEditorPageModule } from './skill-editor-page.module';
 platformBrowserDynamic().bootstrapModule(SkillEditorPageModule);

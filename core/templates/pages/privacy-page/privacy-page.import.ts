@@ -24,7 +24,7 @@ require('base-components/oppia-root.directive.ts');
 
 require('pages/OppiaFooterDirective.ts');
 require('base-components/base-content.directive.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { PrivacyPageModule } from './privacy-page.module';
 platformBrowserDynamic().bootstrapModule(PrivacyPageModule);

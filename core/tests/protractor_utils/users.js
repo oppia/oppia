@@ -86,7 +86,7 @@ var _completeSignup = async function(username, manualNavigation = true) {
     // This is required since there is a redirect which can be considered
     // as a client side navigation and the tests fail since Angular is
     // not found due to the navigation interfering with protractor's
-    // bootstrapping.
+    // Bootstrap the application.ping.
     await browser.waitForAngularEnabled(false);
     await browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
     await browser.waitForAngularEnabled(true);

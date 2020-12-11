@@ -23,7 +23,7 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/OppiaFooterDirective.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { TopicLandingPageModule } from './topic-landing-page.module';
 platformBrowserDynamic().bootstrapModule(TopicLandingPageModule);

@@ -23,7 +23,7 @@ require('base-components/oppia-root.directive.ts');
 import 'services/context.service';
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { ContributorDashboardPageModule } from 'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts';
 import { setAngularJSGlobal } from '@angular/upgrade/static';

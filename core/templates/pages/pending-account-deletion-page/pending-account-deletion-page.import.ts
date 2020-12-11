@@ -25,7 +25,7 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { PendingAccountDeletionPageModule } from './pending-account-deletion-page.module';
 platformBrowserDynamic().bootstrapModule(PendingAccountDeletionPageModule);

@@ -111,10 +111,8 @@ declare var angular: ng.IAngularStatic;
 
 angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
+  // Bootstrap the application. the Angular 8.
   'oppiaAngularRoot',
   downgradeComponent({
     component: OppiaAngularRootComponent
   }) as angular.IDirectiveFactory);
-
-

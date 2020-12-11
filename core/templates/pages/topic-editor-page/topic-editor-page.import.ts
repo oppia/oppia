@@ -26,7 +26,7 @@ require(
   'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts');
 require('pages/topic-editor-page/navbar/topic-editor-navbar.directive.ts');
 require('pages/topic-editor-page/topic-editor-page.component.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { TopicEditorPageModule } from './topic-editor-page.module';
 platformBrowserDynamic().bootstrapModule(TopicEditorPageModule);

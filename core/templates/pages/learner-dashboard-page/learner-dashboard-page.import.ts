@@ -24,8 +24,7 @@ require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
 require('pages/learner-dashboard-page/learner-dashboard-page.component.ts');
-// Bootstrap
+// Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { LearnerDashboardPageModule } from './learner-dashboard-page.module';
 platformBrowserDynamic().bootstrapModule(LearnerDashboardPageModule);
-
