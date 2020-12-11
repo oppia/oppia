@@ -20,29 +20,45 @@ import { TestBed } from '@angular/core/testing';
 
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+import { SubtitledSetOfNormalizedStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Text Input rules service', () => {
-  var tirs: TextInputRulesService = null;
+  let tirs: TextInputRulesService;
+  let ssonsof: SubtitledSetOfNormalizedStringObjectFactory;
+
+  let RULE_INPUT, RULE_INPUT_PLURAL, RULE_INPUT_EMPTY;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe]
     });
     tirs = TestBed.get(TextInputRulesService);
+    ssonsof = TestBed.get(SubtitledSetOfNormalizedStringObjectFactory);
+
+    RULE_INPUT = {
+      x: ssonsof.createFromBackendDict({
+        content_id: 'ri',
+        normalized_str_set: ['abc def']
+      })
+    };
+
+    RULE_INPUT_PLURAL = {
+      x: ssonsof.createFromBackendDict({
+        content_id: 'ri',
+        normalized_str_set: ['testing', 'abc def']
+      })
+    };
+
+    RULE_INPUT_EMPTY = {
+      x: ssonsof.createFromBackendDict({
+        content_id: 'ri',
+        normalized_str_set: []
+      })
+    };
   });
-
-  const RULE_INPUT = {
-    x: ['abc def']
-  };
-
-  const RULE_INPUT_PLURAL = {
-    x: ['testing', 'abc def']
-  };
-
-  const RULE_INPUT_EMPTY = {
-    x: []
-  };
 
   it('should have a correct \'equals\' rule', () => {
     expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);

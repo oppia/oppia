@@ -95,126 +95,126 @@ describe('FractionInputValidationService', () => {
       inputs: {
         f: createFractionDict(false, 0, 1, 1)
       }
-    });
+    }, 'FractionInput');
 
     equalsThreeByTwoRule = rof.createFromBackendDict({
       rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 3, 2)
       }
-    });
+    }, 'FractionInput');
 
     equalsOneAndHalfRule = rof.createFromBackendDict({
       rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 1, 1, 2)
       }
-    });
+    }, 'FractionInput');
 
     greaterThanMinusOneRule = rof.createFromBackendDict({
       rule_type: 'IsGreaterThan',
       inputs: {
         f: createFractionDict(true, 0, 1, 1)
       }
-    });
+    }, 'FractionInput');
 
     integerPartEqualsOne = rof.createFromBackendDict({
       rule_type: 'HasIntegerPartEqualTo',
       inputs: {
         x: 1
       }
-    });
+    }, 'FractionInput');
 
     integerPartEqualsZero = rof.createFromBackendDict({
       rule_type: 'HasIntegerPartEqualTo',
       inputs: {
         x: 0
       }
-    });
+    }, 'FractionInput');
 
     lessThanTwoRule = rof.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
         f: createFractionDict(false, 0, 2, 1)
       }
-    });
+    }, 'FractionInput');
 
     equivalentToOneRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createFractionDict(false, 0, 10, 10)
       }
-    });
+    }, 'FractionInput');
 
     equivalentToOneAndSimplestFormRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentToAndInSimplestForm',
       inputs: {
         f: createFractionDict(false, 0, 10, 10)
       }
-    });
+    }, 'FractionInput');
 
     exactlyEqualToOneAndNotInSimplestFormRule = rof.createFromBackendDict({
       rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 10, 10)
       }
-    });
+    }, 'FractionInput');
 
     nonIntegerRule = rof.createFromBackendDict({
       rule_type: 'HasNumeratorEqualTo',
       inputs: {
         x: 0.5
       }
-    });
+    }, 'FractionInput');
 
     zeroDenominatorRule = rof.createFromBackendDict({
       rule_type: 'HasDenominatorEqualTo',
       inputs: {
         x: 0
       }
-    });
+    }, 'FractionInput');
 
     numeratorEqualsFiveRule = rof.createFromBackendDict({
       rule_type: 'HasNumeratorEqualTo',
       inputs: {
         x: 5
       }
-    });
+    }, 'FractionInput');
 
     denominatorEqualsFiveRule = rof.createFromBackendDict({
       rule_type: 'HasDenominatorEqualTo',
       inputs: {
         x: 5
       }
-    });
+    }, 'FractionInput');
 
     HasFractionalPartExactlyEqualToTwoFifthsRule = rof.createFromBackendDict({
       rule_type: 'HasFractionalPartExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 2, 5)
       }
-    });
+    }, 'FractionInput');
 
     HasFractionalPartExactlyEqualToOneAndHalfRule = rof.createFromBackendDict({
       rule_type: 'HasFractionalPartExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 1, 1, 2)
       }
-    });
+    }, 'FractionInput');
 
     HasFractionalPartExactlyEqualToNegativeValue = rof.createFromBackendDict({
       rule_type: 'HasFractionalPartExactlyEqualTo',
       inputs: {
         f: createFractionDict(true, 0, 1, 2)
       }
-    });
+    }, 'FractionInput');
 
     HasFractionalPartExactlyEqualToThreeHalfs = rof.createFromBackendDict({
       rule_type: 'HasFractionalPartExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 3, 2)
       }
-    });
+    }, 'FractionInput');
 
     answerGroups = [agof.createNew(
       [equalsOneRule, lessThanTwoRule],

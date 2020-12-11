@@ -358,13 +358,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': 'Test'
+                        'x': {
+                            'content_id': 'ri',
+                            'normalized_str_set': ['Test']
+                        }
                     },
                     'rule_type': 'Contains'
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': None
-            })
+            }, 'TextInput')
         ]
 
         self._assert_validation_error(

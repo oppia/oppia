@@ -32,9 +32,11 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
@@ -46,10 +48,12 @@ describe('Answer Classification Service', () => {
   };
 
   let answerClassificationService: AnswerClassificationService;
+  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let appService: AppService;
   let interactionSpecsService: InteractionSpecsService;
   let outcomeObjectFactory: OutcomeObjectFactory;
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
+  let ruleObjectFactory: RuleObjectFactory;
   let stateClassifierMappingService: StateClassifierMappingService;
   let stateObjectFactory: StateObjectFactory;
 
@@ -57,17 +61,20 @@ describe('Answer Classification Service', () => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
     answerClassificationService = TestBed.get(AnswerClassificationService);
+    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     appService = TestBed.get(AppService);
     interactionSpecsService = TestBed.get(InteractionSpecsService);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     predictionAlgorithmRegistryService = TestBed.get(
       PredictionAlgorithmRegistryService);
+    ruleObjectFactory = TestBed.get(RuleObjectFactory);
     stateClassifierMappingService = TestBed.get(StateClassifierMappingService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
   describe('with string classifier disabled', () => {
     let stateDict;
+    let state;
 
     beforeEach(() => {
       spyOn(
@@ -103,10 +110,7 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: {x: 10}
-            }],
+            rule_specs: [],
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -119,16 +123,7 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: { x: 5 }
-            }, {
-              rule_type: 'Equals',
-              inputs: { x: 6 }
-            }, {
-              rule_type: 'NotEquals',
-              inputs: { x: 7 }
-            }],
+            rule_specs: [],
           }],
           default_outcome: {
             dest: 'default',
@@ -154,12 +149,25 @@ describe('Answer Classification Service', () => {
           }
         }
       };
+
+      state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      // Because RuleObjectFactory.createFromBackendDict, which is used when
+      // initializing state, relies on the interaction being present in
+      // rule_templates.json (but we are creating a mock interaction without
+      // an interaction id), we must manually construct rules.
+      state.interaction.answerGroups[0].rules = [
+        ruleObjectFactory.createNew('Equals', { x: 10 })
+      ];
+      state.interaction.answerGroups[1].rules = [
+        ruleObjectFactory.createNew('Equals', { x: 5 }),
+        ruleObjectFactory.createNew('Equals', { x: 6 }),
+        ruleObjectFactory.createNew('NotEquals', { x: 7 })
+      ];
     });
 
     it('should fail if no frontend rules are provided', () => {
-      const state = (
-        stateObjectFactory.createFromBackendDict(stateName, stateDict));
-
       expect(
         () => answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 0, null)
@@ -169,9 +177,6 @@ describe('Answer Classification Service', () => {
 
     it('should return the first matching answer group and first matching ' +
         'rule spec', () => {
-      const state = (
-        stateObjectFactory.createFromBackendDict(stateName, stateDict));
-
       expect(
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 10, rules)
@@ -201,9 +206,6 @@ describe('Answer Classification Service', () => {
     });
 
     it('should return the default rule if no answer group matches', () => {
-      const state = (
-        stateObjectFactory.createFromBackendDict(stateName, stateDict));
-
       expect(
         answerClassificationService.getMatchingClassificationResult(
           state.name, state.interaction, 7, rules)
@@ -220,26 +222,32 @@ describe('Answer Classification Service', () => {
       'should fail if no answer group matches and no default rule is ' +
         'provided',
       () => {
-        stateDict.interaction.answer_groups = [{
-          outcome: {
-            dest: 'outcome 1',
-            feedback: {
-              content_id: 'feedback_1',
-              html: ''
+        state.interaction.answerGroups = [
+          answerGroupObjectFactory.createFromBackendDict({
+            outcome: {
+              dest: 'outcome 1',
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
-          },
-          rule_specs: [{
-            rule_type: 'Equals',
-            inputs: {x: 10}
-          }],
-        }];
+            rule_specs: [],
+            training_data: null,
+            tagged_skill_misconception_id: null
+          }, null)
+        ];
 
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
+        // Because RuleObjectFactory.createFromBackendDict, which is used when
+        // initializing state, relies on the interaction being present in
+        // rule_templates.json (but we are creating a mock interaction without
+        // an interaction id), we must manually construct rules.
+        state.interaction.answerGroups[0].rules = [
+          ruleObjectFactory.createNew('Equals', { x: 10 })
+        ];
 
         expect(
           () => answerClassificationService.getMatchingClassificationResult(
@@ -251,6 +259,7 @@ describe('Answer Classification Service', () => {
 
   describe('with string classifier enabled', () => {
     let stateDict;
+    let state;
 
     beforeEach(() => {
       spyOn(appService, 'isMachineLearningClassificationEnabled')
@@ -318,10 +327,7 @@ describe('Answer Classification Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null
             },
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: { x: 10 }
-            }],
+            rule_specs: [],
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -335,13 +341,7 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             rule_input_translations: {},
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: { x: 5 }
-            }, {
-              rule_type: 'Equals',
-              inputs: { x: 7 }
-            }],
+            rule_specs: [],
           }],
           default_outcome: {
             dest: 'default',
@@ -367,6 +367,21 @@ describe('Answer Classification Service', () => {
           }
         }
       };
+
+      state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      // Because RuleObjectFactory.createFromBackendDict, which is used when
+      // initializing state, relies on the interaction being present in
+      // rule_templates.json (but we are creating a mock interaction without
+      // an interaction id), we must manually construct rules.
+      state.interaction.answerGroups[0].rules = [
+        ruleObjectFactory.createNew('Equals', { x: 10 })
+      ];
+      state.interaction.answerGroups[1].rules = [
+        ruleObjectFactory.createNew('Equals', { x: 5 }),
+        ruleObjectFactory.createNew('Equals', { x: 7 })
+      ];
     });
 
     it(
@@ -376,9 +391,6 @@ describe('Answer Classification Service', () => {
         spyOn(
           interactionSpecsService, 'isInteractionTrainable'
         ).and.returnValue(true);
-
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
@@ -397,9 +409,6 @@ describe('Answer Classification Service', () => {
           interactionSpecsService, 'isInteractionTrainable'
         ).and.returnValue(false);
 
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
-
         expect(
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 0, rules)
@@ -416,6 +425,7 @@ describe('Answer Classification Service', () => {
 
   describe('with training data classification', () => {
     let stateDict;
+    let state;
 
     beforeEach(() => {
       spyOn(
@@ -452,10 +462,7 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['abc', 'input'],
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: { x: 'equal' }
-            }],
+            rule_specs: [],
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -469,10 +476,7 @@ describe('Answer Classification Service', () => {
               missing_prerequisite_skill_id: null
             },
             training_data: ['xyz'],
-            rule_specs: [{
-              rule_type: 'Contains',
-              inputs: {x: 'npu'}
-            }],
+            rule_specs: [],
           }],
           default_outcome: {
             dest: 'default',
@@ -498,15 +502,26 @@ describe('Answer Classification Service', () => {
           }
         }
       };
+
+      state = (
+        stateObjectFactory.createFromBackendDict(stateName, stateDict));
+
+      // Because RuleObjectFactory.createFromBackendDict, which is used when
+      // initializing state, relies on the interaction being present in
+      // rule_templates.json (but we are creating a mock interaction without
+      // an interaction id), we must manually construct rules.
+      state.interaction.answerGroups[0].rules = [
+        ruleObjectFactory.createNew('Equals', { x: 'equal' })
+      ];
+      state.interaction.answerGroups[1].rules = [
+        ruleObjectFactory.createNew('Contains', { x: 'npu' })
+      ];
     });
 
     it(
       'should use training data classification if no answer group matches ' +
         'and interaction is trainable',
       () => {
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
-
         expect(
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 'abc', rules)
@@ -528,9 +543,6 @@ describe('Answer Classification Service', () => {
       'should perform explicit classification before doing training data ' +
         'classification',
       () => {
-        const state = (
-          stateObjectFactory.createFromBackendDict(stateName, stateDict));
-
         expect(
           answerClassificationService.getMatchingClassificationResult(
             state.name, state.interaction, 'input', rules)

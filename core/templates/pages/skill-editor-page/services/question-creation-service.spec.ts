@@ -132,7 +132,10 @@ describe('Question Creation Service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 10}
+                inputs: {x: {
+                  content_id: 'ri',
+                  normalized_str_set: [10]
+                }}
               }],
             }],
             confirmed_unclassified_answers: [],
@@ -322,10 +325,7 @@ describe('Question Creation Service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [{
-                rule_type: 'Equals',
-                inputs: {x: 10}
-              }],
+              rule_specs: [],
             }],
             confirmed_unclassified_answers: [],
             customization_args: {},
@@ -489,7 +489,10 @@ describe('Question Creation Service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 10}
+                inputs: {x: {
+                  content_id: 'ri',
+                  normalized_str_set: [10]
+                }}
               }],
             }],
             confirmed_unclassified_answers: [],

@@ -13,21 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the list of normalized string editor.
+ * @fileoverview Directive for subtitled set of unicode string editor.
  */
 
-// TODO(#11014): Add more extensive front end tests for object editors that rely
-// on schema editors.
-describe('SetOfNormalizedStringEditor', function() {
-  var ctrl = null;
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('setOfNormalizedStringEditor');
-  }));
-
-  it('should initialize the value with an empty array', function() {
-    ctrl.$onInit();
-    expect(ctrl.value).toEqual([]);
-  });
+angular.module('oppia').component('subtitledSetOfUnicodeStringEditor', {
+  bindings: {
+    value: '='
+  },
+  template: require('./subtitled-set-of-unicode-string-editor.component.html'),
+  controller: [function() {
+    var ctrl = this;
+    ctrl.$onInit = function() {
+      ctrl.SCHEMA = {
+        type: 'list',
+        items: {
+          type: 'unicode'
+        },
+        validators: [{
+          id: 'is_uniquified'
+        }]
+      };
+    };
+  }]
 });

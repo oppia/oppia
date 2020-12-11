@@ -40,10 +40,19 @@ require(
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/alerts.service.ts');
 require('services/external-save.service.ts');
 
+import _ from 'lodash';
+
+import { SubtitledSetOfNormalizedString } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import { SubtitledSetOfUnicodeString } from
+  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('answerGroupEditor', [
@@ -58,6 +67,7 @@ angular.module('oppia').directive('answerGroupEditor', [
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
         getOnSaveAnswerGroupCorrectnessLabelFn: (
           '&onSaveAnswerGroupCorrectnessLabel'),
+        getOnSaveNextContentIdIndex: '&onSaveNextContentIdIndex',
         taggedSkillMisconceptionId: '=',
         isEditable: '=',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
@@ -74,11 +84,17 @@ angular.module('oppia').directive('answerGroupEditor', [
       controller: [
         'AlertsService', 'ExternalSaveService', 'ResponsesService',
         'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
+        'StateNextContentIdIndexService',
+        'SubtitledSetOfNormalizedStringObjectFactory',
+        'SubtitledSetOfUnicodeStringObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'INTERACTION_SPECS',
         function(
             AlertsService, ExternalSaveService, ResponsesService,
             RuleObjectFactory, StateEditorService, StateInteractionIdService,
+            StateNextContentIdIndexService,
+            SubtitledSetOfNormalizedStringObjectFactory,
+            SubtitledSetOfUnicodeStringObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             INTERACTION_SPECS) {
           var ctrl = this;
@@ -179,6 +195,12 @@ angular.module('oppia').directive('answerGroupEditor', [
                     getDefaultInputValue('Real'), getDefaultInputValue('Real')],
                   clickedRegions: []
                 };
+              case 'SubtitledSetOfNormalizedString':
+                return (
+                  SubtitledSetOfNormalizedStringObjectFactory.createDefault());
+              case 'SubtitledSetOfUnicodeString':
+                return (
+                  SubtitledSetOfUnicodeStringObjectFactory.createDefault());
             }
           };
 
@@ -199,6 +221,7 @@ angular.module('oppia').directive('answerGroupEditor', [
 
             var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
             var inputs = {};
+            const inputTypes = {};
             while (description.match(PATTERN)) {
               var varName = description.match(PATTERN)[1];
               var varType = description.match(PATTERN)[2];
@@ -206,6 +229,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                 varType = varType.substring(1);
               }
 
+              inputTypes[varName] = varType;
               inputs[varName] = getDefaultInputValue(varType);
               description = description.replace(PATTERN, ' ');
             }
@@ -217,7 +241,9 @@ angular.module('oppia').directive('answerGroupEditor', [
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
             // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
-            ctrl.rules.push(RuleObjectFactory.createNew(ruleType, inputs));
+            const rule = RuleObjectFactory.createNew(ruleType, inputs);
+            rule.inputTypes = inputTypes;
+            ctrl.rules.push(rule);
             ctrl.changeActiveRuleIndex(ctrl.rules.length - 1);
           };
 
@@ -240,9 +266,32 @@ angular.module('oppia').directive('answerGroupEditor', [
           };
 
           ctrl.saveRules = function() {
+            if (ctrl.originalContentIdToContent) {
+              const updatedContentIdToContent = ctrl.getContentIdToContent();
+              const contentIdsWithModifiedContent = [];
+
+              Object.keys(
+                ctrl.originalContentIdToContent
+              ).forEach(contentId => {
+                if (
+                  ctrl.originalContentIdToContent.hasOwnProperty(contentId) &&
+                  updatedContentIdToContent.hasOwnProperty(contentId) &&
+                  (!_.isEqual(ctrl.originalContentIdToContent[contentId],
+                    updatedContentIdToContent[contentId]))
+                ) {
+                  contentIdsWithModifiedContent.push(contentId);
+                }
+              });
+              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+                contentIdsWithModifiedContent);
+            }
+
             ctrl.changeActiveRuleIndex(-1);
             ctrl.rulesMemento = null;
             ctrl.getOnSaveAnswerGroupRulesFn()(ctrl.rules);
+            StateNextContentIdIndexService.saveDisplayedValue();
+            ctrl.getOnSaveNextContentIdIndex()(
+              StateNextContentIdIndexService.displayed);
           };
 
           ctrl.changeActiveRuleIndex = function(newIndex) {
@@ -255,6 +304,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               // The rule editor may not be opened in a read-only editor view.
               return;
             }
+            ctrl.originalContentIdToContent = ctrl.getContentIdToContent();
             ctrl.rulesMemento = angular.copy(ctrl.rules);
             ctrl.changeActiveRuleIndex(index);
           };
@@ -277,6 +327,33 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           ctrl.isMLEnabled = function() {
             return ENABLE_ML_CLASSIFIERS;
+          };
+
+          /**
+          * Extracts a mapping of content ids to the html or unicode content
+          * found in the customization arguments.
+          * @returns {Object} A Mapping of content ids (string) to content
+          *   (string).
+          */
+          ctrl.getContentIdToContent = function() {
+            const contentIdToContent = {};
+            ctrl.rules.forEach(rule => {
+              Object.keys(rule.inputs).forEach(ruleName => {
+                const ruleInput = rule.inputs[ruleName];
+                const isSubtitledSetOfNormalizedString = (
+                  ruleInput instanceof SubtitledSetOfNormalizedString);
+                const isSubtitledSetOfUnicodeString = (
+                  ruleInput instanceof SubtitledSetOfUnicodeString);
+                if (isSubtitledSetOfNormalizedString) {
+                  contentIdToContent[ruleInput.getContentId()] = (
+                    [...ruleInput.getNormalizedStrings()]);
+                } else if (isSubtitledSetOfUnicodeString) {
+                  contentIdToContent[ruleInput.getContentId()] = (
+                    [...ruleInput.getUnicodeStrings()]);
+                }
+              });
+            });
+            return contentIdToContent;
           };
 
           ctrl.$onInit = function() {

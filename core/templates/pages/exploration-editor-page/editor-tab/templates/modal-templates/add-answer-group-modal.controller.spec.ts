@@ -27,6 +27,8 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { Subscription } from 'rxjs';
+import { SubtitledSetOfNormalizedStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
 
 describe('Add Answer Group Modal Controller', function() {
   var $scope = null;
@@ -36,6 +38,8 @@ describe('Add Answer Group Modal Controller', function() {
   var outcomeObjectFactory = null;
   var ruleObjectFactory = null;
   var stateEditorService = null;
+  let subtitledSetOfNormalizedStringObjectFactory:
+    SubtitledSetOfNormalizedStringObjectFactory;
 
   var addState = null;
   var currentInteractionId = 'Continue';
@@ -54,6 +58,8 @@ describe('Add Answer Group Modal Controller', function() {
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     ruleObjectFactory = TestBed.get(RuleObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
+    subtitledSetOfNormalizedStringObjectFactory = TestBed.get(
+      SubtitledSetOfNormalizedStringObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -152,5 +158,42 @@ describe('Add Answer Group Modal Controller', function() {
       tmpTaggedSkillMisconceptionId: null,
       reopen: null
     });
+  });
+
+  it('should populate null content ids on save', () => {
+    $scope.tmpRule = {
+      type: 'Equals',
+      inputTypes: {x: 'SubtitledSetOfNormalizedString'},
+      inputs: {x: subtitledSetOfNormalizedStringObjectFactory.createDefault()}
+    };
+    expect($scope.tmpRule.inputs.x.getContentId()).toBeNull();
+
+    $scope.saveResponse(null);
+
+    expect($scope.tmpRule.inputs.x.getContentId()).not.toBeNull();
+  });
+
+  it('should not populate non-null content ids on save', () => {
+    const ruleInput = (
+      subtitledSetOfNormalizedStringObjectFactory.createDefault());
+    ruleInput.setContentId('ri');
+
+    $scope.tmpRule = {
+      inputTypes: {x: 'SubtitledSetOfNormalizedString'},
+      inputs: {x: ruleInput}
+    };
+
+    $scope.saveResponse(null);
+    expect($scope.tmpRule.inputs.x.getContentId()).toBe('ri');
+  });
+
+  it('should not populate content ids if input does not need one', () => {
+    $scope.tmpRule = {
+      type: 'HasNumberOfTermsEqualTo',
+      inputTypes: {y: 'NonnegativeInt'},
+      inputs: {y: 1}
+    };
+    $scope.saveResponse(null);
+    expect($scope.tmpRule.inputs).toEqual({y: 1});
   });
 });

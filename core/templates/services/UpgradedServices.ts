@@ -468,6 +468,10 @@ import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledSetOfNormalizedStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import { SubtitledSetOfUnicodeStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
@@ -535,6 +539,9 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { SolutionVerificationService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -649,7 +656,6 @@ export class UpgradedServices {
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
-    upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SchemaFormSubmittedService'] =
       new SchemaFormSubmittedService();
     upgradedServices['SchemaUndefinedLastElementService'] =
@@ -670,6 +676,10 @@ export class UpgradedServices {
       new StoryReferenceObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
+    upgradedServices['SubtitledSetOfNormalizedStringObjectFactory'] =
+      new SubtitledSetOfNormalizedStringObjectFactory();
+    upgradedServices['SubtitledSetOfUnicodeStringObjectFactory'] =
+      new SubtitledSetOfUnicodeStringObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
       new SubtitledUnicodeObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
@@ -823,6 +833,9 @@ export class UpgradedServices {
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
+    upgradedServices['RuleObjectFactory'] = new RuleObjectFactory(
+      upgradedServices['SubtitledSetOfNormalizedStringObjectFactory'],
+      upgradedServices['SubtitledSetOfUnicodeStringObjectFactory']);
     upgradedServices['SetInputValidationService'] =
       new SetInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -854,7 +867,8 @@ export class UpgradedServices {
       upgradedServices['SuggestionsService']);
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
-        upgradedServices['baseInteractionValidationService']);
+        upgradedServices['baseInteractionValidationService'],
+        upgradedServices['SubtitledSetOfNormalizedStringObjectFactory']);
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);
@@ -873,9 +887,6 @@ export class UpgradedServices {
         upgradedServices['WrittenTranslationObjectFactory']);
 
     // Topological level: 2.
-    upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
-      upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['RuleObjectFactory']);
     upgradedServices['CkEditorCopyContentService'] =
       new CkEditorCopyContentService(
         upgradedServices['HtmlEscaperService'],);
@@ -995,6 +1006,9 @@ export class UpgradedServices {
       upgradedServices['HttpClient']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
+    upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
+      upgradedServices['OutcomeObjectFactory'],
+      upgradedServices['RuleObjectFactory']);
     upgradedServices['AssetsBackendApiService'] =
       new AssetsBackendApiService(
         upgradedServices['CsrfTokenService'],
@@ -1156,6 +1170,11 @@ export class UpgradedServices {
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['SolutionVerificationService'] =
+      new SolutionVerificationService(
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['StateEditorService']);
     upgradedServices['SkillCreationBackendApiService'] =
       new SkillCreationBackendApiService(
         upgradedServices['HttpClient']);

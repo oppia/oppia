@@ -35,6 +35,10 @@ import { OutcomeObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledSetOfNormalizedStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import { SubtitledSetOfUnicodeStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -58,14 +62,20 @@ describe('Interaction validator', function() {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
+        new RuleObjectFactory(
+          new SubtitledSetOfNormalizedStringObjectFactory(),
+          new SubtitledSetOfUnicodeStringObjectFactory()
+        )));
     $provide.value(
       'baseInteractionValidationService',
       new baseInteractionValidationService());
     $provide.value(
       'OutcomeObjectFactory', new OutcomeObjectFactory(
         new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory(
+      new SubtitledSetOfNormalizedStringObjectFactory(),
+      new SubtitledSetOfUnicodeStringObjectFactory()
+    ));
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));

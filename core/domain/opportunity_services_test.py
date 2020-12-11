@@ -323,7 +323,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'content_id': 'ri',
+                        'normalized_str_set': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],

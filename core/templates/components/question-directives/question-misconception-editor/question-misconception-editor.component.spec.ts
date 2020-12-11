@@ -30,6 +30,10 @@ import { SolutionValidityService } from
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledSetOfNormalizedStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import { SubtitledSetOfUnicodeStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 // ^^^ This block is to be removed.
 
 require('directives/angular-html-bind.directive.ts');
@@ -80,7 +84,10 @@ describe('Question misconception editor component', function() {
     var onSaveAnswerGroupFeedbackSpy = jasmine.createSpy(
       'onSaveAnswerGroupFeedback');
     var outcome = new OutcomeObjectFactory(new SubtitledHtmlObjectFactory());
-    var rules = new RuleObjectFactory();
+    var rules = new RuleObjectFactory(
+      new SubtitledSetOfNormalizedStringObjectFactory(),
+      new SubtitledSetOfUnicodeStringObjectFactory()
+    );
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(

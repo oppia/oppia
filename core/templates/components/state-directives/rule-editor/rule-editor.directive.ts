@@ -20,6 +20,9 @@ require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
@@ -29,6 +32,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
 
 var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 // This directive controls an editor for selecting the type and input parameters
@@ -51,11 +57,17 @@ angular.module('oppia').directive('ruleEditor', [
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'ResponsesService', 'StateEditorService',
-        'StateInteractionIdService', 'INTERACTION_SPECS',
+        '$scope', '$timeout', 'GenerateContentIdService', 'ResponsesService',
+        'StateEditorService', 'StateInteractionIdService',
+        'SubtitledSetOfNormalizedStringObjectFactory',
+        'SubtitledSetOfUnicodeStringObjectFactory',
+        'COMPONENT_NAME_RULE_INPUTS', 'INTERACTION_SPECS',
         function(
-            $scope, $timeout, ResponsesService, StateEditorService,
-            StateInteractionIdService, INTERACTION_SPECS) {
+            $scope, $timeout, GenerateContentIdService, ResponsesService,
+            StateEditorService, StateInteractionIdService,
+            SubtitledSetOfNormalizedStringObjectFactory,
+            SubtitledSetOfUnicodeStringObjectFactory,
+            COMPONENT_NAME_RULE_INPUTS, INTERACTION_SPECS) {
           var ctrl = this;
           // This returns the rule description string.
           var computeRuleDescriptionFragments = function() {
@@ -228,6 +240,12 @@ angular.module('oppia').directive('ruleEditor', [
               } else if (answerChoices) {
                 ctrl.rule.inputs[varName] = angular.copy(
                   answerChoices[0].val);
+              } else if (varType === 'SubtitledSetOfNormalizedString') {
+                ctrl.rule.inputs[varName] = (
+                  SubtitledSetOfNormalizedStringObjectFactory.createDefault());
+              } else if (varType === 'SubtitledSetOfUnicodeString') {
+                ctrl.rule.inputs[varName] = (
+                  SubtitledSetOfUnicodeStringObjectFactory.createDefault());
               } else {
                 ctrl.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
               }
@@ -243,11 +261,48 @@ angular.module('oppia').directive('ruleEditor', [
             }
           };
 
+          ctrl.populateRuleContentIds = function() {
+            const inputs = ctrl.rule.inputs;
+
+            let tmpRuleDescription = computeRuleDescriptionFragments();
+            // Finds the parameters and sets them in ctrl.rule.inputs.
+            const PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+            while (true) {
+              if (!tmpRuleDescription.match(PATTERN)) {
+                break;
+              }
+              const varName = tmpRuleDescription.match(PATTERN)[1];
+              let varType = null;
+              if (tmpRuleDescription.match(PATTERN)[2]) {
+                varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
+              }
+
+              const hasContentId = (
+                varType === 'SubtitledSetOfNormalizedString' ||
+                varType === 'SubtitledSetOfUnicodeString'
+              );
+              if (!hasContentId) {
+                continue;
+              }
+              const needsContentId = inputs[varName].getContentId() === null;
+
+              if (needsContentId) {
+                inputs[varName].setContentId(
+                  GenerateContentIdService.getNextStateId(
+                    `${COMPONENT_NAME_RULE_INPUTS}_${ctrl.rule.type}`
+                  ));
+              }
+
+              tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
+            }
+          };
+
           ctrl.cancelThisEdit = function() {
             ctrl.onCancelRuleEdit();
           };
 
           ctrl.saveThisRule = function() {
+            ctrl.populateRuleContentIds();
             ctrl.onSaveRule();
           };
 

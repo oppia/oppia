@@ -448,7 +448,9 @@ export class InteractionObjectFactory {
     }
 
     return new Interaction(
-      this.generateAnswerGroupsFromBackend(interactionDict.answer_groups),
+      this.generateAnswerGroupsFromBackend(
+        interactionDict.answer_groups,
+        interactionDict.id),
       interactionDict.confirmed_unclassified_answers,
       this.convertFromCustomizationArgsBackendDict(
         interactionDict.id,
@@ -461,11 +463,13 @@ export class InteractionObjectFactory {
   }
 
   generateAnswerGroupsFromBackend(
-      answerGroupBackendDicts: AnswerGroupBackendDict[]): AnswerGroup[] {
+      answerGroupBackendDicts: AnswerGroupBackendDict[],
+      interactionId: string
+  ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
       return this.answerGroupFactory.createFromBackendDict(
-        answerGroupBackendDict);
+        answerGroupBackendDict, interactionId);
     });
   }
 

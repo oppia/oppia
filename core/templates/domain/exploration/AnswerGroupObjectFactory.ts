@@ -65,8 +65,14 @@ export class AnswerGroupObjectFactory {
     private outcomeObjectFactory: OutcomeObjectFactory,
     private ruleObjectFactory: RuleObjectFactory) {}
 
-  generateRulesFromBackend(ruleBackendDicts: RuleBackendDict[]): Rule[] {
-    return ruleBackendDicts.map(this.ruleObjectFactory.createFromBackendDict);
+  generateRulesFromBackend(
+      ruleBackendDicts: RuleBackendDict[],
+      interactionId: string
+  ): Rule[] {
+    return ruleBackendDicts.map(
+      ruleBackendDict => this.ruleObjectFactory.createFromBackendDict(
+        ruleBackendDict, interactionId)
+    );
   }
 
   createNew(
@@ -77,9 +83,12 @@ export class AnswerGroupObjectFactory {
   }
 
   createFromBackendDict(
-      answerGroupBackendDict: AnswerGroupBackendDict): AnswerGroup {
+      answerGroupBackendDict: AnswerGroupBackendDict,
+      interactionId: string
+  ): AnswerGroup {
     return new AnswerGroup(
-      this.generateRulesFromBackend(answerGroupBackendDict.rule_specs),
+      this.generateRulesFromBackend(
+        answerGroupBackendDict.rule_specs, interactionId),
       this.outcomeObjectFactory.createFromBackendDict(
         answerGroupBackendDict.outcome),
       answerGroupBackendDict.training_data,

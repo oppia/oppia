@@ -495,29 +495,6 @@ class NormalizedString(BaseObject):
         }
 
 
-class SetOfNormalizedString(BaseObject):
-    """Class for sets of NormalizedStrings."""
-
-    description = (
-        'A set (a list with unique elements) of whitespace-collapsed strings.')
-    default_value = []
-
-    @classmethod
-    def get_schema(cls):
-        """Returns the object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        return {
-            'type': 'list',
-            'items': NormalizedString.get_schema(),
-            'validators': [{
-                'id': 'is_uniquified'
-            }]
-        }
-
-
 class MathExpressionContent(BaseObject):
     """Math Expression Content class."""
 
@@ -838,8 +815,16 @@ class LogicQuestion(BaseObject):
             assert isinstance(expression, dict)
             assert isinstance(
                 expression['top_kind_name'], python_utils.BASESTRING)
+            top_operator_name_type = (
+                int
+                if (
+                    expression['top_kind_name'] == 'constant' and
+                    'type' in expression and
+                    expression['type'] == 'integer'
+                ) else python_utils.BASESTRING
+            )
             assert isinstance(
-                expression['top_operator_name'], python_utils.BASESTRING)
+                expression['top_operator_name'], top_operator_name_type)
             _validate_expression_array(expression['arguments'])
             _validate_expression_array(expression['dummies'])
 
@@ -1445,6 +1430,21 @@ class AlgebraicExpression(BaseObject):
         }
 
 
+class OskCharacters(BaseObject):
+    """Class for OSK characters.
+    An OSK character could be an english alphabet (uppercase/lowercase)
+    or a greek letter.
+    """
+
+    description = 'An allowed OSK character.'
+    default_value = 'a'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'choices': constants.VALID_CUSTOM_OSK_LETTERS
+    }
+
+
 class AlgebraicIdentifier(BaseObject):
     """Class for an algebraic identifier.
     An algebraic identifier could be an english alphabet (uppercase/lowercase)
@@ -1606,7 +1606,7 @@ class CustomOskLetters(BaseObject):
         """
         return {
             'type': 'list',
-            'items': AlgebraicIdentifier.get_schema(),
+            'items': OskCharacters.get_schema(),
             'validators': [{
                 'id': 'is_uniquified'
             }]
@@ -1628,6 +1628,43 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
             'schema': SetOfNormalizedString.get_schema()
         }]
 
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A normalized Python object to be normalized.
+
+        Returns:
+            dict. A normalized Python object describing the Object specified by
+            this class.
+
+        Raises:
+            ValidationError. The object is not valid.
+            TypeError. The Python object cannot be normalized.
+        """
+        if not isinstance(raw['content_id'], python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected content id to be a string, received %s' %
+                raw['content_id'])
+
+        if not isinstance(raw['normalized_str_set'], list):
+            raise utils.ValidationError(
+                'Invalid unicode string set: %s' % raw['normalized_str_set'])
+
+        for normalized_str in raw['normalized_str_set']:
+            if not isinstance(normalized_str, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Invalid content unicode: %s' % normalized_str)
+
+        normalized_str_set = set(raw['normalized_str_set'])
+        if len(normalized_str_set) != len(raw['normalized_str_set']):
+            raise utils.ValidationError(
+                'Duplicate unicode found '
+                'in set: %s' % raw['normalized_str_set'])
+
+        return schema_utils.normalize_against_schema(raw, cls.get_schema())
+
 
 class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     """Class for translatable sets of UnicodeStrings."""
@@ -1643,3 +1680,38 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
             'name': 'unicode_str_set',
             'schema': SetOfUnicodeString.get_schema()
         }]
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A normalized Python object to be normalized.
+
+        Returns:
+            dict. A normalized Python object describing the Object specified by
+            this class.
+
+        Raises:
+            ValidationError. The object is not valid.
+            TypeError. The Python object cannot be normalized.
+        """
+        if not isinstance(raw['content_id'], python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected content id to be a string, received %s' %
+                raw['content_id'])
+
+        if not isinstance(raw['unicode_str_set'], list):
+            raise utils.ValidationError(
+                'Invalid unicode string set: %s' % raw['unicode_str_set'])
+
+        for unicode_str in raw['unicode_str_set']:
+            if not isinstance(unicode_str, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Invalid content unicode: %s' % unicode_str)
+
+        if len(set(raw['unicode_str_set'])) != len(raw['unicode_str_set']):
+            raise utils.ValidationError(
+                'Duplicate unicode found in set: %s' % raw['unicode_str_set'])
+
+        return schema_utils.normalize_against_schema(raw, cls.get_schema())

@@ -40,6 +40,10 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledSetOfNormalizedStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
+import { SubtitledSetOfUnicodeStringObjectFactory } from
+  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -69,7 +73,10 @@ describe('ExplorationStatesService', function() {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
+        new RuleObjectFactory(
+          new SubtitledSetOfNormalizedStringObjectFactory(),
+          new SubtitledSetOfUnicodeStringObjectFactory()
+        )));
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
@@ -85,7 +92,10 @@ describe('ExplorationStatesService', function() {
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
+    $provide.value('RuleObjectFactory', new RuleObjectFactory(
+      new SubtitledSetOfNormalizedStringObjectFactory(),
+      new SubtitledSetOfUnicodeStringObjectFactory()
+    ));
     $provide.value('SolutionValidityService', new SolutionValidityService());
     $provide.value(
       'StateClassifierMappingService', new StateClassifierMappingService());
@@ -128,6 +138,7 @@ describe('ExplorationStatesService', function() {
             content: {},
             default_outcome: {},
             feedback_1: {},
+            ri: {}
           },
         },
         param_changes: [],
@@ -135,7 +146,10 @@ describe('ExplorationStatesService', function() {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: 'hola'}
+              inputs: {x: {
+                content_id: 'ri',
+                normalized_str_set: ['hola']
+              }}
             }],
             outcome: {
               dest: 'Me Llamo',
@@ -173,6 +187,7 @@ describe('ExplorationStatesService', function() {
             content: {},
             default_outcome: {},
             feedback_1: {},
+            ri: {}
           },
         },
         classifier_model_id: 0,

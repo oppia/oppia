@@ -30,6 +30,8 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
   'domain/exploration/RuleObjectFactory';
+import { SubtitledSetOfUnicodeString } from
+  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 
 interface PreviousRule {
   answerGroupIndex: number;
@@ -82,7 +84,9 @@ export class SetInputValidationService {
    */
   private areSameRule(ruleA: Rule, ruleB: Rule): boolean {
     return ruleA.type === ruleB.type &&
-      this.areSameSet(<string[]>ruleA.inputs.x, <string[]>ruleB.inputs.x);
+      this.areSameSet(
+        (<SubtitledSetOfUnicodeString>ruleA.inputs.x).getUnicodeStrings(),
+        (<SubtitledSetOfUnicodeString>ruleB.inputs.x).getUnicodeStrings());
   }
 
   getCustomizationArgsWarnings(
@@ -139,8 +143,9 @@ export class SetInputValidationService {
                 depending on their rule types.
             */
             let isRuleCoveredByAnyPrevRule = false;
-            let ruleInput = <string[]>rule.inputs.x;
-            let prevRuleInput = <string[]>prevRule.rule.inputs.x;
+            let ruleInput = <SubtitledSetOfUnicodeString>rule.inputs.x;
+            let prevRuleInput = (
+              <SubtitledSetOfUnicodeString>prevRule.rule.inputs.x);
             switch (rule.type) {
               case 'Equals':
                 // An 'Equals' rule is made redundant by another only when
@@ -151,14 +156,16 @@ export class SetInputValidationService {
               case 'HasElementsIn':
               case 'IsDisjointFrom':
                 isRuleCoveredByAnyPrevRule = this.isSubset(
-                  ruleInput, prevRuleInput
+                  ruleInput.getUnicodeStrings(),
+                  prevRuleInput.getUnicodeStrings()
                 );
                 break;
               case 'IsSupersetOf':
               case 'HasElementsNotIn':
               case 'OmitsElementsIn':
                 isRuleCoveredByAnyPrevRule = this.isSubset(
-                  prevRuleInput, ruleInput
+                  prevRuleInput.getUnicodeStrings(),
+                  ruleInput.getUnicodeStrings()
                 );
                 break;
               default:
