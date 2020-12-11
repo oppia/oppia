@@ -471,13 +471,13 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "HasElementsNotIn": "has elements not in {{x|SubtitledSetOfUnicodeString}}",
-      "Equals": "is equal to {{x|SubtitledSetOfUnicodeString}}",
-      "IsSupersetOf": "is a proper superset of {{x|SubtitledSetOfUnicodeString}}",
-      "OmitsElementsIn": "omits some elements of {{x|SubtitledSetOfUnicodeString}}",
-      "HasElementsIn": "has elements in common with {{x|SubtitledSetOfUnicodeString}}",
-      "IsSubsetOf": "is a proper subset of {{x|SubtitledSetOfUnicodeString}}",
-      "IsDisjointFrom": "has no elements in common with {{x|SubtitledSetOfUnicodeString}}"
+      "HasElementsNotIn": "has elements not in {{x|TranslatableSetOfUnicodeString}}",
+      "Equals": "is equal to {{x|TranslatableSetOfUnicodeString}}",
+      "IsSupersetOf": "is a proper superset of {{x|TranslatableSetOfUnicodeString}}",
+      "OmitsElementsIn": "omits some elements of {{x|TranslatableSetOfUnicodeString}}",
+      "HasElementsIn": "has elements in common with {{x|TranslatableSetOfUnicodeString}}",
+      "IsSubsetOf": "is a proper subset of {{x|TranslatableSetOfUnicodeString}}",
+      "IsDisjointFrom": "has no elements in common with {{x|TranslatableSetOfUnicodeString}}"
     }
   },
   "CodeRepl": {
@@ -779,10 +779,10 @@
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
-      "StartsWith": "starts with at least one of {{x|SubtitledSetOfNormalizedString}}",
-      "Contains": "contains at least one of {{x|SubtitledSetOfNormalizedString}}",
-      "Equals": "is equal to at least one of {{x|SubtitledSetOfNormalizedString}}, without taking case into account",
-      "FuzzyEquals": "is equal to at least one of {{x|SubtitledSetOfNormalizedString}}, misspelled by at most one character"
+      "StartsWith": "starts with at least one of {{x|TranslatableSetOfNormalizedString}}",
+      "Contains": "contains at least one of {{x|TranslatableSetOfNormalizedString}}",
+      "Equals": "is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, without taking case into account",
+      "FuzzyEquals": "is equal to at least one of {{x|TranslatableSetOfNormalizedString}}, misspelled by at most one character"
     }
   },
   "InteractiveMap": {

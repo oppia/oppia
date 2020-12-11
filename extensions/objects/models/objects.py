@@ -1462,10 +1462,17 @@ class OskCharacters(BaseObject):
     description = 'An allowed OSK character.'
     default_value = 'a'
 
-    SCHEMA = {
-        'type': 'unicode',
-        'choices': constants.VALID_CUSTOM_OSK_LETTERS
-    }
+    @classmethod
+    def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        return {
+            'type': 'unicode',
+            'choices': constants.VALID_CUSTOM_OSK_LETTERS
+        }
 
 
 class AlgebraicIdentifier(BaseObject):

@@ -27,11 +27,11 @@
     "SetOfAlgebraicIdentifier": [],
     "SetOfHtmlString": [],
     "SetOfUnicodeString": [],
-    "SubtitledSetOfNormalizedString": {
+    "TranslatableSetOfNormalizedString": {
       "content_id": null,
       "normalized_str_set": []
     },
-    "SubtitledSetOfUnicodeString": {
+    "TranslatableSetOfUnicodeString": {
       "content_id": null,
       "unicode_str_set": []
     },
