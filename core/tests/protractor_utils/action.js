@@ -49,8 +49,11 @@ var select2 = async function(selectorName, selectorElement, optionToSelect) {
   await click(`${optionToSelect} in ${selectorName}`, option);
 };
 
-var sendKeys = async function(inputName, inputElement, keys) {
-  await click(inputName, inputElement);
+var sendKeys = async function(
+    inputName, inputElement, keys, clickInputElement = true) {
+  if (clickInputElement) {
+    await click(inputName, inputElement);
+  }
   await inputElement.sendKeys(keys);
 };
 

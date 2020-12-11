@@ -383,4 +383,50 @@ describe('Site Analytics Service', () => {
     expect(gaSpy).toHaveBeenCalledWith(
       'send', 'event', 'UploadRecordedAudio', 'click', explorationId);
   });
+
+  it('should register Contributor Dashboard suggest event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardSuggestEvent(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardSuggest', 'click',
+      contributionType);
+  });
+
+  it('should register Contributor Dashboard submit suggestion event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardSubmitSuggestionEvent(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardSubmitSuggestion', 'click',
+      contributionType);
+  });
+
+  it('should register Contributor Dashboard view suggestion for review event',
+    () => {
+      const contributionType = 'Translation';
+      sas.registerContributorDashboardViewSuggestionForReview(contributionType);
+
+      expect(gaSpy).toHaveBeenCalledWith(
+        'send', 'event', 'ContributorDashboardViewSuggestionForReview', 'click',
+        contributionType);
+    });
+
+  it('should register Contributor Dashboard accept suggestion event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardAcceptSuggestion(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardAcceptSuggestion', 'click',
+      contributionType);
+  });
+
+  it('should register Contributor Dashboard reject suggestion event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardRejectSuggestion(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardRejectSuggestion', 'click',
+      contributionType);
+  });
 });

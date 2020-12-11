@@ -31,7 +31,6 @@ import python_utils
 from scripts import build
 from scripts import common
 from scripts import flake_checker
-from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 
 MAX_RETRY_COUNT = 3
@@ -156,18 +155,6 @@ _PARSER.add_argument(
 SUBPROCESSES = []
 
 
-def ensure_screenshots_dir_is_removed():
-    """Check if screenshot directory exists, if so, delete it."""
-    screenshots_dir = os.path.join(os.pardir, 'protractor-screenshots')
-    if not os.path.isdir(screenshots_dir):
-        return
-    python_utils.PRINT(
-        'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
-        'core/tests/protractor.conf.js, you can view screenshots'
-        'of the failed tests in ../protractor-screenshots/')
-    os.rmdir(screenshots_dir)
-
-
 def cleanup():
     """Kill the running subprocesses and server fired in this program, set
     constants back to default values.
@@ -250,8 +237,6 @@ def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
     if not skip_install:
         install_third_party_libs.main()
-    if os.getenv('TRAVIS'):
-        install_chrome_on_travis.main(args=[])
 
 
 def build_js_files(
@@ -548,7 +533,10 @@ def run_tests(args):
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
-    ensure_screenshots_dir_is_removed()
+    python_utils.PRINT(
+        'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
+        'core/tests/protractor.conf.js, you can view screenshots'
+        'of the failed tests in ../protractor-screenshots/')
     commands = [common.NODE_BIN_PATH]
     if args.debug_mode:
         commands.append('--inspect-brk')

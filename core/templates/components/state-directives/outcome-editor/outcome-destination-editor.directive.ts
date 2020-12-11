@@ -27,10 +27,13 @@ require('services/editability.service.ts');
 require('services/user.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
+require('constants.ts');
+
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('outcomeDestinationEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'MAX_STATE_NAME_LENGTH',
+  function(UrlInterpolationService, MAX_STATE_NAME_LENGTH,) {
     return {
       restrict: 'E',
       scope: {},
@@ -44,15 +47,15 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
         'outcome-destination-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
-        'StateEditorService', 'StateGraphLayoutService', 'UserService',
-        'ENABLE_PREREQUISITE_SKILLS', 'EXPLORATION_AND_SKILL_ID_PATTERN',
-        'PLACEHOLDER_OUTCOME_DEST',
+        '$rootScope', '$scope', 'EditorFirstTimeEventsService',
+        'FocusManagerService', 'StateEditorService', 'StateGraphLayoutService',
+        'UserService', 'ENABLE_PREREQUISITE_SKILLS',
+        'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-            $scope, EditorFirstTimeEventsService, FocusManagerService,
-            StateEditorService, StateGraphLayoutService, UserService,
-            ENABLE_PREREQUISITE_SKILLS, EXPLORATION_AND_SKILL_ID_PATTERN,
-            PLACEHOLDER_OUTCOME_DEST) {
+            $rootScope, $scope, EditorFirstTimeEventsService,
+            FocusManagerService, StateEditorService, StateGraphLayoutService,
+            UserService, ENABLE_PREREQUISITE_SKILLS,
+            EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           var currentStateName = null;
@@ -67,6 +70,7 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
           };
 
           ctrl.isCreatingNewState = function(outcome) {
+            ctrl.maxLen = MAX_STATE_NAME_LENGTH;
             return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
           };
           ctrl.$onInit = function() {
@@ -174,6 +178,9 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
               // development.
               ctrl.canEditRefresherExplorationId = (
                 userInfo.isAdmin() || userInfo.isModerator());
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
 
             ctrl.explorationAndSkillIdPattern =
