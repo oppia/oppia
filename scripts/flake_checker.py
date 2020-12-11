@@ -17,12 +17,12 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import datetime
 import os
 
 import python_utils
 
 import requests
-from datetime import datetime, timezone
 
 FLAKE_REPORT_URL = (
     'https://oppia-e2e-test-results-logger.herokuapp.com'
@@ -61,6 +61,10 @@ def _print_color_message(message):
 
 
 def check_if_on_ci():
+    """Check if the script is running on a CI server.
+
+    Returns: bool. Whether we are running on a CI server.
+    """
     for info in CI_INFO.values():
         ci_identifier = info['env']['identifier']
         if os.getenv(ci_identifier):
@@ -83,7 +87,7 @@ def _get_build_info():
         else:
             build_url = info['build_url_template'] % os.getenv(
                 ci_env['build_id'])
-        timestamp = datetime.now(tz=timezone.utc).isoformat()
+        timestamp = datetime.datetime.utcnow().isoformat() + '+00:00'
 
         build_info['username'] = os.getenv(ci_env['user_info'])
         build_info['build_url'] = build_url
