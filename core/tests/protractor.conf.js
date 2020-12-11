@@ -270,15 +270,17 @@ exports.config = {
         // Actions.
         '--no-sandbox',
         '--disable-dev-shm-usage',
-      ]
+      ],
+      prefs: {
+        download: {
+            'prompt_for_download': false,
+            'default_directory': DOWNLOAD_PATH,
+          }
+      }
     },
     prefs: {
       intl: {
         accept_languages: 'en-EN'
-      },
-      'download': {
-        'prompt_for_download': false,
-        'default_directory': DOWNLOAD_PATH,
       }
     },
     loggingPrefs: {
