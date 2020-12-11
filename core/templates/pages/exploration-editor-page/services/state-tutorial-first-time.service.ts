@@ -16,11 +16,11 @@
  * @fileoverview Service for all tutorials to be run only for the first time.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service.ts';
+import { StateTutorialFirstTimeBackendApiService } from 'pages/exploration-editor-page/services/state-tutorial-first-time-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,12 +28,8 @@ import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/serv
 export class StateTutorialFirstTimeService {
   // Whether this is the first time the tutorial has been seen by this user.
   _currentlyInEditorFirstVisit: boolean = true;
-  STARTED_EDITOR_TUTORIAL_EVENT_URL: string = '/createhandler/' +
-  'started_tutorial_event';
   _currentlyInTranslationFirstVisit: boolean = true;
   _translationTutorialNotSeenBefore: boolean = false;
-  STARTED_TRANSLATION_TUTORIAL_EVENT_URL: string = '/createhandler/' +
-  'started_translation_tutorial_event';
 
   private enterEditorForTheFirstTimeEventEmitter = new EventEmitter();
   private enterTranslationForTheFirstTimeEventEmitter = new EventEmitter();
@@ -43,8 +39,9 @@ export class StateTutorialFirstTimeService {
   _openTranslationTutorialEventEmitter = new EventEmitter();
 
   constructor(
-    private http: HttpClient,
-    private editorFirstTimeEventsService : EditorFirstTimeEventsService) {}
+    private editorFirstTimeEventsService : EditorFirstTimeEventsService,
+    private stateTutorialFirstTimeBackendApiService:
+      StateTutorialFirstTimeBackendApiService) {}
 
   initEditor(firstTime: boolean, expId: string): void {
     // After the first call to it in a client session, this does nothing.
@@ -55,8 +52,8 @@ export class StateTutorialFirstTimeService {
     if (this._currentlyInEditorFirstVisit) {
       this.enterEditorForTheFirstTimeEventEmitter.emit();
       this.editorFirstTimeEventsService.initRegisterEvents(expId);
-      this.http.post(this.STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId, {})
-        .toPromise().then(null, () => {
+      this.stateTutorialFirstTimeBackendApiService.startEditorTutorial(expId)
+        .then(null, () => {
           console.error(
             'Warning: could not record editor tutorial start event.'
           );
@@ -87,9 +84,8 @@ export class StateTutorialFirstTimeService {
     if (this._currentlyInTranslationFirstVisit) {
       this.enterTranslationForTheFirstTimeEventEmitter.emit();
       this.editorFirstTimeEventsService.initRegisterEvents(expId);
-      this.http.post(
-        this.STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId, {})
-        .toPromise().then(null, () => {
+      this.stateTutorialFirstTimeBackendApiService.startTranslationTutorial(expId)
+        .then(null, () => {
           console.error(
             'Warning: could not record translation tutorial start event.'
           );
