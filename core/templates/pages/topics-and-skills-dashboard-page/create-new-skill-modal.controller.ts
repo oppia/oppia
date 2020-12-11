@@ -23,7 +23,7 @@ require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('CreateNewSkillModalController', [
-  '$scope', '$uibModalInstance', 'AllSkillNames','ContextService',
+  '$scope', '$uibModalInstance', 'AllSkillNames', 'ContextService',
   'ImageLocalStorageService', 'RubricObjectFactory', 'SkillCreationService',
   'SkillObjectFactory', 'SubtitledHtmlObjectFactory',
   'COMPONENT_NAME_EXPLANATION', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
