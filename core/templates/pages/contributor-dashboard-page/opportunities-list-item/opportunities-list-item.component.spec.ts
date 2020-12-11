@@ -38,7 +38,7 @@ describe('Opportunities List Item Component', function() {
         onClickActionButton: () => jasmine.createSpy('click', () => {}),
         labelRequired: true,
         progressBarRequired: true,
-        opportunityHeadingTruncationLength: 10
+        opportunityHeadingTruncationLength: 35
       });
       ctrl.$onInit();
     }));

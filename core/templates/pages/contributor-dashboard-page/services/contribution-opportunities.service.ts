@@ -103,7 +103,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
       getTranslationOpportunitiesAsync: async function(languageCode) {
         return _getTranslationOpportunities(languageCode, '');
       },
-      getVoiceoverOpportunitiesAsync: async function(languageCode) {
+      getVoiceoverOpportunities: async function(languageCode) {
         return _getVoiceoverOpportunities(languageCode, '');
       },
       getMoreSkillOpportunitiesAsync: async function() {
@@ -117,7 +117,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
             languageCode, translationOpportunitiesCursor);
         }
       },
-      getMoreVoiceoverOpportunitiesAsync: async function(languageCode) {
+      getMoreVoiceoverOpportunities: async function(languageCode) {
         if (moreVoiceoverOpportunitiesAvailable) {
           return _getVoiceoverOpportunities(
             languageCode, voiceoverOpportunitiesCursor);

@@ -98,7 +98,7 @@ angular.module('oppia').component('questionOpportunities', {
         return {opportunitiesDicts, more};
       };
 
-      var createQuestion = function(skill, skillDifficulty) {
+      ctrl.createQuestion = function(skill, skillDifficulty) {
         const skillId = skill.getId();
         const question =
           QuestionObjectFactory.createDefaultQuestion([skillId]);
@@ -168,7 +168,7 @@ angular.module('oppia').component('questionOpportunities', {
             'QuestionsOpportunitiesSelectSkillAndDifficultyModalController')
         }).result.then(function(result) {
           if (AlertsService.warnings.length === 0) {
-            createQuestion(result.skill, result.skillDifficulty);
+            ctrl.createQuestion(result.skill, result.skillDifficulty);
           }
         }, function() {
           // Note to developers:

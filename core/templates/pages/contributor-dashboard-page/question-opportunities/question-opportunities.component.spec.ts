@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for questionOpportunities.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { ContributionOpportunitiesBackendApiService } from
@@ -94,50 +94,32 @@ describe('Question opportunities component', function() {
     });
   }));
 
-  it('should load question opportunities when component is initialized',
-    function() {
-      spyOn(contributionOpportunitiesService, 'getSkillOpportunities').and
-        .callFake((callback) => {
-          callback(opportunitiesArray, false);
-        });
-      ctrl.$onInit();
+  it('should load question opportunities',
+    fakeAsync(() => {
+      spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
+        .returnValue($q.resolve(opportunitiesArray, false));
+      ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+        expect(opportunitiesDicts.length).toBe(2);
+        expect(more).toBe(false);
+      });
+    }));
 
-      expect(ctrl.opportunities.length).toBe(2);
-      expect(ctrl.moreOpportunitiesAvailable).toBe(false);
-      expect(ctrl.opportunitiesAreLoading).toBe(false);
+  it('should load more question opportunities', function() {
+    spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
+      .returnValue($q.resolve(opportunitiesArray, true));
+    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(true);
     });
 
-  it('should load more question opportunities when reaching the end' +
-    ' of page and there are more opportunities available', function() {
-    spyOn(contributionOpportunitiesService, 'getSkillOpportunities').and
-      .callFake((callback) => {
-        callback(opportunitiesArray, true);
-      });
-    ctrl.$onInit();
-    $rootScope.$apply();
+    spyOn(
+      contributionOpportunitiesService, 'getMoreSkillOpportunitiesAsync').and
+      .returnValue($q.resolve(opportunitiesArray, false));
 
-    expect(ctrl.opportunities.length).toBe(2);
-    expect(ctrl.moreOpportunitiesAvailable).toBe(true);
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-
-    var getMoreSkillOpportunitiesSpy = spyOn(
-      contributionOpportunitiesService, 'getMoreSkillOpportunities');
-
-    getMoreSkillOpportunitiesSpy
-      .and.callFake((callback) => {
-        callback(opportunitiesArray, false);
-      });
-    ctrl.onLoadMoreOpportunities();
-    $rootScope.$apply();
-
-    getMoreSkillOpportunitiesSpy.calls.reset();
-
-    expect(ctrl.opportunities.length).toBe(4);
-    expect(ctrl.moreOpportunitiesAvailable).toBe(false);
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-
-    ctrl.onLoadMoreOpportunities();
-    expect(getMoreSkillOpportunitiesSpy).not.toHaveBeenCalled();
+    ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(false);
+    });
   });
 
   it('should register Contributor Dashboard suggest event when clicking on' +
