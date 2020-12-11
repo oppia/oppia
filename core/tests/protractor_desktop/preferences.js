@@ -165,6 +165,16 @@ describe('Preferences', function() {
         'http://localhost:9001/delete-account');
     });
 
+  it('should export account data',
+    async function() {
+      await users.createUser('export@preferences.com', 'exportPreferences');
+      await users.login('export@preferences.com');
+      await preferencesPage.get();
+      await preferencesPage.clickExportAccountButton();
+      await waitFor.fileToBeDownloaded('oppia_takeout_data.zip');
+    }
+  );
+
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
     await users.logout();
