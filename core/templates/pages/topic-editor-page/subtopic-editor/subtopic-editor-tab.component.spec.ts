@@ -45,7 +45,7 @@ describe('Subtopic editor tab', function() {
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
 
-  beforeEach(angular.mock.inject(async function($injector, $componentController) {
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
@@ -58,7 +58,7 @@ describe('Subtopic editor tab', function() {
     $location = $injector.get('$location');
 
     var MockQuestionBackendApiService = {
-      fetchTotalQuestionCountForSkillIds: () => Promise.resolve(2)
+      fetchTotalQuestionCountForSkillIds: async() => Promise.resolve(2)
     };
     var topic = TopicObjectFactory.createInterstitialTopic();
     var subtopic = SubtopicObjectFactory.createFromTitle(1, 'Subtopic1');

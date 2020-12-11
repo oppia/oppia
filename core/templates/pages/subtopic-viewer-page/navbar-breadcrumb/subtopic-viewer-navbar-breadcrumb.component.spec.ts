@@ -45,7 +45,7 @@ class MockUrlService {
 let component: SubtopicViewerNavbarBreadcrumbComponent;
 let fixture: ComponentFixture<SubtopicViewerNavbarBreadcrumbComponent>;
 
-describe('Subtopic viewer navbar breadcrumb component', async function() {
+describe('Subtopic viewer navbar breadcrumb component', function() {
   let readOnlySubtopicPageObjectFactory = null;
 
   beforeEach(async(() => {
@@ -56,7 +56,7 @@ describe('Subtopic viewer navbar breadcrumb component', async function() {
         {
           provide: SubtopicViewerBackendApiService,
           useValue: {
-            fetchSubtopicData: () => (
+            fetchSubtopicData: async() => (
               new Promise((resolve) => {
                 resolve(
                   readOnlySubtopicPageObjectFactory.createFromBackendDict({
