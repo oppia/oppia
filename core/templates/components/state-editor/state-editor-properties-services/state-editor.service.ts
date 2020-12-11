@@ -39,7 +39,7 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { State } from 'domain/state/StateObjectFactory';
 
-interface AnswerChoice {
+export interface AnswerChoice {
   val: string | number;
   label: string;
 }

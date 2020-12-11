@@ -681,6 +681,8 @@ angular.module('oppia').directive('conversationSkin', [
 
             var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
               PlayerTranscriptService.getLastCard());
+            var previousDisplayedCardIndex = (
+              PlayerPositionService.getDisplayedCardIndex());
 
             if (
               totalNumCards > 1 &&
@@ -702,6 +704,22 @@ angular.module('oppia').directive('conversationSkin', [
             }
             PlayerPositionService.changeCurrentQuestion(
               PlayerPositionService.getDisplayedCardIndex());
+
+            // TODO(#7951): Remove the following try-catch block once #7951 has
+            // been fixed.
+            try {
+              $scope.displayedCard.isTerminal();
+            } catch (error) {
+              let additionalDebugInfo = (
+                `${error.message} \n` +
+                `state name: ${newCard && newCard.getStateName()} \n` +
+                `totalNumCards: ${totalNumCards} \n` +
+                'previous displayedCardIndex: ' +
+                `${previousDisplayedCardIndex} \n` +
+                'current displayedCardIndex: ' +
+                `${PlayerPositionService.getDisplayedCardIndex()} \n`);
+              throw new Error(additionalDebugInfo);
+            }
 
             if ($scope.displayedCard.isTerminal()) {
               $scope.isRefresherExploration = false;

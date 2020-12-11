@@ -97,8 +97,8 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the collection.
-        collection_services.regenerate_collection_summary(
-            self.COLLECTION_ID, None)
+        collection_services.regenerate_collection_and_contributors_summaries(
+            self.COLLECTION_ID)
 
         # Delete the exploration before migration occurs.
         collection_services.delete_collection(
@@ -154,9 +154,8 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Save a collection summary object for indexing. The explicit commit
         # does not create a summary object, which is needed for the
         # job to update the index after updating the collection.
-        collection_summary = collection_services.compute_summary_of_collection(
-            model, self.albert_id)
-        collection_services.save_collection_summary(collection_summary)
+        collection_services.regenerate_collection_summary_with_new_contributor(
+            model.id, self.albert_id)
 
         # Start migration job on sample collection.
         job_id = (
@@ -257,9 +256,8 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Save a collection summary object for indexing. The explicit commit
         # does not create a summary object, which is needed for the
         # job to update the index after updating the collection.
-        collection_summary = collection_services.compute_summary_of_collection(
-            model, self.albert_id)
-        collection_services.save_collection_summary(collection_summary)
+        collection_services.regenerate_collection_summary_with_new_contributor(
+            model.id, self.albert_id)
 
         # Check that collection_contents is empty.
         self.assertEqual(model.collection_contents, {})

@@ -683,7 +683,8 @@ def _create_exploration(
     stats_services.create_exp_issues_for_new_exploration(
         exploration.id, exploration.version)
 
-    regenerate_exploration_summary(exploration.id, committer_id)
+    regenerate_exploration_summary_with_new_contributor(
+        exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -942,7 +943,8 @@ def update_exploration(
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    regenerate_exploration_summary(exploration_id, committer_id)
+    regenerate_exploration_summary_with_new_contributor(
+        exploration_id, committer_id)
 
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
         user_services.add_edited_exploration_id(committer_id, exploration_id)
@@ -957,37 +959,45 @@ def update_exploration(
             exploration_id)
 
 
-def regenerate_exploration_summary(exploration_id, contributor_id_to_add):
-    """Regenerate a summary of the given exploration. If the summary does not
-    exist, this function generates a new one.
+def regenerate_exploration_summary_with_new_contributor(
+        exploration_id, contributor_id):
+    """Regenerate a summary of the given exploration and add a new contributor
+    to the contributors summary. If the summary does not exist, this function
+    generates a new one.
 
     Args:
         exploration_id: str. The id of the exploration.
-        contributor_id_to_add: str or None. The user_id of user who have
-            created the exploration will be added to the list of contributours
-            for the exploration if the argument is not None and it is not a
-            system id.
+        contributor_id: str. ID of the contributor to be added to
+            the exploration summary.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(
-        exploration, contributor_id_to_add)
+    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_summary.add_contribution_by_user(contributor_id)
     save_exploration_summary(exp_summary)
 
 
-def compute_summary_of_exploration(exploration, contributor_id_to_add):
+def regenerate_exploration_and_contributors_summaries(exploration_id):
+    """Regenerate a summary of the given exploration and also regenerate
+    the contributors summary from the snapshots. If the summary does not exist,
+    this function generates a new one.
+
+    Args:
+        exploration_id: str. ID of the exploration.
+    """
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_summary.contributors_summary = (
+        compute_exploration_contributors_summary(exp_summary.id))
+    save_exploration_summary(exp_summary)
+
+
+def _compute_summary_of_exploration(exploration):
     """Create an ExplorationSummary domain object for a given Exploration
-    domain object and return it. contributor_id_to_add will be added to
-    the list of contributors for the exploration if the argument is not
-    None and if the id is not a system id.
+    domain object and return it.
 
     Args:
         exploration: Exploration. The exploration whose summary is to be
             computed.
-        contributor_id_to_add: str|None. The user_id of user who have
-            contributed (humans who have made a positive (not just a revert)
-            change to the exploration's content) will be added to the list of
-            contributors for the exploration if the argument is not None and it
-            is not a system id.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
@@ -999,24 +1009,12 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
             exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
         scaled_average_rating = get_scaled_average_rating(ratings)
-        contributors_summary = old_exp_summary.contributors_summary or {}
     else:
         ratings = feconf.get_empty_ratings()
         scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
-        contributors_summary = {}
 
-    # Update the contributor id list if necessary (contributors
-    # defined as humans who have made a positive (i.e. not just
-    # a revert) change to an exploration's content).
-
-    if contributor_id_to_add is None:
-        # Recalculate the contributors because revert was done.
-        contributors_summary = compute_exploration_contributors_summary(
-            exploration.id)
-    elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        contributors_summary[contributor_id_to_add] = (
-            contributors_summary.get(contributor_id_to_add, 0) + 1)
-
+    contributors_summary = (
+        exp_summary_model.contributors_summary if exp_summary_model else {})
     contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
@@ -1101,7 +1099,7 @@ def save_exploration_summary(exp_summary):
         'editor_ids': exp_summary.editor_ids,
         'voice_artist_ids': exp_summary.voice_artist_ids,
         'viewer_ids': exp_summary.viewer_ids,
-        'contributor_ids': exp_summary.contributor_ids,
+        'contributor_ids': list(exp_summary.contributors_summary.keys()),
         'contributors_summary': exp_summary.contributors_summary,
         'version': exp_summary.version,
         'exploration_model_last_updated': (
@@ -1193,9 +1191,7 @@ def revert_exploration(
         caching_services.CACHE_NAMESPACE_EXPLORATION, None,
         [exploration.id])
 
-    # Update the exploration summary, but since this is just a revert do
-    # not add the committer of the revert to the list of contributors.
-    regenerate_exploration_summary(exploration_id, None)
+    regenerate_exploration_and_contributors_summaries(exploration_id)
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
