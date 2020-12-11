@@ -32,6 +32,7 @@ from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
+from extensions.objects.models import objects
 import feconf
 import python_utils
 import schema_utils
@@ -1941,60 +1942,22 @@ class RuleSpec(python_utils.OBJECT):
         Returns:
             dict. A dict, mapping all fields of RuleSpec instance.
         """
-        rule_inputs_dict = {}
-        for rule_input_name in self.inputs:
-            rule_input = self.inputs[rule_input_name]
-            if isinstance(
-                    rule_input,
-                    (SubtitledSetOfNormalizedString,
-                     SubtitledSetOfUnicodeString)
-            ):
-                rule_inputs_dict[rule_input_name] = rule_input.to_dict()
-            else:
-                rule_inputs_dict[rule_input_name] = rule_input
-
         return {
             'rule_type': self.rule_type,
-            'inputs': rule_inputs_dict,
+            'inputs': self.inputs,
         }
 
     @classmethod
     def from_dict(cls, rulespec_dict, interaction_id):
         """Return a RuleSpec domain object from a dict.
-
         Args:
             rulespec_dict: dict. The dict representation of RuleSpec object.
-            interaction_id: str. The interaction id of the interaction.
-
         Returns:
             RuleSpec. The corresponding RuleSpec domain object.
         """
-        rule_inputs_dict = rulespec_dict['inputs']
-        rule_type = rulespec_dict['rule_type']
-
-        interaction = interaction_registry.Registry.get_interaction_by_id(
-            interaction_id)
-        inputs_name_and_types = (
-            re.findall(
-                r'{{([a-z]+)\|([^}]*)}',
-                interaction.rules_dict[rule_type]['description']))
-
-        rule_inputs = {}
-        for input_name, input_type in inputs_name_and_types:
-            if input_type == 'SubtitledSetOfNormalizedString':
-                rule_inputs[input_name] = (
-                    SubtitledSetOfNormalizedString.from_dict(
-                        rule_inputs_dict[input_name]))
-            elif input_type == 'SubtitledSetOfUnicodeString':
-                rule_inputs[input_name] = (
-                    SubtitledSetOfUnicodeString.from_dict(
-                        rule_inputs_dict[input_name]))
-            else:
-                rule_inputs[input_name] = rule_inputs_dict[input_name]
-
         return cls(
-            rule_type,
-            rule_inputs
+            rulespec_dict['rule_type'],
+            rulespec_dict['inputs']
         )
 
     def validate(self, rule_params_list, exp_param_specs_dict):
@@ -2066,22 +2029,7 @@ class RuleSpec(python_utils.OBJECT):
             else:
                 # Otherwise, a simple parameter value needs to be normalizable
                 # by the parameter object in order to be valid.
-                is_subtitled_set_of_normalized_string = isinstance(
-                    param_value, SubtitledSetOfNormalizedString)
-                is_subtitled_set_of_unicode_string = isinstance(
-                    param_value, SubtitledSetOfUnicodeString)
-                if is_subtitled_set_of_normalized_string:
-                    self.inputs[param_name] = (
-                        SubtitledSetOfNormalizedString.from_dict(
-                            param_obj.normalize(param_value.to_dict())
-                        ))
-                elif is_subtitled_set_of_unicode_string:
-                    self.inputs[param_name] = (
-                        SubtitledSetOfUnicodeString.from_dict(
-                            param_obj.normalize(param_value.to_dict())
-                        ))
-                else:
-                    param_obj.normalize(param_value)
+                param_obj.normalize(param_value)
 
     @staticmethod
     def convert_html_in_rule_spec(rule_spec_dict, conversion_fn):
@@ -2317,150 +2265,6 @@ class SubtitledUnicode(python_utils.OBJECT):
         return cls(content_id, '')
 
 
-class SubtitledSetOfUnicodeString(python_utils.OBJECT):
-    """Value object representing subtitled set of unicode string."""
-
-    def __init__(self, content_id, unicode_str_set):
-        """Initializes a SubtitledSetOfUnicodeString domain object.
-
-        Args:
-            content_id: str. A unique id referring to the other assets for this
-                content.
-            unicode_str_set: list(str). A piece of user-submitted list of
-                unicode.
-        """
-        self.content_id = content_id
-        self.unicode_str_set = unicode_str_set
-        self.validate()
-
-    def to_dict(self):
-        """Returns a dict representing this SubtitledSetOfUnicodeString domain
-            object.
-
-        Returns:
-            dict. A dict, mapping all fields of SubtitledSetOfUnicodeString
-            instance.
-        """
-        return {
-            'content_id': self.content_id,
-            'unicode_str_set': self.unicode_str_set
-        }
-
-    @classmethod
-    def from_dict(cls, subtitled_set_of_unicode_str_dict):
-        """Return a SubtitledSetOfUnicodeString domain object from a dict.
-
-        Args:
-            subtitled_set_of_unicode_str_dict: dict. The dict representation of
-                SubtitledSetOfUnicodeString object.
-
-        Returns:
-            SubtitledSetOfUnicodeString. The corresponding
-            SubtitledSetOfUnicodeString domain object.
-        """
-        return cls(
-            subtitled_set_of_unicode_str_dict['content_id'],
-            subtitled_set_of_unicode_str_dict['unicode_str_set']
-        )
-
-    def validate(self):
-        """Validates properties of the SubtitledSetOfUnicodeString.
-
-        Raises:
-            ValidationError. One or more attributes of the
-                SubtitledSetOfUnicodeString are invalid.
-        """
-        if not isinstance(self.content_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected content id to be a string, received %s' %
-                self.content_id)
-
-        if not isinstance(self.unicode_str_set, list):
-            raise utils.ValidationError(
-                'Invalid unicode string set: %s' % self.unicode_str_set)
-
-        for unicode_str in self.unicode_str_set:
-            if not isinstance(unicode_str, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Invalid content unicode: %s' % unicode_str)
-
-        if len(set(self.unicode_str_set)) != len(self.unicode_str_set):
-            raise utils.ValidationError(
-                'Duplicate unicode found in set: %s' % self.unicode_str_set)
-
-
-class SubtitledSetOfNormalizedString(python_utils.OBJECT):
-    """Value object representing subtitled set of normalized string."""
-
-    def __init__(self, content_id, normalized_str_set):
-        """Initializes a SubtitledSetOfNormalizedString domain object.
-
-        Args:
-            content_id: str. A unique id referring to the other assets for this
-                content.
-            normalized_str_set: list(str). A piece of user-submitted list of
-                normalized unicode.
-        """
-        self.content_id = content_id
-        self.normalized_str_set = normalized_str_set
-        self.validate()
-
-    def to_dict(self):
-        """Returns a dict representing this SubtitledSetOfNormalizedString
-            domain object.
-
-        Returns:
-            dict. A dict, mapping all fields of SubtitledSetOfNormalizedString
-            instance.
-        """
-        return {
-            'content_id': self.content_id,
-            'normalized_str_set': self.normalized_str_set
-        }
-
-    @classmethod
-    def from_dict(cls, subtitled_set_of_normalized_str_dict):
-        """Return a SubtitledSetOfNormalizedString domain object from a dict.
-
-        Args:
-            subtitled_set_of_normalized_str_dict: dict. The dict
-                representation of SubtitledSetOfNormalizedString object.
-
-        Returns:
-            SubtitledSetOfNormalizedString. The corresponding
-            SubtitledSetOfNormalizedString domain object.
-        """
-        return cls(
-            subtitled_set_of_normalized_str_dict['content_id'],
-            subtitled_set_of_normalized_str_dict['normalized_str_set']
-        )
-
-    def validate(self):
-        """Validates properties of the SubtitledSetOfNormalizedString.
-
-        Raises:
-            ValidationError. One or more attributes of the
-                SubtitledSetOfNormalizedString are invalid.
-        """
-        if not isinstance(self.content_id, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected content id to be a string, received %s' %
-                self.content_id)
-
-        if not isinstance(self.normalized_str_set, list):
-            raise utils.ValidationError(
-                'Invalid unicode string set: %s' % self.normalized_str_set)
-
-        for normalized_str in self.normalized_str_set:
-            if not isinstance(normalized_str, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Invalid content unicode: %s' % normalized_str)
-
-        if len(set(self.normalized_str_set)) != len(self.normalized_str_set):
-            raise utils.ValidationError(
-                'Duplicate unicode found in set: %s' % self.normalized_str_set)
-
-
 class State(python_utils.OBJECT):
     """Domain object for a state."""
 
@@ -2548,14 +2352,14 @@ class State(python_utils.OBJECT):
             content_id_list.append(feedback_content_id)
 
             for rule_spec in answer_group.rule_specs:
-                for input_name in rule_spec.inputs:
-                    rule_input = rule_spec.inputs[input_name]
-                    if isinstance(
-                            rule_input,
-                            (SubtitledSetOfNormalizedString,
-                             SubtitledSetOfUnicodeString)
-                    ):
-                        content_id_list.append(rule_input.content_id)
+                for param_name, value in rule_spec.inputs.items():
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).get_rule_param_type(rule_spec.rule_type, param_name))
+
+                    if issubclass(param_type, objects.BaseTranslatableObject):
+                        content_id_list.append(value['content_id'])
 
         if self.interaction.default_outcome:
             default_outcome_content_id = (
@@ -2916,14 +2720,14 @@ class State(python_utils.OBJECT):
 
         for answer_group in self.interaction.answer_groups:
             for rule_spec in answer_group.rule_specs:
-                for input_name in rule_spec.inputs:
-                    rule_input = rule_spec.inputs[input_name]
-                    if isinstance(
-                            rule_input,
-                            (SubtitledSetOfNormalizedString,
-                             SubtitledSetOfUnicodeString)
-                    ):
-                        old_content_id_list.append(rule_input.content_id)
+                for param_name, value in rule_spec.inputs.items():
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).get_rule_param_type(rule_spec.rule_type, param_name))
+
+                    if issubclass(param_type, objects.BaseTranslatableObject):
+                        old_content_id_list.append(value['content_id'])
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
@@ -2961,16 +2765,11 @@ class State(python_utils.OBJECT):
                         # referred to exist and have the correct types.
                         normalized_param = value
                     else:
-                        is_subtitled_set_of_normalized_string = isinstance(
-                            value, SubtitledSetOfNormalizedString)
-                        is_subtitled_set_of_unicode_string = isinstance(
-                            value, SubtitledSetOfUnicodeString)
-                        if (
-                                is_subtitled_set_of_normalized_string or
-                                is_subtitled_set_of_unicode_string
+                        if issubclass(
+                                param_type,
+                                objects.BaseTranslatableObject
                         ):
-                            new_content_id_list.append(value.content_id)
-                            value = value.to_dict()
+                            new_content_id_list.append(value['content_id'])
 
                         try:
                             normalized_param = param_type.normalize(value)
@@ -2978,15 +2777,6 @@ class State(python_utils.OBJECT):
                             raise Exception(
                                 '%s has the wrong type. It should be a %s.' %
                                 (value, param_type.__name__))
-
-                        if is_subtitled_set_of_normalized_string:
-                            normalized_param = (
-                                SubtitledSetOfNormalizedString.from_dict(
-                                    normalized_param))
-                        if is_subtitled_set_of_unicode_string:
-                            normalized_param = (
-                                SubtitledSetOfUnicodeString.from_dict(
-                                    normalized_param))
 
                     rule_inputs[param_name] = normalized_param
 

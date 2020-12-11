@@ -64,7 +64,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                         'content': {},
                         'ca_placeholder_0': {},
                         'default_outcome': {},
-                        'ri': {}
+                        'rule_input': {}
                     }
                 },
                 'recorded_voiceovers': {
@@ -74,7 +74,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                         'content': {},
                         'ca_placeholder_0': {},
                         'default_outcome': {},
-                        'ri': {}
+                        'rule_input': {}
                     }
                 },
                 'param_changes': [],
@@ -133,7 +133,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                             'rule_type': 'Contains',
                             'inputs': {
                                 'x': {
-                                    'content_id': 'ri',
+                                    'content_id': 'rule_input',
                                     'normalized_str_set': ['®®']
                                 }
                             }

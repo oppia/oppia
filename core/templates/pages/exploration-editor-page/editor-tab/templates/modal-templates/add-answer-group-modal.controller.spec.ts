@@ -176,7 +176,7 @@ describe('Add Answer Group Modal Controller', function() {
   it('should not populate non-null content ids on save', () => {
     const ruleInput = (
       subtitledSetOfNormalizedStringObjectFactory.createDefault());
-    ruleInput.setContentId('ri');
+    ruleInput.setContentId('rule_input');
 
     $scope.tmpRule = {
       inputTypes: {x: 'SubtitledSetOfNormalizedString'},
@@ -184,7 +184,7 @@ describe('Add Answer Group Modal Controller', function() {
     };
 
     $scope.saveResponse(null);
-    expect($scope.tmpRule.inputs.x.getContentId()).toBe('ri');
+    expect($scope.tmpRule.inputs.x.getContentId()).toBe('rule_input');
   });
 
   it('should not populate content ids if input does not need one', () => {

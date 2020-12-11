@@ -239,7 +239,7 @@ describe('Audio preloader service', () => {
             rule_specs: [{
               rule_type: 'Contains',
               inputs: {x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 normalized_str_set: ['1']
               }}
             }],
@@ -260,7 +260,7 @@ describe('Audio preloader service', () => {
             rule_specs: [{
               rule_type: 'Contains',
               inputs: {x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 normalized_str_set: ['2']
               }}
             }],

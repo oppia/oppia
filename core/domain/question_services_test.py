@@ -690,7 +690,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'content_id': 'ri_Contains_3',
+                            'content_id': 'rule_input_Contains_3',
                             'normalized_str_set': ['Test']
                         }
                     },
@@ -714,7 +714,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'content_id': 'ri_Contains_4',
+                            'content_id': 'rule_input_Contains_4',
                             'normalized_str_set': ['Test']
                         }
                     },
@@ -738,7 +738,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'content_id': 'ri_Contains_5',
+                            'content_id': 'rule_input_Contains_5',
                             'normalized_str_set': ['Test']
                         }
                     },
@@ -752,17 +752,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'feedback_0': {},
             'feedback_1': {},
             'feedback_2': {},
-            'ri_Contains_3': {},
-            'ri_Contains_4': {},
-            'ri_Contains_5': {}
+            'rule_input_Contains_3': {},
+            'rule_input_Contains_4': {},
+            'rule_input_Contains_5': {}
         })
         question_state_data.recorded_voiceovers.voiceovers_mapping.update({
             'feedback_0': {},
             'feedback_1': {},
             'feedback_2': {},
-            'ri_Contains_3': {},
-            'ri_Contains_4': {},
-            'ri_Contains_5': {}
+            'rule_input_Contains_3': {},
+            'rule_input_Contains_4': {},
+            'rule_input_Contains_5': {}
         })
         question_state_data.next_content_id_index = 5
         inapplicable_skill_misconception_ids = [
@@ -845,7 +845,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'content_id': 'ri_Contains_3',
+                            'content_id': 'rule_input_Contains_3',
                             'normalized_str_set': ['Test']
                         }
                     },
@@ -869,7 +869,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'content_id': 'ri_Contains_4',
+                            'content_id': 'rule_input_Contains_4',
                             'normalized_str_set': ['Test']
                         }
                     },
@@ -893,7 +893,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'content_id': 'ri_Contains_5',
+                            'content_id': 'rule_input_Contains_5',
                             'normalized_str_set': ['Test']
                         }
                     },
@@ -907,17 +907,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'feedback_0': {},
             'feedback_1': {},
             'feedback_2': {},
-            'ri_Contains_3': {},
-            'ri_Contains_4': {},
-            'ri_Contains_5': {}
+            'rule_input_Contains_3': {},
+            'rule_input_Contains_4': {},
+            'rule_input_Contains_5': {}
         })
         question_state_data.recorded_voiceovers.voiceovers_mapping.update({
             'feedback_0': {},
             'feedback_1': {},
             'feedback_2': {},
-            'ri_Contains_3': {},
-            'ri_Contains_4': {},
-            'ri_Contains_5': {}
+            'rule_input_Contains_3': {},
+            'rule_input_Contains_4': {},
+            'rule_input_Contains_5': {}
         })
         question_state_data.next_content_id_index = 5
         inapplicable_skill_misconception_ids = [
@@ -1187,7 +1187,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                             'file_size_bytes': 100,
                             'needs_update': False,
                             'duration_secs': 0.0}},
-                    'ri_Contains_1': {}}})
+                    'rule_input_Contains_1': {}}})
 
     def test_migrate_question_state_from_v31_to_latest(self):
         answer_group = {
@@ -2310,7 +2310,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             migrated_rule_spec,
             {
                 'inputs': {'x': {
-                    'content_id': 'ri_Equals_2',
+                    'content_id': 'rule_input_Equals_2',
                     'normalized_str_set': ['test']
                 }},
                 'rule_type': 'Equals'
@@ -2581,5 +2581,5 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         rule_spec = answer_group.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'].to_dict(),
-            {'content_id': 'ri_Equals_4', 'normalized_str_set': ['Test']})
+            {'content_id': 'rule_input_Equals_4', 'normalized_str_set': ['Test']})
         self.assertEqual(question.question_state_data.next_content_id_index, 5)

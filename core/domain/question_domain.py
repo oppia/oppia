@@ -798,7 +798,7 @@ class Question(python_utils.OBJECT):
     @classmethod
     def _convert_state_v40_dict_to_v41_dict(cls, question_state_dict):
         """Converts from version 40 to 41. Version 41 adds
-        SubtitledSetOfUnicodeString and SubtitledSetOfNormalizedString
+        TranslatableSetOfUnicodeString and TranslatbleSetOfNormalizedString
         objects to RuleSpec domain objects to allow for translations.
 
         Args:
@@ -841,9 +841,10 @@ class Question(python_utils.OBJECT):
                 self.new_content_ids.append(content_id)
                 return content_id
 
-        # Only TextInput and SetInput have translatable rule inputs.
+        # As of Dec 2020, which is when this migration is to be run, only
+        # TextInput and SetInput have translatable rule inputs.
         interaction_id = question_state_dict['interaction']['id']
-        if interaction_id != 'TextInput' and interaction_id != 'SetInput':
+        if interaction_id not in ['TextInput', 'SetInput']:
             return question_state_dict
 
         content_id_counter = ContentIdCounter(
@@ -852,15 +853,15 @@ class Question(python_utils.OBJECT):
         for answer_group_dict in answer_group_dicts:
             for rule_spec_dict in answer_group_dict['rule_specs']:
                 content_id = content_id_counter.generate_content_id(
-                    'ri_%s_' % rule_spec_dict['rule_type'])
+                    'rule_input_%s_' % rule_spec_dict['rule_type'])
                 if interaction_id == 'TextInput':
-                    # Convert to SubtitledSetOfNormalizedString.
+                    # Convert to TranslatableSetOfNormalizedString.
                     rule_spec_dict['inputs']['x'] = {
                         'content_id': content_id,
                         'normalized_str_set': rule_spec_dict['inputs']['x']
                     }
                 elif interaction_id == 'SetInput':
-                    # Convert to SubtitledSetOfUnicodeString.
+                    # Convert to TranslatableSetOfUnicodeString.
                     rule_spec_dict['inputs']['x'] = {
                         'content_id': content_id,
                         'unicode_str_set': rule_spec_dict['inputs']['x']

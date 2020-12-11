@@ -399,7 +399,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Equals',
+                        'content_id': 'rule_input_Equals',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -1085,7 +1085,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Equals',
+                        'content_id': 'rule_input_Equals',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -1250,7 +1250,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Equals',
+                        'content_id': 'rule_input_Equals',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -1353,7 +1353,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'content_id': 'rule_input',
+                        'normalized_str_set': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -1402,7 +1405,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'translation': 'Placeholder translation',
                         'needs_update': False
                     }
-                }
+                },
+                'rule_input': {}
             }
         }
         written_translations = state_domain.WrittenTranslations.from_dict(
@@ -3314,7 +3318,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Equals',
+                        'content_id': 'rule_input_Equals',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -3732,7 +3736,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         with self.assertRaisesRegexp(
-            Exception, 'list indices must be integers, not unicode'):
+                Exception,
+                re.escape('Expected rule_inputs to be a dict, received []')):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)
 
@@ -3777,7 +3782,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Equals',
+                        'content_id': 'rule_input_Equals',
                         'normalized_str_set': [[]]
                     }
                 },
@@ -3790,7 +3795,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                'Invalid content unicode: []'
+                '{u\'content_id\': u\'rule_input_Equals\', u\'normalized_str_set\': [[]'
+                ']} has the wrong type. It should be a TranslatableSetOfNormali'
+                'zedString.'
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
@@ -3821,7 +3828,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Equals',
+                        'content_id': 'rule_input_Equals',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -3938,82 +3945,6 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'id',
             'unicode_str': ''
         })
-
-
-class SubtitledSetOfUnicodeStringUnitTests(test_utils.GenericTestBase):
-    """Test SubtitledSetOfUnicodeString domain object methods."""
-
-    def test_from_and_to_dict(self):
-        subtitled_set_of_unicode_str_dict = {
-            'content_id': 'id',
-            'unicode_str_set': []
-        }
-        subtitled_set_of_unicode_str = (
-            state_domain.SubtitledSetOfUnicodeString.from_dict(
-                subtitled_set_of_unicode_str_dict)
-        )
-        self.assertEqual(
-            subtitled_set_of_unicode_str.to_dict(),
-            subtitled_set_of_unicode_str_dict)
-
-    def test_validation(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected content id to be a string'
-            ):
-            state_domain.SubtitledSetOfUnicodeString(3, '')
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid unicode string set'
-            ):
-            state_domain.SubtitledSetOfUnicodeString('id', '')
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid content unicode'
-            ):
-            state_domain.SubtitledSetOfUnicodeString('id', ['', 2])
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Duplicate unicode found in set'
-            ):
-            state_domain.SubtitledSetOfUnicodeString('id', ['test', 'test'])
-
-
-class SubtitledSetOfNormalizedStringUnitTests(test_utils.GenericTestBase):
-    """Test SubtitledSetOfNormalizedString domain object methods."""
-
-    def test_from_and_to_dict(self):
-        subtitled_set_of_normalized_str_dict = {
-            'content_id': 'id',
-            'normalized_str_set': []
-        }
-        subtitled_set_of_normalized_str = (
-            state_domain.SubtitledSetOfNormalizedString.from_dict(
-                subtitled_set_of_normalized_str_dict)
-        )
-        self.assertEqual(
-            subtitled_set_of_normalized_str.to_dict(),
-            subtitled_set_of_normalized_str_dict)
-
-    def test_validation(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected content id to be a string'
-            ):
-            state_domain.SubtitledSetOfNormalizedString(3, '')
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid unicode string set'
-            ):
-            state_domain.SubtitledSetOfNormalizedString('id', '')
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid content unicode'
-            ):
-            state_domain.SubtitledSetOfNormalizedString('id', ['', 2])
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Duplicate unicode found in set'
-            ):
-            state_domain.SubtitledSetOfNormalizedString('id', ['test', 'test'])
 
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):

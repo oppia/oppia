@@ -2992,7 +2992,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v40_dict_to_v41_dict(cls, states_dict):
         """Converts from version 40 to 41. Version 41 adds
-        SubtitledSetOfUnicodeString and SubtitledSetOfNormalizedString
+        TranslatableSetOfUnicodeString and TranslatableSetOfNormalizedString
         objects to RuleSpec domain objects to allow for translations.
 
         Args:
@@ -3036,9 +3036,10 @@ class Exploration(python_utils.OBJECT):
                 return content_id
 
         for state_dict in states_dict.values():
-            # Only TextInput and SetInput have translatable rule inputs.
+            # As of Dec 2020, which is when this migration is to be run, only
+            # TextInput and SetInput have translatable rule inputs.
             interaction_id = state_dict['interaction']['id']
-            if interaction_id != 'TextInput' and interaction_id != 'SetInput':
+            if interaction_id not in ['TextInput', 'SetInput']:
                 continue
 
             content_id_counter = ContentIdCounter(
@@ -3047,15 +3048,15 @@ class Exploration(python_utils.OBJECT):
             for answer_group_dict in answer_group_dicts:
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     content_id = content_id_counter.generate_content_id(
-                        'ri_%s_' % rule_spec_dict['rule_type'])
+                        'rule_input_%s_' % rule_spec_dict['rule_type'])
                     if interaction_id == 'TextInput':
-                        # Convert to SubtitledSetOfNormalizedString.
+                        # Convert to TranslatableSetOfNormalizedString.
                         rule_spec_dict['inputs']['x'] = {
                             'content_id': content_id,
                             'normalized_str_set': rule_spec_dict['inputs']['x']
                         }
                     elif interaction_id == 'SetInput':
-                        # Convert to SubtitledSetOfUnicodeString.
+                        # Convert to TranslatableSetOfUnicodeString.
                         rule_spec_dict['inputs']['x'] = {
                             'content_id': content_id,
                             'unicode_str_set': rule_spec_dict['inputs']['x']
@@ -4158,7 +4159,7 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v45_dict_to_v46_dict(cls, exploration_dict):
         """Converts a v45 exploration dict into a v46 exploration dict.
-        Adds SubtitledSetOfUnicodeString and SubtitledSetOfNormalizedString
+        Adds TranslatableSetOfUnicodeString and TranslatableSetOfNormalizedString
         objects to RuleSpec domain objects to allow for translations.
 
         Args:

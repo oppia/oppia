@@ -52,7 +52,7 @@ describe('Graph Data Service', function() {
               rule_type: 'Contains',
               inputs: {
                 x: {
-                  content_id: 'ri',
+                  content_id: 'rule_input',
                   normalized_str_set: ['hola']
                 }
               }

@@ -49,7 +49,7 @@ describe('RuleObjectFactory', () => {
       rule_type: 'Equals',
       inputs: {
         x: {
-          content_id: 'ri',
+          content_id: 'rule_input',
           normalized_str_set: ['a', 'b']
         }
       }
@@ -66,7 +66,7 @@ describe('RuleObjectFactory', () => {
       rule_type: 'Equals',
       inputs: {
         x: {
-          content_id: 'ri',
+          content_id: 'rule_input',
           unicode_str_set: ['a', 'b']
         }
       }

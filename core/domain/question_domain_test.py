@@ -359,7 +359,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'rule_specs': [{
                     'inputs': {
                         'x': {
-                            'content_id': 'ri',
+                            'content_id': 'rule_input',
                             'normalized_str_set': ['Test']
                         }
                     },

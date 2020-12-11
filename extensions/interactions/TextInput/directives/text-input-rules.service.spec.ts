@@ -40,21 +40,21 @@ describe('Text Input rules service', () => {
 
     RULE_INPUT = {
       x: ssonsof.createFromBackendDict({
-        content_id: 'ri',
+        content_id: 'rule_input',
         normalized_str_set: ['abc def']
       })
     };
 
     RULE_INPUT_PLURAL = {
       x: ssonsof.createFromBackendDict({
-        content_id: 'ri',
+        content_id: 'rule_input',
         normalized_str_set: ['testing', 'abc def']
       })
     };
 
     RULE_INPUT_EMPTY = {
       x: ssonsof.createFromBackendDict({
-        content_id: 'ri',
+        content_id: 'rule_input',
         normalized_str_set: []
       })
     };

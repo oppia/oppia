@@ -144,7 +144,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -172,7 +172,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -181,7 +181,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['3', '4', '5', '6']
               }
             }
@@ -206,7 +206,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -234,7 +234,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -243,7 +243,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['3', '4', '5', '6']
               }
             }
@@ -268,7 +268,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -296,7 +296,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -305,7 +305,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['3', '4', '5', '6']
               }
             }
@@ -330,7 +330,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -358,7 +358,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -367,7 +367,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['3', '4', '5', '6']
               }
             }
@@ -392,7 +392,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -420,7 +420,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -429,7 +429,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['3', '4', '5', '6']
               }
             }
@@ -454,7 +454,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -482,7 +482,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -491,7 +491,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['3', '4', '5', '6']
               }
             }
@@ -516,7 +516,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -544,7 +544,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -553,7 +553,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['3', '4', '5', '6']
               }
             }
@@ -582,7 +582,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -591,7 +591,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3', '4']
               }
             }
@@ -639,7 +639,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -648,7 +648,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3', '4']
               }
             }
@@ -696,7 +696,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -705,7 +705,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3', '4']
               }
             }
@@ -753,7 +753,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -762,7 +762,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3', '4']
               }
             }
@@ -810,7 +810,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -819,7 +819,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3', '4']
               }
             }
@@ -867,7 +867,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3']
               }
             }
@@ -876,7 +876,7 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'ri',
+                content_id: 'rule_input',
                 unicode_str_set: ['1', '2', '3', '4']
               }
             }

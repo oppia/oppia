@@ -522,7 +522,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Equals',
+                        'content_id': 'rule_input_Equals',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -564,7 +564,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(exploration, 'Unrecognized rule type')
 
         rule_spec.inputs = {'x': {
-            'content_id': 'ri_Equals',
+            'content_id': 'rule_input_Equals',
             'normalized_str_set': 15
         }}
         rule_spec.rule_type = 'Contains'
@@ -578,8 +578,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'PencilCodeEditor')
         rule_spec.rule_type = 'ErrorContains'
         rule_spec.inputs = {'x': '{{ExampleParam}}'}
-        del init_state.written_translations.translations_mapping['ri_Equals']
-        del init_state.recorded_voiceovers.voiceovers_mapping['ri_Equals']
+        del init_state.written_translations.translations_mapping['rule_input_Equals']
+        del init_state.recorded_voiceovers.voiceovers_mapping['rule_input_Equals']
 
         self._assert_validation_error(
             exploration,
@@ -686,7 +686,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(init_state, 'TextInput')
         valid_text_input_cust_args = init_state.interaction.customization_args
         rule_spec.inputs = {'x': {
-            'content_id': 'ri_Equals',
+            'content_id': 'rule_input_Equals',
             'normalized_str_set': ['Test']
         }}
         rule_spec.rule_type = 'Contains'
@@ -787,7 +787,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Contains',
+                        'content_id': 'rule_input_Contains',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -817,7 +817,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Contains',
+                        'content_id': 'rule_input_Contains',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -1296,7 +1296,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri',
+                        'content_id': 'rule_input',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -1676,7 +1676,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'ri_Equals',
+                        'content_id': 'rule_input_Equals',
                         'normalized_str_set': ['Test']
                     }
                 },

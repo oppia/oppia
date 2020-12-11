@@ -137,7 +137,7 @@ describe('Question update service', function() {
           rule_specs: [{
             rule_type: 'Contains',
             inputs: {x: {
-              content_id: 'ri',
+              content_id: 'rule_input',
               normalized_str_set: ['hola']
             }}
           }],
@@ -198,7 +198,7 @@ describe('Question update service', function() {
           rule_specs: [{
             rule_type: 'Contains',
             inputs: {x: {
-              content_id: 'ri',
+              content_id: 'rule_input',
               normalized_str_set: ['hola']
             }}
           }],
