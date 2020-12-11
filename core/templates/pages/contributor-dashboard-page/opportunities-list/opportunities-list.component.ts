@@ -33,10 +33,10 @@ angular.module('oppia').component('opportunitiesList', {
   },
   template: require('./opportunities-list.component.html'),
   controller: [
-    '$rootScope', '$scope', 'TranslationLanguageService',
-    'OPPORTUNITIES_PAGE_SIZE', function(
-        $rootScope, $scope, TranslationLanguageService,
-        OPPORTUNITIES_PAGE_SIZE) {
+    '$rootScope', 'ContributionOpportunitiesService',
+    'TranslationLanguageService', 'OPPORTUNITIES_PAGE_SIZE', function(
+        $rootScope, ContributionOpportunitiesService,
+        TranslationLanguageService, OPPORTUNITIES_PAGE_SIZE) {
       var ctrl = this;
       var opportunities = [];
       ctrl.visibleOpportunities = [];
@@ -46,25 +46,19 @@ angular.module('oppia').component('opportunitiesList', {
         TranslationLanguageService.onActiveLanguageChanged.subscribe(
           () => ctrl.$onInit()));
 
-      if ($scope.$parent.$ctrl.hasOwnProperty(
-        'reloadOpportunitiesEventEmitter')) {
-        ctrl.directiveSubscriptions.add(
-          $scope.$parent.$ctrl.reloadOpportunitiesEventEmitter.subscribe(
-            () => ctrl.$onInit()));
-      }
+      ctrl.directiveSubscriptions.add(
+        ContributionOpportunitiesService
+          .reloadOpportunitiesEventEmitter.subscribe(() => ctrl.$onInit()));
 
-      if ($scope.$parent.$ctrl.hasOwnProperty(
-        'removeOpportunityEventEmitter')) {
-        ctrl.directiveSubscriptions.add(
-          $scope.$parent.$ctrl.removeOpportunityEventEmitter.subscribe(
-            (opportunityIds) => {
-              opportunities = opportunities.filter(function(opportunity) {
-                return opportunityIds.indexOf(opportunity.id) < 0;
-              });
-              ctrl.visibleOpportunities = opportunities.slice(
-                0, OPPORTUNITIES_PAGE_SIZE);
-            }));
-      }
+      ctrl.directiveSubscriptions.add(
+        ContributionOpportunitiesService
+          .removeOpportunitiesEventEmitter.subscribe((opportunityIds) => {
+            opportunities = opportunities.filter(function(opportunity) {
+              return opportunityIds.indexOf(opportunity.id) < 0;
+            });
+            ctrl.visibleOpportunities = opportunities.slice(
+              0, OPPORTUNITIES_PAGE_SIZE);
+          }));
 
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

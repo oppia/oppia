@@ -16,8 +16,6 @@
  * @fileoverview Directive for showing and reviewing contributions.
  */
 
-import { EventEmitter } from '@angular/core';
-
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
@@ -52,18 +50,16 @@ angular.module('oppia').component('contributionsAndReview', {
   template: require('./contributions-and-review.component.html'),
   controller: [
     '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
-    'ContributionAndReviewService',
+    'ContributionAndReviewService', 'ContributionOpportunitiesService',
     'QuestionObjectFactory', 'SkillBackendApiService',
     'UrlInterpolationService', 'UserService', 'IMAGE_CONTEXT',
     function(
         $filter, $rootScope, $uibModal, AlertsService, ContextService,
-        ContributionAndReviewService,
+        ContributionAndReviewService, ContributionOpportunitiesService,
         QuestionObjectFactory, SkillBackendApiService,
         UrlInterpolationService, UserService, IMAGE_CONTEXT) {
       var ctrl = this;
       ctrl.contributions = {};
-      ctrl.reloadOpportunitiesEventEmitter = new EventEmitter();
-      ctrl.removeOpportunityEventEmitter = new EventEmitter();
 
       var SUGGESTION_LABELS = {
         review: {
@@ -163,7 +159,8 @@ angular.module('oppia').component('contributionsAndReview', {
 
       var resolveSuggestionSuccess = function(suggestionId) {
         AlertsService.addSuccessMessage('Submitted suggestion review.');
-        ctrl.removeOpportunityEventEmitter.emit([suggestionId]);
+        ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
+          [suggestionId]);
       };
 
       var _showQuestionSuggestionModal = function(
@@ -247,7 +244,8 @@ angular.module('oppia').component('contributionsAndReview', {
           },
           controller: 'TranslationSuggestionReviewModalController'
         }).result.then(function(resolvedSuggestionIds) {
-          ctrl.removeOpportunityEventEmitter.emit(resolvedSuggestionIds);
+          ContributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
+            resolvedSuggestionIds);
           resolvedSuggestionIds.forEach(function(suggestionId) {
             delete ctrl.contributions[suggestionId];
           });
@@ -307,7 +305,7 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.activeSuggestionType = suggestionType;
         ctrl.activeTabType = tabType;
         ctrl.contributions = {};
-        ctrl.reloadOpportunitiesEventEmitter.emit();
+        ContributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       };
 
       ctrl.loadContributions = function() {

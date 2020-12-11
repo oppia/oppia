@@ -217,9 +217,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'message': 'Please do not access parent properties ' +
                    'using $parent. Use the scope object' +
                    'for this purpose.',
-        'excluded_files': (
-            'core/templates/pages/contributor-dashboard-page/' +
-            'opportunities-list/opportunities-list.component.ts'),
+        'excluded_files': (),
         'excluded_dirs': ()
     },
     {

@@ -17,6 +17,8 @@
  * fields.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities-backend-api.service.ts');
@@ -27,6 +29,9 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
   function(
       $uibModal, ContributionOpportunitiesBackendApiService,
       UrlInterpolationService) {
+    var reloadOpportunitiesEventEmitter = new EventEmitter<void>();
+    var removeOpportunitiesEventEmitter = new EventEmitter<void>();
+
     var skillOpportunitiesCursor = null;
     var translationOpportunitiesCursor = null;
     var voiceoverOpportunitiesCursor = null;
@@ -118,6 +123,8 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
             languageCode, voiceoverOpportunitiesCursor);
         }
       },
-      showRequiresLoginModal: showRequiresLoginModal
+      showRequiresLoginModal: showRequiresLoginModal,
+      reloadOpportunitiesEventEmitter: reloadOpportunitiesEventEmitter,
+      removeOpportunitiesEventEmitter: removeOpportunitiesEventEmitter,
     };
   }]);

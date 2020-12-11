@@ -5244,7 +5244,8 @@ export = {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
-  // The default number of opportunities to show on contributor dashboard page.
+  // The default number of opportunities to show on the contributor dashboard
+  // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
 
   // The following character limit constraints follow from
