@@ -2241,7 +2241,8 @@ class PopulateContributionStatsOneOffJobTests(
             commit_message, is_suggestion):
         self.assertTrue(is_suggestion)
         self.assertEqual(
-            commit_message, 'Accepted suggestion by %s: %s' % (
+            commit_message,
+            'Accepted Hindi translation suggestion by %s: %s' % (
                 'author', self.COMMIT_MESSAGE))
 
     def mock_accept_suggestion(

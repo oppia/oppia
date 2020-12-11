@@ -31,6 +31,7 @@ import logging
 import math
 import os
 import pprint
+import re
 import traceback
 import zipfile
 
@@ -926,15 +927,20 @@ def update_exploration(
             'Exploration is public so expected a commit message but '
             'received none.')
 
-    if (is_suggestion and (
-            not commit_message or
-            not commit_message.startswith('Accepted '))):
-        raise ValueError('Invalid commit message for suggestion.')
-    if (not is_suggestion and commit_message and commit_message.startswith(
-            'Accepted ')):
-        raise ValueError(
-            'Commit messages for non-suggestions may not start with \'%s\'' %
-            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
+    suggestion_commit_message_prefix_regex = '^%s' % (
+        feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX_TEMPLATE.replace(
+            '%s', '.*'))
+    if is_suggestion:
+        if not commit_message or not re.match(
+                suggestion_commit_message_prefix_regex, commit_message):
+            raise ValueError('Invalid commit message for suggestion.')
+    else:
+        if commit_message and re.match(
+                suggestion_commit_message_prefix_regex, commit_message):
+            raise ValueError(
+                'Commit messages for non-suggestions should not follow \'%s\' '
+                'template' %
+                feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX_TEMPLATE)
 
     updated_exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(

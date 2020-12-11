@@ -330,12 +330,15 @@ def get_commit_message_for_suggestion(
             lambda language_code: '%s translation' % (
                 utils.get_supported_audio_language_description(language_code))),
         suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
-            lambda language_code: 'question')
+            lambda _: 'question')
     }
 
-    return 'Accepted %s suggestion by %s: %s' % (
-        suggestion_type_to_redable_text[suggestion_type](language_code),
-        author_username, commit_message)
+    commit_message_prefix = (
+        feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX_TEMPLATE % (
+            suggestion_type_to_redable_text[suggestion_type](language_code),
+            author_username))
+
+    return '%s: %s' % (commit_message_prefix, commit_message)
 
 
 def accept_suggestion(

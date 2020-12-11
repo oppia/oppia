@@ -4276,13 +4276,13 @@ title: Old Title
 
         with self.assertRaisesRegexp(
             Exception,
-            'Commit messages for non-suggestions may not start with'):
+            'Commit messages for non-suggestions should not follow'):
             exp_services.update_exploration(
                 'user_id', 'exp_id', [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
                     'new_value': 'new title'
-                })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
+                })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX_TEMPLATE)
 
     def test_update_language_code(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
