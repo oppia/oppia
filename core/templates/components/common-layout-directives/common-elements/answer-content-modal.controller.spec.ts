@@ -15,18 +15,18 @@
 /**
  * @fileoverview Unit tests for AnswerContentModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Improvement Confirmation Modal', function() {
   let $scope = null;
   let $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     let $rootScope = $injector.get('$rootScope');
 
     $uibModalInstance = (
       jasmine.createSpyObj('$uibModalInstance', ['close', 'dismiss']));
-
     $scope = $rootScope.$new();
     $controller('AnswerContentModalController', {
       $scope: $scope,

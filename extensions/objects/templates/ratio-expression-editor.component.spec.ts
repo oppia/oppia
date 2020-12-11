@@ -16,10 +16,12 @@
  * @fileoverview Unit tests for the ratio expression component.
  */
 import { Ratio } from 'domain/objects/ratio.model';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('RatioExpression', function() {
   var RationExpressionCtrl = null;
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('Ratio', Ratio);
   }));

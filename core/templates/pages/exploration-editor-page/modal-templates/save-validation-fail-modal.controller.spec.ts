@@ -17,13 +17,13 @@
  */
 
 import { WindowRef } from 'services/contextual/window-ref.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Save Validation Fail Modal Controller', () => {
   let $scope = null;
   let $uibModalInstance = null;
   let $timeout = null;
   const windowRef = new WindowRef();
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('WindowRef', windowRef);
   }));

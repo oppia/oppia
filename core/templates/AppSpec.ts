@@ -34,6 +34,7 @@ const constants = require('constants.ts');
 const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 
 describe('App', function() {
+  importAllAngularServices();
   describe('Generating Constants', function() {
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {

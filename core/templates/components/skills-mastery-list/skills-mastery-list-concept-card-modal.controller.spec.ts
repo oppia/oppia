@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for SkillsMasteryListConceptCardModal.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Skills Mastery List Concept Card Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -23,6 +23,7 @@ describe('Skills Mastery List Concept Card Modal Controller', function() {
   var skillId = '1';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

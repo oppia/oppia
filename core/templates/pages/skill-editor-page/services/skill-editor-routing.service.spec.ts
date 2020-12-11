@@ -17,13 +17,14 @@
  */
 
 require('pages/skill-editor-page/services/skill-editor-routing.service');
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Skill Editor Routing Service', function() {
   var sers = null;
   var $rootScope = null;
   var $location = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     sers = $injector.get('SkillEditorRoutingService');
     $rootScope = $injector.get('$rootScope');

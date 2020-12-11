@@ -32,63 +32,14 @@ export class ContextService {
   constructor(
     private urlService: UrlService) {}
 
-  static _pageContext = null;
-  get pageContext(): string {
-    return ContextService._pageContext;
-  }
-  set pageContext(val: string) {
-    ContextService._pageContext = val;
-  }
-  static _explorationIsLinkedToStory = false;
-  get explorationIsLinkedToStory(): boolean {
-    return ContextService._explorationIsLinkedToStory;
-  }
-  set explorationIsLinkedToStory(val: boolean) {
-    ContextService._explorationIsLinkedToStory = val;
-  }
-  static _explorationId = null;
-  get explorationId(): string {
-    return ContextService._explorationId;
-  }
-  set explorationId(val: string) {
-    ContextService._explorationId = val;
-  }
-  static _questionPlayerIsManuallySet = false;
-  get questionPlayerIsManuallySet(): boolean {
-    return ContextService._questionPlayerIsManuallySet;
-  }
-  set questionPlayerIsManuallySet(val: boolean) {
-    ContextService._questionPlayerIsManuallySet = val;
-  }
-  static _questionId = null;
-  get questionId(): unknown {
-    return ContextService._questionId;
-  }
-  set questionId(val: unknown) {
-    ContextService._questionId = val;
-  }
-  static _editorContext = null;
-  get editorContext(): string {
-    return ContextService._editorContext;
-  }
-  set editorContext(val: string) {
-    ContextService._editorContext = val;
-  }
-  static _customEntityContext = null;
-  get customEntityContext(): EntityContext {
-    return ContextService._customEntityContext;
-  }
-  set customEntityContext(val: EntityContext) {
-    ContextService._customEntityContext = val;
-  }
-  static _imageSaveDestination: string = (
-    AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
-  get imageSaveDestination(): string {
-    return ContextService._imageSaveDestination;
-  }
-  set imageSaveDestination(val: string) {
-    ContextService._imageSaveDestination = val;
-  }
+  pageContext = null;
+  explorationIsLinkedToStory = false;
+  explorationId = null;
+  questionPlayerIsManuallySet = false;
+  questionId = null;
+  editorContext = null;
+  customEntityContext = null;
+  imageSaveDestination: string = AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   init(editorName: string): void {
     this.editorContext = editorName;

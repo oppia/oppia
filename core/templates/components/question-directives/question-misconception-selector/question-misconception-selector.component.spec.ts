@@ -23,7 +23,7 @@ import { MisconceptionObjectFactory } from
 import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require('directives/angular-html-bind.directive.ts');
 
 require(
@@ -38,6 +38,7 @@ describe('Question misconception selector component', function() {
   var ses = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());

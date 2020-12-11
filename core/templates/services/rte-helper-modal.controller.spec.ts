@@ -19,8 +19,6 @@
 import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { ContextService } from './context.service';
-import { CsrfTokenService } from './csrf-token.service';
 
 describe('Rte Helper Modal Controller', function() {
   var $scope = null;
@@ -117,7 +115,7 @@ describe('Rte Helper Modal Controller', function() {
 
       AssetsBackendApiService = $injector.get('AssetsBackendApiService');
       ImageUploadHelperService = $injector.get('ImageUploadHelperService');
-      contextService = $injector.get('contextService');
+      contextService = $injector.get('ContextService');
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
 
@@ -135,16 +133,6 @@ describe('Rte Helper Modal Controller', function() {
           customizationArgSpecs: customizationArgSpecs,
         });
     }));
-    afterEach(() => {
-      CsrfTokenService.tokenPromise = null;
-      ContextService._pageContext = null;
-      ContextService._explorationIsLinkedToStory = false;
-      ContextService._explorationId = null;
-      ContextService._questionPlayerIsManuallySet = false;
-      ContextService._questionId = null;
-      ContextService._editorContext = null;
-      ContextService._customEntityContext = null;
-    });
 
     it('should load modal correctly', function() {
       expect($scope.customizationArgSpecs).toEqual(customizationArgSpecs);

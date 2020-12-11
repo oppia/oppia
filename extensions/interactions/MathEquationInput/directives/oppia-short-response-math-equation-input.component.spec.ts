@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the MathEquationInput short response
  * component.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'interactions/MathEquationInput/directives/' +
   'oppia-short-response-math-equation-input.component.ts');
 
 describe('MathEquationInputShortResponse', function() {
   let ctrl = null;
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$attrs', {

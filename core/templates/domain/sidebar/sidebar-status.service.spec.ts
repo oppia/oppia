@@ -41,11 +41,6 @@ describe('SidebarStatusService', () => {
     spyOnProperty($window.nativeWindow, 'innerWidth').and.returnValue(600);
   });
 
-  afterEach(() => {
-    SidebarStatusService.pendingSidebarClick = false;
-    SidebarStatusService.sidebarIsShown = false;
-  });
-
   it('should open the sidebar if its not open', () => {
     sss.openSidebar();
     expect(sss.isSidebarShown()).toBe(true);

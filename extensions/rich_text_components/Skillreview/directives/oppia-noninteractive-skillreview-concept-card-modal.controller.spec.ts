@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for
  * OppiaNoninteractiveSkillreviewConceptCardModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Oppia Noninteractive Skillreview Concept Card Modal Controller',
   function() {
     var $scope = null;
@@ -25,6 +25,7 @@ describe('Oppia Noninteractive Skillreview Concept Card Modal Controller',
     var skillId = 'skill1';
 
     beforeEach(angular.mock.module('oppia'));
+    importAllAngularServices();
     beforeEach(angular.mock.inject(function($injector, $controller) {
       var $rootScope = $injector.get('$rootScope');
 

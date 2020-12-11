@@ -17,7 +17,7 @@
  */
 import { TestBed } from '@angular/core/testing';
 import { UrlService } from 'services/contextual/url.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'pages/subtopic-viewer-page/navbar-pre-logo-action/' +
   'subtopic-viewer-navbar-pre-logo-action.component.ts');
@@ -25,7 +25,7 @@ require(
 describe('subtopic viewer pre logo action', function() {
   let ctrl = null;
   let urlService: UrlService = null;
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     urlService = TestBed.get(UrlService);

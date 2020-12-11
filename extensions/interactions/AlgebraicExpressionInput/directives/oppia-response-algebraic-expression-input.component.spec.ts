@@ -19,11 +19,12 @@
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
   'oppia-response-algebraic-expression-input.component.ts');
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('AlgebraicExpressionInputResponse', function() {
   let ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$attrs', {
       answer: '&quot;answer&quot;',

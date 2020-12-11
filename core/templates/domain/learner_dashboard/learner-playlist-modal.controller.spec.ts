@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for for learnerPlaylistModal.
  */
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Learner Playlist Modal Controller', function() {
   var $scope = null;
@@ -23,6 +24,7 @@ describe('Learner Playlist Modal Controller', function() {
   var $uibModalInstance;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller, $q) {
     var $rootScope = $injector.get('$rootScope');
     $httpBackend = $injector.get('$httpBackend');

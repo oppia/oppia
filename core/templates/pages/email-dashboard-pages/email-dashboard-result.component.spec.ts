@@ -17,7 +17,7 @@
  */
 
 import { WindowRef } from 'services/contextual/window-ref.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require('pages/email-dashboard-pages/email-dashboard-result.component.ts');
 
 describe('Email Dashboard Result Page', function() {
@@ -28,6 +28,7 @@ describe('Email Dashboard Result Page', function() {
   var windowRef = new WindowRef();
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRef);
   }));

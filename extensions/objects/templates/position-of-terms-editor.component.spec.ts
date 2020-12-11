@@ -15,11 +15,12 @@
 /**
  * @fileoverview Unit tests for the position of terms component.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('PositionOfTerms', function() {
   var PositionOfTermsCtrl = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($componentController) {
     PositionOfTermsCtrl = $componentController('positionOfTermsEditor');
     PositionOfTermsCtrl.$onInit();

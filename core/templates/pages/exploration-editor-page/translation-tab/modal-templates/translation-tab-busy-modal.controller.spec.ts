@@ -15,13 +15,14 @@
 /**
  * @fileoverview Unit tests for TranslationTabBusyModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Translation Tab Busy Modal Controller', function() {
   let $scope = null;
   let $uibModalInstance = null;
   const message = 'This is a message';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     const $rootScope = $injector.get('$rootScope');
 

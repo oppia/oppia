@@ -22,7 +22,7 @@ import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 import { SkillDifficulty } from
   'domain/skill/skill-difficulty.model';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Questions List Select Skill And Difficulty Modal Controller',
   function() {
     var $scope = null;
@@ -45,7 +45,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
     var skillIdToRubricsObject = {};
 
     beforeEach(angular.mock.module('oppia'));
-
+    importAllAngularServices();
     beforeEach(function() {
       TestBed.configureTestingModule({
         providers: [

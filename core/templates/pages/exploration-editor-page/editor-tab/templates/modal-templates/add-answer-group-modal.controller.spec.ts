@@ -25,7 +25,7 @@ import { StateEditorService } from
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { Subscription } from 'rxjs';
 
 describe('Add Answer Group Modal Controller', function() {
@@ -47,7 +47,7 @@ describe('Add Answer Group Modal Controller', function() {
   const saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
     editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
     generateContentIdService = TestBed.get(GenerateContentIdService);

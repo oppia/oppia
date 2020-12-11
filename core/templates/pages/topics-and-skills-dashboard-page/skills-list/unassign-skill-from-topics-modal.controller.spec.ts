@@ -16,14 +16,12 @@
  * @fileoverview Unit tests for UnassignSkillToTopicModalController.
  */
 
-
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Unassign Skill from Topics Modal', function() {
   var $scope = null;
   var $rootScope = null;
@@ -38,13 +36,7 @@ describe('Unassign Skill from Topics Modal', function() {
     topicVersion: 1,
     subtopicId: 1}];
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [TopicsAndSkillsDashboardBackendApiService]
-    });
-  });
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'TopicsAndSkillsDashboardBackendApiService',

@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for EditorReloadingModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Editor Reloading Modal Controller', function() {
   var $flushPendingTasks = null;
   var $scope = null;
@@ -23,6 +23,7 @@ describe('Editor Reloading Modal Controller', function() {
   var $verifyNoPendingTasks = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');
     var $rootScope = $injector.get('$rootScope');

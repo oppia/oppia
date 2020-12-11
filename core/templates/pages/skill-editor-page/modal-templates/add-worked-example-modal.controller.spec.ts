@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for AddWorkedExampleModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Add Worked Example Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

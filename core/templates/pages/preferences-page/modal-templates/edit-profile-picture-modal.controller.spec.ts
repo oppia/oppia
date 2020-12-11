@@ -18,13 +18,14 @@
 
 import $ from 'jquery';
 import Cropper from 'cropperjs';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('EditProfilePictureModalController', function() {
   var $scope = null;
   var $timeout = null;
   var $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');

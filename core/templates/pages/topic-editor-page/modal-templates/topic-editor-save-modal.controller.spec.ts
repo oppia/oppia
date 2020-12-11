@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for TopicEditorSaveModalController.
  */
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Topic Editor Save Modal Controller', function() {
   var $scope = null;
@@ -23,7 +24,7 @@ describe('Topic Editor Save Modal Controller', function() {
   var topicIsPublished = true;
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

@@ -18,9 +18,10 @@
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('SetOfNormalizedStringEditor', function() {
   var ctrl = null;
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController('setOfNormalizedStringEditor');

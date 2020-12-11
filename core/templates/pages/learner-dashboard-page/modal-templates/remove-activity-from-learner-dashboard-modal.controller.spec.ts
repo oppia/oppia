@@ -17,6 +17,8 @@
  * RemoveActivityFromLearnerDashboardModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Remove Activity From Learner Dashboard Modal Controller',
   function() {
     var $httpBackend = null;
@@ -29,7 +31,7 @@ describe('Remove Activity From Learner Dashboard Modal Controller',
     };
 
     beforeEach(angular.mock.module('oppia'));
-
+    importAllAngularServices();
     describe('when section name is playlist and subsection name is' +
       ' exploration', function() {
       var sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';

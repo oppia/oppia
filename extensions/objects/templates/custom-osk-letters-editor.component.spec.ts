@@ -18,11 +18,12 @@
 
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('OnScreenKeyboard', function() {
   let ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'GuppyInitializationService', new GuppyInitializationService());

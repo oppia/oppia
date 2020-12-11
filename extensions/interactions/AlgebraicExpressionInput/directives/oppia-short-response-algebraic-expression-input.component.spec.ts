@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the AlgebraicExpressionInput short response
  * component.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
   'oppia-short-response-algebraic-expression-input.component.ts');
@@ -25,6 +25,7 @@ describe('AlgebraicExpressionInputShortResponse', function() {
   let ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$attrs', {
       answer: '&quot;answer&quot;',

@@ -20,7 +20,7 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { UrlService } from 'services/contextual/url.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'pages/story-viewer-page/navbar-pre-logo-action/' +
   'story-viewer-navbar-pre-logo-action.component.ts');
@@ -33,7 +33,7 @@ describe('story viewer pre logo action', function() {
   var mockSendStoryDataEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     mockSendStoryDataEventEmitter = new EventEmitter();
     $provide.value('StoryViewerBackendApiService', {

@@ -22,7 +22,7 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'answer-submit-action.component.ts');
@@ -33,7 +33,7 @@ describe('Answer Submit Action directive', function() {
   var explorationHtmlFormatterService = null;
   var htmlEscaperService = null;
   var interactionObjectFactory = null;
-
+  importAllAngularServices();
   beforeEach(function() {
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService);

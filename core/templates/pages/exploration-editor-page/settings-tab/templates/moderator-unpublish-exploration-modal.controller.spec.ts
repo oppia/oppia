@@ -16,12 +16,14 @@
  * @fileoverview Unit tests for ModeratorUnpublishExplorationModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Moderator Unpublish Exploration Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var draftEmailBody = 'This is a draft email body';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

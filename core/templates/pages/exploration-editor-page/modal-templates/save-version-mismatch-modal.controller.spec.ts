@@ -21,7 +21,7 @@ import { LostChangeObjectFactory } from
 import { TestBed } from '@angular/core/testing';
 import { UtilsService } from 'services/utils.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Save Version Mismatch Modal Controller', () => {
   let $scope = null;
   let $log = null;
@@ -43,7 +43,7 @@ describe('Save Version Mismatch Modal Controller', () => {
       ]
     });
   });
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('ExplorationDataService', mockExplorationData);
     $provide.value('LostChangeObjectFactory', TestBed.get(

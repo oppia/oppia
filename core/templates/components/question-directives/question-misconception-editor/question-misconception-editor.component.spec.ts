@@ -31,7 +31,7 @@ import { StateEditorService } from 'components/state-editor/state-editor-propert
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 // ^^^ This block is to be removed.
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -52,6 +52,7 @@ describe('Question misconception editor component', function() {
   var mockExternalSaveEventEmitter = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());

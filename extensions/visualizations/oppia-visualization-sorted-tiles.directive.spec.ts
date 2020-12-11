@@ -24,12 +24,12 @@ import { TestBed } from '@angular/core/testing';
 import { AnswerStatsBackendDict, AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { UtilsService } from 'services/utils.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Oppia sorted tiles visualization', function() {
   let $compile, $rootScope, $uibModal;
   let answerStatsObjectFactory: AnswerStatsObjectFactory;
   let utilsService: UtilsService;
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     utilsService = TestBed.get(UtilsService);
     $provide.value('UtilsService', utilsService);

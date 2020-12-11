@@ -16,7 +16,7 @@
  * @fileoverview Tests for Validator to check if input is a valid URL fragment.
  */
 
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('IsUrlFragment Filter', function() {
   var filterName = 'isUrlFragment';
   var args = {
@@ -24,7 +24,7 @@ describe('IsUrlFragment Filter', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   it('should exist', angular.mock.inject(function($filter) {
     expect($filter(filterName)).not.toEqual(null);
   }));

@@ -15,12 +15,13 @@
 /**
  * @fileoverview Unit tests for ConfirmOrCancelModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Confirm Or Cancel Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

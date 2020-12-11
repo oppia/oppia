@@ -66,9 +66,8 @@ require('services/state-interaction-stats.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/translation-file-hash-loader.service.ts');
 require('services/user.service.ts');
-
 require('google-analytics.initializer.ts');
-
+const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 // The following file uses constants in app.constants.ts and hence needs to be
 // loaded *after* app.constants.ts.
 require('I18nFooter.ts');
@@ -78,29 +77,16 @@ require('Polyfills.ts');
 // Default to passive event listeners.
 require('default-passive-events');
 import { LoggerService } from 'services/contextual/logger.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { UtilsService } from 'services/utils.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { AlertsService } from 'services/alerts.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { angularServices } from 'services/angular-services.index';
-require('domain/state/StateObjectFactory');
-require('domain/classroom/classroom-backend-api.service');
-require('pages/exploration-editor-page/services/angular-name.service');
-require(
-  'pages/exploration-editor-page/services/editor-first-time-events.service');
-require(
-  'pages/exploration-editor-page/services/user-exploration-permissions.service'
-);
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { BackgroundMaskService } from 'services/stateful/background-mask.service';
-import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
-const sourceMappedStackTrace = require('sourcemapped-stacktrace');
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
@@ -111,41 +97,38 @@ angular.module('oppia').config([
     // We need to provide these services and pipes separately since they are
     // used in the directives imported in this file and cannot be
     // injected before bootstrapping of oppia module.
-    var csrfTokenService = new CsrfTokenService();
     var loggerService = new LoggerService();
     var utilsService = new UtilsService();
     var windowRef = new WindowRef();
     var alertsService = new AlertsService(loggerService);
-    var htmlEscaperService = new HtmlEscaperService(loggerService);
     var urlService = new UrlService(windowRef);
-    var windowDimensionsService = new WindowDimensionsService(windowRef);
-    var backgroundMaskService = new BackgroundMaskService();
-    var sidebarStatusService = new SidebarStatusService(
-      windowDimensionsService);
-    var contextService = new ContextService(urlService);
     var urlInterpolationService = new UrlInterpolationService(
       alertsService, urlService, utilsService);
-    var servicesToProvideInstances = {csrfTokenService,
+    var htmlEscaperService = new HtmlEscaperService(loggerService);
+    var servicesToProvideInstances = {
+      loggerService,
       utilsService,
       alertsService,
-      htmlEscaperService,
-      contextService,
       urlInterpolationService,
+      windowRef,
       urlService,
-      sidebarStatusService,
-      backgroundMaskService
+      htmlEscaperService
     };
     var servicesToProvide = [
-      'AlertsService', 'BackgroundMaskService',
-      'CsrfTokenService', 'ContextService',
-      'HtmlEscaperService', 'SidebarStatusService', 'UrlService',
-      'UrlInterpolationService', 'UtilsService'
+      'LoggerService',
+      'UtilsService',
+      'AlertsService',
+      'UrlService',
+      'WindowRef',
+      'UrlInterpolationService',
+      // 'HtmlEscaperService'
     ];
     for (let service of servicesToProvide) {
       $provide.value(service, servicesToProvideInstances[(
         service[0].toLowerCase() + service.substring(1))]);
     }
-
+    // $provide.value('HtmlEscaperService', 'HtmlEscaperService');
+    $provide.value('ContextService', 'ContextService');
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from
@@ -179,18 +162,19 @@ angular.module('oppia').config([
     $httpProvider.defaults.headers.put = {
       'Content-Type': 'application/x-www-form-urlencoded'
     };
-
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$exceptionHandler', '$q', '$log', 'AlertsService', 'CsrfTokenService',
-      function($exceptionHandler, $q, $log, AlertsService, CsrfTokenService) {
+      '$exceptionHandler', '$q', '$log', 'AlertsService',
+      function($exceptionHandler, $q, $log, AlertsService) {
         return {
           request: function(config) {
             if (config.data) {
               return $q(function(resolve, reject) {
+                let csrfTokenService = (
+                  OppiaAngularRootComponent.getCsrfTokenService);
                 // Get CSRF token before sending the request.
-                CsrfTokenService.getTokenAsync().then(function(token) {
+                csrfTokenService().getTokenAsync().then(function(token) {
                   if ((config.data instanceof FormData)) {
                     var hasPayload = false;
                     // Check whether the FormData has payload in it.
@@ -262,31 +246,6 @@ angular.module('oppia').config([
   }
 ]);
 
-angular.module('oppia').config(['$provide', function($provide) {
-  $provide.decorator(
-    '$log', ['$delegate', 'DEV_MODE',
-      function($delegate, DEV_MODE) {
-        var _originalError = $delegate.error;
-
-        if (!DEV_MODE) {
-          $delegate.log = function() {};
-          $delegate.info = function() {};
-          // TODO(sll): Send errors (and maybe warnings) to the backend.
-          $delegate.warn = function() { };
-          $delegate.error = function(message) {
-            if (String(message).indexOf('$digest already in progress') === -1) {
-              _originalError(message);
-            }
-          };
-          // This keeps angular-mocks happy (in tests).
-          $delegate.error.logs = [];
-        }
-
-        return $delegate;
-      }
-    ]);
-}]);
-
 angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
   angular.extend(toastrConfig, {
     allowHtml: false,
@@ -307,6 +266,7 @@ for (let servicePair of angularServices) {
   angular.module('oppia').factory(
     servicePair[0], downgradeInjectable(servicePair[1]));
 }
+
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
 // NOTE: The line number logged in stack driver will not accurately
@@ -315,8 +275,8 @@ for (let servicePair of angularServices) {
 // spread over multiple lines. The errored file may be viewed on the
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
-  '$log', 'CsrfTokenService', 'UtilsService', 'DEV_MODE',
-  function($log, CsrfTokenService, UtilsService, DEV_MODE) {
+  '$log', 'UtilsService', 'DEV_MODE',
+  function($log, UtilsService, DEV_MODE) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
@@ -382,6 +342,8 @@ angular.module('oppia').factory('$exceptionHandler', [
               '    at URL: ' + window.location.href
             ].join('\n');
             var timeDifference = Date.now() - timeOfLastPostedError;
+            let csrfTokenService = (
+              OppiaAngularRootComponent.getCsrfTokenService);
             // To prevent an overdose of errors, throttle to at most 1 error
             // every MIN_TIME_BETWEEN_ERRORS_MSEC.
             if (timeDifference > MIN_TIME_BETWEEN_ERRORS_MSEC) {
@@ -389,7 +351,7 @@ angular.module('oppia').factory('$exceptionHandler', [
               try {
                 // We use jQuery here instead of Angular's $http, since the
                 // latter creates a circular dependency.
-                CsrfTokenService.getTokenAsync().then(function(token) {
+                csrfTokenService().getTokenAsync().then(function(token) {
                   $.ajax({
                     type: 'POST',
                     url: '/frontend_errors',

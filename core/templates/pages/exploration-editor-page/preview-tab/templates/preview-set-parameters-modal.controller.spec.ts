@@ -15,13 +15,14 @@
 /**
  * @fileoverview Unit tests for PreviewSetParametersModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Preview Set Parameters Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var manualParamChanges = [];
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

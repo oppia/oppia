@@ -27,7 +27,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 class MockRouterService {
   private refreshStatisticsTabEventEmitter: EventEmitter<void>;
   get onRefreshStatisticsTab() {
@@ -119,7 +119,7 @@ describe('Statistics Tab Component', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]

@@ -497,7 +497,6 @@ import { TranslateService } from 'services/translate.service';
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
-
   static adminBackendApiService: AdminBackendApiService;
   static adminDataService: AdminDataService;
   static adminRouterService: AdminRouterService;
@@ -1568,5 +1567,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
 
     // This emit triggers ajs to start its app.
     this.initialized.emit();
+  }
+
+  static getCsrfTokenService(): CsrfTokenService {
+    return OppiaAngularRootComponent.csrfTokenService;
   }
 }

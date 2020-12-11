@@ -34,7 +34,7 @@ import { StateInteractionIdService }
   from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Add Or Update Solution Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -50,6 +50,7 @@ describe('Add Or Update Solution Modal Controller', function() {
   var answerEditorHtml = {};
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(function() {
     currentInteractionService = TestBed.get(CurrentInteractionService);
     explorationHtmlFormatterService = TestBed.get(

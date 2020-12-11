@@ -20,7 +20,7 @@ import { DeviceInfoService } from 'services/contextual/device-info.service.ts';
 import { GuppyInitializationService } from
   'services/guppy-initialization.service.ts';
 import { WindowRef } from 'services/contextual/window-ref.service.ts';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('OnScreenKeyboard', function() {
   var ctrl = null;
@@ -43,6 +43,7 @@ describe('OnScreenKeyboard', function() {
   }
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     guppyInitializationService = new GuppyInitializationService();
     deviceInfoService = new DeviceInfoService(new WindowRef());

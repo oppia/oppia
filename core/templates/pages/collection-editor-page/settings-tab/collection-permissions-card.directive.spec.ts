@@ -22,6 +22,7 @@ import { CollectionPermissionsCard } from
   './collection-permissions-card.directive';
 import { async } from '@angular/core/testing';
 require('./collection-permissions-card.directive.ts');
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Collection Permissions Card component', () => {
   var $rootScope = null;
@@ -30,6 +31,7 @@ describe('Collection Permissions Card component', () => {
   let getCollectionRights: jasmine.Spy;
   let hasLoadedCollection: jasmine.Spy;
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     getCollectionRights = jasmine.createSpy('getCollectionRightsSpy');
     hasLoadedCollection = jasmine.createSpy('hasLoadedCollectionSpy');

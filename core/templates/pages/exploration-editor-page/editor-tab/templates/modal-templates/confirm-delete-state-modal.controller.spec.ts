@@ -16,10 +16,12 @@
  * @fileoverview Unit tests for ConfirmDeleteStateModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Confirm Delete State Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
-
+  importAllAngularServices();
   var deleteStateName = 'Introduction';
 
   beforeEach(angular.mock.module('oppia'));
