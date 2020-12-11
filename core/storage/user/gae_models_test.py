@@ -873,6 +873,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_2,
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
+            activity_ids=self.EXPLORATION_IDS,
             exploration_ids=self.EXPLORATION_IDS,
             feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
@@ -935,6 +936,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         test_data = {
             'creator_usernames': [],
             'collection_ids': [],
+            'activity_ids': [],
             'exploration_ids': [],
             'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
@@ -949,6 +951,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         test_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
+            'activity_ids': self.EXPLORATION_IDS,
             'exploration_ids': self.EXPLORATION_IDS,
             'feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,

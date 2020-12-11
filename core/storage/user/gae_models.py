@@ -924,6 +924,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     # IDs of activities (e.g., explorations) that this user subscribes to.
     # TODO(#10727): Rename this to exploration_ids and perform a migration.
+    # DEPRECATED. Do not use. Use exploration_ids instead.
+    activity_ids = (
+        datastore_services.StringProperty(repeated=True, indexed=True))
+    # IDs of explorations that this user subscribes to.
     exploration_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     # IDs of collections that this user subscribes to.
@@ -957,6 +961,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains user data."""
         return dict(super(cls, cls).get_export_policy(), **{
+            'activity_ids': base_models.EXPORT_POLICY.EXPORTED,
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
@@ -1027,6 +1032,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
             creator.username for creator in creator_user_models]
 
         user_data = {
+            'activity_ids': user_model.activity_ids,
             'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (

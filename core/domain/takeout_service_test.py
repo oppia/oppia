@@ -825,6 +825,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         stats_data = {}
         story_progress_data = {}
         subscriptions_data = {
+            'activity_ids': [],
             'exploration_ids': [],
             'collection_ids': [],
             'creator_usernames': [],

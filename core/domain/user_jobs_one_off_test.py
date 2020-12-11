@@ -1393,7 +1393,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             self.user_id)
         self.assertEqual(len(user_subscription_model.exploration_ids), 3)
 
-        job = user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
+        job = user_jobs_one_off.CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
         job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
