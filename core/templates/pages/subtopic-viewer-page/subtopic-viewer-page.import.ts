@@ -27,3 +27,7 @@ require(
   'subtopic-viewer-navbar-pre-logo-action.component.ts');
 
 require('pages/subtopic-viewer-page/subtopic-viewer-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { SubtopicViewerPageModule } from './subtopic-viewer-page.module';
+platformBrowserDynamic().bootstrapModule(SubtopicViewerPageModule);

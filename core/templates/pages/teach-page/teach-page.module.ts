@@ -19,17 +19,37 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
-]);
+import 'angular-ui-sortable';
+import 'third-party-imports/guppy.import';
+import 'third-party-imports/midi-js.import';
+import 'third-party-imports/ng-audio.import';
+import 'third-party-imports/ng-joy-ride.import';
+import 'third-party-imports/skulpt.import';
+import 'third-party-imports/ui-tree.import';
+import 'angular';
+import 'headroom.js/dist/headroom';
+import 'headroom.js/dist/angular.headroom';
+import 'angular-animate';
+import 'messageformat';
+import 'angular-translate';
+import 'angular-translate-interpolation-messageformat';
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+require('static/angularjs-1.8.2/angular-aria.js');
+require('static/bower-material-1.1.19/angular-material.js');
+require('static/angularjs-1.8.2/angular-sanitize.min.js');
+require('static/angularjs-1.8.2/angular-touch.min.js');
+require('static/angular-toastr-1.7.0/dist/angular-toastr.tpls.min.js');
+require('static/ui-bootstrap-2.5.0/ui-bootstrap-tpls-2.5.0.js');
+require(
+  'static/bower-angular-translate-storage-cookie-2.18.1/' +
+  'angular-translate-storage-cookie.min.js');
+
+
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 
 import { TeachPageComponent } from './teach-page.component';
 import { OppiaAngularRootComponent } from
@@ -43,7 +63,8 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    UpgradeModule
   ],
   declarations: [
     TeachPageComponent,
@@ -67,23 +88,13 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     }
   ]
 })
-class SplashPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+export class TeachPageModule {
+  constructor(private upgrade: UpgradeModule) { }
+  ngDoBootstrap(): void {
+    this.upgrade.bootstrap(document.body, ['oppia'], { strictDi: true });
+  }
 }
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(SplashPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFn);
-
 declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
 
 angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to

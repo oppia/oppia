@@ -23,3 +23,7 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/admin-page/admin-page.directive.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { AdminPageModule } from './admin-page.module';
+platformBrowserDynamic().bootstrapModule(AdminPageModule);

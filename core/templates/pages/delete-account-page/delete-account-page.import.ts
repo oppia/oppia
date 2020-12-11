@@ -23,3 +23,8 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('./delete-account-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { DeleteAccountPageModule } from './delete-account-page.module';
+platformBrowserDynamic().bootstrapModule(DeleteAccountPageModule);
+

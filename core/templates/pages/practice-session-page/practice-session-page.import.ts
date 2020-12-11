@@ -23,3 +23,7 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/practice-session-page/practice-session-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { PracticeSessionPageModule } from './practice-session-page.module';
+platformBrowserDynamic().bootstrapModule(PracticeSessionPageModule);

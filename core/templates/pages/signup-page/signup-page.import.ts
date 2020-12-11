@@ -23,3 +23,7 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/signup-page/signup-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { SignupPageModule } from './signup-page.module';
+platformBrowserDynamic().bootstrapModule(SignupPageModule);

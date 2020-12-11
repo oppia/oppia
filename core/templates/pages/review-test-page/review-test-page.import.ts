@@ -24,3 +24,7 @@ require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
 require('pages/review-test-page/review-test-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { ReviewTestPageModule } from './review-test-page.module';
+platformBrowserDynamic().bootstrapModule(ReviewTestPageModule);

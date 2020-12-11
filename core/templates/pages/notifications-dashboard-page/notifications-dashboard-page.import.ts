@@ -26,3 +26,7 @@ require('base-components/oppia-root.directive.ts');
 require(
   'pages/notifications-dashboard-page/' +
   'notifications-dashboard-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { NotificationsDashboardPageModule } from './notifications-dashboard-page.module';
+platformBrowserDynamic().bootstrapModule(NotificationsDashboardPageModule);

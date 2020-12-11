@@ -25,3 +25,7 @@ require('base-components/oppia-root.directive.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('pages/preferences-page/preferences-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { PreferencesPageModule } from './preferences-page.module';
+platformBrowserDynamic().bootstrapModule(PreferencesPageModule);

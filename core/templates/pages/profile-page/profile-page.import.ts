@@ -24,3 +24,7 @@ require('base-components/oppia-root.directive.ts');
 
 require('pages/OppiaFooterDirective.ts');
 require('pages/profile-page/profile-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { ProfilePageModule } from './profile-page.module';
+platformBrowserDynamic().bootstrapModule(ProfilePageModule);

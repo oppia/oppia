@@ -31,3 +31,7 @@ require(
 require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { TopicsAndSkillsDashboardPageModule } from './topics-and-skills-dashboard-page.module';
+platformBrowserDynamic().bootstrapModule(TopicsAndSkillsDashboardPageModule);

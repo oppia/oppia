@@ -23,3 +23,7 @@ require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { TeachPageModule } from './teach-page.module';
+platformBrowserDynamic().bootstrapModule(TeachPageModule);

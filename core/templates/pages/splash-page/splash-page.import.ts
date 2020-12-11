@@ -23,3 +23,7 @@ require('pages/splash-page/splash-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 require('pages/splash-page/splash-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { SplashPageModule } from './splash-page.module';
+platformBrowserDynamic().bootstrapModule(SplashPageModule);

@@ -101,10 +101,7 @@ require('services/context.service');
   ]
 })
 export class ContributorDashboardPageModule {
-  constructor(private upgrade: UpgradeModule, private injector: Injector) {
-    console.log('Here');
-    OppiaAngularRootComponent.injector = this.injector;
-  }
+  constructor(private upgrade: UpgradeModule) { }
   ngDoBootstrap(): void {
     this.upgrade.bootstrap(document.body, ['oppia'], { strictDi: true });
   }

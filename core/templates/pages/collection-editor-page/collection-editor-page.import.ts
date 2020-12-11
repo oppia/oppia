@@ -30,3 +30,7 @@ require(
 require(
   'pages/collection-editor-page/navbar/' +
   'collection-editor-navbar.directive.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { CollectionEditorPageModule } from './collection-editor-page.module';
+platformBrowserDynamic().bootstrapModule(CollectionEditorPageModule);

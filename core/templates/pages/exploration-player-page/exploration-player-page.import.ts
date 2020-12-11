@@ -32,3 +32,8 @@ require(
 require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { ExplorationPlayerPageModule } from './exploration-player-page.module';
+platformBrowserDynamic().bootstrapModule(ExplorationPlayerPageModule);
+
