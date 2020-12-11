@@ -37,9 +37,7 @@ class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """SkillSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -94,9 +92,7 @@ class SkillModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """SkillModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -248,9 +244,7 @@ class SkillSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """SkillSummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
