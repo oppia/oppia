@@ -29,11 +29,11 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
   'COMPONENT_NAME_EXPLANATION', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
   'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTIES',
   function(
-      $scope, $uibModalInstance, ContextService, ImageLocalStorageService,
-      RubricObjectFactory, SkillCreationService, SkillObjectFactory,
-      SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION,
-      MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
-      SKILL_DIFFICULTIES, AllSkillNames) {
+      $scope, $uibModalInstance, AllSkillNames, ContextService,
+      ImageLocalStorageService, RubricObjectFactory, SkillCreationService,
+      SkillObjectFactory, SubtitledHtmlObjectFactory,
+      COMPONENT_NAME_EXPLANATION, MAX_CHARS_IN_SKILL_DESCRIPTION,
+      SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
     var rubrics = [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
