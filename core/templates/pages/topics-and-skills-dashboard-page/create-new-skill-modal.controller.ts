@@ -27,13 +27,13 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
   'RubricObjectFactory', 'SkillCreationService', 'SkillObjectFactory',
   'SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
   'MAX_CHARS_IN_SKILL_DESCRIPTION', 'SKILL_DESCRIPTION_STATUS_VALUES',
-  'SKILL_DIFFICULTIES',
+  'SKILL_DIFFICULTIES', 'AllSkillNames',
   function(
       $scope, $uibModalInstance, ContextService, ImageLocalStorageService,
       RubricObjectFactory, SkillCreationService, SkillObjectFactory,
       SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION,
       MAX_CHARS_IN_SKILL_DESCRIPTION, SKILL_DESCRIPTION_STATUS_VALUES,
-      SKILL_DIFFICULTIES) {
+      SKILL_DIFFICULTIES, AllSkillNames) {
     var rubrics = [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[0], []),
       RubricObjectFactory.create(SKILL_DIFFICULTIES[1], ['']),
@@ -89,11 +89,12 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
             'alphanumeric characters, spaces and/or hyphens.');
         return false;
       }
-      // if (true) {
-      //   $scope.errorMsg = (
-      //     'Blah blah.');
-      //   return false;
-      // }
+      if (AllSkillNames.includes($scope.newSkillDescription.toUpperCase())) {
+        $scope.errorMsg = (
+          'This description already exists. Please choose a ' + 
+            'new name.');
+        return false;
+      }
       return true;
     };
 
