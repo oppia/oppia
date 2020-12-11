@@ -89,6 +89,11 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
             'alphanumeric characters, spaces and/or hyphens.');
         return false;
       }
+      // if (true) {
+      //   $scope.errorMsg = (
+      //     'Blah blah.');
+      //   return false;
+      // }
       return true;
     };
 

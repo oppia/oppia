@@ -192,7 +192,11 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       };
 
       ctrl.createSkill = function() {
-        SkillCreationService.createNewSkill();
+        let allSkillNames = [];
+        for (let skillSummary of ctrl.untriagedSkillSummaries) {
+          allSkillNames.push(skillSummary.description);
+        }
+        SkillCreationService.createNewSkill([], allSkillNames);
       };
       /**
        * @param {Number} pageNumber - Page number to navigate to.

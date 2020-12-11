@@ -66,7 +66,8 @@ angular.module('oppia').factory('SkillCreationService', [
         skillDescriptionStatusMarker = (
           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
       },
-      createNewSkill: function(topicIds) {
+      createNewSkill: function(topicIds, allSkillNames) {
+        console.log(allSkillNames);
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
