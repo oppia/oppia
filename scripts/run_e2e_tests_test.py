@@ -380,39 +380,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         assert resource_values.update_called
         assert resource_values.updater.execute_called
 
-    def test_check_screenhost_when_not_exist(self):
-        def mock_isdir(unused_path):
-            return False
-
-        exist_swap = self.swap_with_checks(
-            os.path, 'isdir', mock_isdir,
-            expected_args=[(os.path.join(os.pardir, 'protractor-screenshots'),)]
-        )
-        print_swap = self.print_swap(called=False)
-        with print_swap, exist_swap:
-            run_e2e_tests.ensure_screenshots_dir_is_removed()
-
-    def test_check_screenhost_when_exist(self):
-        screenshot_dir = os.path.join(os.pardir, 'protractor-screenshots')
-        def mock_isdir(unused_path):
-            return True
-
-        def mock_rmdir(unused_path):
-            return True
-
-        exist_swap = self.swap_with_checks(
-            os.path, 'isdir', mock_isdir, expected_args=[(screenshot_dir,)])
-        rmdir_swap = self.swap_with_checks(
-            os, 'rmdir', mock_rmdir, expected_args=[(screenshot_dir,)])
-        expected_output = (
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
-            'core/tests/protractor.conf.js, you can view screenshots'
-            'of the failed tests in ../protractor-screenshots/')
-
-        print_swap = self.print_swap(expected_args=[(expected_output,)])
-        with print_swap, exist_swap, rmdir_swap:
-            run_e2e_tests.ensure_screenshots_dir_is_removed()
-
     def test_cleanup_when_no_subprocess(self):
 
         def mock_kill_process_based_on_regex(unused_regex):
@@ -1066,9 +1033,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_wait_for_port_to_be_open(unused_port):
             return
 
-        def mock_ensure_screenshots_dir_is_removed():
-            return
-
         def mock_get_e2e_test_parameters(
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
@@ -1166,9 +1130,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         wait_swap = self.swap(
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open)
-        ensure_screenshots_dir_is_removed_swap = self.swap(
-            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
-            mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters)
@@ -1184,7 +1145,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                    with wait_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
                             with get_chrome_driver_version_swap:
                                 with decrypt_swap, os_getenv_swap:
@@ -1219,9 +1180,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         def mock_wait_for_port_to_be_open(unused_port):
-            return
-
-        def mock_ensure_screenshots_dir_is_removed():
             return
 
         def mock_get_e2e_test_parameters(
@@ -1277,9 +1235,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         wait_swap = self.swap(
             common, 'wait_for_port_to_be_open',
             mock_wait_for_port_to_be_open)
-        ensure_screenshots_dir_is_removed_swap = self.swap(
-            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
-            mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters)
@@ -1290,7 +1245,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                    with wait_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
                             with get_chrome_driver_version_swap:
                                 with os_getenv_swap:
@@ -1327,9 +1282,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         def mock_wait_for_port_to_be_open(unused_port):
-            return
-
-        def mock_ensure_screenshots_dir_is_removed():
             return
 
         def mock_get_e2e_test_parameters(
@@ -1386,9 +1338,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
-            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
-            mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
@@ -1423,7 +1372,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                    with wait_swap:
                         with get_parameters_swap, popen_swap:
                             with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(args=[])
@@ -1457,9 +1406,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         def mock_wait_for_port_to_be_open(unused_port):
-            return
-
-        def mock_ensure_screenshots_dir_is_removed():
             return
 
         def mock_get_e2e_test_parameters(
@@ -1511,9 +1457,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
-            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
-            mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
@@ -1547,7 +1490,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with modify_constants_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                    with wait_swap:
                         with get_parameters_swap, popen_swap:
                             with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
@@ -1634,9 +1577,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_wait_for_port_to_be_open(unused_port):
             return
 
-        def mock_ensure_screenshots_dir_is_removed():
-            return
-
         def mock_get_e2e_test_parameters(
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
@@ -1689,9 +1629,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
-            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
-            mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
@@ -1726,7 +1663,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                    with wait_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
                             with get_chrome_driver_version_swap:
                                 run_e2e_tests.main(args=['--debug_mode'])
@@ -1763,9 +1700,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_wait_for_port_to_be_open(unused_port):
             return
 
-        def mock_ensure_screenshots_dir_is_removed():
-            return
-
         def mock_get_e2e_test_parameters(
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
@@ -1818,9 +1752,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
-            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
-            mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
@@ -1854,7 +1785,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                    with wait_swap:
                         with get_parameters_swap, popen_swap:
                             with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
