@@ -24,6 +24,7 @@
  * TODO(#9172): Remove the import when upgraded to Angular 9.
  */
 import 'hammerjs';
+require('angular-material/angular-material.css');
 require('app.constants.ajs.ts');
 
 require('components/button-directives/create-activity-button.directive.ts');
@@ -87,7 +88,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { angularServices } from 'services/angular-services.index';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import { HtmlEscaperService } from 'services/html-escaper.service';
-
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
   '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
@@ -121,14 +121,16 @@ angular.module('oppia').config([
       'UrlService',
       'WindowRef',
       'UrlInterpolationService',
-      // 'HtmlEscaperService'
+      'HtmlEscaperService'
     ];
-    for (let service of servicesToProvide) {
-      $provide.value(service, servicesToProvideInstances[(
-        service[0].toLowerCase() + service.substring(1))]);
-    }
+    // console.log('zhere');
+    // for (let service of angularServices) {
+    //   $provide.value(service[0], OppiaAngularRootComponent.getService(
+    //     [service[1]]
+    //   ));
+    // }
     // $provide.value('HtmlEscaperService', 'HtmlEscaperService');
-    $provide.value('ContextService', 'ContextService');
+    // $provide.value('ContextService', 'ContextService');
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from

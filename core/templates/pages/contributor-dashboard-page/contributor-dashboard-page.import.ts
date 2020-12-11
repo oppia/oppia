@@ -16,10 +16,16 @@
  * @fileoverview Directive scripts for the contributor dashboard page.
  */
 
-require(
-  'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts');
+import 'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts';
+import * as angular from 'angular';
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
-
+import 'services/context.service';
 require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
+// Bootstrap
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { ContributorDashboardPageModule } from 'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts';
+import { setAngularJSGlobal } from '@angular/upgrade/static';
+setAngularJSGlobal(angular);
+platformBrowserDynamic().bootstrapModule(ContributorDashboardPageModule);

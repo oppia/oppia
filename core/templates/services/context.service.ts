@@ -24,13 +24,15 @@ import { AppConstants } from 'app.constants';
 import { EntityContext } from 'domain/utilities/entity-context.model';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlService } from 'services/contextual/url.service';
-
+import * as angular from 'angular';
 @Injectable({
   providedIn: 'root'
 })
 export class ContextService {
   constructor(
-    private urlService: UrlService) {}
+    private urlService: UrlService) {
+    console.log('constructing');
+    }
 
   pageContext = null;
   explorationIsLinkedToStory = false;

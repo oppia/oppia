@@ -18,6 +18,7 @@
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
+
 require('pages/splash-page/splash-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');

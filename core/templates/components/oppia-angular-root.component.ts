@@ -61,7 +61,7 @@
  *       loading
  */
 
-import { Component, Output, AfterViewInit, EventEmitter } from '@angular/core';
+import { Component, Output, AfterViewInit, EventEmitter, Injector } from '@angular/core';
 import { AdminBackendApiService } from
   'domain/admin/admin-backend-api.service';
 import { AdminDataService } from
@@ -497,6 +497,7 @@ import { TranslateService } from 'services/translate.service';
 export class OppiaAngularRootComponent implements AfterViewInit {
   @Output()
     public initialized: EventEmitter<void> = new EventEmitter();
+  static injector: Injector;
   static adminBackendApiService: AdminBackendApiService;
   static adminDataService: AdminDataService;
   static adminRouterService: AdminRouterService;
@@ -791,6 +792,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
 
   constructor(
+    private injector: Injector,
     private adminBackendApiService: AdminBackendApiService,
 private adminDataService: AdminDataService,
 private adminRouterService: AdminRouterService,
@@ -1088,6 +1090,7 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
   ) {}
 
   public ngAfterViewInit(): void {
+    OppiaAngularRootComponent.injector = this.injector;
     OppiaAngularRootComponent.adminBackendApiService = (
       this.adminBackendApiService);
     OppiaAngularRootComponent.adminDataService = this.adminDataService;
@@ -1571,5 +1574,9 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
 
   static getCsrfTokenService(): CsrfTokenService {
     return OppiaAngularRootComponent.csrfTokenService;
+  }
+
+  static getService(service: [unknown]): unknown {
+    return this.injector.get(service[0]);
   }
 }
