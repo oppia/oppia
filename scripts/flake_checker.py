@@ -1,4 +1,4 @@
-# Copyright 2019 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,12 @@ import os
 import python_utils
 
 import requests
+from datetime import datetime, timezone
 
-FLAKE_REPORT_URL = 'https://oppia-flake-report.herokuapp.com/flake-report'
+FLAKE_REPORT_URL = (
+    'https://oppia-e2e-test-results-logger.herokuapp.com'
+    '/check-flake-and-report')
+FLAKE_REPORT_API_KEY = '7Ccp062JVjv9LUYwnLMqcm5Eu5gYqqhpl3zQmcO3cDQ'
 
 CI_INFO = {
     'circleCI': {
@@ -56,6 +60,14 @@ def _print_color_message(message):
     python_utils.PRINT('\033[92m' + message + '\033[0m\n')
 
 
+def check_if_on_ci():
+    for info in CI_INFO.values():
+        ci_identifier = info['env']['identifier']
+        if os.getenv(ci_identifier):
+            return True
+    return False
+
+
 def _get_build_info():
     """Returns the info related to the build container."""
     build_info = {}
@@ -71,9 +83,11 @@ def _get_build_info():
         else:
             build_url = info['build_url_template'] % os.getenv(
                 ci_env['build_id'])
+        timestamp = datetime.now(tz=timezone.utc).isoformat()
 
         build_info['username'] = os.getenv(ci_env['user_info'])
         build_info['build_url'] = build_url
+        build_info['timestamp'] = timestamp
 
         return build_info
 
@@ -86,16 +100,18 @@ def is_test_output_flaky(output_lines, suite_name):
     payload = {
         'suite': suite_name,
         'output_lines': output_lines,
-        'username': build_info['username'],
-        'build_url': build_info['build_url']
+        'metadata': build_info,
     }
     response = None
     try:
         response = requests.post(
-            FLAKE_REPORT_URL, json=payload, allow_redirects=False)
+            FLAKE_REPORT_URL, json=payload, allow_redirects=False,
+            headers={'report_key': FLAKE_REPORT_API_KEY})
     except Exception as e:
-        _print_color_message('Failed to fetch report from %s: %s' % (
-            FLAKE_REPORT_URL, e))
+        _print_color_message((
+            'Failed to contact E2E test logging server at %s.'
+            'Please report to E2E team in case server is down.'
+            'Exception: %s') % (FLAKE_REPORT_URL, e))
 
         return False
 
@@ -114,4 +130,12 @@ def is_test_output_flaky(output_lines, suite_name):
         _print_color_message(
             'Logs from test result logging server:\n %s' % report['log'])
 
-    return report['result'] if 'result' in report else False
+    flaky = report['result'] if 'result' in report else False
+    if flaky:
+        flake = report['flake']
+        _print_color_message('Flake Detected:')
+        _print_color_message('    Suite: %s' % flake['suite'])
+        _print_color_message('    Test: %s' % flake['test'])
+        _print_color_message(
+            '    Error Message: %s' % flake['flake_id'])
+    return flaky

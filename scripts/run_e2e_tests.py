@@ -554,10 +554,7 @@ def run_tests(args):
             break
         sys.stdout.write(nextline)
         sys.stdout.flush()
-        try:
-            output_lines.append(python_utils.UNICODE(nextline.rstrip()))
-        except UnicodeDecodeError:
-            pass
+        output_lines.append(python_utils.UNICODE(nextline.rstrip()))
 
     return output_lines, p.returncode
 
@@ -573,6 +570,10 @@ def main(args=None):
 
     for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
         python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
+        # Only rerun tests on CI.
+        if not flake_checker.check_if_on_ci():
+            python_utils.PRINT('No reruns because not running on CI.')
+            break
         output, return_code = run_tests(parsed_args)
         if return_code == 0 or not flake_checker.is_test_output_flaky(
                 output, parsed_args.suite):
