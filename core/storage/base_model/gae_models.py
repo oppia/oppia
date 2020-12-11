@@ -468,7 +468,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """BaseCommitLogEntryModel contains data corresponding to a user that
+        """Model contains data corresponding to a user that
         requires pseudonymization: user_id field.
         """
         return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
@@ -1221,8 +1221,8 @@ class BaseSnapshotMetadataModel(BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Metadata models should always be pseudonymized in the context of
-        their parent models.
+        """Model contains data corresponding to a user that requires
+        pseudonymization: committer_id field.
         """
         return DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 

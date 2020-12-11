@@ -32,6 +32,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
+import schema_utils
 import utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
@@ -99,12 +100,12 @@ REMOVED_REVIEWER_EMAIL_DATA = {
     }
 }
 
-NOTIFICATION_EMAIL_LIST_SCHEMA = {
-    'type': 'list',
+NOTIFICATION_USER_IDS_LIST_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'unicode',
+        'type': schema_utils.SCHEMA_TYPE_UNICODE,
         'validators': [{
-            'id': 'is_valid_email',
+            'id': 'is_valid_user_id',
         }]
     },
     'validators': [{
@@ -116,18 +117,18 @@ NOTIFICATION_EMAIL_LIST_SCHEMA = {
 }
 
 EMAIL_HTML_BODY_SCHEMA = {
-    'type': 'unicode',
+    'type': schema_utils.SCHEMA_TYPE_UNICODE,
     'ui_config': {
         'rows': 20,
     }
 }
 
 EMAIL_CONTENT_SCHEMA = {
-    'type': 'dict',
+    'type': schema_utils.SCHEMA_TYPE_DICT,
     'properties': [{
         'name': 'subject',
         'schema': {
-            'type': 'unicode',
+            'type': schema_utils.SCHEMA_TYPE_UNICODE,
         },
     }, {
         'name': 'html_body',
@@ -203,10 +204,10 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'I\'m writing to inform you that I have unpublished the above '
     'exploration.')
 
-NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
-    'notification_emails_for_failed_tasks',
-    NOTIFICATION_EMAIL_LIST_SCHEMA,
-    'Email(s) to notify if an ML training task fails',
+NOTIFICATION_USER_IDS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
+    'notification_user_ids_for_failed_tasks',
+    NOTIFICATION_USER_IDS_LIST_SCHEMA,
+    'User IDs to notify if an ML training task fails',
     []
 )
 
@@ -361,6 +362,8 @@ SENDER_VALIDATORS = {
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_TEST: user_services.is_admin
 }
@@ -534,15 +537,16 @@ def send_job_failure_email(job_id):
         'please visit the admin page at:\n'
         'https://www.oppia.org/admin#/jobs') % job_id)
     send_mail_to_admin(mail_subject, mail_body)
-    other_recipients = (
-        NOTIFICATION_EMAILS_FOR_FAILED_TASKS.value)
-    system_name_email = '%s <%s>' % (
-        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
-    if other_recipients:
-        email_services.send_bulk_mail(
-            system_name_email, other_recipients,
-            mail_subject, mail_body,
-            mail_body.replace('\n', '<br/>'))
+    recipient_ids = (
+        NOTIFICATION_USER_IDS_FOR_FAILED_TASKS.value)
+    bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
+    if recipient_ids:
+        _send_bulk_mail(
+            recipient_ids, feconf.SYSTEM_COMMITTER_ID,
+            feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE, mail_subject, mail_body,
+            feconf.SYSTEM_EMAIL_ADDRESS, feconf.SYSTEM_EMAIL_NAME,
+            bulk_email_model_id
+        )
 
 
 def send_dummy_mail_to_admin(username):

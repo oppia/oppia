@@ -30,6 +30,14 @@ class ConfigServicesTests(test_utils.GenericTestBase):
         config_services.set_property('admin', 'promo_bar_enabled', True)
         self.assertTrue(config_domain.PROMO_BAR_ENABLED.value)
 
+    def test_can_not_set_config_property_containing_email(self):
+        self.assertFalse(config_domain.PROMO_BAR_ENABLED.value)
+        with self.assertRaisesRegexp(
+            AssertionError, 'Validation failed: does_not_contain_email .*'
+        ):
+            config_services.set_property(
+                'admin', 'promo_bar_message', 'Test some@email.cz test')
+
     def test_can_not_set_config_property_with_invalid_config_property_name(
             self):
         with self.assertRaisesRegexp(

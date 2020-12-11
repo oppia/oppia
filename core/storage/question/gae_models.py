@@ -44,9 +44,7 @@ class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """QuestionSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -85,9 +83,7 @@ class QuestionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """QuestionModel doesn't contain any data directly corresponding to
-        a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -226,10 +222,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Question-skill link should be kept since questions are only
-        anonymized and are not deleted whe user is deleted.
-        """
-        return base_models.DELETION_POLICY.KEEP
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user():
@@ -244,19 +238,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             'skill_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_difficulty': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether QuestionSkillLinkModel references the given user.
-
-        Args:
-            unused_user_id: str. The (unused) ID of the user whose data should
-                be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -724,9 +705,7 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """QuestionSummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod

@@ -528,6 +528,7 @@ BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
 BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
 BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
+BULK_EMAIL_INTENT_ML_JOB_FAILURE = 'bulk_email_ml_job_failure'
 BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
@@ -1241,6 +1242,7 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
 
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
+USER_ID_REGEX = r'^uid_[a-z]{%s}$' % USER_ID_RANDOM_PART_LENGTH
 
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5

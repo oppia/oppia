@@ -42,9 +42,7 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -88,9 +86,7 @@ class CollectionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -205,8 +201,8 @@ class CollectionRightsSnapshotContentModel(
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionRightsSnapshotContentModel contains data corresponding to
-        a user: inside the content field there are owner_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: inside the content field there are owner_ids, editor_ids,
         voice_artist_ids, and viewer_ids fields.
 
         The pseudonymization of this model is handled in the wipeout_service
@@ -280,8 +276,8 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionRightsModel contains data to pseudonymize/delete
-        corresponding to a user: viewer_ids, voice_artist_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
         """
         return (
@@ -534,8 +530,8 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionCommitLogEntryModel contains data corresponding to a user
-        that requires pseudonymization/deletion: user_id field.
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: user_id field.
         """
         return (
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
@@ -696,9 +692,9 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionSummaryModel contains data to pseudonymize/delete
-        corresponding to a user: viewer_ids, editor_ids, owner_ids,
-        contributor_ids, and contributors_summary fields.
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: viewer_ids, editor_ids, owner_ids, contributor_ids,
+        and contributors_summary fields.
         """
         return (
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE

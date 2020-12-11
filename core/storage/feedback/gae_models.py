@@ -93,7 +93,9 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General feedback thread needs to be pseudonymized for the user."""
+        """Model contains data to pseudonymize corresponding to a user:
+        original_author_id and last_nonempty_message_author_id fields.
+        """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
@@ -278,7 +280,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General feedback message needs to be pseudonymized for the user."""
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id field.
+        """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
@@ -313,8 +317,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.author_id == user_id).get(
-            keys_only=True) is not None
+        return cls.query(
+            cls.author_id == user_id
+        ).get(keys_only=True) is not None
 
     @classmethod
     def export_data(cls, user_id):
@@ -568,8 +573,8 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General feedback thread user can be deleted since it only contains
-        information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -739,9 +744,7 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """FeedbackAnalyticsModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -800,7 +803,9 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Unsent feedback email is kept until sent."""
+        """Model contains data corresponding to a user: id field but it isn't
+        deleted because it is needed for auditing purposes.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod

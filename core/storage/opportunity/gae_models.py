@@ -51,9 +51,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationOpportunitySummaryModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -195,9 +193,7 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """SkillOpportunityModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod

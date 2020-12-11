@@ -127,8 +127,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserSettingsModel should be deleted after all the other models
-        belonging to the user are deleted or pseudonymized.
+        """Model contains data to delete corresponding to a user: id, model,
+        username, normalized_username, and display_alias fields.
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
@@ -373,9 +373,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CompletedActivitiesModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -457,9 +455,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """IncompleteActivitiesModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -545,8 +541,8 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExpUserLastPlaythroughModel can be deleted since it only contains
-        information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -686,9 +682,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """LearnerPlaylistModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -767,9 +761,7 @@ class UserContributionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserContributionsModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -854,9 +846,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserEmailPreferencesModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -943,9 +933,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserSubscriptionsModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1054,9 +1042,7 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserSubscribersModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -1119,9 +1105,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserRecentChangesBatchModel can be deleted since it only contains
-        information relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -1212,9 +1196,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserStatsModel can be deleted since it only contains information
-        relevant to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1351,8 +1333,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationUserDataModel can be deleted since it only contains
-        information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -1557,8 +1539,8 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionProgressModel can be deleted since it only contains
-        information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -1740,8 +1722,8 @@ class StoryProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StoryProgressModel can be deleted since it only contains information
-        relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_id field.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -1948,8 +1930,8 @@ class UserQueryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserQueryModel can be deleted since it only contains information
-        relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_ids and submitter_id fields.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -2048,7 +2030,9 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserBulkEmailsModel should be kept for audit purposes."""
+        """Model contains data corresponding to a user: id field, but it isn't
+        deleted because it is needed for auditing purposes.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @classmethod
@@ -2099,8 +2083,8 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserSkillMasteryModel can be deleted since it only contains
-        information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_ids field.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -2201,8 +2185,8 @@ class UserContributionProficiencyModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """UserContributionProficiencyModel can be deleted since it only
-        contains information relevant to the one user.
+        """Model contains data to delete corresponding to a user:
+        user_ids field.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -2393,9 +2377,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """The model can be deleted since it only contains information relevant
-        to the one user.
-        """
+        """Model contains data to delete corresponding to a user: id field."""
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
@@ -2553,8 +2535,8 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """PendingDeletionRequestModel should be deleted after all the other
-        models belonging to the user are deleted or pseudonymized.
+        """Model contains data to delete corresponding to a user: id, email,
+        and normalized_long_term_username fields.
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
@@ -2610,7 +2592,9 @@ class DeletedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """DeletedUserModel contains only IDs that were deleted."""
+        """Model contains data corresponding to a user: id field, but it is
+        corresponding to a deleted user.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
@@ -2644,7 +2628,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """PseudonymizedUserModel contains only pseudonymous ids."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -2697,9 +2681,11 @@ class DeletedUsernameModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """DeletedUserModel contains only hashes of usernames that were
-        deleted. The hashes are kept in order to prevent the reuse of usernames
-        of deleted users.
+        """Model contains data corresponding to a user: id field, but it is
+        corresponding to a deleted user.
+
+        Model contains only hashes of usernames that were deleted. The hashes
+        are kept in order to prevent the reuse of usernames of deleted users.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -2740,8 +2726,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """The model can be deleted since it only contains information
-        relevant to one user account.
+        """Model contains data to delete corresponding to a user: id, gae_id,
+         and parent_user_id fields.
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
@@ -2853,8 +2839,8 @@ class UserIdentifiersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """The model can be deleted since it only contains information
-        relevant to one user account.
+        """Model contains data to delete corresponding to a user: id,
+         and user_id fields.
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
