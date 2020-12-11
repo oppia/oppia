@@ -278,6 +278,7 @@ import { GuppyInitializationService } from 'services/guppy-initialization.servic
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { IdGenerationService } from 'services/id-generation.service';
+import { ImageLocalStorageService } from './image-local-storage.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { ImprovementsService } from 'services/improvements.service';
 import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
@@ -436,6 +437,7 @@ export const angularServices: [string, unknown][] = [
   ['ImageClickInputRulesService', ImageClickInputRulesService],
   ['ImageClickInputValidationService', ImageClickInputValidationService],
   ['ImagePreloaderService', ImagePreloaderService],
+  ['ImageLocalStorageService', ImageLocalStorageService],
   ['ImageUploadHelperService', ImageUploadHelperService],
   ['ImprovementsService', ImprovementsService],
   ['InteractionAttributesExtractorService',
