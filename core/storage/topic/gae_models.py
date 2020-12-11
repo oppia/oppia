@@ -41,9 +41,7 @@ class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -117,9 +115,7 @@ class TopicModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
@@ -329,9 +325,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicSummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -374,8 +368,8 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicRightsSnapshotContentModel contains data corresponding to
-        a user: inside the content field there is manager_ids field.
+        """Model contains data corresponding to a user: inside the content field
+        there is a manager_ids field.
 
         The pseudonymization of this model is handled in the wipeout_service
         in the _pseudonymize_activity_models_with_associated_rights_models(),
@@ -420,7 +414,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """TopicRightsModel contains data to pseudonymize corresponding
+        """Model contains data to pseudonymize or delete corresponding
         to a user: manager_ids field.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE

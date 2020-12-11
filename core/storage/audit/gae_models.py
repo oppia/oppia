@@ -50,7 +50,9 @@ class RoleQueryAuditModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Audit logs are kept for investigation purposes."""
+        """Model contains data corresponding to a user: user_id and username
+        fields, but it isn't deleted because it is needed for auditing purposes.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
@@ -108,7 +110,10 @@ class UsernameChangeAuditModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Audit logs are kept for investigation purposes."""
+        """Model contains data corresponding to a user: committer_id,
+        old_username, and new_username fields but it isn't deleted because it is
+        needed for auditing purposes.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod

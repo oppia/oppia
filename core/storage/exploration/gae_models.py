@@ -42,9 +42,7 @@ class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -115,9 +113,7 @@ class ExplorationModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -241,9 +237,7 @@ class ExplorationContextModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationContextModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -272,8 +266,8 @@ class ExplorationRightsSnapshotContentModel(
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationRightsSnapshotContentModel contains data corresponding to
-        a user: inside the content field there are owner_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: inside the content field there are owner_ids, editor_ids,
         voice_artist_ids, and viewer_ids fields.
 
         The pseudonymization of this model is handled in the wipeout_service
@@ -350,8 +344,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationRightsModel contains data to pseudonymize/delete
-        corresponding to a user: viewer_ids, voice_artist_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
         """
         return (
@@ -617,8 +611,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationCommitLogEntryModel contains data corresponding to a user
-        that requires pseudonymization/deletion: user_id field.
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: user_id field.
         """
         return (
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
@@ -801,7 +795,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExpSummaryModel contains data to pseudonymize/delete corresponding
+        """Model contains data to pseudonymize or delete corresponding
         to a user: viewer_ids, voice_artist_ids, editor_ids, owner_ids,
         contributor_ids, and contributors_summary fields.
         """
