@@ -33,6 +33,11 @@ import { SubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { WorkedExampleBackendDict } from
   'domain/skill/WorkedExampleObjectFactory';
+import { Collection } from 'domain/collection/collection.model';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { Story } from 'domain/story/StoryObjectFactory';
+import { Topic } from 'domain/topic/TopicObjectFactory';
 
 interface CollectionTitleChange {
   'cmd': 'edit_collection_property';
@@ -623,6 +628,13 @@ export type BackendChangeObject = (
   StoryChange |
   TopicChange);
 
+export type DomainObject = (
+  Collection |
+  Question |
+  Skill |
+  Story |
+  Topic);
+
 export class Change {
   _backendChangeObject: BackendChangeObject;
   _applyChangeToObject: Function;
@@ -649,14 +661,14 @@ export class Change {
 
   // Applies this change to the related object (such as a frontend collection
   // domain object).
-  applyChange(domainObject: BackendChangeObject): void {
+  applyChange(domainObject: DomainObject): void {
     this._applyChangeToObject(this._backendChangeObject, domainObject);
   }
 
   // Reverse-applies this change to the related object (such as a frontend
   // collection domain object). This method should only be used to reverse a
   // change that was previously applied by calling the applyChange() method.
-  reverseChange(domainObject: BackendChangeObject): void {
+  reverseChange(domainObject: DomainObject): void {
     this._reverseChangeToObject(this._backendChangeObject, domainObject);
   }
 }
