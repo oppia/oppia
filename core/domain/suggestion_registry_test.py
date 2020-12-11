@@ -1316,7 +1316,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], self.fake_date)
 
         suggestion.accept(
-            'Accepted suggestion by translator: Add translation change.')
+            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX_TEMPLATE % (
+                'translation', 'translator'))
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
 
@@ -1341,7 +1342,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], self.fake_date)
 
         suggestion.accept(
-            'Accepted suggestion by translator: Add translation change.')
+            feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX_TEMPLATE % (
+                'translation', 'translator'))
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
 
