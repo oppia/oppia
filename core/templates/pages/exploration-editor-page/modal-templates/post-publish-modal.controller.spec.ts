@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for PostPublishModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Post Publish Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -31,7 +31,7 @@ describe('Post Publish Modal Controller', function() {
       host: 'www.oppia.org'
     }
   };
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
   }));

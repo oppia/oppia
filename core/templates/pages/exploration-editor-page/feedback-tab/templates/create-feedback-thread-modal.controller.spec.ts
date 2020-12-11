@@ -15,13 +15,14 @@
 /**
  * @fileoverview Unit tests for CreateFeedbackThreadModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Create Feedback Thread Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var AlertsService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
     AlertsService = $injector.get('AlertsService');

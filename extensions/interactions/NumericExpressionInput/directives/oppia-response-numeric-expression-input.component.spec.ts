@@ -19,11 +19,12 @@
 require(
   'interactions/NumericExpressionInput/directives/' +
   'oppia-response-numeric-expression-input.component.ts');
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('NumericExpressionInputResponse', function() {
   let ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$attrs', {
       answer: '&quot;answer&quot;',

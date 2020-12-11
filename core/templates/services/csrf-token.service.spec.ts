@@ -37,9 +37,7 @@ describe('Csrf Token Service', function() {
     spyOn($, 'ajax').and.returnValue(Promise.resolve(
       {token: 'sample-csrf-token'}));
   });
-  afterEach(() => {
-    CsrfTokenService.tokenPromise = null;
-  });
+
   it('should correctly set the csrf token', (done) => {
     csrfTokenService.initializeToken();
 

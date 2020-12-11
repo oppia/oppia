@@ -34,6 +34,7 @@ import constants from 'assets/constants';
 import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 describe('App', function() {
+  importAllAngularServices();
   describe('Generating Constants', function() {
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.module('oppia', function($provide) {

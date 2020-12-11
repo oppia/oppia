@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the topic selector directive.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Topic selector Directive', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -64,7 +66,7 @@ describe('Topic selector Directive', function() {
     isSelected: false,
     urlFragment: 'd2',
   }];
-
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
 

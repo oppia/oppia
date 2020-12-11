@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for RevertExplorationModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Revert Exploration Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -23,6 +25,7 @@ describe('Revert Exploration Modal Controller', function() {
   var explorationId = 'exp1';
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationDataService', {
       explorationId: explorationId

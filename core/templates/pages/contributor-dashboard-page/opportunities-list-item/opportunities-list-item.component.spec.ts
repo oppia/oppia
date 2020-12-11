@@ -15,13 +15,13 @@
 /**
  * @fileoverview Unit tests for opportunitiesListItem.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Opportunities List Item Component', function() {
   var ctrl = null;
   var $scope = null;
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   describe('when opportunity is provided', function() {
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       var $rootScope = $injector.get('$rootScope');

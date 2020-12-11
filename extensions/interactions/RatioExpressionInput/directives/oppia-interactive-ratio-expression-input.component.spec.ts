@@ -18,7 +18,7 @@
  */
 
 import { Ratio } from 'domain/objects/ratio.model';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'interactions/RatioExpressionInput/directives/' +
   'oppia-interactive-ratio-expression-input.component.ts');
@@ -39,6 +39,7 @@ describe('RatioExpressionInputInteractive', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('Ratio', Ratio);
     $provide.value(

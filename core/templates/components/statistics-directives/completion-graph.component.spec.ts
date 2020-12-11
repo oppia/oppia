@@ -19,13 +19,14 @@
 
 import { ImprovementsConstants } from
   'domain/improvements/improvements.constants';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require('components/statistics-directives/completion-graph.component.ts');
 
 describe('Completion graph', function() {
   let $componentController;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(_$componentController_ => {
     $componentController = _$componentController_;
   }));

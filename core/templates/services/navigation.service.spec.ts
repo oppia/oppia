@@ -17,6 +17,7 @@
  */
 
 require('services/navigation.service.ts');
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Navigation Service', () => {
   var NavigationService = null;
@@ -35,6 +36,7 @@ describe('Navigation Service', () => {
   var blurAngularElementSpy;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     NavigationService = $injector.get('NavigationService');
 

@@ -26,7 +26,7 @@ import { StateEditorService } from
   /* eslint-disable-next-line max-len */
   'components/state-editor/state-editor-properties-services/state-editor.service';
 // ^^^ This block is to be removed.
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require('directives/angular-html-bind.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -44,6 +44,7 @@ describe('Tag misconception modal controller', function() {
   var ses = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());

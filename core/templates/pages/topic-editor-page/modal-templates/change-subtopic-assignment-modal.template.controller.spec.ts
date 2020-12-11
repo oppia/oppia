@@ -15,13 +15,14 @@
 /**
  * @fileoverview Unit tests for the change subtopic assignment modal.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Change subtopic assignment modal', function() {
   beforeEach(angular.mock.module('oppia'));
 
   var $scope = null;
   var $uibModalInstance = null;
   var subtopics = [];
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

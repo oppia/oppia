@@ -16,11 +16,13 @@
  * @fileoverview Unit tests for the translatable set of unicode string editor.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
 describe('TranslatableSetOfUnicodeStringEditor', function() {
   var ctrl = null;
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($componentController) {
     ctrl = $componentController('translatableSetOfUnicodeStringEditor');

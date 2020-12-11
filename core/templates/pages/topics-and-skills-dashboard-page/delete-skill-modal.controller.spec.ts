@@ -16,28 +16,19 @@
  * @fileoverview Unit tests for DeleteSkillModalController.
  */
 
-
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { TopicsAndSkillsDashboardBackendApiService } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Delete Skill Modal Controller', function() {
   var $scope = null;
   var $rootScope = null;
   var $q = null;
   var $uibModalInstance = null;
   var skillId = 'skillId1';
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [TopicsAndSkillsDashboardBackendApiService]
-    });
-  });
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'TopicsAndSkillsDashboardBackendApiService',

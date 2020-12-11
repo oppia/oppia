@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for SkillPreviewModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Skill Preview Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -24,6 +24,7 @@ describe('Skill Preview Modal Controller', function() {
   var skillWorkedExamples = [];
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

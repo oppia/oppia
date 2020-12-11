@@ -15,12 +15,13 @@
 /**
  * @fileoverview Unit tests for LicenseExplanationModalController.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('License Explanation Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

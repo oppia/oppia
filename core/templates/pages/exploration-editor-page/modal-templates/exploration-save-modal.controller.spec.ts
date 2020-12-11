@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ExplorationSaveModalController.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Exploration Save Modal Controller', function() {
   var $scope = null;
   var $uibModalInstance = null;
@@ -25,6 +27,7 @@ describe('Exploration Save Modal Controller', function() {
   var isExplorationPrivate = true;
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');
 

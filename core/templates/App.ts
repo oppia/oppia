@@ -23,6 +23,7 @@
  * It won't be required in Angular 9.
  * TODO(#9172): Remove the import when upgraded to Angular 9.
  */
+import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
 import 'firebase/auth';
 import 'hammerjs';
 require('app.constants.ajs.ts');
@@ -67,9 +68,8 @@ require('services/state-interaction-stats.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/translation-file-hash-loader-backend-api.service.ts');
 require('services/user.service.ts');
-
 require('google-analytics.initializer.ts');
-
+const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 // The following file uses constants in app.constants.ts and hence needs to be
 // loaded *after* app.constants.ts.
 require('I18nFooter.ts');
@@ -84,8 +84,6 @@ require('default-passive-events');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import sourceMappedStackTrace from 'sourcemapped-stacktrace';
-
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
   '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
@@ -98,7 +96,8 @@ angular.module('oppia').config([
     for (let [key, value] of Object.entries(UpgradedServices.ugs)) {
       $provide.value(key, value);
     }
-
+    // $provide.value('HtmlEscaperService', 'HtmlEscaperService');
+    $provide.value('ContextService', 'ContextService');
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from
@@ -132,18 +131,19 @@ angular.module('oppia').config([
     $httpProvider.defaults.headers.put = {
       'Content-Type': 'application/x-www-form-urlencoded'
     };
-
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$exceptionHandler', '$q', '$log', 'AlertsService', 'CsrfTokenService',
-      function($exceptionHandler, $q, $log, AlertsService, CsrfTokenService) {
+      '$exceptionHandler', '$q', '$log', 'AlertsService',
+      function($exceptionHandler, $q, $log, AlertsService) {
         return {
           request: function(config) {
             if (config.data) {
               return $q(function(resolve, reject) {
+                let csrfTokenService = (
+                  OppiaAngularRootComponent.getCsrfTokenService);
                 // Get CSRF token before sending the request.
-                CsrfTokenService.getTokenAsync().then(function(token) {
+                csrfTokenService().getTokenAsync().then(function(token) {
                   if ((config.data instanceof FormData)) {
                     var hasPayload = false;
                     // Check whether the FormData has payload in it.
@@ -215,31 +215,6 @@ angular.module('oppia').config([
   }
 ]);
 
-angular.module('oppia').config(['$provide', function($provide) {
-  $provide.decorator(
-    '$log', ['$delegate', 'DEV_MODE',
-      function($delegate, DEV_MODE) {
-        var _originalError = $delegate.error;
-
-        if (!DEV_MODE) {
-          $delegate.log = function() {};
-          $delegate.info = function() {};
-          // TODO(sll): Send errors (and maybe warnings) to the backend.
-          $delegate.warn = function() { };
-          $delegate.error = function(message) {
-            if (String(message).indexOf('$digest already in progress') === -1) {
-              _originalError(message);
-            }
-          };
-          // This keeps angular-mocks happy (in tests).
-          $delegate.error.logs = [];
-        }
-
-        return $delegate;
-      }
-    ]);
-}]);
-
 angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
   angular.extend(toastrConfig, {
     allowHtml: false,
@@ -265,8 +240,8 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 // spread over multiple lines. The errored file may be viewed on the
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
-  '$log', 'CsrfTokenService', 'UtilsService', 'DEV_MODE',
-  function($log, CsrfTokenService, UtilsService, DEV_MODE) {
+  '$log', 'UtilsService', 'DEV_MODE',
+  function($log, UtilsService, DEV_MODE) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
@@ -332,6 +307,8 @@ angular.module('oppia').factory('$exceptionHandler', [
               '    at URL: ' + window.location.href
             ].join('\n');
             var timeDifference = Date.now() - timeOfLastPostedError;
+            let csrfTokenService = (
+              OppiaAngularRootComponent.getCsrfTokenService);
             // To prevent an overdose of errors, throttle to at most 1 error
             // every MIN_TIME_BETWEEN_ERRORS_MSEC.
             if (timeDifference > MIN_TIME_BETWEEN_ERRORS_MSEC) {
@@ -339,7 +316,7 @@ angular.module('oppia').factory('$exceptionHandler', [
               try {
                 // We use jQuery here instead of Angular's $http, since the
                 // latter creates a circular dependency.
-                CsrfTokenService.getTokenAsync().then(function(token) {
+                csrfTokenService().getTokenAsync().then(function(token) {
                   $.ajax({
                     type: 'POST',
                     url: '/frontend_errors',

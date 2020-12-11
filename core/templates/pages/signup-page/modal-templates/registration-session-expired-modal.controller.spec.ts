@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for RegistrationSessionExpiredModalController.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { UserService } from 'services/user.service';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Registration Session Expired Modal Controller', function() {
   var $q = null;
   var $scope = null;
@@ -32,11 +31,7 @@ describe('Registration Session Expired Modal Controller', function() {
     }
   };
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('UserService', TestBed.get(UserService));
   }));

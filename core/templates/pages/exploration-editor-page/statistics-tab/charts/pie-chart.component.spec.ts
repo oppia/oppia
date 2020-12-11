@@ -17,7 +17,7 @@
  */
 
 import { of } from 'rxjs';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Pie Chart component', function() {
   var ctrl = null;
   var $flushPendingTasks = null;
@@ -25,7 +25,7 @@ describe('Pie Chart component', function() {
 
   var mockedChart = null;
   var resizeEvent = new Event('resize');
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowDimensionsService', {
       getResizeEvent: () => of(resizeEvent)

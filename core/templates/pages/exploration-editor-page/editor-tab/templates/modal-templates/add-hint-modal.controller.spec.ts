@@ -22,6 +22,7 @@ import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Add Hint Modal Controller', function() {
   var $scope = null;
@@ -34,7 +35,7 @@ describe('Add Hint Modal Controller', function() {
   var existingHintsContentIds = [];
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(function() {
     generateContentIdService = TestBed.get(GenerateContentIdService);
     hintObjectFactory = TestBed.get(HintObjectFactory);

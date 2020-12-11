@@ -25,16 +25,7 @@ import { UrlService } from 'services/contextual/url.service';
 describe('Context service', () => {
   let ecs: ContextService = null;
   let urlService: UrlService = null;
-  let resetContext = () => {
-    ContextService._pageContext = null;
-    ContextService._explorationIsLinkedToStory = false;
-    ContextService._explorationId = null;
-    ContextService._questionPlayerIsManuallySet = false;
-    ContextService._questionId = null;
-    ContextService._editorContext = null;
-    ContextService._customEntityContext = null;
-  };
-  afterEach(resetContext);
+
   describe('behavior in the exploration learner view', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
@@ -42,7 +33,7 @@ describe('Context service', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
       spyOn(urlService, 'getHash').and.returnValue('');
     });
-    afterEach(resetContext);
+
     it('should correctly set editor context to exploration editor', () => {
       ecs.init('exploration_editor');
       expect(ecs.getEditorContext()).toBe('exploration_editor');
@@ -83,7 +74,7 @@ describe('Context service', () => {
         '/embed/exploration/123');
       spyOn(urlService, 'getHash').and.returnValue('');
     });
-    afterEach(resetContext);
+
     it('should correctly set editor context to exploration editor', () => {
       ecs.init('exploration_editor');
       expect(ecs.getEditorContext()).toBe('exploration_editor');
@@ -117,7 +108,7 @@ describe('Context service', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/create/123');
       spyOn(urlService, 'getHash').and.returnValue('#/gui');
     });
-    afterEach(resetContext);
+
     it('should correctly retrieve the exploration id', () => {
       expect(ecs.getExplorationId()).toBe('123');
     });
@@ -147,7 +138,7 @@ describe('Context service', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
       spyOn(urlService, 'getHash').and.returnValue('');
     });
-    afterEach(resetContext);
+
     it('should correctly set editor context to topic editor', () => {
       ecs.init('topic_editor');
       expect(ecs.getEditorContext()).toBe('topic_editor');
@@ -176,7 +167,7 @@ describe('Context service', () => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
     });
-    afterEach(resetContext);
+
     it('should correctly retrieve the values in topic editor', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
       spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
@@ -200,7 +191,7 @@ describe('Context service', () => {
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
     });
-    afterEach(resetContext);
+
     it('should correctly set editor context to story editor', () => {
       ecs.init('story_editor');
       expect(ecs.getEditorContext()).toBe('story_editor');
@@ -231,7 +222,7 @@ describe('Context service', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
       spyOn(urlService, 'getHash').and.returnValue('');
     });
-    afterEach(resetContext);
+
     it('should correctly set editor context to skill editor', () => {
       ecs.init('skill_editor');
       expect(ecs.getEditorContext()).toBe('skill_editor');
@@ -262,7 +253,7 @@ describe('Context service', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/about');
       spyOn(urlService, 'getHash').and.returnValue('');
     });
-    afterEach(resetContext);
+
     it('should throw an error when trying to retrieve the exploration id',
       () => {
         expect(() => ecs.getExplorationId()).toThrowError(

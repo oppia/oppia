@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for activityTilesInfinityGrid.
  */
 
-import { HttpClientTestingModule } from
-  '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
@@ -42,6 +40,7 @@ describe('Activity tiles infinity grid component', function() {
   };
   var loadingMessageChangeEventEmitter = new EventEmitter();
   var initialSearchResultsLoadedEmitter = new EventEmitter();
+
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -50,12 +49,6 @@ describe('Activity tiles infinity grid component', function() {
       onLoadingMessageChange: loadingMessageChangeEventEmitter
     });
   }));
-
-  beforeEach(function() {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
 
   beforeEach(function() {
     userService = TestBed.get(UserService);

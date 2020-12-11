@@ -18,7 +18,7 @@
  */
 
 import { Ratio } from 'domain/objects/ratio.model';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'interactions/RatioExpressionInput/directives/' +
   'oppia-short-response-ratio-expression-input.component.ts');
@@ -33,6 +33,7 @@ describe('RatioExpressionInputShortResponse', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('Ratio', Ratio);
     $provide.value('HtmlEscaperService', mockHtmlEscaperService);

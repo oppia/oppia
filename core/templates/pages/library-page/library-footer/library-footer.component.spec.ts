@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for libraryFooter.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Library Footer Component', function() {
   var ctrl = null;
   var $window = null;
@@ -25,7 +25,7 @@ describe('Library Footer Component', function() {
       pathname: ''
     }
   };
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);
   }));

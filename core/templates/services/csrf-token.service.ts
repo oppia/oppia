@@ -28,17 +28,17 @@ import $ from 'jquery';
   providedIn: 'root'
 })
 export class CsrfTokenService {
-  static tokenPromise: PromiseLike<string> | null = null;
+  tokenPromise: PromiseLike<string> | null = null;
 
   initializeToken(): void {
-    if (CsrfTokenService.tokenPromise !== null) {
+    if (this.tokenPromise !== null) {
       throw new Error('Token request has already been made');
     }
     // TODO(#8035): Remove the use of $.ajax and hence the ts-ignore
     // in csrf-token.service.spec.ts once all the services are migrated
     // We use jQuery here instead of Angular's $http, since the latter creates
     // a circular dependency.
-    CsrfTokenService.tokenPromise = $.ajax({
+    this.tokenPromise = $.ajax({
       url: '/csrfhandler',
       type: 'GET',
       dataType: 'text',
@@ -53,10 +53,10 @@ export class CsrfTokenService {
   }
 
   getTokenAsync(): PromiseLike<string> {
-    if (CsrfTokenService.tokenPromise === null) {
+    if (this.tokenPromise === null) {
       throw new Error('Token needs to be initialized');
     }
-    return CsrfTokenService.tokenPromise;
+    return this.tokenPromise;
   }
 }
 

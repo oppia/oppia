@@ -19,7 +19,8 @@
 import { LostChangeObjectFactory } from
   'domain/exploration/LostChangeObjectFactory';
 import { TestBed } from '@angular/core/testing';
-import { UtilsService } from 'services/utils.service';
+
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Lost Changes Modal Controller', () => {
   let $scope = null;
@@ -32,13 +33,7 @@ describe('Lost Changes Modal Controller', () => {
     state_name: 'State name',
   }];
 
-  beforeEach(function() {
-    TestBed.configureTestingModule({
-      providers: [
-        UtilsService
-      ]
-    });
-  });
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('LostChangeObjectFactory', TestBed.get(

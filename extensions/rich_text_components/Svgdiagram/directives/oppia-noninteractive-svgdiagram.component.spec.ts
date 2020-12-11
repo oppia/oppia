@@ -17,7 +17,7 @@
  */
 
 import { AppConstants } from 'app.constants';
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('oppiaNoninteractiveSvgdiagram', function() {
   var contextService = null;
   var ctrl = null;
@@ -36,6 +36,7 @@ describe('oppiaNoninteractiveSvgdiagram', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', mockAssetsBackendApiService);
     $provide.value('ImagePreloaderService', mockImagePreloaderService);
@@ -81,6 +82,7 @@ describe('oppiaNoninteractiveSvgdiagram with image save destination as' +
   };
 
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {});
     $provide.value('ImageLocalStorageService', mockImageLocalStorageService);

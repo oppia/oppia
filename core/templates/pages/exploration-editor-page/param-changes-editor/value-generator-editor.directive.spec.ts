@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for valueGeneratorEditor.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Value Generator Editor directive', function() {
   var $scope = null;
   var elem = null;
@@ -24,7 +26,7 @@ describe('Value Generator Editor directive', function() {
 
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($compile, $injector) {
     var $rootScope = $injector.get('$rootScope');
 

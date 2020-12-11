@@ -17,11 +17,11 @@
  */
 
 require('visualizations/oppia-visualization-click-hexbins.directive.ts');
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Oppia click hexbins visualization', function() {
   let $compile, $rootScope;
   let el: JQLite;
-
+  importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AssetsBackendApiService', {
       getImageUrlForPreview: (url: string) => url,

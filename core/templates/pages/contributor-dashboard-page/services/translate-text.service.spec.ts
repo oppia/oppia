@@ -15,7 +15,7 @@
 /**
  * @fileoverview Tests for translate-text service.
  */
-
+import { importAllAngularServices } from 'tests/unit-test-utils';
 require(
   'pages/contributor-dashboard-page/services/translate-text.service.ts');
 
@@ -24,7 +24,7 @@ describe('TranslateTextService', function() {
   let $httpBackend;
 
   beforeEach(angular.mock.module('oppia'));
-
+  importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector, $q) {
     TranslateTextService = $injector.get('TranslateTextService');
     $httpBackend = $injector.get('$httpBackend');
