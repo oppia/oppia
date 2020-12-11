@@ -362,7 +362,7 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_model.put()
 
 
-class CopyActivityIdsToExplorationIdsFromUserSubscriptionsModelOneOffJob(
+class FillExplorationIdsInUserSubscriptionsModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One off job that copies from activity_ids to exploration_ids
     in UserSubscriptionsModel.
@@ -371,19 +371,18 @@ class CopyActivityIdsToExplorationIdsFromUserSubscriptionsModelOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
-
         return [user_models.UserSubscriptionsModel]
 
     @staticmethod
     def map(model_instance):
         model_instance.exploration_ids = model_instance.activity_ids
-        model_instance.update_timestamps()
+        model_instance.update_timestamps(update_last_updated_time=False)
         model_instance.put()
-        yield ('Exploration_ids', model_instance.exploration_ids)
+        yield ('SUCCESS', model_instance.exploration_ids)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        yield (key, len(values))
 
 
 class CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob(

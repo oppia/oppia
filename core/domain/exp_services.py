@@ -795,8 +795,6 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     if not exploration_ids:
         return
 
-    # TODO(#10727): activity_ids in UserSubscriptionsModel should be renamed
-    # to explorations_id.
     subscription_models = user_models.UserSubscriptionsModel.query(
         user_models.UserSubscriptionsModel.exploration_ids.IN(exploration_ids)
     ).fetch()
