@@ -10,7 +10,10 @@
   </div>
 </div>
 <div class="modal-body">
-  <div>
+  <div ng-if="!textToTranslate">
+    <strong>Sorry! All available translations are in review currently.</strong>
+  </div>
+  <div ng-if="textToTranslate">
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given content in <[languageDescription]>:</strong>
       <a class="oppia-skip-button" href="" ng-if="moreAvailable" ng-click="skipActiveTranslation()">skip</a>

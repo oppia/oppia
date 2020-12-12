@@ -1054,6 +1054,31 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 suggestion_services
                 .get_translation_suggestion_ids_with_exp_ids([])), 0)
 
+    def test_get_translation_suggestions_in_review_by_exploration(self):
+        self._create_translation_suggestion_with_language_code('hi')
+        self._create_translation_suggestion_with_language_code('hi')
+
+        suggestions = (
+            suggestion_services
+            .get_translation_suggestions_in_review_by_exploration(
+                self.target_id_1))
+
+        self.assertEqual(len(suggestions), 2)
+        self.assertEqual(suggestions[0].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[0].suggestion_type,
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[0].status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(suggestions[1].target_id, self.target_id_1)
+        self.assertEqual(
+            suggestions[1].suggestion_type,
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.assertEqual(
+            suggestions[1].status,
+            suggestion_models.STATUS_IN_REVIEW)
+
     def test_get_translation_suggestions_waiting_longest_for_review_per_lang(
             self):
         suggestion_1 = self._create_translation_suggestion_with_language_code(

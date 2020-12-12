@@ -300,6 +300,28 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_translation_suggestions_in_review_with_exp_id(cls, exp_id):
+        """Returns translation suggestions which are in review with target_id
+        == exp_id.
+
+        Args:
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of translation suggestions in review
+            with target_id of exp_id. The number of returned results is capped
+            by feconf.DEFAULT_QUERY_LIMIT.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.target_id == exp_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
+
+    @classmethod
     def get_translation_suggestion_ids_with_exp_ids(cls, exp_ids):
         """Gets the ids of translation suggestions corresponding to
         explorations with the given exploration ids.
