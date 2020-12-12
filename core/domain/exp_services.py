@@ -105,14 +105,13 @@ def get_exploration_state_history(exp_id):
         exp_id, python_utils.RANGE(1, latest_exp.version))
     exps.append(latest_exp)
 
-    exp_version_diffs = [
-        exp_domain.ExplorationVersionsDiff(
-            [exp_domain.ExplorationChange(c) for c in snapshot['commit_cmds']])
+    change_lists = [
+        [exp_domain.ExplorationChange(c) for c in snapshot['commit_cmds']]
         for snapshot in exp_models.ExplorationModel.get_snapshots_metadata(
             exp_id, python_utils.RANGE(1, latest_exp.version + 1))
     ]
 
-    return exp_domain.ExplorationStatesHistory(exps, exp_version_diffs)
+    return exp_domain.ExplorationStatesHistory(exps, change_lists)
 
 
 # Query methods.
