@@ -37,9 +37,7 @@ class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StorySnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -86,9 +84,7 @@ class StoryModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StoryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
@@ -127,7 +123,7 @@ class StoryModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -195,7 +191,8 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -247,9 +244,7 @@ class StorySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StorySummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -259,7 +254,7 @@ class StorySummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
