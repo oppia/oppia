@@ -662,7 +662,7 @@ def get_translation_suggestions_in_review_by_exploration(exp_id):
     """
     suggestion_models_in_review = (
         suggestion_models.GeneralSuggestionModel
-        .get_translation_suggestions_in_review_by_exp_id(exp_id)
+        .get_translation_suggestions_in_review_with_exp_id(exp_id)
     )
     return [
         get_suggestion_from_model(model) if model else None

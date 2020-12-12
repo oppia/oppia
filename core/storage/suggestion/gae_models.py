@@ -298,7 +298,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_translation_suggestions_in_review_by_exp_id(cls, exp_id):
+    def get_translation_suggestions_in_review_with_exp_id(cls, exp_id):
         """Returns translation suggestions which are in review with target_id
         == exp_id.
 
@@ -308,7 +308,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         Returns:
             list(SuggestionModel). A list of translation suggestions in review
-            with target_id of exp_id.
+            with target_id of exp_id. The number of returned results is capped
+            by feconf.DEFAULT_QUERY_LIMIT.
         """
         return (
             cls.get_all()
