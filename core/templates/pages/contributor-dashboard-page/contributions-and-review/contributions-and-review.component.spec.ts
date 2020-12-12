@@ -695,21 +695,18 @@ describe('Contributions and review component', function() {
       expect(ctrl.reviewTabs.length).toEqual(0);
     });
 
-    it('should get translate contributions when switching to translation' +
+    it('should emit reload even when when switching to translation' +
       ' in review tab', function() {
+      spyOn(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+        'emit').and.callThrough();
+
       ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
       $scope.$apply();
 
-      expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
-      expect(ctrl.contributionSummaries).toEqual([{
-        id: 'suggestion_1',
-        heading: 'Tradução',
-        subheading: 'Topic 1 / Story title / Chapter title',
-        labelText: 'Awaiting review',
-        labelColor: '#eeeeee',
-        actionButtonTitle: 'Review'
-      }]);
-      expect(ctrl.contributionsDataLoading).toBe(false);
+      expect(
+        contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit)
+        .toHaveBeenCalled();
     });
 
     it('should open show view question modal when clicking on' +
@@ -723,7 +720,7 @@ describe('Contributions and review component', function() {
 
     it('should resolve suggestion to skill when closing show question' +
       ' suggestion modal', function() {
-      expect(ctrl.contributionSummaries.length).toBe(1);
+      expect(Object.keys(ctrl.contributions).length).toBe(1);
 
       $httpBackend.expectPUT(
         '/suggestionactionhandler/skill/1/suggestion_1').respond(200);
@@ -735,7 +732,6 @@ describe('Contributions and review component', function() {
       $httpBackend.flush();
 
       expect($uibModal.open).toHaveBeenCalled();
-      expect(ctrl.contributionSummaries.length).toBe(0);
     });
 
     it('should not resolve suggestion to skill when dismissing show question' +
