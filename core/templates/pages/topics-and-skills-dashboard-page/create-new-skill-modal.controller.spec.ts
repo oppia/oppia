@@ -18,7 +18,7 @@
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('Create new skill modal', function() {
+describe('Create new skill modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDifficulties = null;
@@ -111,6 +111,18 @@ fdescribe('Create new skill modal', function() {
       expect($scope.errorMsg).toEqual(errorString);
     });
 
+  it('should add error message text when skill description is duplicate',
+    function() {
+      var errorString = (
+        'This description already exists. Please choose a ' +
+        'new name or modify the existing skill.');
+
+      $scope.AllSkillNames = ['THIS IS A DUPLICATE SKILL NAME'];
+      $scope.newSkillDescription = 'this is a duplicate skill name';
+      $scope.createNewSkill();
+      expect($scope.errorMsg).toEqual(errorString);
+    });
+
   it('should return if the skill description is valid', function() {
     $scope.newSkillDescription = 'valid';
     expect($scope.isSkillDescriptionValid()).toBe(true);
@@ -118,6 +130,9 @@ fdescribe('Create new skill modal', function() {
     expect($scope.isSkillDescriptionValid()).toBe(false);
     $scope.newSkillDescription = 'valid';
     expect($scope.isSkillDescriptionValid()).toBe(true);
+    $scope.AllSkillNames = ['THIS IS A DUPLICATE SKILL NAME'];
+    $scope.newSkillDescription = 'this is a duplicate skill name';
+    expect($scope.isSkillDescriptionValid()).toBe(false);
   });
 
   it('should close the modal with skill input values', function() {

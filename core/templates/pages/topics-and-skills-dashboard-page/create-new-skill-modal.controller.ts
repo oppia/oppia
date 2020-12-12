@@ -51,6 +51,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     };
     $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
       MAX_CHARS_IN_SKILL_DESCRIPTION);
+    $scope.AllSkillNames = AllSkillNames;
     $scope.newExplanationObject = null;
 
     $scope.openConceptCardExplanationEditor = function() {
@@ -89,7 +90,9 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
             'alphanumeric characters, spaces and/or hyphens.');
         return false;
       }
-      if (AllSkillNames.includes($scope.newSkillDescription.toUpperCase())) {
+      if ($scope.AllSkillNames.includes(
+        $scope.newSkillDescription.toUpperCase()
+      )) {
         $scope.errorMsg = (
           'This description already exists. Please choose a ' +
             'new name or modify the existing skill.');
@@ -105,6 +108,14 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
         $scope.errorMsg = (
           'Please use a non-empty description consisting of ' +
           'alphanumeric characters, spaces and/or hyphens.');
+        return;
+      }
+      if ($scope.AllSkillNames.includes(
+        $scope.newSkillDescription.toUpperCase()
+      )) {
+        $scope.errorMsg = (
+          'This description already exists. Please choose a ' +
+            'new name or modify the existing skill.');
         return;
       }
       $scope.saveConceptCardExplanation();
