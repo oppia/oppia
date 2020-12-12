@@ -21,9 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import itertools
-import re
 
-from constants import constants
 from core.domain import base_model_validators
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -32,9 +30,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import suggestion_services
 from core.domain import user_services
-from core.domain import voiceover_services
 from core.platform import models
 import feconf
 import python_utils
@@ -73,9 +69,6 @@ TARGET_TYPE_TO_TARGET_MODEL = {
     suggestion_models.TARGET_TYPE_TOPIC: (
         topic_models.TopicModel)
 }
-VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
-    '%s\\.[A-Za-z0-9-_]{1,%s}' % (
-        suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
 
 
 class ExplorationModelValidator(base_model_validators.BaseModelValidator):
@@ -1045,7 +1038,6 @@ class QuestionSummaryModelValidator(
     @classmethod
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_question_content]
->>>>>>> Refactored validators and test for continuous computation to job_validators
 
 
 class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
@@ -1556,6 +1548,8 @@ class CommunityContributionStatsModelValidator(
         ]
 
 
+=======
+>>>>>>> Fix part of #10415: Refactor suggestion validators (#11345)
 class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SubtopicPageModel."""
 
