@@ -86,6 +86,14 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
 
     $scope.addAnswerGroupForm = {};
 
+    /**
+    * The default values of translatable objects in the rule inputs have
+    * null content_id's. This function populates these null content_id's
+    * with a content_id. This function is called on save but not on
+    * cancel.
+    * Note: There is another copy of this function in rule-editor. This function
+    * is repeated here in an effort to avoid the use of broadcast.
+    */
     $scope.populateRuleContentIds = function() {
       const inputTypes = $scope.tmpRule.inputTypes;
       const inputs = $scope.tmpRule.inputs;

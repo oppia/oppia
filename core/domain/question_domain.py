@@ -798,7 +798,7 @@ class Question(python_utils.OBJECT):
     @classmethod
     def _convert_state_v40_dict_to_v41_dict(cls, question_state_dict):
         """Converts from version 40 to 41. Version 41 adds
-        TranslatableSetOfUnicodeString and TranslatbleSetOfNormalizedString
+        TranslatableSetOfUnicodeString and TranslatableSetOfNormalizedString
         objects to RuleSpec domain objects to allow for translations.
 
         Args:

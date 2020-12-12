@@ -251,6 +251,15 @@ angular.module('oppia').directive('ruleEditor', [
             }
           };
 
+          /**
+          * The default values of translatable objects in the rule inputs have
+          * null content_id's. This function populates these null content_id's
+          * with a content_id. This function is called on save but not on
+          * cancel.
+          * Note: There is another copy of this function in
+          * add-answer-group-modal. This function is repeated there in an effort
+          * of avoiding the use of broadcast.
+          */
           ctrl.populateRuleContentIds = function() {
             const inputs = ctrl.rule.inputs;
             const inputTypes = ctrl.rule.inputTypes;

@@ -1701,7 +1701,7 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
 
     @staticmethod
     def _normalize_value(raw):
-        """Validates and normalizes the value fields of the translatble object.
+        """Validates and normalizes the value fields of the translatable object.
 
         Args:
             raw: *. A translatable Python object whose values are to be
@@ -1754,7 +1754,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
 
     @staticmethod
     def _normalize_value(raw):
-        """Validates and normalizes the value fields of the translatble object.
+        """Validates and normalizes the value fields of the translatable object.
 
         Args:
             raw: *. A translatable Python object whose values are to be

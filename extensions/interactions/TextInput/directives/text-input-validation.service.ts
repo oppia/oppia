@@ -46,9 +46,7 @@ interface Warning {
   providedIn: 'root'
 })
 export class TextInputValidationService {
-  constructor(
-      private bivs: baseInteractionValidationService
-  ) {}
+  constructor(private bivs: baseInteractionValidationService) {}
   getCustomizationArgsWarnings(
       customizationArgs: TextInputCustomizationArgs): Warning[] {
     let warningsList = [];

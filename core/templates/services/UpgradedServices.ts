@@ -652,6 +652,7 @@ export class UpgradedServices {
     upgradedServices['ReviewTestEngineService'] = new ReviewTestEngineService();
     upgradedServices['RubricObjectFactory'] =
       new RubricObjectFactory();
+    upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SchemaFormSubmittedService'] =
       new SchemaFormSubmittedService();
     upgradedServices['SchemaUndefinedLastElementService'] =
@@ -825,7 +826,6 @@ export class UpgradedServices {
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
-    upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SetInputValidationService'] =
       new SetInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -876,6 +876,9 @@ export class UpgradedServices {
         upgradedServices['WrittenTranslationObjectFactory']);
 
     // Topological level: 2.
+    upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
+      upgradedServices['OutcomeObjectFactory'],
+      upgradedServices['RuleObjectFactory']);
     upgradedServices['CkEditorCopyContentService'] =
       new CkEditorCopyContentService(
         upgradedServices['HtmlEscaperService'],);
@@ -995,9 +998,6 @@ export class UpgradedServices {
       upgradedServices['HttpClient']);
     upgradedServices['AdminDataService'] = new AdminDataService(
       upgradedServices['HttpClient']);
-    upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
-      upgradedServices['OutcomeObjectFactory'],
-      upgradedServices['RuleObjectFactory']);
     upgradedServices['AssetsBackendApiService'] =
       new AssetsBackendApiService(
         upgradedServices['CsrfTokenService'],

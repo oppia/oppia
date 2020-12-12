@@ -21,7 +21,6 @@ import { AnswerClassificationResult } from
   'domain/classifier/answer-classification-result.model';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory.ts';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { State, StateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
@@ -42,11 +41,12 @@ interface MockInteractionRulesService {
 }
 
 interface MockInteractionRuleInputs {
-  x: number
+  x: {
+    'normalized_str_set': string[];
+  }
 }
 
 describe('Learner answer info service', () =>{
-  let rof: RuleObjectFactory;
   let sof: StateObjectFactory;
   let oof: OutcomeObjectFactory;
   let stateDict: StateBackendDict;
@@ -77,7 +77,16 @@ describe('Learner answer info service', () =>{
         }
       },
       interaction: {
-        id: null,
+        id: 'TextInput',
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
         answer_groups: [{
           outcome: {
             dest: 'outcome 1',
@@ -90,7 +99,15 @@ describe('Learner answer info service', () =>{
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_specs: [],
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                content_id: 'rule_input_Equals_0',
+                normalized_str_set: ['10']
+              }
+            }
+          }],
           training_data: [],
           tagged_skill_misconception_id: ''
         }, {
@@ -105,7 +122,31 @@ describe('Learner answer info service', () =>{
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null
           },
-          rule_specs: [],
+          rule_specs: [{
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                content_id: 'rule_input_Equals_1',
+                normalized_str_set: ['5']
+              }
+            }
+          }, {
+            rule_type: 'Equals',
+            inputs: {
+              x: {
+                content_id: 'rule_input_Equals_2',
+                normalized_str_set: ['6']
+              }
+            }
+          }, {
+            rule_type: 'FuzzyEquals',
+            inputs: {
+              x: {
+                content_id: 'rule_input_NotEquals_3',
+                normalized_str_set: ['7']
+              }
+            }
+          }],
           training_data: [],
           tagged_skill_misconception_id: ''
         }],
@@ -122,7 +163,6 @@ describe('Learner answer info service', () =>{
         },
         hints: [],
         confirmed_unclassified_answers: [],
-        customization_args: '',
         solution: null
       },
       param_changes: [],
@@ -139,7 +179,6 @@ describe('Learner answer info service', () =>{
       next_content_id_index: null
     };
 
-    rof = TestBed.get(RuleObjectFactory);
     sof = TestBed.get(StateObjectFactory);
     oof = TestBed.get(OutcomeObjectFactory);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
@@ -152,37 +191,6 @@ describe('Learner answer info service', () =>{
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
 
-    // Because RuleObjectFactory.createFromBackendDict, which is used when
-    // initializing state, relies on the interaction being present in
-    // rule_templates.json (but we are creating a mock interaction without
-    // an interaction id), we must manually construct rules.
-    firstState.interaction.answerGroups[0].rules = [
-      rof.createNew('Equals', { x: 10 }, {})
-    ];
-    firstState.interaction.answerGroups[1].rules = [
-      rof.createNew('Equals', { x: 5 }, {}),
-      rof.createNew('Equals', { x: 6 }, {}),
-      rof.createNew('NotEquals', { x: 7 }, {})
-    ];
-
-    secondState.interaction.answerGroups[0].rules = [
-      rof.createNew('Equals', { x: 10 }, {})
-    ];
-    secondState.interaction.answerGroups[1].rules = [
-      rof.createNew('Equals', { x: 5 }, {}),
-      rof.createNew('Equals', { x: 6 }, {}),
-      rof.createNew('NotEquals', { x: 7 }, {})
-    ];
-
-    thirdState.interaction.answerGroups[0].rules = [
-      rof.createNew('Equals', { x: 10 }, {})
-    ];
-    thirdState.interaction.answerGroups[1].rules = [
-      rof.createNew('Equals', { x: 5 }, {}),
-      rof.createNew('Equals', { x: 6 }, {}),
-      rof.createNew('NotEquals', { x: 7 }, {})
-    ];
-
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(new AnswerClassificationResult(
         oof.createNew('default', 'default_outcome', '', []), 2, 0,
@@ -190,11 +198,14 @@ describe('Learner answer info service', () =>{
 
     mockAnswer = 'This is my answer';
     mockInteractionRulesService = {
-      Equals: function(answer, inputs): boolean {
-        return inputs.x === answer;
+      Equals: (answer, inputs) => {
+        return inputs.x.normalized_str_set.some(input => input === answer);
       },
-      NotEquals: function(answer, inputs): boolean {
-        return inputs.x !== answer;
+      // For testing purposes, FuzzyEquals is used here as an alias for not
+      // Equals (we cannot use 'NotEquals' as a rule type because it is not
+      // present in rule_templates).
+      FuzzyEquals: (answer, inputs) => {
+        return !inputs.x.normalized_str_set.some(input => input === answer);
       }
     };
     // Spying the random function to return 0, so that
@@ -289,7 +300,7 @@ describe('Learner answer info service', () =>{
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details');
       expect(
         ladbas.recordLearnerAnswerDetailsAsync).toHaveBeenCalledWith(
-        '10', 'new state', null, 'This is my answer', 'My details');
+        '10', 'new state', 'TextInput', 'This is my answer', 'My details');
     }));
   });
 
