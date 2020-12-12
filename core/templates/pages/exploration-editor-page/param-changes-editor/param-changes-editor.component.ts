@@ -42,7 +42,7 @@ import { UpgradeComponent } from '@angular/upgrade/static';
 
 angular.module('oppia').component('paramChangesEditor', {
   bindings: {
-    paramChangesService: '=',
+    paramChangesService: '<',
     postSaveHook: '=',
     isCurrentlyInSettingsTab: '<'
   },
@@ -163,7 +163,7 @@ angular.module('oppia').component('paramChangesEditor', {
 
         ExplorationParamSpecsService.saveDisplayedValue();
         ctrl.paramChangesService.saveDisplayedValue();
-        if (!ctrl.isCurrentlyInSettingsTab()) {
+        if (!ctrl.isCurrentlyInSettingsTab) {
           ExplorationStatesService.saveStateParamChanges(
             ctrl.paramChangesService.stateName,
             angular.copy(ctrl.paramChangesService.displayed));

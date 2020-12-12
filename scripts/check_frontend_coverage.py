@@ -106,7 +106,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'exploration-engine.service.ts',
     'exploration-footer.directive.ts',
     'exploration-player-state.service.ts',
-    'exploration-recommendations.service.ts',
     'exploration-save.service.ts',
     'exploration-states.service.ts',
     'exploration-summary-tile.directive.ts',
