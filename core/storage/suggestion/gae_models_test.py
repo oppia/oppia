@@ -430,14 +430,14 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             suggestion_models.TARGET_TYPE_SKILL,
             'exp1', self.target_version_at_submission,
-            suggestion_models.STATUS_REJECTED, 'author_3',
+            suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6', self.translation_language_code)
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             'exp1', self.target_version_at_submission,
-            suggestion_models.STATUS_ACCEPTED, 'author_4',
+            suggestion_models.STATUS_IN_REVIEW, 'author_4',
             'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_7', self.translation_language_code)
 
