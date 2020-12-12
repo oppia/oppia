@@ -150,12 +150,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             question_models.QuestionSkillLinkModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            question_models.QuestionSkillLinkModel
-            .has_reference_to_user_id('any_id'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
