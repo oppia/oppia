@@ -23,12 +23,16 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
 class ContributorDashboardPageTest(test_utils.GenericTestBase):
@@ -451,6 +455,35 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             }
         }
 
+        self.assertEqual(output, expected_output)
+
+    def test_handler_does_not_return_in_review_content(self):
+        change_dict = {
+            'cmd': 'add_translation',
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION,
+            '0', 1, self.owner_id, change_dict, 'description')
+
+        output = self.get_json('/gettranslatabletexthandler', params={
+            'language_code': 'hi',
+            'exp_id': '0'
+        })
+
+        expected_output = {
+            'version': 1,
+            'state_names_to_content_id_mapping': {
+                'End State': {
+                    'content': ''
+                }
+            }
+        }
         self.assertEqual(output, expected_output)
 
 
