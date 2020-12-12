@@ -60,7 +60,7 @@ angular.module('oppia').controller(
 
       init();
 
-      var showNextItemToReview = function(suggestionId) {
+      $scope.showNextItemToReview = function(suggestionId) {
         resolvedSuggestionIds.push($scope.activeSuggestionId);
         var suggestionId = null;
         if ($scope.lastSuggestionToReview) {
@@ -80,7 +80,8 @@ angular.module('oppia').controller(
         ContributionAndReviewService.resolveSuggestionToExploration(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
           SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-          $scope.reviewMessage, generateCommitMessage(), showNextItemToReview);
+          $scope.reviewMessage, generateCommitMessage(),
+          $scope.showNextItemToReview);
       };
 
       $scope.rejectAndReviewNext = function() {
@@ -90,7 +91,8 @@ angular.module('oppia').controller(
         ContributionAndReviewService.resolveSuggestionToExploration(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
           SuggestionModalService.ACTION_REJECT_SUGGESTION,
-          $scope.reviewMessage, generateCommitMessage(), showNextItemToReview);
+          $scope.reviewMessage, generateCommitMessage(),
+          $scope.showNextItemToReview);
       };
 
       $scope.cancel = function() {
