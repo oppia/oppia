@@ -29,6 +29,17 @@ import { AlertsService } from 'services/alerts.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
+class MockWindowRef {
+  get nativeWindow() {
+    return {
+      location: {
+        reload: () => {}
+      }
+    };
+  }
+}
 
 describe('Exploration data service', function() {
   let explorationDataService : ExplorationDataService = null;
@@ -38,6 +49,7 @@ describe('Exploration data service', function() {
   let csrfService :CsrfTokenService = null;
   let httpTestingController: HttpTestingController;
   let urlService: UrlService;
+  let windowRef: MockWindowRef;
   let sampleDataResults = {
     draft_change_list_id: 3,
     version: 1,
@@ -69,21 +81,16 @@ describe('Exploration data service', function() {
       }
     },
   };
-  let windowMock = {
-    nativeWindow: {
-      location: {
-        reload: () => {}
-      }
-    }
-  };
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
 
   beforeEach(() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
+      imports: [HttpClientTestingModule],
+      providers: [{ provide: WindowRef, useValue: windowRef }]
+    }).compileComponents();
 
     localStorageService = TestBed.get(LocalStorageService);
     loggerService = TestBed.get(LoggerService);
@@ -93,7 +100,6 @@ describe('Exploration data service', function() {
     urlService = TestBed.get(UrlService);
     spyOn(urlService, 'getPathname').and.returnValue('/create/0');
     spyOn(localStorageService, 'saveExplorationDraft').and.callThrough();
-
     explorationDataService = TestBed.get(ExplorationDataService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
@@ -110,10 +116,10 @@ describe('Exploration data service', function() {
     spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
       draftChanges: [],
       draftChangeListId: 0,
-      isValid: function() {
+      isValid: () => {
         return true;
       },
-      getChanges: function() {
+      getChanges: () => {
         return [];
       }
     });
@@ -136,21 +142,48 @@ describe('Exploration data service', function() {
     flushMicrotasks();
   }));
 
+  it('should use reject handler when fetchApplyDraftExploration fails',
+    fakeAsync(() => {
+      let errorCallback = jasmine.createSpy('error');
+      spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
+        draftChanges: [],
+        draftChangeListId: 0,
+        isValid: () => {
+          return true;
+        },
+        getChanges: () => {
+          return [];
+        }
+      });
+
+      explorationDataService.getData(errorCallback).then((data) => {
+        expect(errorCallback).toHaveBeenCalled();
+      });
+
+      let req = httpTestingController.expectOne(
+        '/createhandler/data/0?apply_draft=true');
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {error: ''},
+        {status: 500, statusText: 'Internal Server Error'});
+      flushMicrotasks();
+    }));
+
   it('should not autosave draft changes when draft is already cached',
     fakeAsync(() => {
       let errorCallback = jasmine.createSpy('error');
       spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
         draftChanges: [],
         draftChangeListId: 0,
-        isValid: function() {
+        isValid: () => {
           return true;
         },
-        getChanges: function() {
+        getChanges: () => {
           return [];
         }
       });
       // Save draft.
-      explorationDataService.getData(errorCallback).then(function(data) {
+      explorationDataService.getData(errorCallback).then((data) => {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });
@@ -168,7 +201,7 @@ describe('Exploration data service', function() {
 
       let logInfoSpy = spyOn(loggerService, 'info').and.callThrough();
       // Draft is already saved and it's in cache.
-      explorationDataService.getData(errorCallback).then(function(data) {
+      explorationDataService.getData(errorCallback).then((data) => {
         expect(logInfoSpy).toHaveBeenCalledWith(
           'Found exploration data in cache.');
         expect(data).toEqual(sampleDataResults);
@@ -188,11 +221,11 @@ describe('Exploration data service', function() {
         return [];
       }
     });
-    let windowRefSpy = spyOn(windowMock.nativeWindow.location, 'reload')
-      .and.callThrough();
+
+    let windowRefSpy = spyOn(windowRef.nativeWindow.location, 'reload');
     explorationDataService.getData(errorCallback).then((data) => {
-      expect(errorCallback).not.toHaveBeenCalled();
-      expect(windowRefSpy).not.toHaveBeenCalled();
+      expect(errorCallback).toHaveBeenCalled();
+      expect(windowRefSpy).toHaveBeenCalled();
     });
     let req = httpTestingController.expectOne(
       '/createhandler/data/0?apply_draft=true');
@@ -202,7 +235,9 @@ describe('Exploration data service', function() {
     req = httpTestingController.expectOne(
       '/createhandler/autosave_draft/0');
     expect(req.request.method).toEqual('PUT');
-    req.flush(500);
+    req.flush({
+      error: ''},
+    {status: 500, statusText: 'Internal Server Error'});
     flushMicrotasks();
   }));
 
@@ -210,10 +245,10 @@ describe('Exploration data service', function() {
     spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
       draftChanges: [],
       draftChangeListId: 0,
-      isValid: function() {
+      isValid: () => {
         return false;
       },
-      getChanges: function() {
+      getChanges: () => {
         return [];
       }
     });
@@ -298,6 +333,27 @@ describe('Exploration data service', function() {
     expect(req.request.method).toEqual('PUT');
     req.flush(200);
     flushMicrotasks();
+    expect(successHandler).toHaveBeenCalled();
+  }));
+
+  it('should use reject handler when resolve answers fails', fakeAsync(() => {
+    let stateName = 'First State';
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let clearWarningsSpy = spyOn(
+      alertService, 'clearWarnings').and.callThrough();
+
+    explorationDataService.resolveAnswers(
+      stateName, [], successHandler, failHandler);
+    expect(clearWarningsSpy).toHaveBeenCalled();
+    let req = httpTestingController.expectOne(
+      '/createhandler/resolved_answers/0/' + encodeURIComponent(stateName));
+    expect(req.request.method).toEqual('PUT');
+    req.flush({
+      error: ''},
+    {status: 500, statusText: 'Internal Server Error'});
+    flushMicrotasks();
+    expect(failHandler).toHaveBeenCalled();
   }));
 
   it('should save an exploration to the backend', fakeAsync(() => {
@@ -308,10 +364,10 @@ describe('Exploration data service', function() {
     spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
       draftChanges: [],
       draftChangeListId: 0,
-      isValid: function() {
+      isValid: () => {
         return true;
       },
-      getChanges: function() {
+      getChanges: () => {
         return [];
       }
     });
@@ -358,10 +414,10 @@ describe('Exploration data service', function() {
     spyOn(localStorageService, 'getExplorationDraft').and.returnValue({
       draftChanges: [],
       draftChangeListId: 0,
-      isValid: function() {
+      isValid: () => {
         return false;
       },
-      getChanges: function() {
+      getChanges: () => {
         return [];
       }
     });
@@ -405,12 +461,12 @@ describe('Exploration data service', function() {
         isValid: () => {
           return true;
         },
-        getChanges: function() {
+        getChanges: () => {
           return [];
         }
       });
       let changeList = [];
-      explorationDataService.getData(errorCallback).then(function(data) {
+      explorationDataService.getData(errorCallback).then((data) => {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });

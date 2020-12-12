@@ -99,28 +99,25 @@ export class ExplorationDataService {
   // committed version (as opposed to the most recent autosave).
   autosaveChangeList(
       changeList: ExplorationChangeList[],
-      successCallback: (value: ExplorationAutosaveChangeListResponse) => void,
-      errorCallback: (reason?: string) => void)
-    : Promise<ExplorationAutosaveChangeListResponse> {
-    return new Promise((resolve, reject) => {
-      // First save locally to be retrieved later if save is unsuccessful.
-      if (this.localStorageService && this.localStorageService.saveExplorationDraft) {
-        this.localStorageService.saveExplorationDraft(
-          this.explorationId, changeList, this.draftChangeListId);
-      }
-      this.httpClient.put<ExplorationAutosaveChangeListResponse>(
-        this.explorationDraftAutosaveUrl, {
-          change_list: changeList,
-          version: this.explorationData.data.version
-        }).toPromise().then(response => {
-        this.draftChangeListId = response.draft_change_list_id;
-        // We can safely remove the locally saved draft copy if it was saved
-        // to the backend.
-        this.localStorageService.removeExplorationDraft(this.explorationId);
-        successCallback(response);
-      }, errorResponse => {
-        errorCallback(errorResponse.error.error);
-      });
+      successCallback,
+      errorCallback) {
+    // First save locally to be retrieved later if save is unsuccessful.
+    if (this.localStorageService && this.localStorageService.saveExplorationDraft) {
+      this.localStorageService.saveExplorationDraft(
+        this.explorationId, changeList, this.draftChangeListId);
+    }
+    this.httpClient.put<ExplorationAutosaveChangeListResponse>(
+      this.explorationDraftAutosaveUrl, {
+        change_list: changeList,
+        version: this.explorationData.data.version
+      }).toPromise().then(response =>{
+      this.draftChangeListId = response.draft_change_list_id;
+      // We can safely remove the locally saved draft copy if it was saved
+      // to the backend.
+      this.localStorageService.removeExplorationDraft(this.explorationId);
+      successCallback(response);
+    }, errorResponse => {
+      errorCallback();
     });
   }
 
@@ -169,7 +166,7 @@ export class ExplorationDataService {
             if (draft) {
               if (draft.isValid(this.draftChangeListId)) {
                 let changeList = draft.getChanges();
-                this.autosaveChangeList(changeList, resolve, reject).then(response => {
+                this.autosaveChangeList(changeList, resolve, () => {
                 // A reload is needed so that the changelist just saved is
                 // loaded as opposed to the exploration returned by this
                 // response.
@@ -183,7 +180,7 @@ export class ExplorationDataService {
             }
             return response;
           }, errorResponse => {
-            errorCallback(errorResponse.error.error);
+            errorCallback(errorResponse);
           }));
       }
     });
