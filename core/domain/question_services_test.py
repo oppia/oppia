@@ -2609,6 +2609,6 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = question.question_state_data.interaction.answer_groups[0]
         rule_spec = answer_group.rule_specs[0]
         self.assertEqual(
-            rule_spec.inputs['x'].to_dict(),
+            rule_spec.inputs['x'],
             {'content_id': 'rule_input_Equals_4', 'normalized_str_set': ['Test']})
         self.assertEqual(question.question_state_data.next_content_id_index, 5)

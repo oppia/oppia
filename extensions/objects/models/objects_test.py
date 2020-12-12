@@ -854,7 +854,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.get_schema())
                     count += 1
 
-        self.assertEqual(count, 51)
+        self.assertEqual(count, 52)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
@@ -862,6 +862,14 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
     def test_default_values_for_objects_are_valid(self):
         for _, member in inspect.getmembers(objects):
             if inspect.isclass(member) and member.default_value is not None:
+                if isinstance(member(), objects.BaseTranslatableObject) and :
+                    # If object is a BaseTranslatableObject, the default
+                    # content_id could be None but the normalization will
+                    # enforce a non-None string. This is because the content id
+                    # is populated before being saved. To get around this, we
+                    # populate the content id if it's here if it is None.
+                    member.default_value['content_id'] = 'content_id'
+
                 self.assertEqual(
                     member.normalize(member.default_value),
                     member.default_value)

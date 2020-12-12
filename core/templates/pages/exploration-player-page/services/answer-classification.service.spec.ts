@@ -158,12 +158,12 @@ describe('Answer Classification Service', () => {
       // rule_templates.json (but we are creating a mock interaction without
       // an interaction id), we must manually construct rules.
       state.interaction.answerGroups[0].rules = [
-        ruleObjectFactory.createNew('Equals', { x: 10 })
+        ruleObjectFactory.createNew('Equals', { x: 10 }, {})
       ];
       state.interaction.answerGroups[1].rules = [
-        ruleObjectFactory.createNew('Equals', { x: 5 }),
-        ruleObjectFactory.createNew('Equals', { x: 6 }),
-        ruleObjectFactory.createNew('NotEquals', { x: 7 })
+        ruleObjectFactory.createNew('Equals', { x: 5 }, {}),
+        ruleObjectFactory.createNew('Equals', { x: 6 }, {}),
+        ruleObjectFactory.createNew('NotEquals', { x: 7 }, {})
       ];
     });
 
@@ -246,7 +246,7 @@ describe('Answer Classification Service', () => {
         // rule_templates.json (but we are creating a mock interaction without
         // an interaction id), we must manually construct rules.
         state.interaction.answerGroups[0].rules = [
-          ruleObjectFactory.createNew('Equals', { x: 10 })
+          ruleObjectFactory.createNew('Equals', { x: 10 }, {})
         ];
 
         expect(
@@ -376,11 +376,11 @@ describe('Answer Classification Service', () => {
       // rule_templates.json (but we are creating a mock interaction without
       // an interaction id), we must manually construct rules.
       state.interaction.answerGroups[0].rules = [
-        ruleObjectFactory.createNew('Equals', { x: 10 })
+        ruleObjectFactory.createNew('Equals', { x: 10 }, {})
       ];
       state.interaction.answerGroups[1].rules = [
-        ruleObjectFactory.createNew('Equals', { x: 5 }),
-        ruleObjectFactory.createNew('Equals', { x: 7 })
+        ruleObjectFactory.createNew('Equals', { x: 5 }, {}),
+        ruleObjectFactory.createNew('Equals', { x: 7 }, {})
       ];
     });
 
@@ -511,10 +511,10 @@ describe('Answer Classification Service', () => {
       // rule_templates.json (but we are creating a mock interaction without
       // an interaction id), we must manually construct rules.
       state.interaction.answerGroups[0].rules = [
-        ruleObjectFactory.createNew('Equals', { x: 'equal' })
+        ruleObjectFactory.createNew('Equals', { x: 'equal' }, {})
       ];
       state.interaction.answerGroups[1].rules = [
-        ruleObjectFactory.createNew('Contains', { x: 'npu' })
+        ruleObjectFactory.createNew('Contains', { x: 'npu' }, {})
       ];
     });
 

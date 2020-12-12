@@ -157,7 +157,7 @@ describe('Responses Service', () => {
           },
           rule_specs: [
             {
-              rule_type: '',
+              rule_type: 'Equals',
               inputs: {
                 x: ['c', 'd', 'e'],
                 y: ['a', 'b', 'c'],

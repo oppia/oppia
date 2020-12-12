@@ -50,9 +50,10 @@ require('objects/templates/sanitized-url-editor.directive.ts');
 require('objects/templates/set-of-algebraic-identifier-editor.component.ts');
 require('objects/templates/set-of-html-string-editor.directive.ts');
 require(
-  'objects/templates/subtitled-set-of-normalized-string-editor.component.ts');
+  // eslint-disable-next-line max-len
+  'objects/templates/translatable-set-of-normalized-string-editor.component.ts');
 require(
-  'objects/templates/subtitled-set-of-unicode-string-editor.component.ts');
+  'objects/templates/translatable-set-of-unicode-string-editor.component.ts');
 require('objects/templates/set-of-unicode-string-editor.directive.ts');
 require('objects/templates/skill-selector-editor.directive.ts');
 require('objects/templates/subtitled-html-editor.directive.ts');

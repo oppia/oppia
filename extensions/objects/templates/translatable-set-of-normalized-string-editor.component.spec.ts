@@ -13,17 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the list of normalized string editor.
+ * @fileoverview Unit tests for the translatable set of normalized string
+ * editor.
  */
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
-describe('SubtitledSetOfNormalizedStringEditor', function() {
+describe('TranslatableSetOfNormalizedStringEditor', function() {
   var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('subtitledSetOfNormalizedStringEditor');
+    ctrl = $componentController('translatableSetOfNormalizedStringEditor');
   }));
 
   it('should initialize the schema', function() {

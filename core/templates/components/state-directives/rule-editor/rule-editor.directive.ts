@@ -59,14 +59,10 @@ angular.module('oppia').directive('ruleEditor', [
       controller: [
         '$scope', '$timeout', 'GenerateContentIdService', 'ResponsesService',
         'StateEditorService', 'StateInteractionIdService',
-        'SubtitledSetOfNormalizedStringObjectFactory',
-        'SubtitledSetOfUnicodeStringObjectFactory',
         'COMPONENT_NAME_RULE_INPUTS', 'INTERACTION_SPECS',
         function(
             $scope, $timeout, GenerateContentIdService, ResponsesService,
             StateEditorService, StateInteractionIdService,
-            SubtitledSetOfNormalizedStringObjectFactory,
-            SubtitledSetOfUnicodeStringObjectFactory,
             COMPONENT_NAME_RULE_INPUTS, INTERACTION_SPECS) {
           var ctrl = this;
           // This returns the rule description string.
@@ -240,12 +236,6 @@ angular.module('oppia').directive('ruleEditor', [
               } else if (answerChoices) {
                 ctrl.rule.inputs[varName] = angular.copy(
                   answerChoices[0].val);
-              } else if (varType === 'SubtitledSetOfNormalizedString') {
-                ctrl.rule.inputs[varName] = (
-                  SubtitledSetOfNormalizedStringObjectFactory.createDefault());
-              } else if (varType === 'SubtitledSetOfUnicodeString') {
-                ctrl.rule.inputs[varName] = (
-                  SubtitledSetOfUnicodeStringObjectFactory.createDefault());
               } else {
                 ctrl.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
               }
@@ -263,38 +253,23 @@ angular.module('oppia').directive('ruleEditor', [
 
           ctrl.populateRuleContentIds = function() {
             const inputs = ctrl.rule.inputs;
+            const inputTypes = ctrl.rule.inputTypes;
 
-            let tmpRuleDescription = computeRuleDescriptionFragments();
-            // Finds the parameters and sets them in ctrl.rule.inputs.
-            const PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-            while (true) {
-              if (!tmpRuleDescription.match(PATTERN)) {
-                break;
-              }
-              const varName = tmpRuleDescription.match(PATTERN)[1];
-              let varType = null;
-              if (tmpRuleDescription.match(PATTERN)[2]) {
-                varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
-              }
-
+            Object.keys(inputs).forEach(inputName => {
               const hasContentId = (
-                varType === 'SubtitledSetOfNormalizedString' ||
-                varType === 'SubtitledSetOfUnicodeString'
-              );
+                inputTypes[inputName].indexOf('Translatable') === 0);
               if (!hasContentId) {
-                continue;
+                return;
               }
-              const needsContentId = inputs[varName].getContentId() === null;
+              const needsContentId = inputs[inputName].content_id === null;
 
               if (needsContentId) {
-                inputs[varName].setContentId(
+                inputs[inputName].content_id = (
                   GenerateContentIdService.getNextStateId(
                     `${COMPONENT_NAME_RULE_INPUTS}_${ctrl.rule.type}`
                   ));
               }
-
-              tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
-            }
+            });
           };
 
           ctrl.cancelThisEdit = function() {

@@ -2653,12 +2653,27 @@ class State(python_utils.OBJECT):
         Args:
             interaction_id: str. The new interaction id to set.
         """
-        self.interaction.id = interaction_id
+        if self.interaction.id:
+            old_content_id_list = [
+                answer_group.outcome.feedback.content_id for answer_group in (
+                    self.interaction.answer_groups)]
 
-        # TODO(sll): This should also clear interaction.answer_groups (except
-        # for the default rule). This is somewhat mitigated because the client
-        # updates interaction_answer_groups directly after this, but we should
-        # fix it.
+            for answer_group in self.interaction.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    for param_name, value in rule_spec.inputs.items():
+                        param_type = (
+                            interaction_registry.Registry.get_interaction_by_id(
+                                self.interaction.id
+                            ).get_rule_param_type(rule_spec.rule_type, param_name))
+
+                        if issubclass(param_type, objects.BaseTranslatableObject):
+                            old_content_id_list.append(value['content_id'])
+
+            self._update_content_ids_in_assets(
+                old_content_id_list, [])
+
+        self.interaction.id = interaction_id
+        self.interaction.answer_groups = []
 
     def update_next_content_id_index(self, next_content_id_index):
         """Update the interaction next content id index attribute.

@@ -430,10 +430,6 @@ import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledSetOfNormalizedStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
-import { SubtitledSetOfUnicodeStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
@@ -755,10 +751,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storyReferenceObjectFactory: StoryReferenceObjectFactory;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory;
-  static subtitledSetOfNormalizedStringObjectFactory:
-    SubtitledSetOfNormalizedStringObjectFactory;
-  static subtitledSetOfUnicodeStringObjectFactory:
-    SubtitledSetOfUnicodeStringObjectFactory;
   static subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   static subtopicObjectFactory: SubtopicObjectFactory;
   static subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory;
@@ -1055,10 +1047,6 @@ private storyObjectFactory: StoryObjectFactory,
 private storyReferenceObjectFactory: StoryReferenceObjectFactory,
 private storyViewerBackendApiService: StoryViewerBackendApiService,
 private subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory,
-private subtitledSetOfNormalizedStringObjectFactory:
-  SubtitledSetOfNormalizedStringObjectFactory,
-private subtitledSetOfUnicodeStringObjectFactory:
-  SubtitledSetOfUnicodeStringObjectFactory,
 private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory,
 private subtopicObjectFactory: SubtopicObjectFactory,
 private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory,
@@ -1513,10 +1501,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.subtitledHtmlObjectFactory);
     OppiaAngularRootComponent.subtitledUnicodeObjectFactory = (
       this.subtitledUnicodeObjectFactory);
-    OppiaAngularRootComponent.subtitledSetOfNormalizedStringObjectFactory = (
-      this.subtitledSetOfNormalizedStringObjectFactory);
-    OppiaAngularRootComponent.subtitledSetOfUnicodeStringObjectFactory = (
-      this.subtitledSetOfUnicodeStringObjectFactory);
     OppiaAngularRootComponent.subtopicObjectFactory = (
       this.subtopicObjectFactory);
     OppiaAngularRootComponent.subtopicPageContentsObjectFactory = (

@@ -13,17 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for subtitled set of unicode string editor.
+ * @fileoverview Directive for translatable set of unicode string editor.
  */
 
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
-angular.module('oppia').component('subtitledSetOfUnicodeStringEditor', {
+angular.module('oppia').component('translatableSetOfUnicodeStringEditor', {
   bindings: {
     value: '='
   },
-  template: require('./subtitled-set-of-unicode-string-editor.component.html'),
+  template: require(
+    './translatable-set-of-unicode-string-editor.component.html'),
   controller: [function() {
     var ctrl = this;
     ctrl.$onInit = function() {

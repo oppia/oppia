@@ -13,18 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for subtitled set of normalized string editor.
+ * @fileoverview Directive for translatable set of normalized string editor.
  */
 
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
-angular.module('oppia').component('subtitledSetOfNormalizedStringEditor', {
+angular.module('oppia').component('translatableSetOfNormalizedStringEditor', {
   bindings: {
     value: '='
   },
   // eslint-disable-next-line max-len
-  template: require('./subtitled-set-of-normalized-string-editor.component.html'),
+  template: require(
+    './translatable-set-of-normalized-string-editor.component.html'),
   controller: [function() {
     var ctrl = this;
     ctrl.$onInit = function() {

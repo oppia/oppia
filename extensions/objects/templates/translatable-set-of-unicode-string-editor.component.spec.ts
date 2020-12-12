@@ -13,17 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the list of unicode string editor.
+ * @fileoverview Unit tests for the translatable set of unicode string editor.
  */
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
-describe('SubtitledSetOfUnicodeStringEditor', function() {
+describe('TranslatableSetOfUnicodeStringEditor', function() {
   var ctrl = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('subtitledSetOfUnicodeStringEditor');
+    ctrl = $componentController('translatableSetOfUnicodeStringEditor');
   }));
 
   it('should initialize the schema', function() {

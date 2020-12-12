@@ -103,7 +103,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         # Modify such that job creation is triggered.
         new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
-        new_answer_group.rule_specs[0].inputs['x'].content_id = 'new_ri'
+        new_answer_group.rule_specs[0].inputs['x']['content_id'] = 'new_ri'
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
         state.recorded_voiceovers.voiceovers_mapping['new_ri'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)
@@ -190,7 +190,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         # Modify such that job creation is triggered.
         new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
         new_answer_group.outcome.feedback.content_id = 'new_feedback'
-        new_answer_group.rule_specs[0].inputs['x'].content_id = 'new_ri'
+        new_answer_group.rule_specs[0].inputs['x']['content_id'] = 'new_ri'
         state.recorded_voiceovers.voiceovers_mapping['new_feedback'] = {}
         state.recorded_voiceovers.voiceovers_mapping['new_ri'] = {}
         state.interaction.answer_groups.insert(3, new_answer_group)

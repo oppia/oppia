@@ -16,7 +16,6 @@
  * @fileoverview Type definiitions for Rule inputs.
  */
 
-import { SubtitledSetOfNormalizedString } from 'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
 import {
   FractionAnswer,
   NumberWithUnitsAnswer,
@@ -223,12 +222,22 @@ export type RatioInputRuleInputs = (
   RatioInputEqualRuleInputs |
   RatioInputHasNumberOfTermsEqualToRuleInputs);
 
+export interface TranslatableSetOfUnicodeString {
+  'content_id': string | null;
+  'unicode_str_set': string[];
+}
+
 export interface SetInputRuleInputs {
-  x: string[];
+  x: TranslatableSetOfUnicodeString;
+}
+
+export interface TranslatableSetOfNormalizedString {
+  'content_id': string | null;
+  'normalized_str_set': string[];
 }
 
 export interface TextInputRuleInputs {
-  x: SubtitledSetOfNormalizedString;
+  x: TranslatableSetOfNormalizedString;
 }
 
 export type InteractionRuleInputs = (

@@ -73,10 +73,6 @@ import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledSetOfNormalizedStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
-import { SubtitledSetOfUnicodeStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { SubtitledUnicodeObjectFactory } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from 'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
@@ -604,10 +600,6 @@ export const angularServices: [string, unknown][] = [
   ['StoryValidationService', StoryValidationService],
   ['StoryViewerBackendApiService', StoryViewerBackendApiService],
   ['SubtitledHtmlObjectFactory', SubtitledHtmlObjectFactory],
-  ['SubtitledSetOfNormalizedStringObjectFactory',
-    SubtitledSetOfNormalizedStringObjectFactory],
-  ['SubtitledSetOfUnicodeStringObjectFactory',
-    SubtitledSetOfUnicodeStringObjectFactory],
   ['SubtitledUnicodeObjectFactory', SubtitledUnicodeObjectFactory],
   ['SubtopicObjectFactory', SubtopicObjectFactory],
   ['SubtopicPageContentsObjectFactory', SubtopicPageContentsObjectFactory],

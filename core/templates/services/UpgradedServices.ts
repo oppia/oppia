@@ -468,10 +468,6 @@ import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledSetOfNormalizedStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
-import { SubtitledSetOfUnicodeStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
@@ -676,10 +672,6 @@ export class UpgradedServices {
       new StoryReferenceObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
-    upgradedServices['SubtitledSetOfNormalizedStringObjectFactory'] =
-      new SubtitledSetOfNormalizedStringObjectFactory();
-    upgradedServices['SubtitledSetOfUnicodeStringObjectFactory'] =
-      new SubtitledSetOfUnicodeStringObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
       new SubtitledUnicodeObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
@@ -833,9 +825,7 @@ export class UpgradedServices {
     upgradedServices['RecordedVoiceoversObjectFactory'] =
       new RecordedVoiceoversObjectFactory(
         upgradedServices['VoiceoverObjectFactory']);
-    upgradedServices['RuleObjectFactory'] = new RuleObjectFactory(
-      upgradedServices['SubtitledSetOfNormalizedStringObjectFactory'],
-      upgradedServices['SubtitledSetOfUnicodeStringObjectFactory']);
+    upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SetInputValidationService'] =
       new SetInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -867,8 +857,7 @@ export class UpgradedServices {
       upgradedServices['SuggestionsService']);
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
-        upgradedServices['baseInteractionValidationService'],
-        upgradedServices['SubtitledSetOfNormalizedStringObjectFactory']);
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['ThreadMessageObjectFactory'] =
       new ThreadMessageObjectFactory(
         upgradedServices['ThreadMessageSummaryObjectFactory']);

@@ -157,30 +157,30 @@ describe('Learner answer info service', () =>{
     // rule_templates.json (but we are creating a mock interaction without
     // an interaction id), we must manually construct rules.
     firstState.interaction.answerGroups[0].rules = [
-      rof.createNew('Equals', { x: 10 })
+      rof.createNew('Equals', { x: 10 }, {})
     ];
     firstState.interaction.answerGroups[1].rules = [
-      rof.createNew('Equals', { x: 5 }),
-      rof.createNew('Equals', { x: 6 }),
-      rof.createNew('NotEquals', { x: 7 })
+      rof.createNew('Equals', { x: 5 }, {}),
+      rof.createNew('Equals', { x: 6 }, {}),
+      rof.createNew('NotEquals', { x: 7 }, {})
     ];
 
     secondState.interaction.answerGroups[0].rules = [
-      rof.createNew('Equals', { x: 10 })
+      rof.createNew('Equals', { x: 10 }, {})
     ];
     secondState.interaction.answerGroups[1].rules = [
-      rof.createNew('Equals', { x: 5 }),
-      rof.createNew('Equals', { x: 6 }),
-      rof.createNew('NotEquals', { x: 7 })
+      rof.createNew('Equals', { x: 5 }, {}),
+      rof.createNew('Equals', { x: 6 }, {}),
+      rof.createNew('NotEquals', { x: 7 }, {})
     ];
 
     thirdState.interaction.answerGroups[0].rules = [
-      rof.createNew('Equals', { x: 10 })
+      rof.createNew('Equals', { x: 10 }, {})
     ];
     thirdState.interaction.answerGroups[1].rules = [
-      rof.createNew('Equals', { x: 5 }),
-      rof.createNew('Equals', { x: 6 }),
-      rof.createNew('NotEquals', { x: 7 })
+      rof.createNew('Equals', { x: 5 }, {}),
+      rof.createNew('Equals', { x: 6 }, {}),
+      rof.createNew('NotEquals', { x: 7 }, {})
     ];
 
     spyOn(answerClassificationService, 'getMatchingClassificationResult')

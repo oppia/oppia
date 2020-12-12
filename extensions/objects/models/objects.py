@@ -79,6 +79,16 @@ class BaseTranslatableObject(BaseObject):
             list(dict). A list of properties that store the object value.
         """
         raise NotImplementedError('Please Implement this method')
+    
+    @staticmethod
+    def _normalize_value():
+        """Returns a method that normalizes the values of the object.
+
+        Returns:
+            dict. A normalized translatable Python object with its values
+            normalized.
+        """
+        raise NotImplementedError('Please Implement this method')
 
     @classmethod
     def get_schema(cls):
@@ -91,9 +101,35 @@ class BaseTranslatableObject(BaseObject):
             'type': 'dict',
             'properties': [{
                 'name': 'content_id',
-                'schema': {'type': 'unicode'}
+                # The default content id is none. However, it should be
+                # populated before being saved. The normalization method has
+                # validation checks for this).
+                'schema': {'type': 'unicode_or_none'}
             }] + cls._get_value_schema()
         }
+
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: dict. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            dict. The normalized object.
+
+        Raises:
+            TypeError. Cannot convert to LogicQuestion schema.
+        """
+        if not isinstance(raw['content_id'], python_utils.BASESTRING):
+            raise TypeError(
+                'Expected content id to be a string, received %s' %
+                raw['content_id'])
+        
+        return schema_utils.normalize_against_schema(
+            cls._normalize_value(raw),
+            cls.get_schema())
 
 
 class Boolean(BaseObject):
@@ -1646,6 +1682,11 @@ class CustomOskLetters(BaseObject):
 class TranslatableSetOfNormalizedString(BaseTranslatableObject):
     """Class for translatable sets of NormalizedStrings."""
 
+    default_value = {
+        'content_id': None,
+        'normalized_str_set': []
+    }
+
     @staticmethod
     def _get_value_schema():
         """Returns a list of properties that store the object value.
@@ -1658,26 +1699,21 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
             'schema': SetOfNormalizedString.get_schema()
         }]
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object.
+    @staticmethod
+    def _normalize_value(raw):
+        """Validates and normalizes the value fields of the translatble object.
 
         Args:
-            raw: *. A normalized Python object to be normalized.
+            raw: *. A translatable Python object whose values are to be
+            normalized.
 
         Returns:
-            dict. A normalized Python object describing the Object specified by
-            this class.
+            dict. A normalized translatable Python object with its values
+            normalized.
 
         Raises:
-            ValidationError. The object is not valid.
             TypeError. The Python object cannot be normalized.
         """
-        if not isinstance(raw['content_id'], python_utils.BASESTRING):
-            raise TypeError(
-                'Expected content id to be a string, received %s' %
-                raw['content_id'])
-
         if not isinstance(raw['normalized_str_set'], list):
             raise TypeError(
                 'Invalid unicode string set: %s' % raw['normalized_str_set'])
@@ -1693,11 +1729,16 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
                 'Duplicate unicode found '
                 'in set: %s' % raw['normalized_str_set'])
 
-        return schema_utils.normalize_against_schema(raw, cls.get_schema())
+        return raw
 
 
 class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     """Class for translatable sets of UnicodeStrings."""
+
+    default_value = {
+        'content_id': None,
+        'unicode_str_set': []
+    }
 
     @staticmethod
     def _get_value_schema():
@@ -1711,25 +1752,21 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
             'schema': SetOfUnicodeString.get_schema()
         }]
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object.
+    @staticmethod
+    def _normalize_value(raw):
+        """Validates and normalizes the value fields of the translatble object.
 
         Args:
-            raw: *. A normalized Python object to be normalized.
+            raw: *. A translatable Python object whose values are to be
+            normalized.
 
         Returns:
-            dict. A normalized Python object describing the Object specified by
-            this class.
+            dict. A normalized translatable Python object with its values
+            normalized.
 
         Raises:
             TypeError. The Python object cannot be normalized.
         """
-        if not isinstance(raw['content_id'], python_utils.BASESTRING):
-            raise TypeError(
-                'Expected content id to be a string, received %s' %
-                raw['content_id'])
-
         if not isinstance(raw['unicode_str_set'], list):
             raise TypeError(
                 'Invalid unicode string set: %s' % raw['unicode_str_set'])
@@ -1743,4 +1780,4 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
             raise TypeError(
                 'Duplicate unicode found in set: %s' % raw['unicode_str_set'])
 
-        return schema_utils.normalize_against_schema(raw, cls.get_schema())
+        return raw

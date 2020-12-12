@@ -46,8 +46,6 @@ require('services/context.service.ts');
 require('services/validators.service.ts');
 
 import { EventEmitter } from '@angular/core';
-import { SubtitledSetOfNormalizedString } from 'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
-import { SubtitledSetOfUnicodeString } from 'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 
 angular.module('oppia').factory('ExplorationStatesService', [
   '$filter', '$injector', '$location', '$q', '$uibModal',
@@ -145,12 +143,9 @@ angular.module('oppia').factory('ExplorationStatesService', [
         answerGroups.forEach(function(answerGroup) {
           contentIds.add(answerGroup.outcome.feedback.getContentId());
           answerGroup.rules.forEach(rule => {
-            Object.values(rule.inputs).forEach(input => {
-              if (
-                input instanceof SubtitledSetOfNormalizedString ||
-                input instanceof SubtitledSetOfUnicodeString
-              ) {
-                contentIds.add(input.getContentId());
+            Object.keys(rule.inputs).forEach(inputName => {
+              if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
+                contentIds.add(rule.inputs[inputName].content_id);
               }
             });
           });

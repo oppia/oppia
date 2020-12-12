@@ -545,7 +545,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name], 'TextInput')
+            init_state, 'TextInput')
+        init_state.update_interaction_answer_groups(old_answer_groups)
+        answer_groups = interaction.answer_groups
+        answer_group = answer_groups[0]
         answer_group.outcome.dest = exploration.init_state_name
         exploration.validate()
 
@@ -569,17 +572,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }}
         rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
-            Exception, 'Expected list, received 15'
+            Exception, 'Invalid unicode string set: 15'
             ):
             exploration.validate()
 
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name],
             'PencilCodeEditor')
+        init_state.interaction.answer_groups = answer_groups
+        init_state.written_translations.translations_mapping[
+            'feedback_1'] = {}
+        init_state.recorded_voiceovers.voiceovers_mapping[
+            'feedback_1'] = {}
         rule_spec.rule_type = 'ErrorContains'
         rule_spec.inputs = {'x': '{{ExampleParam}}'}
-        del init_state.written_translations.translations_mapping['rule_input_Equals']
-        del init_state.recorded_voiceovers.voiceovers_mapping['rule_input_Equals']
 
         self._assert_validation_error(
             exploration,
@@ -682,8 +688,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
         self._assert_validation_error(exploration, 'Invalid interaction id')
+        interaction.id = 'PencilCodeEditor'
 
         self.set_interaction_for_state(init_state, 'TextInput')
+        init_state.update_interaction_answer_groups(old_answer_groups)
         valid_text_input_cust_args = init_state.interaction.customization_args
         rule_spec.inputs = {'x': {
             'content_id': 'rule_input_Equals',
@@ -721,7 +729,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected answer groups to be a list')
 
-        interaction.answer_groups = answer_groups
+        init_state.update_interaction_answer_groups(old_answer_groups)
         self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
@@ -734,13 +742,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Non-terminal interactions must have a default outcome.')
 
         self.set_interaction_for_state(init_state, 'EndExploration')
+        init_state.interaction.answer_groups = answer_groups
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
 
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
-        init_state.update_interaction_answer_groups([])
+        init_state.interaction.answer_groups = []
         exploration.validate()
 
         # Restore a valid exploration.
@@ -6781,7 +6790,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: ri_Equals_3
+              content_id: rule_input_Equals_3
               normalized_str_set:
               - InputString
           rule_type: Equals
@@ -6815,7 +6824,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -6823,7 +6832,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7354,7 +7363,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: ri_Equals_3
+              content_id: rule_input_Equals_3
               normalized_str_set:
               - InputString
           rule_type: Equals
@@ -7388,7 +7397,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7396,7 +7405,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7515,7 +7524,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: ri_Equals_3
+              content_id: rule_input_Equals_3
               normalized_str_set:
               - InputString
           rule_type: Equals
@@ -7549,7 +7558,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7557,7 +7566,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7699,7 +7708,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: ri_Equals_3
+              content_id: rule_input_Equals_3
               normalized_str_set:
               - InputString
           rule_type: Equals
@@ -7733,7 +7742,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7741,7 +7750,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7872,7 +7881,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: ri_Equals_3
+              content_id: rule_input_Equals_3
               normalized_str_set:
               - InputString
           rule_type: Equals
@@ -7906,7 +7915,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7914,7 +7923,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
   END:
     classifier_model_id: null
     content:
@@ -8067,7 +8076,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: ri_Equals_3
+              content_id: rule_input_Equals_3
               normalized_str_set:
               - InputString
           rule_type: Equals
@@ -8101,7 +8110,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -8109,7 +8118,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
   END:
     classifier_model_id: null
     content:
@@ -8645,7 +8654,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: ri_Equals_3
+              content_id: rule_input_Equals_3
               normalized_str_set:
               - InputString
           rule_type: Equals
@@ -8679,7 +8688,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -8691,7 +8700,7 @@ states:
             translation: <p>Translation</p>
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
   END:
     classifier_model_id: null
     content:
@@ -9740,7 +9749,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: ri_Equals_3
+              content_id: rule_input_Equals_3
               normalized_str_set:
               - InputString
           rule_type: Equals
@@ -9774,7 +9783,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -9782,7 +9791,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        ri_Equals_3: {}
+        rule_input_Equals_3: {}
   END:
     classifier_model_id: null
     content:

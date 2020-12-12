@@ -70,7 +70,7 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
         currentInteractionId &&
         INTERACTION_SPECS[currentInteractionId].is_linear);
     };
-    $scope.tmpRule = RuleObjectFactory.createNew(null, {});
+    $scope.tmpRule = RuleObjectFactory.createNew(null, {}, {});
     var feedbackContentId = GenerateContentIdService.getNextStateId(
       COMPONENT_NAME_FEEDBACK);
     $scope.tmpOutcome = OutcomeObjectFactory.createNew(
@@ -96,16 +96,14 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
 
       Object.keys(inputTypes).forEach(inputName => {
         const hasContentId = (
-          inputTypes[inputName] === 'SubtitledSetOfNormalizedString' ||
-          inputTypes[inputName] === 'SubtitledSetOfUnicodeString'
-        );
+          inputTypes[inputName].indexOf('Translatable') === 0);
         if (!hasContentId) {
           return;
         }
-        const needsContentId = inputs[inputName].getContentId() === null;
+        const needsContentId = inputs[inputName].content_id === null;
 
         if (needsContentId) {
-          inputs[inputName].setContentId(
+          inputs[inputName].content_id = (
             GenerateContentIdService.getNextStateId(
               `${COMPONENT_NAME_RULE_INPUTS}_${$scope.tmpRule.type}`
             ));

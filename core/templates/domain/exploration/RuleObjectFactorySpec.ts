@@ -43,42 +43,9 @@ describe('RuleObjectFactory', () => {
     expect(rule.toBackendDict()).toEqual(ruleBackendDict);
   });
 
-  it('should convert to a backend dictionary with ' +
-     'SubtitledSetOfNormalizedString present', () => {
-    const textInputRuleBackendDict = {
-      rule_type: 'Equals',
-      inputs: {
-        x: {
-          content_id: 'rule_input',
-          normalized_str_set: ['a', 'b']
-        }
-      }
-    };
-    const textInputRule = ruleObjectFactory.createFromBackendDict(
-      textInputRuleBackendDict,
-      'TextInput');
-    expect(textInputRule.toBackendDict()).toEqual(textInputRuleBackendDict);
-  });
-
-  it('should convert to a backend dictionary with ' +
-     'SubtitledSetOfUnicodeString present', () => {
-    const setInputRuleBackendDict = {
-      rule_type: 'Equals',
-      inputs: {
-        x: {
-          content_id: 'rule_input',
-          unicode_str_set: ['a', 'b']
-        }
-      }
-    };
-    const setInputRule = ruleObjectFactory.createFromBackendDict(
-      setInputRuleBackendDict,
-      'SetInput');
-    expect(setInputRule.toBackendDict()).toEqual(setInputRuleBackendDict);
-  });
-
-  it('should creat a new rule from creatNew()', () => {
-    let rulesDict = ruleObjectFactory.createNew('rule_type_1', inputBackend);
-    expect(rulesDict).toEqual(new Rule('rule_type_1', inputBackend));
+  it('should create a new rule from createNew()', () => {
+    let rulesDict = ruleObjectFactory.createNew(
+      'rule_type_1', inputBackend, {});
+    expect(rulesDict).toEqual(new Rule('rule_type_1', inputBackend, {}));
   });
 });

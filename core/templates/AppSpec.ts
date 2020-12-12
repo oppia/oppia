@@ -21,10 +21,6 @@
 import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledSetOfNormalizedStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
-import { SubtitledSetOfUnicodeStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { WrittenTranslationObjectFactory } from
@@ -43,10 +39,7 @@ describe('App', function() {
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value(
         'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-      $provide.value('RuleObjectFactory', new RuleObjectFactory(
-        new SubtitledSetOfNormalizedStringObjectFactory(),
-        new SubtitledSetOfUnicodeStringObjectFactory()
-      ));
+      $provide.value('RuleObjectFactory', new RuleObjectFactory());
       $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
       $provide.value(
         'WrittenTranslationObjectFactory',

@@ -49,10 +49,6 @@ require('services/external-save.service.ts');
 
 import _ from 'lodash';
 
-import { SubtitledSetOfNormalizedString } from
-  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
-import { SubtitledSetOfUnicodeString } from
-  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { Subscription } from 'rxjs';
 
 angular.module('oppia').directive('answerGroupEditor', [
@@ -85,16 +81,12 @@ angular.module('oppia').directive('answerGroupEditor', [
         'AlertsService', 'ExternalSaveService', 'ResponsesService',
         'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
         'StateNextContentIdIndexService',
-        'SubtitledSetOfNormalizedStringObjectFactory',
-        'SubtitledSetOfUnicodeStringObjectFactory',
         'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
         'INTERACTION_SPECS',
         function(
             AlertsService, ExternalSaveService, ResponsesService,
             RuleObjectFactory, StateEditorService, StateInteractionIdService,
             StateNextContentIdIndexService,
-            SubtitledSetOfNormalizedStringObjectFactory,
-            SubtitledSetOfUnicodeStringObjectFactory,
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             INTERACTION_SPECS) {
           var ctrl = this;
@@ -150,7 +142,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               case 'SetOfAlgebraicIdentifier':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
-                return [];
+              case 'SetOfNormalizedString':
               case 'MusicPhrase':
                 return [];
               case 'CheckedProof':
@@ -195,12 +187,18 @@ angular.module('oppia').directive('answerGroupEditor', [
                     getDefaultInputValue('Real'), getDefaultInputValue('Real')],
                   clickedRegions: []
                 };
-              case 'SubtitledSetOfNormalizedString':
-                return (
-                  SubtitledSetOfNormalizedStringObjectFactory.createDefault());
-              case 'SubtitledSetOfUnicodeString':
-                return (
-                  SubtitledSetOfUnicodeStringObjectFactory.createDefault());
+              case 'TranslatableSetOfNormalizedString':
+                return {
+                  content_id: null,
+                  normalized_str_set:
+                    getDefaultInputValue('SetOfNormalizedString')
+                };
+              case 'TranslatableSetOfUnicodeString':
+                return {
+                  content_id: null,
+                  normalized_str_set:
+                    getDefaultInputValue('SetOfUnicodeString')
+                };
             }
           };
 
@@ -241,8 +239,8 @@ angular.module('oppia').directive('answerGroupEditor', [
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
             // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
-            const rule = RuleObjectFactory.createNew(ruleType, inputs);
-            rule.inputTypes = inputTypes;
+            const rule = RuleObjectFactory.createNew(
+              ruleType, inputs, inputTypes);
             ctrl.rules.push(rule);
             ctrl.changeActiveRuleIndex(ctrl.rules.length - 1);
           };
@@ -331,7 +329,7 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           /**
           * Extracts a mapping of content ids to the html or unicode content
-          * found in the customization arguments.
+          * found in the rule inputs.
           * @returns {Object} A Mapping of content ids (string) to content
           *   (string).
           */
@@ -340,16 +338,9 @@ angular.module('oppia').directive('answerGroupEditor', [
             ctrl.rules.forEach(rule => {
               Object.keys(rule.inputs).forEach(ruleName => {
                 const ruleInput = rule.inputs[ruleName];
-                const isSubtitledSetOfNormalizedString = (
-                  ruleInput instanceof SubtitledSetOfNormalizedString);
-                const isSubtitledSetOfUnicodeString = (
-                  ruleInput instanceof SubtitledSetOfUnicodeString);
-                if (isSubtitledSetOfNormalizedString) {
-                  contentIdToContent[ruleInput.getContentId()] = (
-                    [...ruleInput.getNormalizedStrings()]);
-                } else if (isSubtitledSetOfUnicodeString) {
-                  contentIdToContent[ruleInput.getContentId()] = (
-                    [...ruleInput.getUnicodeStrings()]);
+                const ruleInputType = rule.inputTypes[ruleName];
+                if (ruleInputType.indexOf('Translatable') === 0) {
+                  contentIdToContent[ruleInput.content_id] = ruleInput;
                 }
               });
             });

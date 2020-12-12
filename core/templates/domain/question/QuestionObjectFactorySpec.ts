@@ -35,10 +35,6 @@ import { RecordedVoiceoversObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtitledSetOfNormalizedStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
-import { SubtitledSetOfUnicodeStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
@@ -68,10 +64,7 @@ describe('Question object factory', function() {
     $provide.value(
       'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
         new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory(
-          new SubtitledSetOfNormalizedStringObjectFactory(),
-          new SubtitledSetOfUnicodeStringObjectFactory()
-        )));
+        new RuleObjectFactory()));
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
@@ -88,10 +81,7 @@ describe('Question object factory', function() {
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory(
-      new SubtitledSetOfNormalizedStringObjectFactory(),
-      new SubtitledSetOfUnicodeStringObjectFactory()
-    ));
+    $provide.value('RuleObjectFactory', new RuleObjectFactory());
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('UnitsObjectFactory', new UnitsObjectFactory());

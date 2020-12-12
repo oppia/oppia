@@ -30,8 +30,7 @@ import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
 import { Rule } from
   'domain/exploration/RuleObjectFactory';
-import { SubtitledSetOfUnicodeString } from
-  'domain/exploration/SubtitledSetOfUnicodeStringObjectFactory';
+import { TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
 
 interface PreviousRule {
   answerGroupIndex: number;
@@ -85,8 +84,8 @@ export class SetInputValidationService {
   private areSameRule(ruleA: Rule, ruleB: Rule): boolean {
     return ruleA.type === ruleB.type &&
       this.areSameSet(
-        (<SubtitledSetOfUnicodeString>ruleA.inputs.x).getUnicodeStrings(),
-        (<SubtitledSetOfUnicodeString>ruleB.inputs.x).getUnicodeStrings());
+        (<TranslatableSetOfUnicodeString>ruleA.inputs.x).unicode_str_set,
+        (<TranslatableSetOfUnicodeString>ruleB.inputs.x).unicode_str_set);
   }
 
   getCustomizationArgsWarnings(
@@ -143,9 +142,9 @@ export class SetInputValidationService {
                 depending on their rule types.
             */
             let isRuleCoveredByAnyPrevRule = false;
-            let ruleInput = <SubtitledSetOfUnicodeString>rule.inputs.x;
+            let ruleInput = <TranslatableSetOfUnicodeString>rule.inputs.x;
             let prevRuleInput = (
-              <SubtitledSetOfUnicodeString>prevRule.rule.inputs.x);
+              <TranslatableSetOfUnicodeString>prevRule.rule.inputs.x);
             switch (rule.type) {
               case 'Equals':
                 // An 'Equals' rule is made redundant by another only when
@@ -156,16 +155,16 @@ export class SetInputValidationService {
               case 'HasElementsIn':
               case 'IsDisjointFrom':
                 isRuleCoveredByAnyPrevRule = this.isSubset(
-                  ruleInput.getUnicodeStrings(),
-                  prevRuleInput.getUnicodeStrings()
+                  ruleInput.unicode_str_set,
+                  prevRuleInput.unicode_str_set
                 );
                 break;
               case 'IsSupersetOf':
               case 'HasElementsNotIn':
               case 'OmitsElementsIn':
                 isRuleCoveredByAnyPrevRule = this.isSubset(
-                  prevRuleInput.getUnicodeStrings(),
-                  ruleInput.getUnicodeStrings()
+                  prevRuleInput.unicode_str_set,
+                  ruleInput.unicode_str_set
                 );
                 break;
               default:

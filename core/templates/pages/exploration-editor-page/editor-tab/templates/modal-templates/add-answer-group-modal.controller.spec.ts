@@ -27,8 +27,6 @@ import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 
 import { Subscription } from 'rxjs';
-import { SubtitledSetOfNormalizedStringObjectFactory } from
-  'domain/exploration/SubtitledSetOfNormalizedStringObjectFactory';
 
 describe('Add Answer Group Modal Controller', function() {
   var $scope = null;
@@ -38,8 +36,6 @@ describe('Add Answer Group Modal Controller', function() {
   var outcomeObjectFactory = null;
   var ruleObjectFactory = null;
   var stateEditorService = null;
-  let subtitledSetOfNormalizedStringObjectFactory:
-    SubtitledSetOfNormalizedStringObjectFactory;
 
   var addState = null;
   var currentInteractionId = 'Continue';
@@ -58,8 +54,6 @@ describe('Add Answer Group Modal Controller', function() {
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     ruleObjectFactory = TestBed.get(RuleObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
-    subtitledSetOfNormalizedStringObjectFactory = TestBed.get(
-      SubtitledSetOfNormalizedStringObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -163,28 +157,32 @@ describe('Add Answer Group Modal Controller', function() {
   it('should populate null content ids on save', () => {
     $scope.tmpRule = {
       type: 'Equals',
-      inputTypes: {x: 'SubtitledSetOfNormalizedString'},
-      inputs: {x: subtitledSetOfNormalizedStringObjectFactory.createDefault()}
+      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
+      inputs: {x: {
+        content_id: null,
+        normalized_str_set: []
+      }}
     };
-    expect($scope.tmpRule.inputs.x.getContentId()).toBeNull();
+    expect($scope.tmpRule.inputs.x.content_id).toBeNull();
 
     $scope.saveResponse(null);
 
-    expect($scope.tmpRule.inputs.x.getContentId()).not.toBeNull();
+    expect($scope.tmpRule.inputs.x.content_id).not.toBeNull();
   });
 
   it('should not populate non-null content ids on save', () => {
-    const ruleInput = (
-      subtitledSetOfNormalizedStringObjectFactory.createDefault());
-    ruleInput.setContentId('rule_input');
+    const ruleInput = {
+      content_id: 'rule_input',
+      normalized_str_set: []
+    };
 
     $scope.tmpRule = {
-      inputTypes: {x: 'SubtitledSetOfNormalizedString'},
+      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
       inputs: {x: ruleInput}
     };
 
     $scope.saveResponse(null);
-    expect($scope.tmpRule.inputs.x.getContentId()).toBe('rule_input');
+    expect($scope.tmpRule.inputs.x.content_id).toBe('rule_input');
   });
 
   it('should not populate content ids if input does not need one', () => {
