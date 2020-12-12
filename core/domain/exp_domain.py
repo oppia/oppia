@@ -527,10 +527,10 @@ class StateVersionSpan(python_utils.OBJECT):
             state_name: str. The state's name at the given exploration version.
             state_content: state_domain.State. The state's content at the given
                 exploration version.
-            exp_version_diff: ExplorationVersionsDiff | None. The changes to the
+            exp_version_diff: ExplorationVersionsDiff|None. The changes to the
                 exploration since its previous version. If None, then the
                 argument `version_reverted_from` must not be None.
-            version_reverted_from: int | None. The version this state is being
+            version_reverted_from: int|None. The version this state is being
                 reverted to. If None, then the argument `exp_version_diff` must
                 not be None.
 
@@ -649,7 +649,7 @@ class ExplorationStatesHistory(python_utils.OBJECT):
 
         self._state_spans_by_version = {}
         for exp, change_list in python_utils.ZIP(exps, change_lists):
-            revert_change = next(
+            revert_change = python_utils.NEXT(
                 (c for c in change_list if c.cmd == CMD_REVERT_COMMIT), None)
             if revert_change is not None:
                 version_reverted_from = revert_change.version_number

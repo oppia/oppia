@@ -739,6 +739,20 @@ class ExplorationStatesHistoryTests(test_utils.GenericTestBase):
         self.assertIs(state_b_v3_span, state_b_v1_span)
         self.assertIs(state_c_v3_span, state_c_v1_span)
 
+    def test_revert_with_surrounding_changes(self):
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            'exp_id', 'owner_id', ['A', 'B'], ['TextInput', 'EndExploration'])
+        exp_services.update_exploration(
+            'owner_id', 'exp_id', [self.add_state_change('Z')], 'add Z')
+        exp_services.update_exploration('owner_id', 'exp_id', [], 'no-op')
+        exp_services.revert_exploration('owner_id', 'exp_id', 3, 1)
+        exp_services.update_exploration('owner_id', 'exp_id', [], 'no-op')
+
+        history = exp_services.get_exploration_state_history('exp_id')
+
+        state_z_span = history.get_state_span(2, 'Z')
+        self.assertEqual(state_z_span.get_versions(), [2, 3])
+
     def test_empty_inputs_raises_an_exception(self):
         with self.assertRaisesRegexp(Exception, 'Inputs must be non-empty'):
             exp_domain.ExplorationStatesHistory([], [])
