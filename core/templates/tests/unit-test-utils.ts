@@ -91,7 +91,7 @@ export const bootstrap = (
     ng1Module: angular.IModule
 ): Promise<UpgradeModule> => {
 // We bootstrap the Angular module first; then when it is ready (async) we
-// Bootstrap the application. the AngularJS module on the bootstrap element (also ensuring that
+// bootstrap the AngularJS module on the bootstrap element (also ensuring that
 // AngularJS errors will fail the test).
   return platform.bootstrapModule(Ng2Module).then(ref => {
     const ngZone = ref.injector.get<NgZone>(NgZone);
