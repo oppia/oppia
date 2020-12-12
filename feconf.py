@@ -95,17 +95,20 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions',
     'html_field_types_to_rule_specs.json')
+
 # A mapping of interaction ids to classifier properties.
+# TODO(#10217): As of now we support only one algorithm per interaction.
+# However, we do have the necessary storage infrastructure to support multiple
+# algorithms per interaction. Hence, whenever we find a secondary algorithm
+# candidate for any of the supported interactions, the logical functions to
+# support multiple algorithms need to be implemented.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
-        'current_data_schema_version': 1
+        'algorithm_version': 1
     },
-    'CodeRepl': {
-        'algorithm_id': 'CodeClassifier',
-        'current_data_schema_version': 1
-    }
 }
+
 # Classifier job time to live (in mins).
 CLASSIFIER_JOB_TTL_MINS = 5
 TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
@@ -525,6 +528,7 @@ BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
 BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
 BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
+BULK_EMAIL_INTENT_ML_JOB_FAILURE = 'bulk_email_ml_job_failure'
 BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
@@ -661,7 +665,8 @@ DEMO_EXPLORATIONS = {
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
     u'17': 'audio_test',
-    u'18': 'code_classifier_test.yaml',
+    # Exploration with ID 18 was used for testing CodeClassifier functionality
+    # which has been removed (#10060).
     u'19': 'example_exploration_in_collection1.yaml',
     u'20': 'example_exploration_in_collection2.yaml',
     u'21': 'example_exploration_in_collection3.yaml',
@@ -883,7 +888,7 @@ MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with App.js.
+# NOTE TO DEVELOPERS: This should be synchronized with app.constants.ts.
 ENABLE_ML_CLASSIFIERS = False
 
 # The regular expression used to identify whether a string contains float value.
@@ -1237,6 +1242,7 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
 
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
+USER_ID_REGEX = r'^uid_[a-z]{%s}$' % USER_ID_RANDOM_PART_LENGTH
 
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5
