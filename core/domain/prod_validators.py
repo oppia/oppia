@@ -78,9 +78,6 @@ TARGET_TYPE_TO_TARGET_MODEL = {
     suggestion_models.TARGET_TYPE_TOPIC: (
         topic_models.TopicModel)
 }
-VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
-    '%s\\.[A-Za-z0-9-_]{1,%s}' % (
-        suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
 
 
 class ExplorationModelValidator(base_model_validators.BaseModelValidator):
