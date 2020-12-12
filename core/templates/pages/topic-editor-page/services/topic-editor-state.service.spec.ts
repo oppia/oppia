@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { SubtopicPageObjectFactory, SubtopicPageBackendDict, SubtopicPage } from
   'domain/topic/SubtopicPageObjectFactory';
 import { TopicRights } from 'domain/topic/topic-rights.model';
@@ -629,7 +629,7 @@ fdescribe('Topic editor state service', () => {
     expect(topicReinitializedSpy).toHaveBeenCalled();
   });
 
-  fit('should track whether it is currently saving the topic', () => {
+  fit('should track whether it is currently saving the topic', fakeAsync(() => {
     topicEditorStateService.loadTopic('5');
     console.log('2');
     topicUpdateService.setTopicName(
@@ -642,7 +642,7 @@ fdescribe('Topic editor state service', () => {
 
     // $rootScope.$apply();
     expect(topicEditorStateService.isSavingTopic()).toBe(false);
-  });
+  }));
 
   it('should indicate a topic is no longer saving after an error',
     () => {
