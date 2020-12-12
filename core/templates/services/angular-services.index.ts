@@ -145,6 +145,7 @@ import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-b
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import { ExplorationDataBackendApiService } from 'pages/exploration-editor-page/services/exploration-data-backend-api.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -405,6 +406,7 @@ export const angularServices: [string, unknown][] = [
   ['ExplorationImprovementsTaskRegistryService',
     ExplorationImprovementsTaskRegistryService],
   ['ExplorationDataService', ExplorationDataService],
+  ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],

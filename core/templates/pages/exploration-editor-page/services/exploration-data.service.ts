@@ -22,8 +22,6 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-
-import { HttpClient } from '@angular/common/http';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { EditableExplorationBackendApiService } from
   'domain/exploration/editable-exploration-backend-api.service';
@@ -34,15 +32,23 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationChangeList } from 'domain/exploration/exploration-draft.model';
-import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
+import { ExplorationDataBackendApiService } from 'pages/exploration-editor-page/services/exploration-data-backend-api.service';
 
-interface ExplorationAutosaveChangeListResponse{
+export interface ExplorationAutosaveChangeListResponse{
   'draft_change_list_id': number
 }
 export interface DraftExplorationResponse{
   'draft_change_list_id': number,
   'version': number,
   'exploration': ExplorationBackendDict
+}
+export interface ResolveAnswerResponse{
+  'resolved_answers': string[]
+}
+export interface ExplorationAutosaveChangeListRequest{
+    'change_list': ExplorationChangeList[],
+    'version': number
 }
 
 @Injectable({
@@ -66,8 +72,8 @@ export class ExplorationDataService {
     private urlService: UrlService,
     private alertsService: AlertsService,
     private windowRef: WindowRef,
-    private httpClient: HttpClient,
     private loggerService: LoggerService,
+    private explorationDataBackendApiService: ExplorationDataBackendApiService
   ) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     this.pathname = urlService.getPathname();
@@ -99,18 +105,22 @@ export class ExplorationDataService {
   // committed version (as opposed to the most recent autosave).
   autosaveChangeList(
       changeList: ExplorationChangeList[],
-      successCallback,
-      errorCallback) {
+      successCallback: (value?: {}) => void,
+      errorCallback: Function) {
     // First save locally to be retrieved later if save is unsuccessful.
     if (this.localStorageService && this.localStorageService.saveExplorationDraft) {
       this.localStorageService.saveExplorationDraft(
         this.explorationId, changeList, this.draftChangeListId);
     }
-    this.httpClient.put<ExplorationAutosaveChangeListResponse>(
-      this.explorationDraftAutosaveUrl, {
-        change_list: changeList,
-        version: this.explorationData.data.version
-      }).toPromise().then(response =>{
+    let autosaveChangeListRequest: ExplorationAutosaveChangeListRequest =
+    {
+      change_list: changeList,
+      version: this.explorationData.data.version
+    };
+    this.explorationDataBackendApiService.setAutoSaveChangeList(
+      this.explorationDraftAutosaveUrl,
+      autosaveChangeListRequest
+    ).then((response : ExplorationAutosaveChangeListResponse) => {
       this.draftChangeListId = response.draft_change_list_id;
       // We can safely remove the locally saved draft copy if it was saved
       // to the backend.
@@ -122,13 +132,12 @@ export class ExplorationDataService {
   }
 
   discardDraft(
-      successCallback: (value?: {}) => void,
+      successCallback: (value?: Object) => void,
       errorCallback: (reason?: string) => void)
     : Promise<Object> {
     return new Promise((resolve, reject) => {
-      this.httpClient.post(
-        this.explorationDraftAutosaveUrl, {})
-        .toPromise()
+      this.explorationDataBackendApiService.setDiscardDraft(
+        this.explorationDraftAutosaveUrl)
         .then(response => {
           this.localStorageService.removeExplorationDraft(this.explorationId);
           successCallback(response);
@@ -137,6 +146,7 @@ export class ExplorationDataService {
         });
     });
   }
+
   // Returns a promise that supplies the data for the current exploration.
   getData(errorCallback: (reason?: string) => void)
   : Promise<DraftExplorationResponse|ExplorationAutosaveChangeListResponse> {
@@ -185,6 +195,7 @@ export class ExplorationDataService {
       }
     });
   }
+
   // Returns a promise supplying the last saved version for the current
   // exploration.
   getLastSavedData(): Promise<ReadOnlyExplorationBackendDict> {
@@ -194,6 +205,7 @@ export class ExplorationDataService {
       return response.exploration;
     });
   }
+
   resolveAnswers(
       stateName: string,
       resolvedAnswersList: string[],
@@ -202,16 +214,21 @@ export class ExplorationDataService {
     : Promise<{}> {
     return new Promise((resolve, reject) => {
       this.alertsService.clearWarnings();
-      this.httpClient.put(
-        this.resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
-          resolved_answers: resolvedAnswersList
-        }).toPromise().then(response => {
+      let resolveAnswerUrl =
+        this.resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName);
+      let resolveAnswerDict: ResolveAnswerResponse = {
+        resolved_answers: resolvedAnswersList
+      };
+      this.explorationDataBackendApiService.setResolveAnswer(
+        resolveAnswerUrl,
+        resolveAnswerDict).then(response => {
         successCallback();
       }, errorResponse => {
         errorCallback();
       });
     });
   }
+
   /**
    * Saves the exploration to the backend, and, on a success callback,
    * updates the local copy of the exploration data.
