@@ -2,10 +2,6 @@
   "core/templates/mathjaxConfig.ts": [
     "skipStartupTypeset: true,"
   ],
-  "core/templates/domain/skill/skill-update.service.spec.ts": [
-    "undoRedoService.undoChange(skill);",
-    "[workedExamplesObject]);"
-  ],
   "core/templates/services/request-interceptor.service.ts": [
     "request.body = body;",
     "request.body = {"
