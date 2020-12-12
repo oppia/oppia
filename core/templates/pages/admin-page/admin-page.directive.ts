@@ -50,11 +50,11 @@ angular.module('oppia').directive('adminPage', [
       controllerAs: '$ctrl',
       controller: [
         '$location', '$rootScope', '$scope', 'AdminDataService',
-        'AdminRouterService', 'CsrfTokenService', 'PlatformFeatureService',
+        'AdminRouterService', 'PlatformFeatureService',
         'DEV_MODE',
         function(
             $location, $rootScope, $scope, AdminDataService,
-            AdminRouterService, CsrfTokenService, PlatformFeatureService,
+            AdminRouterService, PlatformFeatureService,
             DEV_MODE) {
           var ctrl = this;
           ctrl.isActivitiesTabOpen = function() {
@@ -99,7 +99,7 @@ angular.module('oppia').directive('adminPage', [
             });
             ctrl.inDevMode = DEV_MODE;
             ctrl.statusMessage = '';
-            CsrfTokenService.initializeToken();
+            // CsrfTokenService.initializeToken();
           };
         }
       ]

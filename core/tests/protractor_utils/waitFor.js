@@ -61,10 +61,12 @@ var pageToFullyLoad = async function() {
   // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
   // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
+  await browser.waitForAngularEnabled(false);
   var loadingMessage = element(by.css('.protractor-test-loading-fullpage'));
   await browser.driver.wait(
     until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
+  await browser.waitForAngularEnabled(true);
 };
 
 /**

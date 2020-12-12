@@ -44,6 +44,11 @@ require(
   'static/bower-angular-translate-storage-cookie-2.18.1/' +
   'angular-translate-storage-cookie.min.js');
 
+angular.module('oppia', [
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap'
+]);
 
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
