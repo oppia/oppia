@@ -34,7 +34,7 @@ angular.module('oppia').controller(
       $scope.activeSuggestion = suggestionIdToSuggestion[
         $scope.activeSuggestionId];
       delete suggestionIdToSuggestion[initialSuggestionId];
-      var remaningSuggestions = Object.entries(suggestionIdToSuggestion);
+      var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
 
       if (reviewable) {
         SiteAnalyticsService
@@ -50,7 +50,7 @@ angular.module('oppia').controller(
       };
 
       var init = function() {
-        $scope.lastSuggestionToReview = remaningSuggestions.length <= 0;
+        $scope.lastSuggestionToReview = remainingSuggestions.length <= 0;
         $scope.translationHtml = (
           $scope.activeSuggestion.change.translation_html);
         $scope.contentHtml = (
@@ -69,7 +69,7 @@ angular.module('oppia').controller(
         }
 
         [$scope.activeSuggestionId, $scope.activeSuggestion] = (
-          remaningSuggestions.pop());
+          remainingSuggestions.pop());
         init();
       };
 

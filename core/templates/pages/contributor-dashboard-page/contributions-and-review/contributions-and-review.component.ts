@@ -281,7 +281,7 @@ angular.module('oppia').component('contributionsAndReview', {
           });
         }
         if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
-          let suggestionIdToSuggestion = {};
+          const suggestionIdToSuggestion = {};
           for (const [suggestionId, contribution] of Object.entries(
             ctrl.contributions)) {
             suggestionIdToSuggestion[suggestionId] = contribution.suggestion;
