@@ -22,8 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'collection-local-nav',
@@ -31,14 +29,13 @@ import { UrlInterpolationService } from
   styleUrls: []
 })
 export class CollectionLocalNavComponent implements OnInit, OnDestroy {
+  canEdit: boolean;
+  collectionId: string = '';
+  directiveSubscriptions = new Subscription();
   constructor(
       private readOnlyCollectionBackendApiService:
        ReadOnlyCollectionBackendApiService,
       private urlService: UrlService,
-      private urlInterpolationService: UrlInterpolationService,
-      private collectionId: string,
-      private directiveSubscriptions = new Subscription(),
-      private canEdit: boolean
   ) {}
   ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
