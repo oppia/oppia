@@ -86,7 +86,7 @@ class BaseTranslatableObject(BaseObject):
 
         Args:
             raw: *. A translatable Python object whose values are to be
-            normalized.
+                ormalized.
 
         Returns:
             dict. A normalized translatable Python object with its values
@@ -1709,7 +1709,7 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
 
         Args:
             raw: *. A translatable Python object whose values are to be
-            normalized.
+                normalized.
 
         Returns:
             dict. A normalized translatable Python object with its values
@@ -1762,7 +1762,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
 
         Args:
             raw: *. A translatable Python object whose values are to be
-            normalized.
+                normalized.
 
         Returns:
             dict. A normalized translatable Python object with its values

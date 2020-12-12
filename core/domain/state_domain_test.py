@@ -3736,8 +3736,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         with self.assertRaisesRegexp(
-                Exception,
-                re.escape('Expected rule_inputs to be a dict, received []')
+            Exception,
+            re.escape('Expected rule_inputs to be a dict, received []')
         ):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)
