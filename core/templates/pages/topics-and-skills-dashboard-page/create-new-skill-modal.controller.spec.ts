@@ -18,7 +18,7 @@
 
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Create new skill modal', function() {
+fdescribe('Create new skill modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDifficulties = null;
@@ -45,6 +45,7 @@ describe('Create new skill modal', function() {
     $controller('CreateNewSkillModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance,
+      AllSkillNames: [],
     });
   }));
 

@@ -193,7 +193,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
 
       ctrl.createSkill = function() {
         let allSkillNames = ctrl.untriagedSkillSummaries.map(
-          skillSummary => skillSummary.description.toUpperCase()
+          skillSummary => (skillSummary.description || "").toUpperCase()
         );
         SkillCreationService.createNewSkill([], allSkillNames);
       };
