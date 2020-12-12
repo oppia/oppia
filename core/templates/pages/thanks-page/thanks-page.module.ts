@@ -51,13 +51,12 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap'
 ]);
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+
 
 import { ThanksPageComponent } from './thanks-page.component';
 import { OppiaAngularRootComponent } from
@@ -84,12 +83,6 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
       multi: true
     }
   ]

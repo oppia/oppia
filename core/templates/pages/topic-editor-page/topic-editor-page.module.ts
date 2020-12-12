@@ -34,7 +34,9 @@ import 'angular-animate';
 import 'messageformat';
 import 'angular-translate';
 import 'angular-translate-interpolation-messageformat';
-
+require(
+  'static/angular-drag-and-drop-lists-2.1.0/' +
+  'angular-drag-and-drop-lists.min.js');
 require('static/angularjs-1.8.2/angular-aria.js');
 require('static/bower-material-1.1.19/angular-material.js');
 require('static/angularjs-1.8.2/angular-sanitize.min.js');
@@ -53,7 +55,7 @@ angular.module('oppia', [
   uiValidate
 ]);
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -62,8 +64,7 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+
 
 import { PracticeTabComponent } from
   'pages/topic-viewer-page/practice-tab/practice-tab.component';
@@ -95,12 +96,6 @@ import { SubtopicsListComponent } from
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
       multi: true
     }
   ]

@@ -32,7 +32,7 @@
  * values in a new tab.
  */
 
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import isEqual from 'lodash/isEqual';
@@ -50,6 +50,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { ClientContext } from 'domain/platform_feature/client-context.model';
+import { Observable } from 'rxjs';
 
 interface FeatureFlagsCacheItem {
   timestamp: number;
@@ -73,7 +74,10 @@ export class PlatformFeatureService {
   static initializationPromise: Promise<void> = null;
   static _isInitializedWithError = false;
   static _isSkipped = false;
-
+  static platformHasInitialized = false;
+  private static _initializedEventEmitter = new EventEmitter<void>();
+  static platformInitialized = (
+    PlatformFeatureService._initializedEventEmitter.asObservable());
   constructor(
       private platformFeatureBackendApiService:
         PlatformFeatureBackendApiService,
@@ -92,10 +96,16 @@ export class PlatformFeatureService {
    * is done.
    */
   async initialize(): Promise<void> {
-    if (!PlatformFeatureService.initializationPromise) {
-      PlatformFeatureService.initializationPromise = this._initialize();
+    if (!PlatformFeatureService.platformHasInitialized) {
+      // this._initialize();
     }
     return PlatformFeatureService.initializationPromise;
+  }
+
+  initializeSync(): void {
+    if (!PlatformFeatureService.platformHasInitialized) {
+      this._initialize();
+    }
   }
 
   /**
@@ -143,12 +153,13 @@ export class PlatformFeatureService {
    * @returns {Promise} - A promise that is resolved when the initialization
    * is done.
    */
-  private async _initialize(): Promise<void> {
+  private _initialize(): void {
     try {
       const item = this.loadSavedResults();
       if (item && this.validateSavedResults(item)) {
         PlatformFeatureService.featureStatusSummary = item.featureStatusSummary;
         this.saveResults();
+        PlatformFeatureService._initializedEventEmitter.emit();
         return;
       }
       this.clearSavedResults();
@@ -160,12 +171,28 @@ export class PlatformFeatureService {
         PlatformFeatureService._isSkipped = true;
         PlatformFeatureService.featureStatusSummary =
           FeatureStatusSummary.createDefault();
+        PlatformFeatureService._initializedEventEmitter.emit();
         return;
       }
-
-      PlatformFeatureService.featureStatusSummary = await this
-        .loadFeatureFlagsFromServer();
-      this.saveResults();
+      this.loadFeatureFlagsFromServer().subscribe(
+        (response) => {
+          PlatformFeatureService.featureStatusSummary = response;
+          this.saveResults();
+          PlatformFeatureService.platformHasInitialized = true;
+          PlatformFeatureService._initializedEventEmitter.emit();
+        },
+        err => {
+          this.loggerService.error(
+            'Error during initialization of PlatformFeatureService: ' +
+            `${err.message ? err.message : err}`);
+          // If any error, just disable all features.
+          PlatformFeatureService.featureStatusSummary =
+            FeatureStatusSummary.createDefault();
+          PlatformFeatureService._isInitializedWithError = true;
+          this.clearSavedResults();
+          PlatformFeatureService.platformHasInitialized = true;
+        }
+      );
     } catch (err) {
       this.loggerService.error(
         'Error during initialization of PlatformFeatureService: ' +
@@ -174,11 +201,12 @@ export class PlatformFeatureService {
       PlatformFeatureService.featureStatusSummary =
         FeatureStatusSummary.createDefault();
       PlatformFeatureService._isInitializedWithError = true;
+      PlatformFeatureService.platformHasInitialized = true;
       this.clearSavedResults();
     }
   }
 
-  private async loadFeatureFlagsFromServer(): Promise<FeatureStatusSummary> {
+  private loadFeatureFlagsFromServer(): Observable<FeatureStatusSummary> {
     const context = this.generateClientContext();
     return this.platformFeatureBackendApiService.fetchFeatureFlags(context);
   }

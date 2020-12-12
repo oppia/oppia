@@ -20,6 +20,7 @@
 // the PR #9479. https://github.com/oppia/oppia/pull/9479#issue-432536289
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 angular.module('oppia').directive('oppiaRoot', [
   '$translate', function($translate) {
@@ -45,7 +46,10 @@ angular.module('oppia').directive('oppiaRoot', [
             i18nLanguageCodeService.setI18nLanguageCode(
               $translate.proposedLanguage() || $translate.use());
             // The next line allows the transcluded content to start executing.
-            $scope.initialized = true;
+            PlatformFeatureService.platformInitialized.subscribe(
+              _ => $scope.initialized = true
+            );
+            OppiaAngularRootComponent.platformFeatureService.initializeSync();
           };
         }]
     };

@@ -52,7 +52,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -65,8 +65,7 @@ import { OppiaAngularRootComponent } from
 import { CkEditorCopyToolbarComponent } from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component';
 import { TranslationLanguageSelectorComponent } from
   './translation-language-selector/translation-language-selector.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+
 require('services/context.service');
 
 @NgModule({
@@ -90,12 +89,6 @@ require('services/context.service');
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
       multi: true
     }
   ]

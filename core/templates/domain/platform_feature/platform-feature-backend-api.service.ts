@@ -28,6 +28,8 @@ import {
 } from 'domain/platform_feature/feature-status-summary.model';
 import { PlatformFeatureDomainConstants } from
   'domain/platform_feature/platform-feature-domain.constants';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -46,17 +48,14 @@ export class PlatformFeatureBackendApiService {
    * @returns {Promise<FeatureStatusSummary>} - A promise that resolves to
    * the feature status summary.
    */
-  async fetchFeatureFlags(context: ClientContext):
-      Promise<FeatureStatusSummary> {
-    const backendDict = await this.http.get<FeatureStatusSummaryBackendDict>(
+  fetchFeatureFlags(context: ClientContext):
+      Observable<FeatureStatusSummary> {
+    return this.http.get<FeatureStatusSummaryBackendDict>(
       PlatformFeatureDomainConstants.PLATFORM_FEATURES_EVALUATION_HANDLER_URL,
       {
         params: {...context.toBackendDict()}
       }
-    ).toPromise();
-
-    return FeatureStatusSummary.createFromBackendDict(
-      backendDict);
+    ).pipe(map(res => FeatureStatusSummary.createFromBackendDict(res)));
   }
 }
 

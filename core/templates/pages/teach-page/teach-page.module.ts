@@ -50,7 +50,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap'
 ]);
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
@@ -61,8 +61,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
+
 
 @NgModule({
   imports: [
@@ -83,12 +82,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
       multi: true
     }
   ]
