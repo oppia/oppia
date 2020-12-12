@@ -3737,7 +3737,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
                 Exception,
-                re.escape('Expected rule_inputs to be a dict, received []')):
+                re.escape('Expected rule_inputs to be a dict, received []')
+        ):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)
 
@@ -3795,9 +3796,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '{u\'content_id\': u\'rule_input_Equals\', u\'normalized_str_set\': [[]'
-                ']} has the wrong type. It should be a TranslatableSetOfNormali'
-                'zedString.'
+                '{u\'content_id\': u\'rule_input_Equals\', u\'normalized_str_se'
+                't\': [[]]} has the wrong type. It should be a TranslatableSetO'
+                'fNormalizedString.'
             )
         ):
             exploration.init_state.update_interaction_answer_groups(

@@ -862,7 +862,7 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
     def test_default_values_for_objects_are_valid(self):
         for _, member in inspect.getmembers(objects):
             if inspect.isclass(member) and member.default_value is not None:
-                if isinstance(member(), objects.BaseTranslatableObject) and :
+                if isinstance(member(), objects.BaseTranslatableObject):
                     # If object is a BaseTranslatableObject, the default
                     # content_id could be None but the normalization will
                     # enforce a non-None string. This is because the content id

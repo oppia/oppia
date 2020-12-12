@@ -727,7 +727,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': 'skillid12345-0'
-            }, 'TextInput'),
+            }),
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
@@ -751,7 +751,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': 'skillid12345-1'
-            }, 'TextInput'),
+            }),
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
@@ -775,7 +775,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': 'skillid12345-2'
-            }, 'TextInput')
+            })
         ]
         question_state_data.written_translations.translations_mapping.update({
             'feedback_0': {},
@@ -882,7 +882,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': 'skillid12345-0'
-            }, 'TextInput'),
+            }),
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
@@ -906,7 +906,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': 'skillid12345-1'
-            }, 'TextInput'),
+            }),
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
@@ -930,7 +930,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 }],
                 'training_data': [],
                 'tagged_skill_misconception_id': 'skillid12345-2'
-            }, 'TextInput')
+            })
         ]
         question_state_data.written_translations.translations_mapping.update({
             'feedback_0': {},
@@ -2610,5 +2610,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         rule_spec = answer_group.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'],
-            {'content_id': 'rule_input_Equals_4', 'normalized_str_set': ['Test']})
+            {
+                'content_id': 'rule_input_Equals_4',
+                'normalized_str_set': ['Test']
+            })
         self.assertEqual(question.question_state_data.next_content_id_index, 5)

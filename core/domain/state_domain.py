@@ -86,20 +86,19 @@ class AnswerGroup(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, answer_group_dict, interaction_id):
+    def from_dict(cls, answer_group_dict):
         """Return a AnswerGroup domain object from a dict.
 
         Args:
             answer_group_dict: dict. The dict representation of AnswerGroup
                 object.
-            interaction_id: str. The interaction id of the interaction.
 
         Returns:
             AnswerGroup. The corresponding AnswerGroup domain object.
         """
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
-            [RuleSpec.from_dict(rs, interaction_id)
+            [RuleSpec.from_dict(rs)
              for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
@@ -531,7 +530,7 @@ class InteractionInstance(python_utils.OBJECT):
         return cls(
             interaction_dict['id'],
             customization_args,
-            [AnswerGroup.from_dict(h, interaction_dict['id'])
+            [AnswerGroup.from_dict(h)
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
             interaction_dict['confirmed_unclassified_answers'],
@@ -1948,10 +1947,12 @@ class RuleSpec(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, rulespec_dict, interaction_id):
+    def from_dict(cls, rulespec_dict):
         """Return a RuleSpec domain object from a dict.
+
         Args:
             rulespec_dict: dict. The dict representation of RuleSpec object.
+
         Returns:
             RuleSpec. The corresponding RuleSpec domain object.
         """
@@ -2664,9 +2665,12 @@ class State(python_utils.OBJECT):
                         param_type = (
                             interaction_registry.Registry.get_interaction_by_id(
                                 self.interaction.id
-                            ).get_rule_param_type(rule_spec.rule_type, param_name))
+                            ).get_rule_param_type(
+                                rule_spec.rule_type, param_name))
 
-                        if issubclass(param_type, objects.BaseTranslatableObject):
+                        if issubclass(
+                                param_type, objects.BaseTranslatableObject
+                        ):
                             old_content_id_list.append(value['content_id'])
 
             self._update_content_ids_in_assets(
@@ -2760,7 +2764,7 @@ class State(python_utils.OBJECT):
             interaction_answer_groups.append(answer_group)
 
             for rule_dict in rule_specs_list:
-                rule_spec = RuleSpec.from_dict(rule_dict, self.interaction.id)
+                rule_spec = RuleSpec.from_dict(rule_dict)
 
                 # Normalize and store the rule params.
                 rule_inputs = rule_spec.inputs

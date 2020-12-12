@@ -652,7 +652,7 @@ class Exploration(python_utils.OBJECT):
 
             idict = sdict['interaction']
             interaction_answer_groups = [
-                state_domain.AnswerGroup.from_dict(group, idict['id'])
+                state_domain.AnswerGroup.from_dict(group)
                 for group in idict['answer_groups']]
 
             default_outcome = (
@@ -4159,8 +4159,9 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v45_dict_to_v46_dict(cls, exploration_dict):
         """Converts a v45 exploration dict into a v46 exploration dict.
-        Adds TranslatableSetOfUnicodeString and TranslatableSetOfNormalizedString
-        objects to RuleSpec domain objects to allow for translations.
+        Adds TranslatableSetOfUnicodeString and
+        TranslatableSetOfNormalizedString objects to RuleSpec domain objects to
+        allow for translations.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration

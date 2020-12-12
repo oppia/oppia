@@ -79,10 +79,14 @@ class BaseTranslatableObject(BaseObject):
             list(dict). A list of properties that store the object value.
         """
         raise NotImplementedError('Please Implement this method')
-    
+
     @staticmethod
-    def _normalize_value():
+    def _normalize_value(raw):
         """Returns a method that normalizes the values of the object.
+
+        Args:
+            raw: *. A translatable Python object whose values are to be
+            normalized.
 
         Returns:
             dict. A normalized translatable Python object with its values
@@ -126,7 +130,7 @@ class BaseTranslatableObject(BaseObject):
             raise TypeError(
                 'Expected content id to be a string, received %s' %
                 raw['content_id'])
-        
+
         return schema_utils.normalize_against_schema(
             cls._normalize_value(raw),
             cls.get_schema())
@@ -1692,7 +1696,7 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
         """Returns a list of properties that store the object value.
 
         Returns:
-            list(dict). A list of properties that store the object value.
+            list. A list of properties that store the object value.
         """
         return [{
             'name': 'normalized_str_set',
@@ -1745,7 +1749,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
         """Returns a list of properties that store the object value.
 
         Returns:
-            list(dict). A list of properties that store the object value.
+            list. A list of properties that store the object value.
         """
         return [{
             'name': 'unicode_str_set',
