@@ -25,8 +25,11 @@ describe('Set Input rules service', () => {
     sirs = new SetInputRulesService();
   });
 
-  let RULE_INPUT: {x: string[]} = {
-    x: ['a', 'b']
+  let RULE_INPUT = {
+    x: {
+      content_id: 'rule_input',
+      unicode_str_set: ['a', 'b']
+    }
   };
 
   it('should have a correct \'equals\' rule', () => {
@@ -34,10 +37,16 @@ describe('Set Input rules service', () => {
     expect(sirs.Equals(['b', 'a'], RULE_INPUT)).toBe(true);
     expect(sirs.Equals(['a'], RULE_INPUT)).toBe(false);
     expect(sirs.Equals(['b'], {
-      x: ['b', 'a']
+      x: {
+        content_id: '',
+        unicode_str_set: ['b', 'a']
+      }
     })).toBe(false);
     expect(sirs.Equals(['b', 'c'], {
-      x: ['c', 'd']
+      x: {
+        content_id: '',
+        unicode_str_set: ['c', 'd']
+      }
     })).toBe(false);
   });
 

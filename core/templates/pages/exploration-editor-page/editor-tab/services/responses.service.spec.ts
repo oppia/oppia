@@ -269,8 +269,12 @@ describe('Responses Service', () => {
         {
           type: 'Contains',
           inputs: {
-            x: 'correct',
+            x: {
+              content_id: 'rule_input_Contains',
+              normalized_str_set: ['correct']
+            },
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -324,6 +328,7 @@ describe('Responses Service', () => {
           inputs: {
             x: 'correct',
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -390,6 +395,7 @@ describe('Responses Service', () => {
           inputs: {
             x: 'correct',
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
