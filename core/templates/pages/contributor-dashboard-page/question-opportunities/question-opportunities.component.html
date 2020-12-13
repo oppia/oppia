@@ -1,10 +1,8 @@
 <div>
-  <opportunities-list opportunity-data-is-loading="$ctrl.opportunitiesAreLoading"
-                      opportunities="$ctrl.opportunities"
-                      more-available="$ctrl.moreOpportunitiesAvailable"
+  <opportunities-list load-opportunities="$ctrl.loadOpportunities"
                       on-click-action-button="$ctrl.onClickSuggestQuestionButton"
-                      on-load-more-opportunities="$ctrl.onLoadMoreOpportunities()"
-                      progress-bar-required="$ctrl.progressBarRequired"
-                      opportunity-heading-truncation-length="$ctrl.opportunityHeadingTruncationLength">
+                      load-more-opportunities="$ctrl.loadMoreOpportunities"
+                      progress-bar-required="true"
+                      opportunity-heading-truncation-length="">
   </opportunities-list>
 </div>

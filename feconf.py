@@ -269,9 +269,6 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
-# The default number of opportunities to show on contributor dashboard page.
-OPPORTUNITIES_PAGE_SIZE = 20
-
 # The maximum number of top unresolved answers which should be aggregated
 # from all of the submitted answers.
 TOP_UNRESOLVED_ANSWERS_LIMIT = 20
