@@ -42,8 +42,8 @@ export class SkillUpdateService {
       skill,
       command: string,
       params,
-      apply: Function,
-      reverse: Function
+      apply,
+      reverse
   ) => {
     const changeDict = cloneDeep(params);
     changeDict.cmd = command;
@@ -56,8 +56,8 @@ export class SkillUpdateService {
       propertyName: string,
       newValue: string,
       oldValue: string,
-      apply: Function,
-      reverse: Function
+      apply,
+      reverse
   ) => {
     this._applyChange(
       skill,
@@ -78,8 +78,8 @@ export class SkillUpdateService {
       propertyName: string,
       newValue: string | boolean,
       oldValue: string | boolean,
-      apply: Function,
-      reverse: Function
+      apply,
+      reverse
   ) => {
     this._applyChange(
       skill,
@@ -99,8 +99,8 @@ export class SkillUpdateService {
       skill,
       difficulty: string,
       explanations: string[],
-      apply: Function,
-      reverse: Function
+      apply,
+      reverse
   ) => {
     this._applyChange(
       skill,
@@ -119,8 +119,8 @@ export class SkillUpdateService {
       propertyName: string,
       newValue,
       oldValue,
-      apply: Function,
-      reverse: Function
+      apply,
+      reverse
   ) => {
     this._applyChange(
       skill,

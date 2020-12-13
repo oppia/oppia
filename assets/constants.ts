@@ -5244,6 +5244,10 @@ export = {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  // The default number of opportunities to show on the contributor dashboard
+  // page.
+  "OPPORTUNITIES_PAGE_SIZE": 10,
+
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
 
@@ -5277,6 +5281,7 @@ export = {
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
+  "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
