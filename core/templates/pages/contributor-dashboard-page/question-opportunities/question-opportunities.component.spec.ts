@@ -94,50 +94,42 @@ describe('Question opportunities component', function() {
     });
   }));
 
-  it('should load question opportunities when component is initialized',
-    function() {
-      spyOn(contributionOpportunitiesService, 'getSkillOpportunities').and
-        .callFake((callback) => {
-          callback(opportunitiesArray, false);
-        });
-      ctrl.$onInit();
+  it('should load question opportunities', () => {
+    spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
 
-      expect(ctrl.opportunities.length).toBe(2);
-      expect(ctrl.moreOpportunitiesAvailable).toBe(false);
-      expect(ctrl.opportunitiesAreLoading).toBe(false);
+    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(false);
+    });
+  });
+
+  it('should load more question opportunities', function() {
+    spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: true
+      }));
+
+    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(true);
     });
 
-  it('should load more question opportunities when reaching the end' +
-    ' of page and there are more opportunities available', function() {
-    spyOn(contributionOpportunitiesService, 'getSkillOpportunities').and
-      .callFake((callback) => {
-        callback(opportunitiesArray, true);
-      });
-    ctrl.$onInit();
-    $rootScope.$apply();
+    spyOn(
+      contributionOpportunitiesService, 'getMoreSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
 
-    expect(ctrl.opportunities.length).toBe(2);
-    expect(ctrl.moreOpportunitiesAvailable).toBe(true);
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-
-    var getMoreSkillOpportunitiesSpy = spyOn(
-      contributionOpportunitiesService, 'getMoreSkillOpportunities');
-
-    getMoreSkillOpportunitiesSpy
-      .and.callFake((callback) => {
-        callback(opportunitiesArray, false);
-      });
-    ctrl.onLoadMoreOpportunities();
-    $rootScope.$apply();
-
-    getMoreSkillOpportunitiesSpy.calls.reset();
-
-    expect(ctrl.opportunities.length).toBe(4);
-    expect(ctrl.moreOpportunitiesAvailable).toBe(false);
-    expect(ctrl.opportunitiesAreLoading).toBe(false);
-
-    ctrl.onLoadMoreOpportunities();
-    expect(getMoreSkillOpportunitiesSpy).not.toHaveBeenCalled();
+    ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(false);
+    });
   });
 
   it('should register Contributor Dashboard suggest event when clicking on' +
