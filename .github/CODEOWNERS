@@ -74,7 +74,6 @@
 /core/controllers/classifier*.py @prasanna08
 /core/domain/classifier*.py @prasanna08
 /proto/ @prasanna08
-/core/storage/classifier/ @prasanna08
 /core/templates/domain/classifier/ @prasanna08
 /extensions/classifiers/ @prasanna08
 /buf.yaml @prasanna08
@@ -95,7 +94,6 @@
 # Collection project.
 /core/controllers/collection*.py @aks681
 /core/domain/collection*.py @aks681
-/core/storage/collection/ @aks681
 /core/templates/components/entity-creation-services/collection-creation.service*.ts @kevintab95
 /core/templates/components/entity-creation-services/collection-creation-backend-api.service*.ts @kevintab95
 /core/templates/domain/collection/ @kevintab95
@@ -107,7 +105,6 @@
 /core/controllers/contributor_dashboard*.py @sagangwee
 /core/domain/opportunity*.py @sagangwee
 /core/domain/voiceover_services*.py @sagangwee
-/core/storage/opportunity/ @sagangwee
 /core/templates/domain/opportunity/ @sagangwee
 /core/templates/pages/contributor-dashboard-page/ @sagangwee
 
@@ -186,7 +183,6 @@
 /core/domain/state_domain*.py @aks681
 /core/domain/summary_services*.py @aks681
 /core/domain/value_generators_domain*.py @vojtechjelinek
-/core/storage/exploration/ @aks681
 /core/templates/components/entity-creation-services/exploration-creation.service*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.directive*.ts @kevintab95
 /core/templates/components/button-directives/hint-and-solution-buttons.directive.html @kevintab95
@@ -311,8 +307,6 @@
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
-/core/storage/improvements/ @brianrodri
-/core/storage/statistics/ @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
@@ -360,7 +354,6 @@
 /core/controllers/question*.py @aks681
 /core/controllers/review_tests*.py @aks681
 /core/domain/question*.py @aks681
-/core/storage/question/ @aks681
 /core/templates/components/concept-card/ @kevintab95
 /core/templates/components/score-ring/ @kevintab95
 /core/templates/components/skill-mastery/ @kevintab95
@@ -383,7 +376,6 @@
 /core/controllers/concept_card_viewer*.py @aks681
 /core/controllers/skill*.py @aks681
 /core/domain/skill*.py @aks681
-/core/storage/skill/ @aks681
 /core/templates/components/entity-creation-services/skill-creation.service.ts @kevintab95
 /core/templates/components/question-difficulty-selector/ @aks681
 /core/templates/components/review-material-editor/ @kevintab95
@@ -395,7 +387,6 @@
 # Story project.
 /core/controllers/story*.py @aks681
 /core/domain/story*.py @aks681
-/core/storage/story/ @aks681
 /core/templates/components/entity-creation-services/story-creation.service.ts @kevintab95
 /core/templates/domain/story/ @kevintab95
 /core/templates/domain/story_viewer/ @kevintab95
@@ -409,7 +400,6 @@
 /core/domain/subtopic_page_domain*.py @aks681
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
-/core/storage/topic/ @aks681
 /core/templates/components/entity-creation-services/topic-creation.service.ts @kevintab95
 /core/templates/domain/classroom/ @kevintab95
 /core/templates/domain/subtopic_viewer/ @kevintab95
@@ -524,7 +514,6 @@
 # Suggestion project.
 /core/controllers/suggestion*.py @nithusha21
 /core/domain/suggestion*.py @nithusha21
-/core/storage/suggestion/ @nithusha21
 /core/templates/domain/suggestion/ @nithusha21
 /core/templates/services/suggestion-modal.service*.ts @nithusha21
 /core/templates/services/suggestions.service*.ts @nithusha21
@@ -533,7 +522,6 @@
 # Feedback project.
 /core/controllers/feedback*.py @nithusha21
 /core/domain/feedback*.py @nithusha21
-/core/storage/feedback/ @nithusha21
 /core/templates/components/ratings/rating-display/rating-display.directive.html @nithusha21
 /core/templates/components/ratings/ @nithusha21
 /core/templates/domain/feedback_message/ @nithusha21
@@ -607,7 +595,6 @@
 /core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
 /core/domain/platform_parameter*.py @BenHenning @vinitamurthi
 /core/platform_feature*.py @BenHenning @vinitamurthi
-/core/storage/config/ @BenHenning @vinitamurthi
 /core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
 /core/templates/pages/admin-page/features-tab/ @BenHenning @vinitamurthi
 /core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi

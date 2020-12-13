@@ -89,7 +89,10 @@ class SentEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Sent email should be kept for audit purposes."""
+        """Model contains data corresponding to a user: recipient_id,
+        recipient_email, sender_id, and sender_email, but this isn't deleted
+        because this model is needed for auditing purposes.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
@@ -101,8 +104,9 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Users already have access to this data since emails were sent
-        to them.
+        """Model contains data corresponding to a user, but this isn't exported
+        because users already have access to noteworthy details of this data
+        (since emails were sent to them).
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'recipient_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -313,7 +317,8 @@ class BulkEmailModel(base_models.BaseModel):
             feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
             feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
             feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT,
-            feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT
+            feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT,
+            feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE
         ])
     # The subject line of the email.
     subject = datastore_services.TextProperty(required=True)
@@ -325,7 +330,10 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Sent email should be kept for audit purposes."""
+        """Model contains data corresponding to a user: recipient_ids,
+        sender_id, and sender_email, but this isn't deleted because this model
+        is needed for auditing purposes.
+        """
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
@@ -337,8 +345,9 @@ class BulkEmailModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Users already have access to this data since the emails were sent
-        to them.
+        """Model contains data corresponding to a user, but this isn't exported
+        because users already have access to noteworthy details of this data
+        (since emails were sent to them).
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'recipient_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -410,7 +419,9 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Feedback email reply to id should be deleted."""
+        """Model contains data to delete corresponding to a user:
+        user_id field.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -422,7 +433,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thread_id':
