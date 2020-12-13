@@ -581,8 +581,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'PencilCodeEditor')
         temp_rule = old_answer_groups[0]['rule_specs'][0]
         old_answer_groups[0]['rule_specs'][0] = {
-			'rule_type': 'ErrorContains',
-    		'inputs': {'x': '{{ExampleParam}}'}
+            'rule_type': 'ErrorContains',
+            'inputs': {'x': '{{ExampleParam}}'}
         }
         init_state.update_interaction_answer_groups(old_answer_groups)
         old_answer_groups[0]['rule_specs'][0] = temp_rule
