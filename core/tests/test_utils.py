@@ -221,6 +221,12 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
             assert 'id' in document
             if self._DB[index_name] is None:
                 self._DB[index_name] = []
+            deleted_doc = None
+            for stored_doc in self._DB[index_name]:
+                if stored_doc['id'] == document['id']:
+                    deleted_doc = stored_doc
+            if deleted_doc:
+                self._DB[index_name].remove(deleted_doc)
             self._DB[index_name].append(document)
 
     def delete_documents_from_index(self, doc_ids, index_name):
