@@ -1168,6 +1168,9 @@ tags: []
                 models.Registry, 'import_search_services',
                 lambda x: self._search_services_stub))
             stack.enter_context(self.swap(
+                platform_taskqueue_services, 'create_http_task',
+                self._taskqueue_services_stub.create_http_task))
+            stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
                 memory_cache_services_stub.flush_cache))
             stack.enter_context(self.swap(
