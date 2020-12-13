@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { SubtopicPageObjectFactory, SubtopicPageBackendDict, SubtopicPage } from
   'domain/topic/SubtopicPageObjectFactory';
 import { TopicRights } from 'domain/topic/topic-rights.model';
@@ -33,7 +33,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 require('domain/topic/topic-update.service.ts');
 
 
-fdescribe('Topic editor state service', () => {
+describe('Topic editor state service', () => {
   let topicEditorStateService : TopicEditorStateService;
   let topicObjectFactory : TopicObjectFactory;
   let subtopicPageObjectFactory : SubtopicPageObjectFactory;
@@ -69,7 +69,6 @@ fdescribe('Topic editor state service', () => {
     // fetchStories: null;
 
     fetchTopic():Promise<unknown> {
-      // Console.log("in fetch update");
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(this.newBackendTopicObject);
@@ -110,7 +109,7 @@ fdescribe('Topic editor state service', () => {
   class MockTopicRightsBackendApiService {
     backendTopicRightsObject: null;
     failure: null;
-    // FetchTopicRights: null;
+    FetchTopicRights: null;
 
     fetchTopicRights = () => {
       return new Promise((resolve, reject) => {
@@ -246,7 +245,7 @@ fdescribe('Topic editor state service', () => {
     };
 
     subtopicPageObject = {
-      id: 'validTopicId-0', // When i change it to 2 the test runs
+      id: 'validTopicId-0',
       topic_id: 'validTopicId',
       page_contents: {
         subtitled_html: {
@@ -263,9 +262,6 @@ fdescribe('Topic editor state service', () => {
     };
     mockEditableTopicBackendApiService.newBackendSubtopicPageObject = (
       subtopicPageObject);
-    // Let subtopicPage1 = subtopicPageObjectFactory.createFromBackendDict(
-    //   subtopicPageObject);
-    // topicEditorStateService.setSubtopicPage(subtopicPage1);
 
     secondSubtopicPageObject = {
       id: 'validTopicId-0',
@@ -287,13 +283,13 @@ fdescribe('Topic editor state service', () => {
     subtopicPageLoadedSpy = jasmine.createSpy('subtopicPageLoaded');
     testSubscriptions = new Subscription();
     testSubscriptions.add(
-      topicEditorStateService.onSubtopicPageLoaded().subscribe(
+      topicEditorStateService.onSubtopicPageLoaded.subscribe(
         subtopicPageLoadedSpy));
     testSubscriptions.add(
-      topicEditorStateService.onTopicInitialized().subscribe(
+      topicEditorStateService.onTopicInitialized.subscribe(
         topicInitializedSpy));
     testSubscriptions.add(
-      topicEditorStateService.onTopicReinitialized().subscribe(
+      topicEditorStateService.onTopicReinitialized.subscribe(
         topicReinitializedSpy));
   });
 
@@ -378,14 +374,14 @@ fdescribe('Topic editor state service', () => {
   });
 
   it('should correctly delete new subtopic pages without changing already ' +
-    'existing subtopic pages from the local cache', () => {
+    'existing subtopic pages from the local cache', fakeAsync(() => {
     let subtopicPage = subtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     subtopicPage.setId('validTopicId-1');
     subtopicPage.getPageContents().setHtml('<p>Data 1</p>');
     topicEditorStateService.setSubtopicPage(subtopicPage);
     topicEditorStateService.loadSubtopicPage('validTopicId', 0);
-    // $rootScope.$apply();
+    tick(1000);
     expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     expect(topicEditorStateService.getCachedSubtopicPages().length).toBe(2);
     topicEditorStateService.deleteSubtopicPage('validTopicId', 1);
@@ -398,23 +394,22 @@ fdescribe('Topic editor state service', () => {
       topicEditorStateService.getCachedSubtopicPages()[0].getPageContents()
         .getHtml()
     ).toEqual('<p>Data</p>');
-  });
+  }));
 
   it('should correctly delete already existing subtopic pages without ' +
-    'changing newly created subtopic pages from the local cache', () => {
-    let subtopicPage2: SubtopicPage =
+    'changing newly created subtopic pages from the local cache',
+  fakeAsync(() => {
+    let subtopicPage: SubtopicPage =
      subtopicPageObjectFactory.createFromBackendDict(
        secondSubtopicPageObject);
-    subtopicPage2.setId('validTopicId-1');
-    subtopicPage2.getPageContents().setHtml('<p>Data 1</p>');
-    topicEditorStateService.setSubtopicPage(subtopicPage2);
-    topicEditorStateService.loadSubtopicPage('validTopicId', 1);
-    // $rootScope.$apply();
+    subtopicPage.setId('validTopicId-1');
+    subtopicPage.getPageContents().setHtml('<p>Data 1</p>');
+    topicEditorStateService.setSubtopicPage(subtopicPage);
+    topicEditorStateService.loadSubtopicPage('validTopicId', 0);
+    tick(1000);
     expect(subtopicPageLoadedSpy).toHaveBeenCalled();
-    // Console.log(topicEditorStateService.getCachedSubtopicPages()[0].getId());
-    // console.log(topicEditorStateService.getCachedSubtopicPages()[1].getId());
     expect(topicEditorStateService.getCachedSubtopicPages().length).toBe(2);
-    topicEditorStateService.deleteSubtopicPage('validTopicId', 2);
+    topicEditorStateService.deleteSubtopicPage('validTopicId', 0);
 
     expect(topicEditorStateService.getCachedSubtopicPages().length).toEqual(1);
     expect(
@@ -424,7 +419,7 @@ fdescribe('Topic editor state service', () => {
       topicEditorStateService.getCachedSubtopicPages()[0].getPageContents()
         .getHtml()
     ).toEqual('<p>Data 1</p>');
-  });
+  }));
 
   it('should request to load the topic rights from the backend',
     () => {
@@ -438,70 +433,70 @@ fdescribe('Topic editor state service', () => {
   );
 
   it('should fire an init event after loading the first topic',
-    () => {
+    fakeAsync(() => {
       topicEditorStateService.loadTopic('5');
-      // $rootScope.$apply();
+      tick(1000);
       let skillIdToRubricsObject =
         topicEditorStateService.getSkillIdToRubricsObject();
       expect(skillIdToRubricsObject.skill_1.length).toEqual(3);
       expect(topicInitializedSpy).toHaveBeenCalled();
     }
-  );
+    ));
 
   it('should fire a loaded event after loading a new subtopic page',
-    () => {
+    fakeAsync(() => {
       topicEditorStateService.loadSubtopicPage('validTopicId', 1);
+      tick(1000);
       expect(subtopicPageLoadedSpy).toHaveBeenCalled();
     }
-  );
+    ));
 
-  it('should fire an update event after loading more topics', () => {
+  it('should fire an update event after loading more topics', fakeAsync(() => {
     // Load initial topic.
     topicEditorStateService.loadTopic('5');
+    tick(1000);
 
     // Load a second topic.
     topicEditorStateService.loadTopic('1');
+    tick(1000);
 
     expect(topicReinitializedSpy).toHaveBeenCalled();
-  });
+  }));
 
-  it('should track whether it is currently loading the topic', () => {
-    // Console.log("first = "+topicEditorStateService.isLoadingTopic());
+  it('should track whether it is currently loading the topic', fakeAsync(() => {
     expect(topicEditorStateService.isLoadingTopic()).toBe(false);
 
     topicEditorStateService.loadTopic('5');
-    // //console.log("second = "+topicEditorStateService.isLoadingTopic());
     expect(topicEditorStateService.isLoadingTopic()).toBe(true);
 
-    // $rootScope.$apply();
-    // //console.log("third = "+topicEditorStateService.isLoadingTopic());
-    // expect(topicEditorStateService.isLoadingTopic()).toBe(false);
-  });
+    tick(1000);
+    expect(topicEditorStateService.isLoadingTopic()).toBe(false);
+  }));
 
   it('should indicate a topic is no longer loading after an error',
-    () => {
+    fakeAsync(() => {
       expect(topicEditorStateService.isLoadingTopic()).toBe(false);
       mockEditableTopicBackendApiService.failure = 'Internal 500 error';
 
       topicEditorStateService.loadTopic('5');
       expect(topicEditorStateService.isLoadingTopic()).toBe(true);
 
-      // $rootScope.$apply();
-      // expect(topicEditorStateService.isLoadingTopic()).toBe(false);
+      tick(1000);
+      expect(topicEditorStateService.isLoadingTopic()).toBe(false);
     }
-  );
+    ));
 
   it('should report that a topic has loaded through loadTopic()',
-    () => {
+    fakeAsync(() => {
       expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
       topicEditorStateService.loadTopic('5');
       // Expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
-      // $rootScope.$apply();
+      tick(1000);
       expect(topicEditorStateService.hasLoadedTopic()).toBe(true);
     }
-  );
+    ));
 
   it('should report that a topic has loaded through setTopic()',
     () => {
@@ -586,15 +581,15 @@ fdescribe('Topic editor state service', () => {
   );
 
   it('should not save the topic if there are no pending changes',
-    () => {
+    fakeAsync(() => {
       topicEditorStateService.loadTopic('5');
-      // $rootScope.$apply();
+      tick(1000);
       expect(topicEditorStateService.saveTopic(
         'Commit message', ()=> {})).toBe(false);
     }
-  );
+    ));
 
-  it('should be able to save the topic and pending changes', () => {
+  it('should be able to save the topic and pending changes', fakeAsync(() => {
     spyOn(
       mockEditableTopicBackendApiService,
       'updateTopic').and.callThrough();
@@ -602,11 +597,11 @@ fdescribe('Topic editor state service', () => {
     topicEditorStateService.loadTopic('0');
     topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
-    // $rootScope.$apply();
+    tick(1000);
 
     expect(topicEditorStateService.saveTopic(
       'Commit message', ()=> {})).toBe(true);
-    // $rootScope.$apply();
+    tick(1000);
 
     let expectedId = '0';
     let expectedVersion = '1';
@@ -615,41 +610,39 @@ fdescribe('Topic editor state service', () => {
       mockEditableTopicBackendApiService.updateTopic);
     expect(updateTopicSpy).toHaveBeenCalledWith(
       expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
-  });
+  }));
 
-  it('should fire an update event after saving the topic', () => {
+  it('should fire an update event after saving the topic', fakeAsync(() => {
     topicEditorStateService.loadTopic('5');
     topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
-    // $rootScope.$apply();
+    tick(1000);
 
     topicEditorStateService.saveTopic('Commit message', ()=> {});
-    // $rootScope.$apply();
+    tick(1000);
 
     expect(topicReinitializedSpy).toHaveBeenCalled();
-  });
+  }));
 
-  fit('should track whether it is currently saving the topic', fakeAsync(() => {
+  it('should track whether it is currently saving the topic', fakeAsync(() => {
     topicEditorStateService.loadTopic('5');
-    console.log('2');
     topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
-    // $rootScope.$apply();
-
+    tick(1000);
     expect(topicEditorStateService.isSavingTopic()).toBe(false);
     topicEditorStateService.saveTopic('Commit message', ()=> {});
     expect(topicEditorStateService.isSavingTopic()).toBe(true);
 
-    // $rootScope.$apply();
+    tick(1000);
     expect(topicEditorStateService.isSavingTopic()).toBe(false);
   }));
 
   it('should indicate a topic is no longer saving after an error',
-    () => {
+    fakeAsync(() => {
       topicEditorStateService.loadTopic('5');
       topicUpdateService.setTopicName(
         topicEditorStateService.getTopic(), 'New name');
-      // $rootScope.$apply();
+      tick(1000);
 
       expect(topicEditorStateService.isSavingTopic()).toBe(false);
       mockEditableTopicBackendApiService.failure = 'Internal 500 error';
@@ -657,8 +650,8 @@ fdescribe('Topic editor state service', () => {
       topicEditorStateService.saveTopic('Commit message', ()=> {});
       expect(topicEditorStateService.isSavingTopic()).toBe(true);
 
-      // $rootScope.$apply();
+      tick(1000);
       expect(topicEditorStateService.isSavingTopic()).toBe(false);
     }
-  );
+    ));
 });

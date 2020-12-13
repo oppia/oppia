@@ -68,9 +68,9 @@ export class TopicEditorStateService {
   _topicIsBeingSaved: boolean = false;
   _topicWithNameExists: boolean = false;
   _topicWithUrlFragmentExists: boolean = false;
-  _canonicalStorySummaries = [];
+  _canonicalStorySummaries: StorySummary[] = [];
   _skillIdToRubricsObject = {};
-  _skillQuestionCountDict= {};
+  _skillQuestionCountDict = {};
   _groupedSkillSummaries = {
     current: [],
     others: []
@@ -125,7 +125,6 @@ export class TopicEditorStateService {
   }
   _getSubtopicPageIndex(subtopicPageId: string): number|null {
     for (let i = 0; i < this._cachedSubtopicPages.length; i++) {
-      // Console.log("id = "+(this._cachedSubtopicPages[i].getId()));
       if (this._cachedSubtopicPages[i].getId() === subtopicPageId) {
         return i;
       }
@@ -190,39 +189,32 @@ export class TopicEditorStateService {
   }
 
   /**
-       * Loads, or reloads, the topic stored by this service given a
-       * specified topic ID. See setTopic() for more information on
-       * additional behavior of this function.
-       */
+   * Loads, or reloads, the topic stored by this service given a
+   * specified topic ID. See setTopic() for more information on
+   * additional behavior of this function.
+   */
   loadTopic(topicId: string): void {
     this._topicIsLoading = true;
-    console.log('z');
     this.editableTopicBackendApiService.fetchTopic(
       topicId).then(
       (newBackendTopicObject) => {
         this._skillQuestionCountDict = (
           newBackendTopicObject.skillQuestionCountDict);
-          console.log('a');
         this._updateGroupedSkillSummaries(
           newBackendTopicObject.groupedSkillSummaries);
         this._updateTopic(
           newBackendTopicObject.topicDict,
           newBackendTopicObject.skillIdToDescriptionDict
         );
-        console.log('b');
         this._updateGroupedSkillSummaries(
           newBackendTopicObject.groupedSkillSummaries);
-          console.log('c');
         this._updateSkillIdToRubricsObject(
           newBackendTopicObject.skillIdToRubricsDict);
-          console.log('d');
         this._updateClassroomUrlFragment(
           newBackendTopicObject.classroomUrlFragment);
-          console.log('e');
         this.editableTopicBackendApiService.fetchStories(topicId).then(
           (canonicalStorySummaries) => {
             this._setCanonicalStorySummaries(canonicalStorySummaries);
-            // $rootScope.$applyAsync();
           });
       },
       (error) => {
@@ -234,7 +226,6 @@ export class TopicEditorStateService {
       topicId).then((newBackendTopicRightsObject) => {
       this._updateTopicRights(newBackendTopicRightsObject);
       this._topicIsLoading = false;
-      // $rootScope.$applyAsync();
     }, (error) => {
       this.alertService.addWarning(
         error ||
@@ -252,43 +243,35 @@ export class TopicEditorStateService {
   }
 
   /**
-       * Returns whether the topic name already exists on the server.
-       */
+   * Returns whether the topic name already exists on the server.
+   */
   getTopicWithNameExists(): boolean {
     return this._topicWithNameExists;
   }
 
   /**
-       * Returns whether the topic URL fragment already exists on the server.
-       */
+   * Returns whether the topic URL fragment already exists on the server.
+   */
   getTopicWithUrlFragmentExists(): boolean {
     return this._topicWithUrlFragmentExists;
   }
 
   /**
-       * Loads, or reloads, the subtopic page stored by this service given a
-       * specified topic ID and subtopic ID.
-       */
+   * Loads, or reloads, the subtopic page stored by this service given a
+   * specified topic ID and subtopic ID.
+   */
   loadSubtopicPage(topicId: string, subtopicId: number): void {
-    // //console.log("Topicid= "+topicId);
-    // //console.log("subtopic id= "+subtopicId);
-
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
-    // //console.log("subtopic id = "+subtopicPageId);
-    // eslint-disable-next-line max-len
-    // console.log("this._getSubtopicPageIndex(subtopicPageId) = "+this._getSubtopicPageIndex(subtopicPageId));
     if (this._getSubtopicPageIndex(subtopicPageId) !== null) {
       this._subtopicPage = angular.copy(
         this._cachedSubtopicPages[this._getSubtopicPageIndex(subtopicPageId)]);
       this._subtopicPageLoadedEventEmitter.emit();
       return;
     }
-    // //console.log("editable = " +this.editableStoryBackendApiService);
     this.editableTopicBackendApiService.fetchSubtopicPage(
       topicId, subtopicId).then(
       (newBackendSubtopicPageObject) => {
         this._updateSubtopicPage(newBackendSubtopicPageObject);
-        // $rootScope.$applyAsync();
       },
       (error) => {
         this.alertService.addWarning(
@@ -297,17 +280,17 @@ export class TopicEditorStateService {
   }
 
   /**
-       * Returns whether this service is currently attempting to load the
-       * topic maintained by this service.
-       */
+   * Returns whether this service is currently attempting to load the
+   * topic maintained by this service.
+   */
   isLoadingTopic(): boolean {
     return this._topicIsLoading;
   }
 
   /**
-       * Returns whether a topic has yet been loaded using either
-       * loadTopic() or setTopic().
-       */
+   * Returns whether a topic has yet been loaded using either
+   * loadTopic() or setTopic().
+   */
   hasLoadedTopic(): boolean {
     return this._topicIsInitialized;
   }
@@ -317,13 +300,13 @@ export class TopicEditorStateService {
   }
 
   /**
-       * Returns the current topic to be shared among the topic
-       * editor. Please note any changes to this topic will be propogated
-       * to all bindings to it. This topic object will be retained for the
-       * lifetime of the editor. This function never returns null, though it may
-       * return an empty topic object if the topic has not yet been
-       * loaded for this editor instance.
-       */
+   * Returns the current topic to be shared among the topic
+   * editor. Please note any changes to this topic will be propogated
+   * to all bindings to it. This topic object will be retained for the
+   * lifetime of the editor. This function never returns null, though it may
+   * return an empty topic object if the topic has not yet been
+   * loaded for this editor instance.
+   */
   getTopic(): Topic {
     return this._topic;
   }
@@ -333,13 +316,13 @@ export class TopicEditorStateService {
   }
 
   /**
-       * Returns the current subtopic page to be shared among the topic
-       * editor. Please note any changes to this subtopic page will be
-       * propogated to all bindings to it. This subtopic page object will be
-       * retained for the lifetime of the editor. This function never returns
-       * null, though it may return an empty subtopic page object if the topic
-       * has not yet been loaded for this editor instance.
-       */
+   * Returns the current subtopic page to be shared among the topic
+   * editor. Please note any changes to this subtopic page will be
+   * propogated to all bindings to it. This subtopic page object will be
+   * retained for the lifetime of the editor. This function never returns
+   * null, though it may return an empty subtopic page object if the topic
+   * has not yet been loaded for this editor instance.
+   */
   getSubtopicPage(): SubtopicPage {
     return this._subtopicPage;
   }
@@ -349,33 +332,33 @@ export class TopicEditorStateService {
   }
 
   /**
-       * Returns the current topic rights to be shared among the topic
-       * editor. Please note any changes to this topic rights will be
-       * propogated to all bindings to it. This topic rights object will
-       * be retained for the lifetime of the editor. This function never returns
-       * null, though it may return an empty topic rights object if the
-       * topic rights has not yet been loaded for this editor instance.
-       */
+   * Returns the current topic rights to be shared among the topic
+   * editor. Please note any changes to this topic rights will be
+   * propogated to all bindings to it. This topic rights object will
+   * be retained for the lifetime of the editor. This function never returns
+   * null, though it may return an empty topic rights object if the
+   * topic rights has not yet been loaded for this editor instance.
+   */
   getTopicRights(): TopicRights {
     return this._topicRights;
   }
 
 
   /**
-       * Sets the topic stored within this service, propogating changes to
-       * all bindings to the topic returned by getTopic(). The first
-       * time this is called it will fire a global event based on
-       * onTopicInitialized. All subsequent
-       * calls will similarly fire a onTopicReinitialized event.
-       */
+   * Sets the topic stored within this service, propogating changes to
+   * all bindings to the topic returned by getTopic(). The first
+   * time this is called it will fire a global event based on
+   * onTopicInitialized. All subsequent
+   * calls will similarly fire a onTopicReinitialized event.
+   */
   setTopic(topic: Topic): void {
     this._setTopic(topic);
   }
 
   /**
-       * Sets the updated subtopic page object in the correct position in the
-       * _cachedSubtopicPages list.
-       */
+   * Sets the updated subtopic page object in the correct position in the
+   * _cachedSubtopicPages list.
+   */
   setSubtopicPage(subtopicPage: SubtopicPage): void {
     if (this._getSubtopicPageIndex(subtopicPage.getId()) !== null) {
       this._cachedSubtopicPages[
@@ -391,9 +374,7 @@ export class TopicEditorStateService {
   deleteSubtopicPage(topicId: string, subtopicId: number): void {
     let subtopicPageId = this._getSubtopicPageId(topicId, subtopicId);
     let index = this._getSubtopicPageIndex(subtopicPageId);
-    // Console.log("index = "+index);
     let newIndex = this._newSubtopicPageIds.indexOf(subtopicPageId);
-    // Console.log("newIndex ="+newIndex);
     // If index is null, that means the corresponding subtopic page was
     // never loaded from the backend and not that the subtopic page doesn't
     // exist at all. So, not required to throw an error here.
@@ -444,13 +425,13 @@ export class TopicEditorStateService {
 
 
   /**
-       * Attempts to save the current topic given a commit message. This
-       * function cannot be called until after a topic has been initialized
-       * in this service. Returns false if a save is not performed due to no
-       * changes pending, or true if otherwise. This function, upon success,
-       * will clear the UndoRedoService of pending changes. This function also
-       * shares behavior with setTopic(), when it succeeds.
-       */
+   * Attempts to save the current topic given a commit message. This
+   * function cannot be called until after a topic has been initialized
+   * in this service. Returns false if a save is not performed due to no
+   * changes pending, or true if otherwise. This function, upon success,
+   * will clear the UndoRedoService of pending changes. This function also
+   * shares behavior with setTopic(), when it succeeds.
+   */
   saveTopic(commitMessage: string, successCallback: Function): boolean {
     if (!this._topicIsInitialized) {
       this.alertService.fatalWarning(
@@ -488,7 +469,6 @@ export class TopicEditorStateService {
         if (successCallback) {
           successCallback();
         }
-        // $rootScope.$applyAsync();
       }, (error: string) => {
         this.alertService.addWarning(
           error || 'There was an error when saving the topic.');
@@ -498,18 +478,18 @@ export class TopicEditorStateService {
   }
 
   /**
-       * Returns whether this service is currently attempting to save the
-       * topic maintained by this service.
-       */
+   * Returns whether this service is currently attempting to save the
+   * topic maintained by this service.
+   */
   isSavingTopic(): boolean {
     return this._topicIsBeingSaved;
   }
 
-  onTopicInitialized(): EventEmitter<unknown> {
+  get onTopicInitialized(): EventEmitter<unknown> {
     return this._topicInitializedEventEmitter;
   }
 
-  onTopicReinitialized(): EventEmitter<unknown> {
+  get onTopicReinitialized(): EventEmitter<unknown> {
     return this._topicReinitializedEventEmitter;
   }
   /**
@@ -520,13 +500,13 @@ export class TopicEditorStateService {
   }
 
   /**
-       * Attempts to set the boolean variable _topicWithNameExists based
-       * on the value returned by doesTopicWithNameExistAsync and
-       * executes the success callback provided. No arguments are passed to the
-       * success callback. Execution of the success callback indicates that the
-       * async backend call was successful and that _topicWithNameExists
-       * has been successfully updated.
-       */
+   * Attempts to set the boolean variable _topicWithNameExists based
+   * on the value returned by doesTopicWithNameExistAsync and
+   * executes the success callback provided. No arguments are passed to the
+   * success callback. Execution of the success callback indicates that the
+   * async backend call was successful and that _topicWithNameExists
+   * has been successfully updated.
+   */
   updateExistenceOfTopicName(
       topicName: string,
       successCallback: Function): void {
@@ -537,7 +517,6 @@ export class TopicEditorStateService {
         if (successCallback) {
           successCallback();
         }
-        // $rootScope.$applyAsync();
       }, (error) => {
         this.alertService.addWarning(
           error ||
@@ -547,13 +526,13 @@ export class TopicEditorStateService {
   }
 
   /**
-       * Attempts to set the boolean variable _topicWithUrlFragmentExists based
-       * on the value returned by doesTopicWithUrlFragmentExistAsync and
-       * executes the success callback provided. No arguments are passed to the
-       * success callback. Execution of the success callback indicates that the
-       * async backend call was successful and that _topicWithUrlFragmentExists
-       * has been successfully updated.
-       */
+   * Attempts to set the boolean variable _topicWithUrlFragmentExists based
+   * on the value returned by doesTopicWithUrlFragmentExistAsync and
+   * executes the success callback provided. No arguments are passed to the
+   * success callback. Execution of the success callback indicates that the
+   * async backend call was successful and that _topicWithUrlFragmentExists
+   * has been successfully updated.
+   */
   updateExistenceOfTopicUrlFragment(
       topicUrlFragment: string, successCallback: Function): void {
     this.editableTopicBackendApiService.doesTopicWithUrlFragmentExistAsync(
@@ -563,7 +542,6 @@ export class TopicEditorStateService {
         if (successCallback) {
           successCallback();
         }
-        // $rootScope.$applyAsync();
       }, (error) => {
         this.alertService.addWarning(
           error ||
@@ -572,12 +550,11 @@ export class TopicEditorStateService {
       });
   }
 
-  onStorySummariesInitialized(): EventEmitter<unknown> {
+  get onStorySummariesInitialized(): EventEmitter<unknown> {
     return this._storySummariesInitializedEventEmitter;
   }
 
-  onSubtopicPageLoaded(): EventEmitter<unknown> {
-    // Console.log("called");
+  get onSubtopicPageLoaded(): EventEmitter<unknown> {
     return this._subtopicPageLoadedEventEmitter;
   }
 }
