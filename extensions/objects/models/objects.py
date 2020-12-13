@@ -1785,3 +1785,57 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
                 'Duplicate unicode found in set: %s' % raw['unicode_str_set'])
 
         return raw
+
+
+class TranslatableHtmlContentId(BaseObject):
+    """A TranslatableHtml content id."""
+
+    @classmethod
+    def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        return {
+            'type': UnicodeString.get_schema()
+        }
+
+
+class SetOfTranslatableHtmlContentId(BaseObject):
+    """A Set of TranslatableHtml content ids."""
+
+    default_value = []
+
+    @classmethod
+    def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        return {
+            'type': 'list',
+            'items': TranslatableHtmlContentId.get_schema(),
+            'validators': [{
+                'id': 'is_uniquified'
+            }]
+        }
+
+
+class ListOfSetsOfTranslatableHtmlContentId(BaseObject):
+    """List of sets of TranslatableHtml content ids."""
+
+    default_value = []
+
+    @classmethod
+    def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        return {
+            'type': 'list',
+            'items': SetOfTranslatableHtmlContentId.get_schema()
+        }
