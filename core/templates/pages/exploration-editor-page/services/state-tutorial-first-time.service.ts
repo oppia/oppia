@@ -84,12 +84,12 @@ export class StateTutorialFirstTimeService {
     if (this._currentlyInTranslationFirstVisit) {
       this.enterTranslationForTheFirstTimeEventEmitter.emit();
       this.editorFirstTimeEventsService.initRegisterEvents(expId);
-      this.stateTutorialFirstTimeBackendApiService.startTranslationTutorial(expId)
-        .then(null, () => {
-          console.error(
-            'Warning: could not record translation tutorial start event.'
-          );
-        });
+      this.stateTutorialFirstTimeBackendApiService.startTranslationTutorial(
+        expId).then(null, () => {
+        console.error(
+          'Warning: could not record translation tutorial start event.'
+        );
+      });
     }
   }
 
