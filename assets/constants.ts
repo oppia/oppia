@@ -5454,7 +5454,17 @@ export = {
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
 
-  // Firebase project configuration taken from the Firebase Console.
+  "FIRESTORE_EMULATOR_SETTINGS": {
+    "host": "localhost:8181",
+    "ssl": false
+  },
+
+  // Firebase project configurations.
+  //
+  // The config values can be found in the Firebase Console.
+  // Release coordinator is responsible for populating this object and flipping
+  // the FIREBASE_USE_PRODUCTION boolean to true before pushing to production.
+  "FIREBASE_USE_PRODUCTION": false,
   "FIREBASE_CONFIG": {
     "apiKey": "TODO",
     "authDomain": "TODO",

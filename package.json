@@ -137,6 +137,7 @@
     "default-passive-events": "^2.0.0",
     "fabric": "^4.1.0",
     "firebase": "^8.2.0",
+    "firebase-tools": "^8.19.0",
     "firebaseui": "^4.7.1",
     "firebaseui-angular": "^5.1.1",
     "gif-frames": "^1.0.1",

@@ -22,6 +22,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFirestoreModule, SETTINGS } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
 import { FirebaseUIModule, firebase, firebaseui } from 'firebaseui-angular';
 
@@ -71,14 +72,24 @@ const FIREBASE_UI_AUTH_CONFIG: Readonly<firebaseui.auth.Config> = {
 };
 
 @NgModule({
+  providers: [
+    {
+      provide: SETTINGS,
+      useValue: (
+        AppConstants.FIREBASE_USE_PRODUCTION ? undefined :
+        AppConstants.FIRESTORE_EMULATOR_SETTINGS)
+    },
+  ],
+
   imports: [
+    AngularFireAuthModule,
+    AngularFireModule.initializeApp(AppConstants.FIREBASE_CONFIG),
+    AngularFirestoreModule,
     CommonModule,
+    FirebaseUIModule.forRoot(FIREBASE_UI_AUTH_CONFIG),
+    FormsModule,
     MaterialModule,
     NgbModalModule,
-    FormsModule,
-    AngularFireModule.initializeApp(AppConstants.FIREBASE_CONFIG),
-    AngularFireAuthModule,
-    FirebaseUIModule.forRoot(FIREBASE_UI_AUTH_CONFIG)
   ],
 
   declarations: [
@@ -93,23 +104,27 @@ const FIREBASE_UI_AUTH_CONFIG: Readonly<firebaseui.auth.Config> = {
     ProfileLinkTextComponent,
     SharingLinksComponent,
     SkillMasteryViewerComponent,
-    StorySummaryTileDirective,
     SocialButtonsComponent,
+    StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    TranslatePipe
+    TranslatePipe,
   ],
 
   entryComponents: [
+    AttributionGuideComponent,
     BackgroundBannerComponent,
+    LazyLoadingComponent,
+    LoadingDotsComponent,
+    ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
     SharingLinksComponent,
-    SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    SkillMasteryViewerComponent,
+    SocialButtonsComponent,
     // These elements will remain here even after migration.
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
   ],
 
   exports: [
@@ -122,7 +137,7 @@ const FIREBASE_UI_AUTH_CONFIG: Readonly<firebaseui.auth.Config> = {
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
-    TranslatePipe
+    TranslatePipe,
   ],
 })
 
