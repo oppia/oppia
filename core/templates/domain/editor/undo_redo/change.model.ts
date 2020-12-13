@@ -33,6 +33,12 @@ import { SubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { WorkedExampleBackendDict } from
   'domain/skill/WorkedExampleObjectFactory';
+import { Collection } from 'domain/collection/collection.model';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { Story } from 'domain/story/StoryObjectFactory';
+import { Topic } from 'domain/topic/TopicObjectFactory';
+import { SubtopicPage } from 'domain/topic/SubtopicPageObjectFactory';
 
 interface CollectionTitleChange {
   'cmd': 'edit_collection_property';
@@ -178,11 +184,11 @@ interface SkillContentsExplanationChange {
   'old_value': SubtitledHtmlBackendDict;
 }
 
-interface SkillContentsWorkedExamplesChange {
+export interface SkillContentsWorkedExamplesChange {
   'cmd': 'update_skill_contents_property';
   'property_name': 'worked_examples';
-  'new_value': WorkedExampleBackendDict;
-  'old_value': WorkedExampleBackendDict;
+  'new_value': WorkedExampleBackendDict[];
+  'old_value': WorkedExampleBackendDict[];
 }
 
 type SkillContentsChange = (
@@ -623,14 +629,31 @@ export type BackendChangeObject = (
   StoryChange |
   TopicChange);
 
+export type DomainObject = (
+  Collection |
+  Question |
+  Skill |
+  Story |
+  Topic |
+  SubtopicPage);
+
 export class Change {
   _backendChangeObject: BackendChangeObject;
-  _applyChangeToObject: Function;
-  _reverseChangeToObject: Function;
+  _applyChangeToObject: (
+    backendChangeObject: BackendChangeObject,
+    domainObject: DomainObject) => void;
+  _reverseChangeToObject: (
+    backendChangeObject: BackendChangeObject,
+    domainObject: DomainObject) => void;
 
   constructor(
-      backendChangeObject: BackendChangeObject, applyChangeToObject: Function,
-      reverseChangeToObject: Function) {
+      backendChangeObject: BackendChangeObject,
+      applyChangeToObject: (
+        backendChangeObject: BackendChangeObject,
+        domainObject: DomainObject) => void,
+      reverseChangeToObject: (
+        backendChangeObject: BackendChangeObject,
+        domainObject: DomainObject) => void) {
     this._backendChangeObject = cloneDeep(backendChangeObject);
     this._applyChangeToObject = applyChangeToObject;
     this._reverseChangeToObject = reverseChangeToObject;
@@ -649,14 +672,14 @@ export class Change {
 
   // Applies this change to the related object (such as a frontend collection
   // domain object).
-  applyChange(domainObject: BackendChangeObject): void {
+  applyChange(domainObject: DomainObject): void {
     this._applyChangeToObject(this._backendChangeObject, domainObject);
   }
 
   // Reverse-applies this change to the related object (such as a frontend
   // collection domain object). This method should only be used to reverse a
   // change that was previously applied by calling the applyChange() method.
-  reverseChange(domainObject: BackendChangeObject): void {
+  reverseChange(domainObject: DomainObject): void {
     this._reverseChangeToObject(this._backendChangeObject, domainObject);
   }
 }

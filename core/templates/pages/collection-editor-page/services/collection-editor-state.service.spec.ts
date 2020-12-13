@@ -45,6 +45,8 @@ describe('Collection editor state service', function() {
   var $q = null;
   var testSubscriptions: Subscription;
 
+  importAllAngularServices();
+
   const collectionInitializedSpy = jasmine.createSpy('collectionInitialized');
 
   importAllAngularServices();
