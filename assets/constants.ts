@@ -5454,6 +5454,16 @@ export = {
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
 
+  // Firebase project configuration taken from the Firebase Console.
+  "FIREBASE_CONFIG": {
+    "apiKey": "TODO",
+    "authDomain": "TODO",
+    "projectId": "TODO",
+    "storageBucket": "TODO",
+    "messagingSenderId": "TODO",
+    "appId": "TODO"
+  },
+
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
   // Used to disable account removal until it is fully implemented.
