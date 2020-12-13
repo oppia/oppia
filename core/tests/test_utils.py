@@ -63,7 +63,6 @@ import main_mail
 import main_taskqueue
 from proto import text_classifier_pb2
 import python_utils
-import requests_mock
 import schema_utils
 import utils
 
@@ -71,6 +70,7 @@ import contextlib2
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
+import requests_mock
 import webtest
 
 (
@@ -194,6 +194,140 @@ def get_storage_model_classes():
                         clazz)]
                 if 'Model' in all_base_classes:
                     yield clazz
+
+
+class ElasticSearchServicesStub(python_utils.OBJECT):
+    """The stub class that mocks the API functionality offered by the platform
+    layer, namely the platform.search elastic search services API.
+    """
+
+    _DB = {}
+
+    def add_documents_to_index(self, documents, index_name):
+        """Adds documents in a list of documents to a given index in the mock
+        database.
+
+        Args:
+            documents: list(dict). Each document should be a dictionary. Every
+                key in the document is a field name, and the corresponding
+                value will be the field's value. There MUST be a key named
+                'id', its value will be used as the document's id.
+            index_name: str. The name of the index to insert the document into.
+
+        Raises:
+            Exception. A document cannot be added to the index.
+        """
+        for document in documents:
+            assert 'id' in document
+            if self._DB[index_name] is None:
+                self._DB[index_name] = []
+            self._DB[index_name].append(document)
+
+    def delete_documents_from_index(self, doc_ids, index_name):
+        """Deletes documents from an index in the mock database.
+
+        Args:
+            doc_ids: list(str). A list of document ids of documents to be
+                deleted from the index.
+            index_name: str. The name of the index to delete the document from.
+
+        Raises:
+            Exception. Document id does not exist.
+        """
+        assert isinstance(index_name, python_utils.BASESTRING)
+        for doc_id in doc_ids:
+            assert isinstance(doc_id, python_utils.BASESTRING)
+        for doc_id in doc_ids:
+            deleted_doc = None
+            for document in self._DB[index_name]:
+                if document['id'] == doc_id:
+                    deleted_doc = document
+                    break
+            if deleted_doc:
+                self._DB[index_name].remove(deleted_doc)
+            else:
+                raise Exception('Document id does not exist: %s' % doc_id)
+
+    def clear_index(self, index_name):
+        """Clears an index on the mock elastic search instance.
+
+        Args:
+            index_name: str. The name of the index to clear.
+        """
+        assert isinstance(index_name, python_utils.BASESTRING)
+        self._DB[index_name].clear()
+
+    def get_document_from_index(self, doc_id, index_name):
+        """Get the document with the given ID from the given index.
+
+        Args:
+            doc_id: str. The document id.
+            index_name: str. The name of the index to clear.
+
+        Returns:
+            dict. The document in a dictionary format.
+        """
+        assert isinstance(index_name, python_utils.BASESTRING)
+        for document in self._DB[index_name]:
+            if document['id'] == doc_id:
+                return document
+
+    def search(
+            self, query_string, index_name, cursor=None, offset=0,
+            size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
+        """Returns search results from mock db object
+
+        Args:
+            query_string: str. A JSON-encoded string representation of the
+                dictionary search definition that uses Query DSL. See
+                elastic.co/guide/en/elasticsearch/reference/current/
+                query-dsl.html for more details about Query DSL.
+            index_name: str. The name of the index. Use '_all' or empty
+                string to perform the operation on all indices.
+            cursor: str|None. Not used in this implementation.
+            offset: int. The offset into the index. Pass this in to start at
+                the 'offset' when searching through a list of results of max
+                length 'size'. Leave as None to start at the beginning.
+            size: int. The maximum number of documents to return.
+            ids_only: bool. Whether to only return document ids.
+
+        Returns:
+            2-tuple of (result_docs, resulting_offset). Where:
+                result_docs: list(dict)|list(str). Represents search documents.
+                    If'ids_only' is True, this will be a list of strings
+                    corresponding to the search document ids. If 'ids_only' is
+                    False, the full dictionaries representing each document
+                    retrieved from the elastic search instance will be returned.
+                resulting_offset: int. The resulting offset to start at for the
+                    next section of the results. Returns None if there are no
+                    more results.
+        """
+
+        result_docs = []
+        resulting_offset = offset or 0
+        assert query_string is not None
+        assert cursor is None
+        if not index_name or index_name == '_all':
+            for _, documents in self._DB:
+                for doc in documents:
+                    if len(result_docs) == size:
+                        break
+                    if ids_only:
+                        result_docs.append(doc['id'])
+                    else:
+                        result_docs.append(doc)
+                    resulting_offset += 1
+        else:
+            for doc in self._DB[index_name]:
+                if len(result_docs) == size:
+                    break
+                if ids_only:
+                    result_docs.append(doc['id'])
+                else:
+                    result_docs.append(doc)
+                resulting_offset += 1
+
+        return result_docs, resulting_offset
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -1003,6 +1137,7 @@ tags: []
         # Defined outside of setUp() because we want to swap it in during tests,
         # while minimizing the swap's scope. We accomplish this by using a
         # context manager over run().
+        self.search_services_stub = ElasticSearchServicesStub()
         self._taskqueue_services_stub = TaskqueueServicesStub(self)
 
     def run(self, result=None):
@@ -1024,8 +1159,8 @@ tags: []
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
-                platform_taskqueue_services, 'create_http_task',
-                self._taskqueue_services_stub.create_http_task))
+                models.Registry, 'import_search_services',
+                lambda x: self._search_services_stub))
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
                 memory_cache_services_stub.flush_cache))
