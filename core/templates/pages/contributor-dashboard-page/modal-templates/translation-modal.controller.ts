@@ -32,13 +32,13 @@ require('services/image-local-storage.service.ts');
 angular.module('oppia').controller('TranslationModalController', [
   '$controller', '$scope', '$uibModalInstance', 'AlertsService',
   'CkEditorCopyContentService', 'ContextService', 'ImageLocalStorageService',
-  'TranslateTextService', 'TranslationLanguageService',
-  'opportunity', 'ENTITY_TYPE',
+  'TranslateTextService', 'TranslationLanguageService', 'opportunity',
+  'ENTITY_TYPE',
   function(
       $controller, $scope, $uibModalInstance, AlertsService,
       CkEditorCopyContentService, ContextService, ImageLocalStorageService,
-      TranslateTextService, TranslationLanguageService,
-      opportunity, ENTITY_TYPE) {
+      TranslateTextService, TranslationLanguageService, opportunity,
+      ENTITY_TYPE) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

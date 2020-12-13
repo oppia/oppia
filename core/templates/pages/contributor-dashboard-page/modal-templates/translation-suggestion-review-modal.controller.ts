@@ -20,37 +20,71 @@ require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
-    '$scope', '$uibModalInstance', 'SuggestionModalService',
-    'contentHtml', 'reviewable', 'translationHtml',
+    '$scope', '$uibModalInstance', 'ContributionAndReviewService',
+    'SuggestionModalService', 'initialSuggestionId', 'reviewable',
+    'suggestionIdToSuggestion',
     function(
-        $scope, $uibModalInstance, SuggestionModalService,
-        contentHtml, reviewable, translationHtml) {
-      $scope.translationHtml = translationHtml;
-      $scope.contentHtml = contentHtml;
+        $scope, $uibModalInstance, ContributionAndReviewService,
+        SuggestionModalService, initialSuggestionId, reviewable,
+        suggestionIdToSuggestion) {
+      var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
-      $scope.commitMessage = '';
-      $scope.reviewMessage = '';
+      $scope.activeSuggestionId = initialSuggestionId;
+      $scope.activeSuggestion = suggestionIdToSuggestion[
+        $scope.activeSuggestionId];
+      delete suggestionIdToSuggestion[initialSuggestionId];
+      var remainingSuggestions = Object.entries(suggestionIdToSuggestion);
 
-      $scope.accept = function() {
-        SuggestionModalService.acceptSuggestion(
-          $uibModalInstance,
-          {
-            action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-            commitMessage: $scope.commitMessage,
-            reviewMessage: $scope.reviewMessage
-          });
+      var generateCommitMessage = function() {
+        var contentId = $scope.activeSuggestion.change.content_id;
+        var stateName = $scope.activeSuggestion.change.state_name;
+        var contentType = contentId.split('_')[0];
+
+        return `${contentType} section of "${stateName}" card`;
       };
 
-      $scope.reject = function() {
-        SuggestionModalService.rejectSuggestion(
-          $uibModalInstance,
-          {
-            action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-            reviewMessage: $scope.reviewMessage
-          });
+      var init = function() {
+        $scope.lastSuggestionToReview = remainingSuggestions.length <= 0;
+        $scope.translationHtml = (
+          $scope.activeSuggestion.change.translation_html);
+        $scope.contentHtml = (
+          $scope.activeSuggestion.change.content_html);
+        $scope.reviewMessage = '';
       };
+
+      init();
+
+      $scope.showNextItemToReview = function(suggestionId) {
+        resolvedSuggestionIds.push($scope.activeSuggestionId);
+        var suggestionId = null;
+        if ($scope.lastSuggestionToReview) {
+          $uibModalInstance.close(resolvedSuggestionIds);
+          return;
+        }
+
+        [$scope.activeSuggestionId, $scope.activeSuggestion] = (
+          remainingSuggestions.pop());
+        init();
+      };
+
+      $scope.acceptAndReviewNext = function() {
+        ContributionAndReviewService.resolveSuggestionToExploration(
+          $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
+          SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+          $scope.reviewMessage, generateCommitMessage(),
+          $scope.showNextItemToReview);
+      };
+
+      $scope.rejectAndReviewNext = function() {
+        ContributionAndReviewService.resolveSuggestionToExploration(
+          $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
+          SuggestionModalService.ACTION_REJECT_SUGGESTION,
+          $scope.reviewMessage, generateCommitMessage(),
+          $scope.showNextItemToReview);
+      };
+
       $scope.cancel = function() {
-        SuggestionModalService.cancelSuggestion($uibModalInstance);
+        $uibModalInstance.close(resolvedSuggestionIds);
       };
     }
   ]);
