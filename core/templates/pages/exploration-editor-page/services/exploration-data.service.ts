@@ -106,7 +106,7 @@ export class ExplorationDataService {
   autosaveChangeList(
       changeList: ExplorationChangeList[],
       successCallback: Function,
-      errorCallback: (reason?: string) => void) {
+      errorCallback = function() {}) {
     // First save locally to be retrieved later if save is unsuccessful.
     if (this.localStorageService && this.localStorageService.saveExplorationDraft) {
       this.localStorageService.saveExplorationDraft(
@@ -149,16 +149,14 @@ export class ExplorationDataService {
 
   // Returns a promise that supplies the data for the current exploration.
   getData(errorCallback: (reason?: string) => void)
-  : Promise<DraftExplorationResponse|ExplorationAutosaveChangeListResponse> {
+  : Promise<DraftExplorationResponse> {
     if (!this.explorationId) {
       throw new Error('explorationDataService.getData is not a function');
     }
     return new Promise((resolve, reject) => {
       if (this.explorationData.data) {
         this.loggerService.info('Found exploration data in cache.');
-        return new Promise((resolve, reject) => {
-          resolve(this.explorationData.data);
-        });
+        resolve(this.explorationData.data);
       } else {
       // Retrieve data from the server.
       // WARNING: Note that this is a version of the exploration with draft
@@ -181,14 +179,14 @@ export class ExplorationDataService {
                 // loaded as opposed to the exploration returned by this
                 // response.
                   this.windowRef.nativeWindow.location.reload();
-                }, errorCallback);
+                });
               } else {
                 if (errorCallback) {
                   errorCallback(this.explorationId);
                 }
               }
             }
-            return response;
+            resolve(response);
           }, errorResponse => {
             errorCallback(errorResponse);
           }));
