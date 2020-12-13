@@ -592,7 +592,7 @@ export const angularServices: [string, unknown][] = [
   ['StateTopAnswersStatsService', StateTopAnswersStatsService],
   ['StateTutorialFirstTimeService', StateTutorialFirstTimeService],
   ['StateTutorialFirstTimeBackendApiService',
-    StateTopAnswersStatsBackendApiService],
+    StateTutorialFirstTimeBackendApiService],
   ['StateWrittenTranslationsService', StateWrittenTranslationsService],
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
