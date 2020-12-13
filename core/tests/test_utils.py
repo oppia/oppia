@@ -63,6 +63,7 @@ import main_mail
 import main_taskqueue
 from proto import text_classifier_pb2
 import python_utils
+import requests_mock
 import schema_utils
 import utils
 
@@ -70,7 +71,6 @@ import contextlib2
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
-import requests_mock
 import webtest
 
 (
