@@ -37,7 +37,8 @@ export class ExplorationStatsService {
   getExplorationStats(expId: string): Promise<ExplorationStats> {
     if (this.statsCache === null) {
       this.statsCache = (
-        this.explorationStatsBackendApiService.fetchExplorationStats(expId));
+        this.explorationStatsBackendApiService.fetchExplorationStatsAsync(
+          expId));
     }
     return this.statsCache;
   }
