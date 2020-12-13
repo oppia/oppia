@@ -949,6 +949,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
+            'activity_ids': base_models.EXPORT_POLICY.EXPORTED,
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
@@ -1019,6 +1020,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
             creator.username for creator in creator_user_models]
 
         user_data = {
+            'activity_ids': user_model.activity_ids,
             'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
