@@ -160,7 +160,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
 
   async fetchTopicAssignmentsForSkillAsync(
       skillId: string
-   ): Promise<AssignedSkill[]> {
+  ): Promise<AssignedSkill[]> {
     const assignSkillDataUrl = this.urlInterpolationService.interpolateUrl(
       '/topics_and_skills_dashboard/unassign_skill/<skill_id>', {
         skill_id: skillId
