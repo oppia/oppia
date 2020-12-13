@@ -579,13 +579,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name],
             'PencilCodeEditor')
-        init_state.interaction.answer_groups = answer_groups
-        init_state.written_translations.translations_mapping[
-            'feedback_1'] = {}
-        init_state.recorded_voiceovers.voiceovers_mapping[
-            'feedback_1'] = {}
-        rule_spec.rule_type = 'ErrorContains'
-        rule_spec.inputs = {'x': '{{ExampleParam}}'}
+        temp_rule = old_answer_groups[0]['rule_specs'][0]
+        old_answer_groups[0]['rule_specs'][0] = {
+          'rule_type': 'ErrorContains',
+          'inputs': {'x': '{{ExampleParam}}'}
+        }
+        init_state.update_interaction_answer_groups(old_answer_groups)
+        old_answer_groups[0]['rule_specs'][0] = temp_rule
 
         self._assert_validation_error(
             exploration,
@@ -599,7 +599,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Validate Outcome.
-        outcome = answer_group.outcome
+        outcome = init_state.interaction.answer_groups[0].outcome
         destination = exploration.init_state_name
         outcome.dest = None
         self._assert_validation_error(
