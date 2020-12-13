@@ -87,7 +87,9 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids',
                     user_models.UserSettingsModel,
-                    [item.author_id]
+                    [item.author_id],
+                    remove_system_user_ids=True,
+                    remove_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -106,7 +108,10 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                 field_name_to_external_model_references.append(
                     base_model_validators.ExternalModelFetcherDetails(
                         'reviewer_ids', user_models.UserSettingsModel,
-                        [item.final_reviewer_id]))
+                        [item.final_reviewer_id],
+                        remove_system_user_ids=True,
+                        remove_pseudonymous_ids=True
+                    ))
         return field_name_to_external_model_references
 
     @classmethod
@@ -304,7 +309,8 @@ class GeneralVoiceoverApplicationModelValidator(
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids',
                     user_models.UserSettingsModel,
-                    [item.author_id]
+                    [item.author_id],
+                    remove_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -320,7 +326,9 @@ class GeneralVoiceoverApplicationModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     'final_reviewer_ids', user_models.UserSettingsModel,
-                    [item.final_reviewer_id]))
+                    [item.final_reviewer_id],
+                    remove_pseudonymous_ids=True
+                ))
         return field_name_to_external_model_references
 
     @classmethod
