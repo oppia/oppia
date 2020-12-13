@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for questionOpportunities.
  */
 
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { ContributionOpportunitiesBackendApiService } from
@@ -94,19 +94,26 @@ describe('Question opportunities component', function() {
     });
   }));
 
-  it('should load question opportunities',
-    fakeAsync(() => {
-      spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
-        .returnValue($q.resolve(opportunitiesArray, false));
-      ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
-        expect(opportunitiesDicts.length).toBe(2);
-        expect(more).toBe(false);
-      });
-    }));
+  it('should load question opportunities', () => {
+    spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
+
+    ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
+      expect(opportunitiesDicts.length).toBe(2);
+      expect(more).toBe(false);
+    });
+  });
 
   it('should load more question opportunities', function() {
     spyOn(contributionOpportunitiesService, 'getSkillOpportunitiesAsync').and
-      .returnValue($q.resolve(opportunitiesArray, true));
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: true
+      }));
+
     ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBe(true);
@@ -114,7 +121,10 @@ describe('Question opportunities component', function() {
 
     spyOn(
       contributionOpportunitiesService, 'getMoreSkillOpportunitiesAsync').and
-      .returnValue($q.resolve(opportunitiesArray, false));
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
 
     ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);

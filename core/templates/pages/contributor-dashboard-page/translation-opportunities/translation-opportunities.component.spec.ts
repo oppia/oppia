@@ -103,7 +103,10 @@ describe('Translation opportunities component', function() {
   it('should load translation opportunities', function() {
     spyOn(
       contributionOpportunitiesService, 'getTranslationOpportunitiesAsync').and
-      .returnValue($q.resolve(opportunitiesArray, false));
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
 
     ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
@@ -114,7 +117,10 @@ describe('Translation opportunities component', function() {
   it('should load more translation opportunities', function() {
     spyOn(
       contributionOpportunitiesService, 'getTranslationOpportunitiesAsync').and
-      .returnValue($q.resolve(opportunitiesArray, true));
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: true
+      }));
     ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
       expect(more).toBe(true);
@@ -122,8 +128,10 @@ describe('Translation opportunities component', function() {
 
     spyOn(
       contributionOpportunitiesService,
-      'getMoreTranslationOpportunitiesAsync').and.returnValue(
-      $q.resolve(opportunitiesArray, false));
+      'getMoreTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
+      opportunities: opportunitiesArray,
+      more: false
+    }));
 
     ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
       expect(opportunitiesDicts.length).toBe(2);
@@ -138,7 +146,10 @@ describe('Translation opportunities component', function() {
       }));
     spyOn(
       contributionOpportunitiesService, 'getTranslationOpportunitiesAsync').and
-      .returnValue($q.resolve(opportunitiesArray, false));
+      .returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
     ctrl.$onInit();
     $scope.$apply();
 
@@ -155,8 +166,10 @@ describe('Translation opportunities component', function() {
       }));
       spyOn(
         contributionOpportunitiesService,
-        'getTranslationOpportunitiesAsync').and.returnValue(
-        $q.resolve(opportunitiesArray, false));
+        'getTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
 
       spyOn(siteAnalyticsService, 'registerContributorDashboardSuggestEvent');
       ctrl.$onInit();
@@ -176,8 +189,10 @@ describe('Translation opportunities component', function() {
       }));
     spyOn(
       contributionOpportunitiesService,
-      'getTranslationOpportunitiesAsync').and.returnValue(
-      $q.resolve(opportunitiesArray, false));
+      'getTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
+      opportunities: opportunitiesArray,
+      more: false
+    }));
     ctrl.$onInit();
     $scope.$apply();
 
@@ -197,8 +212,10 @@ describe('Translation opportunities component', function() {
       }));
     spyOn(
       contributionOpportunitiesService,
-      'getTranslationOpportunitiesAsync').and.returnValue(
-      $q.resolve(opportunitiesArray, true));
+      'getTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
+      opportunities: opportunitiesArray,
+      more: true
+    }));
     ctrl.$onInit();
     $scope.$apply();
 
@@ -218,8 +235,10 @@ describe('Translation opportunities component', function() {
       }));
     spyOn(
       contributionOpportunitiesService,
-      'getTranslationOpportunitiesAsync').and.returnValue(
-      $q.resolve(opportunitiesArray, true));
+      'getTranslationOpportunitiesAsync').and.returnValue(Promise.resolve({
+      opportunities: opportunitiesArray,
+      more: true
+    }));
     ctrl.$onInit();
     $scope.$apply();
 

@@ -282,8 +282,8 @@ angular.module('oppia').component('contributionsAndReview', {
         }
         if (suggestion.suggestion_type === SUGGESTION_TYPE_TRANSLATE) {
           const suggestionIdToSuggestion = {};
-          for (const [suggestionId, contribution] of Object.entries(
-            ctrl.contributions)) {
+          for (let suggestionId in ctrl.contributions) {
+            var contribution = ctrl.contributions[suggestionId];
             suggestionIdToSuggestion[suggestionId] = contribution.suggestion;
           }
           ContextService.setCustomEntityContext(

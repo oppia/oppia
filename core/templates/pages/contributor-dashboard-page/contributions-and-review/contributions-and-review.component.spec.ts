@@ -67,7 +67,7 @@ describe('Contributions and review component', function() {
       spyOn(
         contributionAndReviewService,
         'getUserCreatedTranslationSuggestionsAsync').and.returnValue(
-        $q.resolve({
+        Promise.resolve({
           suggestion_1: {
             suggestion: {
               suggestion_id: 'suggestion_1',
@@ -84,7 +84,7 @@ describe('Contributions and review component', function() {
         }));
       spyOn(
         contributionAndReviewService, 'getReviewableQuestionSuggestionsAsync')
-        .and.returnValue($q.resolve({
+        .and.returnValue(Promise.resolve({
           suggestion_1: {
             suggestion: {
               suggestion_id: 'suggestion_1',
@@ -189,7 +189,7 @@ describe('Contributions and review component', function() {
     describe('ctrl.loadContributions', () => {
       it('should load contributions correctly', () => {
         ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
-          expect(Object.entries(ctrl.contributions)).toContain('suggestion_1');
+          expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
           expect(opportunitiesDicts).toEqual([{
             id: 'suggestion_1',
             heading: 'Question 1',
@@ -226,58 +226,56 @@ describe('Contributions and review component', function() {
       ' suggestion', function() {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
-          ctrl.loadContributions();
+          ctrl.loadContributions().then(() => {
+            spyOn($uibModal, 'open').and.callThrough();
+            ctrl.onClickViewSuggestion('suggestion_1');
+
+            expect($uibModal.open).toHaveBeenCalled();
+          });
         });
 
       ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
       $scope.$apply();
-
-      spyOn($uibModal, 'open').and.callThrough();
-      ctrl.onClickViewSuggestion('suggestion_1');
-
-      expect($uibModal.open).toHaveBeenCalled();
     });
 
     it('should resolve suggestion when closing show suggestion modal',
       function() {
         contributionOpportunitiesService
           .reloadOpportunitiesEventEmitter.subscribe(() => {
-            ctrl.loadContributions();
+            ctrl.loadContributions().then(() => {
+              spyOn($uibModal, 'open').and.returnValue({
+                result: $q.resolve({
+                  action: 'add',
+                  reviewMessage: 'Review message',
+                  skillDifficulty: 'Easy'
+                })
+              });
+              ctrl.onClickViewSuggestion('suggestion_1');
+              $scope.$apply();
+
+              expect($uibModal.open).toHaveBeenCalled();
+            });
           });
         ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
-
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.resolve({
-            action: 'add',
-            reviewMessage: 'Review message',
-            skillDifficulty: 'Easy'
-          })
-        });
-        ctrl.onClickViewSuggestion('suggestion_1');
-        $scope.$apply();
-
-        expect($uibModal.open).toHaveBeenCalled();
-        expect(Object.entries(ctrl.contributions)).not.toContain(
-          'suggestion_1');
       });
 
     it('should not resolve suggestion when dismissing show suggestion modal',
       function() {
         contributionOpportunitiesService
           .reloadOpportunitiesEventEmitter.subscribe(() => {
-            ctrl.loadContributions();
+            ctrl.loadContributions().then(() => {
+              spyOn($uibModal, 'open').and.returnValue({
+                result: $q.reject()
+              });
+              ctrl.onClickViewSuggestion('suggestion_1');
+              $scope.$apply();
+
+              expect($uibModal.open).toHaveBeenCalled();
+            });
           });
         ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
         $scope.$apply();
-
-        spyOn($uibModal, 'open').and.returnValue({
-          result: $q.reject()
-        });
-        ctrl.onClickViewSuggestion('suggestion_1');
-        $scope.$apply();
-
-        expect($uibModal.open).toHaveBeenCalled();
       });
   });
 
