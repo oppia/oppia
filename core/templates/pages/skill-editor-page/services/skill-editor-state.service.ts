@@ -22,7 +22,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import { EventEmitter, Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { SkillChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillRights } from 'domain/skill/skill-rights.model';
@@ -203,14 +202,7 @@ export class SkillEditorStateService {
 
     this.skillBackendApiService.updateSkill(
       this._skill.getId(), this._skill.getVersion(), commitMessage,
-      // This throws "Conversion of type 'BackendChangeObject[]' to type
-      // 'SkillChange' may be a mistake because neither type sufficiently
-      // Overlaps with the other. If this was intentional, convert the
-      // expression to 'unknown' first. Type 'BackendChangeObject[]' is
-      // Missing the following properties from type
-      // 'SkillDeletePrerequisiteChange': 'cmd', 'skill_id'
-      // @ts-ignore
-      <SkillChange> this.undoRedoService.getCommittableChangeList()).then(
+      this.undoRedoService.getCommittableChangeList()).then(
       (skill) => {
         this._updateSkill(skill);
         this.undoRedoService.clearChanges();

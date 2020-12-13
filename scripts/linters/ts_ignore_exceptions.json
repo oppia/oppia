@@ -1,10 +1,4 @@
 {
-  "core/templates/domain/skill/skill-update.service.spec.ts": [
-    "undoRedoService.undoChange(skill);"
-  ],
-  "core/templates/pages/skill-editor-page/services/skill-editor-state.service.ts": [
-    "<SkillChange> this.undoRedoService.getCommittableChangeList()).then("
-  ],
   "core/templates/mathjaxConfig.ts": [
     "skipStartupTypeset: true,"
   ],

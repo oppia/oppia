@@ -146,6 +146,7 @@ describe('Skill update service', () => {
     ]);
 
     expect(skill.getDescription()).toEqual('new description');
+
     undoRedoService.undoChange(skill);
     expect(skill.getDescription()).toEqual('test description');
   });
@@ -175,6 +176,7 @@ describe('Skill update service', () => {
     expect(skill.getConceptCard().getExplanation()).toEqual(
       subtitledHtmlObjectFactory.createDefault('new explanation', 'explanation')
     );
+
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getExplanation()).toEqual(
       subtitledHtmlObjectFactory.createDefault(
@@ -205,6 +207,7 @@ describe('Skill update service', () => {
       },
     ]);
     expect(skill.getMisconceptions().length).toEqual(3);
+
     undoRedoService.undoChange(skill);
     expect(skill.getMisconceptions().length).toEqual(2);
   });
@@ -220,6 +223,7 @@ describe('Skill update service', () => {
       },
     ]);
     expect(skill.getMisconceptions().length).toEqual(1);
+
     undoRedoService.undoChange(skill);
     expect(skill.getMisconceptions().length).toEqual(2);
   });
@@ -235,6 +239,7 @@ describe('Skill update service', () => {
       },
     ]);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(2);
+
     undoRedoService.undoChange(skill);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
   });
@@ -250,6 +255,7 @@ describe('Skill update service', () => {
       },
     ]);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(0);
+
     undoRedoService.undoChange(skill);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
   });
@@ -274,6 +280,7 @@ describe('Skill update service', () => {
       'new explanation 1',
       'new explanation 2',
     ]);
+
     undoRedoService.undoChange(skill);
     expect(skill.getRubrics().length).toEqual(1);
     expect(skill.getRubrics()[0].getExplanations()).toEqual(['explanation']);
@@ -298,6 +305,7 @@ describe('Skill update service', () => {
       },
     ]);
     expect(skill.findMisconceptionById('2').getName()).toEqual('new name');
+
     undoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById('2').getName()).toEqual('test name');
   });
@@ -321,6 +329,7 @@ describe('Skill update service', () => {
       },
     ]);
     expect(skill.findMisconceptionById('2').getNotes()).toEqual('new notes');
+
     undoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById('2').getNotes()).toEqual('test notes');
   });
@@ -346,6 +355,7 @@ describe('Skill update service', () => {
     expect(skill.findMisconceptionById('2').getFeedback()).toEqual(
       'new feedback'
     );
+
     undoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById('2').getFeedback()).toEqual(
       'test feedback'
@@ -371,6 +381,7 @@ describe('Skill update service', () => {
       },
     ]);
     expect(skill.findMisconceptionById('2').isMandatory()).toEqual(false);
+
     undoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById('2').isMandatory()).toEqual(true);
   });
@@ -409,6 +420,7 @@ describe('Skill update service', () => {
       workedExampleObjectFactory.createFromBackendDict(example2),
       workedExampleObjectFactory.createFromBackendDict(newExample),
     ]);
+
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example1),
@@ -434,6 +446,7 @@ describe('Skill update service', () => {
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example2),
     ]);
+
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example1),
@@ -476,6 +489,7 @@ describe('Skill update service', () => {
       workedExampleObjectFactory.createFromBackendDict(modifiedExample1),
       workedExampleObjectFactory.createFromBackendDict(example2),
     ]);
+
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example1),
