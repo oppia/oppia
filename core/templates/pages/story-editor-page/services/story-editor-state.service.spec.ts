@@ -25,7 +25,6 @@ import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service.ts';
 import { TranslatorProviderForTests } from 'tests/test.extras';
-import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('domain/story/story-update.service.ts');
 
