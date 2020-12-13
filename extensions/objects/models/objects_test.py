@@ -930,19 +930,18 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
                 self.assertTrue('Translatable' not in name)
 
     def test_translatable_required_methods(self):
-        MockTranslatableObject = type(
-            str('MockTranslatableObject'),
+        mock_translatable_object_class = type(
+            python_utils.convert_to_bytes('mock_translatable_object_class'),
             (objects.BaseTranslatableObject,),
             {})
-        mockTranslatableObjectInstance = MockTranslatableObject()
 
         with self.assertRaisesRegexp(
             NotImplementedError, 'Please Implement this method'):
-            mockTranslatableObjectInstance.get_schema()
+            mock_translatable_object_class.get_schema()
 
         with self.assertRaisesRegexp(
             NotImplementedError, 'Please Implement this method'):
-            mockTranslatableObjectInstance.normalize({
+            mock_translatable_object_class.normalize({
                 'content_id': 'rule_input'
             })
 
@@ -950,14 +949,14 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
         def mock_normalize_value(raw):
             return raw
 
-        MockTranslatableObject = type(
-            str('MockTranslatableObject'),
+        mock_translatable_object_class = type(
+            python_utils.convert_to_bytes('mock_translatable_object_class'),
             (objects.BaseTranslatableObject,),
             {'_normalize_value': mock_normalize_value})
 
         with self.assertRaisesRegexp(
             TypeError, 'Expected content id to be a string'):
-            MockTranslatableObject.normalize({
+            mock_translatable_object_class.normalize({
                 'content_id': 5
             })
 
