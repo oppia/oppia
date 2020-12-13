@@ -105,8 +105,8 @@ export class ExplorationDataService {
   // committed version (as opposed to the most recent autosave).
   autosaveChangeList(
       changeList: ExplorationChangeList[],
-      successCallback: (value?: {}) => void,
-      errorCallback: Function) {
+      successCallback: Function,
+      errorCallback: (reason?: string) => void) {
     // First save locally to be retrieved later if save is unsuccessful.
     if (this.localStorageService && this.localStorageService.saveExplorationDraft) {
       this.localStorageService.saveExplorationDraft(
@@ -176,12 +176,12 @@ export class ExplorationDataService {
             if (draft) {
               if (draft.isValid(this.draftChangeListId)) {
                 let changeList = draft.getChanges();
-                this.autosaveChangeList(changeList, resolve, () => {
+                this.autosaveChangeList(changeList, () => {
                 // A reload is needed so that the changelist just saved is
                 // loaded as opposed to the exploration returned by this
                 // response.
                   this.windowRef.nativeWindow.location.reload();
-                });
+                }, errorCallback);
               } else {
                 if (errorCallback) {
                   errorCallback(this.explorationId);

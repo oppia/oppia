@@ -69,7 +69,7 @@ export class EditableExplorationBackendApiService {
         explorationId, applyDraft);
       this.httpClient.get<ExplorationBackendDict | DraftExplorationResponse>(
         editableExplorationDataUrl).toPromise().then((response) => {
-        let exploration = angular.copy(response);
+        let exploration = cloneDeep(response);
         successCallback(exploration);
       }, (errorResponse) => {
         errorCallback(errorResponse.error.error);

@@ -222,10 +222,8 @@ describe('Exploration data service', function() {
       }
     });
 
-    let windowRefSpy = spyOn(windowRef.nativeWindow.location, 'reload');
     explorationDataService.getData(errorCallback).then((data) => {
       expect(errorCallback).toHaveBeenCalled();
-      expect(windowRefSpy).toHaveBeenCalled();
     });
     let req = httpTestingController.expectOne(
       '/createhandler/data/0?apply_draft=true');
@@ -377,8 +375,10 @@ describe('Exploration data service', function() {
       draft_changes: ''
     };
 
+    let windowRefSpy = spyOn(windowRef.nativeWindow.location, 'reload');
     explorationDataService.getData(errorCallback).then((data) => {
       expect(data).toEqual(sampleDataResults);
+      expect(windowRefSpy).toHaveBeenCalled();
       expect(errorCallback).not.toHaveBeenCalled();
     });
 
@@ -466,8 +466,10 @@ describe('Exploration data service', function() {
         }
       });
       let changeList = [];
+      let windowRefSpy = spyOn(windowRef.nativeWindow.location, 'reload');
       explorationDataService.getData(errorCallback).then((data) => {
         expect(data).toEqual(sampleDataResults);
+        expect(windowRefSpy).toHaveBeenCalled();
         expect(errorCallback).not.toHaveBeenCalled();
       });
 
