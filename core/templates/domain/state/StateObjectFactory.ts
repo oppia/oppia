@@ -42,6 +42,47 @@ import {
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 const constants = require('constants.ts');
+type NewStateTemplate = {
+  'classifier_model_id': null,
+  'content': {
+    'html': '',
+    'content_id': 'content'
+  },
+  'interaction': {
+    'id': null | string,
+    'customization_args': {},
+    'answer_groups': [],
+    'default_outcome': {
+      'dest': 'Introduction' | string,
+      'feedback': {
+        'content_id': 'default_outcome',
+        'html': ''
+      },
+      'labelled_as_correct': false,
+      'param_changes': [],
+      'refresher_exploration_id': null,
+      'missing_prerequisite_skill_id': null
+    },
+    'confirmed_unclassified_answers': [],
+    'hints': [],
+    'solution': null
+  },
+  'next_content_id_index': 0,
+  'param_changes': [],
+  'recorded_voiceovers': {
+    'voiceovers_mapping': {
+      'content': {},
+      'default_outcome': {}
+    }
+  },
+  'solicit_answer_details': false,
+  'written_translations': {
+    'translations_mapping': {
+      'content': {},
+      'default_outcome': {}
+    }
+  }
+};
 
 export interface StateBackendDict {
   'classifier_model_id': string;
@@ -122,8 +163,12 @@ export class StateObjectFactory {
     private subtitledHtmlObject: SubtitledHtmlObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
+  get NEW_STATE_TEMPLATE(): NewStateTemplate {
+    return constants.NEW_STATE_TEMPLATE;
+  }
+
   createDefaultState(newStateName: string): State {
-    var newStateTemplate = constants.NEW_STATE_TEMPLATE;
+    var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
       content: newStateTemplate.content,

@@ -33,13 +33,15 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class SiteAnalyticsService {
+  CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;
+
   constructor(private windowRef: WindowRef) {}
 
   // For definitions of the various arguments, please see:
   // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
-    if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
+    if (this.windowRef.nativeWindow.ga && this.CAN_SEND_ANALYTICS_EVENTS) {
       this.windowRef.nativeWindow.ga(
         'send', 'event', eventCategory, eventAction, eventLabel);
     }
@@ -50,7 +52,7 @@ export class SiteAnalyticsService {
   // social-interactions.
   __sendSocialEventToGoogleAnalytics(
       network: string, action: string, targetUrl: string): void {
-    if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
+    if (this.windowRef.nativeWindow.ga && this.CAN_SEND_ANALYTICS_EVENTS) {
       this.windowRef.nativeWindow.ga(
         'send', 'social', network, action, targetUrl);
     }

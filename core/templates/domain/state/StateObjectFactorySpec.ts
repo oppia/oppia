@@ -20,18 +20,68 @@ import { CamelCaseToHyphensPipe } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
 
-const constants = require('constants.ts');
-
 describe('State Object Factory', () => {
-  let sof;
+  let sof: StateObjectFactory;
   let stateObject;
-  const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
     sof = TestBed.get(StateObjectFactory);
+
+    spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      next_content_id_index: 0,
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    }
+    );
 
     stateObject = {
       classifier_model_id: null,
@@ -84,64 +134,6 @@ describe('State Object Factory', () => {
         }
       }
     };
-  });
-
-  beforeAll(() => {
-    constants.NEW_STATE_TEMPLATE = {
-      classifier_model_id: null,
-      content: {
-        content_id: 'content',
-        html: ''
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
-      interaction: {
-        answer_groups: [],
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: {
-              unicode_str: 'Type your answer here.',
-              content_id: ''
-            }
-          }
-        },
-        default_outcome: {
-          dest: '(untitled state)',
-          feedback: {
-            content_id: 'default_outcome',
-            html: ''
-          },
-          param_changes: [],
-          labelled_as_correct: false,
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
-        },
-        hints: [],
-        solution: null,
-        id: 'TextInput'
-      },
-      next_content_id_index: 0,
-      param_changes: [],
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
-    };
-  });
-
-  afterAll(() => {
-    constants.NEW_STATE_TEMPLATE = oldNewStateTemplate;
   });
 
   it('should create a new state object from backend dict', () => {

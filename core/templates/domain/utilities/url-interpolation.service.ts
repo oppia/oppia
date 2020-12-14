@@ -43,6 +43,8 @@ export class UrlInterpolationService {
     private urlService: UrlService,
     private utilsService: UtilsService) {}
 
+  DEV_MODE: boolean = Constants.DEV_MODE;
+
   validateResourcePath(resourcePath: string): void {
     if (!resourcePath) {
       this.alertsService.fatalWarning('Empty path passed in method.');
@@ -61,7 +63,7 @@ export class UrlInterpolationService {
    * returns resource path with cache slug.
    */
   _getUrlWithSlug(resourcePath: string): string {
-    if (!Constants.DEV_MODE) {
+    if (!this.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');
         return (
@@ -78,7 +80,7 @@ export class UrlInterpolationService {
    * depending on dev/prod mode.
    */
   _getCompleteUrl(prefix: string, path: string): string {
-    if (Constants.DEV_MODE) {
+    if (this.DEV_MODE) {
       return prefix + this._getUrlWithSlug(path);
     } else {
       return '/build' + prefix + this._getUrlWithSlug(path);
@@ -207,7 +209,7 @@ export class UrlInterpolationService {
 
   getFullStaticAssetUrl(path: string): string {
     this.validateResourcePath(path);
-    if (Constants.DEV_MODE) {
+    if (this.DEV_MODE) {
       return this.urlService.getOrigin() + path;
     } else {
       return this.urlService.getOrigin() + '/build' + path;
@@ -233,7 +235,7 @@ export class UrlInterpolationService {
    */
   getDirectiveTemplateUrl(path: string): string {
     this.validateResourcePath(path);
-    if (Constants.DEV_MODE) {
+    if (this.DEV_MODE) {
       return '/templates' + this._getUrlWithSlug(path);
     } else {
       return '/build/templates' + this._getUrlWithSlug(path);
