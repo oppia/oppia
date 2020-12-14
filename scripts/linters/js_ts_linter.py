@@ -820,9 +820,14 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         # because it has a different structure than rest of the
                         # '*constants.ts' files because it inherits constants
                         # from 'assets/constants.ts'.
+                        # Likewise for the respective pairs:
+                        # 'interaction-specs.constants.ts' and
+                        # 'interaction_specs.json'.
                         angular_constants_nodes = (
                             node.expression.right.arguments[1].properties
-                            if filepath.endswith('app.constants.ts') else
+                            if filepath.endswith((
+                                'app.constants.ts',
+                                'interaction-specs.constants.ts')) else
                             node.expression.right.properties)
                     # We need a try-except block here beacuse we need a node
                     # that has properties exactly as we have defined above.
