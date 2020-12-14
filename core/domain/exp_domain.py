@@ -3074,6 +3074,39 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v41_dict_to_v42_dict(cls, states_dict):
+        """Converts from version 41 to 42. Version 42 Changes rule input types
+        for DragAndDropSortInput and ItemSelectionInput interactions to better
+        support translations. Specifically, the rule inputs will store content
+        ids of html rather than the raw html.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id not in [
+                'DragAndDropSortInput', 'ItemSelectionInput']:
+                continue
+            answer_group_dicts = state_dict['interaction']['answer_groups']
+            for answer_group_dict in answer_group_dicts:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    rule_inputs = rule_spec_dict['inputs']['x']
+
+                    if interaction_id == 'ItemSelectionInput':
+                        # All rule inputs for ItemSelectionInput are being
+                        # migrated from SetOfHtmlString to
+                        # SetOfTranslatableHtmlContentId.
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -4180,6 +4213,29 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v46_dict_to_v47_dict(cls, exploration_dict):
+        """Converts a v46 exploration dict into a v47 exploration dict.
+        Changes rule input types for DragAndDropSortInput and ItemSelectionInput
+        interactions to better support translations. Specifically, the rule
+        inputs will store content ids of html rather than the raw html.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v46.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v47.
+        """
+        exploration_dict['schema_version'] = 47
+
+        exploration_dict['states'] = cls._convert_states_v41_dict_to_v42_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 42
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4441,6 +4497,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v45_dict_to_v46_dict(
                 exploration_dict)
             exploration_schema_version = 46
+
+        if exploration_schema_version == 46:
+            exploration_dict = cls._convert_v46_dict_to_v47_dict(
+                exploration_dict)
+            exploration_schema_version = 47
 
         return (exploration_dict, initial_schema_version)
 
