@@ -291,7 +291,7 @@ describe('Chapter editor functionality', function() {
   beforeEach(async function() {
     await users.login(userEmail);
     await topicsAndSkillsDashboardPage.get();
-    await topicsAndSkillsDashboardPage.editTopic(topicName)
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
     await topicEditorPage.navigateToStoryWithTitle(storyName);
   });
 
