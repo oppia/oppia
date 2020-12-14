@@ -50,7 +50,7 @@ describe('Exploration stats service', function() {
   });
 
   it('should callout to backend api service for stats', fakeAsync(() => {
-    spyOn(explorationStatsBackendApiService, 'fetchExplorationStats')
+    spyOn(explorationStatsBackendApiService, 'fetchExplorationStatsAsync')
       .and.returnValue(Promise.resolve(this.explorationStats));
 
     const onSuccess = jasmine.createSpy('onSuccess');
@@ -66,7 +66,7 @@ describe('Exploration stats service', function() {
 
   it('should cache results after the first call', fakeAsync(() => {
     const backendApiSpy = (
-      spyOn(explorationStatsBackendApiService, 'fetchExplorationStats')
+      spyOn(explorationStatsBackendApiService, 'fetchExplorationStatsAsync')
         .and.returnValue(Promise.resolve(this.explorationStats)));
 
     const onSuccess = jasmine.createSpy('onSuccess');

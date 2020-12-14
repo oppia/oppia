@@ -76,7 +76,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     NotImplementedError,
                     r'The has_reference_to_user_id\(\) method is missing from '
                     r'the derived class. It should be implemented in the '
-                    r'derived class.'):
+                    r'derived class.'
+                ):
                     clazz.has_reference_to_user_id('any_id')
             else:
                 try:
