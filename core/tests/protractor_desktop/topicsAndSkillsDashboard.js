@@ -204,9 +204,7 @@ fdescribe('Topics and skills dashboard functionality', function() {
       correctAnswer: 'correct',
       explanation: 'It is correct'
     });
-    debugger;
     await skillEditorPage.saveQuestion();
-    debugger;
     await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
