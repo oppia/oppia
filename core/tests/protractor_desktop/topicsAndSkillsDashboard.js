@@ -29,7 +29,7 @@ var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 
 
-describe('Topics and skills dashboard functionality', function() {
+fdescribe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var topicEditorPage = null;
@@ -204,7 +204,9 @@ describe('Topics and skills dashboard functionality', function() {
       correctAnswer: 'correct',
       explanation: 'It is correct'
     });
+    debugger;
     await skillEditorPage.saveQuestion();
+    debugger;
     await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToSkillsTab();
