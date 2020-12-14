@@ -33,7 +33,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory.ts';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 describe('Interaction object factory', () => {
   let iof = null;

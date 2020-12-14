@@ -74,17 +74,17 @@ import {
 
 export interface InteractionBackendDict {
   'default_outcome': OutcomeBackendDict;
-  'answer_groups': AnswerGroupBackendDict[];
-  'confirmed_unclassified_answers': InteractionAnswer[];
+  'answer_groups': readonly AnswerGroupBackendDict[];
+  'confirmed_unclassified_answers': readonly InteractionAnswer[];
   'customization_args': InteractionCustomizationArgsBackendDict;
-  'hints': HintBackendDict[];
+  'hints': readonly HintBackendDict[];
   'id': string;
   'solution': SolutionBackendDict;
 }
 
 export class Interaction {
   answerGroups: AnswerGroup[];
-  confirmedUnclassifiedAnswers: InteractionAnswer[];
+  confirmedUnclassifiedAnswers: readonly InteractionAnswer[];
   customizationArgs: InteractionCustomizationArgs;
   defaultOutcome: Outcome;
   hints: Hint[];
@@ -92,7 +92,7 @@ export class Interaction {
   solution: Solution;
   constructor(
       answerGroups: AnswerGroup[],
-      confirmedUnclassifiedAnswers: InteractionAnswer[],
+      confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
       customizationArgs: InteractionCustomizationArgs,
       defaultOutcome: Outcome, hints: Hint[], id: string, solution: Solution) {
     this.answerGroups = answerGroups;
@@ -463,7 +463,7 @@ export class InteractionObjectFactory {
   }
 
   generateAnswerGroupsFromBackend(
-      answerGroupBackendDicts: AnswerGroupBackendDict[],
+      answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
       interactionId: string
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
@@ -473,7 +473,8 @@ export class InteractionObjectFactory {
     });
   }
 
-  generateHintsFromBackend(hintBackendDicts: HintBackendDict[]): Hint[] {
+  generateHintsFromBackend(
+      hintBackendDicts: readonly HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });

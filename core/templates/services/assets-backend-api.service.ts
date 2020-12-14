@@ -28,7 +28,7 @@ import { ImageFile } from 'domain/utilities/image-file.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-const Constants = require('constants.ts');
+import Constants from 'assets/constants';
 
 interface SaveAudioResponse {
   'filename': string;
