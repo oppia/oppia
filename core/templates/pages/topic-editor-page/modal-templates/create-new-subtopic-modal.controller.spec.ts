@@ -49,6 +49,7 @@ describe('Create new subtopic modal', function() {
       $uibModalInstance: $uibModalInstance,
       topic: topic
     });
+    ctrl.$onInit();
   }));
 
 
