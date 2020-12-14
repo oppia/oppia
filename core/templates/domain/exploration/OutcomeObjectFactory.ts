@@ -47,7 +47,7 @@ export class Outcome {
   constructor(
       dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
       paramChanges: readonly ParamChangeBackendDict[],
-    refresherExplorationId: string, missingPrerequisiteSkillId: string) {
+      refresherExplorationId: string, missingPrerequisiteSkillId: string) {
     this.dest = dest;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;

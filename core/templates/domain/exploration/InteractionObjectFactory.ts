@@ -461,7 +461,8 @@ export class InteractionObjectFactory {
   }
 
   generateAnswerGroupsFromBackend(
-      answerGroupBackendDicts: readonly AnswerGroupBackendDict[]): AnswerGroup[] {
+      answerGroupBackendDicts: readonly AnswerGroupBackendDict[]
+  ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
       return this.answerGroupFactory.createFromBackendDict(
@@ -469,7 +470,8 @@ export class InteractionObjectFactory {
     });
   }
 
-  generateHintsFromBackend(hintBackendDicts: readonly HintBackendDict[]): Hint[] {
+  generateHintsFromBackend(
+      hintBackendDicts: readonly HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });
