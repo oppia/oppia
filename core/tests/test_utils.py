@@ -220,7 +220,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         """
         for document in documents:
             assert 'id' in document
-            if self._DB[index_name] is None:
+            if index_name not in self._DB:
                 self._DB[index_name] = []
             deleted_doc = None
             for stored_doc in self._DB[index_name]:
