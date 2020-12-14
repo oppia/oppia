@@ -964,6 +964,69 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
                 ]
             )
 
+    def test_data_does_not_export_if_user_id_leaked(self):
+        # Update user settings to constants.
+        user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        user_settings = user_services.get_user_settings(user_id)
+        user_settings.last_agreed_to_terms = self.GENERIC_DATE
+        user_settings.last_logged_in = self.GENERIC_DATE
+
+        # For testing, set the user_settings.username to the user_id.
+        user_settings.username = user_settings.user_id
+
+        user_settings.validate()
+        user_models.UserSettingsModel(
+            id=user_settings.user_id,
+            email=user_settings.email,
+            role=user_settings.role,
+            username=user_settings.username,
+            normalized_username=user_settings.normalized_username,
+            last_agreed_to_terms=user_settings.last_agreed_to_terms,
+            last_started_state_editor_tutorial=(
+                user_settings.last_started_state_editor_tutorial),
+            last_started_state_translation_tutorial=(
+                user_settings.last_started_state_translation_tutorial),
+            last_logged_in=user_settings.last_logged_in,
+            last_edited_an_exploration=user_settings.last_edited_an_exploration,
+            last_created_an_exploration=(
+                user_settings.last_created_an_exploration),
+            profile_picture_data_url=user_settings.profile_picture_data_url,
+            default_dashboard=user_settings.default_dashboard,
+            creator_dashboard_display_pref=(
+                user_settings.creator_dashboard_display_pref),
+            user_bio=user_settings.user_bio,
+            subject_interests=user_settings.subject_interests,
+            first_contribution_msec=user_settings.first_contribution_msec,
+            preferred_language_codes=user_settings.preferred_language_codes,
+            preferred_site_language_code=(
+                user_settings.preferred_site_language_code),
+            preferred_audio_language_code=(
+                user_settings.preferred_audio_language_code),
+            deleted=user_settings.deleted
+        ).put()
+
+        constants_swap = self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', True)
+        time_swap = self.swap(
+            user_services, 'record_user_logged_in', lambda *args: None)
+
+        with constants_swap, time_swap:
+            data = self.get_custom_response(
+                '/export-account-handler', 'text/plain')
+
+            # Check downloaded zip file.
+            filename = 'oppia_takeout_data.zip'
+            self.assertEqual(
+                data.headers['Content-Disposition'],
+                'attachment; filename=%s' % filename)
+            zf_saved = zipfile.ZipFile(
+                python_utils.string_io(buffer_value=data.body))
+            self.assertEqual(
+                zf_saved.namelist(),
+                [
+                    'oppia_takeout_data.json',
+                ]
+            )
+
     def test_export_account_handler_disabled_logged_in(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_EXPORT', False):
             self.get_json('/export-account-handler', expected_status_int=404)

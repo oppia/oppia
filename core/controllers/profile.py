@@ -379,11 +379,18 @@ class ExportAccountHandler(base.BaseHandler):
         user_data = user_takeout_object.user_data
         user_images = user_takeout_object.user_images
 
+        # Ensure that the exported data does not contain a user ID.
+        user_data_json_string = json.dumps(user_data)
+        if str(self.user_id) in user_data_json_string:
+            user_data_json_string = 'There was an error while exporting your ' \
+                'data. Please contact admin@oppia.org to export your data.'
+            user_images = []
+
         # Create zip file.
         temp_file = python_utils.string_io()
         with zipfile.ZipFile(
             temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
-            zfile.writestr('oppia_takeout_data.json', json.dumps(user_data))
+            zfile.writestr('oppia_takeout_data.json', user_data_json_string)
             for image in user_images:
                 b64_png_no_header = image.b64_image_data.split(',')[1]
                 decoded_png = base64.b64decode(
