@@ -43,6 +43,7 @@ from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
@@ -1165,8 +1166,20 @@ tags: []
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
-                models.Registry, 'import_search_services',
-                lambda x: search_services_stub))
+                search_services, 'add_documents_to_index',
+                search_services_stub.add_documents_to_index))
+            stack.enter_context(self.swap(
+                search_services, 'delete_documents_from_index',
+                search_services_stub.delete_documents_from_index))
+            stack.enter_context(self.swap(
+                search_services, 'clear_index',
+                search_services_stub.clear_index))
+            stack.enter_context(self.swap(
+                search_services, 'get_document_from_index',
+                search_services_stub.get_document_from_index))
+            stack.enter_context(self.swap(
+                search_services, 'search',
+                search_services_stub.search))
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self._taskqueue_services_stub.create_http_task))
@@ -1203,7 +1216,6 @@ tags: []
         self.testbed.init_blobstore_stub()
         self.testbed.init_files_stub()
         self.testbed.init_memcache_stub()
-        self.testbed.init_search_stub()
         self.testbed.init_urlfetch_stub()
         self.testbed.init_user_stub()
 
