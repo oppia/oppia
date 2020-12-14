@@ -28,8 +28,6 @@ import { ImageFile } from 'domain/utilities/image-file.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-const Constants = require('constants.ts');
-
 interface SaveAudioResponse {
   'filename': string;
   'duration_secs': number;
@@ -52,16 +50,25 @@ export class AssetsBackendApiService {
   /** Map from asset filename to asset blob. */
   private assetsCache: Map<string, Blob> = new Map();
 
+  static get DEV_MODE(): boolean {
+    return AppConstants.DEV_MODE;
+  }
+  static get GCS_RESOURCE_BUCKET_NAME(): string {
+    return AppConstants.GCS_RESOURCE_BUCKET_NAME;
+  }
+
   constructor(
       private csrfTokenService: CsrfTokenService,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {
-    if (!Constants.DEV_MODE && !Constants.GCS_RESOURCE_BUCKET_NAME) {
+    if (!AssetsBackendApiService.DEV_MODE &&
+        !AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME) {
       throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
-    const urlPrefix = Constants.DEV_MODE ?
-      '/assetsdevhandler' :
-      'https://storage.googleapis.com/' + Constants.GCS_RESOURCE_BUCKET_NAME;
+    const urlPrefix = AssetsBackendApiService.DEV_MODE ?
+      '/assetsdevhandler' : (
+        'https://storage.googleapis.com/' +
+        AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME);
     this.downloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
   }

@@ -25,8 +25,6 @@ import { ImageFile } from 'domain/utilities/image-file.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-const Constants = require('constants.ts');
-
 describe('Assets Backend API Service', () => {
   describe('on dev mode', () => {
     let assetsBackendApiService: AssetsBackendApiService;
@@ -366,18 +364,11 @@ describe('Assets Backend API Service', () => {
   });
 
   describe('without dev mode settings', () => {
-    let oldGcsResourceBucketName: string = null;
-    let oldDevMode: boolean = null;
     beforeAll(() => {
-      oldGcsResourceBucketName = Constants.GCS_RESOURCE_BUCKET_NAME;
-      Constants.GCS_RESOURCE_BUCKET_NAME = '';
-      oldDevMode = Constants.DEV_MODE;
-      Constants.DEV_MODE = false;
-    });
-
-    afterAll(() => {
-      Constants.GCS_RESOURCE_BUCKET_NAME = oldGcsResourceBucketName;
-      Constants.DEV_MODE = oldDevMode;
+      spyOnProperty(AssetsBackendApiService, 'GCS_RESOURCE_BUCKET_NAME', 'get')
+        .and.returnValue('');
+      spyOnProperty(AssetsBackendApiService, 'DEV_MODE', 'get')
+        .and.returnValue(false);
     });
 
     beforeEach(() => {
@@ -399,16 +390,6 @@ describe('Assets Backend API Service', () => {
     let assetsBackendApiService: AssetsBackendApiService = null;
     let httpTestingController: HttpTestingController = null;
     const gcsPrefix: string = 'https://storage.googleapis.com/None-resources';
-    let oldDevMode: boolean = null;
-
-    beforeAll(() => {
-      oldDevMode = Constants.DEV_MODE;
-      Constants.DEV_MODE = false;
-    });
-
-    afterAll(() => {
-      Constants.DEV_MODE = oldDevMode;
-    });
 
     beforeEach(() => {
       TestBed.configureTestingModule({
@@ -417,6 +398,8 @@ describe('Assets Backend API Service', () => {
       });
       httpTestingController = TestBed.get(HttpTestingController);
       assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+      spyOnProperty(AssetsBackendApiService, 'DEV_MODE', 'get')
+        .and.returnValue(false);
     });
 
     it('should correctly formulate the download URL for audios', () => {
