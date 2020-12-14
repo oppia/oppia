@@ -76,7 +76,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             'version': 0,
             'practice_tab_is_displayed': False,
-            'meta_tag_content': ''
+            'meta_tag_content': '',
+            'page_title_fragment_for_web': ''
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
