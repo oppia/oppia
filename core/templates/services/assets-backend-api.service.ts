@@ -65,10 +65,9 @@ export class AssetsBackendApiService {
         !AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME) {
       throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
-    const urlPrefix = AssetsBackendApiService.DEV_MODE ?
-      '/assetsdevhandler' : (
-        'https://storage.googleapis.com/' +
-        AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME);
+    const urlPrefix = AssetsBackendApiService.DEV_MODE ? '/assetsdevhandler' : (
+      'https://storage.googleapis.com/' +
+      AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME);
     this.downloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
   }

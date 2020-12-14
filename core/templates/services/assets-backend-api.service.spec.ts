@@ -392,14 +392,16 @@ describe('Assets Backend API Service', () => {
     const gcsPrefix: string = 'https://storage.googleapis.com/None-resources';
 
     beforeEach(() => {
+      spyOnProperty(AssetsBackendApiService, 'DEV_MODE', 'get')
+        .and.returnValue(false);
+
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         providers: [AssetsBackendApiService]
       });
+
       httpTestingController = TestBed.get(HttpTestingController);
       assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-      spyOnProperty(AssetsBackendApiService, 'DEV_MODE', 'get')
-        .and.returnValue(false);
     });
 
     it('should correctly formulate the download URL for audios', () => {
