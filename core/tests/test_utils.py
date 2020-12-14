@@ -246,14 +246,15 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
             assert isinstance(doc_id, python_utils.BASESTRING)
         for doc_id in doc_ids:
             deleted_doc = None
-            for document in self._DB[index_name]:
-                if document['id'] == doc_id:
-                    deleted_doc = document
-                    break
-            if deleted_doc:
-                self._DB[index_name].remove(deleted_doc)
-            else:
-                raise Exception('Document id does not exist: %s' % doc_id)
+            if index_name in self._DB:
+                for document in self._DB[index_name]:
+                    if document['id'] == doc_id:
+                        deleted_doc = document
+                        break
+                if deleted_doc:
+                    self._DB[index_name].remove(deleted_doc)
+                else:
+                    raise Exception('Document id does not exist: %s' % doc_id)
 
     def clear_index(self, index_name):
         """Clears an index on the mock elastic search instance.
