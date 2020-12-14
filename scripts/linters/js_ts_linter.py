@@ -820,7 +820,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                         # because it has a different structure than rest of the
                         # '*constants.ts' files because it inherits constants
                         # from 'assets/constants.ts'.
-                        # Likewise for the respective pairs:
+                        # Likewise respectively for the pair of files:
                         # 'interaction-specs.constants.ts' and
                         # 'interaction_specs.json'.
                         angular_constants_nodes = (
