@@ -39,8 +39,8 @@ describe('URL Interpolation Service', () => {
     uis = TestBed.get(UrlInterpolationService);
     urlService = TestBed.get(UrlService);
     alertsService = TestBed.get(AlertsService);
-    uis.DEV_MODE = false;
-    urlService.getCurrentLocation = mockLocation;
+    spyOnProperty(uis, 'DEV_MODE', 'get').and.returnValue(false);
+    spyOn(urlService, 'getCurrentLocation').and.returnValue(mockLocation);
     alertsObject.alertsService = alertsService;
   });
 

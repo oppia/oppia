@@ -43,7 +43,7 @@ export class UrlInterpolationService {
     private urlService: UrlService,
     private utilsService: UtilsService) {}
 
-  DEV_MODE: boolean = Constants.DEV_MODE;
+  get DEV_MODE(): boolean { return Constants.DEV_MODE; }
 
   validateResourcePath(resourcePath: string): void {
     if (!resourcePath) {
