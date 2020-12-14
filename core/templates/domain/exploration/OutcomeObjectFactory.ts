@@ -96,7 +96,7 @@ export class OutcomeObjectFactory {
 
   createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
-      paramChanges: ParamChangeBackendDict[]): Outcome {
+      paramChanges: readonly ParamChangeBackendDict[]): Outcome {
     return new Outcome(
       dest,
       this.subtitledHtmlObjectFactory.createDefault(
