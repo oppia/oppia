@@ -50,13 +50,6 @@ export class AssetsBackendApiService {
   /** Map from asset filename to asset blob. */
   private assetsCache: Map<string, Blob> = new Map();
 
-  static get DEV_MODE(): boolean {
-    return AppConstants.DEV_MODE;
-  }
-  static get GCS_RESOURCE_BUCKET_NAME(): string {
-    return AppConstants.GCS_RESOURCE_BUCKET_NAME;
-  }
-
   constructor(
       private csrfTokenService: CsrfTokenService,
       private http: HttpClient,
@@ -70,6 +63,13 @@ export class AssetsBackendApiService {
       AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME);
     this.downloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
+  }
+
+  static get DEV_MODE(): boolean {
+    return AppConstants.DEV_MODE;
+  }
+  static get GCS_RESOURCE_BUCKET_NAME(): string {
+    return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }
 
   async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {

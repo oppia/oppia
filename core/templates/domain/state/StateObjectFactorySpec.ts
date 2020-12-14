@@ -17,12 +17,12 @@
  */
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
 
 describe('State Object Factory', () => {
   let sof: StateObjectFactory;
-  let stateObject;
+  let stateObject: StateBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -31,59 +31,6 @@ describe('State Object Factory', () => {
     sof = TestBed.get(StateObjectFactory);
 
     spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
-      classifier_model_id: null,
-      content: {
-        content_id: 'content',
-        html: ''
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
-      interaction: {
-        answer_groups: [],
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: {
-              unicode_str: 'Type your answer here.',
-              content_id: ''
-            }
-          }
-        },
-        default_outcome: {
-          dest: '(untitled state)',
-          feedback: {
-            content_id: 'default_outcome',
-            html: ''
-          },
-          param_changes: [],
-          labelled_as_correct: false,
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
-        },
-        hints: [],
-        solution: null,
-        id: 'TextInput'
-      },
-      next_content_id_index: 0,
-      param_changes: [],
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
-    }
-    );
-
-    stateObject = {
       classifier_model_id: null,
       content: {
         html: '',
@@ -126,6 +73,58 @@ describe('State Object Factory', () => {
           default_outcome: {}
         }
       },
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    });
+
+    stateObject = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: {
+              unicode_str: 'Type your answer here.',
+              content_id: ''
+            }
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      next_content_id_index: 0,
+      param_changes: [],
       solicit_answer_details: false,
       written_translations: {
         translations_mapping: {

@@ -445,7 +445,7 @@ export class InteractionObjectFactory {
         interactionDict.id,
         interactionDict.customization_args),
       interactionDict.default_outcome ? (
-        this.outcomeFactory.createFromBackendDict(
+        this.generateOutcomeFromBackend(
           interactionDict.default_outcome)) : null,
       this.generateHintsFromBackend(interactionDict.hints),
       interactionDict.id,
@@ -461,6 +461,11 @@ export class InteractionObjectFactory {
       return this.answerGroupFactory.createFromBackendDict(
         answerGroupBackendDict);
     });
+  }
+
+  generateOutcomeFromBackend(
+      outcomeBackendDict: OutcomeBackendDict): Outcome {
+    return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
   }
 
   generateHintsFromBackend(

@@ -33,11 +33,11 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class SiteAnalyticsService {
+  constructor(private windowRef: WindowRef) {}
+
   get CAN_SEND_ANALYTICS_EVENTS(): typeof constants.CAN_SEND_ANALYTICS_EVENTS {
     return constants.CAN_SEND_ANALYTICS_EVENTS;
   }
-
-  constructor(private windowRef: WindowRef) {}
 
   // For definitions of the various arguments, please see:
   // https://developers.google.com/analytics/devguides/collection/analyticsjs/events

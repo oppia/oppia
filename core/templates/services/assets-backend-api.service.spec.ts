@@ -394,12 +394,10 @@ describe('Assets Backend API Service', () => {
     beforeEach(() => {
       spyOnProperty(AssetsBackendApiService, 'DEV_MODE', 'get')
         .and.returnValue(false);
-
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
         providers: [AssetsBackendApiService]
       });
-
       httpTestingController = TestBed.get(HttpTestingController);
       assetsBackendApiService = TestBed.get(AssetsBackendApiService);
     });
