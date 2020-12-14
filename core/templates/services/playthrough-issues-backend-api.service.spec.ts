@@ -26,8 +26,8 @@ import { PlaythroughIssueBackendDict, PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 
 describe('PlaythroughIssuesBackendApiService', () => {
-  let httpTestingController: HttpTestingController = null;
-  let playthroughIssuesBackendApiService:
+  async let httpTestingController: HttpTestingController = null;
+  let playthroughIssuesBackendApiServiceAsync:
     PlaythroughIssuesBackendApiService = null;
   let playthroughIssueObjectFactory: PlaythroughIssueObjectFactory = null;
 
@@ -45,7 +45,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
     httpTestingController = TestBed.get(HttpTestingController);
-    playthroughIssuesBackendApiService = TestBed.get(
+    playthroughIssuesBackendApiServiceAsync = TestBed.get(
       PlaythroughIssuesBackendApiService);
     playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
   });
@@ -60,7 +60,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         let successHandler = jasmine.createSpy('success');
         let failureHandler = jasmine.createSpy('failure');
 
-        playthroughIssuesBackendApiService.fetchIssues('7', 1).then(
+        playthroughIssuesBackendApiServiceAsync.fetchIssues('7', 1).then(
           successHandler, failureHandler);
 
         let req = httpTestingController.expectOne(
@@ -80,7 +80,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
 
-        playthroughIssuesBackendApiService.fetchIssues('7', 1).then(
+        playthroughIssuesBackendApiServiceAsync.fetchIssues('7', 1).then(
           successHandler, failHandler);
 
         var req = httpTestingController.expectOne(
@@ -104,7 +104,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         let successHandler = jasmine.createSpy('success');
         let failureHandler = jasmine.createSpy('failure');
 
-        playthroughIssuesBackendApiService.fetchIssues('7', 1).then(
+        playthroughIssuesBackendApiServiceAsync.fetchIssues('7', 1).then(
           successHandler, failureHandler);
 
         let req = httpTestingController.expectOne(
@@ -119,7 +119,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         expect(failureHandler).not.toHaveBeenCalled();
 
         // Try to fetch another issue.
-        playthroughIssuesBackendApiService.fetchIssues('8', 1).then(
+        playthroughIssuesBackendApiServiceAsync.fetchIssues('8', 1).then(
           successHandler, failureHandler);
 
         flushMicrotasks();
@@ -145,7 +145,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         let successHandler = jasmine.createSpy('success');
         let failureHandler = jasmine.createSpy('failure');
 
-        playthroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
+        playthroughIssuesBackendApiServiceAsync.fetchPlaythrough('7', '1').then(
           successHandler, failureHandler);
         let req = httpTestingController.expectOne(
           '/playthroughdatahandler/7/1');
@@ -165,7 +165,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      playthroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
+      playthroughIssuesBackendApiServiceAsync.fetchPlaythrough('7', '1').then(
         successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
@@ -192,8 +192,8 @@ describe('PlaythroughIssuesBackendApiService', () => {
       let playthroughIssue = playthroughIssueObjectFactory
         .createFromBackendDict(backendIssues[0]);
 
-      playthroughIssuesBackendApiService.fetchIssues('7', 1)
-        .then(() => playthroughIssuesBackendApiService.resolveIssue(
+      playthroughIssuesBackendApiServiceAsync.fetchIssues('7', 1)
+        .then(() => playthroughIssuesBackendApiServiceAsync.resolveIssue(
           playthroughIssue, explorationId, 1))
         .then(successHandler, failureHandler);
       let req = httpTestingController.expectOne(
@@ -220,8 +220,8 @@ describe('PlaythroughIssuesBackendApiService', () => {
         let playthroughIssue = playthroughIssueObjectFactory
           .createFromBackendDict(backendIssues[0]);
 
-        playthroughIssuesBackendApiService.fetchIssues('7', 1)
-          .then(() => playthroughIssuesBackendApiService.resolveIssue(
+        playthroughIssuesBackendApiServiceAsync.fetchIssues('7', 1)
+          .then(() => playthroughIssuesBackendApiServiceAsync.resolveIssue(
             playthroughIssue, explorationId, 1))
           .then(successHandler, failHandler);
 
@@ -255,7 +255,7 @@ describe('PlaythroughIssuesBackendApiService', () => {
         let playthroughIssue = playthroughIssueObjectFactory
           .createFromBackendDict(backendIssues[0]);
 
-        playthroughIssuesBackendApiService.resolveIssue(
+        playthroughIssuesBackendApiServiceAsync.resolveIssue(
           playthroughIssue, explorationId, 1).then(successHandler, failHandler);
         let req = httpTestingController.expectOne(
           '/resolveissuehandler/' + explorationId);
