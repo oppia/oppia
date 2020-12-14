@@ -1301,6 +1301,114 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': '<p>The default outcome.</p>'
             })
 
+    def test_get_content_id_mapping_needing_translations_with_interaction_translations(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Placeholder'
+                }
+            },
+            'rows': {'value': 1}
+        }
+        init_state.update_interaction_customization_args(
+            state_interaction_cust_args)
+
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['Test']
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
+        init_state.update_interaction_hints(hints_list)
+
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            },
+        }
+
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
+        init_state.update_interaction_solution(solution)
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {},
+                'default_outcome': {},
+                'solution': {},
+                'feedback_1': {},
+                'ca_placeholder_0': {
+                    'hi': {
+                        'data_format': 'unicode',
+                        'translation': 'Placeholder translation',
+                        'needs_update': False
+                    }
+                }
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        init_state.update_written_translations(written_translations)
+
+        self.assertEqual(
+            init_state.get_content_id_mapping_needing_translations('hi'), {
+                'hint_1': '<p>hint one</p>',
+                'solution': '<p>hello_world is a string</p>',
+                'feedback_1': '<p>Feedback</p>',
+                'default_outcome': '<p>The default outcome.</p>'
+            })
+
     def test_add_translation_works_correctly(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
