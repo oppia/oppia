@@ -573,8 +573,8 @@
 
 
 # Authentication.
-/.firebaserc
-/firebase.json
+/.firebaserc @brianrodri
+/firebase.json @brianrodri
 
 
 # User Data Takeout.
