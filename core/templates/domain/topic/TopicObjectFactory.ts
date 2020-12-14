@@ -56,7 +56,7 @@ export interface TopicBackendDict {
   'page_title_fragment_for_web': string;
 }
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 export class Topic {
   _id: string;

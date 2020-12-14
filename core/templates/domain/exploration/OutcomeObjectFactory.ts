@@ -32,7 +32,7 @@ export interface OutcomeBackendDict {
   'dest': string;
   'feedback': SubtitledHtmlBackendDict;
   'labelled_as_correct': boolean;
-  'param_changes': ParamChangeBackendDict[];
+  'param_changes': readonly ParamChangeBackendDict[];
   'refresher_exploration_id': string;
   'missing_prerequisite_skill_id': string;
 }
@@ -41,13 +41,13 @@ export class Outcome {
   dest: string;
   feedback: SubtitledHtml;
   labelledAsCorrect: boolean;
-  paramChanges: ParamChangeBackendDict[];
+  paramChanges: readonly ParamChangeBackendDict[];
   refresherExplorationId: string;
   missingPrerequisiteSkillId: string;
   constructor(
       dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
-      paramChanges: ParamChangeBackendDict[], refresherExplorationId: string,
-      missingPrerequisiteSkillId: string) {
+      paramChanges: readonly ParamChangeBackendDict[],
+      refresherExplorationId: string, missingPrerequisiteSkillId: string) {
     this.dest = dest;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
@@ -96,7 +96,7 @@ export class OutcomeObjectFactory {
 
   createNew(
       dest: string, feedbackTextId: string, feedbackText: string,
-      paramChanges: ParamChangeBackendDict[]): Outcome {
+      paramChanges: readonly ParamChangeBackendDict[]): Outcome {
     return new Outcome(
       dest,
       this.subtitledHtmlObjectFactory.createDefault(

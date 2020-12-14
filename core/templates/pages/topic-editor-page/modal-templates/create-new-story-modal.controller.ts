@@ -26,7 +26,7 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
-const newStoryConstants = require('constants.ts');
+import newStoryConstants from 'assets/constants';
 
 angular.module('oppia').controller('CreateNewStoryModalController', [
   '$controller', '$rootScope', '$scope', '$uibModalInstance',

@@ -57,8 +57,8 @@ export class AdminFeaturesTabComponent implements OnInit {
   readonly filterTypeToContext: {
     [key in PlatformParameterFilterType]: {
       displayName: string,
-      operators: string[],
-      options?: string[],
+      operators: readonly string[],
+      options?: readonly string[],
       optionFilter?: (feature: PlatformParameter, option: string) => boolean;
       placeholder?: string;
       inputRegex?: RegExp;

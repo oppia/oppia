@@ -29,7 +29,7 @@ import { RubricObjectFactory } from
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 describe('Skill object factory', () => {
   let skillObjectFactory: SkillObjectFactory = null;

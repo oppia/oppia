@@ -83,7 +83,7 @@ require('default-passive-events');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-const sourceMappedStackTrace = require('sourcemapped-stacktrace');
+import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',

@@ -23,7 +23,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { ShortSkillSummary, ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 export interface SubtopicBackendDict {
   'id': number;
