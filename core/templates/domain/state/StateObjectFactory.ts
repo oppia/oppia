@@ -41,13 +41,13 @@ import {
   WrittenTranslationsObjectFactory
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 export interface StateBackendDict {
   'classifier_model_id': string;
   'content': SubtitledHtmlBackendDict;
   'interaction': InteractionBackendDict;
-  'param_changes': ParamChangeBackendDict[];
+  'param_changes': readonly ParamChangeBackendDict[];
   'recorded_voiceovers': RecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;
   'written_translations': WrittenTranslationsBackendDict;

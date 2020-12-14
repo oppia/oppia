@@ -25,8 +25,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 
 
-const Constants = require('constants.ts');
-const hashes = require('hashes.json');
+import Constants from 'assets/constants';
+import hashes from 'assets/hashes.json';
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
 // are string.
