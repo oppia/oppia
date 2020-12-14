@@ -228,6 +228,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
                     deleted_doc = stored_doc
             if deleted_doc:
                 self._DB[index_name].remove(deleted_doc)
+            # self.delete_documents_from_index([document['id']])
             self._DB[index_name].append(document)
 
     def delete_documents_from_index(self, doc_ids, index_name):
@@ -244,15 +245,11 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         assert isinstance(index_name, python_utils.BASESTRING)
         for doc_id in doc_ids:
             assert isinstance(doc_id, python_utils.BASESTRING)
-        for doc_id in doc_ids:
-            deleted_doc = None
             if index_name in self._DB:
-                for document in self._DB[index_name]:
-                    if document['id'] == doc_id:
-                        deleted_doc = document
-                        break
-                if deleted_doc:
-                    self._DB[index_name].remove(deleted_doc)
+                deleted_docs = filter(lambda x: x['id'] == doc_id, self._DB[index_name])
+                if deleted_docs:
+                    for doc in deleted_docs:
+                        self._DB[index_name].remove(doc)
                 else:
                     raise Exception('Document id does not exist: %s' % doc_id)
 
@@ -312,29 +309,28 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         """
 
         result_docs = []
+        result_doc_ids = set()
         resulting_offset = offset or 0
         assert query_string is not None
-        assert cursor is None
         if not index_name or index_name == '_all':
             for _, documents in self._DB:
                 for doc in documents:
-                    if len(result_docs) == size:
+                    if len(result_doc_ids) == size:
                         break
-                    if ids_only:
-                        result_docs.append(doc['id'])
-                    else:
+                    if not doc['id'] in result_doc_ids:
                         result_docs.append(doc)
-                    resulting_offset += 1
+                        result_doc_ids.add(doc['id'])
+                        resulting_offset += 1
         else:
             for doc in self._DB[index_name]:
-                if len(result_docs) == size:
+                if len(result_doc_ids) == size:
                     break
-                if ids_only:
-                    result_docs.append(doc['id'])
-                else:
+                if not doc['id'] in result_doc_ids:
                     result_docs.append(doc)
-                resulting_offset += 1
-
+                    result_doc_ids.add(doc['id'])
+                    resulting_offset += 1
+        if ids_only:
+            return list(result_doc_ids), resulting_offset
         return result_docs, resulting_offset
 
 
