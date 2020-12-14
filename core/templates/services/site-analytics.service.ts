@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 // Service for sending events to Google Analytics.
@@ -33,7 +33,9 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class SiteAnalyticsService {
-  CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;
+  get CAN_SEND_ANALYTICS_EVENTS(): typeof constants.CAN_SEND_ANALYTICS_EVENTS {
+    return constants.CAN_SEND_ANALYTICS_EVENTS;
+  }
 
   constructor(private windowRef: WindowRef) {}
 

@@ -41,54 +41,13 @@ import {
   WrittenTranslationsObjectFactory
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
-const constants = require('constants.ts');
-type NewStateTemplate = {
-  'classifier_model_id': null,
-  'content': {
-    'html': '',
-    'content_id': 'content'
-  },
-  'interaction': {
-    'id': null | string,
-    'customization_args': {},
-    'answer_groups': [],
-    'default_outcome': {
-      'dest': 'Introduction' | string,
-      'feedback': {
-        'content_id': 'default_outcome',
-        'html': ''
-      },
-      'labelled_as_correct': false,
-      'param_changes': [],
-      'refresher_exploration_id': null,
-      'missing_prerequisite_skill_id': null
-    },
-    'confirmed_unclassified_answers': [],
-    'hints': [],
-    'solution': null
-  },
-  'next_content_id_index': 0,
-  'param_changes': [],
-  'recorded_voiceovers': {
-    'voiceovers_mapping': {
-      'content': {},
-      'default_outcome': {}
-    }
-  },
-  'solicit_answer_details': false,
-  'written_translations': {
-    'translations_mapping': {
-      'content': {},
-      'default_outcome': {}
-    }
-  }
-};
+import constants from 'assets/constants';
 
 export interface StateBackendDict {
   'classifier_model_id': string;
   'content': SubtitledHtmlBackendDict;
   'interaction': InteractionBackendDict;
-  'param_changes': ParamChangeBackendDict[];
+  'param_changes': readonly ParamChangeBackendDict[];
   'recorded_voiceovers': RecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;
   'written_translations': WrittenTranslationsBackendDict;
@@ -163,7 +122,7 @@ export class StateObjectFactory {
     private subtitledHtmlObject: SubtitledHtmlObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
-  get NEW_STATE_TEMPLATE(): NewStateTemplate {
+  get NEW_STATE_TEMPLATE(): typeof constants.NEW_STATE_TEMPLATE {
     return constants.NEW_STATE_TEMPLATE;
   }
 

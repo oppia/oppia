@@ -28,7 +28,8 @@ describe('Site Analytics Service', () => {
   beforeEach(() => {
     sas = TestBed.get(SiteAnalyticsService);
     ws = TestBed.get(WindowRef);
-    sas.CAN_SEND_ANALYTICS_EVENTS = true;
+    spyOnProperty(sas, 'CAN_SEND_ANALYTICS_EVENTS', 'get')
+      .and.returnValue(true);
 
     ws.nativeWindow.ga = function() {};
     gaSpy = spyOn(ws.nativeWindow, 'ga').and.stub();
