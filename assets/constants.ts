@@ -5461,16 +5461,16 @@ export = {
   // Firebase project configurations. The "firebase" values can be found in the
   // Firebase Console.
   // IMPORTANT: The release coordinator is responsible for configuring this
-  // object before pushing to production.
+  // environment before pushing to production.
   "FIREBASE_ENVIRONMENT": {
     "production": false,
     "config": {
-      "apiKey": "TODO",
-      "authDomain": "TODO",
+      "apiKey": "",
+      "authDomain": "",
       "projectId": "dev-project-id",
-      "storageBucket": "TODO",
-      "messagingSenderId": "TODO",
-      "appId": "TODO"
+      "storageBucket": "",
+      "messagingSenderId": "",
+      "appId": ""
     }
   },
 

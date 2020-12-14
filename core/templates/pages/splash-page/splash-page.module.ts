@@ -74,6 +74,12 @@ const FIREBASE_UI_AUTH_CONFIG: firebaseui.auth.Config = {
   ],
   providers: [
     {
+      provide: USE_EMULATOR,
+      useValue: (
+        AppConstants.FIREBASE_ENVIRONMENT.production ? undefined :
+        ['localhost', 9099])
+    },
+    {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
       multi: true
@@ -83,20 +89,12 @@ const FIREBASE_UI_AUTH_CONFIG: firebaseui.auth.Config = {
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
-    },
-    {
-      provide: USE_EMULATOR,
-      useValue: (
-        AppConstants.FIREBASE_ENVIRONMENT.production ? undefined :
-        ['localhost', 9099])
-    },
+    }
   ]
 })
 class SplashPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {
-    console.log('<_<');
-  }
+  ngDoBootstrap() {}
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';

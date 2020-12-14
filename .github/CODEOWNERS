@@ -572,6 +572,11 @@
 /typings/tests/ @shavavo
 
 
+# Authentication.
+/.firebaserc
+/firebase.json
+
+
 # User Data Takeout.
 /core/domain/takeout_*.py @BenHenning @vojtechjelinek
 /core/domain/wipeout_*.py @BenHenning @vojtechjelinek
