@@ -43,7 +43,6 @@ from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
-from core.domain import search_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
@@ -56,6 +55,7 @@ from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain.search_services import search_services
 from core.platform import models
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
