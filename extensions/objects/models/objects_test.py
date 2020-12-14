@@ -928,3 +928,84 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
                 self.assertEqual(name.index('Translatable'), 0)
             else:
                 self.assertTrue('Translatable' not in name)
+
+    def test_translatable_required_methods(self):
+        mock_translatable_object_class = type(
+            python_utils.convert_to_bytes('mock_translatable_object_class'),
+            (objects.BaseTranslatableObject,),
+            {})
+
+        with self.assertRaisesRegexp(
+            NotImplementedError, 'Please Implement this method'):
+            mock_translatable_object_class.get_schema()
+
+        with self.assertRaisesRegexp(
+            NotImplementedError, 'Please Implement this method'):
+            mock_translatable_object_class.normalize({
+                'content_id': 'rule_input'
+            })
+
+    def test_base_translatable_object_normalization(self):
+        def mock_normalize_value(raw):
+            return raw
+
+        mock_translatable_object_class = type(
+            python_utils.convert_to_bytes('mock_translatable_object_class'),
+            (objects.BaseTranslatableObject,),
+            {'_normalize_value': mock_normalize_value})
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Expected content id to be a string'):
+            mock_translatable_object_class.normalize({
+                'content_id': 5
+            })
+
+
+class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        with self.assertRaisesRegexp(
+            TypeError, 'Invalid unicode string set'):
+            objects.TranslatableSetOfNormalizedString.normalize({
+                'content_id': 'rule_input',
+                'normalized_str_set': 5
+            })
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Invalid content unicode'):
+            objects.TranslatableSetOfNormalizedString.normalize({
+                'content_id': 'rule_input',
+                'normalized_str_set': ['1', 2, '3']
+            })
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Duplicate unicode found'):
+            objects.TranslatableSetOfNormalizedString.normalize({
+                'content_id': 'rule_input',
+                'normalized_str_set': ['1', '1']
+            })
+
+
+class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        with self.assertRaisesRegexp(
+            TypeError, 'Invalid unicode string set'):
+            objects.TranslatableSetOfUnicodeString.normalize({
+                'content_id': 'rule_input',
+                'unicode_str_set': 5
+            })
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Invalid content unicode'):
+            objects.TranslatableSetOfUnicodeString.normalize({
+                'content_id': 'rule_input',
+                'unicode_str_set': ['1', 2, '3']
+            })
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Duplicate unicode found'):
+            objects.TranslatableSetOfUnicodeString.normalize({
+                'content_id': 'rule_input',
+                'unicode_str_set': ['1', '1']
+            })
