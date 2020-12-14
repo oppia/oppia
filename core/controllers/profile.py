@@ -381,9 +381,9 @@ class ExportAccountHandler(base.BaseHandler):
 
         # Ensure that the exported data does not contain a user ID.
         user_data_json_string = json.dumps(user_data)
-        if str(self.user_id) in user_data_json_string:
-            user_data_json_string = 'There was an error while exporting your ' \
-                'data. Please contact admin@oppia.org to export your data.'
+        if python_utils.UNICODE(self.user_id) in user_data_json_string:
+            user_data_json_string = ('There was an error while exporting ' +
+                'data. Please contact admin@oppia.org to export your data.')
             user_images = []
 
         # Create zip file.
