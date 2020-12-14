@@ -25,8 +25,14 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap'
 ]);
 
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
+import { FirebaseUIModule, firebase, firebaseui } from 'firebaseui-angular';
+import { AppConstants } from 'app.constants';
+
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -37,11 +43,28 @@ import { OppiaAngularRootComponent } from
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 
+const FIREBASE_UI_AUTH_CONFIG: firebaseui.auth.Config = {
+  signInFlow: 'popup',
+  signInOptions: [
+    {
+      provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+      requireDisplayName: false
+    }
+  ],
+  privacyPolicyUrl: '/privacy-policy',
+  signInSuccessUrl: '/signup',
+  tosUrl: '/terms',
+};
+
 @NgModule({
   imports: [
     BrowserModule,
+    FormsModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    AngularFireModule.initializeApp(AppConstants.FIREBASE_ENVIRONMENT.config),
+    AngularFireAuthModule,
+    FirebaseUIModule.forRoot(FIREBASE_UI_AUTH_CONFIG)
   ],
   declarations: [
     OppiaAngularRootComponent
@@ -60,12 +83,20 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
-    }
+    },
+    {
+      provide: USE_EMULATOR,
+      useValue: (
+        AppConstants.FIREBASE_ENVIRONMENT.production ? undefined :
+        ['localhost', 9099])
+    },
   ]
 })
 class SplashPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+  ngDoBootstrap() {
+    console.log('<_<');
+  }
 }
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
