@@ -26,7 +26,7 @@ import { UtilsService } from 'services/utils.service';
 
 
 import Constants from 'assets/constants';
-import hashes from 'assets/hashes.json';
+const hashes = require('hashes.json');
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
 // are string.
