@@ -126,7 +126,7 @@ export class SearchService {
       selectedCategories: SelectionList,
       selectedLanguageCodes: SelectionList,
       successCallback:()=>void,
-      errorCallback:(reason: string)=>void): void {
+      errorCallback?:(reason: string)=>void): void {
     const queryUrl = this.getQueryUrl(
       this.getSearchUrlQueryString(
         searchQuery, selectedCategories, selectedLanguageCodes));
@@ -208,11 +208,11 @@ export class SearchService {
 
   loadMoreData(
       successCallback:(SearchResponseData, boolean)=>void,
-      failureCallback:(any)=>void): void {
+      errorCallback?:(any)=>void): void {
     // If a new query is still being sent, or the end of the page has been
     // reached, do not fetch more results.
     if (this.isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
-      successCallback(null, this.hasReachedEndOfPage());
+      errorCallback(this.hasReachedEndOfPage());
       return;
     }
 
@@ -230,9 +230,6 @@ export class SearchService {
       if (successCallback) {
         successCallback(response, this.hasReachedEndOfPage());
       }
-    },
-    (errorResponse) => {
-      failureCallback(errorResponse.error.error);
     });
   }
 
@@ -246,9 +243,9 @@ export class SearchService {
   }
 }
 
-export interface SelectionList {[key: string]: string}
+export interface SelectionList {[key: string]: boolean}
 
-export interface SelectionDetails {
+export interface FilterDetails {
   description: string;
   itemsName: string;
   masterList: {
@@ -256,7 +253,13 @@ export interface SelectionDetails {
     text: string;
   }[];
   selections: SelectionList;
+  numSelections: number;
   summary: string;
+}
+
+export interface SelectionDetails {
+  categories: FilterDetails;
+  languageCodes: FilterDetails;
 }
 
 // SELF QUESTION: should there be a backend-api interface defined for this?
