@@ -18,10 +18,10 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
 import { ServicesConstants } from 'services/services.constants';
 import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
+import { SearchBackendApiService, SelectionDetails, SelectionList } from './search-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +38,7 @@ export class SearchService {
   public numSearchesInProgress = 0;
 
   constructor(
-    private http: HttpClient) {
+    private searchBackendApiService: SearchBackendApiService) {
   }
 
   private getSuffixForQuery(
@@ -133,7 +133,7 @@ export class SearchService {
 
     this.isCurrentlyFetchingResults = true;
     this.numSearchesInProgress++;
-    this.http.get<SearchResponse>(queryUrl).toPromise()
+    this.searchBackendApiService.getSearchresults(queryUrl)
       .then((response) => {
         this.lastQuery = searchQuery;
         this.lastSelectedCategories = angular.copy(selectedCategories);
@@ -223,7 +223,7 @@ export class SearchService {
     }
 
     this.isCurrentlyFetchingResults = true;
-    this.http.get<SearchResponse>(queryUrl).toPromise().then((response) => {
+    this.searchBackendApiService.getSearchresults(queryUrl).then((response) => {
       this.searchCursor = response.search_cursor;
       this.isCurrentlyFetchingResults = false;
 
@@ -241,31 +241,6 @@ export class SearchService {
     EventEmitter<ExplorationSummaryBackendDict> {
     return this.initialSearchResultsLoadedEventEmitter;
   }
-}
-
-export interface SelectionList {[key: string]: boolean}
-
-export interface FilterDetails {
-  description: string;
-  itemsName: string;
-  masterList: {
-    id: string;
-    text: string;
-  }[];
-  selections: SelectionList;
-  numSelections: number;
-  summary: string;
-}
-
-export interface SelectionDetails {
-  categories: FilterDetails;
-  languageCodes: FilterDetails;
-}
-
-// SELF QUESTION: should there be a backend-api interface defined for this?
-export interface SearchResponse {
-  'search_cursor': string;
-  'activity_list': ExplorationSummaryBackendDict;
 }
 
 angular.module('oppia').factory(
