@@ -109,7 +109,7 @@ def report_pass(suite_name):
         'metadata': metadata,
     }
     try:
-        response = requests.post(
+        requests.post(
             PASS_REPORT_URL, json=payload,
             allow_redirects=False,
             headers={'report_key': REPORT_API_KEY})

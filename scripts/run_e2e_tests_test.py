@@ -33,6 +33,7 @@ import python_utils
 
 from scripts import build
 from scripts import common
+from scripts import flake_checker
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 
@@ -910,11 +911,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                         with get_parameters_swap, popen_swap:
                             with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
-                                        args=['--suite', 'mySuite'])
+                                    args=['--suite', 'mySuite'])
 
     def test_rerun_when_tests_fail(self):
-
-        mock_process = MockProcessClass()
 
         def mock_exit(unused_exit_code):
             return
@@ -942,8 +941,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_rerun_when_tests_flake(self):
-
-        mock_process = MockProcessClass()
 
         def mock_exit(unused_exit_code):
             return
@@ -1096,7 +1093,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                         with get_parameters_swap, popen_swap:
                             with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
-                                        args=['--suite', 'mySuite'])
+                                    args=['--suite', 'mySuite'])
 
     def test_start_tests_skip_build(self):
 
@@ -1214,7 +1211,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with modify_constants_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap:
+                    with wait_swap, report_flake_swap:
                         with get_parameters_swap, popen_swap:
                             with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
@@ -1393,7 +1390,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap:
+                    with wait_swap, report_flake_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
                             with get_chrome_driver_version_swap:
                                 run_e2e_tests.main(args=[
@@ -1520,7 +1517,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap:
+                    with wait_swap, report_flake_swap:
                         with get_parameters_swap, popen_swap:
                             with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
