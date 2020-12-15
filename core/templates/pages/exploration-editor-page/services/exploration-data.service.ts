@@ -124,7 +124,7 @@ export class ExplorationDataService {
       // We can safely remove the locally saved draft copy if it was saved
       // to the backend.
       this.localStorageService.removeExplorationDraft(this.explorationId);
-      successCallback();
+      successCallback({data: response});
     }, errorResponse => {
 
     });
