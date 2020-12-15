@@ -25,9 +25,12 @@ import { Subscription } from 'rxjs';
 angular.module('oppia').component('activityTilesInfinityGrid', {
   template: require('./activity-tiles-infinity-grid.component.html'),
   controller: [
-    '$scope', 'LoaderService', 'SearchService', 'WindowDimensionsService',
+    '$rootScope', '$scope' , 'LoaderService', 'SearchService',
+    'WindowDimensionsService',
     function(
-        $scope, LoaderService, SearchService, WindowDimensionsService) {
+        $rootScope, $scope, LoaderService, SearchService,
+        WindowDimensionsService
+    ) {
       var ctrl = this;
       ctrl.loadingMessage = '';
       ctrl.directiveSubscriptions = new Subscription();
@@ -35,14 +38,13 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
         if (!ctrl.loadingMessage && !ctrl.endOfPageIsReached) {
           ctrl.searchResultsAreLoading = true;
           SearchService.loadMoreData(function(data, endOfPageIsReached) {
-            ctrl.allActivitiesInOrder = (
-              ctrl.allActivitiesInOrder.concat(
-                data.activity_list));
-            ctrl.endOfPageIsReached = endOfPageIsReached;
+            if (data) {
+              ctrl.allActivitiesInOrder = (
+                ctrl.allActivitiesInOrder.concat(
+                  data.activity_list));
+            }
             ctrl.searchResultsAreLoading = false;
-          }, function(endOfPageIsReached) {
-            ctrl.endOfPageIsReached = endOfPageIsReached;
-            ctrl.searchResultsAreLoading = false;
+            $rootScope.$apply();
           });
         }
       };

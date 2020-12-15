@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,215 +16,258 @@
  * @fileoverview search service for activityTilesInfinityGrid
  */
 
-require('services/services.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable, EventEmitter } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-import { EventEmitter } from '@angular/core';
+import { ServicesConstants } from 'services/services.constants';
+import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
 
-angular.module('oppia').factory('SearchService', [
-  '$http', '$log', '$translate', 'SEARCH_DATA_URL',
-  function($http, $log, $translate, SEARCH_DATA_URL) {
-    var _lastQuery = null;
-    var _lastSelectedCategories = {};
-    var _lastSelectedLanguageCodes = {};
-    var _searchCursor = null;
-    var _isCurrentlyFetchingResults = false;
-    var numSearchesInProgress = 0;
-    var _searchBarLoadedEventEmitter = new EventEmitter();
-    var _initialSearchResultsLoadedEventEmitter = new EventEmitter();
-    // Appends a suffix to the query describing allowed category and language
-    // codes to filter on.
-    var _getSuffixForQuery =
-      function(selectedCategories, selectedLanguageCodes) {
-        var querySuffix = '';
+@Injectable({
+  providedIn: 'root'
+})
+export class SearchService {
+  private lastQuery: string = null;
+  private lastSelectedCategories: SelectionList = {};
+  private lastSelectedLanguageCodes: SelectionList = {};
+  private searchCursor: string = null;
+  private isCurrentlyFetchingResults = false;
+  private searchBarLoadedEventEmitter = new EventEmitter<string>();
+  private initialSearchResultsLoadedEventEmitter =
+    new EventEmitter<ExplorationSummaryBackendDict>();
+  public numSearchesInProgress = 0;
 
-        var _categories = '';
-        for (var key in selectedCategories) {
-          if (selectedCategories[key]) {
-            if (_categories) {
-              _categories += '" OR "';
-            }
-            _categories += key;
-          }
-        }
-        if (_categories) {
-          querySuffix += '&category=("' + _categories + '")';
-        }
-
-        var _languageCodes = '';
-        for (var key in selectedLanguageCodes) {
-          if (selectedLanguageCodes[key]) {
-            if (_languageCodes) {
-              _languageCodes += '" OR "';
-            }
-            _languageCodes += key;
-          }
-        }
-        if (_languageCodes) {
-          querySuffix += '&language_code=("' + _languageCodes + '")';
-        }
-
-        return querySuffix;
-      };
-
-    var hasReachedEndOfPage = function() {
-      return _searchCursor === null;
-    };
-
-    var updateSearchFields = function(
-        itemsType, urlComponent, selectionDetails) {
-      var itemCodeGroup = urlComponent.match(/=\("[A-Za-z%20" ]+"\)/);
-      var itemCodes = itemCodeGroup ? itemCodeGroup[0] : null;
-
-      var EXPECTED_PREFIX = '=("';
-      var EXPECTED_SUFFIX = '")';
-
-      if (!itemCodes ||
-          itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
-          itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
-            itemCodes.length - EXPECTED_SUFFIX.length) {
-        throw new Error(
-          'Invalid search query url fragment for ' +
-          itemsType + ': ' + urlComponent);
-      }
-
-      var items = itemCodes.substring(
-        EXPECTED_PREFIX.length, itemCodes.length - EXPECTED_SUFFIX.length
-      ).split('" OR "');
-
-      var selections = selectionDetails[itemsType].selections;
-      for (var i = 0; i < items.length; i++) {
-        selections[items[i]] = true;
-      }
-    };
-
-    var getQueryUrl = function(searchUrlQueryString) {
-      return SEARCH_DATA_URL + '?q=' + searchUrlQueryString;
-    };
-
-    return {
-      getSearchUrlQueryString: function(
-          searchQuery, selectedCategories, selectedLanguageCodes) {
-        return encodeURIComponent(searchQuery) +
-          _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
-      },
-      // Note that an empty query results in all activities being shown.
-      executeSearchQuery: function(
-          searchQuery, selectedCategories, selectedLanguageCodes,
-          successCallback) {
-        var queryUrl = getQueryUrl(
-          this.getSearchUrlQueryString(
-            searchQuery, selectedCategories, selectedLanguageCodes));
-
-        _isCurrentlyFetchingResults = true;
-        numSearchesInProgress++;
-        $http.get(queryUrl).then(function(response) {
-          var data = response.data;
-          _lastQuery = searchQuery;
-          _lastSelectedCategories = angular.copy(selectedCategories);
-          _lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
-          _searchCursor = data.search_cursor;
-          numSearchesInProgress--;
-
-          _initialSearchResultsLoadedEventEmitter.emit(data.activity_list);
-          _isCurrentlyFetchingResults = false;
-          var checkMismatch = function(searchQuery) {
-            var isMismatch = true;
-            $('.oppia-search-bar-input').each(function() {
-              if ((<string>$(this).val()).trim() === searchQuery) {
-                isMismatch = false;
-              }
-            });
-            return isMismatch;
-          };
-          if (checkMismatch(searchQuery)) {
-            $log.error('Mismatch');
-            $log.error('SearchQuery: ' + searchQuery);
-            $log.error('Input: ' + (
-              <string>$('.oppia-search-bar-input').val()).trim());
-          }
-        })['catch'](function() {
-          numSearchesInProgress--;
-        });
-
-        // Translate the new explorations loaded.
-        $translate.refresh();
-
-        if (successCallback) {
-          successCallback();
-        }
-      },
-      isSearchInProgress: function() {
-        return numSearchesInProgress > 0;
-      },
-      // The following takes in the url search component as an argument and the
-      // selectionDetails. It will update selectionDetails with the relevant
-      // fields that were extracted from the url. It returns the unencoded
-      // search query string.
-      updateSearchFieldsBasedOnUrlQuery: function(
-          urlComponent, selectionDetails) {
-        var urlQuery = urlComponent.substring('?q='.length);
-        // The following will split the urlQuery into 3 components:
-        // 1. query
-        // 2. categories (optional)
-        // 3. language codes (default to 'en').
-        var querySegments = urlQuery.split('&');
-
-        for (var i = 1; i < querySegments.length; i++) {
-          urlComponent = decodeURIComponent(querySegments[i]);
-
-          var itemsType = null;
-          if (urlComponent.indexOf('category') === 0) {
-            itemsType = 'categories';
-          } else if (urlComponent.indexOf('language_code') === 0) {
-            itemsType = 'languageCodes';
-          } else {
-            continue;
-          }
-
-          try {
-            updateSearchFields(itemsType, urlComponent, selectionDetails);
-          } catch (error) {
-            selectionDetails[itemsType].selections = {};
-          }
-        }
-
-        return decodeURIComponent(querySegments[0]);
-      },
-      getCurrentUrlQueryString: function() {
-        return this.getSearchUrlQueryString(
-          _lastQuery, _lastSelectedCategories, _lastSelectedLanguageCodes);
-      },
-      loadMoreData: function(successCallback, failureCallback) {
-        // If a new query is still being sent, or the end of the page has been
-        // reached, do not fetch more results.
-        if (_isCurrentlyFetchingResults || hasReachedEndOfPage()) {
-          failureCallback(hasReachedEndOfPage());
-          return;
-        }
-
-        var queryUrl = getQueryUrl(this.getCurrentUrlQueryString());
-
-        if (_searchCursor) {
-          queryUrl += '&cursor=' + _searchCursor;
-        }
-
-        _isCurrentlyFetchingResults = true;
-        $http.get(queryUrl).then(function(response) {
-          _searchCursor = response.data.search_cursor;
-          _isCurrentlyFetchingResults = false;
-
-          if (successCallback) {
-            successCallback(response.data, hasReachedEndOfPage());
-          }
-        });
-      },
-
-      get onSearchBarLoaded() {
-        return _searchBarLoadedEventEmitter;
-      },
-      get onInitialSearchResultsLoaded() {
-        return _initialSearchResultsLoadedEventEmitter;
-      }
-    };
+  constructor(
+    private http: HttpClient) {
   }
-]);
+
+  private getSuffixForQuery(
+      selectedCategories:SelectionList,
+      selectedLanguageCodes:SelectionList) {
+    let querySuffix = '';
+
+    let _categories = '';
+    for (let key in selectedCategories) {
+      if (selectedCategories[key]) {
+        if (_categories) {
+          _categories += '" OR "';
+        }
+        _categories += key;
+      }
+    }
+    if (_categories) {
+      querySuffix += '&category=("' + _categories + '")';
+    }
+
+    let _languageCodes = '';
+    for (let key in selectedLanguageCodes) {
+      if (selectedLanguageCodes[key]) {
+        if (_languageCodes) {
+          _languageCodes += '" OR "';
+        }
+        _languageCodes += key;
+      }
+    }
+    if (_languageCodes) {
+      querySuffix += '&language_code=("' + _languageCodes + '")';
+    }
+
+    return querySuffix;
+  }
+
+  hasReachedEndOfPage():boolean {
+    return this.searchCursor === null;
+  }
+
+  updateSearchFields(
+      itemsType:string, urlComponent:string, selectionDetails:SelectionDetails)
+      :void {
+    const itemCodeGroup = urlComponent.match(/=\("[A-Za-z%20" ]+"\)/);
+    const itemCodes = itemCodeGroup ? itemCodeGroup[0] : null;
+
+    const EXPECTED_PREFIX = '=("';
+    const EXPECTED_SUFFIX = '")';
+
+    if (!itemCodes ||
+        itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
+        itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
+          itemCodes.length - EXPECTED_SUFFIX.length) {
+      throw new Error(
+        'Invalid search query url fragment for ' +
+        itemsType + ': ' + urlComponent);
+    }
+
+    const items = itemCodes.substring(
+      EXPECTED_PREFIX.length, itemCodes.length - EXPECTED_SUFFIX.length
+    ).split('" OR "');
+
+    const selections = selectionDetails[itemsType].selections;
+    for (let i = 0; i < items.length; i++) {
+      selections[items[i]] = true;
+    }
+  }
+
+  getQueryUrl(searchUrlQueryString: string):string {
+    return ServicesConstants.SEARCH_DATA_URL + '?q=' + searchUrlQueryString;
+  }
+
+  getSearchUrlQueryString(
+      searchQuery:string,
+      selectedCategories:SelectionList,
+      selectedLanguageCodes:SelectionList):string {
+    return encodeURIComponent(searchQuery) +
+      this.getSuffixForQuery(selectedCategories, selectedLanguageCodes);
+  }
+
+
+  // Note that an empty query results in all activities being shown.
+  executeSearchQuery(
+      searchQuery:string,
+      selectedCategories: SelectionList,
+      selectedLanguageCodes: SelectionList,
+      successCallback:()=>void,
+      errorCallback:(reason: string)=>void): void {
+    const queryUrl = this.getQueryUrl(
+      this.getSearchUrlQueryString(
+        searchQuery, selectedCategories, selectedLanguageCodes));
+
+    this.isCurrentlyFetchingResults = true;
+    this.numSearchesInProgress++;
+    this.http.get<SearchResponse>(queryUrl).toPromise()
+      .then((response) => {
+        this.lastQuery = searchQuery;
+        this.lastSelectedCategories = angular.copy(selectedCategories);
+        this.lastSelectedLanguageCodes = angular.copy(selectedLanguageCodes);
+        this.searchCursor = response.search_cursor;
+        this.numSearchesInProgress--;
+
+        this.initialSearchResultsLoadedEventEmitter.emit(
+          response.activity_list);
+
+        this.isCurrentlyFetchingResults = false;
+      }, (errorResponse) => {
+        this.numSearchesInProgress--;
+        if (errorCallback) {
+          errorCallback(errorResponse.error.error);
+        }
+      });
+
+    if (successCallback) {
+      successCallback();
+    }
+  }
+
+  isSearchInProgress(): boolean {
+    return this.numSearchesInProgress > 0;
+  }
+
+  /**
+   * Takes in the url search component as an argument and the
+   * selectionDetails. It will update selectionDetails with the relevant
+   * fields that were extracted from the url.
+   * @returns the unencoded search query string.
+  */
+  updateSearchFieldsBasedOnUrlQuery(
+      urlComponent:string, selectionDetails:SelectionDetails): string {
+    var urlQuery = urlComponent.substring('?q='.length);
+    // The following will split the urlQuery into 3 components:
+    // 1. query
+    // 2. categories (optional)
+    // 3. language codes (default to 'en').
+    var querySegments = urlQuery.split('&');
+
+    for (var i = 1; i < querySegments.length; i++) {
+      urlComponent = decodeURIComponent(querySegments[i]);
+
+      var itemsType = null;
+      if (urlComponent.indexOf('category') === 0) {
+        itemsType = 'categories';
+      } else if (urlComponent.indexOf('language_code') === 0) {
+        itemsType = 'languageCodes';
+      } else {
+        continue;
+      }
+
+      try {
+        this.updateSearchFields(itemsType, urlComponent, selectionDetails);
+      } catch (error) {
+        selectionDetails[itemsType].selections = {};
+      }
+    }
+
+    return decodeURIComponent(querySegments[0]);
+  }
+
+  getCurrentUrlQueryString():string {
+    return this.getSearchUrlQueryString(
+      this.lastQuery,
+      this.lastSelectedCategories,
+      this.lastSelectedLanguageCodes
+    );
+  }
+
+  loadMoreData(
+      successCallback:(SearchResponseData, boolean)=>void,
+      failureCallback:(any)=>void): void {
+    // If a new query is still being sent, or the end of the page has been
+    // reached, do not fetch more results.
+    if (this.isCurrentlyFetchingResults || this.hasReachedEndOfPage()) {
+      successCallback(null, this.hasReachedEndOfPage());
+      return;
+    }
+
+    var queryUrl = this.getQueryUrl(this.getCurrentUrlQueryString());
+
+    if (this.searchCursor) {
+      queryUrl += '&cursor=' + this.searchCursor;
+    }
+
+    this.isCurrentlyFetchingResults = true;
+    this.http.get<SearchResponse>(queryUrl).toPromise().then((response) => {
+      this.searchCursor = response.search_cursor;
+      this.isCurrentlyFetchingResults = false;
+
+      if (successCallback) {
+        successCallback(response, this.hasReachedEndOfPage());
+      }
+    },
+    (errorResponse) => {
+      failureCallback(errorResponse.error.error);
+    });
+  }
+
+  get onSearchBarLoaded(): EventEmitter<string> {
+    return this.searchBarLoadedEventEmitter;
+  }
+
+  get onInitialSearchResultsLoaded():
+    EventEmitter<ExplorationSummaryBackendDict> {
+    return this.initialSearchResultsLoadedEventEmitter;
+  }
+}
+
+export interface SelectionList {[key: string]: string}
+
+export interface SelectionDetails {
+  description: string;
+  itemsName: string;
+  masterList: {
+    id: string;
+    text: string;
+  }[];
+  selections: SelectionList;
+  summary: string;
+}
+
+// SELF QUESTION: should there be a backend-api interface defined for this?
+export interface SearchResponse {
+  // eslint-disable-next-line camelcase
+  search_cursor: string;
+  // eslint-disable-next-line camelcase
+  activity_list: ExplorationSummaryBackendDict;
+}
+
+angular.module('oppia').factory(
+  'SearchService',
+  downgradeInjectable(SearchService)
+);
