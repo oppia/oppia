@@ -377,17 +377,17 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             }
         }
         if terms:
-            term_string = ' '.join(['"%s"' % term for term in terms])
+            term_string = ' '.join([term for term in terms])
             query['query']['bool']['must'].append(
                 {'multi_match': {'query': term_string}}
             )
         if categories:
-            category_string = ' '.join(['"%s"' % cat for cat in categories])
+            category_string = ' '.join([category for category in categories])
             query['query']['bool']['filter'].append(
                 {'match': {'category': category_string}}
             )
         if languages:
-            language_string = ' '.join(['"%s"' % lang for lang in languages])
+            language_string = ' '.join([language for language in languages])
             query['query']['bool']['filter'].append(
                 {'match': {'language_code': language_string}}
             )

@@ -285,19 +285,22 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         filters = query['query']['bool']['filter']
         terms = query['query']['bool']['must']
 
-        for fil in filters:
-            for _, v in fil['match']:
+        for f in filters:
+            for k, v in f['match'].items():
                 values = v.split(' ')
-                result_docs = [doc for doc in result_docs if doc['k'] in values]
+                print(k,values, result_docs[0][k])
+                result_docs = [doc for doc in result_docs if doc[k] in values]
 
-        filtered_docs = []
-        for term in terms:
-            for _, val in term:
-                values = val.split(' ')
-                for doc in result_docs:
-                    if any([value in json.dumps(doc) for value in values]):
-                        filtered_docs.append(doc)
-        return filtered_docs
+        if terms:
+            filtered_docs = []
+            for term in terms:
+                for _, v in term.items():
+                    values = v['query'].split(' ')
+                    for doc in result_docs:
+                        if all([value in json.dumps(doc) for value in values]):
+                            filtered_docs.append(doc)
+            result_docs = filtered_docs
+        return result_docs
 
     def reset(self):
         """Helper method that clears the mock database."""
