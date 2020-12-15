@@ -17,6 +17,8 @@
  * fields.
  */
 
+import { EventEmitter } from '@angular/core';
+
 require(
   'pages/contributor-dashboard-page/services/' +
   'contribution-opportunities-backend-api.service.ts');
@@ -27,6 +29,9 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
   function(
       $uibModal, ContributionOpportunitiesBackendApiService,
       UrlInterpolationService) {
+    var reloadOpportunitiesEventEmitter = new EventEmitter<void>();
+    var removeOpportunitiesEventEmitter = new EventEmitter<void>();
+
     var skillOpportunitiesCursor = null;
     var translationOpportunitiesCursor = null;
     var voiceoverOpportunitiesCursor = null;
@@ -34,32 +39,40 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     var moreTranslationOpportunitiesAvailable = true;
     var moreVoiceoverOpportunitiesAvailable = true;
 
-    var _getSkillOpportunities = function(cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
+    var _getSkillOpportunities = function(cursor) {
+      return ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
         cursor).then(({ opportunities, nextCursor, more }) => {
         skillOpportunitiesCursor = nextCursor;
         moreSkillOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
+        return {
+          opportunities: opportunities,
+          more: more
+        };
       });
     };
-    var _getTranslationOpportunities = function(
-        languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        languageCode, cursor).then(({ opportunities, nextCursor, more }) => {
-        translationOpportunitiesCursor = nextCursor;
-        moreTranslationOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
-      });
+    var _getTranslationOpportunities = function(languageCode, cursor) {
+      return ContributionOpportunitiesBackendApiService
+        .fetchTranslationOpportunities(
+          languageCode, cursor).then(({ opportunities, nextCursor, more }) => {
+          translationOpportunitiesCursor = nextCursor;
+          moreTranslationOpportunitiesAvailable = more;
+          return {
+            opportunities: opportunities,
+            more: more
+          };
+        });
     };
-    var _getVoiceoverOpportunities = function(
-        languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        languageCode, cursor
-      ).then(function({ opportunities, nextCursor, more }) {
-        voiceoverOpportunitiesCursor = nextCursor;
-        moreVoiceoverOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
-      });
+    var _getVoiceoverOpportunities = function(languageCode, cursor) {
+      return ContributionOpportunitiesBackendApiService
+        .fetchVoiceoverOpportunities(languageCode, cursor).then(
+          function({ opportunities, nextCursor, more }) {
+            voiceoverOpportunitiesCursor = nextCursor;
+            moreVoiceoverOpportunitiesAvailable = more;
+            return {
+              opportunities: opportunities,
+              more: more
+            };
+          });
     };
 
     var showRequiresLoginModal = function(argument) {
@@ -84,32 +97,34 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     };
 
     return {
-      getSkillOpportunities: function(successCallback) {
-        _getSkillOpportunities('', successCallback);
+      getSkillOpportunitiesAsync: async function() {
+        return _getSkillOpportunities('');
       },
-      getTranslationOpportunities: function(languageCode, successCallback) {
-        _getTranslationOpportunities(languageCode, '', successCallback);
+      getTranslationOpportunitiesAsync: async function(languageCode) {
+        return _getTranslationOpportunities(languageCode, '');
       },
-      getVoiceoverOpportunities: function(languageCode, successCallback) {
-        _getVoiceoverOpportunities(languageCode, '', successCallback);
+      getVoiceoverOpportunities: async function(languageCode) {
+        return _getVoiceoverOpportunities(languageCode, '');
       },
-      getMoreSkillOpportunities: function(successCallback) {
+      getMoreSkillOpportunitiesAsync: async function() {
         if (moreSkillOpportunitiesAvailable) {
-          _getSkillOpportunities(skillOpportunitiesCursor, successCallback);
+          return _getSkillOpportunities(skillOpportunitiesCursor);
         }
       },
-      getMoreTranslationOpportunities: function(languageCode, successCallback) {
+      getMoreTranslationOpportunitiesAsync: async function(languageCode) {
         if (moreTranslationOpportunitiesAvailable) {
-          _getTranslationOpportunities(
-            languageCode, translationOpportunitiesCursor, successCallback);
+          return _getTranslationOpportunities(
+            languageCode, translationOpportunitiesCursor);
         }
       },
-      getMoreVoiceoverOpportunities: function(languageCode, successCallback) {
+      getMoreVoiceoverOpportunities: async function(languageCode) {
         if (moreVoiceoverOpportunitiesAvailable) {
-          _getVoiceoverOpportunities(
-            languageCode, voiceoverOpportunitiesCursor, successCallback);
+          return _getVoiceoverOpportunities(
+            languageCode, voiceoverOpportunitiesCursor);
         }
       },
-      showRequiresLoginModal: showRequiresLoginModal
+      showRequiresLoginModal: showRequiresLoginModal,
+      reloadOpportunitiesEventEmitter: reloadOpportunitiesEventEmitter,
+      removeOpportunitiesEventEmitter: removeOpportunitiesEventEmitter,
     };
   }]);

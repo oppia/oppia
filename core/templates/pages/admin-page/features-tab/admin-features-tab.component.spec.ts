@@ -462,7 +462,7 @@ describe('Admin page feature tab', function() {
   });
 
   describe('server mode option filter', () => {
-    let options: string[];
+    let options: readonly string[];
     let optionFilter: (feature: PlatformParameter, option: string) => boolean;
 
     beforeEach(() => {
