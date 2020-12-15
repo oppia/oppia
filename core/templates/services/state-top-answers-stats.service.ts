@@ -76,7 +76,7 @@ export class StateTopAnswersStatsService {
           this.topAnswersStatsByStateName.set(
             stateName, new AnswerStatsEntry(
               answers[stateName], interactionIds[stateName]));
-          this.refreshAddressedInfo(states.getState(stateName));
+          this.refreshAddressedInfoAsync(states.getState(stateName));
         }
         this.resolveInitPromise();
       } catch (error) {
@@ -86,27 +86,27 @@ export class StateTopAnswersStatsService {
     return this.initPromise;
   }
 
-  getInitPromise(): Promise<void> {
+  async getInitPromiseAsync(): Promise<void> {
     return this.initPromise;
   }
 
-  getStateNamesWithStats(): string[] {
+  async getStateNamesWithStatsAsync(): Promise<string[]> {
     return [...this.topAnswersStatsByStateName.keys()];
   }
 
-  hasStateStats(stateName: string): boolean {
+  async hasStateStatsAsync(stateName: string): Promise<boolean> {
     return this.topAnswersStatsByStateName.has(stateName);
   }
 
-  getStateStats(stateName: string): AnswerStats[] {
-    if (!this.hasStateStats(stateName)) {
+  async getStateStatsAsync(stateName: string): Promise<AnswerStats[]> {
+    if (!this.hasStateStatsAsync(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }
     return [...this.topAnswersStatsByStateName.get(stateName).answers];
   }
 
-  getUnresolvedStateStats(stateName: string): AnswerStats[] {
-    return this.getStateStats(stateName).filter(a => !a.isAddressed);
+  async getUnresolvedStateStatsAsync(stateName: string):  Promise<AnswerStats[]> {
+    return this.getStateStatsAsync(stateName).filter(a => !a.isAddressed);
   }
 
   async getTopAnswersByStateNameAsync(): Promise<
@@ -116,18 +116,18 @@ export class StateTopAnswersStatsService {
       ([stateName, cachedStats]) => [stateName, cachedStats.answers]));
   }
 
-  onStateAdded(stateName: string): void {
+  async onStateAddedAsync(stateName: string):  Promise<void> {
     this.topAnswersStatsByStateName.set(
       stateName, new AnswerStatsEntry([], null));
   }
 
-  onStateDeleted(stateName: string): void {
+  async onStateDeletedAsync(stateName: string): Promise<void> {
     // ES2016 Map uses delete as a method name despite it being a reserved word.
     // eslint-disable-next-line dot-notation
     this.topAnswersStatsByStateName.delete(stateName);
   }
 
-  onStateRenamed(oldStateName: string, newStateName: string): void {
+  async onStateRenamedAsync(oldStateName: string, newStateName: string): Promise<void> {
     this.topAnswersStatsByStateName.set(
       newStateName, this.topAnswersStatsByStateName.get(oldStateName));
     // ES2016 Map uses delete as a method name despite it being a reserved word.
@@ -135,28 +135,28 @@ export class StateTopAnswersStatsService {
     this.topAnswersStatsByStateName.delete(oldStateName);
   }
 
-  onStateInteractionSaved(updatedState: State): void {
-    this.refreshAddressedInfo(updatedState);
+  async onStateInteractionSavedAsync(updatedState: State):Promise<void> {
+    this.refreshAddressedInfoAsync(updatedState);
   }
 
-  private refreshAddressedInfo(updatedState: State): void {
+  private refreshAddressedInfoAsync(updatedState: State): void {
     const stateName = updatedState.name;
 
     if (!this.topAnswersStatsByStateName.has(stateName)) {
       throw new Error(stateName + ' does not exist.');
     }
 
-    const stateStats = this.topAnswersStatsByStateName.get(stateName);
+    const stateStatsAsync = this.topAnswersStatsByStateName.get(stateName);
 
-    if (stateStats.interactionId !== updatedState.interaction.id) {
+    if (stateStatsAsync.interactionId !== updatedState.interaction.id) {
       this.topAnswersStatsByStateName.set(
         stateName, new AnswerStatsEntry([], updatedState.interaction.id));
     } else {
-      stateStats.answers.forEach(a => a.isAddressed = (
+      stateStatsAsync.answers.forEach(a => a.isAddressed = (
         this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
           stateName, updatedState, a.answer,
           this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-            stateStats.interactionId))));
+            stateStatsAsync.interactionId))));
     }
   }
 }
