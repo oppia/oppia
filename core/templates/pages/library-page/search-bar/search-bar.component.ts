@@ -146,17 +146,18 @@ angular.module('oppia').component('searchBar', {
       ctrl.onSearchQueryChangeExec = function() {
         SearchService.executeSearchQuery(
           ctrl.searchQuery, ctrl.selectionDetails.categories.selections,
-          ctrl.selectionDetails.languageCodes.selections);
-
-        var searchUrlQueryString = SearchService.getSearchUrlQueryString(
-          ctrl.searchQuery, ctrl.selectionDetails.categories.selections,
-          ctrl.selectionDetails.languageCodes.selections
-        );
-        if ($window.location.pathname === '/search/find') {
-          $location.url('/find?q=' + searchUrlQueryString);
-        } else {
-          $window.location.href = '/search/find?q=' + searchUrlQueryString;
-        }
+          ctrl.selectionDetails.languageCodes.selections, () => {
+            var searchUrlQueryString = SearchService.getSearchUrlQueryString(
+              ctrl.searchQuery, ctrl.selectionDetails.categories.selections,
+              ctrl.selectionDetails.languageCodes.selections
+            );
+            if ($window.location.pathname === '/search/find') {
+              $location.url('/find?q=' + searchUrlQueryString);
+            } else {
+              $window.location.href = '/search/find?q=' + searchUrlQueryString;
+            }
+            $rootScope.$apply();
+          });
       };
 
       var updateSearchFieldsBasedOnUrlQuery = function() {
