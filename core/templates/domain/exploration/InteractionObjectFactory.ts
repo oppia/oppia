@@ -461,16 +461,16 @@ export class InteractionObjectFactory {
     });
   }
 
-  createOutcomeFromBackendDict(
-      outcomeBackendDict: OutcomeBackendDict): Outcome {
-    return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
-  }
-
   createHintsFromBackendDict(
       hintBackendDicts: readonly HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });
+  }
+
+  createOutcomeFromBackendDict(
+      outcomeBackendDict: OutcomeBackendDict): Outcome {
+    return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
   }
 
   createSolutionFromBackendDict(
