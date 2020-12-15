@@ -116,7 +116,7 @@ class ContributionOpportunitiesHandler(base.BaseHandler):
         opportunities = []
         for topic in topics_with_skills:
             for skill_id in topic.get_all_skill_ids():
-                if len(opportunities) == feconf.OPPORTUNITIES_PAGE_SIZE:
+                if len(opportunities) == constants.OPPORTUNITIES_PAGE_SIZE:
                     break
                 if skill_id in id_to_skill_opportunity_dict:
                     skill_opportunity_dict = (
