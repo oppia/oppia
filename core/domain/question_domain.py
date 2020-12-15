@@ -841,7 +841,7 @@ class Question(python_utils.OBJECT):
                 self.new_content_ids.append(content_id)
                 return content_id
 
-        # As of Dec 2020, which is when this migration is to be run, only
+        # As of Jan 2021, which is when this migration is to be run, only
         # TextInput and SetInput have translatable rule inputs.
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id not in ['TextInput', 'SetInput']:

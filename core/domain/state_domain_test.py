@@ -1354,7 +1354,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input',
+                        'content_id': 'rule_input_Contains_4',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -1406,7 +1406,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     }
                 },
-                'rule_input': {}
+                'rule_input_Contains_4': {}
             }
         }
         written_translations = state_domain.WrittenTranslations.from_dict(

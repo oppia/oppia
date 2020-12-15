@@ -237,7 +237,8 @@ angular.module('oppia').directive('ruleEditor', [
                 ctrl.rule.inputs[varName] = angular.copy(
                   answerChoices[0].val);
               } else {
-                ctrl.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
+                ctrl.rule.inputs[varName] = angular.copy(
+                  DEFAULT_OBJECT_VALUES[varType]);
               }
 
               tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');

@@ -45,7 +45,7 @@ import { SolutionVerificationService } from 'pages/exploration-editor-page/edito
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 @Injectable({
   providedIn: 'root',
@@ -53,7 +53,8 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 export class ResponsesService {
   private _answerGroupsMemento: AnswerGroup[] = null;
   private _defaultOutcomeMemento: Outcome = null;
-  private _confirmedUnclassifiedAnswersMemento: InteractionAnswer[] = null;
+  private _confirmedUnclassifiedAnswersMemento: readonly InteractionAnswer[] = (
+    null);
   // Represents the current selected answer group, starting at index 0. If the
   // index equal to the number of answer groups (answerGroups.length), then it
   // is referring to the default outcome.
@@ -61,7 +62,7 @@ export class ResponsesService {
   private _activeRuleIndex: number = -1;
   private _answerGroups = null;
   private _defaultOutcome: Outcome = null;
-  private _confirmedUnclassifiedAnswers: InteractionAnswer[] = null;
+  private _confirmedUnclassifiedAnswers: readonly InteractionAnswer[] = null;
   private _answerChoices: AnswerChoice[] = null;
   private _answerGroupsChangedEventEmitter = new EventEmitter();
   private _initializeAnswerGroupsEventEmitter = new EventEmitter();
@@ -253,7 +254,7 @@ export class ResponsesService {
   getDefaultOutcome(): Outcome {
     return cloneDeep(this._defaultOutcome);
   }
-  getConfirmedUnclassifiedAnswers(): InteractionAnswer[] {
+  getConfirmedUnclassifiedAnswers(): readonly InteractionAnswer[] {
     return cloneDeep(this._confirmedUnclassifiedAnswers);
   }
   getAnswerChoices(): AnswerChoice[] {

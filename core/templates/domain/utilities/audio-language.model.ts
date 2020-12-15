@@ -19,15 +19,16 @@
 export interface AudioLanguageBackendDict {
   id: string;
   description: string;
-  relatedLanguages: string[];
+  relatedLanguages: readonly string[];
 }
 
 export class AudioLanguage {
   id: string;
   description: string;
-  relatedLanguages: string[];
+  relatedLanguages: readonly string[];
 
-  constructor(id: string, description: string, relatedLanguages: string[]) {
+  constructor(
+      id: string, description: string, relatedLanguages: readonly string[]) {
     this.id = id;
     this.description = description;
     this.relatedLanguages = relatedLanguages;

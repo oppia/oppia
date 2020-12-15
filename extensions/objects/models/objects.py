@@ -67,7 +67,7 @@ class BaseTranslatableObject(BaseObject):
 
     This is a superclass for objects that are translatable and thus require a
     content id. This class enforces that the object is a dictionary with a
-    content id field. The schema of actual value is determined by the
+    content id field. The schema of the actual value is determined by the
     _get_value_schema() method.
     """
 
@@ -78,7 +78,9 @@ class BaseTranslatableObject(BaseObject):
         Returns:
             list(dict). A list of properties that store the object value.
         """
-        raise NotImplementedError('Please Implement this method')
+        raise NotImplementedError(
+            'Subclasses of BaseTranslatableObject should implement '
+            '_get_value_schema().')
 
     @staticmethod
     def _normalize_value(raw):
@@ -92,11 +94,13 @@ class BaseTranslatableObject(BaseObject):
             dict. A normalized translatable Python object with its values
             normalized.
         """
-        raise NotImplementedError('Please Implement this method')
+        raise NotImplementedError(
+            'Subclasses of BaseTranslatableObject should implement '
+            '_normalize_value().')
 
     @classmethod
     def get_schema(cls):
-        """Returns the object schema.
+        """Returns the full object schema.
 
         Returns:
             dict. The object schema.
@@ -106,8 +110,8 @@ class BaseTranslatableObject(BaseObject):
             'properties': [{
                 'name': 'content_id',
                 # The default content id is none. However, it should be
-                # populated before being saved. The normalization method has
-                # validation checks for this).
+                # populated before being saved. The The normalize() method has
+                # validation checks for this.
                 'schema': {'type': 'unicode_or_none'}
             }] + cls._get_value_schema()
         }
@@ -124,7 +128,7 @@ class BaseTranslatableObject(BaseObject):
             dict. The normalized object.
 
         Raises:
-            TypeError. Cannot convert to LogicQuestion schema.
+            TypeError. Error while normalizing.
         """
         if not isinstance(raw['content_id'], python_utils.BASESTRING):
             raise TypeError(

@@ -1305,7 +1305,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input',
+                        'content_id': 'rule_input_Contains_5',
                         'normalized_str_set': ['Test']
                     }
                 },

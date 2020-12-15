@@ -324,7 +324,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input',
+                        'content_id': 'rule_input_Contains_4',
                         'normalized_str_set': ['Test']
                     }
                 },
@@ -379,6 +379,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
                     'state_name': 'Introduction',
                     'new_value': [answer_group_dict]
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'Introduction',
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
+                    'new_value': 4
                 }),
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
