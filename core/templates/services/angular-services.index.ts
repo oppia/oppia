@@ -298,6 +298,7 @@ import { QuestionsListService } from 'services/questions-list.service';
 import { SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
+import { SearchBackendApiService } from 'services/search-backend-api.service';
 import { SearchService } from 'services/search.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
@@ -552,6 +553,7 @@ export const angularServices: [string, unknown][] = [
   ['SchemaFormSubmittedService', SchemaFormSubmittedService],
   ['SchemaUndefinedLastElementService', SchemaUndefinedLastElementService],
   ['SearchExplorationsBackendApiService', SearchExplorationsBackendApiService],
+  ['SearchBackendApiService', SearchBackendApiService],
   ['SearchService', SearchService],
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],
