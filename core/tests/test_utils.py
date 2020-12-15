@@ -221,9 +221,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         for document in documents:
             assert 'id' in document
             if index_name not in self._DB:
-            
                 self._DB[index_name] = []
-            print(index_name)
             self._DB[index_name].append(document)
 
     def delete_documents_from_index(self, doc_ids, index_name):
@@ -241,11 +239,11 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         if index_name in self._DB:
             for doc_id in doc_ids:
                 assert isinstance(doc_id, python_utils.BASESTRING)
-                docs = [d for d in self._DB[index_name] if d["id"] != doc_id]
-                if len(self._DB[index_name] ) != len(docs):
+                docs = [d for d in self._DB[index_name] if d['id'] != doc_id]
+                if len(self._DB[index_name]) != len(docs):
                     self._DB[index_name] = docs
                 else:
-                    raise Exception( 'Document id does not exist: %s' % doc_id )
+                    raise Exception('Document id does not exist: %s' % doc_id)
 
     def clear_index(self, index_name):
         """Clears an index on the mock elastic search instance.
@@ -270,6 +268,35 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         for document in self._DB[index_name]:
             if document['id'] == doc_id:
                 return document
+
+    def _filter_search(self, query_string, result_docs):
+        """Helper method that returns filtered search results
+
+        Args:
+            query_string: str.
+            result_docs: list. A list of documents represented as dicts.
+
+        Returns:
+            list. A list of documents represented as dicts.
+        """
+
+        query = json.loads(query_string)
+        filters = query['query']['bool']['filter']
+        terms = query['query']['bool']['must']
+
+        for fil in filters:
+            for _, v in fil['match']:
+                values = v.split(' ')
+                result_docs = [doc for doc in result_docs if doc['k'] in values]
+
+        filtered_docs = []
+        for term in terms:
+            for _, val in term:
+                values = val.split(' ')
+                for doc in result_docs:
+                    if any([value in json.dumps(doc) for value in values]):
+                        filtered_docs.append(doc)
+        return filtered_docs
 
     def search(
             self, query_string, index_name, cursor=None, offset=0,
@@ -303,24 +330,31 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         """
 
         result_docs = []
-        result_doc_ids = []
+        result_doc_ids = set()
         resulting_offset = None
+
+        assert cursor is None
         assert query_string is not None
+
         if not index_name or index_name == '_all':
             for _, documents in self._DB:
                 for doc in documents:
                     if not doc['id'] in result_doc_ids:
                         result_docs.append(doc)
-                        result_doc_ids.append(doc['id'])
+                        result_doc_ids.add(doc['id'])
         else:
             for doc in self._DB[index_name]:
                 if not doc['id'] in result_doc_ids:
                     result_docs.append(doc)
-                    result_doc_ids.append(doc['id'])
+                    result_doc_ids.add(doc['id'])
+
+        if query_string != '':
+            result_docs = self._filter_search(query_string, result_docs)
+
         if offset + size < len(result_docs):
             resulting_offset = offset + size
         if ids_only:
-            result_docs = result_doc_ids
+            result_docs = [d['id'] for d in result_docs]
         if resulting_offset:
             return result_docs[offset:resulting_offset], resulting_offset
         else:

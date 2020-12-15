@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import json
 import logging
 import os
 import re
@@ -355,6 +356,44 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
                 '"%s"' % language for language in languages]) + ')'
         return query
 
+    def _create_elastic_search_query(self, terms, categories, languages):
+        """Creates elastic search query from list of arguments.
+
+        Args:
+            terms: list(str). A list of terms to be added in the query.
+            categories: list(str). A list of categories to be added in the
+                query.
+            languages: list(str). A list of languages to be added in the query.
+
+        Returns:
+            str. A search query string.
+        """
+        query = {
+            'query': {
+                'bool': {
+                    'must': [],
+                    'filter': [],
+                }
+            }
+        }
+        if terms:
+            term_string = ' '.join(['"%s"' % term for term in terms])
+            query['query']['bool']['must'].append(
+                {'multi_match': {'query': term_string}}
+            )
+        if categories:
+            category_string = ' '.join(['"%s"' % cat for cat in categories])
+            query['query']['bool']['filter'].append(
+                {'match': {'category': category_string}}
+            )
+        if languages:
+            language_string = ' '.join(['"%s"' % lang for lang in languages])
+            query['query']['bool']['filter'].append(
+                {'match': {'language_code': language_string}}
+            )
+
+        return json.dumps(query)
+
     def test_get_exploration_summaries_with_no_query(self):
         # An empty query should return all explorations.
         (exp_ids, search_cursor) = (
@@ -425,45 +464,46 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     def test_search_exploration_summaries(self):
         # Search within the 'Architecture' category.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query([], ['Architecture'], []))
+            self._create_elastic_search_query([], ['Architecture'], []))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Search for explorations in Finnish.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query([], [], ['fi']))
+            self._create_elastic_search_query([], [], ['fi']))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_1, self.EXP_ID_5])
 
         # Search for Finnish explorations in the 'Architecture' category.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query([], ['Architecture'], ['fi']))
+            self._create_elastic_search_query([], ['Architecture'], ['fi']))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_1])
 
         # Search for explorations containing 'Oppia'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['Oppia'], [], []))
+            self._create_elastic_search_query(['Oppia'], [], []))
         self.assertEqual(
             sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5])
 
         # Search for explorations containing 'Oppia' and 'Introduce'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['Oppia', 'Introduce'], [], []))
+            self._create_elastic_search_query(['Oppia', 'Introduce'], [], []))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3])
 
         # Search for explorations containing 'England' in English.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['England'], [], ['en']))
+            self._create_elastic_search_query(['England'], [], ['en']))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0])
 
         # Search for explorations containing 'in'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['in'], [], []))
+            self._create_elastic_search_query(['in'], [], []))
         self.assertEqual(
             sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3, self.EXP_ID_6])
 
         # Search for explorations containing 'in' in the 'Architecture' and
         # 'Welcome' categories.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['in'], ['Architecture', 'Welcome'], []))
+            self._create_elastic_search_query(
+                ['in'], ['Architecture', 'Welcome'], []))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3])
 
     def test_exploration_summaries_pagination_in_filled_search_results(self):
@@ -539,7 +579,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             observed_log_messages,
             [
                 'Search index contains stale exploration ids: '
-                '1_fi_arch_sillat_suomi, 0_en_arch_bridges_in_england',
+                '0_en_arch_bridges_in_england, 1_fi_arch_sillat_suomi',
                 'Could not fulfill search request for query string ; at '
                 'least 1 retries were needed.'
             ]

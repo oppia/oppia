@@ -168,7 +168,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
         else:
             logging.error(
                 'Search index contains stale exploration ids: %s' %
-                ', '.join(invalid_exp_ids))
+                ', '.join(sorted(invalid_exp_ids)))
 
     if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
             and search_cursor is not None):
