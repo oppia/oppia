@@ -169,12 +169,12 @@ class TasksTests(test_utils.EmailTestBase):
 
                 # Create suggestion from user A to user B.
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.exploration.id, 1,
                     self.user_id_a, change, 'test description')
                 threadlist = feedback_services.get_all_threads(
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.exploration.id, True)
                 thread_id = threadlist[0].id
 

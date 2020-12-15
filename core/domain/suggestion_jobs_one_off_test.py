@@ -103,8 +103,8 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
         }
 
         suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, self.skill_id, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, self.skill_id, 1,
             self.albert_id, suggestion_change, 'test description')
 
         self.assertEqual(
@@ -192,8 +192,8 @@ class QuestionSuggestionMigrationJobManagerTests(test_utils.GenericTestBase):
         }
 
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             exp_id, 1, self.albert_id, add_translation_change_dict,
             'test description')
 
@@ -320,8 +320,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'generate_new_thread_id',
             self.mock_generate_new_exploration_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, add_translation_change_dict, 'test description')
         answer_group = {
@@ -424,8 +424,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         }
         suggestion_dict_with_math = {
             'suggestion_id': 'skill2.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill2',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -451,8 +451,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_with_math['change'],
                 'test description')
@@ -550,8 +550,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             'generate_new_thread_id',
             self.mock_generate_new_exploration_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, change_dict, 'test description')
 
@@ -671,8 +671,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
         }
         suggestion_dict_without_math = {
             'suggestion_id': 'skill2.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill2',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -698,8 +698,8 @@ class SuggestionMathRteAuditOneOffJobTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict_without_math['change'],
                 'test description')
@@ -811,14 +811,14 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
 
             suggestion1 = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, change1, 'test description')
 
             suggestion2 = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, change2, 'test description')
 
@@ -878,8 +878,8 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
 
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, change1, 'test description')
 
@@ -927,8 +927,8 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
 
             suggestion = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, change1, 'test description')
 
@@ -969,8 +969,8 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id_1, change1, 'test description')
 
@@ -989,8 +989,8 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
                 exp_domain.Exploration, 'get_content_html',
                 self.MockExploration.get_content_html):
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id_1, 1, self.author_id_1,
                     change2, 'test description')
 
@@ -1109,8 +1109,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             'generate_new_thread_id',
             self.mock_generate_new_exploration_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, add_translation_change_dict, 'test description')
         answer_group = {
@@ -1208,8 +1208,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         }
         suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -1235,8 +1235,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict['change'], 'test description')
         job_id = (
@@ -1366,8 +1366,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             'generate_new_thread_id',
             self.mock_generate_new_exploration_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, change_dict, 'test description')
 
@@ -1465,8 +1465,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             'generate_new_thread_id',
             self.mock_generate_new_exploration_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, change_dict, 'test description')
 
@@ -1579,8 +1579,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         }
         suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -1606,8 +1606,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict['change'], 'test description')
 
@@ -1733,8 +1733,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
         }
         suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -1760,8 +1760,8 @@ class SuggestionMathMigrationOneOffJobTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, suggestion_dict['change'], 'test description')
 
@@ -1959,8 +1959,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -1983,8 +1983,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
     def test_migrate_language_code_for_translation_suggestions(self):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
-            suggestion_type=suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -2008,8 +2008,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
     def test_migrate_language_code_for_question_suggestions(self):
         suggestion_models.GeneralSuggestionModel(
             id=self.SKILL_THREAD_ID,
-            suggestion_type=suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            target_type=suggestion_models.TARGET_TYPE_SKILL,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
             target_id='skill_1',
             target_version_at_submission=feconf.CURRENT_STATE_SCHEMA_VERSION,
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -2034,8 +2034,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         # Create an add question suggestion.
         suggestion_models.GeneralSuggestionModel(
             id=self.SKILL_THREAD_ID,
-            suggestion_type=suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            target_type=suggestion_models.TARGET_TYPE_SKILL,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
             target_id='skill_1',
             target_version_at_submission=feconf.CURRENT_STATE_SCHEMA_VERSION,
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -2049,8 +2049,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         # Create a translate content suggestion.
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
-            suggestion_type=suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -2087,8 +2087,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, self.add_question_change_dict,
                 'test description')
@@ -2108,8 +2108,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, self.add_question_change_dict,
                 'test description')
@@ -2136,8 +2136,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
                 exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
                     self.author_id, self.edit_state_content_change_dict,
                     'test description')
@@ -2158,8 +2158,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
                     exp_domain.Exploration, 'get_content_html',
                     self.MockExploration.get_content_html):
                     suggestion_services.create_suggestion(
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        feconf.ENTITY_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
                         self.author_id, self.add_translation_change_dict,
                         'test description')
@@ -2173,8 +2173,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_skill_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 'skill_1', feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, self.add_question_change_dict,
                 'test description')
@@ -2186,8 +2186,8 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJobTests(
         # Create an add question suggestion with an invalid score category.
         suggestion_models.GeneralSuggestionModel(
             id=self.SKILL_THREAD_ID,
-            suggestion_type=suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            target_type=suggestion_models.TARGET_TYPE_SKILL,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
             target_id='skill_1',
             target_version_at_submission=feconf.CURRENT_STATE_SCHEMA_VERSION,
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -2285,8 +2285,8 @@ class PopulateContributionStatsOneOffJobTests(
             self.mock_get_exploration_by_id):
             edit_state_content_suggestion = (
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
                     self.author_id, edit_state_content_change_dict,
                     'test description')
@@ -2313,8 +2313,8 @@ class PopulateContributionStatsOneOffJobTests(
                 self.MockExploration.get_content_html):
                 translation_suggestion = (
                     suggestion_services.create_suggestion(
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                        suggestion_models.TARGET_TYPE_EXPLORATION,
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                        feconf.ENTITY_TYPE_EXPLORATION,
                         self.target_id, self.target_version_at_submission,
                         self.author_id, add_translation_change_dict,
                         'test description')
@@ -2342,8 +2342,8 @@ class PopulateContributionStatsOneOffJobTests(
         }
 
         question_suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description')
@@ -2745,8 +2745,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
@@ -2773,8 +2773,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
@@ -2794,8 +2794,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
@@ -2823,8 +2823,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_REJECTED,
@@ -2852,8 +2852,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
@@ -2875,8 +2875,8 @@ class PopulateFinalReviewerIdOneOffJobTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.EXPLORATION_THREAD_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,

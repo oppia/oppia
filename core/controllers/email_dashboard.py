@@ -28,8 +28,6 @@ import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-current_user_services = models.Registry.import_current_user_services()
-
 
 class EmailDashboardPage(base.BaseHandler):
     """Page to submit query and show past queries."""

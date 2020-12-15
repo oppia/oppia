@@ -52,7 +52,7 @@ class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted or item.suggestion_type != (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
             return
 
         try:
@@ -121,10 +121,10 @@ class SuggestionSvgFilenameValidationOneOffJob(
 
     @staticmethod
     def map(item):
-        if item.target_type != suggestion_models.TARGET_TYPE_EXPLORATION:
+        if item.target_type != feconf.ENTITY_TYPE_EXPLORATION:
             return
         if item.suggestion_type != (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             return
         suggestion = suggestion_services.get_suggestion_from_model(item)
         html_string_list = suggestion.get_all_html_content_strings()
@@ -255,18 +255,18 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
         # suggestion type is not queryable by language, since ndb automatically
         # sets properties that aren't intialized to None.
         if item.deleted or item.language_code or item.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             return
 
         suggestion = suggestion_services.get_suggestion_from_model(item)
         if suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
             # Set the language code to be the language of the question.
             suggestion.change.question_dict['language_code'] = (
                 constants.DEFAULT_LANGUAGE_CODE)
             suggestion.language_code = constants.DEFAULT_LANGUAGE_CODE
         elif suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             # Set the language code to be the language of the translation.
             suggestion.language_code = suggestion.change.language_code
         # Validate the suggestion before updating the storage model.
@@ -322,7 +322,7 @@ class PopulateContributionStatsOneOffJob(
             # Contributor Dashboard or if the suggestion is not currently in
             # review.
             if item.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT) or (
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT) or (
                         item.status != suggestion_models.STATUS_IN_REVIEW):
                 return
             suggestion = suggestion_services.get_suggestion_from_model(item)
@@ -397,10 +397,10 @@ class PopulateContributionStatsOneOffJob(
             # Update the suggestion counts.
             else:
                 if item_category == (
-                        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                        feconf.SUGGESTION_TYPE_ADD_QUESTION):
                     stats_model.question_suggestion_count = count_value
                 elif item_category == (
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                     (
                         stats_model
                         .translation_suggestion_counts_by_lang_code[
