@@ -273,11 +273,12 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         """Helper method that returns filtered search results
 
         Args:
-            query_string: str.
-            result_docs: list. A list of documents represented as dicts.
+            query_string: str. A JSON-encoded string representation of the
+                dictionary search definition that uses Query DSL.
+            result_docs: list(dict). A list of documents represented as dicts.
 
         Returns:
-            list. A list of documents represented as dicts.
+            list(dict). A list of documents represented as dicts.
         """
 
         query = json.loads(query_string)
@@ -297,6 +298,11 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
                     if any([value in json.dumps(doc) for value in values]):
                         filtered_docs.append(doc)
         return filtered_docs
+
+    def reset(self):
+        """Helper method that clears the mock database."""
+
+        self._DB.clear()
 
     def search(
             self, query_string, index_name, cursor=None, offset=0,
@@ -333,8 +339,9 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         result_doc_ids = set()
         resulting_offset = None
 
-        #TODO(shubha-rajan): This block will make tests pass when the caller passes in a cursor instead of an offset. 
-        # Remove once migration to ElasticSearch is complete
+        # TODO(shubha-rajan): This block will make tests pass when the caller
+        # passes in a cursor instead of an offset.
+        # Remove once migration to ElasticSearch is complete.
         if cursor and not offset:
             offset = cursor
         elif not cursor and not offset:
@@ -1191,6 +1198,7 @@ tags: []
                 defaultTestResult() method) and used instead.
         """
         search_services_stub = ElasticSearchServicesStub()
+        search_services_stub.reset()
         memory_cache_services_stub = MemoryCacheServicesStub()
         memory_cache_services_stub.flush_cache()
 
