@@ -936,11 +936,11 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
             {})
 
         with self.assertRaisesRegexp(
-            NotImplementedError, 'Please Implement this method'):
+            NotImplementedError, 'Subclasses of BaseTranslatableObject should'):
             mock_translatable_object_class.get_schema()
 
         with self.assertRaisesRegexp(
-            NotImplementedError, 'Please Implement this method'):
+            NotImplementedError, 'Subclasses of BaseTranslatableObject should'):
             mock_translatable_object_class.normalize({
                 'content_id': 'rule_input'
             })

@@ -3036,7 +3036,7 @@ class Exploration(python_utils.OBJECT):
                 return content_id
 
         for state_dict in states_dict.values():
-            # As of Dec 2020, which is when this migration is to be run, only
+            # As of Jan 2021, which is when this migration is to be run, only
             # TextInput and SetInput have translatable rule inputs.
             interaction_id = state_dict['interaction']['id']
             if interaction_id not in ['TextInput', 'SetInput']:

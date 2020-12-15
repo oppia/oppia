@@ -123,7 +123,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 'rule_type': 'Equals',
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input',
+                        'content_id': 'rule_input_Equals_4',
                         'normalized_str_set': ['abc']
                     }
                 },
@@ -149,7 +149,13 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             'property_name': (
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
             'new_value': interaction_answer_groups
-        })]
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
+            'new_value': 4
+        }), ]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
