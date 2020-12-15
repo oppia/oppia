@@ -97,6 +97,8 @@
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.spec.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
+    "core/templates/domain/classifier/classifier.model.ts",
+    "core/templates/domain/classifier/classifier.model.spec.ts"
   ],
   "include": ["typings/*.ts"]
 }
