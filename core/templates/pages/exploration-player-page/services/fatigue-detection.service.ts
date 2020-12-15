@@ -71,42 +71,44 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   providedIn: 'root'
 })
 
-export class FatigueDetectionService{
-  private submissionTimesMsec: number[]=[];
+export class FatigueDetectionService {
+  private submissionTimesMsec: number[] = [];
   private SPAM_COUNT_THRESHOLD: number = 4;
-  private SPAM_WINDOW_MSEC:number = 10000;
-  private windowStartTime:number;
-  private windowEndTime:number;
+  private SPAM_WINDOW_MSEC: number = 10000;
+  private windowStartTime: number;
+  private windowEndTime: number;
 
-  constructor(private ngbModal: NgbModal){}
+  constructor(private ngbModal: NgbModal) { }
 
-  recordSubmissionTimestamp(): void{
+  recordSubmissionTimestamp(): void {
     this.submissionTimesMsec.push((new Date()).getTime());
-    console.log(this.submissionTimesMsec)
   }
   isSubmittingTooFast(): boolean {
     if (this.submissionTimesMsec.length >= this.SPAM_COUNT_THRESHOLD) {
       this.windowStartTime = this.submissionTimesMsec.shift();
-      this.windowEndTime = this.submissionTimesMsec[this.submissionTimesMsec.length - 1];
-      if (this.windowEndTime.valueOf() - this.windowStartTime.valueOf() < this.SPAM_WINDOW_MSEC) {
+      this.windowEndTime =
+        this.submissionTimesMsec[this.submissionTimesMsec.length - 1];
+      if (this.windowEndTime.valueOf() - this.windowStartTime.valueOf()
+        < this.SPAM_WINDOW_MSEC) {
         return true;
       }
     }
     return false;
   }
 
-  displayTakeBreakMessage():void {
+  displayTakeBreakMessage(): void {
     this.ngbModal.open(
       'pages/exploration-player-page/templates/take-break-modal.template.html',
-      { backdrop: 'static'
-    }).result.then(function() {}, function() {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+      {
+        backdrop: 'static'
+      }).result.then(function () { }, function () {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
   }
 
-  reset():void {
+  reset(): void {
     this.submissionTimesMsec = [];
   }
 

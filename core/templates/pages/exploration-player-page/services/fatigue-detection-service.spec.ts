@@ -19,12 +19,12 @@
 
 
 import { TestBed } from '@angular/core/testing';
-import {FatigueDetectionService} from 'pages/exploration-player-page/services/fatigue-detection.service';
+import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
 
 
 describe('Fatigue detection service', () => {
 
-  let fatigueDetectionService : FatigueDetectionService;
+  let fatigueDetectionService: FatigueDetectionService;
   beforeEach(() => {
     fatigueDetectionService = TestBed.get(FatigueDetectionService);
   });
@@ -35,13 +35,13 @@ describe('Fatigue detection service', () => {
     jasmine.clock().mockDate();
   });
 
-  afterEach(() =>{
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
   describe('isSubmittingTooFast', () => {
     it('should return true for 4 or more submissions in under 10 seconds',
-    () => {
+      () => {
         fatigueDetectionService.recordSubmissionTimestamp();
         jasmine.clock().tick(100);
         fatigueDetectionService.recordSubmissionTimestamp();
@@ -57,7 +57,7 @@ describe('Fatigue detection service', () => {
       });
 
     it('should return false for 4 or more submissions in over 10 seconds',
-    () => {
+      () => {
         fatigueDetectionService.recordSubmissionTimestamp();
         jasmine.clock().tick(100);
         fatigueDetectionService.recordSubmissionTimestamp();
