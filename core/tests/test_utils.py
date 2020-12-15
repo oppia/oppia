@@ -252,7 +252,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
             index_name: str. The name of the index to clear.
         """
         assert isinstance(index_name, python_utils.BASESTRING)
-        self._DB[index_name].clear()
+        del self._DB[index_name][:]
 
     def get_document_from_index(self, doc_id, index_name):
         """Get the document with the given ID from the given index.
@@ -269,19 +269,17 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
             if document['id'] == doc_id:
                 return document
 
-    def _filter_search(self, query_string, result_docs):
+    def _filter_search(self, query, result_docs):
         """Helper method that returns filtered search results
 
         Args:
-            query_string: str. A JSON-encoded string representation of the
-                dictionary search definition that uses Query DSL.
+            query: dict. A dictionary search definition that uses Query DSL.
             result_docs: list(dict). A list of documents represented as dicts.
 
         Returns:
             list(dict). A list of documents represented as dicts.
         """
 
-        query = json.loads(query_string)
         filters = query['query']['bool']['filter']
         terms = query['query']['bool']['must']
 
@@ -368,8 +366,12 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
                     result_docs.append(doc)
                     result_doc_ids.add(doc['id'])
 
-        if query_string != '':
-            result_docs = self._filter_search(query_string, result_docs)
+        try:
+            query = json.loads(query_string)
+        except ValueError:
+            pass
+        else:
+            result_docs = self._filter_search(query, result_docs)
 
         if offset + size < len(result_docs):
             resulting_offset = offset + size
@@ -1190,6 +1192,8 @@ tags: []
         # context manager over run().
         self._taskqueue_services_stub = TaskqueueServicesStub(self)
 
+        self._search_services_stub = ElasticSearchServicesStub()
+
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
 
@@ -1204,27 +1208,26 @@ tags: []
                 None, a temporary result object is created (by calling the
                 defaultTestResult() method) and used instead.
         """
-        search_services_stub = ElasticSearchServicesStub()
-        search_services_stub.reset()
+
         memory_cache_services_stub = MemoryCacheServicesStub()
         memory_cache_services_stub.flush_cache()
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
                 search_services, 'add_documents_to_index',
-                search_services_stub.add_documents_to_index))
+                self._search_services_stub.add_documents_to_index))
             stack.enter_context(self.swap(
                 search_services, 'delete_documents_from_index',
-                search_services_stub.delete_documents_from_index))
+                self._search_services_stub.delete_documents_from_index))
             stack.enter_context(self.swap(
                 search_services, 'clear_index',
-                search_services_stub.clear_index))
+                self._search_services_stub.clear_index))
             stack.enter_context(self.swap(
                 search_services, 'get_document_from_index',
-                search_services_stub.get_document_from_index))
+                self._search_services_stub.get_document_from_index))
             stack.enter_context(self.swap(
                 search_services, 'search',
-                search_services_stub.search))
+                self._search_services_stub.search))
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self._taskqueue_services_stub.create_http_task))
@@ -1279,6 +1282,7 @@ tags: []
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
         self.signup_superadmin_user()
+        self._search_services_stub.reset()
 
     def tearDown(self):
         datastore_services.delete_multi(
