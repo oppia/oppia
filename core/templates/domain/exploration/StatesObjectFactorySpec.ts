@@ -27,10 +27,8 @@ import { SubtitledUnicode } from
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 
-const constants = require('constants.ts');
-
 describe('States Object Factory', () => {
-  let sof = null;
+  let sof: StateObjectFactory = null;
   let ssof = null;
   let statesDict = null;
   let newState = null;
@@ -39,7 +37,6 @@ describe('States Object Factory', () => {
   let statesWithCyclicOutcomeDict = null;
   let statesWithAudioDict = null;
   let vof = null;
-  const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,6 +45,55 @@ describe('States Object Factory', () => {
     ssof = TestBed.get(StatesObjectFactory);
     sof = TestBed.get(StateObjectFactory);
     vof = TestBed.get(VoiceoverObjectFactory);
+    spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: new SubtitledUnicode('Type your answer here.', '')
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      next_content_id_index: 0,
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    }
+    );
 
     newState = {
       classifier_model_id: null,
@@ -456,60 +502,6 @@ describe('States Object Factory', () => {
     };
   });
 
-  beforeAll(() => {
-    constants.NEW_STATE_TEMPLATE = {
-      classifier_model_id: null,
-      content: {
-        content_id: 'content',
-        html: ''
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      },
-      interaction: {
-        answer_groups: [],
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: 1
-          },
-          placeholder: {
-            value: new SubtitledUnicode('Type your answer here.', '')
-          }
-        },
-        default_outcome: {
-          dest: '(untitled state)',
-          feedback: {
-            content_id: 'default_outcome',
-            html: ''
-          },
-          param_changes: [],
-          labelled_as_correct: false,
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
-        },
-        hints: [],
-        solution: null,
-        id: 'TextInput'
-      },
-      next_content_id_index: 0,
-      param_changes: [],
-      solicit_answer_details: false,
-      written_translations: {
-        translations_mapping: {
-          content: {},
-          default_outcome: {}
-        }
-      }
-    };
-  });
-
-  afterAll(() => {
-    constants.NEW_STATE_TEMPLATE = oldNewStateTemplate;
-  });
 
   it('should create a new state given a state name and set ' +
     'that state to a terminal state', () => {
