@@ -156,7 +156,6 @@ angular.module('oppia').component('searchBar', {
             } else {
               $window.location.href = '/search/find?q=' + searchUrlQueryString;
             }
-            $rootScope.$apply();
           });
       };
 

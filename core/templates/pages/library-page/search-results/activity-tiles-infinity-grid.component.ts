@@ -47,7 +47,6 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
           }, function(endOfPageIsReached) {
             ctrl.endOfPageIsReached = endOfPageIsReached;
             ctrl.searchResultsAreLoading = false;
-            $rootScope.$apply();
           });
         }
       };
