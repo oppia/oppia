@@ -288,7 +288,6 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         for f in filters:
             for k, v in f['match'].items():
                 values = v.split(' ')
-                print(k,values, result_docs[0][k])
                 result_docs = [doc for doc in result_docs if doc[k] in values]
 
         if terms:
@@ -297,7 +296,12 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
                 for _, v in term.items():
                     values = v['query'].split(' ')
                     for doc in result_docs:
-                        if all([value in json.dumps(doc) for value in values]):
+                        strs = [val for val in doc.values() if isinstance(
+                            val, python_utils.BASESTRING)]
+                        words = []
+                        for s in strs:
+                            words += s.split(' ')
+                        if all([value in words for value in values]):
                             filtered_docs.append(doc)
             result_docs = filtered_docs
         return result_docs
