@@ -264,10 +264,8 @@ export interface SelectionDetails {
 
 // SELF QUESTION: should there be a backend-api interface defined for this?
 export interface SearchResponse {
-  // eslint-disable-next-line camelcase
-  search_cursor: string;
-  // eslint-disable-next-line camelcase
-  activity_list: ExplorationSummaryBackendDict;
+  'search_cursor': string;
+  'activity_list': ExplorationSummaryBackendDict;
 }
 
 angular.module('oppia').factory(
