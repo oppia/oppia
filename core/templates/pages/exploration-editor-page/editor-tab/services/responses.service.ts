@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,463 +17,525 @@
  * answer groups.
  */
 
-require('domain/exploration/OutcomeObjectFactory.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
-  'answer-groups-cache.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
-  'solution-validity.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
-  'solution-verification.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+import cloneDeep from 'lodash/cloneDeep';
 
 import { EventEmitter } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ResponsesService', [
-  'AlertsService', 'AnswerGroupsCacheService',
-  'LoggerService', 'OutcomeObjectFactory',
-  'SolutionValidityService', 'SolutionVerificationService',
-  'StateEditorService', 'StateInteractionIdService',
-  'StateSolutionService', 'COMPONENT_NAME_DEFAULT_OUTCOME',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
-  'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
-  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INTERACTION_SPECS',
-  function(
-      AlertsService, AnswerGroupsCacheService,
-      LoggerService, OutcomeObjectFactory,
-      SolutionValidityService, SolutionVerificationService,
-      StateEditorService, StateInteractionIdService,
-      StateSolutionService, COMPONENT_NAME_DEFAULT_OUTCOME,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE,
-      INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
-      INFO_MESSAGE_SOLUTION_IS_VALID, INTERACTION_SPECS) {
-    var _answerGroupsMemento = null;
-    var _defaultOutcomeMemento = null;
-    var _confirmedUnclassifiedAnswersMemento = null;
-    // Represents the current selected answer group, starting at index 0. If the
-    // index equal to the number of answer groups (answerGroups.length), then it
-    // is referring to the default outcome.
-    var _activeAnswerGroupIndex = null;
-    var _activeRuleIndex = -1;
-    var _answerGroups = null;
-    var _defaultOutcome = null;
-    var _confirmedUnclassifiedAnswers = null;
-    var _answerChoices = null;
-    var _answerGroupsChangedEventEmitter = new EventEmitter();
-    var _initializeAnswerGroupsEventEmitter = new EventEmitter();
+import { AlertsService } from 'services/alerts.service';
+import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
+import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AppConstants } from 'app.constants';
+import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { LoggerService } from 'services/contextual/logger.service';
+import { Outcome, OutcomeObjectFactory, } from 'domain/exploration/OutcomeObjectFactory';
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 
-    var _verifySolution = function() {
-      // This checks if the solution is valid once a rule has been changed or
-      // added.
-      var currentInteractionId = StateInteractionIdService.savedMemento;
-      var interactionCanHaveSolution = (
-        currentInteractionId &&
-        INTERACTION_SPECS[currentInteractionId].can_have_solution);
-      var solutionExists = (
-        StateSolutionService.savedMemento &&
-        StateSolutionService.savedMemento.correctAnswer !== null);
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
-      if (interactionCanHaveSolution && solutionExists) {
-        var interaction = StateEditorService.getInteraction();
+@Injectable({
+  providedIn: 'root',
+})
+export class ResponsesService {
+  private _answerGroupsMemento: AnswerGroup[] = null;
+  private _defaultOutcomeMemento: Outcome = null;
+  private _confirmedUnclassifiedAnswersMemento: readonly InteractionAnswer[] = (
+    null);
+  // Represents the current selected answer group, starting at index 0. If the
+  // index equal to the number of answer groups (answerGroups.length), then it
+  // is referring to the default outcome.
+  private _activeAnswerGroupIndex: number = null;
+  private _activeRuleIndex: number = -1;
+  private _answerGroups = null;
+  private _defaultOutcome: Outcome = null;
+  private _confirmedUnclassifiedAnswers: readonly InteractionAnswer[] = null;
+  private _answerChoices: AnswerChoice[] = null;
+  private _answerGroupsChangedEventEmitter = new EventEmitter();
+  private _initializeAnswerGroupsEventEmitter = new EventEmitter();
 
-        interaction.answerGroups = angular.copy(_answerGroups);
-        interaction.defaultOutcome = angular.copy(_defaultOutcome);
-        var solutionIsValid = SolutionVerificationService.verifySolution(
-          StateEditorService.getActiveStateName(),
-          interaction,
-          StateSolutionService.savedMemento.correctAnswer
+  constructor(
+    private alertsService: AlertsService,
+    private answerGroupsCacheService: AnswerGroupsCacheService,
+    private loggerService: LoggerService,
+    private outcomeObjectFactory: OutcomeObjectFactory,
+    private solutionValidityService: SolutionValidityService,
+    private solutionVerificationService: SolutionVerificationService,
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private stateSolutionService: StateSolutionService
+  ) {}
+
+  private _verifySolution = () => {
+    // This checks if the solution is valid once a rule has been changed or
+    // added.
+    const currentInteractionId = this.stateInteractionIdService.savedMemento;
+    const interactionCanHaveSolution = (
+      currentInteractionId &&
+      INTERACTION_SPECS[currentInteractionId].can_have_solution);
+    const solutionExists = (
+      this.stateSolutionService.savedMemento &&
+      this.stateSolutionService.savedMemento.correctAnswer !== null);
+
+    if (interactionCanHaveSolution && solutionExists) {
+      const interaction = this.stateEditorService.getInteraction();
+
+      interaction.answerGroups = cloneDeep(this._answerGroups);
+      interaction.defaultOutcome = cloneDeep(this._defaultOutcome);
+      const solutionIsValid = this.solutionVerificationService.verifySolution(
+        this.stateEditorService.getActiveStateName(),
+        interaction,
+        this.stateSolutionService.savedMemento.correctAnswer
+      );
+
+      const solutionWasPreviouslyValid = (
+        this.solutionValidityService.isSolutionValid(
+          this.stateEditorService.getActiveStateName()
+        ));
+      this.solutionValidityService.updateValidity(
+        this.stateEditorService.getActiveStateName(),
+        solutionIsValid
+      );
+
+      if (solutionIsValid && !solutionWasPreviouslyValid) {
+        this.alertsService.addInfoMessage(
+          ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_VALID);
+      } else if (!solutionIsValid && solutionWasPreviouslyValid) {
+        this.alertsService.addInfoMessage(
+          ExplorationEditorPageConstants.
+            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE
         );
-
-        var solutionWasPreviouslyValid = (
-          SolutionValidityService.isSolutionValid(
-            StateEditorService.getActiveStateName()));
-        SolutionValidityService.updateValidity(
-          StateEditorService.getActiveStateName(), solutionIsValid);
-        if (solutionIsValid && !solutionWasPreviouslyValid) {
-          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
-        } else if (!solutionIsValid && solutionWasPreviouslyValid) {
-          AlertsService.addInfoMessage(
-            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
-        } else if (!solutionIsValid && !solutionWasPreviouslyValid) {
-          AlertsService.addInfoMessage(
-            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION);
-        }
+      } else if (!solutionIsValid && !solutionWasPreviouslyValid) {
+        this.alertsService.addInfoMessage(
+          AppConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION
+        );
       }
-    };
+    }
+  };
 
-    var _saveAnswerGroups = function(newAnswerGroups) {
-      var oldAnswerGroups = _answerGroupsMemento;
-      if (newAnswerGroups && oldAnswerGroups &&
-          !angular.equals(newAnswerGroups, oldAnswerGroups)) {
-        _answerGroups = newAnswerGroups;
-        _answerGroupsChangedEventEmitter.emit();
-        _verifySolution();
-        _answerGroupsMemento = angular.copy(newAnswerGroups);
+  private _saveAnswerGroups = (newAnswerGroups) => {
+    const oldAnswerGroups = this._answerGroupsMemento;
+    if (
+      newAnswerGroups &&
+      oldAnswerGroups &&
+      !angular.equals(newAnswerGroups, oldAnswerGroups)
+    ) {
+      this._answerGroups = newAnswerGroups;
+      this._answerGroupsChangedEventEmitter.emit();
+      this._verifySolution();
+      this._answerGroupsMemento = cloneDeep(newAnswerGroups);
+    }
+  };
+
+  private _updateAnswerGroup = (index, updates, callback) => {
+    const answerGroup = this._answerGroups[index];
+
+    if (answerGroup) {
+      if (updates.hasOwnProperty('rules')) {
+        answerGroup.rules = updates.rules;
       }
-    };
-
-    var _updateAnswerGroup = function(index, updates, callback) {
-      var answerGroup = _answerGroups[index];
-
-      if (answerGroup) {
-        if (updates.hasOwnProperty('rules')) {
-          answerGroup.rules = updates.rules;
-        }
-        if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
-          answerGroup.taggedSkillMisconceptionId =
-            updates.taggedSkillMisconceptionId;
-        }
-        if (updates.hasOwnProperty('feedback')) {
-          answerGroup.outcome.feedback = updates.feedback;
-        }
-        if (updates.hasOwnProperty('dest')) {
-          answerGroup.outcome.dest = updates.dest;
-        }
-        if (updates.hasOwnProperty('refresherExplorationId')) {
-          answerGroup.outcome.refresherExplorationId = (
-            updates.refresherExplorationId);
-        }
-        if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
-          answerGroup.outcome.missingPrerequisiteSkillId = (
-            updates.missingPrerequisiteSkillId);
-        }
-        if (updates.hasOwnProperty('labelledAsCorrect')) {
-          answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
-        }
-        if (updates.hasOwnProperty('trainingData')) {
-          answerGroup.trainingData = updates.trainingData;
-        }
-        _saveAnswerGroups(_answerGroups);
-        callback(_answerGroupsMemento);
-      } else {
-        _activeAnswerGroupIndex = -1;
-
-        LoggerService.error(
-          'The index provided does not exist in _answerGroups array.');
+      if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
+        answerGroup.taggedSkillMisconceptionId = (
+          updates.taggedSkillMisconceptionId);
       }
-    };
-
-    var _saveDefaultOutcome = function(newDefaultOutcome) {
-      var oldDefaultOutcome = _defaultOutcomeMemento;
-      if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
-        _defaultOutcome = newDefaultOutcome;
-        _verifySolution();
-        _defaultOutcomeMemento = angular.copy(newDefaultOutcome);
+      if (updates.hasOwnProperty('feedback')) {
+        answerGroup.outcome.feedback = updates.feedback;
       }
-    };
-
-    var _saveConfirmedUnclassifiedAnswers = function(
-        newConfirmedUnclassifiedAnswers) {
-      var oldConfirmedUnclassifiedAnswers = (
-        _confirmedUnclassifiedAnswersMemento);
-      if (!angular.equals(
-        newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
-        _confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
-
-        _confirmedUnclassifiedAnswersMemento = angular.copy(
-          newConfirmedUnclassifiedAnswers);
+      if (updates.hasOwnProperty('dest')) {
+        answerGroup.outcome.dest = updates.dest;
       }
-    };
-
-    var _updateAnswerChoices = function(newAnswerChoices) {
-      var oldAnswerChoices = angular.copy(_answerChoices);
-      _answerChoices = newAnswerChoices;
-      return oldAnswerChoices;
-    };
-
-    return {
-      // The 'data' arg is a list of interaction handlers for the
-      // currently-active state.
-      init: function(data) {
-        AnswerGroupsCacheService.reset();
-
-        _answerGroups = angular.copy(data.answerGroups);
-        _defaultOutcome = angular.copy(data.defaultOutcome);
-        _confirmedUnclassifiedAnswers = angular.copy(
-          data.confirmedUnclassifiedAnswers);
-        if (StateInteractionIdService.savedMemento !== null) {
-          AnswerGroupsCacheService.set(
-            StateInteractionIdService.savedMemento, _answerGroups);
-        }
-
-        _answerGroupsMemento = angular.copy(_answerGroups);
-        _defaultOutcomeMemento = angular.copy(_defaultOutcome);
-        _confirmedUnclassifiedAnswersMemento = angular.copy(
-          _confirmedUnclassifiedAnswers);
-        _activeAnswerGroupIndex = -1;
-        _activeRuleIndex = 0;
-      },
-      getAnswerGroups: function() {
-        return angular.copy(_answerGroups);
-      },
-      getAnswerGroup: function(index) {
-        return angular.copy(_answerGroups[index]);
-      },
-      getAnswerGroupCount: function() {
-        return _answerGroups.length;
-      },
-      getDefaultOutcome: function() {
-        return angular.copy(_defaultOutcome);
-      },
-      getConfirmedUnclassifiedAnswers: function() {
-        return angular.copy(_confirmedUnclassifiedAnswers);
-      },
-      getAnswerChoices: function() {
-        return angular.copy(_answerChoices);
-      },
-      getActiveRuleIndex: function() {
-        return _activeRuleIndex;
-      },
-      getActiveAnswerGroupIndex: function() {
-        return _activeAnswerGroupIndex;
-      },
-      onInteractionIdChanged: function(newInteractionId, callback) {
-        if (AnswerGroupsCacheService.contains(newInteractionId)) {
-          _answerGroups = AnswerGroupsCacheService.get(newInteractionId);
-        } else {
-          _answerGroups = [];
-        }
-
-        // Preserve the default outcome unless the interaction is terminal.
-        // Recreate the default outcome if switching away from a terminal
-        // interaction.
-        if (newInteractionId) {
-          if (INTERACTION_SPECS[newInteractionId].is_terminal) {
-            _defaultOutcome = null;
-          } else if (!_defaultOutcome) {
-            _defaultOutcome = OutcomeObjectFactory.createNew(
-              StateEditorService.getActiveStateName(),
-              COMPONENT_NAME_DEFAULT_OUTCOME, '', []);
-          }
-        }
-
-        _confirmedUnclassifiedAnswers = [];
-
-        _saveAnswerGroups(_answerGroups);
-        _saveDefaultOutcome(_defaultOutcome);
-        _saveConfirmedUnclassifiedAnswers(_confirmedUnclassifiedAnswers);
-        if (newInteractionId) {
-          AnswerGroupsCacheService.set(newInteractionId, _answerGroups);
-        }
-
-        _answerGroupsMemento = angular.copy(_answerGroups);
-        _defaultOutcomeMemento = angular.copy(_defaultOutcome);
-        _confirmedUnclassifiedAnswersMemento = angular.copy(
-          _confirmedUnclassifiedAnswers);
-        _activeAnswerGroupIndex = -1;
-        _activeRuleIndex = 0;
-
-        if (callback) {
-          callback(_answerGroupsMemento, _defaultOutcomeMemento);
-        }
-      },
-      changeActiveAnswerGroupIndex: function(newIndex) {
-        // If the current group is being clicked on again, close it.
-        if (newIndex === _activeAnswerGroupIndex) {
-          _activeAnswerGroupIndex = -1;
-        } else {
-          _activeAnswerGroupIndex = newIndex;
-        }
-
-        _activeRuleIndex = -1;
-      },
-      changeActiveRuleIndex: function(newIndex) {
-        _activeRuleIndex = newIndex;
-      },
-      updateAnswerGroup: function(index, updates, callback) {
-        _updateAnswerGroup(index, updates, callback);
-      },
-      deleteAnswerGroup: function(index, callback) {
-        _answerGroupsMemento = angular.copy(_answerGroups);
-        _answerGroups.splice(index, 1);
-        _activeAnswerGroupIndex = -1;
-        _saveAnswerGroups(_answerGroups);
-        callback(_answerGroupsMemento);
-      },
-      updateActiveAnswerGroup: function(updates, callback) {
-        _updateAnswerGroup(_activeAnswerGroupIndex, updates, callback);
-      },
-      updateDefaultOutcome: function(updates, callback) {
-        var outcome = _defaultOutcome;
-        if (updates.hasOwnProperty('feedback')) {
-          outcome.feedback = updates.feedback;
-        }
-        if (updates.hasOwnProperty('dest')) {
-          outcome.dest = updates.dest;
-        }
-        if (updates.hasOwnProperty('refresherExplorationId')) {
-          outcome.refresherExplorationId = updates.refresherExplorationId;
-        }
-        if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
-          outcome.missingPrerequisiteSkillId =
-            updates.missingPrerequisiteSkillId;
-        }
-        if (updates.hasOwnProperty('labelledAsCorrect')) {
-          outcome.labelledAsCorrect = updates.labelledAsCorrect;
-        }
-        _saveDefaultOutcome(outcome);
-        callback(_defaultOutcomeMemento);
-      },
-      updateConfirmedUnclassifiedAnswers: function(
-          confirmedUnclassifiedAnswers) {
-        _saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
-      },
-      // Updates answer choices when the interaction is initialized or deleted.
-      // For example, the rules for multiple choice need to refer to the
-      // multiple choice interaction's customization arguments.
-      updateAnswerChoices: function(newAnswerChoices) {
-        _updateAnswerChoices(newAnswerChoices);
-      },
-      // Handles changes to custom args by updating the answer choices
-      // accordingly.
-      handleCustomArgsUpdate: function(newAnswerChoices, callback) {
-        var oldAnswerChoices = _updateAnswerChoices(newAnswerChoices);
-        // If the interaction is ItemSelectionInput, update the answer groups
-        // to refer to the new answer options.
-        if (StateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
-            oldAnswerChoices) {
-          // We use an approximate algorithm here. If the length of the answer
-          // choices array remains the same, and no choice is replicated at
-          // different indices in both arrays (which indicates that some
-          // moving-around happened), then replace any old choice with its
-          // corresponding new choice. Otherwise, we simply remove any answer
-          // that has not been changed. This is not foolproof, but it should
-          // cover most cases.
-          //
-          // TODO(sll): Find a way to make this fully deterministic. This can
-          // probably only occur after we support custom editors for
-          // interactions.
-          var onlyEditsHappened = false;
-          if (oldAnswerChoices.length === newAnswerChoices.length) {
-            onlyEditsHappened = true;
-
-            // Check that no answer choice appears to have been moved.
-            var numAnswerChoices = oldAnswerChoices.length;
-            for (var i = 0; i < numAnswerChoices; i++) {
-              for (var j = 0; j < numAnswerChoices; j++) {
-                if (i !== j &&
-                    oldAnswerChoices[i].val === newAnswerChoices[j].val) {
-                  onlyEditsHappened = false;
-                  break;
-                }
-              }
-            }
-          }
-
-          var oldChoiceStrings = oldAnswerChoices.map(function(choice) {
-            return choice.val;
-          });
-          var newChoiceStrings = newAnswerChoices.map(function(choice) {
-            return choice.val;
-          });
-
-          var key, newInputValue;
-          _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-            var newRules = angular.copy(answerGroup.rules);
-            newRules.forEach(function(rule) {
-              for (key in rule.inputs) {
-                newInputValue = [];
-                rule.inputs[key].forEach(function(item) {
-                  var newIndex = newChoiceStrings.indexOf(item);
-                  if (newIndex !== -1) {
-                    newInputValue.push(item);
-                  } else if (onlyEditsHappened) {
-                    var oldIndex = oldChoiceStrings.indexOf(item);
-                    if (oldIndex !== -1) {
-                      newInputValue.push(newAnswerChoices[oldIndex].val);
-                    }
-                  }
-                });
-                rule.inputs[key] = newInputValue;
-              }
-            });
-
-            _updateAnswerGroup(answerGroupIndex, {
-              rules: newRules
-            }, callback);
-          });
-        }
-
-        // If the interaction is DragAndDropSortInput, update the answer groups
-        // to refer to the new answer options.
-        if (StateInteractionIdService.savedMemento === 'DragAndDropSortInput' &&
-            oldAnswerChoices) {
-          // If the length of the answer choices array changes, then there is
-          // surely any deletion or modification or addition in the array. We
-          // simply set answer groups to refer to default value. If the length
-          // of the answer choices array remains the same and all the choices in
-          // the previous array are present, then no change is required.
-          // However, if any of the choices is not present, we set answer groups
-          // to refer to the default value containing new answer choices.
-          var anyChangesHappened = false;
-          if (oldAnswerChoices.length !== newAnswerChoices.length) {
-            anyChangesHappened = true;
-          } else {
-            // Check if any modification happened in answer choices.
-            var numAnswerChoices = oldAnswerChoices.length;
-            for (var i = 0; i < numAnswerChoices; i++) {
-              var choiceIsPresent = false;
-              for (var j = 0; j < numAnswerChoices; j++) {
-                if (oldAnswerChoices[i].val === newAnswerChoices[j].val) {
-                  choiceIsPresent = true;
-                  break;
-                }
-              }
-              if (choiceIsPresent === false) {
-                anyChangesHappened = true;
-                break;
-              }
-            }
-          }
-
-          if (anyChangesHappened) {
-            _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-              var newRules = angular.copy(answerGroup.rules);
-              newRules.forEach(function(rule) {
-                if (rule.type === 'HasElementXAtPositionY') {
-                  rule.inputs.x = newAnswerChoices[0].val;
-                  rule.inputs.y = 1;
-                } else if (rule.type === 'HasElementXBeforeElementY') {
-                  rule.inputs.x = newAnswerChoices[0].val;
-                  rule.inputs.y = newAnswerChoices[1].val;
-                } else {
-                  rule.inputs.x = newAnswerChoices.map(({val}) => [val]);
-                }
-              });
-
-              _updateAnswerGroup(answerGroupIndex, {
-                rules: newRules
-              }, callback);
-            });
-          }
-        }
-      },
-      // This registers the change to the handlers in the list of changes.
-      save: function(newAnswerGroups, defaultOutcome, callback) {
-        _saveAnswerGroups(newAnswerGroups);
-        _saveDefaultOutcome(defaultOutcome);
-        callback(_answerGroupsMemento, _defaultOutcomeMemento);
-      },
-
-      get onAnswerGroupsChanged() {
-        return _answerGroupsChangedEventEmitter;
-      },
-
-      get onInitializeAnswerGroups() {
-        return _initializeAnswerGroupsEventEmitter;
+      if (updates.hasOwnProperty('refresherExplorationId')) {
+        answerGroup.outcome.refresherExplorationId = (
+          updates.refresherExplorationId);
       }
-    };
+      if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
+        answerGroup.outcome.missingPrerequisiteSkillId = (
+          updates.missingPrerequisiteSkillId);
+      }
+      if (updates.hasOwnProperty('labelledAsCorrect')) {
+        answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
+      }
+      if (updates.hasOwnProperty('trainingData')) {
+        answerGroup.trainingData = updates.trainingData;
+      }
+      this._saveAnswerGroups(this._answerGroups);
+      callback(this._answerGroupsMemento);
+    } else {
+      this._activeAnswerGroupIndex = -1;
+
+      this.loggerService.error(
+        'The index provided does not exist in _answerGroups array.'
+      );
+    }
+  };
+
+  private _saveDefaultOutcome = (newDefaultOutcome) => {
+    const oldDefaultOutcome = this._defaultOutcomeMemento;
+    if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
+      this._defaultOutcome = newDefaultOutcome;
+      this._verifySolution();
+      this._defaultOutcomeMemento = cloneDeep(newDefaultOutcome);
+    }
+  };
+
+  private _saveConfirmedUnclassifiedAnswers = (
+      newConfirmedUnclassifiedAnswers
+  ) => {
+    const oldConfirmedUnclassifiedAnswers = this
+      ._confirmedUnclassifiedAnswersMemento;
+    if (
+      !angular.equals(
+        newConfirmedUnclassifiedAnswers,
+        oldConfirmedUnclassifiedAnswers
+      )
+    ) {
+      this._confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
+
+      this._confirmedUnclassifiedAnswersMemento = (
+        cloneDeep(newConfirmedUnclassifiedAnswers)
+      );
+    }
+  };
+
+  private _updateAnswerChoices = (newAnswerChoices) => {
+    const oldAnswerChoices = cloneDeep(this._answerChoices);
+    this._answerChoices = newAnswerChoices;
+    return oldAnswerChoices;
+  };
+
+  // The 'data' arg is a list of interaction handlers for the
+  // currently-active state.
+  init(data: Interaction): void {
+    this.answerGroupsCacheService.reset();
+
+    this._answerGroups = cloneDeep(data.answerGroups);
+    this._defaultOutcome = cloneDeep(data.defaultOutcome);
+    this._confirmedUnclassifiedAnswers = cloneDeep(
+      data.confirmedUnclassifiedAnswers
+    );
+    if (this.stateInteractionIdService.savedMemento !== null) {
+      this.answerGroupsCacheService.set(
+        this.stateInteractionIdService.savedMemento,
+        this._answerGroups
+      );
+    }
+
+    this._answerGroupsMemento = cloneDeep(this._answerGroups);
+    this._defaultOutcomeMemento = cloneDeep(this._defaultOutcome);
+    this._confirmedUnclassifiedAnswersMemento = cloneDeep(
+      this._confirmedUnclassifiedAnswers
+    );
+    this._activeAnswerGroupIndex = -1;
+    this._activeRuleIndex = 0;
   }
-]);
+  getAnswerGroups(): AnswerGroup[] {
+    return cloneDeep(this._answerGroups);
+  }
+
+  getAnswerGroup(index: number): AnswerGroup {
+    return cloneDeep(this._answerGroups[index]);
+  }
+  getAnswerGroupCount(): number {
+    return this._answerGroups.length;
+  }
+  getDefaultOutcome(): Outcome {
+    return cloneDeep(this._defaultOutcome);
+  }
+  getConfirmedUnclassifiedAnswers(): readonly InteractionAnswer[] {
+    return cloneDeep(this._confirmedUnclassifiedAnswers);
+  }
+  getAnswerChoices(): AnswerChoice[] {
+    return cloneDeep(this._answerChoices);
+  }
+  getActiveRuleIndex(): number {
+    return this._activeRuleIndex;
+  }
+  getActiveAnswerGroupIndex(): number {
+    return this._activeAnswerGroupIndex;
+  }
+  onInteractionIdChanged(
+      newInteractionId: string,
+      callback: (value: AnswerGroup[], value2: Outcome) => void
+  ): void {
+    if (this.answerGroupsCacheService.contains(newInteractionId)) {
+      this._answerGroups = this.answerGroupsCacheService.get(newInteractionId);
+    } else {
+      this._answerGroups = [];
+    }
+
+    // Preserve the default outcome unless the interaction is terminal.
+    // Recreate the default outcome if switching away from a terminal
+    // interaction.
+    if (newInteractionId) {
+      if (INTERACTION_SPECS[newInteractionId].is_terminal) {
+        this._defaultOutcome = null;
+      } else if (!this._defaultOutcome) {
+        this._defaultOutcome = this.outcomeObjectFactory.createNew(
+          this.stateEditorService.getActiveStateName(),
+          ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME,
+          '',
+          []
+        );
+      }
+    }
+
+    this._confirmedUnclassifiedAnswers = [];
+
+    this._saveAnswerGroups(this._answerGroups);
+    this._saveDefaultOutcome(this._defaultOutcome);
+    this._saveConfirmedUnclassifiedAnswers(this._confirmedUnclassifiedAnswers);
+    if (newInteractionId) {
+      this.answerGroupsCacheService.set(newInteractionId, this._answerGroups);
+    }
+
+    this._answerGroupsMemento = cloneDeep(this._answerGroups);
+    this._defaultOutcomeMemento = cloneDeep(this._defaultOutcome);
+    this._confirmedUnclassifiedAnswersMemento = cloneDeep(
+      this._confirmedUnclassifiedAnswers
+    );
+    this._activeAnswerGroupIndex = -1;
+    this._activeRuleIndex = 0;
+
+    if (callback) {
+      callback(this._answerGroupsMemento, this._defaultOutcomeMemento);
+    }
+  }
+  changeActiveAnswerGroupIndex(newIndex: number): void {
+    // If the current group is being clicked on again, close it.
+    if (newIndex === this._activeAnswerGroupIndex) {
+      this._activeAnswerGroupIndex = -1;
+    } else {
+      this._activeAnswerGroupIndex = newIndex;
+    }
+
+    this._activeRuleIndex = -1;
+  }
+  changeActiveRuleIndex(newIndex: number): void {
+    this._activeRuleIndex = newIndex;
+  }
+  updateAnswerGroup(
+      index: number,
+      updates: AnswerGroup,
+      callback: (value: AnswerGroup) => void
+  ): void {
+    this._updateAnswerGroup(index, updates, callback);
+  }
+  deleteAnswerGroup(
+      index: number,
+      callback: (value: AnswerGroup[]) => void
+  ): void {
+    this._answerGroupsMemento = cloneDeep(this._answerGroups);
+    this._answerGroups.splice(index, 1);
+    this._activeAnswerGroupIndex = -1;
+    this._saveAnswerGroups(this._answerGroups);
+    callback(this._answerGroupsMemento);
+  }
+  updateActiveAnswerGroup(
+      updates: AnswerGroup,
+      callback: (value: AnswerGroup) => void
+  ): void {
+    this._updateAnswerGroup(this._activeAnswerGroupIndex, updates, callback);
+  }
+  updateDefaultOutcome(
+      updates: Outcome,
+      callback: (value: Outcome) => void
+  ): void {
+    const outcome = this._defaultOutcome;
+    if (updates.hasOwnProperty('feedback')) {
+      outcome.feedback = updates.feedback;
+    }
+    if (updates.hasOwnProperty('dest')) {
+      outcome.dest = updates.dest;
+    }
+    if (updates.hasOwnProperty('refresherExplorationId')) {
+      outcome.refresherExplorationId = updates.refresherExplorationId;
+    }
+    if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
+      outcome.missingPrerequisiteSkillId = updates.missingPrerequisiteSkillId;
+    }
+    if (updates.hasOwnProperty('labelledAsCorrect')) {
+      outcome.labelledAsCorrect = updates.labelledAsCorrect;
+    }
+    this._saveDefaultOutcome(outcome);
+    callback(this._defaultOutcomeMemento);
+  }
+  updateConfirmedUnclassifiedAnswers(
+      confirmedUnclassifiedAnswers: InteractionAnswer[]
+  ): void {
+    this._saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
+  }
+  // Updates answer choices when the interaction is initialized or deleted.
+  // For example, the rules for multiple choice need to refer to the
+  // multiple choice interaction's customization arguments.
+  updateAnswerChoices(newAnswerChoices: AnswerChoice[]): void {
+    this._updateAnswerChoices(newAnswerChoices);
+  }
+  // Handles changes to custom args by updating the answer choices
+  // accordingly.
+  handleCustomArgsUpdate(
+      newAnswerChoices: AnswerChoice[],
+      callback: (value: AnswerGroup) => void
+  ): void {
+    const oldAnswerChoices = this._updateAnswerChoices(newAnswerChoices);
+    // If the interaction is ItemSelectionInput, update the answer groups
+    // to refer to the new answer options.
+    if (
+      this.stateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
+      oldAnswerChoices
+    ) {
+      // We use an approximate algorithm here. If the length of the answer
+      // choices array remains the same, and no choice is replicated at
+      // different indices in both arrays (which indicates that some
+      // moving-around happened), then replace any old choice with its
+      // corresponding new choice. Otherwise, we simply remove any answer
+      // that has not been changed. This is not foolproof, but it should
+      // cover most cases.
+      //
+      // TODO(sll): Find a way to make this fully deterministic. This can
+      // probably only occur after we support custom editors for
+      // interactions.
+      let onlyEditsHappened = false;
+      if (oldAnswerChoices.length === newAnswerChoices.length) {
+        onlyEditsHappened = true;
+
+        // Check that no answer choice appears to have been moved.
+        const numAnswerChoices = oldAnswerChoices.length;
+        for (let i = 0; i < numAnswerChoices; i++) {
+          for (let j = 0; j < numAnswerChoices; j++) {
+            if (
+              i !== j &&
+              oldAnswerChoices[i].val === newAnswerChoices[j].val
+            ) {
+              onlyEditsHappened = false;
+              break;
+            }
+          }
+        }
+      }
+
+      const oldChoiceStrings = oldAnswerChoices.map((choice) => {
+        return choice.val;
+      });
+      const newChoiceStrings = newAnswerChoices.map((choice) => {
+        return choice.val;
+      });
+
+      let key, newInputValue;
+      this._answerGroups.forEach((answerGroup, answerGroupIndex) => {
+        const newRules = cloneDeep(answerGroup.rules);
+        newRules.forEach((rule) => {
+          for (key in rule.inputs) {
+            newInputValue = [];
+            rule.inputs[key].forEach((item) => {
+              const newIndex = newChoiceStrings.indexOf(item);
+              if (newIndex !== -1) {
+                newInputValue.push(item);
+              } else if (onlyEditsHappened) {
+                const oldIndex = oldChoiceStrings.indexOf(item);
+                if (oldIndex !== -1) {
+                  newInputValue.push(newAnswerChoices[oldIndex].val);
+                }
+              }
+            });
+            rule.inputs[key] = newInputValue;
+          }
+        });
+
+        this._updateAnswerGroup(
+          answerGroupIndex,
+          {
+            rules: newRules,
+          },
+          callback
+        );
+      });
+    }
+
+    // If the interaction is DragAndDropSortInput, update the answer groups
+    // to refer to the new answer options.
+    if (
+      this.stateInteractionIdService.savedMemento === 'DragAndDropSortInput' &&
+      oldAnswerChoices
+    ) {
+      // If the length of the answer choices array changes, then there is
+      // surely any deletion or modification or addition in the array. We
+      // simply set answer groups to refer to default value. If the length
+      // of the answer choices array remains the same and all the choices in
+      // the previous array are present, then no change is required.
+      // However, if any of the choices is not present, we set answer groups
+      // to refer to the default value containing new answer choices.
+      let anyChangesHappened = false;
+      if (oldAnswerChoices.length !== newAnswerChoices.length) {
+        anyChangesHappened = true;
+      } else {
+        // Check if any modification happened in answer choices.
+        const numAnswerChoices = oldAnswerChoices.length;
+        for (let i = 0; i < numAnswerChoices; i++) {
+          let choiceIsPresent = false;
+          for (let j = 0; j < numAnswerChoices; j++) {
+            if (oldAnswerChoices[i].val === newAnswerChoices[j].val) {
+              choiceIsPresent = true;
+              break;
+            }
+          }
+          if (choiceIsPresent === false) {
+            anyChangesHappened = true;
+            break;
+          }
+        }
+      }
+
+      if (anyChangesHappened) {
+        this._answerGroups.forEach((answerGroup, answerGroupIndex) => {
+          const newRules = cloneDeep(answerGroup.rules);
+          newRules.forEach((rule) => {
+            if (rule.type === 'HasElementXAtPositionY') {
+              rule.inputs.x = newAnswerChoices[0].val;
+              rule.inputs.y = 1;
+            } else if (rule.type === 'HasElementXBeforeElementY') {
+              rule.inputs.x = newAnswerChoices[0].val;
+              rule.inputs.y = newAnswerChoices[1].val;
+            } else {
+              rule.inputs.x = newAnswerChoices.map(({ val }) => [val]);
+            }
+          });
+
+          this._updateAnswerGroup(
+            answerGroupIndex,
+            {
+              rules: newRules,
+            },
+            callback
+          );
+        });
+      }
+    }
+  }
+  // This registers the change to the handlers in the list of changes.
+  save(
+      newAnswerGroups: AnswerGroup[],
+      defaultOutcome: Outcome,
+      callback:(value: AnswerGroup[], value2: Outcome) => void
+  ): void {
+    this._saveAnswerGroups(newAnswerGroups);
+    this._saveDefaultOutcome(defaultOutcome);
+    callback(this._answerGroupsMemento, this._defaultOutcomeMemento);
+  }
+
+  get onAnswerGroupsChanged(): EventEmitter<unknown> {
+    return this._answerGroupsChangedEventEmitter;
+  }
+
+  get onInitializeAnswerGroups(): EventEmitter<unknown> {
+    return this._initializeAnswerGroupsEventEmitter;
+  }
+}
+
+angular.module('oppia').factory('ResponsesService',
+  downgradeInjectable(ResponsesService));
