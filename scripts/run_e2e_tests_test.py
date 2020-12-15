@@ -850,8 +850,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         register_swap = self.swap_with_checks(
             atexit, 'register', mock_register, expected_args=[
-                (mock_cleanup,),
                 (run_e2e_tests.cleanup_portserver, mock_process),
+                (mock_cleanup,),
             ])
 
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
@@ -1159,8 +1159,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_setup_and_install_dependencies, expected_args=[(True,)])
         register_swap = self.swap_with_checks(
             atexit, 'register', mock_register, expected_args=[
-                (mock_cleanup,),
                 (run_e2e_tests.cleanup_portserver, mock_process),
+                (mock_cleanup,),
             ])
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
         modify_constants_swap = self.swap_with_checks(
@@ -1336,8 +1336,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         register_swap = self.swap_with_checks(
             atexit, 'register', mock_register, expected_args=[
-                (mock_cleanup,),
                 (run_e2e_tests.cleanup_portserver, mock_process),
+                (mock_cleanup,),
             ])
 
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
@@ -1464,8 +1464,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         register_swap = self.swap_with_checks(
             atexit, 'register', mock_register, expected_args=[
-                (mock_cleanup,),
                 (run_e2e_tests.cleanup_portserver, mock_process),
+                (mock_cleanup,),
             ])
 
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
