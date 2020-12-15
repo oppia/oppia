@@ -173,7 +173,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 'You cannot accept/reject your own suggestion.')
 
-        if action == constants.ACTION_TYPE_ACCEPT:
+        if action == constants.ACTION_ACCEPT_SUGGESTION:
             commit_message = self.payload.get('commit_message')
             if (commit_message is not None and
                     len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
@@ -183,7 +183,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
-        elif action == constants.ACTION_TYPE_REJECT:
+        elif action == constants.ACTION_REJECT_SUGGESTION:
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id, self.payload.get('review_message'))
         else:
@@ -224,12 +224,12 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
 
         action = self.payload.get('action')
 
-        if action == constants.ACTION_TYPE_ACCEPT:
+        if action == constants.ACTION_ACCEPT_SUGGESTION:
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
-        elif action == constants.ACTION_TYPE_REJECT:
+        elif action == constants.ACTION_REJECT_SUGGESTION:
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id, self.payload.get('review_message'))
         else:

@@ -709,7 +709,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         # changes. We save the draft to the datastore even if the version is
         # invalid, so that it is available for recovery later.
         self.render_json({
-            'draft_change_list_id': exp_user_data['draft_changes'],
+            'draft_change_list_id': exp_user_data['draft_change_list_id'],
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 

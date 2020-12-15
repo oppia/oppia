@@ -332,7 +332,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
-                0, 0, 0, feconf.THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
+                0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
         suggestion_models = cls.get_all().filter(
             cls.status == STATUS_IN_REVIEW).filter(
                 cls.last_updated < threshold_time).fetch()
