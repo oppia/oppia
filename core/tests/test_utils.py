@@ -202,7 +202,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
     layer, namely the platform.search elastic search services API.
     """
 
-    _DB = {}
+    _DB = {'explorations': [], 'collections': []}
 
     def add_documents_to_index(self, documents, index_name):
         """Adds documents in a list of documents to a given index in the mock
@@ -306,8 +306,9 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
 
     def reset(self):
         """Helper method that clears the mock database."""
-
         self._DB.clear()
+        self._DB['explorations'] = []
+        self._DB['collections'] = []
 
     def search(
             self, query_string, index_name, cursor=None, offset=0,
