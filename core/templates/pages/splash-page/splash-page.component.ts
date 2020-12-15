@@ -30,27 +30,21 @@ import splashConstants from 'assets/constants';
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
-    '$rootScope', 'LoaderService', 'SiteAnalyticsService',
+    '$rootScope', '$translate', 'LoaderService', 'SiteAnalyticsService',
     'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
     function(
-        $rootScope, LoaderService, SiteAnalyticsService,
+        $rootScope, $translate, LoaderService, SiteAnalyticsService,
         UrlInterpolationService, UserService, WindowDimensionsService) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
+        if (imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        }
       };
 
       ctrl.onClickBrowseLessonsButton = function() {
         SiteAnalyticsService.registerClickBrowseLessonsButtonEvent();
         return false;
-      };
-
-      ctrl.getMainBackgroundUrl = function() {
-        if (ctrl.isWindowNarrow()) {
-          return ctrl.getStaticImageUrl('/splash/splashMainMobile.png');
-        } else {
-          return ctrl.getStaticImageUrl('/splash/splashMainDesktop.png');
-        }
       };
 
       ctrl.isWindowNarrow = function() {
@@ -99,12 +93,41 @@ angular.module('oppia').component('splashPage', {
             '/splash/dsk_community_background.png') + ')');
       };
 
+      ctrl.getTestimonials = function() {
+        return [{
+          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_1'),
+          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_1'),
+          imageUrl: '/splash/mira.png',
+          imageUrlWebp: '/splash/mira.webp',
+          borderPresent: false
+        }, {
+          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_2'),
+          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_2'),
+          imageUrl: '/splash/Dheeraj_3.jpeg',
+          imageUrlWebp: '/splash/Dheeraj_3.webp',
+          borderPresent: true
+        }, {
+          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_3'),
+          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_3'),
+          imageUrl: '/splash/sama.png',
+          imageUrlWebp: '/splash/sama.webp',
+          borderPresent: false
+        }, {
+          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_4'),
+          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_4'),
+          imageUrl: '/splash/Gaurav_2.jpeg',
+          imageUrlWebp: '/splash/Gaurav_2.webp',
+          borderPresent: true
+        }];
+      };
+
       ctrl.$onInit = function() {
         ctrl.userIsLoggedIn = null;
         ctrl.displayedTestimonialId = 0;
         ctrl.testimonialCount = 4;
+        ctrl.testimonials = ctrl.getTestimonials();
         ctrl.classroomUrl = UrlInterpolationService.interpolateUrl(
-          '/learn/<classroomUrlFragment>',  {
+          '/learn/<classroomUrlFragment>', {
             classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
           });
         LoaderService.showLoadingScreen('Loading');

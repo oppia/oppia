@@ -97,12 +97,13 @@ describe('Splash Page', function() {
     expect(ctrl.displayedTestimonialId).toBe(1);
     ctrl.incrementDisplayedTestimonialId();
     ctrl.incrementDisplayedTestimonialId();
+    ctrl.incrementDisplayedTestimonialId();
     expect(ctrl.displayedTestimonialId).toBe(0);
 
     ctrl.decrementDisplayedTestimonialId();
-    expect(ctrl.displayedTestimonialId).toBe(2);
+    expect(ctrl.displayedTestimonialId).toBe(3);
     ctrl.decrementDisplayedTestimonialId();
-    expect(ctrl.displayedTestimonialId).toBe(1);
+    expect(ctrl.displayedTestimonialId).toBe(2);
   });
 
   it('should get correct background URLs', function() {
@@ -123,13 +124,11 @@ describe('Splash Page', function() {
     expect(
       ctrl.getTestimonialBackgroundUrl()).toContain(
       '/splash/m_testimonial_background.png');
+  });
 
-    expect(
-      ctrl.getMainBackgroundUrl()).toContain(
-      '/splash/splashMainDesktop.png');
-    expect(
-      ctrl.getMainBackgroundUrl()).toContain(
-      '/splash/splashMainMobile.png');
+  it('should get testimonials correctly', function() {
+    ctrl.$onInit();
+    expect(ctrl.getTestimonials().length).toBe(ctrl.testimonialCount);
   });
 
   it('should evaluate if user is logged in', function() {
