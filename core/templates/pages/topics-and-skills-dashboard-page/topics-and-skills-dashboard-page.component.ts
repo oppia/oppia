@@ -218,7 +218,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       ctrl.fetchSkills = function() {
         if (ctrl.moreSkillsPresent) {
           TopicsAndSkillsDashboardBackendApiService
-            .fetchSkillsDashboardData(
+            .fetchSkillsDashboardDataAsync(
               ctrl.filterObject, ctrl.itemsPerPage, ctrl.nextCursor).then(
               (response) => {
                 ctrl.moreSkillsPresent = response.more;
