@@ -16,52 +16,6 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
-// require(
-//   'components/common-layout-directives/common-elements/' +
-//   'confirm-or-cancel-modal.controller.ts');
-
-// angular.module('oppia').factory('FatigueDetectionService', [
-//   '$uibModal', function($uibModal) {
-//     // 4 submissions in under 10 seconds triggers modal.
-//     var SPAM_COUNT_THRESHOLD = 4;
-//     var SPAM_WINDOW_MSEC = 10000;
-//     var submissionTimesMsec = [];
-
-//     return {
-//       recordSubmissionTimestamp: function() {
-//         submissionTimesMsec.push((new Date()).getTime());
-//       },
-//       isSubmittingTooFast: function() {
-//         if (submissionTimesMsec.length >= SPAM_COUNT_THRESHOLD) {
-//           var windowStartTime = submissionTimesMsec.shift();
-//           var windowEndTime =
-//             submissionTimesMsec[submissionTimesMsec.length - 1];
-//           if (windowEndTime - windowStartTime < SPAM_WINDOW_MSEC) {
-//             return true;
-//           }
-//         }
-//         return false;
-//       },
-//       displayTakeBreakMessage: function() {
-//         $uibModal.open({
-//           template: require(
-//             'pages/exploration-player-page/templates/' +
-//             'take-break-modal.template.html'),
-//           backdrop: 'static',
-//           resolve: {},
-//           controller: 'ConfirmOrCancelModalController'
-//         }).result.then(function() {}, function() {
-//           // Note to developers:
-//           // This callback is triggered when the Cancel button is clicked.
-//           // No further action is needed.
-//         });
-//       },
-//       reset: function() {
-//         submissionTimesMsec = [];
-//       }
-//     };
-//   }]);
-
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
