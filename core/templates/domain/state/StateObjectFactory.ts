@@ -122,7 +122,7 @@ export class StateObjectFactory {
     private subtitledHtmlObject: SubtitledHtmlObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
-  get NEW_STATE_TEMPLATE(): typeof constants.NEW_STATE_TEMPLATE {
+  get NEW_STATE_TEMPLATE(): StateBackendDict {
     return constants.NEW_STATE_TEMPLATE;
   }
 

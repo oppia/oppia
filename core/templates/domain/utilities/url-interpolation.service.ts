@@ -42,7 +42,7 @@ export class UrlInterpolationService {
     private urlService: UrlService,
     private utilsService: UtilsService) {}
 
-  get DEV_MODE(): typeof Constants.DEV_MODE {
+  get DEV_MODE(): boolean {
     return Constants.DEV_MODE;
   }
 

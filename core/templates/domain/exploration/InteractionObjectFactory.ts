@@ -439,21 +439,19 @@ export class InteractionObjectFactory {
 
   createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
     return new Interaction(
-      this.generateAnswerGroupsFromBackend(interactionDict.answer_groups),
+      this.createAnswerGroupsFromBackendDict(interactionDict.answer_groups),
       interactionDict.confirmed_unclassified_answers,
       this.convertFromCustomizationArgsBackendDict(
-        interactionDict.id,
-        interactionDict.customization_args),
-      interactionDict.default_outcome ? (
-        this.generateOutcomeFromBackend(
-          interactionDict.default_outcome)) : null,
-      this.generateHintsFromBackend(interactionDict.hints),
+        interactionDict.id, interactionDict.customization_args),
+      interactionDict.default_outcome ? this.createOutcomeFromBackendDict(
+        interactionDict.default_outcome) : null,
+      this.createHintsFromBackendDict(interactionDict.hints),
       interactionDict.id,
-      interactionDict.solution ? (
-        this.generateSolutionFromBackend(interactionDict.solution)) : null);
+      interactionDict.solution ? this.createSolutionFromBackendDict(
+        interactionDict.solution) : null);
   }
 
-  generateAnswerGroupsFromBackend(
+  createAnswerGroupsFromBackendDict(
       answerGroupBackendDicts: readonly AnswerGroupBackendDict[]
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
@@ -463,19 +461,19 @@ export class InteractionObjectFactory {
     });
   }
 
-  generateOutcomeFromBackend(
+  createOutcomeFromBackendDict(
       outcomeBackendDict: OutcomeBackendDict): Outcome {
     return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
   }
 
-  generateHintsFromBackend(
+  createHintsFromBackendDict(
       hintBackendDicts: readonly HintBackendDict[]): Hint[] {
     return hintBackendDicts.map((hintBackendDict) => {
       return this.hintFactory.createFromBackendDict(hintBackendDict);
     });
   }
 
-  generateSolutionFromBackend(
+  createSolutionFromBackendDict(
       solutionBackendDict: SolutionBackendDict): Solution {
     return this.solutionFactory.createFromBackendDict(solutionBackendDict);
   }

@@ -35,7 +35,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 export class SiteAnalyticsService {
   constructor(private windowRef: WindowRef) {}
 
-  get CAN_SEND_ANALYTICS_EVENTS(): typeof constants.CAN_SEND_ANALYTICS_EVENTS {
+  get CAN_SEND_ANALYTICS_EVENTS(): boolean {
     return constants.CAN_SEND_ANALYTICS_EVENTS;
   }
 
