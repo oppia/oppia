@@ -833,6 +833,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
 
+        def mock_report_pass(unused_suite_name):
+            return
+
         get_chrome_driver_version_swap = self.swap(
             run_e2e_tests, 'get_chrome_driver_version',
             mock_get_chrome_driver_version)
@@ -893,15 +896,207 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 ],),
             ],
         )
+        report_swap = self.swap_with_checks(
+            flake_checker, 'report_pass', mock_report_pass,
+            expected_args=[
+                (['mySuite'],),
+            ])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
-                    with wait_swap:
+                    with wait_swap, report_swap:
                         with get_parameters_swap, popen_swap:
                             with get_chrome_driver_version_swap, exit_swap:
-                                run_e2e_tests.main(args=[])
+                                run_e2e_tests.main(
+                                        args=['--suite', 'mySuite'])
+
+    def test_rerun_when_tests_fail(self):
+
+        mock_process = MockProcessClass()
+
+        def mock_exit(unused_exit_code):
+            return
+
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+
+        def mock_is_test_output_flaky(
+                unused_output, unused_suite_name):
+            return False
+
+        is_test_output_flaky_swap = self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky,
+            expected_args=[
+                (['sample\noutput', 'mySuite'],),
+                (['sample\noutput', 'mySuite'],),
+                (['sample\noutput', 'mySuite'],),
+            ])
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)])
+        run_swap = self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests)
+        with exit_swap, is_test_output_flaky_swap, run_swap:
+            run_e2e_tests.main(args=['--suite', 'mySuite'])
+
+    def test_rerun_when_tests_flake(self):
+
+        mock_process = MockProcessClass()
+
+        def mock_exit(unused_exit_code):
+            return
+
+        def mock_is_test_output_flaky(
+                unused_output, unused_suite_name):
+            return True
+
+        def mock_run_tests(unused_args):
+            return 'sample\noutput', 1
+
+        is_test_output_flaky_swap = self.swap_with_checks(
+            flake_checker, 'is_test_output_flaky',
+            mock_is_test_output_flaky,
+            expected_args=[
+                (['sample\noutput', 'mySuite'],),
+                (['sample\noutput', 'mySuite'],),
+                (['sample\noutput', 'mySuite'],),
+            ])
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)])
+        run_swap = self.swap(
+            run_e2e_tests, 'run_tests', mock_run_tests)
+        with exit_swap, is_test_output_flaky_swap, run_swap:
+            run_e2e_tests.main(args=['--suite', 'mySuite'])
+
+    def test_rerun_tests(self):
+
+        mock_process = MockProcessClass()
+
+        def mock_is_oppia_server_already_running(*unused_args):
+            return False
+
+        def mock_setup_and_install_dependencies(unused_arg):
+            return
+
+        def mock_register(unused_func, unused_arg=None):
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_exit(unused_exit_code):
+            return
+
+        def mock_build_js_files(
+                unused_arg, deparallelize_terser=False, source_maps=False): # pylint: disable=unused-argument
+            return
+
+        def mock_start_webdriver_manager(unused_arg):
+            return
+
+        def mock_start_google_app_engine_server(unused_arg, unused_log_level):
+            return
+
+        def mock_wait_for_port_to_be_open(unused_port):
+            return
+
+        def mock_get_e2e_test_parameters(
+                unused_sharding_instances, unused_suite, unused_dev_mode):
+            return ['commands']
+
+        def mock_popen(unused_commands, stdout=None): # pylint: disable=unused-argument
+            def mock_communicate():
+                return
+            result = mock_process
+            result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
+            result.returncode = 0 # pylint: disable=attribute-defined-outside-init
+            result.stdout = python_utils.string_io(
+                buffer_value='sample output\n')
+            return result
+
+        def mock_get_chrome_driver_version():
+            return CHROME_DRIVER_VERSION
+
+        def mock_report_pass(unused_suite_name):
+            return
+
+        get_chrome_driver_version_swap = self.swap(
+            run_e2e_tests, 'get_chrome_driver_version',
+            mock_get_chrome_driver_version)
+
+        check_swap = self.swap_with_checks(
+            run_e2e_tests, 'is_oppia_server_already_running',
+            mock_is_oppia_server_already_running)
+
+        setup_and_install_swap = self.swap_with_checks(
+            run_e2e_tests, 'setup_and_install_dependencies',
+            mock_setup_and_install_dependencies, expected_args=[(False,)])
+
+        register_swap = self.swap_with_checks(
+            atexit, 'register', mock_register, expected_args=[
+                (mock_cleanup,),
+                (run_e2e_tests.cleanup_portserver, mock_process),
+            ])
+
+        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
+        build_swap = self.swap_with_checks(
+            run_e2e_tests, 'build_js_files', mock_build_js_files,
+            expected_args=[(True,)])
+        start_webdriver_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_webdriver_manager',
+            mock_start_webdriver_manager,
+            expected_args=[(CHROME_DRIVER_VERSION,)])
+        start_google_app_engine_server_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_google_app_engine_server',
+            mock_start_google_app_engine_server,
+            expected_args=[(True, 'error')])
+        wait_swap = self.swap_with_checks(
+            common, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open,
+            expected_args=[
+                (feconf.REDISPORT,),
+                (run_e2e_tests.WEB_DRIVER_PORT,),
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+        get_parameters_swap = self.swap_with_checks(
+            run_e2e_tests, 'get_e2e_test_parameters',
+            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen, expected_args=[
+                ([
+                    'python', '-m',
+                    'scripts.run_portserver',
+                    '--portserver_unix_socket_address',
+                    run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                ],),
+                ([
+                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    '--daemonize', 'yes'
+                ],),
+                ([
+                    common.NODE_BIN_PATH,
+                    '--unhandled-rejections=strict',
+                    run_e2e_tests.PROTRACTOR_BIN_PATH,
+                    'commands',
+                ],),
+            ],
+        )
+        report_flake_swap = self.swap_with_checks(
+            flake_checker, 'report_pass', mock_report_pass,
+            expected_args=[
+                (['mySuite'],),
+            ])
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(0,)])
+        with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
+            with build_swap, start_webdriver_swap:
+                with start_google_app_engine_server_swap:
+                    with wait_swap, report_flake_swap:
+                        with get_parameters_swap, popen_swap:
+                            with get_chrome_driver_version_swap, exit_swap:
+                                run_e2e_tests.main(
+                                        args=['--suite', 'mySuite'])
 
     def test_start_tests_skip_build(self):
 
@@ -948,6 +1143,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
+
+        def mock_report_pass(unused_suite_name):
+            return
 
         get_chrome_driver_version_swap = self.swap(
             run_e2e_tests, 'get_chrome_driver_version',
@@ -1006,6 +1204,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 ],),
             ],
         )
+        report_flake_swap = self.swap_with_checks(
+            flake_checker, 'report_pass', mock_report_pass,
+            expected_args=[
+                (['mySuite'],),
+            ])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
@@ -1015,7 +1218,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                         with get_parameters_swap, popen_swap:
                             with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(
-                                    args=['--skip-install', '--skip-build'])
+                                    args=[
+                                        '--skip-install',
+                                        '--skip-build', '--suite',
+                                        'mySuite'])
 
     def test_linux_chrome_version_command_not_found_failure(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
@@ -1113,6 +1319,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
 
+        def mock_report_pass(unused_suite_name):
+            return
+
         get_chrome_driver_version_swap = self.swap(
             run_e2e_tests, 'get_chrome_driver_version',
             mock_get_chrome_driver_version)
@@ -1174,6 +1383,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 ],),
             ],
         )
+        report_flake_swap = self.swap_with_checks(
+            flake_checker, 'report_pass', mock_report_pass,
+            expected_args=[
+                (['mySuite'],),
+            ])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
@@ -1182,7 +1396,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     with wait_swap:
                         with get_parameters_swap, popen_swap, exit_swap:
                             with get_chrome_driver_version_swap:
-                                run_e2e_tests.main(args=['--debug_mode'])
+                                run_e2e_tests.main(args=[
+                                    '--debug_mode', '--suite',
+                                    'mySuite'])
 
     def test_start_tests_in_with_chromedriver_flag(self):
 
@@ -1230,6 +1446,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
+
+        def mock_report_pass(unused_suite_name):
+            return
 
         get_chrome_driver_version_swap = self.swap(
             run_e2e_tests, 'get_chrome_driver_version',
@@ -1291,6 +1510,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 ],),
             ],
         )
+        report_flake_swap = self.swap_with_checks(
+            flake_checker, 'report_pass', mock_report_pass,
+            expected_args=[
+                (['mySuite'],),
+            ])
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
@@ -1302,7 +1526,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                                 run_e2e_tests.main(
                                     args=[
                                         '--chrome_driver_version',
-                                        CHROME_DRIVER_VERSION])
+                                        CHROME_DRIVER_VERSION,
+                                        '--suite', 'mySuite'])
 
     def test_cleanup_portserver_when_server_shuts_down_cleanly(self):
         process = MockProcessClass(clean_shutdown=True)

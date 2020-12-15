@@ -24,10 +24,13 @@ import python_utils
 
 import requests
 
-FLAKE_REPORT_URL = (
+FLAKE_CHECK_AND_REPORT_URL = (
     'https://oppia-e2e-test-results-logger.herokuapp.com'
     '/check-flake-and-report')
-FLAKE_REPORT_API_KEY = '7Ccp062JVjv9LUYwnLMqcm5Eu5gYqqhpl3zQmcO3cDQ'
+PASS_REPORT_URL = (
+    'https://oppia-e2e-test-results-logger.herokuapp.com'
+    '/check-flake-and-report')
+REPORT_API_KEY = '7Ccp062JVjv9LUYwnLMqcm5Eu5gYqqhpl3zQmcO3cDQ'
 
 CI_INFO = {
     'circleCI': {
@@ -98,6 +101,25 @@ def _get_build_info():
     raise Exception('Unknown build environment.')
 
 
+def report_pass(suite_name):
+    """Report a passing test to the logging server."""
+    metadata = _get_build_info()
+    payload = {
+        'suite': suite_name,
+        'metadata': metadata,
+    }
+    try:
+        response = requests.post(
+            PASS_REPORT_URL, json=payload,
+            allow_redirects=False,
+            headers={'report_key': REPORT_API_KEY})
+    except Exception as e:
+        _print_color_message((
+            'Failed to contact E2E test logging server at %s.'
+            'Please report to E2E team in case server is down.'
+            'Exception: %s') % (FLAKE_CHECK_AND_REPORT_URL, e))
+
+
 def is_test_output_flaky(output_lines, suite_name):
     """Returns whether the test output matches any flaky test log."""
     build_info = _get_build_info()
@@ -109,13 +131,14 @@ def is_test_output_flaky(output_lines, suite_name):
     response = None
     try:
         response = requests.post(
-            FLAKE_REPORT_URL, json=payload, allow_redirects=False,
-            headers={'report_key': FLAKE_REPORT_API_KEY})
+            FLAKE_CHECK_AND_REPORT_URL, json=payload,
+            allow_redirects=False,
+            headers={'report_key': REPORT_API_KEY})
     except Exception as e:
         _print_color_message((
             'Failed to contact E2E test logging server at %s.'
             'Please report to E2E team in case server is down.'
-            'Exception: %s') % (FLAKE_REPORT_URL, e))
+            'Exception: %s') % (FLAKE_CHECK_AND_REPORT_URL, e))
 
         return False
 
@@ -131,8 +154,9 @@ def is_test_output_flaky(output_lines, suite_name):
         _print_color_message('Unable to convert json response: %s' % e)
 
     if 'log' in report:
+        log_str = '\n'.join(report['log'])
         _print_color_message(
-            'Logs from test result logging server:\n %s' % report['log'])
+            'Logs from test result logging server:\n %s' % log_str)
 
     flaky = report['result'] if 'result' in report else False
     if flaky:
