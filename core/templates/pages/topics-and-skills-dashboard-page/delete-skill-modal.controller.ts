@@ -32,10 +32,10 @@ angular.module('oppia').controller('DeleteSkillModalController', [
     $scope.fetchTopicAssignmentsForSkill = function() {
       TopicsAndSkillsDashboardBackendApiService
         .fetchTopicAssignmentsForSkillAsync(
-        skillId).then((response) => {
-        $scope.topicsAssignments = response;
-        $scope.topicsAssignmentsAreFetched = true;
-      });
+          skillId).then((response) => {
+          $scope.topicsAssignments = response;
+          $scope.topicsAssignmentsAreFetched = true;
+        });
     };
     $scope.init = function() {
       $scope.topicsAssignmentsAreFetched = false;

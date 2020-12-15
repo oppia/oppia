@@ -37,17 +37,17 @@ angular.module('oppia').controller('UnassignSkillFromTopicModalController', [
     $scope.fetchTopicAssignmentsForSkill = function() {
       TopicsAndSkillsDashboardBackendApiService
         .fetchTopicAssignmentsForSkillAsync(
-        skillId).then((response) => {
-        $scope.topicsAssignments = {};
-        response.map((topic) => {
-          $scope.topicsAssignments[topic.topicName] = {
-            subtopicId: topic.subtopicId,
-            topicVersion: topic.topicVersion,
-            topicId: topic.topicId,
-          };
+          skillId).then((response) => {
+          $scope.topicsAssignments = {};
+          response.map((topic) => {
+            $scope.topicsAssignments[topic.topicName] = {
+              subtopicId: topic.subtopicId,
+              topicVersion: topic.topicVersion,
+              topicId: topic.topicId,
+            };
+          });
+          $scope.topicsAssignmentsAreFetched = true;
         });
-        $scope.topicsAssignmentsAreFetched = true;
-      });
     };
     $scope.init = function() {
       $scope.selectedTopicNames = [];
