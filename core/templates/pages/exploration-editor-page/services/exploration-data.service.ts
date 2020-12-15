@@ -105,7 +105,8 @@ export class ExplorationDataService {
   // committed version (as opposed to the most recent autosave).
   autosaveChangeList(
       changeList: ExplorationChangeList[],
-      successCallback: Function) {
+      successCallback: Function,
+      errorCallback = () => {}) {
     // First save locally to be retrieved later if save is unsuccessful.
     if (this.localStorageService && this.localStorageService.saveExplorationDraft) {
       this.localStorageService.saveExplorationDraft(
@@ -126,7 +127,7 @@ export class ExplorationDataService {
       this.localStorageService.removeExplorationDraft(this.explorationId);
       successCallback({data: response});
     }, errorResponse => {
-
+      errorCallback();
     });
   }
 
