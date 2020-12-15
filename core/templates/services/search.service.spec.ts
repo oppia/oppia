@@ -24,7 +24,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { SearchService, SelectionList, SelectionDetails } from 'services/search.service';
 import { Subscription } from 'rxjs';
 
-fdescribe('Search Service', () => {
+describe('Search Service', () => {
   let searchService: SearchService;
   let results: SelectionDetails;
   let httpTestingController: HttpTestingController;
