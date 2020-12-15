@@ -72,11 +72,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 
 export class FatigueDetectionService{
-  private submissionTimesMsec: Number[]=[];
-  private SPAM_COUNT_THRESHOLD: Number = 4;
-  private SPAM_WINDOW_MSEC:Number = 10000;
-  private windowStartTime:Number;
-  private windowEndTime:Number;
+  private submissionTimesMsec: number[]=[];
+  private SPAM_COUNT_THRESHOLD: number = 4;
+  private SPAM_WINDOW_MSEC:number = 10000;
+  private windowStartTime:number;
+  private windowEndTime:number;
 
   constructor(private ngbModal: NgbModal){}
 
@@ -96,8 +96,9 @@ export class FatigueDetectionService{
   }
 
   displayTakeBreakMessage():void {
-    this.ngbModal.open('pages/exploration-player-page/templates/take-break-modal.template.html',{
-      backdrop: 'static'
+    this.ngbModal.open(
+      'pages/exploration-player-page/templates/take-break-modal.template.html',
+      { backdrop: 'static'
     }).result.then(function() {}, function() {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -111,4 +112,6 @@ export class FatigueDetectionService{
 
 }
 
-angular.module('oppia').factory('FatigueDetectionService',downgradeInjectable(FatigueDetectionService));
+angular.module('oppia').factory(
+  'FatigueDetectionService',
+  downgradeInjectable(FatigueDetectionService));
