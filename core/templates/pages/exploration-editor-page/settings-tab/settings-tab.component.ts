@@ -92,7 +92,7 @@ angular.module('oppia').component('settingsTab', {
   },
   template: require('./settings-tab.component.html'),
   controller: [
-    '$http', '$uibModal', 'AlertsService', 'ChangeListService',
+    '$http', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
     'EditabilityService', 'EditableExplorationBackendApiService',
     'ExplorationAutomaticTextToSpeechService',
     'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
@@ -107,7 +107,7 @@ angular.module('oppia').component('settingsTab', {
     'WindowRef', 'ALL_CATEGORIES',
     'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
     function(
-        $http, $uibModal, AlertsService, ChangeListService,
+        $http, $rootScope, $uibModal, AlertsService, ChangeListService,
         EditabilityService, EditableExplorationBackendApiService,
         ExplorationAutomaticTextToSpeechService,
         ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
@@ -458,6 +458,27 @@ angular.module('oppia').component('settingsTab', {
           width: '16.66666667%',
           'vertical-align': 'top'
         });
+      };
+
+      // Called by the ng-if present in Unpublish button in
+      // "settings-tab.component.hmtl". Refreshes the permissions for Unpublish
+      // and transfer buttons.
+
+      ctrl.canReleaseOwnership = false;
+      ctrl.canUnpublish = false;
+
+      ctrl.refreshPermissions = function(permissions) {
+        ctrl.canUnpublish = permissions.canUnpublish;
+        ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+      };
+
+      ctrl.showUnpublishButton = function() {
+        UserExplorationPermissionsService.getPermissionsAsync()
+          .then(function(permissions) {
+            ctrl.refreshPermissions(permissions);
+            $rootScope.$applyAsync();
+          });
+        return ctrl.canUnpublish;
       };
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();

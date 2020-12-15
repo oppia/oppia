@@ -34,11 +34,11 @@ require('services/editability.service.ts');
 angular.module('oppia').component('explorationSaveAndPublishButtons', {
   template: require('./exploration-save-and-publish-buttons.component.html'),
   controller: [
-    '$scope', 'ChangeListService', 'EditabilityService',
+    '$rootScope', '$scope', 'ChangeListService', 'EditabilityService',
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationWarningsService', 'UserExplorationPermissionsService',
     function(
-        $scope, ChangeListService, EditabilityService,
+        $rootScope, $scope, ChangeListService, EditabilityService,
         ExplorationRightsService, ExplorationSaveService,
         ExplorationWarningsService, UserExplorationPermissionsService) {
       var ctrl = this;
@@ -125,13 +125,22 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.saveIsInProcess = false;
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
+      };
 
+      $scope.canPublish = true;
+
+      $scope.refreshPermissions = function(permissions) {
+        $scope.canPublish = permissions.canPublish;
+      };
+
+      $scope.showPublishButton = function() {
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
-            $scope.showPublishButton = function() {
-              return permissions.canPublish && $scope.isPrivate();
-            };
+            $scope.refreshPermissions(permissions);
+            $rootScope.$applyAsync();
           });
+
+        return $scope.canPublish && $scope.isPrivate();
       };
     }
   ]

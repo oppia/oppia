@@ -18,13 +18,18 @@
  */
 
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('ExplorationRightsService', [
-  '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
-  'ACTIVITY_STATUS_PUBLIC',
+  '$http', 'AlertsService', 'ExplorationDataService',
+  'UserExplorationPermissionsService',
+  'ACTIVITY_STATUS_PRIVATE', 'ACTIVITY_STATUS_PUBLIC',
   function(
       $http, AlertsService, ExplorationDataService,
+      UserExplorationPermissionsService,
       ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC) {
     return {
       init: function(
@@ -148,6 +153,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
             data.rights.voice_artist_names, data.rights.viewer_names,
             data.rights.status, data.rights.cloned_from,
             data.rights.community_owned, data.rights.viewable_if_private);
+          UserExplorationPermissionsService.getPermissionsAsync(true);
         });
       }
     };
