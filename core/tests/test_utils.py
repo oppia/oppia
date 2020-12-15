@@ -333,7 +333,13 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         result_doc_ids = set()
         resulting_offset = None
 
-        assert cursor is None
+        #TODO(shubha-rajan): This block will make tests pass when the caller passes in a cursor instead of an offset. 
+        # Remove once migration to ElasticSearch is complete
+        if cursor and not offset:
+            offset = cursor
+        elif not cursor and not offset:
+            offset = 0
+
         assert query_string is not None
 
         if not index_name or index_name == '_all':
