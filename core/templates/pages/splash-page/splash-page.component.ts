@@ -103,8 +103,10 @@ angular.module('oppia').component('splashPage', {
         ctrl.userIsLoggedIn = null;
         ctrl.displayedTestimonialId = 0;
         ctrl.testimonialCount = 4;
-        ctrl.classroomUrl = (
-          '/learn/' + splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT);
+        ctrl.classroomUrl = UrlInterpolationService.interpolateUrl(
+          '/learn/<classroomUrlFragment>',  {
+            classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+          });
         LoaderService.showLoadingScreen('Loading');
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
