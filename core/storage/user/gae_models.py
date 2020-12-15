@@ -913,7 +913,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
     """
 
     # IDs of activities (e.g., explorations) that this user subscribes to.
-    # TODO(#10727): Rename this to exploration_ids and perform a migration.
     # IDs of explorations that this user subscribes to.
     exploration_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))

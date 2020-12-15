@@ -1354,6 +1354,30 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(owner_settings.last_edited_an_exploration)
 
 
+class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(FillExplorationIdsInUserSubscriptionsModelOneOffJobTests, self).setUp()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.create_new())
+        user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        return user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.get_output(job_id)
+
+    def test_that_exploration_ids_and_activity_ids_are_equal(self):
+
+        #Generate activity_ids
+        user_models.UserSubscriptionsModel(activity_ids=['exp_1', 'exp_2', 'exp_3']).put()
+        exploration_ids = self._run_one_off_job()
+        self.assertEqual(exploration_ids, [u"[u'SUCCESS', 1]"])
+
+
 class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):

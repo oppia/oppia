@@ -844,7 +844,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     CREATOR_IDS = [USER_ID_5, USER_ID_6]
     CREATOR_USERNAMES = ['usernameuser_id_5', 'usernameuser_id_6']
     COLLECTION_IDS = ['23', '42', '4']
-    EXPLORATION_IDS = ['8', '16', '23']
+    EXPLORATION_IDS = ['exp_1', 'exp_2', 'exp_3']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
     GENERIC_DATETIME = datetime.datetime(2020, 6, 2)
 
