@@ -4095,8 +4095,8 @@ class Exploration(python_utils.OBJECT):
         """
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
-        except Exception as e:
-            raise Exception(
+        except utils.InvalidInputException as e:
+            raise utils.InvalidInputException(
                 'Please ensure that you are uploading a YAML text file, not '
                 'a zip file. The YAML parser returned the following error: %s'
                 % e)

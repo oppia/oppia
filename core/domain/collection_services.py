@@ -629,48 +629,40 @@ def apply_change_list(collection_id, change_list):
         Collection. The resulting collection domain object.
     """
     collection = get_collection_by_id(collection_id)
-    try:
-        changes = [collection_domain.CollectionChange(change_dict)
-                   for change_dict in change_list]
+    changes = [collection_domain.CollectionChange(change_dict)
+               for change_dict in change_list]
 
-        for change in changes:
-            if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
-                collection.add_node(change.exploration_id)
-            elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
-                collection.delete_node(change.exploration_id)
-            elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
-                collection.swap_nodes(change.first_index, change.second_index)
-            elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-                if (change.property_name ==
-                        collection_domain.COLLECTION_PROPERTY_TITLE):
-                    collection.update_title(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
-                    collection.update_category(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
-                    collection.update_objective(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
-                    collection.update_language_code(change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_PROPERTY_TAGS):
-                    collection.update_tags(change.new_value)
-            elif (change.cmd ==
-                  collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
-                # Loading the collection model from the datastore into an
-                # Collection domain object automatically converts it to use the
-                # latest schema version. As a result, simply resaving the
-                # collection is sufficient to apply the schema migration.
-                continue
-        return collection
-
-    except Exception as e:
-        logging.error(
-            '%s %s %s %s' % (
-                e.__class__.__name__, e, collection_id, change_list)
-        )
-        raise
+    for change in changes:
+        if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
+            collection.add_node(change.exploration_id)
+        elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
+            collection.delete_node(change.exploration_id)
+        elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
+            collection.swap_nodes(change.first_index, change.second_index)
+        elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
+            if (change.property_name ==
+                    collection_domain.COLLECTION_PROPERTY_TITLE):
+                collection.update_title(change.new_value)
+            elif (change.property_name ==
+                  collection_domain.COLLECTION_PROPERTY_CATEGORY):
+                collection.update_category(change.new_value)
+            elif (change.property_name ==
+                  collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
+                collection.update_objective(change.new_value)
+            elif (change.property_name ==
+                  collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
+                collection.update_language_code(change.new_value)
+            elif (change.property_name ==
+                  collection_domain.COLLECTION_PROPERTY_TAGS):
+                collection.update_tags(change.new_value)
+        elif (change.cmd ==
+              collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+            # Loading the collection model from the datastore into an
+            # Collection domain object automatically converts it to use the
+            # latest schema version. As a result, simply resaving the
+            # collection is sufficient to apply the schema migration.
+            continue
+    return collection
 
 
 def validate_exps_in_collection_are_public(collection):
