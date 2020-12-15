@@ -221,14 +221,9 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         for document in documents:
             assert 'id' in document
             if index_name not in self._DB:
+            
                 self._DB[index_name] = []
-            deleted_doc = None
-            for stored_doc in self._DB[index_name]:
-                if stored_doc['id'] == document['id']:
-                    deleted_doc = stored_doc
-            if deleted_doc:
-                self._DB[index_name].remove(deleted_doc)
-            # self.delete_documents_from_index([document['id']])
+            print(index_name)
             self._DB[index_name].append(document)
 
     def delete_documents_from_index(self, doc_ids, index_name):
@@ -243,15 +238,14 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
             Exception. Document id does not exist.
         """
         assert isinstance(index_name, python_utils.BASESTRING)
-        for doc_id in doc_ids:
-            assert isinstance(doc_id, python_utils.BASESTRING)
-            if index_name in self._DB:
-                deleted_docs = filter(lambda x: x['id'] == doc_id, self._DB[index_name])
-                if deleted_docs:
-                    for doc in deleted_docs:
-                        self._DB[index_name].remove(doc)
+        if index_name in self._DB:
+            for doc_id in doc_ids:
+                assert isinstance(doc_id, python_utils.BASESTRING)
+                docs = [d for d in self._DB[index_name] if d["id"] != doc_id]
+                if len(self._DB[index_name] ) != len(docs):
+                    self._DB[index_name] = docs
                 else:
-                    raise Exception('Document id does not exist: %s' % doc_id)
+                    raise Exception( 'Document id does not exist: %s' % doc_id )
 
     def clear_index(self, index_name):
         """Clears an index on the mock elastic search instance.
@@ -309,29 +303,28 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         """
 
         result_docs = []
-        result_doc_ids = set()
-        resulting_offset = offset or 0
+        result_doc_ids = []
+        resulting_offset = None
         assert query_string is not None
         if not index_name or index_name == '_all':
             for _, documents in self._DB:
                 for doc in documents:
-                    if len(result_doc_ids) == size:
-                        break
                     if not doc['id'] in result_doc_ids:
                         result_docs.append(doc)
-                        result_doc_ids.add(doc['id'])
-                        resulting_offset += 1
+                        result_doc_ids.append(doc['id'])
         else:
             for doc in self._DB[index_name]:
-                if len(result_doc_ids) == size:
-                    break
                 if not doc['id'] in result_doc_ids:
                     result_docs.append(doc)
-                    result_doc_ids.add(doc['id'])
-                    resulting_offset += 1
+                    result_doc_ids.append(doc['id'])
+        if offset + size < len(result_docs):
+            resulting_offset = offset + size
         if ids_only:
-            return list(result_doc_ids), resulting_offset
-        return result_docs, resulting_offset
+            result_docs = result_doc_ids
+        if resulting_offset:
+            return result_docs[offset:resulting_offset], resulting_offset
+        else:
+            return result_docs[offset:], resulting_offset
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
