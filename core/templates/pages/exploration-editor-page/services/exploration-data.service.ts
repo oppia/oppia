@@ -105,8 +105,7 @@ export class ExplorationDataService {
   // committed version (as opposed to the most recent autosave).
   autosaveChangeList(
       changeList: ExplorationChangeList[],
-      successCallback: Function,
-      errorCallback = function() {}) {
+      successCallback: Function) {
     // First save locally to be retrieved later if save is unsuccessful.
     if (this.localStorageService && this.localStorageService.saveExplorationDraft) {
       this.localStorageService.saveExplorationDraft(
@@ -125,9 +124,9 @@ export class ExplorationDataService {
       // We can safely remove the locally saved draft copy if it was saved
       // to the backend.
       this.localStorageService.removeExplorationDraft(this.explorationId);
-      successCallback(response);
+      successCallback();
     }, errorResponse => {
-      errorCallback();
+
     });
   }
 

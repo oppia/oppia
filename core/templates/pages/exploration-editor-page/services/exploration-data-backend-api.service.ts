@@ -30,33 +30,45 @@ export class ExplorationDataBackendApiService {
 
   setDiscardDraft(explorationDraftAutosaveUrl: string)
   : Promise<Object> {
-    return this.httpClient.post(
-      explorationDraftAutosaveUrl, {})
-      .toPromise().then(response => {
-        return response;
-      });
+    return new Promise((resolve, reject) => {
+      return this.httpClient.post(
+        explorationDraftAutosaveUrl, {})
+        .toPromise().then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse);
+        });
+    });
   }
 
   setResolveAnswer(
       resolveAnswerUrl: string,
       resolveAnswerDict: ResolveAnswerResponse)
     : Promise<Object> {
-    return this.httpClient.put(
-      resolveAnswerUrl, resolveAnswerDict)
-      .toPromise().then(response => {
-        return response;
-      });
+    return new Promise((resolve, reject) => {
+      return this.httpClient.put(
+        resolveAnswerUrl, resolveAnswerDict)
+        .toPromise().then(response => {
+          resolve(response);
+        }, errorResponse => {
+          reject(errorResponse);
+        });
+    });
   }
 
   setAutoSaveChangeList(
       autoSaveChangeListUrl:string,
       autoSaveChangeListRequest:ExplorationAutosaveChangeListRequest)
     : Promise<ExplorationAutosaveChangeListResponse> {
-    return this.httpClient.put<ExplorationAutosaveChangeListResponse>(
-      autoSaveChangeListUrl, autoSaveChangeListRequest)
-      .toPromise().then(response => {
-        return response;
-      });
+    return new Promise((resolve, reject) => {
+      return this.httpClient.put<ExplorationAutosaveChangeListResponse>(
+        autoSaveChangeListUrl, autoSaveChangeListRequest)
+        .toPromise().then(response => {
+          resolve(response);
+        }, errorResponse =>{
+          reject(errorResponse);
+        });
+    });
   }
 }
 
