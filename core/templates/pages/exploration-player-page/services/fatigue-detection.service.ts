@@ -88,8 +88,8 @@ export class FatigueDetectionService {
       this.windowStartTime = this.submissionTimesMsec.shift();
       this.windowEndTime =
         this.submissionTimesMsec[this.submissionTimesMsec.length - 1];
-      if (this.windowEndTime.valueOf() - this.windowStartTime.valueOf()
-        < this.SPAM_WINDOW_MSEC) {
+      if (this.windowEndTime.valueOf() - this.windowStartTime.valueOf() <
+         this.SPAM_WINDOW_MSEC) {
         return true;
       }
     }
@@ -101,17 +101,16 @@ export class FatigueDetectionService {
       'pages/exploration-player-page/templates/take-break-modal.template.html',
       {
         backdrop: 'static'
-      }).result.then(function () { }, function () {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
+      }).result.then(() => { }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
       });
   }
 
   reset(): void {
     this.submissionTimesMsec = [];
   }
-
 }
 
 angular.module('oppia').factory(

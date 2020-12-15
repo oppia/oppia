@@ -23,7 +23,6 @@ import { FatigueDetectionService } from 'pages/exploration-player-page/services/
 
 
 describe('Fatigue detection service', () => {
-
   let fatigueDetectionService: FatigueDetectionService;
   beforeEach(() => {
     fatigueDetectionService = TestBed.get(FatigueDetectionService);
