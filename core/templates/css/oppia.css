@@ -1313,9 +1313,9 @@ span.sort-explorations-select .sort-order {
 
 .oppia-dashboard-intro-button {
   background-color: #015c53;
-  border-radius: 0;
+  border-radius: 4px;
   color: #fff;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   margin-top: 10px;
   text-transform: uppercase;
@@ -1729,7 +1729,7 @@ pre.oppia-pre-wrapped-text {
   background-color: rgba(0,0,0,0.2);
   border-radius: 4px;
   color: rgba(255,255,255,1.0);
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   margin-left: 5px;
   margin-right: 5px;
@@ -3359,9 +3359,9 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-splash-button {
   background-color: #015c53;
-  border-radius: 0;
+  border-radius: 4px;
   color: #fff;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 16px;
   margin-top: -20px;
   min-width: 360px;
@@ -4178,8 +4178,9 @@ oppia-noninteractive-link {
 
 .oppia-about-button {
   background-color: rgb(0, 121, 109);
+  border-radius: 4px;
   color: rgba(255,255,255,1.0);
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 18px;
   margin: 0 15px 15px 15px;
   max-width: 90%;
