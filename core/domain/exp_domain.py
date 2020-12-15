@@ -3093,6 +3093,7 @@ class Exploration(python_utils.OBJECT):
             if interaction_id not in [
                 'DragAndDropSortInput', 'ItemSelectionInput']:
                 continue
+            customization_args = state_dict['interaction']['customization_args']
             answer_group_dicts = state_dict['interaction']['answer_groups']
             for answer_group_dict in answer_group_dicts:
                 for rule_spec_dict in answer_group_dict['rule_specs']:
@@ -3103,6 +3104,35 @@ class Exploration(python_utils.OBJECT):
                         # All rule inputs for ItemSelectionInput are being
                         # migrated from SetOfHtmlString to
                         # SetOfTranslatableHtmlContentId.
+
+                        # Find the content ids of the html.
+                        content_ids = []
+                        choices = customization_args['choices']['value']
+                        for rule_input_html in rule_inputs:
+                            for subtitled_html in choices:
+                                if subtitled_html['html'] == rule_input_html:
+                                    content_ids.append(
+                                        subtitled_html['content_id'])
+                        rule_spec_dict['inputs']['x'] = content_ids
+
+                    if interaction_id == 'DragAndDropSortInput':
+                        # The migrations required for DragAndDropSortInput are:
+                        # IsEqualToOrdering
+                        #   x:  ListOfSetsOfHtmlStrings to
+                        #       ListOfSetsOfTranslatableHtmlContentId
+                        # IsEqualToOrderingWithOneItemAtIncorrectPosition
+                        #   x:  ListOfSetsOfHtmlStrings to
+                        #       ListOfSetsOfTranslatableHtmlContentId
+                        # HasElementXAtPositionY
+                        #   x:  DragAndDropHtmlString to
+                        #       TranslatableHtmlContentId
+                        #   y: No migrations
+                        # HasElementXBeforeElementY
+                        #   x:  DragAndDropHtmlString to
+                        #       TranslatableHtmlContentId
+                        #   y:  DragAndDropHtmlString to
+                        #       TranslatableHtmlContentId
+
 
         return states_dict
 

@@ -51,7 +51,7 @@
       "description": "has element {{x|TranslatableHtmlContentId}} at position {{y|DragAndDropPositiveInt}}"
     },
     "HasElementXBeforeElementY": {
-      "description": "has element {{x|TranslatableHtmlContentId}} before element {{y|DragAndDropHtmlString}}"
+      "description": "has element {{x|TranslatableHtmlContentId}} before element {{y|TranslatableHtmlContentId}}"
     }
   },
   "EndExploration": {},
