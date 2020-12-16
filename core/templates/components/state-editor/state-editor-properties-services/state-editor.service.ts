@@ -63,6 +63,8 @@ export class StateEditorService {
 
   activeStateName: string = null;
   stateNames: string[] = [];
+  private _stateNamesChangedEventEmitter = new EventEmitter();
+  onStateNamesChanged = this._stateNamesChangedEventEmitter.asObservable();
   correctnessFeedbackEnabled: boolean = null;
   inQuestionMode: boolean = null;
   // Currently, the only place where this is used in the state editor
@@ -248,6 +250,7 @@ export class StateEditorService {
 
   setStateNames(newStateNames: string[]): void {
     this.stateNames = newStateNames;
+    this._stateNamesChangedEventEmitter.emit();
   }
 
   getStateNames(): string[] {

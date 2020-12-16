@@ -47,12 +47,12 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
         'outcome-destination-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', 'EditorFirstTimeEventsService',
+        '$rootScope', '$timeout', 'EditorFirstTimeEventsService',
         'FocusManagerService', 'StateEditorService', 'StateGraphLayoutService',
         'UserService', 'ENABLE_PREREQUISITE_SKILLS',
         'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
-            $rootScope, $scope, EditorFirstTimeEventsService,
+            $rootScope, $timeout, EditorFirstTimeEventsService,
             FocusManagerService, StateEditorService, StateGraphLayoutService,
             UserService, ENABLE_PREREQUISITE_SKILLS,
             EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
@@ -73,28 +73,13 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
             ctrl.maxLen = MAX_STATE_NAME_LENGTH;
             return outcome.dest === PLACEHOLDER_OUTCOME_DEST;
           };
-          ctrl.$onInit = function() {
-            ctrl.directiveSubscriptions.add(
-              StateEditorService.onSaveOutcomeDestDetails.subscribe(
-                () => {
-                  if (ctrl.isSelfLoop()) {
-                    ctrl.outcome.dest = StateEditorService.getActiveStateName();
-                  }
-                  // Create new state if specified.
-                  if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
-                    EditorFirstTimeEventsService
-                      .registerFirstCreateSecondStateEvent();
 
-                    var newStateName = ctrl.outcome.newStateName;
-                    ctrl.outcome.dest = newStateName;
-                    delete ctrl.outcome.newStateName;
-
-                    ctrl.addState(newStateName);
-                  }
-                }
-              )
-            );
-            $scope.$watch(StateEditorService.getStateNames, function() {
+          ctrl.updateOptionNames = function() {
+            // $timeout is used for updating view. The use of
+            // $scope.$applyAsync() didn't work and use of $scope.$apply()
+            // resulted in console errors. The value of 10ms in the $timeout is
+            // arbitrary. It has no significance.
+            $timeout(() => {
               currentStateName = StateEditorService.getActiveStateName();
 
               var questionModeEnabled = StateEditorService.isInQuestionMode();
@@ -135,12 +120,12 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
                   if (lastComputedArrangement.hasOwnProperty(stateName)) {
                     allStateScores[stateName] = (
                       lastComputedArrangement[stateName].depth *
-                      (maxOffset + 1) +
-                      lastComputedArrangement[stateName].offset);
+                    (maxOffset + 1) +
+                    lastComputedArrangement[stateName].offset);
                   } else {
-                    // States that have just been added in the rule 'create new'
-                    // modal are not yet included as part of
-                    // lastComputedArrangement so we account for them here.
+                  // States that have just been added in the rule 'create new'
+                  // modal are not yet included as part of
+                  // lastComputedArrangement so we account for them here.
                     allStateScores[stateName] = (
                       (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
                     unarrangedStateCount++;
@@ -167,7 +152,36 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
                   text: 'A New Card Called...'
                 });
               }
-            }, true);
+            }, 10);
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onSaveOutcomeDestDetails.subscribe(
+                () => {
+                  if (ctrl.isSelfLoop()) {
+                    ctrl.outcome.dest = StateEditorService.getActiveStateName();
+                  }
+                  // Create new state if specified.
+                  if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+                    EditorFirstTimeEventsService
+                      .registerFirstCreateSecondStateEvent();
+
+                    var newStateName = ctrl.outcome.newStateName;
+                    ctrl.outcome.dest = newStateName;
+                    delete ctrl.outcome.newStateName;
+
+                    ctrl.addState(newStateName);
+                  }
+                }
+              )
+            );
+            ctrl.updateOptionNames();
+            ctrl.directiveSubscriptions.add(
+              StateEditorService.onStateNamesChanged.subscribe(() => {
+                ctrl.updateOptionNames();
+              })
+            );
             ctrl.canAddPrerequisiteSkill = (
               ENABLE_PREREQUISITE_SKILLS &&
               StateEditorService.isExplorationWhitelisted());
