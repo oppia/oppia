@@ -41,13 +41,13 @@ import {
   WrittenTranslationsObjectFactory
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 export interface StateBackendDict {
   'classifier_model_id': string;
   'content': SubtitledHtmlBackendDict;
   'interaction': InteractionBackendDict;
-  'param_changes': ParamChangeBackendDict[];
+  'param_changes': readonly ParamChangeBackendDict[];
   'recorded_voiceovers': RecordedVoiceOverBackendDict;
   'solicit_answer_details': boolean;
   'written_translations': WrittenTranslationsBackendDict;
@@ -122,8 +122,12 @@ export class StateObjectFactory {
     private subtitledHtmlObject: SubtitledHtmlObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
+  get NEW_STATE_TEMPLATE(): StateBackendDict {
+    return constants.NEW_STATE_TEMPLATE;
+  }
+
   createDefaultState(newStateName: string): State {
-    var newStateTemplate = constants.NEW_STATE_TEMPLATE;
+    var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
       content: newStateTemplate.content,

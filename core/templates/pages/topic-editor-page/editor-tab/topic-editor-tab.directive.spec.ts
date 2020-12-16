@@ -356,6 +356,23 @@ describe('Topic editor tab directive', function() {
       expect(topicMetaTagContentSpy).not.toHaveBeenCalled();
     });
 
+  it('should call the TopicUpdateService if topic page title is updated',
+    function() {
+      var topicPageTitleFragmentForWebSpy = spyOn(
+        TopicUpdateService, 'setPageTitleFragmentForWeb');
+      $scope.updateTopicPageTitleFragmentForWeb('new page title');
+      expect(topicPageTitleFragmentForWebSpy).toHaveBeenCalled();
+    });
+
+  it('should not call the TopicUpdateService if topic page title is same',
+    function() {
+      $scope.updateTopicPageTitleFragmentForWeb('New page title');
+      var topicPageTitleFragmentForWebSpy = spyOn(
+        TopicUpdateService, 'setPageTitleFragmentForWeb');
+      $scope.updateTopicPageTitleFragmentForWeb('New page title');
+      expect(topicPageTitleFragmentForWebSpy).not.toHaveBeenCalled();
+    });
+
   it('should call the TopicUpdateService if practice tab is displayed ' +
     'property is updated', function() {
     var topicPracticeTabSpy = (

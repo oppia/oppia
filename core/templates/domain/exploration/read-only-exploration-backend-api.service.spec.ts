@@ -16,241 +16,238 @@
  * @fileoverview Unit tests for ReadOnlyExplorationBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { TranslatorProviderForTests } from 'tests/test.extras';
+import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-
-require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-
-describe('Read only exploration backend API service', function() {
-  let ReadOnlyExplorationBackendApiService = null;
-  let sampleDataResults = null;
-  let $rootScope = null;
-  let $httpBackend = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.module(
-    'oppia', TranslatorProviderForTests));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    ReadOnlyExplorationBackendApiService = $injector.get(
-      'ReadOnlyExplorationBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $httpBackend = $injector.get('$httpBackend');
-
-    // Sample exploration object returnable from the backend.
-    sampleDataResults = {
-      exploration_id: '0',
-      is_logged_in: true,
-      session_id: 'KERH',
-      exploration: {
-        init_state_name: 'Introduction',
-        states: {
-          Introduction: {
-            param_changes: [],
-            content: {
-              html: '',
-              audio_translations: {}
-            },
-            unresolved_answers: {},
-            interaction: {
-              customization_args: {},
-              answer_groups: [],
-              default_outcome: {
-                param_changes: [],
-                dest: 'Introduction',
-                feedback: {
-                  html: '',
-                  audio_translations: {}
-                }
+describe('Read only exploration backend API service', () => {
+  let roebas: ReadOnlyExplorationBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let sampleDataResults: FetchExplorationBackendResponse = {
+    exploration_id: '0',
+    is_logged_in: true,
+    session_id: 'KERH',
+    exploration: {
+      init_state_name: 'Introduction',
+      param_changes: [],
+      param_specs: null,
+      title: 'Exploration',
+      language_code: 'en',
+      correctness_feedback_enabled: true,
+      objective: 'To learn',
+      states: {
+        Introduction: {
+          param_changes: [],
+          classifier_model_id: null,
+          recorded_voiceovers: null,
+          solicit_answer_details: true,
+          written_translations: null,
+          next_content_id_index: null,
+          content: {
+            html: '',
+            content_id: 'content'
+          },
+          interaction: {
+            customization_args: {},
+            answer_groups: [],
+            solution: null,
+            hints: [],
+            default_outcome: {
+              param_changes: [],
+              dest: 'Introduction',
+              feedback: {
+                html: '',
+                content_id: 'content'
               },
-              confirmed_unclassified_answers: [],
-              id: null
-            }
+              labelled_as_correct: true,
+              refresher_exploration_id: 'exp',
+              missing_prerequisite_skill_id: null
+            },
+            confirmed_unclassified_answers: [],
+            id: null
           }
         }
-      },
-      version: 1,
-      state_classifier_mapping: {}
-    };
-  }));
+      }
+    },
+    version: 1,
+    can_edit: true,
+    preferred_audio_language_code: 'en',
+    auto_tts_enabled: true,
+    correctness_feedback_enabled: true,
+    record_playthrough_probability: 1
+  };
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    roebas = TestBed.get(ReadOnlyExplorationBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing exploration from the backend',
-    function() {
+    fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-        sampleDataResults);
-      ReadOnlyExplorationBackendApiService.fetchExploration(
-        '0', null).then(successHandler, failHandler);
-      $httpBackend.flush();
+      roebas.fetchExploration('0', null).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/explorehandler/init/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    }));
 
   it('should successfully fetch an existing exploration with version from' +
-    ' the backend', function() {
+    ' the backend', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', '/explorehandler/init/0?v=1').respond(
-      sampleDataResults);
-    ReadOnlyExplorationBackendApiService.fetchExploration(
-      '0', 1).then(successHandler, failHandler);
-    $httpBackend.flush();
+    roebas.fetchExploration('0', 1).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/explorehandler/init/0?v=1');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should load a cached exploration after fetching it from the backend',
-    function() {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      // Loading a exploration the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-        sampleDataResults);
-      ReadOnlyExplorationBackendApiService.loadExploration(
-        '0', null).then(successHandler, failHandler);
-      $httpBackend.flush();
-
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-
-      // Loading a exploration the second time should not fetch it.
-      ReadOnlyExplorationBackendApiService.loadExploration(
-        '0', null).then(successHandler, failHandler);
-
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+  }));
 
   it('should use the rejection handler if the backend request failed',
-    function() {
+    fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      // Loading a exploration the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-        500, 'Error loading exploration 0.');
-      ReadOnlyExplorationBackendApiService.loadExploration(
-        '0', null).then(successHandler, failHandler);
-      $httpBackend.flush();
+      roebas.loadExploration('0', null).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/explorehandler/init/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Error loading exploration 0.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading exploration 0.');
-    }
-  );
+    }));
 
-  it('should report caching and support clearing the cache', function() {
+  it('should report caching and support clearing the cache', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     // The exploration should not currently be cached.
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+    expect(roebas.isCached('0')).toBe(false);
 
-    // Loading a exploration the first time should fetch it from the backend.
-    $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-      sampleDataResults);
-    ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
+    roebas.loadLatestExploration('0').then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/explorehandler/init/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
 
     // The exploration should now be cached.
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
+    expect(roebas.isCached('0')).toBe(true);
 
     // The exploration should be loadable from the cache.
-    ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
-      successHandler, failHandler);
+    roebas.loadLatestExploration('0').then(successHandler, failHandler);
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
 
     // Resetting the cache will cause another fetch from the backend.
-    ReadOnlyExplorationBackendApiService.clearExplorationCache();
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+    roebas.clearExplorationCache();
+    expect(roebas.isCached('0')).toBe(false);
 
-    $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-      sampleDataResults);
-    ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
+    roebas.loadLatestExploration('0').then(
       successHandler, failHandler);
-    $httpBackend.flush();
+
+    req = httpTestingController.expectOne('/explorehandler/init/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should report a cached exploration after caching it', function() {
+  it('should report a cached exploration after caching it', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
     // The exploration should not currently be cached.
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+    expect(roebas.isCached('0')).toBe(false);
 
     // Cache a exploration.
-    ReadOnlyExplorationBackendApiService.cacheExploration('0', {
-      id: '0',
-      nodes: []
+    roebas.cacheExploration('0', {
+      can_edit: true,
+      exploration: null,
+      exploration_id: '0',
+      is_logged_in: true,
+      session_id: 'sessionId',
+      version: 1,
+      preferred_audio_language_code: 'en',
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: false,
+      record_playthrough_probability: 1
     });
 
     // It should now be cached.
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
+    expect(roebas.isCached('0')).toBe(true);
 
     // A new exploration should not have been fetched from the backend. Also,
     // the returned exploration should match the expected exploration object.
-    ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
-      successHandler, failHandler);
-
-    // http://brianmcd.com/2014/03/27/a-tip-for-angular-unit-tests-with-promises.html
-    $rootScope.$digest();
+    roebas.loadLatestExploration('0').then(successHandler, failHandler);
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
-      id: '0',
-      nodes: []
+      can_edit: true,
+      exploration: null,
+      exploration_id: '0',
+      is_logged_in: true,
+      session_id: 'sessionId',
+      version: 1,
+      preferred_audio_language_code: 'en',
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: false,
+      record_playthrough_probability: 1
     });
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
-  it('should delete a exploration from cache', function() {
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+  it('should delete a exploration from cache', fakeAsync(() => {
+    expect(roebas.isCached('0')).toBe(false);
 
-    ReadOnlyExplorationBackendApiService.cacheExploration('0', {
-      id: '0',
-      nodes: []
+    roebas.cacheExploration('0', {
+      can_edit: true,
+      exploration: null,
+      exploration_id: '0',
+      is_logged_in: true,
+      session_id: 'sessionId',
+      version: 1,
+      preferred_audio_language_code: 'en',
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: false,
+      record_playthrough_probability: 1
     });
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
+    expect(roebas.isCached('0')).toBe(true);
 
-    ReadOnlyExplorationBackendApiService.deleteExplorationFromCache('0');
-    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
-  });
+    roebas.deleteExplorationFromCache('0');
+    expect(roebas.isCached('0')).toBe(false);
+  }));
 });

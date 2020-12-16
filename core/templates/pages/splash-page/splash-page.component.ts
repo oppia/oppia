@@ -22,13 +22,17 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 
+// TODO(#9186): Change variable name to 'constants' once this file
+// is migrated to Angular.
+import splashConstants from 'assets/constants';
+
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
-    '$timeout', 'LoaderService', 'SiteAnalyticsService',
+    '$rootScope', '$timeout', 'LoaderService', 'SiteAnalyticsService',
     'UrlInterpolationService', 'UserService', 'WindowRef',
     function(
-        $timeout, LoaderService, SiteAnalyticsService,
+        $rootScope, $timeout, LoaderService, SiteAnalyticsService,
         UrlInterpolationService, UserService, WindowRef) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {
@@ -48,10 +52,11 @@ angular.module('oppia').component('splashPage', {
         return false;
       };
 
-      ctrl.onClickBrowseLibraryButton = function() {
-        SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+      ctrl.onClickBrowseLessonsButton = function() {
+        SiteAnalyticsService.registerClickBrowseLessonsButtonEvent();
         $timeout(function() {
-          WindowRef.nativeWindow.location = '/community-library';
+          WindowRef.nativeWindow.location = (
+            `/learn/${splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
         }, 150);
         return false;
       };
@@ -69,6 +74,9 @@ angular.module('oppia').component('splashPage', {
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
       };
     }

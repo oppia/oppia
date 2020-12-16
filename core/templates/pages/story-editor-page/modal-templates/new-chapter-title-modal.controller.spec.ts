@@ -30,6 +30,7 @@ import { ExplorationIdValidationService } from
   'domain/exploration/exploration-id-validation.service.ts';
 import { ExplorationSummaryBackendApiService } from
   'domain/summary/exploration-summary-backend-api.service.ts';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Create New Chapter Modal Controller', function() {
   var $scope = null;
@@ -42,7 +43,10 @@ describe('Create New Chapter Modal Controller', function() {
   var explorationIdValidationService = null;
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]

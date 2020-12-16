@@ -16,284 +16,317 @@
  * @fileoverview Utility service for the question player for an exploration.
  */
 
-require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
-require('domain/state_card/StateCardObjectFactory.ts');
-require('expressions/expression-interpolation.service.ts');
-require(
-  'pages/exploration-player-page/services/answer-classification.service.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-require('services/contextual/url.service.ts');
-require('services/exploration-html-formatter.service.ts');
-require('services/stateful/focus-manager.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-require(
-  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
-require('pages/interaction-specs.constants.ajs.ts');
+import { AppConstants } from 'app.constants';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { BindableVoiceovers } from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { State } from 'domain/state/StateObjectFactory';
+import { StateCard, StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
+import { AlertsService } from 'services/alerts.service';
+import { ContextService } from 'services/context.service';
+import { UrlService } from 'services/contextual/url.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
-angular.module('oppia').factory('QuestionPlayerEngineService', [
-  'AlertsService', 'AnswerClassificationService',
-  'ContextService', 'ExplorationHtmlFormatterService',
-  'ExpressionInterpolationService', 'FocusManagerService',
-  'QuestionObjectFactory', 'ReadOnlyExplorationBackendApiService',
-  'StateCardObjectFactory', 'UrlService', 'ENTITY_TYPE',
-  'INTERACTION_DISPLAY_MODE_INLINE', 'INTERACTION_SPECS',
-  function(
-      AlertsService, AnswerClassificationService,
-      ContextService, ExplorationHtmlFormatterService,
-      ExpressionInterpolationService, FocusManagerService,
-      QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
-      StateCardObjectFactory, UrlService, ENTITY_TYPE,
-      INTERACTION_DISPLAY_MODE_INLINE, INTERACTION_SPECS) {
-    ContextService.setQuestionPlayerIsOpen();
-    var _explorationId = ContextService.getExplorationId();
-    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
-    var version = UrlService.getExplorationVersionFromUrl();
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionPlayerEngineService {
+  private explorationId: string = null;
+  private questionPlayerMode: boolean = null;
+  private version: number = null;
 
-    if (!_questionPlayerMode) {
-      ReadOnlyExplorationBackendApiService
-        .loadExploration(_explorationId, version)
+  private answerIsBeingProcessed: boolean = false;
+  private questions: Question[] = [];
+  private currentIndex: number = null;
+  private nextIndex: number = null;
+
+  constructor(
+      private alertsService: AlertsService,
+      private answerClassificationService: AnswerClassificationService,
+      private contextService: ContextService,
+      private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+      private expressionInterpolationService: ExpressionInterpolationService,
+      private focusManagerService: FocusManagerService,
+      private questionObjectFactory: QuestionObjectFactory,
+      private readOnlyExplorationBackendApiService:
+        ReadOnlyExplorationBackendApiService,
+      private stateCardObjectFactory: StateCardObjectFactory,
+      private urlService: UrlService) {
+
+  }
+
+  // Evaluate feedback.
+  private makeFeedback(
+      feedbackHtml: string, envs: Record<string, string>[]): string {
+    return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
+  }
+
+  // Evaluate question string.
+  private makeQuestion(
+      newState: State, envs: Record<string, string>[]): string {
+    return this.expressionInterpolationService.processHtml(
+      newState.content.getHtml(), envs);
+  }
+
+  private getRandomSuffix(): string {
+    // This is a bit of a hack. When a refresh to a $scope variable
+    // happens,
+    // AngularJS compares the new value of the variable to its previous
+    // value. If they are the same, then the variable is not updated.
+    // Appending a random suffix makes the new value different from the
+    // previous one, and thus indirectly forces a refresh.
+    var randomSuffix = '';
+    var N = Math.round(Math.random() * 1000);
+    for (var i = 0; i < N; i++) {
+      randomSuffix += ' ';
+    }
+    return randomSuffix;
+  }
+
+  // This should only be called when 'exploration' is non-null.
+  private loadInitialQuestion(
+      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
+      errorCallback: () => void): void {
+    if (!this.questions || this.questions.length === 0) {
+      errorCallback();
+      return;
+    }
+    this.contextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.QUESTION, this.questions[0].getId());
+    var initialState = this.questions[0].getStateData();
+
+    var questionHtml = this.makeQuestion(initialState, []);
+    if (questionHtml === null) {
+      this.alertsService.addWarning('Expression parsing error.');
+      return;
+    }
+
+    this.currentIndex = 0;
+    this.nextIndex = 0;
+
+    var interaction = initialState.interaction;
+    var nextFocusLabel = this.focusManagerService.generateFocusLabel();
+
+    var interactionId = interaction.id;
+    var interactionHtml = null;
+
+    if (interactionId) {
+      interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
+        interactionId, interaction.customizationArgs, true, nextFocusLabel);
+    }
+    var initialCard =
+      this.stateCardObjectFactory.createNewCard(
+        null, questionHtml, interactionHtml, interaction,
+        initialState.recordedVoiceovers, initialState.content.getContentId());
+    successCallback(initialCard, nextFocusLabel);
+  }
+
+  private getCurrentStateData() {
+    return this.questions[this.currentIndex].getStateData();
+  }
+
+  private getNextStateData() {
+    return this.questions[this.nextIndex].getStateData();
+  }
+
+  private getNextInteractionHtml(labelForFocusTarget: string): string {
+    var interactionId = this.getNextStateData().interaction.id;
+    return this.explorationHtmlFormatterService.getInteractionHtml(
+      interactionId,
+      this.getNextStateData().interaction.customizationArgs,
+      true,
+      labelForFocusTarget);
+  }
+
+  init(
+      questionDicts: QuestionBackendDict[],
+      successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
+      errorCallback: () => void): void {
+    this.contextService.setQuestionPlayerIsOpen();
+    this.explorationId = this.contextService.getExplorationId();
+    this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+    this.version = this.urlService.getExplorationVersionFromUrl();
+
+    if (!this.questionPlayerMode) {
+      this.readOnlyExplorationBackendApiService
+        .loadExploration(this.explorationId, this.version)
         .then(function(exploration) {
-          version = exploration.version;
+          this.version = exploration.version;
         });
     }
 
-    var answerIsBeingProcessed = false;
-
-    var questions = [];
-
-    var currentIndex = null;
-    var nextIndex = null;
-
-    // Evaluate feedback.
-    var makeFeedback = function(feedbackHtml, envs) {
-      return ExpressionInterpolationService.processHtml(feedbackHtml, envs);
-    };
-
-    // Evaluate question string.
-    var makeQuestion = function(newState, envs) {
-      return ExpressionInterpolationService.processHtml(
-        newState.content.getHtml(), envs);
-    };
-
-    var _getRandomSuffix = function() {
-      // This is a bit of a hack. When a refresh to a $scope variable
-      // happens,
-      // AngularJS compares the new value of the variable to its previous
-      // value. If they are the same, then the variable is not updated.
-      // Appending a random suffix makes the new value different from the
-      // previous one, and thus indirectly forces a refresh.
-      var randomSuffix = '';
-      var N = Math.round(Math.random() * 1000);
-      for (var i = 0; i < N; i++) {
-        randomSuffix += ' ';
-      }
-      return randomSuffix;
-    };
-
-    // This should only be called when 'exploration' is non-null.
-    var _loadInitialQuestion = function(successCallback, errorCallback) {
-      if (!questions || questions.length === 0) {
-        errorCallback();
-        return;
-      }
-      ContextService.setCustomEntityContext(
-        ENTITY_TYPE.QUESTION, questions[0].getId());
-      var initialState = questions[0].getStateData();
-
-      var questionHtml = makeQuestion(initialState, []);
-      if (questionHtml === null) {
-        AlertsService.addWarning('Expression parsing error.');
-        return;
-      }
-
-      currentIndex = 0;
-      nextIndex = 0;
-
-      var interaction = initialState.interaction;
-      var nextFocusLabel = FocusManagerService.generateFocusLabel();
-
-      var interactionId = interaction.id;
-      var interactionHtml = null;
-
-      if (interactionId) {
-        interactionHtml = ExplorationHtmlFormatterService.getInteractionHtml(
-          interactionId,
-          interaction.customizationArgs,
-          true, nextFocusLabel);
-      }
-      var initialCard =
-        StateCardObjectFactory.createNewCard(
-          null, questionHtml, interactionHtml, interaction,
-          initialState.recordedVoiceovers, initialState.content.getContentId());
-      successCallback(initialCard, nextFocusLabel);
-    };
-
-    var _getCurrentStateData = function() {
-      return questions[currentIndex].getStateData();
-    };
-
-    var _getNextStateData = function() {
-      return questions[nextIndex].getStateData();
-    };
-
-    var _getNextInteractionHtml = function(labelForFocusTarget) {
-      var interactionId = _getNextStateData().interaction.id;
-
-      return ExplorationHtmlFormatterService.getInteractionHtml(
-        interactionId,
-        _getNextStateData().interaction.customizationArgs,
-        true,
-        labelForFocusTarget);
-    };
-
-    return {
-      /**
-       * Initializes the question player for an exploration,
-       * passing the data for the first question to successCallback.
-       *
-       *
-       * @param {function} successCallback - The function to execute after the
-       *   question data is successfully loaded. This function will
-       *   be passed two arguments:
-       *   - initHtml {string}, an HTML string representing the content of the
-       *       first state.
-       */
-      init: function(questionDicts, successCallback, errorCallback) {
-        answerIsBeingProcessed = false;
-        for (var i = 0; i < questionDicts.length; i++) {
-          questions.push(
-            QuestionObjectFactory.createFromBackendDict(questionDicts[i])
-          );
-        }
-        _loadInitialQuestion(successCallback, errorCallback);
-      },
-      recordNewCardAdded: function() {
-        currentIndex = nextIndex;
-      },
-      getCurrentQuestion: function() {
-        return questions[currentIndex];
-      },
-      getCurrentQuestionId: function() {
-        return questions[currentIndex].getId();
-      },
-      getQuestionCount: function() {
-        return questions.length;
-      },
-      getExplorationId: function() {
-        return _explorationId;
-      },
-      getExplorationVersion: function() {
-        return version;
-      },
-      clearQuestions: function() {
-        questions = [];
-      },
-      getLanguageCode: function() {
-        return questions[currentIndex].getLanguageCode();
-      },
-      isInPreviewMode: function() {
-        return false;
-      },
-      submitAnswer: function(answer, interactionRulesService, successCallback) {
-        if (answerIsBeingProcessed) {
-          return;
-        }
-
-        answerIsBeingProcessed = true;
-        var oldState = _getCurrentStateData();
-        var recordedVoiceovers = oldState.recordedVoiceovers;
-        var classificationResult = (
-          AnswerClassificationService.getMatchingClassificationResult(
-            null, oldState.interaction, answer,
-            interactionRulesService));
-        var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
-        var taggedSkillMisconceptionId = null;
-        if (oldState.interaction.answerGroups[answer]) {
-          taggedSkillMisconceptionId =
-            oldState.interaction.answerGroups[answer]
-              .taggedSkillMisconceptionId;
-        }
-
-        // Use angular.copy() to clone the object
-        // since classificationResult.outcome points
-        // at oldState.interaction.default_outcome.
-        var outcome = angular.copy(classificationResult.outcome);
-        // Compute the data for the next state.
-        var oldParams = {
-          answer: answer
-        };
-        var feedbackHtml =
-          makeFeedback(outcome.feedback.getHtml(), [oldParams]);
-        var feedbackContentId = outcome.feedback.getContentId();
-        var feedbackAudioTranslations = (
-          recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
-        if (feedbackHtml === null) {
-          answerIsBeingProcessed = false;
-          AlertsService.addWarning('Expression parsing error.');
-          return;
-        }
-
-        var newState = null;
-        if (answerIsCorrect && (currentIndex < questions.length - 1)) {
-          newState = questions[currentIndex + 1].getStateData();
-        } else {
-          newState = oldState;
-        }
-
-        var questionHtml = makeQuestion(newState, [oldParams, {
-          answer: 'answer'
-        }]);
-        if (questionHtml === null) {
-          answerIsBeingProcessed = false;
-          AlertsService.addWarning('Expression parsing error.');
-          return;
-        }
-        answerIsBeingProcessed = false;
-
-        var interactionId = oldState.interaction.id;
-        var interactionIsInline = (
-          !interactionId ||
-          INTERACTION_SPECS[interactionId].display_mode ===
-            INTERACTION_DISPLAY_MODE_INLINE);
-        var refreshInteraction = (
-          answerIsCorrect || interactionIsInline);
-
-        nextIndex = currentIndex + 1;
-        var isFinalQuestion = (nextIndex === questions.length);
-        var onSameCard = !answerIsCorrect;
-
-        var _nextFocusLabel = FocusManagerService.generateFocusLabel();
-        var nextCard = null;
-        if (!isFinalQuestion) {
-          var nextInteractionHtml = _getNextInteractionHtml(_nextFocusLabel);
-
-          questionHtml = questionHtml + _getRandomSuffix();
-          nextInteractionHtml = nextInteractionHtml + _getRandomSuffix();
-          if (!onSameCard) {
-            ContextService.setCustomEntityContext(
-              ENTITY_TYPE.QUESTION, questions[nextIndex].getId());
-          }
-          nextCard = StateCardObjectFactory.createNewCard(
-            true, questionHtml, nextInteractionHtml,
-            _getNextStateData().interaction,
-            _getNextStateData().recordedVoiceovers,
-            _getNextStateData().content.getContentId()
-          );
-        } else if (!onSameCard) {
-          ContextService.removeCustomEntityContext();
-        }
-        successCallback(
-          nextCard, refreshInteraction, feedbackHtml,
-          feedbackAudioTranslations,
-          null, null, onSameCard, taggedSkillMisconceptionId,
-          null, null, isFinalQuestion, _nextFocusLabel);
-        return answerIsCorrect;
-      },
-      isAnswerBeingProcessed: function() {
-        return answerIsBeingProcessed;
-      }
-    };
+    this.answerIsBeingProcessed = false;
+    for (var i = 0; i < questionDicts.length; i++) {
+      this.questions.push(
+        this.questionObjectFactory.createFromBackendDict(questionDicts[i])
+      );
+    }
+    this.loadInitialQuestion(successCallback, errorCallback);
   }
-]);
+
+  recordNewCardAdded(): void {
+    this.currentIndex = this.nextIndex;
+  }
+
+  getCurrentQuestion(): Question {
+    return this.questions[this.currentIndex];
+  }
+
+  getCurrentQuestionId(): string {
+    return this.questions[this.currentIndex].getId();
+  }
+
+  getQuestionCount(): number {
+    return this.questions.length;
+  }
+
+  getExplorationId(): string {
+    return this.explorationId;
+  }
+
+  getExplorationVersion(): number {
+    return this.version;
+  }
+
+  clearQuestions(): void {
+    this.questions = [];
+  }
+
+  getLanguageCode(): string {
+    return this.questions[this.currentIndex].getLanguageCode();
+  }
+
+  isInPreviewMode(): boolean {
+    return false;
+  }
+
+  isAnswerBeingProcessed(): boolean {
+    return this.answerIsBeingProcessed;
+  }
+
+  submitAnswer(
+      answer: InteractionAnswer,
+      interactionRulesService: InteractionRulesService,
+      successCallback: (
+          nextCard: StateCard,
+          refreshInteraction: boolean,
+          feedbackHtml: string,
+          feedbackAudioTranslations: BindableVoiceovers,
+          refresherExplorationId,
+          missingPrerequisiteSkillId,
+          remainOnCurrentCard: boolean,
+          taggedSkillMisconceptionId: string,
+          wasOldStateInitial,
+          isFirstHit,
+          isFinalQuestion: boolean,
+          focusLabel: string) => void): boolean {
+    if (this.answerIsBeingProcessed) {
+      return;
+    }
+
+    var answerString = answer as string;
+    this.answerIsBeingProcessed = true;
+    var oldState = this.getCurrentStateData();
+    var recordedVoiceovers = oldState.recordedVoiceovers;
+    var classificationResult = (
+      this.answerClassificationService.getMatchingClassificationResult(
+        null, oldState.interaction, answer,
+        interactionRulesService));
+    var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+    var taggedSkillMisconceptionId = null;
+    if (oldState.interaction.answerGroups[answerString]) {
+      taggedSkillMisconceptionId =
+        oldState.interaction.answerGroups[answerString]
+          .taggedSkillMisconceptionId;
+    }
+
+    // Use angular.copy() to clone the object
+    // since classificationResult.outcome points
+    // at oldState.interaction.default_outcome.
+    var outcome = angular.copy(classificationResult.outcome);
+    // Compute the data for the next state.
+    var oldParams = {
+      answer: answerString
+    };
+    var feedbackHtml =
+      this.makeFeedback(outcome.feedback.getHtml(), [oldParams]);
+    var feedbackContentId = outcome.feedback.getContentId();
+    var feedbackAudioTranslations = (
+      recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
+    if (feedbackHtml === null) {
+      this.answerIsBeingProcessed = false;
+      this.alertsService.addWarning('Expression parsing error.');
+      return;
+    }
+
+    var newState = null;
+    if (answerIsCorrect && (this.currentIndex < this.questions.length - 1)) {
+      newState = this.questions[this.currentIndex + 1].getStateData();
+    } else {
+      newState = oldState;
+    }
+
+    var questionHtml = this.makeQuestion(newState, [oldParams, {
+      answer: 'answer'
+    }]);
+    if (questionHtml === null) {
+      this.answerIsBeingProcessed = false;
+      this.alertsService.addWarning('Expression parsing error.');
+      return;
+    }
+    this.answerIsBeingProcessed = false;
+
+    var interactionId = oldState.interaction.id;
+    var interactionIsInline = (
+      !interactionId ||
+      InteractionSpecsConstants.
+        INTERACTION_SPECS[interactionId].display_mode ===
+        AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+    var refreshInteraction = (
+      answerIsCorrect || interactionIsInline);
+
+    this.nextIndex = this.currentIndex + 1;
+    var isFinalQuestion = (this.nextIndex === this.questions.length);
+    var onSameCard = !answerIsCorrect;
+
+    var _nextFocusLabel = this.focusManagerService.generateFocusLabel();
+    var nextCard = null;
+    if (!isFinalQuestion) {
+      var nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
+
+      questionHtml = questionHtml + this.getRandomSuffix();
+      nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
+      if (!onSameCard) {
+        this.contextService.setCustomEntityContext(
+          AppConstants.ENTITY_TYPE.QUESTION,
+          this.questions[this.nextIndex].getId());
+      }
+      nextCard = this.stateCardObjectFactory.createNewCard(
+        'true', questionHtml, nextInteractionHtml,
+        this.getNextStateData().interaction,
+        this.getNextStateData().recordedVoiceovers,
+        this.getNextStateData().content.getContentId()
+      );
+    } else if (!onSameCard) {
+      this.contextService.removeCustomEntityContext();
+    }
+    successCallback(
+      nextCard, refreshInteraction, feedbackHtml,
+      feedbackAudioTranslations,
+      null, null, onSameCard, taggedSkillMisconceptionId,
+      null, null, isFinalQuestion, _nextFocusLabel);
+    return answerIsCorrect;
+  }
+}
+
+angular.module('oppia').factory(
+  'QuestionPlayerEngineService',
+  downgradeInjectable(QuestionPlayerEngineService));
