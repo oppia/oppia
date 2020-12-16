@@ -16,32 +16,51 @@
  * @fileoverview Unit tests for answerSubmitAction component.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+import { AnswerSubmitActionComponent } from './answer-submit-action.component';
 
-require(
-  'pages/exploration-editor-page/statistics-tab/issues/' +
-  'answer-submit-action.component.ts');
-
-describe('Answer Submit Action directive', function() {
+describe('Answer Submit Action directive', () => {
+  let component: AnswerSubmitActionComponent;
+  let fixture: ComponentFixture<AnswerSubmitActionComponent>;
   var ctrl = null;
   var $scope = null;
   var explorationHtmlFormatterService = null;
   var htmlEscaperService = null;
   var interactionObjectFactory = null;
 
-  beforeEach(function() {
-    explorationHtmlFormatterService = TestBed.get(
-      ExplorationHtmlFormatterService);
-    htmlEscaperService = TestBed.get(HtmlEscaperService);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AnswerSubmitActionComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [AnswerSubmitActionComponent],
+      providers: [
+        {
+          provide: explorationHtmlFormatterService,
+          useClass: TestBed.get(ExplorationHtmlFormatterService)
+        },
+        {
+          provide: htmlEscaperService
+          useClass: TestBed.get(HtmlEscaperService);
+        },
+        {
+        interactionObjectFactory = TestBed.get(InteractionObjectFactory)
+        }
+      }],
+      schemas: [NO_ERRORS_SCHEMA]
+    })
+  }));
+
+  beforeEach(angular.mock.module('oppia', ($provide) => {
     $provide.value('$attrs', {
       actionIndex: 2,
       answer: '"This is an answer string."',
@@ -63,7 +82,7 @@ describe('Answer Submit Action directive', function() {
   }));
 
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
+  beforeEach(angular.mock.inject(($injector, $componentController) => {
     var $rootScope = $injector.get('$rootScope');
 
     $scope = $rootScope.$new();
@@ -77,14 +96,14 @@ describe('Answer Submit Action directive', function() {
   }));
 
   it('should initialize controller properties after its initialization',
-    function() {
+    () => {
       expect(ctrl.currentStateName).toBe('State name');
       expect(ctrl.destStateName).toBe('Introduction');
       expect(ctrl.actionIndex).toBe(2);
       expect(ctrl.timeSpentInStateSecs).toBe(2000);
     });
 
-  it('should get short answer html', function() {
+  it('should get short answer html', () => {
     expect(ctrl.getShortAnswerHtml()).toBe(
       '<oppia-short-response-multiple-choice-input answer="&amp;quot;This is' +
       ' an answer string.&amp;quot;" choices="[&amp;quot;Value&amp;quot;]"' +
