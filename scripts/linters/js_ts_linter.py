@@ -67,10 +67,10 @@ def _parse_js_or_ts_file(filepath, file_content, **kwargs):
     """Runs the correct function to parse the given file's source code.
 
     With ES2015 and later, a JavaScript program can be either a script or a
-    module. It is a very important distinction, a parser such as Esprima needs
-    to know the type of the source to be able to analyze its syntax correctly.
-    This is achieved by choosing parseScript function to parse a script and
-    parseModule function to parse a module.
+    module. It is a very important distinction, since a parser such as Esprima
+    needs to know the type of the source to be able to analyze its syntax
+    correctly. This is achieved by choosing the parseScript function to parse a
+    script and the parseModule function to parse a module.
 
     https://esprima.readthedocs.io/en/latest/syntactic-analysis.html#distinguishing-a-script-and-a-module
 
