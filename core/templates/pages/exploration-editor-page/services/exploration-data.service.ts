@@ -132,17 +132,21 @@ export class ExplorationDataService {
   }
 
   discardDraft(
-      successCallback: (value?: Object) => void,
-      errorCallback: (reason?: string) => void)
+      successCallback: Function,
+      errorCallback: Function)
     : Promise<Object> {
     return new Promise((resolve, reject) => {
       this.explorationDataBackendApiService.setDiscardDraft(
         this.explorationDraftAutosaveUrl)
         .then(response => {
           this.localStorageService.removeExplorationDraft(this.explorationId);
-          successCallback(response);
+          if (successCallback) {
+            successCallback();
+          }
         }, errorResponse => {
-          errorCallback(errorResponse.error.error);
+          if (errorResponse) {
+            errorCallback();
+          }
         });
     });
   }
