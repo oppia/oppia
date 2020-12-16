@@ -29,6 +29,7 @@ from core.domain import story_services
 from core.domain import topic_fetchers
 from core.platform import models
 import feconf
+import utils
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
@@ -62,7 +63,7 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             story.validate()
             story_services.validate_prerequisite_skills_in_story_contents(
                 story.corresponding_topic_id, story.story_contents)
-        except Exception as e:
+        except utils.ValidationError as e:
             logging.error(
                 'Story %s failed validation: %s' % (item.id, e))
             yield (

@@ -27,6 +27,7 @@ from core.domain import question_domain
 from core.domain import question_services
 from core.platform import models
 import feconf
+import utils
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
@@ -58,7 +59,7 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         question = question_services.get_question_by_id(item.id)
         try:
             question.validate()
-        except Exception as e:
+        except utils.ValidationError as e:
             logging.error(
                 'Question %s failed validation: %s' % (item.id, e))
             yield (

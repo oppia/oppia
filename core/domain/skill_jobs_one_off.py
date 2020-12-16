@@ -28,6 +28,7 @@ from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.platform import models
 import feconf
+import utils
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -59,7 +60,7 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         skill = skill_fetchers.get_skill_by_id(item.id)
         try:
             skill.validate()
-        except Exception as e:
+        except utils.ValidationError as e:
             logging.error(
                 'Skill %s failed validation: %s' % (item.id, e))
             yield (

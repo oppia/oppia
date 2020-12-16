@@ -200,7 +200,8 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
         while states_schema_version < current_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
-                    versioned_exploration_states, states_schema_version,
+                    versioned_exploration_states,
+                    states_schema_version,
                     item.id)
                 states_schema_version += 1
             except Exception as e:
@@ -249,7 +250,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
         old_exploration = exp_fetchers.get_exploration_by_id(item.id)
         try:
             old_exploration.validate()
-        except Exception as e:
+        except utils.ValidationError as e:
             logging.error(
                 'Exploration %s failed non-strict validation: %s' %
                 (item.id, e))
@@ -581,7 +582,7 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJob(
             try:
                 image_validation_services.validate_image_and_filename(
                     new_svg_image, filename)
-            except Exception as e:
+            except utils.ValidationError as e:
                 yield (
                     'FAILED validation',
                     'Exploration with id %s failed image validation for the '

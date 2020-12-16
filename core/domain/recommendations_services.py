@@ -233,13 +233,7 @@ def validate_topic_similarities(data):
     for row_ind in python_utils.RANGE(topics_length):
         for col_ind in python_utils.RANGE(topics_length):
             similarity = topic_similarities_values[row_ind][col_ind]
-            try:
-                similarity = float(similarity)
-            except:
-                raise ValueError(
-                    'Expected similarity to be a float, received %s' % (
-                        similarity))
-
+            similarity = float(similarity)
             if similarity < 0.0 or similarity > 1.0:
                 raise ValueError(
                     'Expected similarity to be between 0.0 and '

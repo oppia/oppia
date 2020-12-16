@@ -28,6 +28,7 @@ from core.domain import html_validation_service
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
+import utils
 
 (feedback_models, suggestion_models, user_models,) = (
     models.Registry.import_models(
@@ -65,7 +66,7 @@ class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
 
         try:
             suggestion.validate()
-        except Exception as e:
+        except utils.ValidationError as e:
             yield ('POST_MIGRATION_VALIDATION_FALIURE', (item.id, e))
             return
 
@@ -187,7 +188,7 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         suggestion = suggestion_services.get_suggestion_by_id(item.id)
         try:
             suggestion.validate()
-        except Exception as e:
+        except utils.ValidationError as e:
             logging.error(
                 'Suggestion %s failed validation: %s' % (item.id, e))
             yield (
@@ -206,7 +207,7 @@ class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 html_validation_service.add_math_content_to_math_rte_components)
             try:
                 suggestion.validate()
-            except Exception as e:
+            except utils.ValidationError as e:
                 logging.error(
                     'Suggestion %s failed validation after migration: %s' % (
                         item.id, e))
@@ -272,7 +273,7 @@ class PopulateSuggestionLanguageCodeMigrationOneOffJob(
         # Validate the suggestion before updating the storage model.
         try:
             suggestion.validate()
-        except Exception as e:
+        except utils.ValidationError as e:
             logging.error(
                 'Suggestion %s failed validation: %s' % (
                     item.id, e))

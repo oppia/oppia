@@ -29,6 +29,7 @@ from core.domain import topic_services
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (skill_models, topic_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.topic])
@@ -61,7 +62,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         topic = topic_fetchers.get_topic_by_id(item.id)
         try:
             topic.validate()
-        except Exception as e:
+        except utils.ValidationError as e:
             logging.error(
                 'Topic %s failed validation: %s' % (item.id, e))
             yield (
