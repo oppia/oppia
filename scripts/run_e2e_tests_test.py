@@ -1065,7 +1065,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands, stdout=None):
+        def mock_popen(unused_commands, stdout=None):  #pylint: disable=unused-argument
             def mock_communicate():
                 return
             result = mock_process
@@ -1237,7 +1237,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands, stdout=None):
+        def mock_popen(unused_commands, stdout=None):  # pylint: disable=unused-argument
             def mock_communicate():
                 return
             result = mock_process
@@ -1362,7 +1362,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_popen(unused_commands, stdout=None):
+        def mock_popen(unused_commands, stdout=None):  # pylint: disable=unused-argument
             def mock_communicate():
                 return
             result = mock_process
