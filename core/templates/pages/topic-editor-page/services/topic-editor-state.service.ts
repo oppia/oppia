@@ -53,40 +53,40 @@ export class TopicEditorStateService {
     private topicRightsBackendApiService: TopicRightsBackendApiService,
     private undoRedoService: UndoRedoService) {}
 
-  _topic: Topic = this.topicObjectFactory.createInterstitialTopic();
-  _topicRights: TopicRights = TopicRights.createInterstitialRights();
+  private _topic: Topic = this.topicObjectFactory.createInterstitialTopic();
+  private _topicRights: TopicRights = TopicRights.createInterstitialRights();
   // The array that caches all the subtopic pages loaded by the user.
-  _cachedSubtopicPages: SubtopicPage[] = [];
+  private _cachedSubtopicPages: SubtopicPage[] = [];
   // The array that stores all the ids of the subtopic pages that were not
   // loaded from the backend i.e those that correspond to newly created
   // subtopics (and not loaded from the backend).
-  _newSubtopicPageIds: string[] = [];
-  _subtopicPage: SubtopicPage =
+  private _newSubtopicPageIds: string[] = [];
+  private _subtopicPage: SubtopicPage =
   this.subtopicPageObjectFactory.createInterstitialSubtopicPage();
-  _topicIsInitialized: boolean = false;
-  _topicIsLoading: boolean = false;
-  _topicIsBeingSaved: boolean = false;
-  _topicWithNameExists: boolean = false;
-  _topicWithUrlFragmentExists: boolean = false;
-  _canonicalStorySummaries: StorySummary[] = [];
-  _skillIdToRubricsObject = {};
-  _skillQuestionCountDict = {};
-  _groupedSkillSummaries = {
+  private _topicIsInitialized: boolean = false;
+  private _topicIsLoading: boolean = false;
+  private _topicIsBeingSaved: boolean = false;
+  private _topicWithNameExists: boolean = false;
+  private _topicWithUrlFragmentExists: boolean = false;
+  private _canonicalStorySummaries: StorySummary[] = [];
+  private _skillIdToRubricsObject: RubricBackendDict[] = [];
+  private _skillQuestionCountDict: QuestionBackendDict[] = [];
+  private _groupedSkillSummaries = {
     current: [],
     others: []
   };
-  _classroomUrlFragment = 'staging';
-  _storySummariesInitializedEventEmitter = new EventEmitter();
-  _subtopicPageLoadedEventEmitter = new EventEmitter();
+  private _classroomUrlFragment = 'staging';
+  private _storySummariesInitializedEventEmitter = new EventEmitter();
+  private _subtopicPageLoadedEventEmitter = new EventEmitter();
 
-  _topicInitializedEventEmitter = new EventEmitter();
-  _topicReinitializedEventEmitter = new EventEmitter();
+  private _topicInitializedEventEmitter = new EventEmitter();
+  private _topicReinitializedEventEmitter = new EventEmitter();
 
-  _getSubtopicPageId(topicId: string, subtopicId: number):string {
+  private _getSubtopicPageId(topicId: string, subtopicId: number):string {
     return topicId + '-' + subtopicId.toString();
   }
 
-  _updateGroupedSkillSummaries(
+  private _updateGroupedSkillSummaries(
       groupedSkillSummaries:{[topicName: string]: SkillSummaryBackendDict[]})
     : void {
     this._groupedSkillSummaries.current = [];
@@ -106,12 +106,12 @@ export class TopicEditorStateService {
       }
     }
   }
-  _getSubtopicIdFromSubtopicPageId(subtopicPageId: string): number {
+  private _getSubtopicIdFromSubtopicPageId(subtopicPageId: string): number {
     // The subtopic page id consists of the topic id of length 12, a hyphen
     // and a subtopic id (which is a number).
     return parseInt(subtopicPageId.slice(13));
   }
-  _setTopic(topic: Topic): void {
+  private _setTopic(topic: Topic): void {
     this._topic.copyFromTopic(topic);
     // Reset the subtopic pages list after setting new topic.
     this._cachedSubtopicPages.length = 0;
@@ -123,7 +123,7 @@ export class TopicEditorStateService {
       this._topicInitializedEventEmitter.emit();
     }
   }
-  _getSubtopicPageIndex(subtopicPageId: string): number|null {
+  private _getSubtopicPageIndex(subtopicPageId: string): number|null {
     for (let i = 0; i < this._cachedSubtopicPages.length; i++) {
       if (this._cachedSubtopicPages[i].getId() === subtopicPageId) {
         return i;
@@ -141,7 +141,7 @@ export class TopicEditorStateService {
       this.topicObjectFactory.create(
         newBackendTopicDict, skillIdToDescriptionDict));
   }
-  _updateSkillIdToRubricsObject(
+  private _updateSkillIdToRubricsObject(
       skillIdToRubricsObject:
       {[skillId: string]: RubricBackendDict[]}): void {
     for (let skillId in skillIdToRubricsObject) {
@@ -152,25 +152,25 @@ export class TopicEditorStateService {
       this._skillIdToRubricsObject[skillId] = rubrics;
     }
   }
-  _setSubtopicPage(subtopicPage: SubtopicPage): void {
+  private _setSubtopicPage(subtopicPage: SubtopicPage): void {
     this._subtopicPage.copyFromSubtopicPage(subtopicPage);
     this._cachedSubtopicPages.push(angular.copy(subtopicPage));
     this._subtopicPageLoadedEventEmitter.emit();
   }
-  _updateSubtopicPage(
+  private _updateSubtopicPage(
       newBackendSubtopicPageObject: SubtopicPageBackendDict): void {
     this._setSubtopicPage(this.subtopicPageObjectFactory.createFromBackendDict(
       newBackendSubtopicPageObject));
   }
-  _setTopicRights(topicRights: TopicRights): void {
+  private _setTopicRights(topicRights: TopicRights): void {
     this._topicRights.copyFromTopicRights(topicRights);
   }
-  _updateTopicRights(
+  private _updateTopicRights(
       newBackendTopicRightsObject: unknown): void {
     this._setTopicRights(TopicRights.createFromBackendDict(
       newBackendTopicRightsObject));
   }
-  _setCanonicalStorySummaries(
+  private _setCanonicalStorySummaries(
       canonicalStorySummaries: StorySummaryBackendDict[]): void {
     this._canonicalStorySummaries = canonicalStorySummaries.map(
       (storySummaryDict) => {
@@ -180,11 +180,12 @@ export class TopicEditorStateService {
     this._storySummariesInitializedEventEmitter.emit();
   }
 
-  _setTopicWithNameExists(topicWithNameExists: boolean): void {
+  private _setTopicWithNameExists(topicWithNameExists: boolean): void {
     this._topicWithNameExists = topicWithNameExists;
   }
 
-  _setTopicWithUrlFragmentExists(topicWithUrlFragmentExists: boolean): void {
+  private _setTopicWithUrlFragmentExists(
+      topicWithUrlFragmentExists: boolean): void {
     this._topicWithUrlFragmentExists = topicWithUrlFragmentExists;
   }
 
@@ -238,7 +239,7 @@ export class TopicEditorStateService {
     return angular.copy(this._groupedSkillSummaries);
   }
 
-  getSkillQuestionCountDict(): QuestionBackendDict {
+  getSkillQuestionCountDict(): QuestionBackendDict[] {
     return this._skillQuestionCountDict;
   }
 
@@ -444,11 +445,9 @@ export class TopicEditorStateService {
     }
     this._topicIsBeingSaved = true;
     this.editableTopicBackendApiService.updateTopic(
-      this._topic.getId(), this._topic.getVersion().toString(),
+      this._topic.getId(), this._topic.getVersion(),
       commitMessage, this.undoRedoService.getCommittableChangeList()).then(
-      (topicBackendObject: {
-          topicDict: TopicBackendDict;
-          skillIdToDescriptionDict }) => {
+      (topicBackendObject) => {
         this._updateTopic(
           topicBackendObject.topicDict,
           topicBackendObject.skillIdToDescriptionDict
