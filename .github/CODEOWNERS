@@ -635,6 +635,7 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/pre_commit_linter.py in sync with the modifications.
+/core/templates/services/svg-sanitizer.service.ts @BenHenning @seanlip
 # TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
 /scripts/linters/warranted_angular_security_bypasses.py @BenHenning
 # TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
