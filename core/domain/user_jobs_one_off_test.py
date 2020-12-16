@@ -1354,28 +1354,29 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(owner_settings.last_edited_an_exploration)
 
 
-class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FillExplorationIdsInUserSubscriptionsModelOneOffJobTests, self).setUp()
+class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(test_utils.GenericTestBase): # pylint: disable=line-too-long
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.create_new())
-        user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.enqueue(job_id)
+            user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.create_new()) # pylint: disable=line-too-long
+        user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.enqueue(job_id) # pylint: disable=line-too-long
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_mapreduce_tasks()
-        return user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.get_output(job_id)
+        stringified_output = (
+            user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.get_output(job_id)) # pylint: disable=line-too-long
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
 
     def test_that_exploration_ids_and_activity_ids_are_equal(self):
-
-        #Generate activity_ids
-        user_models.UserSubscriptionsModel(activity_ids=['exp_1', 'exp_2', 'exp_3']).put()
+        # Generate activity_ids.
+        user_models.UserSubscriptionsModel(
+            activity_ids=['exp_1', 'exp_2', 'exp_3']).put()
         exploration_ids = self._run_one_off_job()
-        self.assertEqual(exploration_ids, [u"[u'SUCCESS', 1]"])
+        self.assertEqual([[u'SUCCESS', 1]], exploration_ids)
 
 
 class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):

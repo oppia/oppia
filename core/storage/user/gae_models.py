@@ -930,7 +930,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # DEPRECATED in v2.6.8. Do not use. Use general_feedback_thread_ids instead.
     feedback_thread_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
-    #DEPRECATED in v3.0.7. Do not use. Use exploration_ids instead.
+    # DEPRECATED in v3.0.7. Do not use. Use exploration_ids instead.
     activity_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
