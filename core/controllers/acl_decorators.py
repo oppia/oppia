@@ -606,7 +606,7 @@ def can_upload_exploration(handler):
 
         if not user_services.is_current_user_super_admin():
             raise self.UnauthorizedUserException(
-                'You do not have credentials to upload exploration.')
+                'You do not have credentials to upload explorations.')
         return handler(self, **kwargs)
     test_can_upload.__wrapped__ = True
 

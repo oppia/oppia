@@ -1269,11 +1269,13 @@ SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
 SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
 SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
 
+# Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [
     'suggestion_type', 'target_type', 'target_id', 'status', 'author_id',
     'final_reviewer_id', 'score_category', 'language_code'
 ]
 
+# Possible targets that the suggestions can modify.
 SUGGESTION_TARGET_TYPE_CHOICES = [
     ENTITY_TYPE_EXPLORATION,
     ENTITY_TYPE_QUESTION,
@@ -1281,6 +1283,7 @@ SUGGESTION_TARGET_TYPE_CHOICES = [
     ENTITY_TYPE_TOPIC
 ]
 
+# Possible suggestion types.
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
     SUGGESTION_TYPE_TRANSLATE_CONTENT,

@@ -2832,7 +2832,6 @@ def create_login_url(target_url):
     Returns:
         str. The correct login URL that includes the page to redirect to.
     """
-
     return current_user_services.create_login_url(target_url)
 
 
@@ -2840,9 +2839,9 @@ def is_current_user_super_admin():
     """Checks whether the current logged user is super admin.
 
     Returns:
-        bool. Whether the current logged user is super admin.
+        bool. Whether the current logged user is super admin. When the user is
+        not logged in False is returned.
     """
-
     return current_user_services.is_current_user_super_admin()
 
 

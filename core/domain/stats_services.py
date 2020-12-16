@@ -251,6 +251,33 @@ def get_stats_for_new_exp_version(
     return exploration_stats
 
 
+def assign_playthrough_to_corresponding_issue(
+        playthrough, exp_issues, issue_schema_version):
+    """Stores the given playthrough as a new model into its corresponding
+    exploration issue. When the corresponding exploration issue does not
+    exist, a new one is created.
+
+    Args:
+        playthrough: Playthrough. The playthrough domain object.
+        exp_issues: ExplorationIssues. The exploration issues domain object.
+        issue_schema_version: int. The version of the issue schema.
+
+    Returns:
+        bool. Whether the playthrough was stored successfully.
+    """
+    issue = _get_corresponding_exp_issue(
+        playthrough, exp_issues, issue_schema_version)
+    if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
+        issue.playthrough_ids.append(
+            stats_models.PlaythroughModel.create(
+                playthrough.exp_id, playthrough.exp_version,
+                playthrough.issue_type,
+                playthrough.issue_customization_args,
+                [action.to_dict() for action in playthrough.actions]))
+        return True
+    return False
+
+
 def _get_corresponding_exp_issue(
         playthrough, exp_issues, issue_schema_version):
     """Returns the unique exploration issue model expected to own the given
@@ -282,33 +309,6 @@ def _get_corresponding_exp_issue(
         [], issue_schema_version, is_valid=True)
     exp_issues.unresolved_issues.append(issue)
     return issue
-
-
-def assign_playthrough_to_corresponding_issue(
-        playthrough, exp_issues, issue_schema_version):
-    """Stores the given playthrough as a new model into its corresponding
-    exploration issue. When the corresponding exploration issue does not
-    exist, a new one is created.
-
-    Args:
-        playthrough: Playthrough. The playthrough domain object.
-        exp_issues: ExplorationIssues. The exploration issues domain object.
-        issue_schema_version: int. The version of the issue schema.
-
-    Returns:
-        bool. Whether the playthrough was stored successfully.
-    """
-    issue = _get_corresponding_exp_issue(
-        playthrough, exp_issues, issue_schema_version)
-    if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
-        issue.playthrough_ids.append(
-            stats_models.PlaythroughModel.create(
-                playthrough.exp_id, playthrough.exp_version,
-                playthrough.issue_type,
-                playthrough.issue_customization_args,
-                [action.to_dict() for action in playthrough.actions]))
-        return True
-    return False
 
 
 def create_exp_issues_for_new_exploration(exp_id, exp_version):

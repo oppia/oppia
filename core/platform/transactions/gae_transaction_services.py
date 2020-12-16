@@ -19,7 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from functools import wraps
+import functools
 
 from google.appengine.ext import ndb
 
@@ -50,7 +50,7 @@ def run_in_transaction(fn, *args, **kwargs):
     )
 
 
-def transaction_wrapper(fn):
+def run_in_transaction_wrapper(fn):
     """Runs a decorated function in a transaction. Either all of the operations
     in the transaction are applied, or none of them are applied.
 
@@ -64,14 +64,10 @@ def transaction_wrapper(fn):
         Exception. Whatever fn() raises.
         datastore_errors.TransactionFailedError. The transaction failed.
     """
-    @wraps(fn)
+    @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         """Wrapper for the transaction."""
-        return ndb.transaction(
-            lambda: fn(*args, **kwargs),
-            xg=True,
-            propagation=ndb.TransactionOptions.ALLOWED,
-        )
+        return run_in_transaction(fn, *args, **kwargs)
 
     return wrapper
 
