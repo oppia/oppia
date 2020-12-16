@@ -21,7 +21,7 @@ import { NumericExpressionInputRulesService } from
   'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
 describe('Numeric expression input rules service', () => {
-  let neirs: NumericExpressionInputRulesService = null;
+  let neirs: NumericExpressionInputRulesService;
   let inputString;
 
   beforeEach(() => {
