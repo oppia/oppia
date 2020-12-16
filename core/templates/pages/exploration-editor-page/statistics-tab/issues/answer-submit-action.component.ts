@@ -16,35 +16,51 @@
  * @fileoverview Component for the Answer Submit Learner Action.
  */
 
-require('services/exploration-html-formatter.service.ts');
-require('services/html-escaper.service.ts');
-require('domain/exploration/InteractionObjectFactory.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory.ts';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service.ts';
+import { HtmlEscaperService } from 'services/html-escaper.service.ts';
 
-angular.module('oppia').component('answerSubmitAction', {
-  template: require('./answer-submit-action.component.html'),
-  controller: ['$attrs', 'ExplorationHtmlFormatterService',
-    'HtmlEscaperService', 'InteractionObjectFactory',
-    function(
-        $attrs, ExplorationHtmlFormatterService,
-        HtmlEscaperService, InteractionObjectFactory) {
-      var ctrl = this;
-      var _customizationArgs = (
-        InteractionObjectFactory.convertFromCustomizationArgsBackendDict(
-          $attrs.interactionId,
-          HtmlEscaperService.escapedJsonToObj(
-            $attrs.interactionCustomizationArgs)
-        )
-      );
-      var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      ctrl.getShortAnswerHtml = function() {
-        return ExplorationHtmlFormatterService.getShortAnswerHtml(
-          _answer, $attrs.interactionId, _customizationArgs);
-      };
-      ctrl.$onInit = function() {
-        ctrl.currentStateName = $attrs.currentStateName;
-        ctrl.destStateName = $attrs.destStateName;
-        ctrl.actionIndex = $attrs.actionIndex;
-        ctrl.timeSpentInStateSecs = $attrs.timeSpentInStateSecs;
-      };
-    }]
-});
+@Component({
+  selector: 'answer-submit-action',
+  templateUrl: './answer-submit-action.component.html',
+  styleUrls: []
+})
+export class AnswerSubmitActionComponent implements OnInit{
+  // check these types are correct
+  currentStateName: string = '';
+  destStateName: string = '';
+  actionIndex: number = 0;
+  timeSpentInStateSecs: number = 0;
+  _customizationArgs = (
+    this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
+      $attrs.interactionId,
+      this.htmlEscaperService.escapedJsonToObj(
+        $attrs.interactionCustomizationArgs)
+    )
+  );
+  _answer: any = this.htmlEscaperService.escapedJsonToObj($attrs.answer);
+
+  constructor(
+    private attrs: $attrs,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private htmlEscaperService: HtmlEscaperService,
+    private interactionObjectFactory: InteractionObjectFactory
+  ) {}
+
+  ngOnInt(): void {
+    this.currentStateName = attrs.currentStateName;
+    this.destStateName = $attrs.destStateName;
+    this.actionIndex = $attrs.actionIndex;
+    this.timeSpentInStateSecs = $attrs.timeSpentInStateSecs;
+  }
+  getShortAnswerHtml(): string {
+    return this.explorationHtmlFormatterService.getShortAnswerHtml(
+      this._answer, $attrs.interactionId, this._customizationArgs);
+  }
+}
+angular.module('oppia').directive(
+  'answerSubmitAction', downgradeComponent(
+    { component: AnswerSubmitActionComponent }
+));
