@@ -450,31 +450,25 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
         previous_last_updated_by_human = (
             self.model_instance.last_updated_by_human)
 
-        with self.swap(
-            TestBaseHumanMaintainedModel, 'put_async',
-            TestBaseHumanMaintainedModel.put_async_for_human):
-            self.model_instance.update_timestamps()
-            TestBaseHumanMaintainedModel.put_multi_for_human(
-                [self.model_instance])
+        self.model_instance.update_timestamps()
+        TestBaseHumanMaintainedModel.put_multi_for_human(
+            [self.model_instance])
 
-            self.assertNotEqual(
-                previous_last_updated_by_human,
-                self.model_instance.last_updated_by_human)
+        self.assertNotEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
 
     def test_put_multi_for_bot(self):
         previous_last_updated_by_human = (
             self.model_instance.last_updated_by_human)
 
-        with self.swap(
-            TestBaseHumanMaintainedModel, 'put_async',
-            TestBaseHumanMaintainedModel.put_async_for_bot):
-            self.model_instance.update_timestamps()
-            TestBaseHumanMaintainedModel.put_multi_for_bot(
-                [self.model_instance])
+        self.model_instance.update_timestamps()
+        TestBaseHumanMaintainedModel.put_multi_for_bot(
+            [self.model_instance])
 
-            self.assertEqual(
-                previous_last_updated_by_human,
-                self.model_instance.last_updated_by_human)
+        self.assertEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
 
     def test_put_multi_async(self):
         with self.assertRaisesRegexp(
@@ -486,31 +480,25 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
         previous_last_updated_by_human = (
             self.model_instance.last_updated_by_human)
 
-        with self.swap(
-            TestBaseHumanMaintainedModel, 'put_async',
-            TestBaseHumanMaintainedModel.put_async_for_bot):
-            self.model_instance.update_timestamps()
-            TestBaseHumanMaintainedModel.put_multi_async_for_human(
-                [self.model_instance])
+        self.model_instance.update_timestamps()
+        TestBaseHumanMaintainedModel.put_multi_async_for_human(
+            [self.model_instance])
 
-            self.assertNotEqual(
-                previous_last_updated_by_human,
-                self.model_instance.last_updated_by_human)
+        self.assertNotEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
 
     def test_put_multi_async_for_bot(self):
         previous_last_updated_by_human = (
             self.model_instance.last_updated_by_human)
 
-        with self.swap(
-            TestBaseHumanMaintainedModel, 'put_async',
-            TestBaseHumanMaintainedModel.put_async_for_bot):
-            self.model_instance.update_timestamps()
-            TestBaseHumanMaintainedModel.put_multi_async_for_bot(
-                [self.model_instance])
+        self.model_instance.update_timestamps()
+        TestBaseHumanMaintainedModel.put_multi_async_for_bot(
+            [self.model_instance])
 
-            self.assertEqual(
-                previous_last_updated_by_human,
-                self.model_instance.last_updated_by_human)
+        self.assertEqual(
+            previous_last_updated_by_human,
+            self.model_instance.last_updated_by_human)
 
 
 class TestSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):

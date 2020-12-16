@@ -22,7 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import contextlib
 import datetime
 import functools
-
+import inspect
 import python_utils
 
 from google.appengine.api import datastore_types
@@ -93,6 +93,13 @@ def put_multi(models):
     Returns:
         list(str). A list with the stored keys.
     """
+    for model in models:
+        # We can remove this once all the models have inherited from
+        # BaseHumanMaintainedModel.
+        if (
+                'BaseHumanMaintainedModel' in
+                [x.__name__ for x in inspect.getmro(type(model))]):
+            model.put_async = model.put_async_for_bot
     return ndb.put_multi(models)
 
 
@@ -105,6 +112,13 @@ def put_multi_async(models):
     Returns:
         list(future). A list of futures.
     """
+    for model in models:
+        # We can remove this once all the models have inherited from
+        # BaseHumanMaintainedModel.
+        if (
+                'BaseHumanMaintainedModel' in
+                [x.__name__ for x in inspect.getmro(type(model))]):
+            model.put_async = model.put_async_for_bot
     return ndb.put_multi_async(models)
 
 
