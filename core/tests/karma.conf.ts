@@ -38,7 +38,7 @@ module.exports = function(config) {
       },
       'extensions/interactions/**/*.directive.html',
       'extensions/interactions/**/*.component.html',
-      'extensions/interactions/rule_templates.json',
+      'extensions/interactions/*.json',
       'core/tests/data/*.json',
       {
         pattern: 'assets/i18n/**/*.json',
@@ -72,7 +72,7 @@ module.exports = function(config) {
       'core/templates/**/*.template.html': ['ng-html2js'],
       'extensions/interactions/**/*.directive.html': ['ng-html2js'],
       'extensions/interactions/**/*.component.html': ['ng-html2js'],
-      'extensions/interactions/rule_templates.json': ['json_fixtures'],
+      'extensions/interactions/*.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage-istanbul'],
