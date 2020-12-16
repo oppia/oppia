@@ -29,7 +29,7 @@
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5": "Todo o conteúdo nas explorações da Oppia está licenciado sob <a href=\"https://creativecommons.org/licenses/by-sa/4.0/legalcode\" class=\"inline-links\">CC-BY-SA 4.0</a> com uma renúncia do requisito de atribuição (especificamente, as Seções 3(a)(1) e 3(a)(2)). Se você reutilizar o conteúdo deste site, recomendamos que você inclua um link para a página de exploração relevante, mas não o exija.",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING": "Licença",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_6": "O software que alimenta o Oppia é open source, e seu <a href=\"https://github.com/oppia/oppia/\" class=\"inline-links\">códigos</a> é lançado sob a licença  <a href=\"https://www.apache.org/licenses/\" class=\"inline-links\">Apache 2.0</a>.",
-	"I18N_ABOUT_PAGE_HEADING": "Oppia: educação para todos",
+	//"I18N_ABOUT_PAGE_HEADING": "Oppia: educação para todos",
 	"I18N_ABOUT_PAGE_LEARN_BUTTON": "Eu quero aprender",
 	"I18N_ABOUT_PAGE_SPEECH_BUBBLE": "O que gostaria de fazer hoje?",
 	"I18N_ABOUT_PAGE_TABS_ABOUT": "Sobre",

@@ -63,7 +63,7 @@ export class AboutPageComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef) {
-  }
+    }
 
   getCredits(startLetter: string): string[] {
     const results = AboutPageConstants.CREDITS_CONSTANTS.filter(

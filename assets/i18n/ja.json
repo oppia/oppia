@@ -29,7 +29,7 @@
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5": "Oppiaの探検の全コンテンツは<a href=\"https://creativecommons.org/licenses/by-sa/4.0/legalcode\" class=\"inline-links\">CC-BY-SA 4.0</a>ライセンスで、「表示」要件（具体的にはセクション3のaの1と、3のaの2）が放棄されています。本サイトのコンテンツを再利用する場合、該当する探検のページにリンクを張ることを推奨しますが、要件ではありません。",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING": "ライセンス",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_6": "Oppiaを支えているソフトウェアはオープンソースで、<a href=\"https://github.com/oppia/oppia/\" class=\"inline-links\">コード</a>は<a href=\"https://www.apache.org/licenses/\" class=\"inline-links\">Apache 2.0</a>ライセンスで提供されています。",
-	"I18N_ABOUT_PAGE_HEADING": "Oppia：すべての人のための教育",
+	//"I18N_ABOUT_PAGE_HEADING": "Oppia：すべての人のための教育",
 	"I18N_ABOUT_PAGE_LEARN_BUTTON": "学びたい",
 	"I18N_ABOUT_PAGE_SPEECH_BUBBLE": "これから何をしたいですか？",
 	"I18N_ABOUT_PAGE_TABS_ABOUT": "このサイトについて",
