@@ -133,7 +133,7 @@ describe('App', function() {
       // unknown to string.
       let obj: unknown = {a: 'something'};
       $exceptionHandler(obj);
-      const errorFromObject = new Error(<string> obj);
+      const errorFromObject = new Error(<string>obj);
 
       expect(sourceMappedStackTrace.mapStackTrace).toHaveBeenCalledWith(
         jasmine.stringMatching(/^Error: \[object Object\]/),
