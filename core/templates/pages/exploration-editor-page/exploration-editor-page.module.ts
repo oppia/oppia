@@ -50,7 +50,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
-import { AnswerSubmitActionComponent } from './statistics-tab/issues/answer-submit-action.component'
+import { AnswerSubmitActionComponent } from './statistics-tab/issues/answer-submit-action.component';
 
 @NgModule({
   imports: [

@@ -27,40 +27,41 @@ import { HtmlEscaperService } from 'services/html-escaper.service.ts';
   templateUrl: './answer-submit-action.component.html',
   styleUrls: []
 })
-export class AnswerSubmitActionComponent implements OnInit{
-  // check these types are correct
+export class AnswerSubmitActionComponent implements OnInit {
+  // Check these types are correct.
   currentStateName: string = '';
   destStateName: string = '';
   actionIndex: number = 0;
   timeSpentInStateSecs: number = 0;
   _customizationArgs = (
     this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
-      $attrs.interactionId,
+      Attr.interactionId,
       this.htmlEscaperService.escapedJsonToObj(
-        $attrs.interactionCustomizationArgs)
+        Attr.interactionCustomizationArgs)
     )
   );
-  _answer: any = this.htmlEscaperService.escapedJsonToObj($attrs.answer);
+  _answer: Object = this.htmlEscaperService.escapedJsonToObj(Attr.answer);
 
   constructor(
-    private attrs: $attrs,
+    private attrs: Attr,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private htmlEscaperService: HtmlEscaperService,
     private interactionObjectFactory: InteractionObjectFactory
   ) {}
 
-  ngOnInt(): void {
-    this.currentStateName = attrs.currentStateName;
-    this.destStateName = $attrs.destStateName;
-    this.actionIndex = $attrs.actionIndex;
-    this.timeSpentInStateSecs = $attrs.timeSpentInStateSecs;
+  ngOnInit(): void {
+    this.currentStateName = Attr.currentStateName;
+    this.destStateName = Attr.destStateName;
+    this.actionIndex = Attr.actionIndex;
+    this.timeSpentInStateSecs = Attr.timeSpentInStateSecs;
   }
   getShortAnswerHtml(): string {
     return this.explorationHtmlFormatterService.getShortAnswerHtml(
-      this._answer, $attrs.interactionId, this._customizationArgs);
+      this._answer as number, Attr.interactionId, this._customizationArgs);
   }
 }
 angular.module('oppia').directive(
   'answerSubmitAction', downgradeComponent(
     { component: AnswerSubmitActionComponent }
-));
+  )
+);
