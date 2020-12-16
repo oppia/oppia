@@ -358,9 +358,9 @@ angular.module('oppia').directive('conversationSkin', [
         'RefresherExplorationConfirmationModalService',
         'SiteAnalyticsService', 'StateCardObjectFactory',
         'StatsReportingService', 'StoryViewerBackendApiService', 'UrlService',
-        'UserService', 'WindowDimensionsService', 'COMPONENT_NAME_FEEDBACK',
-        'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
-        'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
+        'UserService', 'WindowDimensionsService',
+        'COMPONENT_NAME_FEEDBACK', 'CONTENT_FOCUS_LABEL_PREFIX',
+        'CONTINUE_BUTTON_FOCUS_LABEL', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
@@ -387,9 +387,9 @@ angular.module('oppia').directive('conversationSkin', [
             RefresherExplorationConfirmationModalService,
             SiteAnalyticsService, StateCardObjectFactory,
             StatsReportingService, StoryViewerBackendApiService, UrlService,
-            UserService, WindowDimensionsService, COMPONENT_NAME_FEEDBACK,
-            CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
-            DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
+            UserService, WindowDimensionsService,
+            COMPONENT_NAME_FEEDBACK, CONTENT_FOCUS_LABEL_PREFIX,
+            CONTINUE_BUTTON_FOCUS_LABEL, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
@@ -681,6 +681,8 @@ angular.module('oppia').directive('conversationSkin', [
 
             var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
               PlayerTranscriptService.getLastCard());
+            var previousDisplayedCardIndex = (
+              PlayerPositionService.getDisplayedCardIndex());
 
             if (
               totalNumCards > 1 &&
@@ -702,6 +704,22 @@ angular.module('oppia').directive('conversationSkin', [
             }
             PlayerPositionService.changeCurrentQuestion(
               PlayerPositionService.getDisplayedCardIndex());
+
+            // TODO(#7951): Remove the following try-catch block once #7951 has
+            // been fixed.
+            try {
+              $scope.displayedCard.isTerminal();
+            } catch (error) {
+              let additionalDebugInfo = (
+                `${error.message} \n` +
+                `state name: ${newCard && newCard.getStateName()} \n` +
+                `totalNumCards: ${totalNumCards} \n` +
+                'previous displayedCardIndex: ' +
+                `${previousDisplayedCardIndex} \n` +
+                'current displayedCardIndex: ' +
+                `${PlayerPositionService.getDisplayedCardIndex()} \n`);
+              throw new Error(additionalDebugInfo);
+            }
 
             if ($scope.displayedCard.isTerminal()) {
               $scope.isRefresherExploration = false;

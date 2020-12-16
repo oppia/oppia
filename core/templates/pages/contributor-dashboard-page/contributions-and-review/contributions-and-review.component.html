@@ -26,9 +26,7 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" ng-if="$ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
-      <opportunities-list opportunity-data-is-loading="$ctrl.contributionsDataLoading"
-                          opportunities="$ctrl.contributionSummaries"
-                          more-available="$ctrl.moreOpportunitiesAvailable"
+      <opportunities-list load-opportunities="$ctrl.loadContributions"
                           on-click-action-button="$ctrl.onClickViewSuggestion"
                           label-required="!$ctrl.activeReviewTab">
       </opportunities-list>
