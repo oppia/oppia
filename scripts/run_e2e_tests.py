@@ -582,16 +582,15 @@ def main(args=None):
             break
         flaky = flake_checker.is_test_output_flaky(
             output, parsed_args.suite)
-        # Don't rerun if the test was non-flaky or if we are not
+        # Don't rerun if the test was non-flaky and we are not
         # rerunning non-flaky tests.
-        if not flaky or not RERUN_NON_FLAKY:
+        if not flaky and not RERUN_NON_FLAKY:
             break
         # Don't rerun off of CI.
         if not flake_checker.check_if_on_ci():
             python_utils.PRINT('No reruns because not running on CI.')
             break
         # Prepare for rerun.
-        cleanup_portserver(portserver_process)
         cleanup()
 
     sys.exit(return_code)
