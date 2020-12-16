@@ -18,6 +18,7 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
+import { Observable } from 'rxjs';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
@@ -60,11 +61,10 @@ export class StateEditorService {
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
+  private _stateNamesChangedEventEmitter = new EventEmitter<void>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
-  private _stateNamesChangedEventEmitter = new EventEmitter();
-  onStateNamesChanged = this._stateNamesChangedEventEmitter.asObservable();
   correctnessFeedbackEnabled: boolean = null;
   inQuestionMode: boolean = null;
   // Currently, the only place where this is used in the state editor
@@ -110,6 +110,10 @@ export class StateEditorService {
 
   updateCurrentRuleInputIsValid(value: boolean): void {
     this.currentRuleInputIsValid = value;
+  }
+
+  get onStateNamesChanged(): Observable<void> {
+    return this._stateNamesChangedEventEmitter;
   }
 
   checkCurrentRuleInputIsValid(): boolean {

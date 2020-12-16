@@ -75,10 +75,9 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
           };
 
           ctrl.updateOptionNames = function() {
-            // $timeout is used for updating view. The use of
-            // $scope.$applyAsync() didn't work and use of $scope.$apply()
-            // resulted in console errors. The value of 10ms in the $timeout is
-            // arbitrary. It has no significance.
+            // $timeout is being used here to update the view.
+            // $scope.$applyAsync() doesn't work and $scope.$apply() causes
+            // console errors.
             $timeout(() => {
               currentStateName = StateEditorService.getActiveStateName();
 
@@ -120,12 +119,12 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
                   if (lastComputedArrangement.hasOwnProperty(stateName)) {
                     allStateScores[stateName] = (
                       lastComputedArrangement[stateName].depth *
-                    (maxOffset + 1) +
-                    lastComputedArrangement[stateName].offset);
+                      (maxOffset + 1) +
+                      lastComputedArrangement[stateName].offset);
                   } else {
-                  // States that have just been added in the rule 'create new'
-                  // modal are not yet included as part of
-                  // lastComputedArrangement so we account for them here.
+                    // States that have just been added in the rule 'create new'
+                    // modal are not yet included as part of
+                    // lastComputedArrangement so we account for them here.
                     allStateScores[stateName] = (
                       (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
                     unarrangedStateCount++;
@@ -152,36 +151,33 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
                   text: 'A New Card Called...'
                 });
               }
+              // This value of 10ms is arbitrary, it has no significance.
             }, 10);
           };
 
           ctrl.$onInit = function() {
             ctrl.directiveSubscriptions.add(
-              StateEditorService.onSaveOutcomeDestDetails.subscribe(
-                () => {
-                  if (ctrl.isSelfLoop()) {
-                    ctrl.outcome.dest = StateEditorService.getActiveStateName();
-                  }
-                  // Create new state if specified.
-                  if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
-                    EditorFirstTimeEventsService
-                      .registerFirstCreateSecondStateEvent();
-
-                    var newStateName = ctrl.outcome.newStateName;
-                    ctrl.outcome.dest = newStateName;
-                    delete ctrl.outcome.newStateName;
-
-                    ctrl.addState(newStateName);
-                  }
+              StateEditorService.onSaveOutcomeDestDetails.subscribe(() => {
+                if (ctrl.isSelfLoop()) {
+                  ctrl.outcome.dest = StateEditorService.getActiveStateName();
                 }
-              )
-            );
+                // Create new state if specified.
+                if (ctrl.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
+                  EditorFirstTimeEventsService
+                    .registerFirstCreateSecondStateEvent();
+
+                  var newStateName = ctrl.outcome.newStateName;
+                  ctrl.outcome.dest = newStateName;
+                  delete ctrl.outcome.newStateName;
+
+                  ctrl.addState(newStateName);
+                }
+              }));
             ctrl.updateOptionNames();
             ctrl.directiveSubscriptions.add(
               StateEditorService.onStateNamesChanged.subscribe(() => {
                 ctrl.updateOptionNames();
-              })
-            );
+              }));
             ctrl.canAddPrerequisiteSkill = (
               ENABLE_PREREQUISITE_SKILLS &&
               StateEditorService.isExplorationWhitelisted());
