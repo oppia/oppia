@@ -17,15 +17,12 @@
  */
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TestBed } from '@angular/core/testing';
 
-const constants = require('constants.ts');
-
 describe('State Object Factory', () => {
-  let sof;
-  let stateObject;
-  const oldNewStateTemplate = constants.NEW_STATE_TEMPLATE;
+  let sof: StateObjectFactory;
+  let stateObject: StateBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -33,7 +30,7 @@ describe('State Object Factory', () => {
     });
     sof = TestBed.get(StateObjectFactory);
 
-    stateObject = {
+    spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
         html: '',
@@ -83,11 +80,9 @@ describe('State Object Factory', () => {
           default_outcome: {}
         }
       }
-    };
-  });
+    });
 
-  beforeAll(() => {
-    constants.NEW_STATE_TEMPLATE = {
+    stateObject = {
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -138,10 +133,6 @@ describe('State Object Factory', () => {
         }
       }
     };
-  });
-
-  afterAll(() => {
-    constants.NEW_STATE_TEMPLATE = oldNewStateTemplate;
   });
 
   it('should create a new state object from backend dict', () => {
