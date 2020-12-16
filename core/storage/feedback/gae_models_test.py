@@ -60,12 +60,10 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.NEW_USER_1_ID,
-            gae_id='gae_1_id',
             email='some@email.com'
         ).put()
         user_models.UserSettingsModel(
             id=self.NEW_USER_2_ID,
-            gae_id='gae_2_id',
             email='some_other@email.com'
         ).put()
 
@@ -80,6 +78,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             summary=self.SUMMARY,
             message_count=self.MESSAGE_COUNT
         )
+        self.feedback_thread_model.update_timestamps()
         self.feedback_thread_model.put()
 
     def test_get_deletion_policy(self):
@@ -152,6 +151,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     def test_message_cache_supports_huge_text(self):
         self.feedback_thread_model.last_nonempty_message_text = 'X' * 2000
         # Storing the model should not throw.
+        self.feedback_thread_model.update_timestamps()
         self.feedback_thread_model.put()
 
 
@@ -360,17 +360,20 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             thread_id='exploration.exp_id.thread_id',
             message_ids_read_by_user=[])
 
+        feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
 
         last_updated = feedback_thread_model.last_updated
 
         # If we do not wish to update the last_updated time, we should set
         # the update_last_updated_time argument to False in the put function.
-        feedback_thread_model.put(update_last_updated_time=False)
+        feedback_thread_model.update_timestamps(update_last_updated_time=False)
+        feedback_thread_model.put()
         self.assertEqual(feedback_thread_model.last_updated, last_updated)
 
         # If we do wish to change it however, we can simply use the put function
         # as the default value of update_last_updated_time is True.
+        feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
         self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
 
@@ -456,9 +459,15 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         user_data = feedback_models.GeneralFeedbackThreadUserModel.export_data(
             self.USER_ID_A)
         expected_data = {
-            self.THREAD_ID_A: self.MESSAGE_IDS_READ_IN_THREAD_A,
-            self.THREAD_ID_B: self.MESSAGE_IDS_READ_IN_THREAD_B,
-            self.THREAD_ID_C: self.MESSAGE_IDS_READ_IN_THREAD_C
+            self.THREAD_ID_A: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_IN_THREAD_A
+            },
+            self.THREAD_ID_B: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_IN_THREAD_B
+            },
+            self.THREAD_ID_C: {
+                'message_ids_read_by_user': self.MESSAGE_IDS_READ_IN_THREAD_C
+            }
         }
         self.assertDictEqual(expected_data, user_data)
 
@@ -475,12 +484,7 @@ class FeedbackAnalyticsModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self):
         self.assertEqual(
             feedback_models.FeedbackAnalyticsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
-
-    def test_has_reference_to_user_id(self):
-        self.assertFalse(
-            feedback_models.FeedbackAnalyticsModel
-            .has_reference_to_user_id('id_x'))
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
@@ -509,6 +513,7 @@ class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
         }
         email_instance = feedback_models.UnsentFeedbackEmailModel(
             id=user_id, feedback_message_references=[message_reference_dict])
+        email_instance.update_timestamps()
         email_instance.put()
 
         retrieved_instance = (

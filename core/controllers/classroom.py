@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -55,10 +56,13 @@ class ClassroomDataHandler(base.BaseHandler):
         topic_ids = classroom.topic_ids
         topic_summaries = topic_services.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_services.get_multi_topic_rights(topic_ids)
-        topic_summary_dicts = [
-            summary.to_dict() for ind, summary in enumerate(topic_summaries)
-            if summary is not None and topic_rights[ind].topic_is_published
-        ]
+        topic_summary_dicts = []
+        for index, summary in enumerate(topic_summaries):
+            if summary is not None:
+                topic_summary_dict = summary.to_dict()
+                topic_summary_dict['is_published'] = (
+                    topic_rights[index].topic_is_published)
+                topic_summary_dicts.append(topic_summary_dict)
 
         self.values.update({
             'topic_summary_dicts': topic_summary_dicts,
@@ -83,3 +87,12 @@ class ClassroomPromosStatusHandler(base.BaseHandler):
             'classroom_promos_are_enabled': (
                 config_domain.CLASSROOM_PROMOS_ARE_ENABLED.value)
         })
+
+
+class DefaultClassroomRedirectPage(base.BaseHandler):
+    """Redirects to the default classroom page."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)

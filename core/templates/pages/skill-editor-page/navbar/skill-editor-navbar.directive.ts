@@ -86,8 +86,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
               backdrop: true,
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
-              SkillEditorStateService.saveSkill(commitMessage);
-              AlertsService.addSuccessMessage('Changes Saved.');
+              SkillEditorStateService.saveSkill(commitMessage, () => {
+                AlertsService.addSuccessMessage('Changes Saved.');
+              });
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

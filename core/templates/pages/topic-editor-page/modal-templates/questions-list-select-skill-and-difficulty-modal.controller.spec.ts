@@ -20,14 +20,13 @@
 import { TestBed } from '@angular/core/testing';
 import { ShortSkillSummaryObjectFactory } from
   'domain/skill/ShortSkillSummaryObjectFactory';
-import { SkillDifficultyObjectFactory } from
-  'domain/skill/SkillDifficultyObjectFactory';
+import { SkillDifficulty } from
+  'domain/skill/skill-difficulty.model';
 
 describe('Questions List Select Skill And Difficulty Modal Controller',
   function() {
     var $scope = null;
     var $uibModalInstance = null;
-    var skillDifficultyObjectFactory = null;
     var skillSummaryObjectFactory = null;
 
     var allSkillSummaries = [{
@@ -50,12 +49,9 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
     beforeEach(function() {
       TestBed.configureTestingModule({
         providers: [
-          SkillDifficultyObjectFactory,
           ShortSkillSummaryObjectFactory
         ]
       });
-
-      skillDifficultyObjectFactory = TestBed.get(SkillDifficultyObjectFactory);
       skillSummaryObjectFactory = TestBed.get(ShortSkillSummaryObjectFactory);
     });
 
@@ -71,7 +67,6 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
       $scope = $rootScope.$new();
       $controller('QuestionsListSelectSkillAndDifficultyModalController', {
         $scope: $scope,
-        SkillDifficultyObjectFactory: skillDifficultyObjectFactory,
         $uibModalInstance: $uibModalInstance,
         allSkillSummaries: allSkillSummaries,
         countOfSkillsToPrioritize: countOfSkillsToPrioritize,
@@ -132,7 +127,7 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
         $scope.startQuestionCreation();
 
         expect($uibModalInstance.close).toHaveBeenCalledWith([
-          skillDifficultyObjectFactory.create(
+          SkillDifficulty.create(
             allSkillSummaries[1].id, allSkillSummaries[1].description, 0.3)
         ]);
 

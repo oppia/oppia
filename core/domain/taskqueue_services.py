@@ -57,6 +57,7 @@ FUNCTION_ID_DISPATCH_EVENT = 'dispatch_event'
 FUNCTION_ID_UPDATE_STATS = 'update_stats'
 FUNCTION_ID_DELETE_EXPLORATIONS = 'delete_explorations'
 FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS = 'untag_deleted_misconceptions'
+FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS = 'remove_user_from_rights_models'
 
 
 def defer(fn_identifier, queue_name, *args, **kwargs):
@@ -92,8 +93,7 @@ def defer(fn_identifier, queue_name, *args, **kwargs):
     # See https://bugs.python.org/issue7980
     datetime.datetime.strptime('', '')
     platform_taskqueue_services.create_http_task(
-        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED,
-        payload=payload)
+        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
 
 
 def enqueue_task(url, params, countdown):

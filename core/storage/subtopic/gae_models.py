@@ -35,7 +35,10 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
 
-    pass
+    @staticmethod
+    def get_deletion_policy():
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
 class SubtopicPageModel(base_models.VersionedModel):
@@ -62,21 +65,8 @@ class SubtopicPageModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Subtopic should be kept if associated topic is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, unused_user_id):
-        """Check whether SubtopicPageModel snapshots references the given user.
-
-        Args:
-            unused_user_id: str. The ID of the user whose data should be
-                checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return False
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -104,11 +94,12 @@ class SubtopicPageModel(base_models.VersionedModel):
             commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
+        subtopic_page_commit_log_entry.update_timestamps()
         subtopic_page_commit_log_entry.put()
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -132,13 +123,6 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     subtopic_page_id = (
         datastore_services.StringProperty(indexed=True, required=True))
 
-    @staticmethod
-    def get_deletion_policy():
-        """Subtopic page commit log is deleted only if the corresponding
-        topic is not public.
-        """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
     @classmethod
     def _get_instance_id(cls, subtopic_page_id, version):
         """This function returns the generated id for the get_commit function
@@ -156,7 +140,8 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{

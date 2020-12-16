@@ -521,7 +521,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -563,7 +563,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_spec.inputs = {'x': 15}
         rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
-            Exception, 'Expected unicode string, received 15'
+            Exception, 'Expected list, received 15'
             ):
             exploration.validate()
 
@@ -767,7 +767,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -794,7 +794,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -1059,7 +1059,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.get_languages_with_complete_translation(), [])
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
@@ -1079,9 +1079,25 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
+
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
@@ -1097,14 +1113,25 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
+        init_state.update_written_translations(written_translations)
 
         exploration.add_states(['New state'])
+        new_state = exploration.states['New state']
+        new_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        new_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None)
+        new_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>New state translation in Hindi.</p>',
@@ -1120,8 +1147,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        exploration.states['New state'].update_written_translations(
-            written_translations)
+        new_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 4})
@@ -1130,9 +1156,24 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
+
+        init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+        init_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi': {
                         'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
@@ -1148,9 +1189,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
+        init_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {'hi': 1})
@@ -1159,9 +1198,24 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         self.assertEqual(
             exploration.get_translation_counts(), {})
+        init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
         written_translations = state_domain.WrittenTranslations.from_dict({
             'translations_mapping': {
-                'content_1': {
+                'content': {
                     'hi-en': {
                         'data_format': 'html',
                         'translation': '<p>Translation in Hindi.</p>',
@@ -1182,9 +1236,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         })
-        exploration.states[
-            feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-                written_translations)
+        init_state.update_written_translations(written_translations)
 
         self.assertEqual(
             exploration.get_translation_counts(), {
@@ -1218,7 +1270,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -1595,7 +1647,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['Test']
                 },
                 'rule_type': 'Contains'
             }],
@@ -1947,6 +1999,27 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.assertFalse(self.exp_summary.is_solely_owned_by_user('viewer_id'))
         self.assertFalse(
             self.exp_summary.is_solely_owned_by_user('contributor_id'))
+
+    def test_add_new_contribution_for_user_adds_user_to_contributors(self):
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.exp_summary.contributors_summary)
+        self.assertEqual(self.exp_summary.contributors_summary['user_id'], 1)
+        self.assertIn('user_id', self.exp_summary.contributor_ids)
+
+    def test_add_new_contribution_for_user_increases_score_in_contributors(
+            self):
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.exp_summary.add_contribution_by_user('user_id')
+        self.assertIn('user_id', self.exp_summary.contributors_summary)
+        self.assertEqual(self.exp_summary.contributors_summary['user_id'], 2)
+
+    def test_add_new_contribution_for_user_does_not_add_system_user(self):
+        self.exp_summary.add_contribution_by_user(
+            feconf.SYSTEM_COMMITTER_ID)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributors_summary)
+        self.assertNotIn(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributor_ids)
 
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):
@@ -6505,7 +6578,147 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V44
+    YAML_CONTENT_V45 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 45
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 40
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V45
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -6945,7 +7158,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 44
+schema_version: 45
 states:
   (untitled state):
     classifier_model_id: null
@@ -6965,7 +7178,8 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+            - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7068,7 +7282,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 39
+states_schema_version: 40
 tags: []
 title: Title
 """)
@@ -7101,7 +7315,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 44
+schema_version: 45
 states:
   (untitled state):
     classifier_model_id: null
@@ -7121,7 +7335,8 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+            - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7229,7 +7444,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 39
+states_schema_version: 40
 tags: []
 title: Title
 """)
@@ -7280,7 +7495,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 44
+schema_version: 45
 states:
   (untitled state):
     classifier_model_id: null
@@ -7300,7 +7515,8 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+            - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7415,7 +7631,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 39
+states_schema_version: 40
 tags: []
 title: Title
 """)
@@ -7448,7 +7664,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 44
+schema_version: 45
 states:
   (untitled state):
     classifier_model_id: null
@@ -7468,7 +7684,8 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+            - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7575,7 +7792,7 @@ states:
         ca_customPlaceholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 39
+states_schema_version: 40
 tags: []
 title: Title
 """)
@@ -7638,7 +7855,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 44
+schema_version: 45
 states:
   (untitled state):
     classifier_model_id: null
@@ -7658,7 +7875,8 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+            - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7758,7 +7976,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 39
+states_schema_version: 40
 tags: []
 title: Title
 """)
@@ -7934,7 +8152,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 44
+schema_version: 45
 states:
   (untitled state):
     classifier_model_id: null
@@ -8061,7 +8279,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 39
+states_schema_version: 40
 tags: []
 title: Title
 """)
@@ -8211,7 +8429,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 44
+schema_version: 45
 states:
   (untitled state):
     classifier_model_id: null
@@ -8231,7 +8449,8 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+            - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -8338,7 +8557,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 39
+states_schema_version: 40
 tags: []
 title: Title
 """)
@@ -8774,7 +8993,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long, single-line-pragma
-    YAML_CONTENT_V44_IMAGE_DIMENSIONS = (
+    YAML_CONTENT_V45_IMAGE_DIMENSIONS = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -8785,7 +9004,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 44
+schema_version: 45
 states:
   Introduction:
     classifier_model_id: null
@@ -9038,7 +9257,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 39
+states_schema_version: 40
 tags: []
 title: title
 """)
@@ -9286,7 +9505,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V44_WITH_IMAGE_CAPTION = (
+    YAML_CONTENT_V45_WITH_IMAGE_CAPTION = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -9297,7 +9516,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 44
+schema_version: 45
 states:
   (untitled state):
     classifier_model_id: null
@@ -9321,7 +9540,8 @@ states:
           refresher_exploration_id: null
         rule_specs:
         - inputs:
-            x: InputString
+            x:
+            - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -9424,7 +9644,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 39
+states_schema_version: 40
 tags: []
 title: Title
 """)
@@ -9440,7 +9660,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V44_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V45_IMAGE_DIMENSIONS)
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
@@ -9452,7 +9672,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V44_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V45_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
