@@ -53,7 +53,9 @@ module.exports = {
       // assets/constants.ts. We can't directly write import 'constants'
       // because a module named 'constants' is defined in '@types/node'
       // package.
-      'assets/constants': 'constants.ts'
+      'assets/constants': 'constants.ts',
+      'assets/rich_text_components_definitions':
+        'rich_text_components_definitions.ts'
     }
   },
   entry: {
