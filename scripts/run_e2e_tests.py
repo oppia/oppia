@@ -553,9 +553,9 @@ def run_tests(args):
         nextline = p.stdout.readline()
         if len(nextline) == 0 and p.poll() is not None:
             break
-        sys.stdout.write(nextline)
-        sys.stdout.flush()
         try:
+            sys.stdout.write(nextline)
+            sys.stdout.flush()
             output_lines.append(python_utils.UNICODE(nextline.rstrip()))
         except UnicodeError:
             # Some characters, like the check-marks next to passing
