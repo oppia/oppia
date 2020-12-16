@@ -50,6 +50,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
+import { AnswerSubmitActionComponent } from './statistics-tab/issues/answer-submit-action.component'
 
 @NgModule({
   imports: [
@@ -58,12 +59,14 @@ import { ParamChangesEditorDirective } from './param-changes-editor/param-change
     SharedComponentsModule
   ],
   declarations: [
+    AnswerSubmitActionComponent,
     CkEditorCopyToolbarComponent,
     OppiaAngularRootComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
   ],
   entryComponents: [
+    AnswerSubmitActionComponent,
     CkEditorCopyToolbarComponent,
     OppiaAngularRootComponent,
     StateParamChangesEditorComponent
