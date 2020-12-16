@@ -110,7 +110,7 @@ angular.module('oppia').component('contributorDashboardPage', {
             $rootScope.$applyAsync();
           });
 
-        UserService.getUserContributionRightsData().then(
+        UserService.getUserContributionRightsDataAsync().then(
           function(userContributionRights) {
             ctrl.userCanReviewTranslationSuggestionsInLanguages = (
               getLanguageDescriptions(
