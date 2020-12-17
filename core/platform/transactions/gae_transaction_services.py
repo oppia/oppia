@@ -24,6 +24,7 @@ import functools
 from google.appengine.ext import ndb
 
 
+# TODO(#11431): Remove this in favor of run_in_transaction_wrapper.
 def run_in_transaction(fn, *args, **kwargs):
     """Runs a function in a transaction. Either all of the operations in
     the transaction are applied, or none of them are applied.
@@ -43,6 +44,7 @@ def run_in_transaction(fn, *args, **kwargs):
         Exception. Whatever fn() raises.
         datastore_errors.TransactionFailedError. The transaction failed.
     """
+    # XG enables cross-group transaction that can handle up to 25 model groups.
     return ndb.transaction(
         lambda: fn(*args, **kwargs),
         xg=True,
