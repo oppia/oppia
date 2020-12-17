@@ -446,7 +446,7 @@ describe('Topic update service', function() {
     'when the subtopic does not exist', () => {
     expect(() => {
       topicUpdateService.setSubtopicTitle(_sampleTopic, 10, 'whatever');
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -480,7 +480,7 @@ describe('Topic update service', function() {
     expect(() => {
       topicUpdateService
         .setSubtopicThumbnailFilename(_sampleTopic, 10, 'whatever');
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -518,7 +518,7 @@ describe('Topic update service', function() {
     expect(() => {
       topicUpdateService
         .setSubtopicThumbnailBgColor(_sampleTopic, 10, 'whatever');
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -538,7 +538,7 @@ describe('Topic update service', function() {
     'url fragment when the subtopic does not exist', () => {
     expect(() => {
       topicUpdateService.setSubtopicUrlFragment(_sampleTopic, 10, 'whatever');
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -769,7 +769,7 @@ describe('Topic update service', function() {
     'when an error is encountered', () => {
     expect(() => {
       topicUpdateService.deleteSubtopic(_sampleTopic, 10);
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
