@@ -407,7 +407,7 @@ describe('TextInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                contentId: 'rule_input',
+                contentId: 'rule_input_4',
                 normalizedStrSet: ['xyz']
               }
             }
@@ -457,7 +457,7 @@ describe('TextInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                contentId: 'rule_input',
+                contentId: 'rule_input_4',
                 normalizedStrSet: ['xya']
               }
             }
