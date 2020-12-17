@@ -22,19 +22,19 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 @Component({
-  selector: 'oppia-svg-thumbnail-display',
+  selector: 'oppia-thumbnail-display',
   templateUrl: './thumbnail-display.component.html',
   styleUrls: []
 })
 export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   constructor(private svgSanitizerService: SvgSanitizerService) {}
   @Input() imgSrc: string;
-  @Input() height: string;
-  @Input() width: string;
+  @Input() aspectRatio: string;
   @Input() classes: string[];
   @Input() background: string;
   imageSourceInView = null;
-
+  height = '180px';
+  width = '320px';
   ngOnInit(): void {
     this.updateSvgInViewIfSafe();
   }
@@ -53,13 +53,17 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
     } else {
       this.imageSourceInView = this.imgSrc;
     }
+    this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
+    this.height = this.aspectRatio === '4:3' ? '186px' : '180px';
   }
 
   ngOnChanges(): void {
     this.updateSvgInViewIfSafe();
+    this.width = this.aspectRatio === '4:3' ? '248px' : '320px';
+    this.height = this.aspectRatio === '4:3' ? '186px' : '180px';
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaSvgThumbnailDisplay', downgradeComponent(
+  'oppiaThumbnailDisplay', downgradeComponent(
     {component: ThumbnailDisplayComponent}));

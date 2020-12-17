@@ -9,16 +9,16 @@
       <i class="material-icons oppia-editor-edit-icon oppia-pencil-icon">
         &#xE254;
       </i>
-      <oppia-svg-thumbnail-display ng-show="!thumbnailIsLoading"
+      <oppia-thumbnail-display ng-show="!thumbnailIsLoading"
                                    [img-src]="editableThumbnailDataUrl"
                                    [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                                    [background]="getBgColor()">
-      </oppia-svg-thumbnail-display>
-      <oppia-svg-thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
+      </oppia-thumbnail-display>
+      <oppia-thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
                                    [img-src]="newThumbnailDataUrl"
                                    [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
                                    [background]="localStorageBgcolor">
-      </oppia-svg-thumbnail-display>
+      </oppia-thumbnail-display>
     </div>
   </div>
 </div>
