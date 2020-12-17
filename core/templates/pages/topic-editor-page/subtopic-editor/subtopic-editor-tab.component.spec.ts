@@ -16,13 +16,9 @@
 /**
  * @fileoverview Unit tests for the subtopic editor tab component.
  */
-import { SpyLocation } from '@angular/common/testing';
-import { Location } from '@angular/common';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { angularServices } from 'services/angular-services.index';
-import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
+
 import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Subtopic editor tab', function() {
@@ -36,7 +32,7 @@ describe('Subtopic editor tab', function() {
   var TopicEditorStateService = null;
   var TopicUpdateService = null;
   var SubtopicValidationService = null;
-  var topicEditorRoutingService = null;
+  var TopicEditorRoutingService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
   var ShortSkillSummaryObjectFactory = null;
@@ -45,31 +41,15 @@ describe('Subtopic editor tab', function() {
     isWindowNarrow: () => false
   };
   var $location = null;
-  let location = null;
+
   var topicInitializedEventEmitter = null;
   var topicReinitializedEventEmitter = null;
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [
-        TopicEditorRoutingService,
-        {provide: Location, useClass: SpyLocation}]
-    });
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    for (let servicePair of angularServices) {
-      $provide.value(
-        servicePair[0], TestBed.get(servicePair[1]));
-    }
-    $provide.value(
-      'TopicEditorRoutingService', TestBed.get(TopicEditorRoutingService));
-    topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
-    location = TestBed.get(Location);
-  }));
+
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicUpdateService = $injector.get('TopicUpdateService');
     SubtopicValidationService = $injector.get('SubtopicValidationService');
+    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     ShortSkillSummaryObjectFactory = $injector.get(
@@ -335,9 +315,9 @@ describe('Subtopic editor tab', function() {
     ctrl.toggleSubtopicPreview();
   });
 
-  it('should call topicEditorRoutingService to navigate To Topic Editor',
+  it('should call TopicEditorRoutingService to navigate To Topic Editor',
     function() {
-      var navigateSpy = spyOn(topicEditorRoutingService, 'navigateToMainTab');
+      var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
       ctrl.navigateToTopicEditor();
       expect(navigateSpy).toHaveBeenCalled();
     });
@@ -357,8 +337,8 @@ describe('Subtopic editor tab', function() {
   });
 
   it('should redirect to topic editor if subtopic id is invalid', function() {
-    var navigateSpy = spyOn(topicEditorRoutingService, 'navigateToMainTab');
-    location.go('/subtopic_editor/99');
+    var navigateSpy = spyOn(TopicEditorRoutingService, 'navigateToMainTab');
+    $location.path('/subtopic_editor/99');
     ctrl.initEditor();
     expect(navigateSpy).toHaveBeenCalled();
   });

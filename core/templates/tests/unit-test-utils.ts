@@ -23,21 +23,18 @@ import { TestBed } from '@angular/core/testing';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
-import { RouterTestingModule } from '@angular/router/testing';
+
 import { angularServices } from 'services/angular-services.index';
-import { SpyLocation } from '@angular/common/testing';
 
 declare var angular: ng.IAngularStatic;
 
 export const importAllAngularServices = (): void => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, RouterTestingModule],
-      providers: [{provide: Location, useClass: SpyLocation}]
+      imports: [HttpClientTestingModule]
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('Location', TestBed.get(Location));
     for (let servicePair of angularServices) {
       $provide.value(
         servicePair[0], TestBed.get(servicePair[1]));
