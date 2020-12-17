@@ -151,7 +151,7 @@ module.exports = function(config) {
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
         alias: {
           // These both are used so that we can refer to them in imports using
-          // their full path (assets/fname).
+          // their full path: 'assets/{{filename}}'.
           'assets/constants': 'constants.ts',
           'assets/rich_text_components_definitions':
             'rich_text_components_definitions.ts'
