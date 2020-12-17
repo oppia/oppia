@@ -247,7 +247,6 @@ import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-
 import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
-import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 import { AlertsService } from 'services/alerts.service';
 import { AppService } from 'services/app.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -629,7 +628,6 @@ export const angularServices: [string, unknown][] = [
   ['TopicsAndSkillsDashboardBackendApiService',
     TopicsAndSkillsDashboardBackendApiService],
   ['TopicsAndSkillsDashboardPageService', TopicsAndSkillsDashboardPageService],
-  ['TopicEditorRoutingService', TopicEditorRoutingService],
   ['TranslationLanguageService', TranslationLanguageService],
   ['TranslateService', TranslateService],
   ['TranslationsBackendApiService', TranslationsBackendApiService],

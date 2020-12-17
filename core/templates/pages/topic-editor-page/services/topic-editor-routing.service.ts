@@ -15,119 +15,102 @@
 /**
  * @fileoverview Service that handles routing for the topic editor page.
  */
+require('domain/utilities/url-interpolation.service.ts');
+require('services/page-title.service.ts');
 
-import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { PageTitleService } from 'services/page-title.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class TopicEditorRoutingService {
-  currentPath: string = '';
-  MAIN_TAB: string = 'main';
-  SUBTOPIC_EDITOR_TAB: string = 'subtopic_editor';
-  SUBTOPIC_PREVIEW_TAB: string = 'subtopic_preview';
-  TOPIC_PREVIEW_TAB: string = 'topic_preview';
-  QUESTIONS_TAB: string = 'questions';
-  lastTabVisited: string = 'main';
-  lastSubtopicId: number = null;
-  // This variable checks whether the file is running
-  // in testing or in server. If running in testing mode the whole
-  // URL of the window is not used (ex-URL : /questions),
-  // which clashes with running on the server where whole URL is used.
-  // (ex-URL : http://localhost:8181/topic_editor/6xposGcAZShX#/questions).
-  inSpecMode: boolean = false;
+angular.module('oppia').factory('TopicEditorRoutingService', [
+  '$location', '$rootScope', '$window', 'PageTitleService',
+  'UrlInterpolationService',
+  function(
+      $location, $rootScope, $window, PageTitleService,
+      UrlInterpolationService) {
+    var MAIN_TAB = 'main';
+    var SUBTOPIC_EDITOR_TAB = 'subtopic_editor';
+    var SUBTOPIC_PREVIEW_TAB = 'subtopic_preview';
+    var TOPIC_PREVIEW_TAB = 'topic_preview';
+    var QUESTIONS_TAB = 'questions';
+    var lastTabVisited = 'main';
+    var lastSubtopicId = null;
 
-  activeTabName: string = this.MAIN_TAB;
+    var activeTabName = MAIN_TAB;
 
-  constructor(
-    private location: Location,
-    private pageTitleService: PageTitleService,
-    private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef) {
-    this.currentPath = this.location.path();
-    this.location.onUrlChange((newPath: string, state: unknown) => {
-      if (!this.inSpecMode) {
-        newPath = newPath.split('#')[1];
-      }
+    // When the URL path changes, reroute to the appropriate tab in the
+    // topic editor page.
+    $rootScope.$watch(function() {
+      return $location.path();
+    }, function(newPath, oldPath) {
       if (newPath === '') {
-        this.location.go(this.currentPath);
+        $location.path(oldPath);
         return;
       }
+      if (!oldPath) {
+        // This can happen when clicking on links whose href is "#".
+        return;
+      }
+
       if (newPath === '/') {
-        this.activeTabName = this.MAIN_TAB;
+        activeTabName = MAIN_TAB;
       } else if (newPath === '/questions') {
-        this.activeTabName = this.QUESTIONS_TAB;
+        activeTabName = QUESTIONS_TAB;
       } else if (newPath.startsWith('/subtopic_editor')) {
-        this.activeTabName = this.SUBTOPIC_EDITOR_TAB;
+        activeTabName = SUBTOPIC_EDITOR_TAB;
       } else if (newPath.startsWith('/subtopic_preview')) {
-        this.activeTabName = this.SUBTOPIC_PREVIEW_TAB;
+        activeTabName = SUBTOPIC_PREVIEW_TAB;
       } else if (newPath.startsWith('/topic_preview')) {
-        this.activeTabName = this.TOPIC_PREVIEW_TAB;
+        activeTabName = TOPIC_PREVIEW_TAB;
       }
     });
-    this.location.go(this.currentPath);
+
+    var TopicEditorRouterService = {
+      getActiveTabName: function() {
+        return activeTabName;
+      },
+      getLastTabVisited: function() {
+        return lastTabVisited;
+      },
+      getLastSubtopicIdVisited: function() {
+        return lastSubtopicId;
+      },
+      navigateToMainTab: function() {
+        lastTabVisited = 'topic';
+        PageTitleService.setPageTitleForMobileView('Topic Editor');
+        $location.path('');
+      },
+      navigateToSubtopicPreviewTab: function(subtopicId) {
+        lastTabVisited = 'subtopic';
+        PageTitleService.setPageTitleForMobileView('Subtopic Preview');
+        $location.path('/subtopic_preview/' + subtopicId);
+      },
+      navigateToTopicPreviewTab: function() {
+        lastTabVisited = 'topic';
+        PageTitleService.setPageTitleForMobileView('Topic Preview');
+        $location.path('/topic_preview/');
+      },
+      navigateToSubtopicEditorWithId: function(subtopicId) {
+        lastTabVisited = 'subtopic';
+        PageTitleService.setPageTitleForMobileView('Subtopic Editor');
+        $location.path('/subtopic_editor/' + subtopicId);
+      },
+      navigateToQuestionsTab: function() {
+        lastSubtopicId = this.getSubtopicIdFromUrl();
+        PageTitleService.setPageTitleForMobileView('Question Editor');
+        $location.path('/questions');
+      },
+      getSubtopicIdFromUrl: function() {
+        return parseInt($location.path().split('/')[2]);
+      },
+      navigateToSkillEditorWithId: function(skillId) {
+        var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
+
+        var skillEditorUrl = UrlInterpolationService.interpolateUrl(
+          SKILL_EDITOR_URL_TEMPLATE, {
+            skill_id: skillId
+          });
+        $window.open(skillEditorUrl);
+      }
+    };
+
+    return TopicEditorRouterService;
   }
-
-  getActiveTabName(): string {
-    return this.activeTabName;
-  }
-
-  getLastTabVisited(): string {
-    return this.lastTabVisited;
-  }
-
-  getLastSubtopicIdVisited(): number {
-    return this.lastSubtopicId;
-  }
-
-  navigateToMainTab(): void {
-    this.lastTabVisited = 'topic';
-    this.location.go('/');
-  }
-
-  navigateToSubtopicPreviewTab(subtopicId: string | number): void {
-    this.lastTabVisited = 'subtopic';
-    this.pageTitleService.setPageTitleForMobileView('Subtopic Preview');
-    this.location.go('/subtopic_preview/' + subtopicId);
-  }
-
-  navigateToTopicPreviewTab(): void {
-    this.lastTabVisited = 'topic';
-    this.pageTitleService.setPageTitleForMobileView('Topic Preview');
-    this.location.go('/topic_preview/');
-  }
-
-  navigateToSubtopicEditorWithId(subtopicId: string | number): void {
-    this.lastTabVisited = 'subtopic';
-    this.pageTitleService.setPageTitleForMobileView('Subtopic Editor');
-    this.location.go('/subtopic_editor/' + subtopicId);
-  }
-
-  navigateToQuestionsTab(): void {
-    this.lastSubtopicId = this.getSubtopicIdFromUrl();
-    this.pageTitleService.setPageTitleForMobileView('Question Editor');
-    this.location.go('/questions');
-  }
-
-  getSubtopicIdFromUrl(): number {
-    return parseInt(this.location.path().split('/')[2]);
-  }
-
-  navigateToSkillEditorWithId(skillId: string): void {
-    const SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skill_id>';
-
-    const skillEditorUrl = this.urlInterpolationService.interpolateUrl(
-      SKILL_EDITOR_URL_TEMPLATE, {
-        skill_id: skillId
-      });
-    this.windowRef.nativeWindow.open(skillEditorUrl);
-  }
-}
-
-angular.module('oppia').factory(
-  'TopicEditorRoutingService', downgradeInjectable(TopicEditorRoutingService));
+]);
