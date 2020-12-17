@@ -18,26 +18,19 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // App.ts is upgraded to Angular 8.
-
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/topic-editor-page/topic-editor-page.component.ts');
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SpyLocation } from '@angular/common/testing';
-import { Location } from '@angular/common';
-import { angularServices } from 'services/angular-services.index';
-import { TopicEditorRoutingService } from './services/topic-editor-routing.service';
 
 describe('Topic editor page', function() {
   var ctrl = null;
   var $scope = null;
   var ContextService = null;
   var PageTitleService = null;
-  let topicEditorRoutingService : TopicEditorRoutingService;
+  var TopicEditorRoutingService = null;
   var UndoRedoService = null;
   var TopicEditorStateService = null;
   var UrlService = null;
@@ -47,23 +40,6 @@ describe('Topic editor page', function() {
   var topic = null;
   var ShortSkillSummaryObjectFactory = null;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [
-        TopicEditorRoutingService,
-        {provide: Location, useClass: SpyLocation}]
-    });
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    for (let servicePair of angularServices) {
-      $provide.value(
-        servicePair[0], TestBed.get(servicePair[1]));
-    }
-    $provide.value(
-      'TopicEditorRoutingService', TestBed.get(TopicEditorRoutingService));
-    topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
-  }));
   importAllAngularServices();
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -71,6 +47,7 @@ describe('Topic editor page', function() {
     ContextService = $injector.get('ContextService');
     UndoRedoService = $injector.get('UndoRedoService');
     PageTitleService = $injector.get('PageTitleService');
+    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     UrlService = $injector.get('UrlService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
@@ -131,7 +108,7 @@ describe('Topic editor page', function() {
 
   it('should get active tab name', function() {
     ctrl.selectQuestionsTab();
-    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'questions');
     expect(ctrl.getActiveTabName()).toBe('questions');
     expect(ctrl.isInTopicEditorTabs()).toBe(true);
@@ -161,48 +138,48 @@ describe('Topic editor page', function() {
 
   it('should open subtopic preview tab if active tab is subtopic editor',
     function() {
-      spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
         'subtopic_editor');
       const topicPreviewSpy = spyOn(
-        topicEditorRoutingService, 'navigateToSubtopicPreviewTab');
+        TopicEditorRoutingService, 'navigateToSubtopicPreviewTab');
       ctrl.openTopicViewer();
       expect(topicPreviewSpy).toHaveBeenCalled();
     });
 
   it('should open topic preview if active tab is topic editor', function() {
-    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'topic_editor');
     const topicPreviewSpy = spyOn(
-      topicEditorRoutingService, 'navigateToTopicPreviewTab');
+      TopicEditorRoutingService, 'navigateToTopicPreviewTab');
     ctrl.openTopicViewer();
     expect(topicPreviewSpy).toHaveBeenCalled();
   });
 
   it('should open subtopic preview tab if active tab is subtopic editor',
     function() {
-      spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
         'subtopic_editor');
       const topicPreviewSpy = spyOn(
-        topicEditorRoutingService, 'navigateToSubtopicPreviewTab');
+        TopicEditorRoutingService, 'navigateToSubtopicPreviewTab');
       ctrl.openTopicViewer();
       expect(topicPreviewSpy).toHaveBeenCalled();
     });
 
   it('should navigate to topic editor tab in topic editor', function() {
-    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+    spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'topic_preview');
     const topicPreviewSpy = spyOn(
-      topicEditorRoutingService, 'navigateToMainTab');
+      TopicEditorRoutingService, 'navigateToMainTab');
     ctrl.selectMainTab();
     expect(topicPreviewSpy).toHaveBeenCalled();
   });
 
   it('should select navigate to the subtopic editor tab in subtopic editor',
     function() {
-      spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      spyOn(TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
         'subtopic_preview');
       const topicPreviewSpy = spyOn(
-        topicEditorRoutingService, 'navigateToSubtopicEditorWithId');
+        TopicEditorRoutingService, 'navigateToSubtopicEditorWithId');
       ctrl.selectMainTab();
       expect(topicPreviewSpy).toHaveBeenCalled();
     });
@@ -227,7 +204,7 @@ describe('Topic editor page', function() {
   it('should return the navbar text', function() {
     ctrl.selectQuestionsTab();
     var routingSpy = spyOn(
-      topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      TopicEditorRoutingService, 'getActiveTabName').and.returnValue(
       'questions');
     expect(ctrl.getNavbarText()).toBe('Question Editor');
     routingSpy.and.returnValue('subtopic_editor');
