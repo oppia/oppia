@@ -48,7 +48,6 @@ describe('Upload Activity Modal Controller', function() {
   }));
 
   it('should close modal when saving activity', function() {
-    var documentCopy = angular.copy(document);
     var file = {
       size: 100,
       name: 'file.mp3'
@@ -71,11 +70,9 @@ describe('Upload Activity Modal Controller', function() {
     expect($uibModalInstance.close).toHaveBeenCalledWith({
       yamlFile: file
     });
-    document = documentCopy;
   });
 
   it('should not save activity when file is empty', function() {
-    var documentCopy = angular.copy(document);
     spyOn(AlertsService, 'addWarning').and.callThrough();
     // TODO(#10113): Refactor the code to not use the DOM methods.
     // This throws "Argument of type '() => { files: { size: number;
@@ -95,6 +92,5 @@ describe('Upload Activity Modal Controller', function() {
     expect(AlertsService.addWarning).toHaveBeenCalledWith(
       'Empty file detected.');
     expect($uibModalInstance.close).not.toHaveBeenCalled();
-    document = documentCopy;
   });
 });

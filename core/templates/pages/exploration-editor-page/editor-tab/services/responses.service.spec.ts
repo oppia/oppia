@@ -105,7 +105,7 @@ describe('Responses Service', () => {
             param_changes: [],
           },
           rule_specs: [],
-          training_data: '',
+          training_data: [],
           tagged_skill_misconception_id: '',
         },
       ],
@@ -164,7 +164,7 @@ describe('Responses Service', () => {
               },
             },
           ],
-          training_data: '',
+          training_data: [],
           tagged_skill_misconception_id: '',
         },
       ],
@@ -286,7 +286,7 @@ describe('Responses Service', () => {
         hasNonemptyFeedback: jasmine.createSpy('hasNonemptyFeedback'),
         isConfusing: jasmine.createSpy('isConfusing'),
       },
-      trainingData: 'This is training data text',
+      trainingData: ['This is training data text'],
       taggedSkillMisconceptionId: '',
       toBackendDict: jasmine.createSpy('toBackendDict'),
     };
@@ -345,7 +345,7 @@ describe('Responses Service', () => {
       refresherExplorationId: 'test',
       missingPrerequisiteSkillId: 'test_skill_id',
       labelledAsCorrect: true,
-      trainingData: 'This is training data text',
+      trainingData: ['This is training data text'],
       toBackendDict: jasmine.createSpy('toBackendDict'),
     };
     const callbackSpy = jasmine.createSpy('callback');
@@ -411,7 +411,7 @@ describe('Responses Service', () => {
       refresherExplorationId: '',
       missingPrerequisiteSkillId: '',
       labelledAsCorrect: true,
-      trainingData: 'This is training data text',
+      trainingData: ['This is training data text'],
       toBackendDict: jasmine.createSpy('toBackendDict'),
     };
     const callbackSpy = jasmine.createSpy('callback');
@@ -881,7 +881,7 @@ describe('Responses Service', () => {
       answerGroupObjectFactory.createNew(
         [],
         outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
-        'Training data text',
+        ['Training data text'],
         '0'
       ),
     ];
@@ -924,7 +924,7 @@ describe('Responses Service', () => {
       answerGroupObjectFactory.createNew(
         [],
         outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
-        'Training data text',
+        ['Training data text'],
         '0'
       ),
     ];

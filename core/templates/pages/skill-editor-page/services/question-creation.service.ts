@@ -207,9 +207,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       QuestionUndoRedoService.clearChanges();
       var selectedSkillId = SkillEditorStateService.getSkill().getId();
       $location.hash(questionId);
-      var skillIdToNameMapping = (
-        [].reduce((obj, skill) => (
-          obj[skill.getId()] = skill.getDescription(), obj), {}));
+      var skillIdToNameMapping = {};
       var skillNames = [];
       var rubrics = [];
       skillNames = [skillIdToNameMapping[selectedSkillId]];

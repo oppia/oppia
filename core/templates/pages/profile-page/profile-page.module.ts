@@ -16,15 +16,6 @@
  * @fileoverview Module for the profile page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap'
-]);
-
 import {
   APP_INITIALIZER,
   Injector,

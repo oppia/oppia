@@ -63,6 +63,31 @@ INJECTABLES_TO_IGNORE = [
 ]
 
 
+def _parse_js_or_ts_file(filepath, file_content, **kwargs):
+    """Runs the correct function to parse the given file's source code.
+
+    With ES2015 and later, a JavaScript program can be either a script or a
+    module. It is a very important distinction, since a parser such as Esprima
+    needs to know the type of the source to be able to analyze its syntax
+    correctly. This is achieved by choosing the parseScript function to parse a
+    script and the parseModule function to parse a module.
+
+    https://esprima.readthedocs.io/en/latest/syntactic-analysis.html#distinguishing-a-script-and-a-module
+
+    Args:
+        filepath: str. Path of the source file.
+        file_content: str. Code to compile.
+        **kwargs: dict(*: *). Passed along to esprima.
+
+    Returns:
+        dict. Parsed contents produced by esprima.
+    """
+    parse_function = (
+        esprima.parseScript if filepath.endswith('.js') else
+        esprima.parseModule)
+    return parse_function(file_content, **kwargs)
+
+
 def _get_expression_from_node_if_one_exists(
         parsed_node, components_to_check):
     """This function first checks whether the parsed node represents
@@ -176,8 +201,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
 
             try:
                 # Use esprima to parse a JS or TS file.
-                parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                    file_content, comment=True)
+                parsed_js_and_ts_files[filepath] = _parse_js_or_ts_file(
+                    filepath, file_content, comment=True)
             except Exception:
                 if filepath.endswith('.js'):
                     raise
@@ -185,8 +210,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                 compiled_js_filepath = self._get_compiled_ts_filepath(filepath)
 
                 file_content = self.file_cache.read(compiled_js_filepath)
-                parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                    file_content)
+                parsed_js_and_ts_files[filepath] = _parse_js_or_ts_file(
+                    filepath, file_content)
 
         return parsed_js_and_ts_files
 
@@ -712,7 +737,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     file_content = self.file_cache.read(
                         compiled_js_filepath).decode('utf-8')
 
-                    parsed_script = esprima.parseScript(file_content)
+                    parsed_script = (
+                        _parse_js_or_ts_file(filepath, file_content))
                     parsed_nodes = parsed_script.body
                     angularjs_constants_list = []
                     components_to_check = ['constant']
@@ -814,6 +840,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             # *.constants.ajs.ts file are in sync.
             if filepath.endswith('.constants.ts') and (
                     is_corresponding_angularjs_filepath):
+                angular_constants_nodes = None
                 for node in parsed_nodes:
                     try:
                         # Here we are treating 'app.constants.ts' differently
@@ -832,9 +859,10 @@ class JsTsLintChecksManager(python_utils.OBJECT):
                     except (AttributeError, IndexError, TypeError):
                         continue
 
-                for angular_constant_node in angular_constants_nodes:
-                    angular_constants_list.append(
-                        angular_constant_node.key.name)
+                if angular_constants_nodes:
+                    for angular_constant_node in angular_constants_nodes:
+                        angular_constants_list.append(
+                            angular_constant_node.key.name)
 
                 angular_constants_set = set(angular_constants_list)
                 if len(angular_constants_set) != len(
