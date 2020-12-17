@@ -59,8 +59,7 @@ TS_IGNORE_EXCEPTIONS = json.load(python_utils.open_file(
 # questions, please talk to @srijanreddy98.
 INJECTABLES_TO_IGNORE = [
     'MockIgnoredService', # This file is required for the js-ts-linter-test.
-    # We don't want this service to be present in the index.
-    'UpgradedServices'
+    'UpgradedServices' # We don't want this service to be present in the index.
 ]
 
 
