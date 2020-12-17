@@ -41,7 +41,7 @@ export class EditableExplorationBackendApiService {
 
   private _getExplorationUrl(
       explorationId: string,
-      applyDraft: boolean):string {
+      applyDraft: boolean): string {
     if (applyDraft) {
       return this.urlInterpolationService.interpolateUrl(
         AppConstants.EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
@@ -99,7 +99,7 @@ export class EditableExplorationBackendApiService {
         .toPromise()
         .then((response) => {
         // The returned data is an updated exploration dict.
-          let exploration:ExplorationBackendDict = cloneDeep(response);
+          let exploration: ExplorationBackendDict = cloneDeep(response);
 
           // Delete from the ReadOnlyExplorationBackendApiService's cache
           // As the two versions of the data (learner and editor) now differ.
@@ -118,7 +118,7 @@ export class EditableExplorationBackendApiService {
       successCallback: (value: {}) => void,
       errorCallback: (reason?: string) => void): Promise<{}> {
     return new Promise((resolve, reject) => {
-      var editableExplorationDataUrl = this._getExplorationUrl(
+      let editableExplorationDataUrl = this._getExplorationUrl(
         explorationId, null);
 
       this.httpClient['delete'](editableExplorationDataUrl)

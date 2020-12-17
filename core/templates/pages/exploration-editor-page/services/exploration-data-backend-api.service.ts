@@ -57,8 +57,8 @@ export class ExplorationDataBackendApiService {
   }
 
   setAutoSaveChangeList(
-      autoSaveChangeListUrl:string,
-      autoSaveChangeListRequest:ExplorationAutosaveChangeListRequest)
+      autoSaveChangeListUrl: string,
+      autoSaveChangeListRequest: ExplorationAutosaveChangeListRequest)
     : Promise<ExplorationAutosaveChangeListResponse> {
     return new Promise((resolve, reject) => {
       return this.httpClient.put<ExplorationAutosaveChangeListResponse>(

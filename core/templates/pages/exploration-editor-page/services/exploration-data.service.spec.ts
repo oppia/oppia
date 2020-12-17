@@ -42,11 +42,11 @@ class MockWindowRef {
 }
 
 describe('Exploration data service', function() {
-  let explorationDataService : ExplorationDataService = null;
-  let localStorageService : LocalStorageService = null;
-  let loggerService :LoggerService = null;
-  let alertService :AlertsService = null;
-  let csrfService :CsrfTokenService = null;
+  let explorationDataService: ExplorationDataService = null;
+  let localStorageService: LocalStorageService = null;
+  let loggerService: LoggerService = null;
+  let alertService: AlertsService = null;
+  let csrfService: CsrfTokenService = null;
   let httpTestingController: HttpTestingController;
   let urlService: UrlService;
   let windowRef: MockWindowRef;
@@ -495,11 +495,11 @@ describe('Exploration data service', function() {
 });
 
 describe('Exploration data service', function() {
-  let explorationDataService :ExplorationDataService = null;
-  let loggerService :LoggerService = null;
+  let explorationDataService: ExplorationDataService = null;
+  let loggerService: LoggerService = null;
   let logErrorSpy;
   let pathname = '/exploration/0';
-  let urlService :UrlService;
+  let urlService: UrlService;
 
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
