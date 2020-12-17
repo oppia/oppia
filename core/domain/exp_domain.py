@@ -3090,51 +3090,105 @@ class Exploration(python_utils.OBJECT):
         Returns:
             dict. The converted states_dict.
         """
+
+        def migrate_rule_inputs(new_type, value, choices):
+            """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentId,
+            ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentId,
+            and DragAndDropHtmlString to TranslatableHtmlContentId. These
+            migrations are necessary to have rules work easily for multiple
+            languages; instead of comparing html for equality, we compare
+            content_ids for equality.
+
+            Args:
+                new_type: str. The type to migrate to.
+                value: *. The value to migrate.
+                choices: list(dict). The list of subtitled html dicts to extract
+                    content ids from.
+
+            Returns:
+                *. The migrated rule input.
+            """
+
+            def extract_content_id_from_choices(html):
+                """Given a 
+                """
+                for subtitled_html_dict in choices:
+                    if subtitled_html_dict['html'] == html:
+                        return subtitled_html_dict['content_id']
+            
+            if new_type == 'TranslatableHtmlContentId':
+                return extract_content_id_from_choices(value)
+
+            if new_type == 'SetOfTranslatableHtmlContentId':
+                return [
+                    migrate_rule_inputs(
+                        'TranslatableHtmlContentId', html, choices
+                    ) for html in rule_input
+                ]
+            
+            if new_type == 'ListOfSetsOfTranslatableHtmlContentId':
+                return [
+                    migrate_rule_inputs(
+                        'SetOfTranslatableHtmlContentId', html_set, choices
+                    ) for html_set in rule_input
+                ]
+
         for state_dict in states_dict.values():
             interaction_id = state_dict['interaction']['id']
             if interaction_id not in [
                 'DragAndDropSortInput', 'ItemSelectionInput']:
                 continue
-            customization_args = state_dict['interaction']['customization_args']
-            answer_group_dicts = state_dict['interaction']['answer_groups']
-            for answer_group_dict in answer_group_dicts:
+
+            choices = state_dict['interaction']['customization_args'][
+                'choices']['value']
+            for answer_group_dict in state_dict['interaction']['answer_groups']:
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     rule_type = rule_spec_dict['rule_type']
-                    rule_inputs = rule_spec_dict['inputs']['x']
+                    rule_inputs = rule_spec_dict['inputs']
 
                     if interaction_id == 'ItemSelectionInput':
-                        # All rule inputs for ItemSelectionInput are being
+                        # All rule inputs for ItemSelectionInput will be
                         # migrated from SetOfHtmlString to
                         # SetOfTranslatableHtmlContentId.
-
-                        # Find the content ids of the html.
-                        content_ids = []
-                        choices = customization_args['choices']['value']
-                        for rule_input_html in rule_inputs:
-                            for subtitled_html in choices:
-                                if subtitled_html['html'] == rule_input_html:
-                                    content_ids.append(
-                                        subtitled_html['content_id'])
-                        rule_spec_dict['inputs']['x'] = content_ids
-
+                        rule_inputs['x'] = migrate_rule_inputs(
+                            'SetOfTranslatableHtmlContentId',
+                            rule_inputs['x'],
+                            choices)
                     if interaction_id == 'DragAndDropSortInput':
-                        # The migrations required for DragAndDropSortInput are:
-                        # IsEqualToOrdering
-                        #   x:  ListOfSetsOfHtmlStrings to
-                        #       ListOfSetsOfTranslatableHtmlContentId
-                        # IsEqualToOrderingWithOneItemAtIncorrectPosition
-                        #   x:  ListOfSetsOfHtmlStrings to
-                        #       ListOfSetsOfTranslatableHtmlContentId
-                        # HasElementXAtPositionY
-                        #   x:  DragAndDropHtmlString to
-                        #       TranslatableHtmlContentId
-                        #   y: No migrations
-                        # HasElementXBeforeElementY
-                        #   x:  DragAndDropHtmlString to
-                        #       TranslatableHtmlContentId
-                        #   y:  DragAndDropHtmlString to
-                        #       TranslatableHtmlContentId
-
+                        if rule_type in [
+                            'IsEqualToOrdering',
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                        ]:
+                            # For rule type IsEqualToOrdering and
+                            # IsEqualToOrderingWithOneItemAtIncorrectPosition,
+                            # the x input will be migrated from
+                            # ListOfSetsOfHtmlStrings to
+                            # ListOfSetsOfTranslatableHtmlContentId.
+                            rule_inputs['x'] = migrate_rule_inputs(
+                                'ListOfSetsOfTranslatableHtmlContentId',
+                                rule_inputs['x'],
+                                choices)
+                        elif rule_type == 'HasElementXAtPositionY':
+                            # For rule type HasElementXAtPositionY,
+                            # the x input will be migrated from
+                            # DragAndDropHtmlString to
+                            # TranslatableHtmlContentId, and the y input will
+                            # remain as DragAndDropPositiveInt.
+                            rule_inputs['x'] = migrate_rule_inputs(
+                                'TranslatableHtmlContentId',
+                                rule_inputs['x'],
+                                choices)
+                        elif rule_type == 'HasElementXBeforeElementY':
+                            # For rule type HasElementXBeforeElementY,
+                            # the x and y inputs will be migrated from
+                            # DragAndDropHtmlString to
+                            # TranslatableHtmlContentId.
+                            for rule_input_name in ['x', 'y']:
+                                rule_inputs[rule_input_name] = (
+                                    migrate_rule_inputs(
+                                        'TranslatableHtmlContentId',
+                                        rule_inputs[rule_input_name],
+                                        choices))
 
         return states_dict
 
