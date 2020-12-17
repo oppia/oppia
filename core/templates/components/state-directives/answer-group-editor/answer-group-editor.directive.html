@@ -71,6 +71,7 @@
           <div class="oppia-rule-header">
             <span ng-if="$index > 0">or</span>
             <span ng-if="$ctrl.getCurrentInteractionId() !== 'MultipleChoiceInput' && $index !== $ctrl.activeRuleIndex">
+              <[rule.inputs.x | json]>
               <[rule | parameterizeRuleDescription:$ctrl.getCurrentInteractionId():$ctrl.answerChoices]>...
             </span>
             <span ng-if="$ctrl.getCurrentInteractionId() === 'MultipleChoiceInput'">
