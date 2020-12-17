@@ -160,11 +160,10 @@ class ExplorationHandler(base.BaseHandler):
         version = self.request.get('v')
         version = int(version) if version else None
 
-        try:
-            exploration = exp_fetchers.get_exploration_by_id(
-                exploration_id, version=version)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False, version=version)
+        if exploration is None:
+            raise self.PageNotFoundException()
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)

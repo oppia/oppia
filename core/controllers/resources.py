@@ -41,7 +41,7 @@ class ValueGeneratorHandler(base.BaseHandler):
             self.response.write(
                 value_generators_domain.Registry.get_generator_class_by_id(
                     generator_id).get_html_template())
-        except Exception as e:
+        except KeyError as e:
             logging.error(
                 'Value generator not found: %s. %s' % (generator_id, e))
             raise self.PageNotFoundException

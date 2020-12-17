@@ -429,8 +429,7 @@ class TopicPublishHandler(base.BaseHandler):
 
 
 class TopicUrlFragmentHandler(base.BaseHandler):
-    """A data handler for checking if a topic with given url fragment exists.
-    """
+    """A data handler for checking if a topic with given url fragment exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

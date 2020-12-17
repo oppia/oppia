@@ -98,6 +98,9 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
     Returns:
         _io.TextIOWrapper. The file object.
     """
+    # The try/except is needed here to unify the errors because io.open in
+    # Python 3 throws FileNotFoundError while in Python 2 it throws an IOError.
+    # This should be removed after we fully migrate to Python 3.
     try:
         return io.open(filename, mode, encoding=encoding, newline=newline)
     except:

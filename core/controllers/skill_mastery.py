@@ -48,7 +48,7 @@ class SkillMasteryDataHandler(base.BaseHandler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
+        except utils.ValidationError:
             raise self.InvalidInputException('Invalid skill ID %s' % skill_id)
 
         try:

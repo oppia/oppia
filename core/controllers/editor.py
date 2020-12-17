@@ -133,15 +133,23 @@ class ExplorationHandler(EditorHandler):
                 % feconf.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_list_dict = self.payload.get('change_list')
-        change_list = [
-            exp_domain.ExplorationChange(change) for change in change_list_dict]
+
         try:
-            exploration_rights = rights_manager.get_exploration_rights(
-                exploration_id)
-            can_edit = rights_manager.check_can_edit_activity(
-                self.user, exploration_rights)
-            can_voiceover = rights_manager.check_can_voiceover_activity(
-                self.user, exploration_rights)
+            change_list = [
+                exp_domain.ExplorationChange(change)
+                for change in change_list_dict
+            ]
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user, exploration_rights)
+        can_voiceover = rights_manager.check_can_voiceover_activity(
+            self.user, exploration_rights)
+
+        try:
             if can_edit:
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message)
@@ -586,8 +594,7 @@ class ResolveIssueHandler(EditorHandler):
         """Handles POST requests."""
         exp_issue_dict = self.payload.get('exp_issue_dict')
         try:
-            unused_exp_issue = stats_domain.ExplorationIssue.from_dict(
-                exp_issue_dict)
+            stats_domain.ExplorationIssue.from_dict(exp_issue_dict)
         except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
@@ -688,14 +695,19 @@ class EditorAutosaveHandler(ExplorationHandler):
             change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in change_list_dict]
-            version = self.payload.get('version')
+        except utils.ValidationError as e:
+            # We leave any pre-existing draft changes in the datastore.
+            raise self.InvalidInputException(e)
 
-            exploration_rights = rights_manager.get_exploration_rights(
-                exploration_id)
-            can_edit = rights_manager.check_can_edit_activity(
-                self.user, exploration_rights)
-            can_voiceover = rights_manager.check_can_voiceover_activity(
-                self.user, exploration_rights)
+        version = self.payload.get('version')
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        can_edit = rights_manager.check_can_edit_activity(
+            self.user, exploration_rights)
+        can_voiceover = rights_manager.check_can_voiceover_activity(
+            self.user, exploration_rights)
+
+        try:
             if can_edit:
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
@@ -704,10 +716,10 @@ class EditorAutosaveHandler(ExplorationHandler):
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
                     datetime.datetime.utcnow(), is_by_voice_artist=True)
-
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
+
         exp_user_data = user_models.ExplorationUserDataModel.get(
             self.user_id, exploration_id)
         draft_change_list_id = exp_user_data.draft_change_list_id

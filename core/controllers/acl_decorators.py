@@ -41,6 +41,7 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import utils
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -205,7 +206,7 @@ def can_view_skills(handler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
+        except utils.ValidationError:
             raise self.InvalidInputException
 
         try:
@@ -1614,7 +1615,7 @@ def can_edit_topic(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -1829,7 +1830,7 @@ def can_add_new_story_to_topic(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -2107,7 +2108,7 @@ def can_delete_topic(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
@@ -2240,7 +2241,7 @@ def can_view_any_topic_editor(handler):
             raise self.NotLoggedInException
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
@@ -2333,7 +2334,7 @@ def can_change_topic_publication_status(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
