@@ -112,6 +112,7 @@ import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
 import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service.ts';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
@@ -305,6 +306,7 @@ import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answer
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
@@ -541,6 +543,7 @@ export const angularServices: [string, unknown][] = [
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],
+  ['ResponsesService', ResponsesService],
   ['RubricObjectFactory', RubricObjectFactory],
   ['RuleObjectFactory', RuleObjectFactory],
   ['SVMPredictionService', SVMPredictionService],
@@ -558,6 +561,7 @@ export const angularServices: [string, unknown][] = [
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
+  ['SkillUpdateService', SkillUpdateService],
   ['SolutionObjectFactory', SolutionObjectFactory],
   ['SolutionValidityService', SolutionValidityService],
   ['SolutionVerificationService', SolutionVerificationService],
