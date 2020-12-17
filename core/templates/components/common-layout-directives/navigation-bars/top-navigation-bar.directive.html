@@ -2,8 +2,8 @@
   <a ng-if="$ctrl.windowIsNarrow" ng-click="$ctrl.toggleSidebar()"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button"
      tabindex="0">
-    <i class="material-icons oppia-navbar-menu-icon" ng-if="!$ctrl.isSidebarShown()" >&#xE5D2;</i>
-    <i class="material-icons oppia-navbar-close-icon" ng-if="$ctrl.isSidebarShown()" >&#10005;</i>
+    <i class="material-icons oppia-navbar-menu-icon" ng-if="!$ctrl.isSidebarShown()" ng-class="{'oppia-stop-scroll':!$ctrl.isSidebarShown() }" >&#xE5D2;</i>
+    <i class="material-icons oppia-navbar-close-icon" ng-if="$ctrl.isSidebarShown()" ng-class="{'oppia-stop-scroll':$ctrl.isSidebarShown() }" >&#10005;</i>
   </a>
 
   <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-none d-sm-block" href="/"

@@ -24,11 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
-import {
-  AnswerChoice,
-  StateEditorService,
-  // eslint-disable-next-line max-len
-} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AppConstants } from 'app.constants';
@@ -36,10 +32,7 @@ import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/ex
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { LoggerService } from 'services/contextual/logger.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import { Outcome, OutcomeObjectFactory, } from 'domain/exploration/OutcomeObjectFactory';
 import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
