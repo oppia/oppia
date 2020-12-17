@@ -399,8 +399,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Equals',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Equals'
@@ -1085,8 +1085,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Equals',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'
@@ -1250,8 +1250,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Equals',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'
@@ -1354,8 +1354,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Contains_4',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_4',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'
@@ -1406,7 +1406,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'needs_update': False
                     }
                 },
-                'rule_input_Contains_4': {}
+                'rule_input_4': {}
             }
         }
         written_translations = state_domain.WrittenTranslations.from_dict(
@@ -3301,7 +3301,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected state param_changes to be a list, received 0'):
             exploration.init_state.validate(None, True)
 
-    def test_validate_duplicate_content_id_with_answer_groups(self):
+    def test_validate_duplicate_content_id_with_answer_group_feedback(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         answer_group_dict = {
             'outcome': {
@@ -3318,8 +3318,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Equals',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'
@@ -3338,6 +3338,48 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id feedback_1'):
+            exploration.init_state.validate(None, True)
+
+    def test_validate_duplicate_content_id_with_answer_group_rules(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
+                    }
+                },
+                'rule_type': 'Contains'
+            }, {
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test1']
+                    }
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        exploration.init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id rule_input_Contains'):
             exploration.init_state.validate(None, True)
 
     def test_validate_duplicate_content_id_with_default_outcome(self):
@@ -3783,8 +3825,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Equals',
-                        'normalized_str_set': [[]]
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': [[]]
                     }
                 },
                 'rule_type': 'Contains'
@@ -3796,9 +3838,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '{u\'content_id\': u\'rule_input_Equals\', u\'normalized_str_se'
-                't\': [[]]} has the wrong type. It should be a TranslatableSetO'
-                'fNormalizedString.'
+                '{u\'normalizedStrSet\': [[]], u\'contentId\': u\'rule_input_'
+                'Equals\'} has the wrong type. It should be a TranslatableSetOf'
+                'NormalizedString.'
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
@@ -3829,8 +3871,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Equals',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'

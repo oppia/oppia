@@ -153,45 +153,4 @@ describe('Add Answer Group Modal Controller', function() {
       reopen: null
     });
   });
-
-  it('should populate null content ids on save', () => {
-    $scope.tmpRule = {
-      type: 'Equals',
-      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
-      inputs: {x: {
-        content_id: null,
-        normalized_str_set: []
-      }}
-    };
-    expect($scope.tmpRule.inputs.x.content_id).toBeNull();
-
-    $scope.saveResponse(null);
-
-    expect($scope.tmpRule.inputs.x.content_id).not.toBeNull();
-  });
-
-  it('should not populate non-null content ids on save', () => {
-    const ruleInput = {
-      content_id: 'rule_input',
-      normalized_str_set: []
-    };
-
-    $scope.tmpRule = {
-      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
-      inputs: {x: ruleInput}
-    };
-
-    $scope.saveResponse(null);
-    expect($scope.tmpRule.inputs.x.content_id).toBe('rule_input');
-  });
-
-  it('should not populate content ids if input does not need one', () => {
-    $scope.tmpRule = {
-      type: 'HasNumberOfTermsEqualTo',
-      inputTypes: {y: 'NonnegativeInt'},
-      inputs: {y: 1}
-    };
-    $scope.saveResponse(null);
-    expect($scope.tmpRule.inputs).toEqual({y: 1});
-  });
 });

@@ -108,7 +108,7 @@ angular.module('oppia').constant(
   'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
   AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
 angular.module('oppia').constant(
-  'COMPONENT_NAME_RULE_INPUTS', AppConstants.COMPONENT_NAME_RULE_INPUTS);
+  'COMPONENT_NAME_RULE_INPUT', AppConstants.COMPONENT_NAME_RULE_INPUT);
 angular.module('oppia').constant(
   'COMPONENT_NAME_SOLUTION', AppConstants.COMPONENT_NAME_SOLUTION);
 angular.module('oppia').constant(

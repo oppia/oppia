@@ -144,8 +144,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -172,8 +172,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -181,8 +181,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['3', '4', '5', '6']
+                contentId: 'rule_input',
+                unicodeStrSet: ['3', '4', '5', '6']
               }
             }
           }, 'SetInput');
@@ -206,8 +206,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -234,8 +234,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -243,8 +243,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['3', '4', '5', '6']
+                contentId: 'rule_input',
+                unicodeStrSet: ['3', '4', '5', '6']
               }
             }
           }, 'SetInput');
@@ -268,8 +268,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -296,8 +296,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -305,8 +305,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['3', '4', '5', '6']
+                contentId: 'rule_input',
+                unicodeStrSet: ['3', '4', '5', '6']
               }
             }
           }, 'SetInput');
@@ -330,8 +330,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -358,8 +358,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -367,8 +367,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['3', '4', '5', '6']
+                contentId: 'rule_input',
+                unicodeStrSet: ['3', '4', '5', '6']
               }
             }
           }, 'SetInput');
@@ -392,8 +392,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -420,8 +420,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -429,8 +429,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['3', '4', '5', '6']
+                contentId: 'rule_input',
+                unicodeStrSet: ['3', '4', '5', '6']
               }
             }
           }, 'SetInput');
@@ -454,8 +454,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -482,8 +482,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -491,8 +491,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['3', '4', '5', '6']
+                contentId: 'rule_input',
+                unicodeStrSet: ['3', '4', '5', '6']
               }
             }
           }, 'SetInput');
@@ -516,8 +516,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -544,8 +544,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -553,8 +553,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['3', '4', '5', '6']
+                contentId: 'rule_input',
+                unicodeStrSet: ['3', '4', '5', '6']
               }
             }
           }, 'SetInput');
@@ -582,8 +582,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -591,8 +591,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSubsetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3', '4']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3', '4']
               }
             }
           }, 'SetInput');
@@ -639,8 +639,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -648,8 +648,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3', '4']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3', '4']
               }
             }
           }, 'SetInput');
@@ -696,8 +696,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -705,8 +705,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsDisjointFrom',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3', '4']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3', '4']
               }
             }
           }, 'SetInput');
@@ -753,8 +753,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -762,8 +762,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'IsSupersetOf',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3', '4']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3', '4']
               }
             }
           }, 'SetInput');
@@ -810,8 +810,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -819,8 +819,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'HasElementsNotIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3', '4']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3', '4']
               }
             }
           }, 'SetInput');
@@ -867,8 +867,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3']
               }
             }
           }, 'SetInput');
@@ -876,8 +876,8 @@ describe('SetInputValidationService', () => {
             rule_type: 'OmitsElementsIn',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                unicode_str_set: ['1', '2', '3', '4']
+                contentId: 'rule_input',
+                unicodeStrSet: ['1', '2', '3', '4']
               }
             }
           }, 'SetInput');

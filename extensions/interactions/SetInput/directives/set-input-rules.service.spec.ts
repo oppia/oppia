@@ -27,8 +27,8 @@ describe('Set Input rules service', () => {
 
   let RULE_INPUT = {
     x: {
-      content_id: 'rule_input',
-      unicode_str_set: ['a', 'b']
+      contentId: 'rule_input',
+      unicodeStrSet: ['a', 'b']
     }
   };
 
@@ -38,14 +38,14 @@ describe('Set Input rules service', () => {
     expect(sirs.Equals(['a'], RULE_INPUT)).toBe(false);
     expect(sirs.Equals(['b'], {
       x: {
-        content_id: '',
-        unicode_str_set: ['b', 'a']
+        contentId: '',
+        unicodeStrSet: ['b', 'a']
       }
     })).toBe(false);
     expect(sirs.Equals(['b', 'c'], {
       x: {
-        content_id: '',
-        unicode_str_set: ['c', 'd']
+        contentId: '',
+        unicodeStrSet: ['c', 'd']
       }
     })).toBe(false);
   });

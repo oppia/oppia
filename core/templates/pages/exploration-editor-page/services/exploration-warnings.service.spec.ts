@@ -889,8 +889,8 @@ describe('Exploration Warnings Service', function() {
               rule_specs: [{
                 rule_type: 'Equals',
                 inputs: {x: {
-                  content_id: 'rule_input',
-                  normalized_str_set: [10]
+                  contentId: 'rule_input',
+                  normalizedStrSet: [10]
                 }}
               }],
               training_data: ['1']

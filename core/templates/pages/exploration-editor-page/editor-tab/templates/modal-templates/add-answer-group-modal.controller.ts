@@ -19,7 +19,8 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
-
+require(
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -31,15 +32,15 @@ require('services/generate-content-id.service.ts');
 
 angular.module('oppia').controller('AddAnswerGroupModalController', [
   '$controller', '$scope', '$uibModalInstance', 'EditorFirstTimeEventsService',
-  'GenerateContentIdService', 'OutcomeObjectFactory', 'RuleObjectFactory',
-  'StateEditorService', 'addState', 'currentInteractionId',
-  'stateName', 'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_RULE_INPUTS',
+  'GenerateContentIdService', 'OutcomeObjectFactory',
+  'PopulateRuleContentIdsService', 'RuleObjectFactory', 'StateEditorService',
+  'addState', 'currentInteractionId', 'stateName', 'COMPONENT_NAME_FEEDBACK',
   'INTERACTION_SPECS',
   function(
       $controller, $scope, $uibModalInstance, EditorFirstTimeEventsService,
-      GenerateContentIdService, OutcomeObjectFactory, RuleObjectFactory,
-      StateEditorService, addState, currentInteractionId,
-      stateName, COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_RULE_INPUTS,
+      GenerateContentIdService, OutcomeObjectFactory,
+      PopulateRuleContentIdsService, RuleObjectFactory, StateEditorService,
+      addState, currentInteractionId, stateName, COMPONENT_NAME_FEEDBACK,
       INTERACTION_SPECS) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
@@ -86,41 +87,8 @@ angular.module('oppia').controller('AddAnswerGroupModalController', [
 
     $scope.addAnswerGroupForm = {};
 
-    /**
-    * The default values of translatable objects in the rule inputs have
-    * null content_id's. This function populates these null content_id's
-    * with a content_id. This function is called on save but not on
-    * cancel.
-    * Note: There is another copy of this function in rule-editor. This function
-    * is repeated here in an effort to avoid the use of broadcast.
-    */
-    $scope.populateRuleContentIds = function() {
-      const inputTypes = $scope.tmpRule.inputTypes;
-      const inputs = $scope.tmpRule.inputs;
-
-      if ($scope.tmpRule.type === null) {
-        return;
-      }
-
-      Object.keys(inputTypes).forEach(inputName => {
-        const hasContentId = (
-          inputTypes[inputName].indexOf('Translatable') === 0);
-        if (!hasContentId) {
-          return;
-        }
-        const needsContentId = inputs[inputName].content_id === null;
-
-        if (needsContentId) {
-          inputs[inputName].content_id = (
-            GenerateContentIdService.getNextStateId(
-              `${COMPONENT_NAME_RULE_INPUTS}_${$scope.tmpRule.type}`
-            ));
-        }
-      });
-    };
-
     $scope.saveResponse = function(reopen) {
-      $scope.populateRuleContentIds();
+      PopulateRuleContentIdsService.populateNullRuleContentIds($scope.tmpRule);
       StateEditorService.onSaveOutcomeDestDetails.emit();
 
       EditorFirstTimeEventsService.registerFirstSaveRuleEvent();

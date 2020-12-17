@@ -324,8 +324,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Contains_4',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_4',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'

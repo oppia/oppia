@@ -3037,7 +3037,8 @@ class Exploration(python_utils.OBJECT):
 
         for state_dict in states_dict.values():
             # As of Jan 2021, which is when this migration is to be run, only
-            # TextInput and SetInput have translatable rule inputs.
+            # TextInput and SetInput have translatable rule inputs, and they
+            # both take exactly one translatable input named x.
             interaction_id = state_dict['interaction']['id']
             if interaction_id not in ['TextInput', 'SetInput']:
                 continue
@@ -3048,18 +3049,18 @@ class Exploration(python_utils.OBJECT):
             for answer_group_dict in answer_group_dicts:
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     content_id = content_id_counter.generate_content_id(
-                        'rule_input_%s_' % rule_spec_dict['rule_type'])
+                        'rule_input_')
                     if interaction_id == 'TextInput':
                         # Convert to TranslatableSetOfNormalizedString.
                         rule_spec_dict['inputs']['x'] = {
-                            'content_id': content_id,
-                            'normalized_str_set': rule_spec_dict['inputs']['x']
+                            'contentId': content_id,
+                            'normalizedStrSet': rule_spec_dict['inputs']['x']
                         }
                     elif interaction_id == 'SetInput':
                         # Convert to TranslatableSetOfUnicodeString.
                         rule_spec_dict['inputs']['x'] = {
-                            'content_id': content_id,
-                            'unicode_str_set': rule_spec_dict['inputs']['x']
+                            'contentId': content_id,
+                            'unicodeStrSet': rule_spec_dict['inputs']['x']
                         }
             state_dict['next_content_id_index'] = (
                 content_id_counter.next_content_id_index)

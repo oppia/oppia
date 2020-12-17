@@ -67,8 +67,8 @@ describe('StateTopAnswersStatsService', () => {
         rule_specs: [{
           rule_type: 'Contains',
           inputs: {x: {
-            content_id: 'rule_input',
-            normalized_str_set: ['hola']
+            contentId: 'rule_input',
+            normalizedStrSet: ['hola']
           }}
         }],
         outcome: {
@@ -300,8 +300,8 @@ describe('StateTopAnswersStatsService', () => {
           rule_type: 'Contains',
           inputs: {
             x: {
-              content_id: 'rule_input',
-              normalized_str_set: ['adios']
+              contentId: 'rule_input',
+              normalizedStrSet: ['adios']
             }
           }
         },
@@ -332,8 +332,8 @@ describe('StateTopAnswersStatsService', () => {
           rule_type: 'Contains',
           inputs: {
             x: {
-              content_id: 'rule_input',
-              normalized_str_set: ['bonjour']
+              contentId: 'rule_input',
+              normalizedStrSet: ['bonjour']
             }
           }
         },

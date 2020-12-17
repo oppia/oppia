@@ -21,6 +21,8 @@ require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   'components/state-directives/rule-editor/rule-type-selector.directive.ts');
 require(
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service');
+require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
@@ -57,13 +59,13 @@ angular.module('oppia').directive('ruleEditor', [
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'GenerateContentIdService', 'ResponsesService',
-        'StateEditorService', 'StateInteractionIdService',
-        'COMPONENT_NAME_RULE_INPUTS', 'INTERACTION_SPECS',
+        '$scope', '$timeout', 'PopulateRuleContentIdsService',
+        'ResponsesService', 'StateEditorService', 'StateInteractionIdService',
+        'INTERACTION_SPECS',
         function(
-            $scope, $timeout, GenerateContentIdService, ResponsesService,
-            StateEditorService, StateInteractionIdService,
-            COMPONENT_NAME_RULE_INPUTS, INTERACTION_SPECS) {
+            $scope, $timeout, PopulateRuleContentIdsService,
+            ResponsesService, StateEditorService, StateInteractionIdService,
+            INTERACTION_SPECS) {
           var ctrl = this;
           // This returns the rule description string.
           var computeRuleDescriptionFragments = function() {
@@ -252,42 +254,12 @@ angular.module('oppia').directive('ruleEditor', [
             }
           };
 
-          /**
-          * The default values of translatable objects in the rule inputs have
-          * null content_id's. This function populates these null content_id's
-          * with a content_id. This function is called on save but not on
-          * cancel.
-          * Note: There is another copy of this function in
-          * add-answer-group-modal. This function is repeated there in an effort
-          * of avoiding the use of broadcast.
-          */
-          ctrl.populateRuleContentIds = function() {
-            const inputs = ctrl.rule.inputs;
-            const inputTypes = ctrl.rule.inputTypes;
-
-            Object.keys(inputs).forEach(inputName => {
-              const hasContentId = (
-                inputTypes[inputName].indexOf('Translatable') === 0);
-              if (!hasContentId) {
-                return;
-              }
-              const needsContentId = inputs[inputName].content_id === null;
-
-              if (needsContentId) {
-                inputs[inputName].content_id = (
-                  GenerateContentIdService.getNextStateId(
-                    `${COMPONENT_NAME_RULE_INPUTS}_${ctrl.rule.type}`
-                  ));
-              }
-            });
-          };
-
           ctrl.cancelThisEdit = function() {
             ctrl.onCancelRuleEdit();
           };
 
           ctrl.saveThisRule = function() {
-            ctrl.populateRuleContentIds();
+            PopulateRuleContentIdsService.populateNullRuleContentIds(ctrl.rule);
             ctrl.onSaveRule();
           };
 

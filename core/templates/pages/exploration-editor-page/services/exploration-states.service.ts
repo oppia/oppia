@@ -145,7 +145,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
           answerGroup.rules.forEach(rule => {
             Object.keys(rule.inputs).forEach(inputName => {
               if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
-                contentIds.add(rule.inputs[inputName].content_id);
+                contentIds.add(rule.inputs[inputName].contentId);
               }
             });
           });

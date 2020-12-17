@@ -65,7 +65,7 @@ export class AnswerGroupObjectFactory {
     private outcomeObjectFactory: OutcomeObjectFactory,
     private ruleObjectFactory: RuleObjectFactory) {}
 
-  generateRulesFromBackend(
+  generateRulesFromBackendDict(
       ruleBackendDicts: RuleBackendDict[],
       interactionId: string
   ): Rule[] {
@@ -87,7 +87,7 @@ export class AnswerGroupObjectFactory {
       interactionId: string
   ): AnswerGroup {
     return new AnswerGroup(
-      this.generateRulesFromBackend(
+      this.generateRulesFromBackendDict(
         answerGroupBackendDict.rule_specs, interactionId),
       this.outcomeObjectFactory.createFromBackendDict(
         answerGroupBackendDict.outcome),

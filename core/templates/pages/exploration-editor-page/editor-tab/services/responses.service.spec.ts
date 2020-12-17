@@ -270,8 +270,8 @@ describe('Responses Service', () => {
           type: 'Contains',
           inputs: {
             x: {
-              content_id: 'rule_input_Contains',
-              normalized_str_set: ['correct']
+              contentId: 'rule_input_Contains',
+              normalizedStrSet: ['correct']
             },
           },
           inputTypes: {},

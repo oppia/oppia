@@ -146,8 +146,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput'),
@@ -155,8 +155,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyza']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyza']
               }
             }
           }, 'TextInput')
@@ -181,8 +181,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Contains',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -194,8 +194,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Contains',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyza']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyza']
               }
             }
           }, 'TextInput')
@@ -218,8 +218,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Contains',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['']
+                contentId: 'rule_input',
+                normalizedStrSet: ['']
               }
             }
           }, 'TextInput')
@@ -231,8 +231,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Contains',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['abc']
+                contentId: 'rule_input',
+                normalizedStrSet: ['abc']
               }
             }
           }, 'TextInput')
@@ -255,8 +255,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Contains',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -268,8 +268,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Contains',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -294,8 +294,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'StartsWith',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -307,8 +307,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'StartsWith',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyza']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyza']
               }
             }
           }, 'TextInput')
@@ -331,8 +331,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'StartsWith',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['']
+                contentId: 'rule_input',
+                normalizedStrSet: ['']
               }
             }
           }, 'TextInput')
@@ -344,8 +344,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'StartsWith',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['abc']
+                contentId: 'rule_input',
+                normalizedStrSet: ['abc']
               }
             }
           }, 'TextInput')
@@ -368,8 +368,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Contains',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -381,8 +381,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'StartsWith',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyzy']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyzy']
               }
             }
           }, 'TextInput')
@@ -407,8 +407,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input_4',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -420,8 +420,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -444,8 +444,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -457,8 +457,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xya']
+                contentId: 'rule_input_4',
+                normalizedStrSet: ['xya']
               }
             }
           }, 'TextInput')
@@ -483,8 +483,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -496,8 +496,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -520,8 +520,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xyz']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
               }
             }
           }, 'TextInput')
@@ -533,8 +533,8 @@ describe('TextInputValidationService', () => {
             rule_type: 'FuzzyEquals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['xya']
+                contentId: 'rule_input',
+                normalizedStrSet: ['xya']
               }
             }
           }, 'TextInput')

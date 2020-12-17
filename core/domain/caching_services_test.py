@@ -64,7 +64,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                         'content': {},
                         'ca_placeholder_0': {},
                         'default_outcome': {},
-                        'rule_input_Contains_4': {}
+                        'rule_input_4': {}
                     }
                 },
                 'recorded_voiceovers': {
@@ -74,7 +74,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                         'content': {},
                         'ca_placeholder_0': {},
                         'default_outcome': {},
-                        'rule_input_Contains_4': {}
+                        'rule_input_4': {}
                     }
                 },
                 'param_changes': [],
@@ -133,8 +133,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                             'rule_type': 'Contains',
                             'inputs': {
                                 'x': {
-                                    'content_id': 'rule_input_Contains_4',
-                                    'normalized_str_set': ['®®']
+                                    'contentId': 'rule_input_4',
+                                    'normalizedStrSet': ['®®']
                                 }
                             }
                         }],
@@ -161,8 +161,8 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '}, "dest": "Introduction", "refresher_exploration_id": null, "missing_'
         'prerequisite_skill_id": null, "labelled_as_correct": false}, "training'
         '_data": [], "rule_specs": [{"rule_type": "Contains", "inputs": {"x": {'
-        '"content_id": "rule_input_Contains_4", "normalized_str_set": ["\\u00ae'
-        '\\u00ae"]}}}]}], "default_outcome": {"param_changes": [], "feedback": '
+        '"normalizedStrSet": ["\\u00ae\\u00ae"], "contentId": "rule_input_4"}}}'
+        ']}], "default_outcome": {"param_changes": [], "feedback": '
         '{"content_id": "default_outcome", "html": ""}, "dest": "Introduction",'
         ' "refresher_exploration_id": null, "missing_prerequisite_skill_id": nu'
         'll, "labelled_as_correct": false}, "customization_args": {"rows": {"va'
@@ -171,12 +171,12 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
         '_0"}}}, "confirmed_unclassified_answers": [], "id": "TextInput", "hint'
         's": [{"hint_content": {"content_id": "hint_3", "html": "<p>This is a c'
         'opyright character \\u00a9.</p>"}}]}, "recorded_voiceovers": {"voiceov'
-        'ers_mapping": {"feedback_2": {}, "rule_input_Contains_4": {}, "content'
+        'ers_mapping": {"feedback_2": {}, "rule_input_4": {}, "content'
         '": {}, "hint_3": {}, "default_outcome": {}, "ca_placeholder_0": {}}}, '
         '"classifier_model_id": null, "content": {"content_id": "content", "htm'
         'l": "<p>Unicode Characters \\ud83d\\ude0d\\ud83d\\ude0d\\ud83d\\ude0d'
         '\\ud83d\\ude0d</p>"}, "written_translations": {"translations_mapping":'
-        ' {"feedback_2": {}, "rule_input_Contains_4": {}, "content": {}, "hint_'
+        ' {"feedback_2": {}, "rule_input_4": {}, "content": {}, "hint_'
         '3": {}, "default_outcome": {}, "ca_placeholder_0": {}}}, "next_content'
         '_id_index": 5, "solicit_answer_details": false}}, "version": 0, "corre'
         'ctness_feedback_enabled": false, "language_code": "en", "objective": "'

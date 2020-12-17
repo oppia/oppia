@@ -86,8 +86,8 @@ describe('Teach Oppia Modal Controller', function() {
         rule_specs: [{
           rule_type: 'Equals',
           inputs: { x: {
-            content_id: 'rule_input',
-            normalized_str_set: ['Correct Answer']
+            contentId: 'rule_input',
+            normalizedStrSet: ['Correct Answer']
           }}
         }],
         outcome: {

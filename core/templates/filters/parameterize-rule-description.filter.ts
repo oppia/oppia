@@ -158,20 +158,20 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
           replacementText += ']';
         } else if (varType === 'TranslatableSetOfNormalizedString') {
           replacementText = '[';
-          for (var i = 0; i < inputs[varName].normalized_str_set.length; i++) {
+          for (var i = 0; i < inputs[varName].normalizedStrSet.length; i++) {
             if (i !== 0) {
               replacementText += ', ';
             }
-            replacementText += inputs[varName].normalized_str_set[i];
+            replacementText += inputs[varName].normalizedStrSet[i];
           }
           replacementText += ']';
         } else if (varType === 'TranslatableSetOfUnicodeString') {
           replacementText = '[';
-          for (var i = 0; i < inputs[varName].unicode_str_set.length; i++) {
+          for (var i = 0; i < inputs[varName].unicodeStrSet.length; i++) {
             if (i !== 0) {
               replacementText += ', ';
             }
-            replacementText += inputs[varName].unicode_str_set[i];
+            replacementText += inputs[varName].unicodeStrSet[i];
           }
           replacementText += ']';
         } else if (
