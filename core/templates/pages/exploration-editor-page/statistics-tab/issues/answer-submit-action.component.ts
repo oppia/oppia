@@ -16,7 +16,7 @@
  * @fileoverview Component for the Answer Submit Learner Action.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory.ts';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service.ts';
@@ -29,35 +29,35 @@ import { HtmlEscaperService } from 'services/html-escaper.service.ts';
 })
 export class AnswerSubmitActionComponent implements OnInit {
   // Check these types are correct.
-  currentStateName: string = '';
-  destStateName: string = '';
-  actionIndex: number = 0;
-  timeSpentInStateSecs: number = 0;
+  @Input() answer: string = '';
+  @Input() destStateName: string = '';
+  @Input() timeSpentInStateSecs: number = 0;
+  @Input() currentStateName: string = '';
+  @Input() actionIndex: number = 0;
+  @Input() interactionId: string = '';
+  @Input() interactionCustomizationArgs: string = '';
+
   _customizationArgs = (
     this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
-      Attr.interactionId,
+      this.interactionId,
       this.htmlEscaperService.escapedJsonToObj(
-        Attr.interactionCustomizationArgs)
+        this.interactionCustomizationArgs)
     )
   );
-  _answer: Object = this.htmlEscaperService.escapedJsonToObj(Attr.answer);
+  _answer: Object = this.htmlEscaperService.escapedJsonToObj(this.answer);
 
   constructor(
-    private attrs: Attr,
+    // private attrs: Attr,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private htmlEscaperService: HtmlEscaperService,
     private interactionObjectFactory: InteractionObjectFactory
   ) {}
 
-  ngOnInit(): void {
-    this.currentStateName = Attr.currentStateName;
-    this.destStateName = Attr.destStateName;
-    this.actionIndex = Attr.actionIndex;
-    this.timeSpentInStateSecs = Attr.timeSpentInStateSecs;
-  }
+  ngOnInit(): void {}
+
   getShortAnswerHtml(): string {
     return this.explorationHtmlFormatterService.getShortAnswerHtml(
-      this._answer as number, Attr.interactionId, this._customizationArgs);
+      this._answer as number, this.interactionId, this._customizationArgs);
   }
 }
 angular.module('oppia').directive(
