@@ -131,15 +131,9 @@ class CollectionModel(base_models.VersionedModel):
         # need to move the values from nodes field to collection_contents dict
         # and delete nodes.
         if 'nodes' in model_dict and model_dict['nodes']:
-            if ('collection_contents' not in model_dict or not
-                    model_dict['collection_contents']
-               ):
-                model_dict['collection_contents'] = (
-                    (datastore_services.JsonProperty(
-                        default={}, indexed=False)))
             model_dict['collection_contents']['nodes'] = (
                 copy.deepcopy(model_dict['nodes']))
-            model_dict['nodes'] = []
+            del model_dict['nodes']
 
         return model_dict
 
@@ -429,7 +423,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         # and delete translator_ids.
         if 'translator_ids' in model_dict and model_dict['translator_ids']:
             model_dict['voice_artist_ids'] = model_dict['translator_ids']
-            model_dict['translator_ids'] = []
+            del model_dict['translator_ids']
 
         # We need to remove pseudonymous IDs from all the fields that contain
         # user IDs.

@@ -124,7 +124,9 @@ class RemoveCollectionRightsTranslatorIdsOneOffJob(
             del collection_rights_model._properties['translator_ids']  # pylint: disable=protected-access
             if 'translator_ids' in collection_rights_model._values:  # pylint: disable=protected-access
                 del collection_rights_model._values['translator_ids']  # pylint: disable=protected-access
-            collection_rights_model.put(update_last_updated_time=False)
+            collection_rights_model.update_timestamps(
+                update_last_updated_time=False)
+            collection_rights_model.put()
             yield (
                 'SUCCESS_REMOVED - CollectionRightsModel',
                 collection_rights_model.id)
@@ -164,7 +166,8 @@ class RemoveCollectionModelNodesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             del collection_model._properties['nodes']  # pylint: disable=protected-access
             if 'nodes' in collection_model._values:  # pylint: disable=protected-access
                 del collection_model._values['nodes']  # pylint: disable=protected-access
-            collection_model.put(update_last_updated_time=False)
+            collection_model.update_timestamps(update_last_updated_time=False)
+            collection_model.put()
             yield ('SUCCESS_REMOVED - CollectionModel', collection_model.id)
         else:
             yield (

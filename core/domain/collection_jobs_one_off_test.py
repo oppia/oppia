@@ -31,8 +31,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(job_models, collection_models,) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.collection])
+(job_models, collection_models, base_models) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.collection, models.NAMES.base_model])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -227,56 +227,65 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         """Tests that the collection migration job migrates content from
         nodes to collection_contents if collection_contents is empty.
         """
-        # Create an exploration to put in the collection.
-        self.save_new_default_exploration(self.EXP_ID, self.albert_id)
-        node = collection_domain.CollectionNode.create_default_node(self.EXP_ID)
+        with self.swap(
+            collection_models,
+            'CollectionModel',
+            MockCollectionModel):
+            # Create an exploration to put in the collection.
+            self.save_new_default_exploration(self.EXP_ID, self.albert_id)
+            node = collection_domain.CollectionNode.create_default_node(
+                self.EXP_ID)
 
-        # Create a collection directly using the model, so that the collection
-        # nodes are stored in the 'nodes' property rather than the
-        # 'collection_contents' property.
-        collection_title = 'A title'
-        collection_category = 'A category'
-        rights_manager.create_new_collection_rights(
-            self.COLLECTION_ID, self.albert_id)
-        model = collection_models.CollectionModel(
-            id=self.COLLECTION_ID,
-            category=collection_category,
-            title=collection_title,
-            objective='An objective',
-            tags=[],
-            schema_version=2,
-            nodes=[{
-                'exploration_id': self.EXP_ID,
-                'prerequisite_skills': [],
-                'acquired_skills': []
-            }],
-        )
-        model.commit(self.albert_id, 'Made a new collection!', [{
-            'cmd': collection_services.CMD_CREATE_NEW,
-            'title': collection_title,
-            'category': collection_category,
-        }])
+            # Create a collection directly using the model, so that the
+            # collection nodes are stored in the 'nodes' property rather
+            # than the 'collection_contents' property.
+            collection_title = 'A title'
+            collection_category = 'A category'
+            rights_manager.create_new_collection_rights(
+                self.COLLECTION_ID, self.albert_id)
+            model = collection_models.CollectionModel(
+                id=self.COLLECTION_ID,
+                category=collection_category,
+                title=collection_title,
+                objective='An objective',
+                tags=[],
+                schema_version=2,
+                nodes=[{
+                    'exploration_id': self.EXP_ID,
+                    'prerequisite_skills': [],
+                    'acquired_skills': []
+                }],
+            )
+            model.commit(self.albert_id, 'Made a new collection!', [{
+                'cmd': collection_services.CMD_CREATE_NEW,
+                'title': collection_title,
+                'category': collection_category,
+            }])
 
-        # Save a collection summary object for indexing. The explicit commit
-        # does not create a summary object, which is needed for the
-        # job to update the index after updating the collection.
-        collection_services.regenerate_collection_summary_with_new_contributor(
-            model.id, self.albert_id)
+            # Save a collection summary object for indexing. The explicit commit
+            # does not create a summary object, which is needed for the
+            # job to update the index after updating the collection.
+            (
+                collection_services
+                .regenerate_collection_summary_with_new_contributor(
+                    model.id, self.albert_id))
 
-        # Check that collection_contents is empty.
-        self.assertEqual(model.collection_contents, {})
+            # Check that collection_contents is empty.
+            self.assertEqual(model.collection_contents, {})
 
-        # Run the job. This should populate collection_contents.
-        job_id = (
-            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
-        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
+            # Run the job. This should populate collection_contents.
+            job_id = (
+                collection_jobs_one_off.CollectionMigrationOneOffJob
+                .create_new())
+            collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_mapreduce_tasks()
 
-        new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
-        self.assertEqual(
-            new_model.collection_contents, {
-                'nodes': [node.to_dict()]
-            })
+            new_model = collection_models.CollectionModel.get(
+                self.COLLECTION_ID)
+            self.assertEqual(
+                new_model.collection_contents, {
+                    'nodes': [node.to_dict()]
+                })
 
 
 class MockCollectionRightsModel(collection_models.CollectionRightsModel):
@@ -285,9 +294,43 @@ class MockCollectionRightsModel(collection_models.CollectionRightsModel):
     translator_ids = datastore_services.StringProperty(
         indexed=True, repeated=True, required=False)
 
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        base_models.VersionedModel._trusted_commit(  # pylint: disable=protected-access
+            self, committer_id, commit_type, commit_message, commit_cmds)
+
 
 class RemoveCollectionRightsTranslatorIdsOneOffJobTests(
         test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    COLLECTION_ID = 'collection_id'
+
+    def setUp(self):
+        super(RemoveCollectionRightsTranslatorIdsOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test objects.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -326,7 +369,9 @@ class RemoveCollectionRightsTranslatorIdsOneOffJobTests(
                     translator_ids=['translator_id']
                 )
             )
-            original_collection_rights_model.put()
+            original_collection_rights_model.commit(
+                self.albert_id, 'Made a new collection right!', [{
+                    'cmd': collection_services.CMD_CREATE_NEW, }])
 
             self.assertIsNotNone(
                 original_collection_rights_model.translator_ids)
@@ -364,7 +409,9 @@ class RemoveCollectionRightsTranslatorIdsOneOffJobTests(
                 first_published_msec=0.0
             )
         )
-        original_collection_rights_model.put()
+        original_collection_rights_model.commit(
+            self.albert_id, 'Made a new collection right!', [{
+                'cmd': collection_services.CMD_CREATE_NEW, }])
 
         self.assertNotIn(
             'translator_ids', original_collection_rights_model._values)  # pylint: disable=protected-access
@@ -391,8 +438,42 @@ class MockCollectionModel(collection_models.CollectionModel):
 
     nodes = datastore_services.JsonProperty(default={}, indexed=False)
 
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        base_models.VersionedModel._trusted_commit(  # pylint: disable=protected-access
+            self, committer_id, commit_type, commit_message, commit_cmds)
+
 
 class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    COLLECTION_ID = 'collection_id'
+
+    def setUp(self):
+        super(RemoveCollectionModelNodesOneOffJobTests, self).setUp()
+
+        # Setup user who will own the test objects.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.process_and_flush_pending_mapreduce_tasks()
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -418,9 +499,9 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
             collection_models, 'CollectionModel', MockCollectionModel):
             original_collection_model = (
                 collection_models.CollectionModel(
-                    id='id',
-                    category='category',
-                    title='title',
+                    id=self.COLLECTION_ID,
+                    category='category1',
+                    title='title1',
                     objective='An objective',
                     tags=[],
                     schema_version=2,
@@ -430,7 +511,11 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
                     }],
                     )
             )
-            original_collection_model.put()
+            original_collection_model.commit(
+                self.albert_id, 'Made a new collection!', [{
+                    'cmd': collection_services.CMD_CREATE_NEW,
+                    'title': 'title1',
+                    'category': 'category1', }])
 
             self.assertIsNotNone(original_collection_model.nodes)
             self.assertIn('nodes', original_collection_model._values)  # pylint: disable=protected-access
@@ -451,9 +536,11 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
                 migrated_collection_model.last_updated)
 
     def test_one_collection_model_without_nodes(self):
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.albert_id)
         original_collection_model = (
             collection_models.CollectionModel(
-                id='id',
+                id=self.COLLECTION_ID,
                 category='category',
                 title='title',
                 objective='An objective',
@@ -461,7 +548,11 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
                 schema_version=2
                 )
         )
-        original_collection_model.put()
+        original_collection_model.commit(
+            self.albert_id, 'Made a new collection!', [{
+                'cmd': collection_services.CMD_CREATE_NEW,
+                'title': 'title',
+                'category': 'category', }])
 
         self.assertNotIn('nodes', original_collection_model._values)  # pylint: disable=protected-access
         self.assertNotIn('nodes', original_collection_model._properties)  # pylint: disable=protected-access
