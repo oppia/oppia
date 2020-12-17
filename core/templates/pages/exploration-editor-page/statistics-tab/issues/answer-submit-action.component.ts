@@ -16,7 +16,7 @@
  * @fileoverview Component for the Answer Submit Learner Action.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory.ts';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service.ts';
@@ -29,34 +29,40 @@ import { HtmlEscaperService } from 'services/html-escaper.service.ts';
 })
 export class AnswerSubmitActionComponent implements OnInit {
   // Check these types are correct.
-  @Input() answer: string = '';
-  @Input() destStateName: string = '';
-  @Input() timeSpentInStateSecs: number = 0;
-  @Input() currentStateName: string = '';
-  @Input() actionIndex: number = 0;
-  @Input() interactionId: string = '';
-  @Input() interactionCustomizationArgs: string = '';
+  destStateName: string = '';
+  timeSpentInStateSecs: number = 0;
+  currentStateName: string = '';
+  actionIndex: number = 0;
 
   _customizationArgs = (
     this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
-      this.interactionId,
+      this.el.nativeElement.interactionId,
       this.htmlEscaperService.escapedJsonToObj(
-        this.interactionCustomizationArgs)
+        this.el.nativeElement.interactionCustomizationArgs)
     )
   );
-  _answer: Object = this.htmlEscaperService.escapedJsonToObj(this.answer);
+  _answer: Object = this.htmlEscaperService.escapedJsonToObj(
+    this.el.nativeElement.answer);
 
   constructor(
+    private el: ElementRef,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private htmlEscaperService: HtmlEscaperService,
     private interactionObjectFactory: InteractionObjectFactory
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.currentStateName = this.el.nativeElement.currentStateName;
+    this.destStateName = this.el.nativeElement.destStateName;
+    this.actionIndex = this.el.nativeElement.actionIndex;
+    this.timeSpentInStateSecs = this.el.nativeElement.timeSpentInStateSecs;
+  }
 
   getShortAnswerHtml(): string {
     return this.explorationHtmlFormatterService.getShortAnswerHtml(
-      this._answer as number, this.interactionId, this._customizationArgs);
+      this._answer as number,
+      this.el.nativeElement.interactionId,
+      this._customizationArgs);
   }
 }
 angular.module('oppia').directive(
