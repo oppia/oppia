@@ -28,12 +28,12 @@
     "SetOfHtmlString": [],
     "SetOfUnicodeString": [],
     "TranslatableSetOfNormalizedString": {
-      "content_id": null,
-      "normalized_str_set": []
+      "contentId": null,
+      "normalizedStrSet": []
     },
     "TranslatableSetOfUnicodeString": {
-      "content_id": null,
-      "unicode_str_set": []
+      "contentId": null,
+      "unicodeStrSet": []
     },
     "UnicodeString": "",
     "Fraction": {

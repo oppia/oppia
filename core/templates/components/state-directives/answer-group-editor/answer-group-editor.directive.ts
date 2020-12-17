@@ -189,14 +189,14 @@ angular.module('oppia').directive('answerGroupEditor', [
                 };
               case 'TranslatableSetOfNormalizedString':
                 return {
-                  content_id: null,
-                  normalized_str_set:
+                  contentId: null,
+                  normalizedStrSet:
                     getDefaultInputValue('SetOfNormalizedString')
                 };
               case 'TranslatableSetOfUnicodeString':
                 return {
-                  content_id: null,
-                  normalized_str_set:
+                  contentId: null,
+                  normalizedStrSet:
                     getDefaultInputValue('SetOfUnicodeString')
                 };
             }
@@ -264,8 +264,8 @@ angular.module('oppia').directive('answerGroupEditor', [
           };
 
           ctrl.saveRules = function() {
-            if (ctrl.originalContentIdToContent) {
-              const updatedContentIdToContent = ctrl.getContentIdToContent();
+            if (ctrl.originalContentIdToContent !== undefined) {
+              const updatedContentIdToContent = getContentIdToContent();
               const contentIdsWithModifiedContent = [];
 
               Object.keys(
@@ -302,7 +302,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               // The rule editor may not be opened in a read-only editor view.
               return;
             }
-            ctrl.originalContentIdToContent = ctrl.getContentIdToContent();
+            ctrl.originalContentIdToContent = getContentIdToContent();
             ctrl.rulesMemento = angular.copy(ctrl.rules);
             ctrl.changeActiveRuleIndex(index);
           };
@@ -333,14 +333,14 @@ angular.module('oppia').directive('answerGroupEditor', [
           * @returns {Object} A Mapping of content ids (string) to content
           *   (string).
           */
-          ctrl.getContentIdToContent = function() {
+          const getContentIdToContent = function() {
             const contentIdToContent = {};
             ctrl.rules.forEach(rule => {
               Object.keys(rule.inputs).forEach(ruleName => {
                 const ruleInput = rule.inputs[ruleName];
                 const ruleInputType = rule.inputTypes[ruleName];
                 if (ruleInputType.indexOf('Translatable') === 0) {
-                  contentIdToContent[ruleInput.content_id] = ruleInput;
+                  contentIdToContent[ruleInput.contentId] = ruleInput;
                 }
               });
             });

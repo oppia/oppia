@@ -576,8 +576,8 @@ describe('Extracting Image file names in the state service', () => {
               rule_specs: [{
                 rule_type: 'Contains',
                 inputs: {x: {
-                  content_id: 'rule_input',
-                  normalized_str_set: ['1']
+                  contentId: 'rule_input',
+                  normalizedStrSet: ['1']
                 }}
               }],
               outcome: {
@@ -594,8 +594,8 @@ describe('Extracting Image file names in the state service', () => {
               rule_specs: [{
                 rule_type: 'Contains',
                 inputs: {x: {
-                  content_id: 'rule_input',
-                  normalized_str_set: ['2']
+                  contentId: 'rule_input',
+                  normalizedStrSet: ['2']
                 }}
               }],
               outcome: {

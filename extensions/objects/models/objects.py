@@ -108,9 +108,9 @@ class BaseTranslatableObject(BaseObject):
         return {
             'type': 'dict',
             'properties': [{
-                'name': 'content_id',
+                'name': 'contentId',
                 # The default content id is none. However, it should be
-                # populated before being saved. The The normalize() method has
+                # populated before being saved. The normalize() method has
                 # validation checks for this.
                 'schema': {'type': 'unicode_or_none'}
             }] + cls._get_value_schema()
@@ -130,10 +130,10 @@ class BaseTranslatableObject(BaseObject):
         Raises:
             TypeError. Error while normalizing.
         """
-        if not isinstance(raw['content_id'], python_utils.BASESTRING):
+        if not isinstance(raw['contentId'], python_utils.BASESTRING):
             raise TypeError(
                 'Expected content id to be a string, received %s' %
-                raw['content_id'])
+                raw['contentId'])
 
         return schema_utils.normalize_against_schema(
             cls._normalize_value(raw),
@@ -245,6 +245,7 @@ class Html(BaseObject):
         }
 
 
+# TODO(shavavo) Migrate SubtitledUnicode to TranslatableUnicode.
 class SubtitledUnicode(BaseObject):
     """SubtitledUnicode class."""
 
@@ -276,6 +277,7 @@ class SubtitledUnicode(BaseObject):
         }
 
 
+# TODO(shavavo) Migrate SubtitledHtml to TranslatableHtml.
 class SubtitledHtml(BaseObject):
     """SubtitledHtml class."""
 
@@ -1691,8 +1693,8 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
     """Class for translatable sets of NormalizedStrings."""
 
     default_value = {
-        'content_id': None,
-        'normalized_str_set': []
+        'contentId': None,
+        'normalizedStrSet': []
     }
 
     @staticmethod
@@ -1703,7 +1705,7 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
             list. A list of properties that store the object value.
         """
         return [{
-            'name': 'normalized_str_set',
+            'name': 'normalizedStrSet',
             'schema': SetOfNormalizedString.get_schema()
         }]
 
@@ -1722,20 +1724,20 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
         Raises:
             TypeError. The Python object cannot be normalized.
         """
-        if not isinstance(raw['normalized_str_set'], list):
+        if not isinstance(raw['normalizedStrSet'], list):
             raise TypeError(
-                'Invalid unicode string set: %s' % raw['normalized_str_set'])
+                'Invalid unicode string set: %s' % raw['normalizedStrSet'])
 
-        for normalized_str in raw['normalized_str_set']:
+        for normalized_str in raw['normalizedStrSet']:
             if not isinstance(normalized_str, python_utils.BASESTRING):
                 raise TypeError(
                     'Invalid content unicode: %s' % normalized_str)
 
-        normalized_str_set = set(raw['normalized_str_set'])
-        if len(normalized_str_set) != len(raw['normalized_str_set']):
+        normalizedStrSet = set(raw['normalizedStrSet'])
+        if len(normalizedStrSet) != len(raw['normalizedStrSet']):
             raise TypeError(
                 'Duplicate unicode found '
-                'in set: %s' % raw['normalized_str_set'])
+                'in set: %s' % raw['normalizedStrSet'])
 
         return raw
 
@@ -1744,8 +1746,8 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     """Class for translatable sets of UnicodeStrings."""
 
     default_value = {
-        'content_id': None,
-        'unicode_str_set': []
+        'contentId': None,
+        'unicodeStrSet': []
     }
 
     @staticmethod
@@ -1756,7 +1758,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
             list. A list of properties that store the object value.
         """
         return [{
-            'name': 'unicode_str_set',
+            'name': 'unicodeStrSet',
             'schema': SetOfUnicodeString.get_schema()
         }]
 
@@ -1775,17 +1777,17 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
         Raises:
             TypeError. The Python object cannot be normalized.
         """
-        if not isinstance(raw['unicode_str_set'], list):
+        if not isinstance(raw['unicodeStrSet'], list):
             raise TypeError(
-                'Invalid unicode string set: %s' % raw['unicode_str_set'])
+                'Invalid unicode string set: %s' % raw['unicodeStrSet'])
 
-        for unicode_str in raw['unicode_str_set']:
+        for unicode_str in raw['unicodeStrSet']:
             if not isinstance(unicode_str, python_utils.BASESTRING):
                 raise TypeError(
                     'Invalid content unicode: %s' % unicode_str)
 
-        if len(set(raw['unicode_str_set'])) != len(raw['unicode_str_set']):
+        if len(set(raw['unicodeStrSet'])) != len(raw['unicodeStrSet']):
             raise TypeError(
-                'Duplicate unicode found in set: %s' % raw['unicode_str_set'])
+                'Duplicate unicode found in set: %s' % raw['unicodeStrSet'])
 
         return raw

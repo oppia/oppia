@@ -131,8 +131,8 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input',
-                normalized_str_set: ['c', 'd', 'e']
+                contentId: 'rule_input',
+                normalizedStrSet: ['c', 'd', 'e']
               }
             }
           }],

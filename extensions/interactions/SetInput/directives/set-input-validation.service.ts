@@ -84,8 +84,8 @@ export class SetInputValidationService {
   private areSameRule(ruleA: Rule, ruleB: Rule): boolean {
     return ruleA.type === ruleB.type &&
       this.areSameSet(
-        (<TranslatableSetOfUnicodeString>ruleA.inputs.x).unicode_str_set,
-        (<TranslatableSetOfUnicodeString>ruleB.inputs.x).unicode_str_set);
+        (<TranslatableSetOfUnicodeString>ruleA.inputs.x).unicodeStrSet,
+        (<TranslatableSetOfUnicodeString>ruleB.inputs.x).unicodeStrSet);
   }
 
   getCustomizationArgsWarnings(
@@ -155,16 +155,16 @@ export class SetInputValidationService {
               case 'HasElementsIn':
               case 'IsDisjointFrom':
                 isRuleCoveredByAnyPrevRule = this.isSubset(
-                  ruleInput.unicode_str_set,
-                  prevRuleInput.unicode_str_set
+                  ruleInput.unicodeStrSet,
+                  prevRuleInput.unicodeStrSet
                 );
                 break;
               case 'IsSupersetOf':
               case 'HasElementsNotIn':
               case 'OmitsElementsIn':
                 isRuleCoveredByAnyPrevRule = this.isSubset(
-                  prevRuleInput.unicode_str_set,
-                  ruleInput.unicode_str_set
+                  prevRuleInput.unicodeStrSet,
+                  ruleInput.unicodeStrSet
                 );
                 break;
               default:

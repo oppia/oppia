@@ -317,6 +317,8 @@ import { UserBackendApiService } from 'services/user-backend-api.service.ts';
 import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
+import { PopulateRuleContentIdsService } from
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 
 
@@ -515,6 +517,7 @@ export const angularServices: [string, unknown][] = [
   ['PlaythroughIssueObjectFactory', PlaythroughIssueObjectFactory],
   ['PlaythroughIssuesBackendApiService', PlaythroughIssuesBackendApiService],
   ['PlaythroughObjectFactory', PlaythroughObjectFactory],
+  ['PopulateRuleContentIdsService', PopulateRuleContentIdsService],
   ['PlaythroughService', PlaythroughService],
   ['PredictionAlgorithmRegistryService', PredictionAlgorithmRegistryService],
   ['PretestQuestionBackendApiService', PretestQuestionBackendApiService],

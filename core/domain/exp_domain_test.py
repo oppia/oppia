@@ -522,8 +522,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Equals',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'
@@ -567,8 +567,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(exploration, 'Unrecognized rule type')
 
         rule_spec.inputs = {'x': {
-            'content_id': 'rule_input_Equals',
-            'normalized_str_set': 15
+            'contentId': 'rule_input_Equals',
+            'normalizedStrSet': 15
         }}
         rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
@@ -694,8 +694,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(old_answer_groups)
         valid_text_input_cust_args = init_state.interaction.customization_args
         rule_spec.inputs = {'x': {
-            'content_id': 'rule_input_Equals',
-            'normalized_str_set': ['Test']
+            'contentId': 'rule_input_Equals',
+            'normalizedStrSet': ['Test']
         }}
         rule_spec.rule_type = 'Contains'
         exploration.validate()
@@ -796,8 +796,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Contains',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'
@@ -826,8 +826,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Contains',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'
@@ -1305,8 +1305,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Contains_5',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_5',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'
@@ -1685,8 +1685,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': {
-                        'content_id': 'rule_input_Equals',
-                        'normalized_str_set': ['Test']
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
                     }
                 },
                 'rule_type': 'Contains'
@@ -6790,8 +6790,8 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: rule_input_Equals_3
-              normalized_str_set:
+              contentId: rule_input_3
+              normalizedStrSet:
               - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
@@ -6824,7 +6824,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -6832,7 +6832,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7363,8 +7363,8 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: rule_input_Equals_3
-              normalized_str_set:
+              contentId: rule_input_3
+              normalizedStrSet:
               - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
@@ -7397,7 +7397,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7405,7 +7405,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7524,8 +7524,8 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: rule_input_Equals_3
-              normalized_str_set:
+              contentId: rule_input_3
+              normalizedStrSet:
               - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
@@ -7558,7 +7558,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7566,7 +7566,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7708,8 +7708,8 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: rule_input_Equals_3
-              normalized_str_set:
+              contentId: rule_input_3
+              normalizedStrSet:
               - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
@@ -7742,7 +7742,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7750,7 +7750,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7881,8 +7881,8 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: rule_input_Equals_3
-              normalized_str_set:
+              contentId: rule_input_3
+              normalizedStrSet:
               - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
@@ -7915,7 +7915,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7923,7 +7923,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -8076,8 +8076,8 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: rule_input_Equals_3
-              normalized_str_set:
+              contentId: rule_input_3
+              normalizedStrSet:
               - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
@@ -8110,7 +8110,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -8118,7 +8118,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -8654,8 +8654,8 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: rule_input_Equals_3
-              normalized_str_set:
+              contentId: rule_input_3
+              normalizedStrSet:
               - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
@@ -8688,7 +8688,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -8700,7 +8700,7 @@ states:
             translation: <p>Translation</p>
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -9749,8 +9749,8 @@ states:
         rule_specs:
         - inputs:
             x:
-              content_id: rule_input_Equals_3
-              normalized_str_set:
+              contentId: rule_input_3
+              normalizedStrSet:
               - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
@@ -9783,7 +9783,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -9791,7 +9791,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_Equals_3: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:

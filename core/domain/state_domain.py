@@ -2360,7 +2360,11 @@ class State(python_utils.OBJECT):
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
                     if issubclass(param_type, objects.BaseTranslatableObject):
-                        content_id_list.append(value['content_id'])
+                        if value['contentId'] in content_id_list:
+                            raise utils.ValidationError(
+                                'Found a duplicate content '
+                                'id %s' % value['contentId'])
+                        content_id_list.append(value['contentId'])
 
         if self.interaction.default_outcome:
             default_outcome_content_id = (
@@ -2671,7 +2675,7 @@ class State(python_utils.OBJECT):
                         if issubclass(
                                 param_type, objects.BaseTranslatableObject
                         ):
-                            old_content_id_list.append(value['content_id'])
+                            old_content_id_list.append(value['contentId'])
 
             self._update_content_ids_in_assets(
                 old_content_id_list, [])
@@ -2746,7 +2750,7 @@ class State(python_utils.OBJECT):
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
                     if issubclass(param_type, objects.BaseTranslatableObject):
-                        old_content_id_list.append(value['content_id'])
+                        old_content_id_list.append(value['contentId'])
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
@@ -2788,7 +2792,7 @@ class State(python_utils.OBJECT):
                                 param_type,
                                 objects.BaseTranslatableObject
                         ):
-                            new_content_id_list.append(value['content_id'])
+                            new_content_id_list.append(value['contentId'])
 
                         try:
                             normalized_param = param_type.normalize(value)

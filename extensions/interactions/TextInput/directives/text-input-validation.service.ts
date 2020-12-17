@@ -130,7 +130,7 @@ export class TextInputValidationService {
 
 
         let currentStrings = (
-          <TranslatableSetOfNormalizedString>rule.inputs.x).normalized_str_set;
+          <TranslatableSetOfNormalizedString>rule.inputs.x).normalizedStrSet;
         if (rule.type === 'Contains') {
           // Check if any of the current strings contain any of the previously
           // seen strings as a substring.
@@ -173,7 +173,7 @@ export class TextInputValidationService {
           if (seenStringsEquals.some(
             (seenString) => textInputRulesService.Equals(
               seenString, {x: {
-                content_id: null, normalized_str_set: currentStrings
+                contentId: null, normalizedStrSet: currentStrings
               }}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
@@ -184,7 +184,7 @@ export class TextInputValidationService {
           } else if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
               seenString, {x: {
-                content_id: null, normalized_str_set: currentStrings
+                contentId: null, normalizedStrSet: currentStrings
               }}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
@@ -198,7 +198,7 @@ export class TextInputValidationService {
           if (seenStringsFuzzyEquals.some(
             (seenString) => textInputRulesService.FuzzyEquals(
               seenString, {x: {
-                content_id: null, normalized_str_set: currentStrings
+                contentId: null, normalizedStrSet: currentStrings
               }}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,

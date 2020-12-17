@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AnswerClassificationResult } from
   'domain/classifier/answer-classification-result.model';
-import { AnswerClassificationService } from
+import { AnswerClassificationService, InteractionRulesService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { AppService } from 'services/app.service';
 import { CamelCaseToHyphensPipe } from
@@ -35,23 +35,11 @@ import { PredictionAlgorithmRegistryService } from
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
-  let rules = {
-    Equals: (answer, inputs) => {
-      return inputs.x.normalized_str_set.some(input => input === answer);
-    },
-    // For testing purposes, FuzzyEquals is used here as an alias for not
-    // Equals (we cannot use 'NotEquals' as a rule type because it is not
-    // present in rule_templates).
-    FuzzyEquals: (answer, inputs) => {
-      return !inputs.x.normalized_str_set.some(input => input === answer);
-    },
-    Contains: (answer, inputs) => {
-      return inputs.x.normalized_str_set.some(input => answer.includes(input));
-    }
-  };
 
   let answerClassificationService: AnswerClassificationService;
   let appService: AppService;
@@ -60,6 +48,7 @@ describe('Answer Classification Service', () => {
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   let stateClassifierMappingService: StateClassifierMappingService;
   let stateObjectFactory: StateObjectFactory;
+  let textInputRulesService: InteractionRulesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
@@ -72,6 +61,7 @@ describe('Answer Classification Service', () => {
       PredictionAlgorithmRegistryService);
     stateClassifierMappingService = TestBed.get(StateClassifierMappingService);
     stateObjectFactory = TestBed.get(StateObjectFactory);
+    textInputRulesService = TestBed.get(TextInputRulesService);
   });
 
   describe('with string classifier disabled', () => {
@@ -124,8 +114,8 @@ describe('Answer Classification Service', () => {
               rule_type: 'Equals',
               inputs: {
                 x: {
-                  content_id: 'rule_input_Equals_0',
-                  normalized_str_set: ['10']
+                  contentId: 'rule_input_0',
+                  normalizedStrSet: ['10']
                 }
               }
             }],
@@ -145,24 +135,24 @@ describe('Answer Classification Service', () => {
               rule_type: 'Equals',
               inputs: {
                 x: {
-                  content_id: 'rule_input_Equals_1',
-                  normalized_str_set: ['5']
+                  contentId: 'rule_input_1',
+                  normalizedStrSet: ['5']
                 }
               }
             }, {
               rule_type: 'Equals',
               inputs: {
                 x: {
-                  content_id: 'rule_input_Equals_2',
-                  normalized_str_set: ['6']
+                  contentId: 'rule_input_2',
+                  normalizedStrSet: ['6']
                 }
               }
             }, {
               rule_type: 'FuzzyEquals',
               inputs: {
                 x: {
-                  content_id: 'rule_input_NotEquals_3',
-                  normalized_str_set: ['7']
+                  contentId: 'rule_input_3',
+                  normalizedStrSet: ['7']
                 }
               }
             }],
@@ -211,7 +201,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name, state.interaction, '10', rules)
+          state.name, state.interaction, '10', textInputRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 1', 'feedback_1', '', []),
@@ -220,7 +210,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name, state.interaction, '5', rules)
+          state.name, state.interaction, '5', textInputRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
@@ -229,7 +219,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name, state.interaction, '6', rules)
+          state.name, state.interaction, '6', textInputRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
@@ -243,7 +233,7 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name, state.interaction, '7', rules)
+          state.name, state.interaction, '777', textInputRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
@@ -273,8 +263,8 @@ describe('Answer Classification Service', () => {
             rule_type: 'Equals',
             inputs: {
               x: {
-                content_id: 'rule_input_Equals_0',
-                normalized_str_set: ['10']
+                contentId: 'rule_input_0',
+                normalizedStrSet: ['10']
               }
             }
           }],
@@ -373,8 +363,8 @@ describe('Answer Classification Service', () => {
               rule_type: 'Equals',
               inputs: {
                 x: {
-                  content_id: 'rule_input_Equals_0',
-                  normalized_str_set: ['10']
+                  contentId: 'rule_input_0',
+                  normalizedStrSet: ['10']
                 }
               }
             }],
@@ -395,16 +385,16 @@ describe('Answer Classification Service', () => {
               rule_type: 'Equals',
               inputs: {
                 x: {
-                  content_id: 'rule_input_Equals_1',
-                  normalized_str_set: ['5']
+                  contentId: 'rule_input_1',
+                  normalizedStrSet: ['5']
                 }
               }
             }, {
               rule_type: 'Equals',
               inputs: {
                 x: {
-                  content_id: 'rule_input_Equals_2',
-                  normalized_str_set: ['7']
+                  contentId: 'rule_input_2',
+                  normalizedStrSet: ['7']
                 }
               }
             }],
@@ -448,7 +438,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, '0', rules)
+            state.name, state.interaction, '0', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, null,
@@ -468,7 +458,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, '0', rules)
+            state.name, state.interaction, '0', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             outcomeObjectFactory.createNew(
@@ -531,8 +521,8 @@ describe('Answer Classification Service', () => {
               rule_type: 'Equals',
               inputs: {
                 x: {
-                  content_id: 'rule_input_Equals_0',
-                  normalized_str_set: ['equal']
+                  contentId: 'rule_input_0',
+                  normalizedStrSet: ['equal']
                 }
               }
             }],
@@ -553,8 +543,8 @@ describe('Answer Classification Service', () => {
               rule_type: 'Contains',
               inputs: {
                 x: {
-                  content_id: 'rule_input_Contains_5',
-                  normalized_str_set: ['npu']
+                  contentId: 'rule_input_5',
+                  normalizedStrSet: ['npu']
                 }
               }
             }],
@@ -594,7 +584,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, 'abc', rules)
+            state.name, state.interaction, 'abc', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[0].outcome, 0, null,
@@ -602,7 +592,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, 'xyz', rules)
+            state.name, state.interaction, 'xyz', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, null,
@@ -618,7 +608,7 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, 'input', rules)
+            state.name, state.interaction, 'input', textInputRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, 0,
