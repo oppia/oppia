@@ -842,8 +842,8 @@ class Question(python_utils.OBJECT):
                 return content_id
 
         # As of Jan 2021, which is when this migration is to be run, only
-        # TextInput and SetInput have translatable rule inputs, and they both
-        # take exactly one translatable input named x.
+        # TextInput and SetInput have translatable rule inputs, and every rule
+        # for these interactions takes exactly one translatable input named x.
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id not in ['TextInput', 'SetInput']:
             return question_state_dict
