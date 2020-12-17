@@ -2908,4 +2908,4 @@ class UserIdentifiersModel(base_models.BaseModel):
             UserIdentifiersModel. The model with user_id field equal to user_id
             argument.
         """
-        return cls.query.filter(cls.user_id == user_id).get()
+        return cls.query(cls.user_id == user_id).get()
