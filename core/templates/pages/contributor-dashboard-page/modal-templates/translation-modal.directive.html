@@ -10,7 +10,10 @@
   </div>
 </div>
 <div class="modal-body">
-  <div>
+  <div ng-if="!textToTranslate">
+    <strong>Sorry! All available translations are in review currently.</strong>
+  </div>
+  <div ng-if="textToTranslate">
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given content in <[languageDescription]>:</strong>
       <a class="oppia-skip-button" href="" ng-if="moreAvailable" ng-click="skipActiveTranslation()">skip</a>
@@ -23,7 +26,7 @@
         <lazy-loading></lazy-loading>
       </div>
     </div>
-    <div ng-if="!loadingData && !uploadingTranslation">
+    <div ng-if="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
       <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
                          ng-click="onContentClick($event)"
                          html-data="textToTranslate"
@@ -72,8 +75,13 @@
     width: 40%;
   }
   .oppia-translation-editor-section {
-    padding: 25px 0px;
+    padding: 20px 0px;
     word-wrap: break-word;
+  }
+  .oppia-text-to-translate-container {
+    border: 1px solid #ccc;
+    margin: 15px 0px;
+    padding: 20px;
   }
   .oppia-skip-button {
     color: #ababab;

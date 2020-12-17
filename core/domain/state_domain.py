@@ -153,8 +153,12 @@ class AnswerGroup(python_utils.OBJECT):
 
         self.outcome.validate()
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self, interaction_id):
         """Get all html content strings in the AnswerGroup.
+
+        Args:
+            interaction_id: str. The interaction id that the answer group is
+                associated with.
 
         Returns:
             list(str). The list of all html content strings in the interaction.
@@ -170,15 +174,21 @@ class AnswerGroup(python_utils.OBJECT):
         # is used to figure out the assembly of the html in the rulespecs.
 
         outcome_html = self.outcome.feedback.html
-        html_list = html_list + [outcome_html]
+        html_list += [outcome_html]
 
         html_field_types_to_rule_specs_dict = json.loads(
             utils.get_file_contents(
                 feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
-
         for rule_spec in self.rule_specs:
             for interaction_and_rule_details in (
                     html_field_types_to_rule_specs_dict.values()):
+                # Check that the value corresponds to the answer group's
+                # associated interaction id.
+                if (
+                        interaction_and_rule_details['interactionId'] !=
+                        interaction_id):
+                    continue
+
                 rule_type_has_html = (
                     rule_spec.rule_type in
                     interaction_and_rule_details['ruleTypes'].keys())
@@ -196,24 +206,18 @@ class AnswerGroup(python_utils.OBJECT):
                                 rule_spec.inputs[input_variable])
                             if (html_type_format ==
                                     feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
-                                html_list = html_list + [rule_input_variable]
+                                html_list += [rule_input_variable]
                             elif (html_type_format ==
                                   feconf.HTML_RULE_VARIABLE_FORMAT_SET):
-                                # Here we are checking the type of the
-                                # rule_specs.inputs because the rule type
-                                # 'Equals' is used by other interactions as
-                                # well which don't have HTML and we don't have
-                                # a reference to the interaction ID.
-                                if isinstance(rule_input_variable, list):
-                                    for value in rule_input_variable:
-                                        if isinstance(
-                                                value, python_utils.BASESTRING):
-                                            html_list = html_list + [value]
+                                for value in rule_input_variable:
+                                    if isinstance(
+                                            value, python_utils.BASESTRING):
+                                        html_list += [value]
                             elif (html_type_format ==
                                   feconf.
                                   HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
                                 for rule_spec_html in rule_input_variable:
-                                    html_list = html_list + rule_spec_html
+                                    html_list += rule_spec_html
                             else:
                                 raise Exception(
                                     'The rule spec does not belong to a valid'
@@ -728,7 +732,7 @@ class InteractionInstance(python_utils.OBJECT):
                     raise utils.ValidationError(
                         'Expected customization arg value to be a '
                         'InteractionCustomizationArg domain object, '
-                        'recieved %s' % self.customization_args[ca_name])
+                        'received %s' % self.customization_args[ca_name])
 
         interaction = interaction_registry.Registry.get_interaction_by_id(
             self.id)
@@ -777,15 +781,16 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-            html_list = html_list + answer_group.get_all_html_content_strings()
+            html_list += answer_group.get_all_html_content_strings(
+                self.id)
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
-            html_list = html_list + [default_outcome_html]
+            html_list += [default_outcome_html]
 
         for hint in self.hints:
             hint_html = hint.hint_content.html
-            html_list = html_list + [hint_html]
+            html_list += [hint_html]
 
         if self.id is None:
             return html_list
@@ -796,7 +801,7 @@ class InteractionInstance(python_utils.OBJECT):
 
         if self.solution and interaction.can_have_solution:
             solution_html = self.solution.explanation.html
-            html_list = html_list + [solution_html]
+            html_list += [solution_html]
             html_field_types_to_rule_specs_dict = json.loads(
                 utils.get_file_contents(
                     feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
@@ -808,10 +813,10 @@ class InteractionInstance(python_utils.OBJECT):
                                 html_type ==
                                 feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
                             for value in self.solution.correct_answer:
-                                html_list = html_list + value
+                                html_list += value
                         elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
                             for value in self.solution.correct_answer:
-                                html_list = html_list + [value]
+                                html_list += [value]
                         else:
                             raise Exception(
                                 'The solution does not have a valid '
@@ -1706,23 +1711,6 @@ class WrittenTranslations(python_utils.OBJECT):
         else:
             self.translations_mapping.pop(content_id, None)
 
-    def get_translation_counts(self):
-        """Return a dict representing the number of translation available in a
-        languages in which there exist at least one translation in the
-        WrittenTranslation object.
-
-        Returns:
-            dict(str, int). A dict with language code as a key and number of
-            translation available in that language as the value.
-        """
-        translation_counts = collections.defaultdict(int)
-        for translations in self.translations_mapping.values():
-            for language, translation in translations.items():
-                if not translation.needs_update:
-                    translation_counts[language] += 1
-
-        return translation_counts
-
     def get_all_html_content_strings(self):
         """Gets all html content strings used in the WrittenTranslations.
 
@@ -2542,11 +2530,22 @@ class State(python_utils.OBJECT):
         languages in which there exists at least one translation in the state
         object.
 
+        Note: This method only counts the translations which are translatable as
+        per _get_all_translatable_content method.
+
         Returns:
             dict(str, int). A dict with language code as a key and number of
             translations available in that language as the value.
         """
-        return self.written_translations.get_translation_counts()
+        translation_counts = collections.defaultdict(int)
+        translations_mapping = self.written_translations.translations_mapping
+
+        for content_id in self._get_all_translatable_content():
+            for language_code, translation in (
+                    translations_mapping[content_id].items()):
+                if not translation.needs_update:
+                    translation_counts[language_code] += 1
+        return translation_counts
 
     def get_translatable_content_count(self):
         """Returns the number of content fields available for translation in
@@ -2885,6 +2884,10 @@ class State(python_utils.OBJECT):
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
 
+        Note: Currently, we don't support interaction translation through
+        contributor dashboard, this method only returns content which are
+        translatable through the contributor dashboard.
+
         Returns:
             dict(str, str). Returns a dict with key as content id and content
             html as the value.
@@ -2933,7 +2936,12 @@ class State(python_utils.OBJECT):
             .get_content_ids_that_are_correctly_translated(language_code))
 
         for content_id in available_translation_content_ids:
-            del content_id_to_html[content_id]
+            # Interactions can be translated through editor pages but
+            # _get_all_translatable_content returns contents which are only
+            # translatable through the contributor dashboard page, we are
+            # ignoring the content ids related to interaction translation below
+            # if it doesn't exist in content_id_to_html.
+            content_id_to_html.pop(content_id, None)
 
         # TODO(#7571): Add functionality to return the list of
         # translations which needs update.

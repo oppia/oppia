@@ -58,7 +58,9 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 require('pages/exploration-editor-page/services/graph-data.service');
@@ -73,6 +75,9 @@ describe('Exploration Warnings Service', function() {
   var StateTopAnswersStatsBackendApiService = null;
 
   beforeEach(angular.mock.module('oppia'));
+
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', new AngularNameService());
     $provide.value(
@@ -117,12 +122,6 @@ describe('Exploration Warnings Service', function() {
       'WrittenTranslationsObjectFactory',
       new WrittenTranslationsObjectFactory(
         new WrittenTranslationObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
 
   describe('when exploration param changes has jinja values', function() {

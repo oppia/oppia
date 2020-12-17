@@ -23,6 +23,7 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
+var action = require('../protractor_utils/action.js');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
@@ -42,9 +43,8 @@ describe('rich-text components', function() {
   });
 
   it('should display correctly', async function() {
-    await users.createUser(
+    await users.createAndLoginUser(
       'user@richTextComponents.com', 'userRichTextComponents');
-    await users.login('user@richTextComponents.com');
 
     await workflow.createExploration();
 
@@ -126,6 +126,7 @@ describe('Interactions', function() {
     await users.createUser('user@interactions.com', 'userInteractions');
     await users.login('user@interactions.com');
     await workflow.createExploration();
+
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
@@ -148,8 +149,9 @@ describe('Interactions', function() {
         var confirmDeleteResponseButton = element(by.css(
           '.protractor-test-confirm-delete-response'));
         if (await deleteResponseButton.isPresent()) {
-          await deleteResponseButton.click();
-          await confirmDeleteResponseButton.click();
+          await action.click('Delete Response button', deleteResponseButton);
+          await action.click(
+            'Confirm Delete Response button', confirmDeleteResponseButton);
         }
 
         await explorationEditorMainTab.addResponse.apply(
@@ -211,7 +213,6 @@ describe('Interactions', function() {
     await users.createAndLoginUser(
       'explorationEditor@interactions.com', 'explorationEditor');
     await workflow.createExploration();
-
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Draw a complete graph with the given vertices.'));

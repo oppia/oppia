@@ -28,7 +28,6 @@ from core.domain import question_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.platform import models
-import feconf
 import utils
 
 (opportunity_models,) = models.Registry.import_models(
@@ -67,8 +66,8 @@ def get_exploration_opportunity_summary_from_model(model):
     # constants.SUPPORTED_AUDIO_LANGUAGES.
     set_of_all_languages = set(
         model.incomplete_translation_language_codes +
-        model.need_voice_artist_in_language_codes +
-        model.assigned_voice_artist_in_language_codes)
+        model.language_codes_needing_voice_artists +
+        model.language_codes_with_assigned_voice_artists)
     supported_language_codes = set([language['id'] for language in (
         constants.SUPPORTED_AUDIO_LANGUAGES)])
     missing_language_codes = list(
@@ -85,8 +84,8 @@ def get_exploration_opportunity_summary_from_model(model):
         model.id, model.topic_id, model.topic_name, model.story_id,
         model.story_title, model.chapter_title, model.content_count,
         new_incomplete_translation_language_codes, model.translation_counts,
-        model.need_voice_artist_in_language_codes,
-        model.assigned_voice_artist_in_language_codes)
+        model.language_codes_needing_voice_artists,
+        model.language_codes_with_assigned_voice_artists)
 
 
 def _save_multi_exploration_opportunity_summary(
@@ -112,14 +111,17 @@ def _save_multi_exploration_opportunity_summary(
             incomplete_translation_language_codes=(
                 opportunity_summary.incomplete_translation_language_codes),
             translation_counts=opportunity_summary.translation_counts,
-            need_voice_artist_in_language_codes=(
-                opportunity_summary.need_voice_artist_in_language_codes),
-            assigned_voice_artist_in_language_codes=(
-                opportunity_summary.assigned_voice_artist_in_language_codes)
+            language_codes_needing_voice_artists=(
+                opportunity_summary.language_codes_needing_voice_artists),
+            language_codes_with_assigned_voice_artists=(
+                opportunity_summary.language_codes_with_assigned_voice_artists)
         )
 
         exploration_opportunity_summary_model_list.append(model)
 
+    (
+        opportunity_models.ExplorationOpportunitySummaryModel
+        .update_timestamps_multi(exploration_opportunity_summary_model_list))
     opportunity_models.ExplorationOpportunitySummaryModel.put_multi(
         exploration_opportunity_summary_model_list)
 
@@ -147,7 +149,7 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
 
     incomplete_translation_language_codes = (
         audio_language_codes - complete_translation_languages)
-    need_voice_artist_in_language_codes = complete_translation_languages
+    language_codes_needing_voice_artists = complete_translation_languages
 
     if exploration.language_code in incomplete_translation_language_codes:
         # Removing exploration language from incomplete translation
@@ -157,7 +159,7 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
             exploration.language_code)
         # Adding exploration language to voiceover required languages
         # list as exploration can be voiceovered in it's own language.
-        need_voice_artist_in_language_codes.add(exploration.language_code)
+        language_codes_needing_voice_artists.add(exploration.language_code)
 
     content_count = exploration.get_content_count()
     translation_counts = exploration.get_translation_counts()
@@ -167,14 +169,14 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
 
     # TODO(#7376): Once the voiceover application functionality is
     # implemented change this method such that it also populates the
-    # assigned_voice_artist_in_language_codes with the required data.
+    # language_codes_with_assigned_voice_artists with the required data.
 
     exploration_opportunity_summary = (
         opportunity_domain.ExplorationOpportunitySummary(
             exploration.id, topic.id, topic.name, story.id, story.title,
             story_node.title, content_count,
             list(incomplete_translation_language_codes), translation_counts,
-            list(need_voice_artist_in_language_codes), []))
+            list(language_codes_needing_voice_artists), []))
 
     return exploration_opportunity_summary
 
@@ -282,20 +284,21 @@ def update_opportunity_with_updated_exploration(exp_id):
     )
 
     new_languages_for_voiceover = set(complete_translation_language_list) - set(
-        exploration_opportunity_summary.assigned_voice_artist_in_language_codes)
+        exploration_opportunity_summary.
+        language_codes_with_assigned_voice_artists)
 
-    # We only append new languages to need_voice_artist_in_language_codes(
+    # We only append new languages to language_codes_needing_voice_artists(
     # instead of adding all of the complete_translation_language_list), as the
     # complete translation languages list will be dynamic based on some
     # content text are changed, where as the voiceover is a long term work and
     # we can allow a voice_artist to work for an exploration which needs a
     # little bit update in text translation.
-    need_voice_artist_in_language_codes_set = set(
-        exploration_opportunity_summary.need_voice_artist_in_language_codes)
-    need_voice_artist_in_language_codes_set |= set(new_languages_for_voiceover)
+    language_codes_needing_voice_artists_set = set(
+        exploration_opportunity_summary.language_codes_needing_voice_artists)
+    language_codes_needing_voice_artists_set |= set(new_languages_for_voiceover)
 
-    exploration_opportunity_summary.need_voice_artist_in_language_codes = list(
-        need_voice_artist_in_language_codes_set)
+    exploration_opportunity_summary.language_codes_needing_voice_artists = list(
+        language_codes_needing_voice_artists_set)
 
     exploration_opportunity_summary.validate()
 
@@ -336,7 +339,7 @@ def update_exploration_opportunities_with_story_changes(story, exp_ids):
 
 def update_exploration_voiceover_opportunities(
         exp_id, assigned_voice_artist_in_language_code):
-    """Updates the assigned_voice_artist_in_language_codes of exploration
+    """Updates the language_codes_with_assigned_voice_artists of exploration
     opportunity model.
 
     Args:
@@ -348,11 +351,11 @@ def update_exploration_voiceover_opportunities(
     exploration_opportunity_summary = (
         get_exploration_opportunity_summary_from_model(model))
 
-    exploration_opportunity_summary.need_voice_artist_in_language_codes.remove(
+    exploration_opportunity_summary.language_codes_needing_voice_artists.remove(
         assigned_voice_artist_in_language_code)
     (
         exploration_opportunity_summary
-        .assigned_voice_artist_in_language_codes.append(
+        .language_codes_with_assigned_voice_artists.append(
             assigned_voice_artist_in_language_code))
     exploration_opportunity_summary.validate()
     _save_multi_exploration_opportunity_summary(
@@ -461,7 +464,7 @@ def get_translation_opportunities(language_code, cursor):
             more: bool. If True, there are (probably) more results after this
                 batch. If False, there are no further results after this batch.
     """
-    page_size = feconf.OPPORTUNITIES_PAGE_SIZE
+    page_size = constants.OPPORTUNITIES_PAGE_SIZE
     exp_opportunity_summary_models, cursor, more = (
         opportunity_models
         .ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
@@ -497,7 +500,7 @@ def get_voiceover_opportunities(language_code, cursor):
                 this batch. If False, there are no further results after
                 this batch.
     """
-    page_size = feconf.OPPORTUNITIES_PAGE_SIZE
+    page_size = constants.OPPORTUNITIES_PAGE_SIZE
     exp_opportunity_summary_models, cursor, more = (
         opportunity_models.ExplorationOpportunitySummaryModel
         .get_all_voiceover_opportunities(page_size, cursor, language_code))
@@ -511,30 +514,25 @@ def get_voiceover_opportunities(language_code, cursor):
 
 
 def get_exploration_opportunity_summaries_by_ids(ids):
-    """Returns a list of ExplorationOpportunitySummary objects corresponding to
-    the given list of ids.
+    """Returns a dict with key as id and value representing
+    ExplorationOpportunitySummary objects corresponding to the opportunity id.
 
     Args:
         ids: list(str). A list of opportunity ids.
 
     Returns:
-        list(ExplorationOpportunitySummary). A list of
-        ExplorationOpportunitySummary domain objects corresponding to the
-        supplied ids.
+        dict(str, ExplorationOpportunitySummary|None). A dict with key as the
+        opportunity id and values representing the ExplorationOpportunitySummary
+        domain objects corresponding to the opportunity id if exist else None.
     """
+    opportunities = {opportunity_id: None for opportunity_id in ids}
     exp_opportunity_summary_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
-    opportunities = []
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         if exp_opportunity_summary_model is not None:
-            exp_opportunity_summary = (
+            opportunities[exp_opportunity_summary_model.id] = (
                 get_exploration_opportunity_summary_from_model(
                     exp_opportunity_summary_model))
-            opportunities.append(exp_opportunity_summary)
-        else:
-            logging.warning(
-                'When getting the exploration opportunity summary models for '
-                'ids: %s, one of the models was None.' % ids)
     return opportunities
 
 
@@ -596,7 +594,7 @@ def get_skill_opportunities(cursor):
                 this batch. If False, there are no further results after
                 this batch.
     """
-    page_size = feconf.OPPORTUNITIES_PAGE_SIZE
+    page_size = constants.OPPORTUNITIES_PAGE_SIZE
     skill_opportunity_models, cursor, more = (
         opportunity_models.SkillOpportunityModel
         .get_skill_opportunities(page_size, cursor))
@@ -616,16 +614,18 @@ def get_skill_opportunities_by_ids(ids):
         ids: list(str). A list of the opportunity ids.
 
     Returns:
-        list(SkillOpportunity). A list of SkillOpportunity domain objects
-        corresponding to the supplied ids.
+        dict(str, SkillOpportunity|None). A dict with key as the
+        opportunity id and values representing the SkillOpportunity
+        domain objects corresponding to the opportunity id if exist else None.
     """
+    opportunities = {opportunity_id: None for opportunity_id in ids}
     skill_opportunity_models = (
         opportunity_models.SkillOpportunityModel.get_multi(ids))
-    opportunities = []
+
     for skill_opportunity_model in skill_opportunity_models:
-        skill_opportunity = (
-            get_skill_opportunity_from_model(skill_opportunity_model))
-        opportunities.append(skill_opportunity)
+        if skill_opportunity_model is not None:
+            opportunities[skill_opportunity_model.id] = (
+                get_skill_opportunity_from_model(skill_opportunity_model))
     return opportunities
 
 
@@ -675,6 +675,8 @@ def _save_skill_opportunities(skill_opportunities):
             question_count=skill_opportunity.question_count,
         )
         skill_opportunity_models.append(model)
+    opportunity_models.SkillOpportunityModel.update_timestamps_multi(
+        skill_opportunity_models)
     opportunity_models.SkillOpportunityModel.put_multi(skill_opportunity_models)
 
 

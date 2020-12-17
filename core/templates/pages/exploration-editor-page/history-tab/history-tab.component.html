@@ -36,13 +36,16 @@
         <i class="fa fa-search"></i>
       </div>
       <div class="history-table-header">
+        <div class="history-table-header-version">
+          <span>Version No.</span>
+        </div>
         <div class="history-table-header-message">
           <span>Notes</span>
         </div>
         <div class="history-table-header-profile">
           <span>User</span>
         </div>
-        <div class="history-table-header-version" ng-click="$ctrl.reverseDateOrder()">
+        <div class="history-table-header-date" ng-click="$ctrl.reverseDateOrder()">
           <span>Date</span>
         </div>
       </div>
@@ -51,7 +54,7 @@
       </div>
       <div ng-repeat="metadata in $ctrl.explorationVersionMetadata track by $index" class="history-list-item protractor-test-history-list-item">
         <div class="history-table-index">
-          <[$index +1]>.
+          <[metadata.versionNumber]>.
         </div>
         <div class="history-table-message">
           <[metadata.commitMessage]>
@@ -64,10 +67,10 @@
         </div>
         <div class="history-table-options protractor-test-history-list-options">
           <div class="dropdown">
-            <div type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="$ctrl.toggleHistoryOptions($index)">
+            <div type="button" id="<['dropdownMenuButton-' + $index]>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-ellipsis-v"></i>
             </div>
-            <div class="dropdown-menu dropdown-menu-left" aria-labelledby="dropdownMenuButton" ng-if="$ctrl.highlightedIndex === $index">
+            <div class="dropdown-menu dropdown-menu-left" aria-labelledby="<['dropdownMenuButton-' + $index]>">
               <a class="dropdown-item protractor-test-revert-version" href="#" ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.isEditable()" ng-click="$ctrl.showRevertExplorationModal(metadata.versionNumber)">
                 Revert
               </a>
@@ -141,21 +144,23 @@
   history-tab .history-table-header {
     border-bottom: 2px solid #000;
     display: flex;
+    padding-left: 0.5em;
   }
+  history-tab .history-table-header-date,
   history-tab .history-table-header-message,
   history-tab .history-table-header-profile,
   history-tab .history-table-header-version {
     font-weight: bold;
   }
   history-tab  .history-table-header-message {
-    padding-left: 5%;
-    width: 60%;
+    width: 39%;
   }
   history-tab .history-table-header-profile,
+  history-tab .history-table-header-date,
   history-tab .history-table-header-version {
     width: 20%;
   }
-  history-tab .history-table-header-version {
+  history-tab .history-table-header-date {
     cursor: pointer;
   }
   history-tab .history-list-item {
@@ -165,13 +170,12 @@
     padding: 16px 10px;
     position: relative;
   }
-  history-tab .history-table-index {
-    width: 5%;
-  }
   history-tab .history-table-message {
-    width: 55%;
+    width: 40%;
   }
-  history-tab .history-table-profile {
+  history-tab .history-table-index,
+  history-tab .history-table-profile,
+  history-tab .history-table-version {
     width: 20%;
   }
   history-tab .pagination-page,

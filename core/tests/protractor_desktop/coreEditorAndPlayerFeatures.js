@@ -141,7 +141,7 @@ describe('Enable correctness feedback and set correctness', function() {
     // Set the response for this interaction and close it.
     await explorationEditorMainTab.setResponse(
       'TextInput', await forms.toRichText('Correct!'),
-      'End', true, 'Equals', 'One');
+      'End', true, 'Equals', ['One']);
 
     await explorationEditorMainTab.expectTickMarkIsDisplayed();
     responseEditor = await explorationEditorMainTab.getResponseEditor(
@@ -445,10 +445,10 @@ describe('Core exploration functionality', function() {
     // Create new state 'I am happy' for 'happy' rule.
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('You must be happy!'),
-      'I am happy', true, 'FuzzyEquals', 'happy');
+      'I am happy', true, 'FuzzyEquals', ['happy']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.expectRuleToBe(
-      'TextInput', 'FuzzyEquals', ['"happy"']);
+      'TextInput', 'FuzzyEquals', ['[happy]']);
     responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.expectFeedbackInstructionToBe('You must be happy!');
     // Verify newly created state.
@@ -458,9 +458,9 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.moveToState('Introduction');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('You cannot be sad!'),
-      '(try again)', false, 'FuzzyEquals', 'sad');
+      '(try again)', false, 'FuzzyEquals', ['sad']);
     responseEditor = await explorationEditorMainTab.getResponseEditor(1);
-    await responseEditor.expectRuleToBe('TextInput', 'FuzzyEquals', ['"sad"']);
+    await responseEditor.expectRuleToBe('TextInput', 'FuzzyEquals', ['[sad]']);
     await explorationEditorPage.saveChanges();
   });
 

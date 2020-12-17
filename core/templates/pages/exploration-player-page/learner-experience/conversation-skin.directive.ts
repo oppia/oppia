@@ -47,8 +47,8 @@ require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/question/pretest-question-backend-api.service.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
+require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
@@ -358,14 +358,15 @@ angular.module('oppia').directive('conversationSkin', [
         'RefresherExplorationConfirmationModalService',
         'SiteAnalyticsService', 'StateCardObjectFactory',
         'StatsReportingService', 'StoryViewerBackendApiService', 'UrlService',
-        'UserService', 'WindowDimensionsService', 'COMPONENT_NAME_FEEDBACK',
-        'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
-        'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
+        'UserService', 'WindowDimensionsService',
+        'COMPONENT_NAME_FEEDBACK', 'CONTENT_FOCUS_LABEL_PREFIX',
+        'CONTINUE_BUTTON_FOCUS_LABEL', 'DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR',
         'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES',
         'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         'FEEDBACK_POPOVER_PATH', 'INTERACTION_SPECS',
-        'REVIEW_TESTS_URL_TEMPLATE', 'STORY_VIEWER_URL_TEMPLATE',
+        'REVIEW_TESTS_URL_TEMPLATE',
+        'STORY_PROGRESS_URL_TEMPLATE', 'STORY_VIEWER_URL_TEMPLATE',
         'SUPPORTED_SITE_LANGUAGES', 'TWO_CARD_THRESHOLD_PX',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
@@ -386,14 +387,15 @@ angular.module('oppia').directive('conversationSkin', [
             RefresherExplorationConfirmationModalService,
             SiteAnalyticsService, StateCardObjectFactory,
             StatsReportingService, StoryViewerBackendApiService, UrlService,
-            UserService, WindowDimensionsService, COMPONENT_NAME_FEEDBACK,
-            CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
-            DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
+            UserService, WindowDimensionsService,
+            COMPONENT_NAME_FEEDBACK, CONTENT_FOCUS_LABEL_PREFIX,
+            CONTINUE_BUTTON_FOCUS_LABEL, DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR,
             ENABLE_NEW_STRUCTURE_VIEWER_UPDATES,
             ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
             FEEDBACK_POPOVER_PATH, INTERACTION_SPECS,
-            REVIEW_TESTS_URL_TEMPLATE, STORY_VIEWER_URL_TEMPLATE,
+            REVIEW_TESTS_URL_TEMPLATE,
+            STORY_PROGRESS_URL_TEMPLATE, STORY_VIEWER_URL_TEMPLATE,
             SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
@@ -414,8 +416,8 @@ angular.module('oppia').directive('conversationSkin', [
             );
           };
 
-          $scope.canAskLearnerForAnswerInfo = function() {
-            return LearnerAnswerInfoService.canAskLearnerForAnswerInfo();
+          $scope.getCanAskLearnerForAnswerInfo = function() {
+            return LearnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
           };
 
           var initLearnerAnswerInfoService = function(
@@ -521,7 +523,7 @@ angular.module('oppia').directive('conversationSkin', [
                 var collectionIdToAdd = $scope.collectionId;
                 var storyUrlFragmentToAdd = null;
                 var topicUrlFragment = null;
-                var classroomName = null;
+                var classroomUrlFragment = null;
                 // Replace the collection ID with the one in the URL if it
                 // exists in urlParams.
                 if (parentExplorationIds &&
@@ -534,15 +536,15 @@ angular.module('oppia').directive('conversationSkin', [
                     UrlService.getStoryUrlFragmentFromLearnerUrl());
                   topicUrlFragment = (
                     UrlService.getTopicUrlFragmentFromLearnerUrl());
-                  classroomName = (
+                  classroomUrlFragment = (
                     UrlService.getClassroomUrlFragmentFromLearnerUrl());
                 } else if (
                   urlParams.hasOwnProperty('story_url_fragment') &&
                     urlParams.hasOwnProperty('node_id') &&
                     urlParams.hasOwnProperty('topic_url_fragment') &&
-                    urlParams.hasOwnProperty('classroom_name')) {
+                    urlParams.hasOwnProperty('classroom_url_fragment')) {
                   topicUrlFragment = urlParams.topic_url_fragment;
-                  classroomName = urlParams.classroom_name;
+                  classroomUrlFragment = urlParams.classroom_url_fragment;
                   storyUrlFragmentToAdd = urlParams.story_url_fragment;
                 }
 
@@ -560,7 +562,7 @@ angular.module('oppia').directive('conversationSkin', [
                   result = UrlService.addField(
                     result, 'topic_url_fragment', topicUrlFragment);
                   result = UrlService.addField(
-                    result, 'classroom_name', classroomName);
+                    result, 'classroom_url_fragment', classroomUrlFragment);
                   result = UrlService.addField(
                     result, 'story_url_fragment', storyUrlFragmentToAdd);
                   result = UrlService.addField(
@@ -679,6 +681,8 @@ angular.module('oppia').directive('conversationSkin', [
 
             var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
               PlayerTranscriptService.getLastCard());
+            var previousDisplayedCardIndex = (
+              PlayerPositionService.getDisplayedCardIndex());
 
             if (
               totalNumCards > 1 &&
@@ -700,6 +704,22 @@ angular.module('oppia').directive('conversationSkin', [
             }
             PlayerPositionService.changeCurrentQuestion(
               PlayerPositionService.getDisplayedCardIndex());
+
+            // TODO(#7951): Remove the following try-catch block once #7951 has
+            // been fixed.
+            try {
+              $scope.displayedCard.isTerminal();
+            } catch (error) {
+              let additionalDebugInfo = (
+                `${error.message} \n` +
+                `state name: ${newCard && newCard.getStateName()} \n` +
+                `totalNumCards: ${totalNumCards} \n` +
+                'previous displayedCardIndex: ' +
+                `${previousDisplayedCardIndex} \n` +
+                'current displayedCardIndex: ' +
+                `${PlayerPositionService.getDisplayedCardIndex()} \n`);
+              throw new Error(additionalDebugInfo);
+            }
 
             if ($scope.displayedCard.isTerminal()) {
               $scope.isRefresherExploration = false;
@@ -757,23 +777,34 @@ angular.module('oppia').directive('conversationSkin', [
                     // once the directive is migrated to angular.
                     $rootScope.$apply();
                   });
-                StoryViewerBackendApiService.recordChapterCompletion(
-                  topicUrlFragment, classroomUrlFragment,
-                  storyUrlFragment, nodeId
-                ).then(function(returnObject) {
-                  if (returnObject.readyForReviewTest) {
-                    $window.location =
-                      UrlInterpolationService.interpolateUrl(
-                        REVIEW_TESTS_URL_TEMPLATE, {
-                          topic_url_fragment: topicUrlFragment,
-                          classroom_url_fragment: classroomUrlFragment,
-                          story_url_fragment: storyUrlFragment
-                        });
-                  }
-                  // TODO(#8521): Remove the use of $rootScope.$apply()
-                  // once the directive is migrated to angular.
-                  $rootScope.$apply();
-                });
+                if ($scope.isLoggedIn) {
+                  StoryViewerBackendApiService.recordChapterCompletion(
+                    topicUrlFragment, classroomUrlFragment,
+                    storyUrlFragment, nodeId
+                  ).then(function(returnObject) {
+                    if (returnObject.readyForReviewTest) {
+                      $window.location =
+                        UrlInterpolationService.interpolateUrl(
+                          REVIEW_TESTS_URL_TEMPLATE, {
+                            topic_url_fragment: topicUrlFragment,
+                            classroom_url_fragment: classroomUrlFragment,
+                            story_url_fragment: storyUrlFragment
+                          });
+                    }
+                    // TODO(#8521): Remove the use of $rootScope.$apply()
+                    // once the directive is migrated to angular.
+                    $rootScope.$apply();
+                  });
+                } else {
+                  let loginRedirectUrl = UrlInterpolationService.interpolateUrl(
+                    STORY_PROGRESS_URL_TEMPLATE, {
+                      topic_url_fragment: topicUrlFragment,
+                      classroom_url_fragment: classroomUrlFragment,
+                      story_url_fragment: storyUrlFragment,
+                      node_id: nodeId
+                    });
+                  UserService.setReturnUrl(loginRedirectUrl);
+                }
               } else {
                 ExplorationRecommendationsService.getRecommendedSummaryDicts(
                   recommendedExplorationIds,
@@ -877,7 +908,7 @@ angular.module('oppia').directive('conversationSkin', [
 
             PlayerTranscriptService.addNewInput(answer, false);
 
-            if ($scope.canAskLearnerForAnswerInfo()) {
+            if ($scope.getCanAskLearnerForAnswerInfo()) {
               $timeout(function() {
                 PlayerTranscriptService.addNewResponse(
                   LearnerAnswerInfoService.getSolicitAnswerDetailsQuestion());
@@ -968,7 +999,7 @@ angular.module('oppia').directive('conversationSkin', [
                     }
                     if (missingPrerequisiteSkillId) {
                       $scope.displayedCard.markAsCompleted();
-                      ConceptCardBackendApiService.loadConceptCards(
+                      ConceptCardBackendApiService.loadConceptCardsAsync(
                         [missingPrerequisiteSkillId]
                       ).then(function(conceptCardObject) {
                         $scope.conceptCard = conceptCardObject;
@@ -1239,6 +1270,14 @@ angular.module('oppia').directive('conversationSkin', [
             CurrentInteractionService.submitAnswer();
           };
 
+          $scope.signIn = function() {
+            UserService.getLoginUrlAsync().then(
+              loginUrl => {
+                loginUrl ? $window.location = loginUrl : (
+                  $window.location.reload());
+              });
+          };
+
           ctrl.$onInit = function() {
             $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
             $scope.isLoggedIn = null;
@@ -1342,6 +1381,7 @@ angular.module('oppia').directive('conversationSkin', [
             ctrl.directiveSubscriptions.add(
               LearnerViewRatingService.onRatingUpdated.subscribe(() => {
                 $scope.userRating = LearnerViewRatingService.getUserRating();
+                AlertsService.addSuccessMessage('Rating saved!', 1000);
               })
             );
             $window.addEventListener('beforeunload', function(e) {

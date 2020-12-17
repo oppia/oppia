@@ -27,18 +27,19 @@ import feconf
 import python_utils
 import schema_utils
 
-(config_models,) = models.Registry.import_models([models.NAMES.config])
+(config_models, suggestion_models,) = models.Registry.import_models(
+    [models.NAMES.config, models.NAMES.suggestion])
 
 CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
-    'type': 'list',
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'dict',
+        'type': schema_utils.SCHEMA_TYPE_DICT,
         'properties': [{
             'name': 'language_code',
             'schema': {
-                'type': 'unicode',
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 'validators': [{
                     'id': 'is_supported_audio_language_code',
                 }]
@@ -46,16 +47,16 @@ LIST_OF_FEATURED_TRANSLATION_LANGUAGES_DICTS_SCHEMA = {
         }, {
             'name': 'explanation',
             'schema': {
-                'type': 'unicode'
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }]
     }
 }
 
 SET_OF_STRINGS_SCHEMA = {
-    'type': 'list',
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'unicode',
+        'type': schema_utils.SCHEMA_TYPE_UNICODE,
     },
     'validators': [{
         'id': 'is_uniquified',
@@ -63,18 +64,18 @@ SET_OF_STRINGS_SCHEMA = {
 }
 
 SET_OF_CLASSROOM_DICTS_SCHEMA = {
-    'type': 'list',
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'dict',
+        'type': schema_utils.SCHEMA_TYPE_DICT,
         'properties': [{
             'name': 'name',
             'schema': {
-                'type': 'unicode'
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }, {
             'name': 'url_fragment',
             'schema': {
-                'type': 'unicode',
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 'validators': [{
                     'id': 'is_url_fragment',
                 }, {
@@ -85,7 +86,7 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
         }, {
             'name': 'course_details',
             'schema': {
-                'type': 'unicode',
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 'ui_config': {
                     'rows': 8,
                 }
@@ -93,7 +94,7 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
         }, {
             'name': 'topic_list_intro',
             'schema': {
-                'type': 'unicode',
+                'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 'ui_config': {
                     'rows': 5,
                 }
@@ -101,9 +102,9 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
         }, {
             'name': 'topic_ids',
             'schema': {
-                'type': 'list',
+                'type': schema_utils.SCHEMA_TYPE_LIST,
                 'items': {
-                    'type': 'unicode',
+                    'type': schema_utils.SCHEMA_TYPE_UNICODE,
                 },
                 'validators': [{
                     'id': 'is_uniquified',
@@ -114,18 +115,18 @@ SET_OF_CLASSROOM_DICTS_SCHEMA = {
 }
 
 VMID_SHARED_SECRET_KEY_SCHEMA = {
-    'type': 'list',
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'dict',
+        'type': schema_utils.SCHEMA_TYPE_DICT,
         'properties': [{
             'name': 'vm_id',
             'schema': {
-                'type': 'unicode'
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }, {
             'name': 'shared_secret_key',
             'schema': {
-                'type': 'unicode'
+                'type': schema_utils.SCHEMA_TYPE_UNICODE
             }
         }]
     }
@@ -210,8 +211,7 @@ class ConfigProperty(python_utils.OBJECT):
         self._name = name
         self._schema = schema
         self._description = description
-        self._default_value = schema_utils.normalize_against_schema(
-            default_value, self._schema)
+        self._default_value = self.normalize(default_value)
 
         Registry.init_config_property(self.name, self)
 
@@ -296,7 +296,9 @@ class ConfigProperty(python_utils.OBJECT):
         Returns:
             instance. The normalized object.
         """
-        return schema_utils.normalize_against_schema(value, self._schema)
+        email_validators = [{'id': 'does_not_contain_email'}]
+        return schema_utils.normalize_against_schema(
+            value, self._schema, global_validators=email_validators)
 
 
 class Registry(python_utils.OBJECT):
@@ -456,3 +458,35 @@ MAX_NUMBER_OF_EXPLORATIONS_IN_MATH_SVGS_BATCH = ConfigProperty(
 CONTRIBUTOR_DASHBOARD_IS_ENABLED = ConfigProperty(
     'contributor_dashboard_is_enabled', BOOL_SCHEMA,
     'Enable contributor dashboard page. The default value is true.', True)
+
+CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED = ConfigProperty(
+    'contributor_dashboard_reviewer_emails_is_enabled', BOOL_SCHEMA,
+    (
+        'Enable sending Contributor Dashboard reviewers email notifications '
+        'about suggestions that need review. The default value is false.'
+    ), False)
+
+ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW = ConfigProperty(
+    'notify_admins_suggestions_waiting_too_long_is_enabled', BOOL_SCHEMA,
+    (
+        'Enable sending admins email notifications if there are Contributor '
+        'Dashboard suggestions that have been waiting for a review for more '
+        'than %s days. The default value is false.' % (
+            suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS)
+    ), False)
+
+ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE = ConfigProperty(
+    'enable_admin_notifications_for_reviewer_shortage', BOOL_SCHEMA,
+    (
+        'Enable sending admins email notifications if Contributor Dashboard '
+        'reviewers are needed in specific suggestion types. The default value '
+        'is false.'
+    ), False)
+
+MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER = ConfigProperty(
+    'max_number_of_suggestions_per_reviewer',
+    INT_SCHEMA,
+    'The maximum number of Contributor Dashboard suggestions per reviewer. If '
+    'the number of suggestions per reviewer surpasses this maximum, for any '
+    'given suggestion type on the dashboard, the admins are notified by email.',
+    5)

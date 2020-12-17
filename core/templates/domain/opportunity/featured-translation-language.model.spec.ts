@@ -23,7 +23,7 @@ import {
   'domain/opportunity/featured-translation-language.model';
 
 describe('Featured Translation Language model', () => {
-  let sampleFTL: FeaturedTranslationLanguage = null;
+  let sampleFTL: FeaturedTranslationLanguage;
 
   beforeEach(() => {
     let sampleFTLDict: FeaturedTranslationLanguageBackendDict = {

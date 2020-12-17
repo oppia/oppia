@@ -33,6 +33,7 @@ import utils
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
+transaction_services = models.Registry.import_transaction_services()
 
 
 def create_new_question(committer_id, question, commit_message):
@@ -117,6 +118,7 @@ def create_new_question_skill_link(
 
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
         question_id, skill_id, skill_difficulty)
+    question_skill_link_model.update_timestamps()
     question_skill_link_model.put()
 
     if skill_id not in question.linked_skill_ids:
@@ -148,6 +150,7 @@ def update_question_skill_link_difficulty(
     if question_skill_link_model is None:
         raise Exception('The given question and skill are not linked.')
     question_skill_link_model.skill_difficulty = new_difficulty
+    question_skill_link_model.update_timestamps()
     question_skill_link_model.put()
 
 
@@ -303,14 +306,26 @@ def delete_question(
             still retained in the datastore. This last option is the preferred
             one.
     """
-    question_model = question_models.QuestionModel.get(question_id)
-    question_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
-        force_deletion=force_deletion)
 
-    question_models.QuestionSummaryModel.get(question_id).delete()
-    opportunity_services.increment_question_counts(
-        question_model.linked_skill_ids, -1)
+    def delete_question_model(question_id, committer_id, force_deletion):
+        """Inner function that is to be done in a transaction."""
+        question_model = question_models.QuestionModel.get_by_id(question_id)
+        if question_model is not None:
+            opportunity_services.increment_question_counts(
+                question_model.linked_skill_ids, -1)
+        question_models.QuestionModel.delete_multi(
+            [question_id], committer_id,
+            feconf.COMMIT_MESSAGE_QUESTION_DELETED,
+            force_deletion=force_deletion)
+
+    transaction_services.run_in_transaction(
+        delete_question_model, question_id,
+        committer_id, force_deletion=force_deletion)
+
+    question_summary_model = (
+        question_models.QuestionSummaryModel.get(question_id, False))
+    if question_summary_model is not None:
+        question_summary_model.delete()
 
 
 def get_question_skill_link_from_model(
@@ -673,6 +688,7 @@ def save_question_summary(question_summary):
         interaction_id=question_summary.interaction_id
     )
 
+    question_summary_model.update_timestamps()
     question_summary_model.put()
 
 

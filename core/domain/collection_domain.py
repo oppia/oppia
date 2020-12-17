@@ -1079,7 +1079,7 @@ class CollectionSummary(python_utils.OBJECT):
                 this collection.
             editor_ids: list(str). List of the user ids of the users who have
                 access to edit this collection.
-            viewer_ids: lsit(str). List of the user ids of the users who have
+            viewer_ids: list(str). List of the user ids of the users who have
                 view this collection.
             contributor_ids: list(str). List of the user ids of the user who
                 have contributed to  this collection.
@@ -1288,3 +1288,31 @@ class CollectionSummary(python_utils.OBJECT):
             bool. Whether the collection is solely owned by the user.
         """
         return user_id in self.owner_ids and len(self.owner_ids) == 1
+
+    def does_user_have_any_role(self, user_id):
+        """Checks if a given user has any role within the collection.
+
+        Args:
+            user_id: str. User id of the user.
+
+        Returns:
+            bool. Whether the given user has any role in the collection.
+        """
+        return (
+            user_id in self.owner_ids or
+            user_id in self.editor_ids or
+            user_id in self.viewer_ids
+        )
+
+    def add_contribution_by_user(self, contributor_id):
+        """Add a new contributor to the contributors summary.
+
+        Args:
+            contributor_id: str. ID of the contributor to be added.
+        """
+        # We don't want to record the contributions of system users.
+        if contributor_id not in constants.SYSTEM_USER_IDS:
+            self.contributors_summary[contributor_id] = (
+                self.contributors_summary.get(contributor_id, 0) + 1)
+
+        self.contributor_ids = list(self.contributors_summary.keys())

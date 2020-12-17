@@ -4,8 +4,8 @@
       <div class="oppia-contributions-navbar-items-list" navbar-label="Things to do">
         <div class="oppia-contributions-navbar-item" ng-repeat="tab in $ctrl.reviewTabs">
           <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToReviewTab(tab.suggestionType)"
-                  ng-class="$ctrl.activeReviewTab == tab.suggestionType ? 'oppia-contributions-active-navbar' : ''"><[tab.text]>
+                  ng-click="$ctrl.switchToReviewTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType)"
+                  ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''"><[tab.text]>
           </button>
         </div>
       </div>
@@ -14,8 +14,8 @@
       <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions">
         <div class="oppia-contributions-navbar-item" ng-repeat="tab in $ctrl.contributionTabs">
           <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToContributionsTab(tab.suggestionType)"
-                  ng-class="$ctrl.activeContributionTab == tab.suggestionType ? 'oppia-contributions-active-navbar' : ''"><[tab.text]>
+                  ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
+                  ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''"><[tab.text]>
           </button>
         </div>
       </div>
@@ -26,8 +26,7 @@
       <login-required-message></login-required-message>
     </div>
     <div class="oppia-login-required" ng-if="$ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
-      <opportunities-list opportunity-data-is-loading="$ctrl.contributionsDataLoading"
-                          opportunities="$ctrl.contributionSummaries"
+      <opportunities-list load-opportunities="$ctrl.loadContributions"
                           on-click-action-button="$ctrl.onClickViewSuggestion"
                           label-required="!$ctrl.activeReviewTab">
       </opportunities-list>
@@ -38,10 +37,10 @@
 <style>
   contributions-and-review .oppia-contributions-show-review {
     display: flex;
-    height: 70vh;
     justify-content: center;
     margin: auto;
     max-width: 1200px;
+    min-height: 70vh;
     width: 80%;
   }
 
@@ -54,7 +53,6 @@
 
   contributions-and-review .oppia-contributions-show-review-container {
     background-color: white;
-    overflow-y: auto;
     width: 75%;
   }
   contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar {

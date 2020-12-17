@@ -16,6 +16,8 @@
  * @fileoverview Directive for the learner's view of a collection.
  */
 
+import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.component.ts');
@@ -23,8 +25,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.component.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
-
-require('domain/collection/CollectionPlaythroughObjectFactory.ts');
 require('domain/collection/guest-collection-progress.service.ts');
 require('domain/collection/read-only-collection-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -55,18 +55,16 @@ angular.module('oppia').directive('collectionPlayerPage', [
         '/pages/collection-player-page/collection-player-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$http', '$location', '$scope', 'AlertsService',
-        'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
-        'LoaderService', 'PageTitleService',
-        'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
-        'UrlService', 'UserService',
+        '$anchorScroll', '$http', '$location', '$rootScope', '$scope',
+        'AlertsService', 'GuestCollectionProgressService', 'LoaderService',
+        'PageTitleService', 'ReadOnlyCollectionBackendApiService',
+        'UrlInterpolationService', 'UrlService', 'UserService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
-            $anchorScroll, $http, $location, $scope, AlertsService,
-            CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
-            LoaderService, PageTitleService,
-            ReadOnlyCollectionBackendApiService, UrlInterpolationService,
-            UrlService, UserService,
+            $anchorScroll, $http, $location, $rootScope, $scope,
+            AlertsService, GuestCollectionProgressService, LoaderService,
+            PageTitleService, ReadOnlyCollectionBackendApiService,
+            UrlInterpolationService, UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
           ctrl.getStaticImageUrl = function(imagePath) {
@@ -325,13 +323,13 @@ angular.module('oppia').directive('collectionPlayerPage', [
                       GuestCollectionProgressService
                         .hasCompletedSomeExploration(ctrl.collectionId)) {
                     var completedExplorationIds = (
-                      GuestCollectionProgressService.getCompletedExplorationIds(
-                        ctrl.collection));
+                      GuestCollectionProgressService
+                        .getCompletedExplorationIds(ctrl.collection));
                     var nextExplorationId = (
                       GuestCollectionProgressService.getNextExplorationId(
                         ctrl.collection, completedExplorationIds));
                     ctrl.collectionPlaythrough = (
-                      CollectionPlaythroughObjectFactory.create(
+                      CollectionPlaythrough.create(
                         nextExplorationId, completedExplorationIds));
                   } else {
                     ctrl.collectionPlaythrough = collection.getPlaythrough();
@@ -340,10 +338,14 @@ angular.module('oppia').directive('collectionPlayerPage', [
                     ctrl.collectionPlaythrough.getNextExplorationId();
 
                   ctrl.isCompletedExploration = function(explorationId) {
-                    var completedExplorationIds = (
-                      ctrl.collectionPlaythrough.getCompletedExplorationIds());
-                    return completedExplorationIds.indexOf(explorationId) > -1;
+                    var completedExplorationIds = ctrl.collectionPlaythrough
+                      .getCompletedExplorationIds();
+                    return completedExplorationIds.indexOf(
+                      explorationId) > -1;
                   };
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the controller is migrated to angular.
+                  $rootScope.$applyAsync();
                 });
               },
               function() {

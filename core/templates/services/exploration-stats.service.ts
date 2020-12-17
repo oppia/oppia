@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+  'domain/statistics/exploration-stats.model';
 import { ExplorationStatsBackendApiService } from
   'services/exploration-stats-backend-api.service';
 
@@ -37,7 +37,8 @@ export class ExplorationStatsService {
   getExplorationStats(expId: string): Promise<ExplorationStats> {
     if (this.statsCache === null) {
       this.statsCache = (
-        this.explorationStatsBackendApiService.fetchExplorationStats(expId));
+        this.explorationStatsBackendApiService.fetchExplorationStatsAsync(
+          expId));
     }
     return this.statsCache;
   }

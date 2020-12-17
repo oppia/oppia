@@ -16,13 +16,20 @@
  * @fileoverview Unit tests for the splash page.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+
+import { UserService } from 'services/user.service';
+
 require('pages/splash-page/splash-page.component.ts');
+
+import constants from 'assets/constants';
 
 describe('Splash Page', function() {
   var $scope = null, ctrl = null;
   var $timeout = null;
   var $q = null;
-  var UserService = null;
+  var userService: UserService = null;
   var LoaderService = null;
   var loadingMessage = null;
   var SiteAnalyticsService = null;
@@ -34,13 +41,19 @@ describe('Splash Page', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('WindowRef', windowRefMock);
+    $provide.value('UserService', TestBed.get(UserService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');
     $q = $injector.get('$q');
-    UserService = $injector.get('UserService');
+    userService = $injector.get('UserService');
     LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
@@ -81,14 +94,15 @@ describe('Splash Page', function() {
     expect(startLoginEventSpy).toHaveBeenCalled();
   });
 
-  it('should redirect to library page', function() {
+  it('should redirect to default classroom page', function() {
     var clickBrowseLibraryButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
+      SiteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
       .and.callThrough();
-    ctrl.onClickBrowseLibraryButton();
+    ctrl.onClickBrowseLessonsButton();
     $timeout.flush(150);
 
-    expect(windowRefMock.nativeWindow.location).toBe('/community-library');
+    expect(windowRefMock.nativeWindow.location).toBe(
+      `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
     expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
   });
 
@@ -105,7 +119,7 @@ describe('Splash Page', function() {
   });
 
   it('should evaluate if user is logged in', function() {
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
+    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
         isLoggedIn: function() {
@@ -125,7 +139,7 @@ describe('Splash Page', function() {
   });
 
   it('should evaluate if user is not logged in', function() {
-    spyOn(UserService, 'getUserInfoAsync').and.callFake(function() {
+    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve({
         isLoggedIn: function() {

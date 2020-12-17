@@ -26,7 +26,7 @@ import {
   ExplorationOpportunitySummaryBackendDict
 } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { SkillOpportunity, SkillOpportunityBackendDict } from
-  'domain/opportunity/SkillOpportunityObjectFactory';
+  'domain/opportunity/skill-opportunity.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import {
@@ -34,7 +34,7 @@ import {
   FeaturedTranslationLanguageBackendDict,
 } from 'domain/opportunity/featured-translation-language.model';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 interface SkillContributionOpportunitiesBackendDict {
   'opportunities': SkillOpportunityBackendDict[];

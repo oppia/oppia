@@ -15,11 +15,15 @@
 /**
  * @fileoverview Unit tests for CreateNewStoryModalController.
  */
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
-import { NewlyCreatedStoryObjectFactory } from
-  'domain/topic/NewlyCreatedStoryObjectFactory';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 
-const CONSTANTS = require('constants.ts');
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
+
+import CONSTANTS from 'assets/constants';
 
 describe('Create New Story Modal Controller', function() {
   var $scope = null;
@@ -27,10 +31,20 @@ describe('Create New Story Modal Controller', function() {
   var ImageLocalStorageService = null;
   var StoryEditorStateService = null;
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [EditableStoryBackendApiService]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'NewlyCreatedStoryObjectFactory', new NewlyCreatedStoryObjectFactory());
+      'EditableStoryBackendApiService',
+      TestBed.get(EditableStoryBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {

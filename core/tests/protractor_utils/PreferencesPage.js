@@ -53,6 +53,10 @@ var PreferencesPage = function() {
     by.css('.protractor-test-photo-crop .cropper-container'));
   var profilePhotoUploadError = element(
     by.css('.protractor-test-upload-error'));
+  var deleteAccountButton = element(
+    by.css('.protractor-test-delete-account-button'));
+  var exportAccountButton = element(
+    by.css('.protractor-test-export-account-button'));
 
   var saveNewChanges = async function(fieldName) {
     await navBar.click();
@@ -189,6 +193,16 @@ var PreferencesPage = function() {
     await action.click(
       'Learner Dashboard radio', learnerDashboardRadio);
     await saveNewChanges('Learner Dashboard Option');
+  };
+
+  this.clickDeleteAccountButton = async function() {
+    await action.click(
+      'Delete Account button', deleteAccountButton);
+  };
+
+  this.clickExportAccountButton = async function() {
+    await action.click(
+      'Export Account button', exportAccountButton);
   };
 };
 

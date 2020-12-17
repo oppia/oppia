@@ -10,6 +10,11 @@
 
 /**
  * @fileoverview Definitions for rich text components.
+ *
+ * NOTE TO DEVELOPERS: If a new inline element is added (i.e 'is_block_element'
+ * is false), then make sure to add .cke_widget_<element id> {display: inline;}
+ * style to the element's directive HTML and add a CSS style similar to
+ * oppia-noninteractive-link in oppia.css for the new directive.
  */
 
 export = {
@@ -78,7 +83,8 @@ export = {
           "id": "is_nonempty"
         }],
         "ui_config": {
-          "placeholder": "Description of Image (Example : George Handel, 18th century baroque composer)"
+          "placeholder": "Description of Image (Example : George Handel, 18th century baroque composer)",
+          "rows": 3
         }
       },
       "default_value": ""

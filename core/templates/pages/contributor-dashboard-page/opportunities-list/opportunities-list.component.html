@@ -1,24 +1,33 @@
 <div class="oppia-opportunities-list">
-  <div infinite-scroll="$ctrl.onLoadMoreOpportunities()"
-       infinite-scroll-distance="1"
-       infinite-scroll-disabled="false">
-    <div ng-repeat="opportunity in $ctrl.getOpportunities()">
-      <opportunities-list-item opportunity="opportunity"
-                               on-click-action-button="$ctrl.onClickActionButton"
-                               progress-bar-required="$ctrl.isProgressBarRequired()"
-                               label-required="$ctrl.isLabelRequired()"
-                               opportunity-heading-truncation-length="$ctrl.getOpportunityHeadingTruncationLength()">
-      </opportunities-list-item>
-    </div>
+  <div ng-repeat="opportunity in $ctrl.visibleOpportunities track by $index">
+    <opportunities-list-item opportunity="opportunity"
+                             on-click-action-button="$ctrl.onClickActionButton"
+                             progress-bar-required="$ctrl.progressBarRequired"
+                             label-required="$ctrl.labelRequired"
+                             opportunity-heading-truncation-length="$ctrl.opportunityHeadingTruncationLength">
+    </opportunities-list-item>
   </div>
-  <div ng-show="opportunityDataIsLoading" class="protractor-test-opportunity-loading-placeholder">
+  <div ng-show="$ctrl.loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
     <opportunities-list-item></opportunities-list-item>
     <opportunities-list-item></opportunities-list-item>
   </div>
-  <div class="oppia-end-availability" ng-if="!$ctrl.opportunityDataIsLoading && !$ctrl.isMoreOpportunitiesAvailable()">
+  <div class="oppia-opportunity-pagination-contaniner" ng-if="$ctrl.visibleOpportunities.length > 0">
+    <button type="button"
+            class="oppia-pagination-button"
+            ng-click="$ctrl.gotoPage($ctrl.activePageNumber - 1)"
+            ng-disabled="$ctrl.activePageNumber == 1">
+      <span class="material-icons">navigate_before</span>Previous
+    </button>
+    <button type="button"
+            class="oppia-pagination-button"
+            ng-click="$ctrl.gotoPage($ctrl.activePageNumber + 1)"
+            ng-disabled="$ctrl.loadingOpportunityData || $ctrl.activePageNumber >= $ctrl.lastPageNumber">
+      Next<span class="material-icons">navigate_next</span>
+    </button>
+  </div>
+  <div class="oppia-end-availability" ng-show="$ctrl.visibleOpportunities.length === 0 && !$ctrl.loadingOpportunityData">
     <div class="oppia-end-availability-line"></div>
-    <div class="oppia-opportunity-availablity-message protractor-test-opportunity-list-empty-availability-message" ng-show="$ctrl.getOpportunities().length === 0">No opportunity available!</div>
-    <div class="oppia-opportunity-availablity-message" ng-if="$ctrl.getOpportunities().length !== 0">End of results.</div>
+    <div class="oppia-opportunity-availablity-message protractor-test-opportunity-list-empty-availability-message">No opportunity available!</div>
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>
@@ -46,6 +55,35 @@
     overflow: auto;
     width: 80%;
   }
+  .oppia-opportunity-pagination-contaniner {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    width: 100%;
+  }
+  .oppia-pagination-button {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    color: #009688;
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 40px;
+    min-width: 100px;
+    text-align: center;
+  }
+
+  .oppia-pagination-button:hover {
+    border: 2px solid #009688;
+    border-radius: 5px;
+  }
+  .oppia-pagination-button[disabled] {
+    color: #a9e5df;
+  }
+  .oppia-pagination-button[disabled]:hover {
+    border: none;
+  }
+
   /* All of the css for opportunities-list-item is added here to avoid having duplicate css properties.*/
   .oppia-opportunities-button {
     background-color: #ffffff;

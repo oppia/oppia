@@ -20,24 +20,24 @@
 import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationTaskType } from
-  'domain/improvements/ExplorationTaskObjectFactory';
+  'domain/improvements/exploration-task.model';
 import { HighBounceRateTask } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+  'domain/improvements/high-bounce-rate-task.model';
 import { IneffectiveFeedbackLoopTask } from
-  'domain/improvements/IneffectiveFeedbackLoopTaskObjectFactory';
+  'domain/improvements/ineffective-feedback-loop-task.model';
 import { NeedsGuidingResponsesTask } from
-  'domain/improvements/NeedsGuidingResponsesTaskObjectFactory';
+  'domain/improvements/needs-guiding-response-task.model';
 import { SuccessiveIncorrectAnswersTask } from
-  'domain/improvements/SuccessiveIncorrectAnswersTaskObjectFactory';
+  'domain/improvements/successive-incorrect-answers-task.model';
 import { StateStats } from 'domain/statistics/state-stats-model';
 import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+  'domain/statistics/exploration-stats.model';
 import { ExplorationImprovementsTaskRegistryService } from
   'services/exploration-improvements-task-registry.service';
 
 // TODO(#7222): Remove usages of UpgradedServices. Used here because too many
 // indirect AngularJS dependencies are required for the improvements tab.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require(
   'pages/exploration-editor-page/improvements-tab/' +
@@ -48,12 +48,7 @@ describe('Improvements tab', function() {
 
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
 
-  beforeEach(angular.mock.module('oppia', $provide => {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  importAllAngularServices();
 
   beforeEach(angular.mock.inject(function(
       $componentController, $rootScope, _ExplorationImprovementsService_,

@@ -70,10 +70,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_does_diff_include_ts_files(unused_diff_files):
             return self.does_diff_include_ts_files
 
-        self.does_diff_include_travis_yml_or_js_files = False
-        def mock_does_diff_include_travis_yml_or_js_files(
+        self.does_diff_include_ci_config_or_js_files = False
+        def mock_does_diff_include_ci_config_or_js_files(
                 unused_diff_files):
-            return self.does_diff_include_travis_yml_or_js_files
+            return self.does_diff_include_ci_config_or_js_files
 
         def mock_check_backend_python_library_for_inconsistencies():
             return
@@ -102,10 +102,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.ts_swap = self.swap(
             pre_push_hook, 'does_diff_include_ts_files',
             mock_does_diff_include_ts_files)
-        self.travis_yml_or_js_files_swap = self.swap(
+        self.ci_config_or_js_files_swap = self.swap(
             pre_push_hook,
-            'does_diff_include_travis_yml_or_js_files',
-            mock_does_diff_include_travis_yml_or_js_files)
+            'does_diff_include_ci_config_or_js_files',
+            mock_does_diff_include_ci_config_or_js_files)
 
     def test_start_subprocess_for_result(self):
         with self.popen_swap:
@@ -250,27 +250,63 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_compare_to_remote(self):
         check_function_calls = {
             'start_subprocess_for_result_is_called': False,
-            'git_diff_name_status_is_called': False
+            'git_diff_name_status_is_called': False,
+            'get_merge_base_is_called': False,
         }
         expected_check_function_calls = {
             'start_subprocess_for_result_is_called': True,
-            'git_diff_name_status_is_called': True
+            'git_diff_name_status_is_called': True,
+            'get_merge_base_is_called': True,
         }
         def mock_start_subprocess_for_result(unused_cmd_tokens):
             check_function_calls['start_subprocess_for_result_is_called'] = True
         def mock_git_diff_name_status(unused_left, unused_right):
             check_function_calls['git_diff_name_status_is_called'] = True
             return 'Test'
+        def mock_get_merge_base(unused_left, unused_right):
+            check_function_calls['get_merge_base_is_called'] = True
+            return 'Merge Base'
         subprocess_swap = self.swap(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
         git_diff_swap = self.swap(
             pre_push_hook, 'git_diff_name_status', mock_git_diff_name_status)
+        get_merge_base_swap = self.swap(
+            pre_push_hook, 'get_merge_base', mock_get_merge_base)
 
-        with subprocess_swap, git_diff_swap:
+        with subprocess_swap, git_diff_swap, get_merge_base_swap:
             self.assertEqual(
                 pre_push_hook.compare_to_remote('remote', 'local branch'),
                 'Test')
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_get_merge_base_reports_error(self):
+        def mock_start_subprocess_for_result(unused_cmd_tokens):
+            return None, 'Test'
+        subprocess_swap = self.swap(
+            pre_push_hook, 'start_subprocess_for_result',
+            mock_start_subprocess_for_result)
+
+        with subprocess_swap, self.assertRaisesRegexp(ValueError, 'Test'):
+            pre_push_hook.get_merge_base('A', 'B')
+
+    def test_get_merge_base_returns_merge_base(self):
+        check_function_calls = {
+            'start_subprocess_for_result_is_called': False,
+        }
+        expected_check_function_calls = {
+            'start_subprocess_for_result_is_called': True,
+        }
+        def mock_start_subprocess_for_result(unused_cmd_tokens):
+            check_function_calls['start_subprocess_for_result_is_called'] = True
+            return 'Test', None
+        subprocess_swap = self.swap(
+            pre_push_hook, 'start_subprocess_for_result',
+            mock_start_subprocess_for_result)
+
+        with subprocess_swap:
+            self.assertEqual(pre_push_hook.get_merge_base('A', 'B'), 'Test')
+
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_extract_files_to_lint_with_empty_file_diffs(self):
@@ -398,7 +434,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertTrue(
-            'pre-push hook file is now executable!'in self.print_arr)
+            'pre-push hook file is now executable!' in self.print_arr)
 
     def test_install_hook_with_error_in_making_pre_push_executable(self):
         def mock_islink(unused_file):
@@ -518,7 +554,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue('Removing broken symlink' in self.print_arr)
         self.assertTrue(
-            'pre-push hook file is now executable!'in self.print_arr)
+            'pre-push hook file is now executable!' in self.print_arr)
 
     def test_does_diff_include_js_or_ts_files_with_js_file(self):
         self.assertTrue(
@@ -540,14 +576,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.does_diff_include_ts_files(
                 ['file1.html', 'file2.yml', 'file3.js']))
 
-    def test_does_diff_include_travis_yml_or_js_files(self):
+    def test_does_diff_include_ci_config_or_js_files(self):
         self.assertTrue(
-            pre_push_hook.does_diff_include_travis_yml_or_js_files(
-                ['file1.js', 'protractor.conf.js', '.travis.yml']))
+            pre_push_hook.does_diff_include_ci_config_or_js_files(
+                ['file1.js', 'protractor.conf.js', 'e2e_dummy.yml']))
 
-    def test_does_diff_include_travis_yml_or_js_files_fail(self):
+    def test_does_diff_include_ci_config_or_js_files_fail(self):
         self.assertFalse(
-            pre_push_hook.does_diff_include_travis_yml_or_js_files(
+            pre_push_hook.does_diff_include_ci_config_or_js_files(
                 ['file1.ts', 'file2.ts', 'file3.html']))
 
     def test_repo_in_dirty_state(self):
@@ -651,8 +687,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
 
-    def test_invalid_travis_e2e_test_suites_failure(self):
-        self.does_diff_include_travis_yml_or_js_files = True
+    def test_invalid_ci_e2e_test_suites_failure(self):
+        self.does_diff_include_ci_config_or_js_files = True
 
         def mock_run_script_and_get_returncode(unused_script):
             return 1
@@ -663,7 +699,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with run_script_and_get_returncode_swap:
-                        with self.travis_yml_or_js_files_swap:
+                        with self.ci_config_or_js_files_swap:
                             with self.assertRaisesRegexp(SystemExit, '1'):
                                 with self.swap_check_backend_python_libs:
                                     pre_push_hook.main(args=[])

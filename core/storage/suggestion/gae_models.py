@@ -106,6 +106,16 @@ THRESHOLD_DAYS_BEFORE_ACCEPT = 7
 THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
     THRESHOLD_DAYS_BEFORE_ACCEPT * 24 * 60 * 60 * 1000)
 
+# Threshold number of days after which to notify the admin that the
+# suggestion has waited too long for a review. The admin will be notified of the
+# top MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN number of suggestions that have
+# waited for a review longer than the threshold number of days.
+SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS = 7
+
+# The maximum number of suggestions, that have been waiting too long for review,
+# to email admins about.
+MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN = 10
+
 # The default message to be shown when accepting stale suggestions.
 DEFAULT_SUGGESTION_ACCEPT_MESSAGE = (
     'Automatically accepting suggestion after'
@@ -143,6 +153,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
     linked to the suggestion.
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # The type of suggestion.
     suggestion_type = datastore_services.StringProperty(
         required=True, indexed=True, choices=SUGGESTION_TYPE_CHOICES)
@@ -176,12 +189,21 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General suggestion needs to be pseudonymized for the user."""
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
+        """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple unshared instance since there
+        are multiple suggestions per user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -189,11 +211,13 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'target_version_at_submission':
                 base_models.EXPORT_POLICY.EXPORTED,
             'status': base_models.EXPORT_POLICY.EXPORTED,
-            'author_id': base_models.EXPORT_POLICY.EXPORTED,
-            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            # The author_id and final_reviewer_id are not exported since
+            # we do not want to reveal internal user ids.
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
-            'score_category': base_models.EXPORT_POLICY.EXPORTED,
-            'language_code': base_models.EXPORT_POLICY.EXPORTED
+            'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -276,6 +300,28 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_translation_suggestions_in_review_with_exp_id(cls, exp_id):
+        """Returns translation suggestions which are in review with target_id
+        == exp_id.
+
+        Args:
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of translation suggestions in review
+            with target_id of exp_id. The number of returned results is capped
+            by feconf.DEFAULT_QUERY_LIMIT.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.target_id == exp_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
+
+    @classmethod
     def get_translation_suggestion_ids_with_exp_ids(cls, exp_ids):
         """Gets the ids of translation suggestions corresponding to
         explorations with the given exploration ids.
@@ -318,6 +364,38 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.status == STATUS_IN_REVIEW).filter(
                 cls.last_updated < threshold_time).fetch()
         return [suggestion_model.id for suggestion_model in suggestion_models]
+
+    @classmethod
+    def get_suggestions_waiting_too_long_for_review(cls):
+        """Returns a list of suggestions that have been waiting for a review
+        longer than SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS days on the
+        Contributor Dashboard. MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN
+        suggestions are returned, sorted in descending order by their review
+        wait time.
+
+        Returns:
+            list(GeneralSuggestionModel). A list of suggestions, sorted in
+            descending order by their review wait time.
+
+        Raises:
+            Exception. If there are no suggestion types offered on the
+                Contributor Dashboard.
+        """
+        if not CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES:
+            raise Exception(
+                'Expected the suggestion types offered on the Contributor '
+                'Dashboard to be nonempty.')
+        threshold_time = (
+            datetime.datetime.utcnow() - datetime.timedelta(
+                days=SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS))
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.last_updated < threshold_time)
+            .filter(cls.suggestion_type.IN(
+                CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES))
+            .order(cls.last_updated)
+            .fetch(MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_ADMIN))
 
     @classmethod
     def get_in_review_suggestions_in_score_categories(
@@ -474,6 +552,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     The ID of the voiceover application will be a random hashed value.
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.
     target_type = datastore_services.StringProperty(required=True, indexed=True)
@@ -502,8 +583,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General voiceover application needs to be pseudonymized for the
-        user.
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
@@ -579,9 +660,16 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there are
+        multiple voiceover applications relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -589,8 +677,10 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             'status': base_models.EXPORT_POLICY.EXPORTED,
             'content': base_models.EXPORT_POLICY.EXPORTED,
             'filename': base_models.EXPORT_POLICY.EXPORTED,
-            'author_id': base_models.EXPORT_POLICY.EXPORTED,
-            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            # The author_id and final_reviewer_id are not exported in order to
+            # keep internal ids private.
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rejection_message': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -628,6 +718,9 @@ class CommunityContributionStatsModel(base_models.BaseModel):
     total number of reviewers for each suggestion type and the total number of
     suggestions in review for each suggestion type. There is only ever one
     instance of this model, and its ID is COMMUNITY_CONTRIBUTION_STATS_MODEL_ID.
+
+    Note: since this is a singleton model, the model GET and PUT must be done in
+    a transaction to avoid the loss of updates that come in rapid succession.
     """
 
     # A dictionary where the keys represent the language codes that translation
@@ -670,6 +763,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
                 question_reviewer_count=0,
                 question_suggestion_count=0
             )
+            community_contribution_stats_model.update_timestamps()
             community_contribution_stats_model.put()
             return community_contribution_stats_model
 
@@ -680,15 +774,21 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """This model only contains general statistical information about the
+        contributor dashboard and does not include any individual user
+        information.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
+        """Model doesn't contain any data directly corresponding to a user
+        because the data is aggregated.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'translation_reviewer_counts_by_lang_code':

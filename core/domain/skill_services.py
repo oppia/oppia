@@ -777,10 +777,8 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
-    skill_model = skill_models.SkillModel.get(skill_id)
-    skill_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
-        force_deletion=force_deletion)
+    skill_models.SkillModel.delete_multi(
+        [skill_id], committer_id, '', force_deletion=force_deletion)
 
     # This must come after the skill is retrieved. Otherwise the memcache
     # key will be reinstated.
@@ -803,7 +801,10 @@ def delete_skill_summary(skill_id):
             be deleted.
     """
 
-    skill_models.SkillSummaryModel.get(skill_id).delete()
+    skill_summary_model = (
+        skill_models.SkillSummaryModel.get(skill_id, False))
+    if skill_summary_model is not None:
+        skill_summary_model.delete()
 
 
 def compute_summary_of_skill(skill):
@@ -865,10 +866,13 @@ def save_skill_summary(skill_summary):
         skill_models.SkillSummaryModel.get_by_id(skill_summary.id))
     if skill_summary_model is not None:
         skill_summary_model.populate(**skill_summary_dict)
+        skill_summary_model.update_timestamps()
         skill_summary_model.put()
     else:
         skill_summary_dict['id'] = skill_summary.id
-        skill_models.SkillSummaryModel(**skill_summary_dict).put()
+        model = skill_models.SkillSummaryModel(**skill_summary_dict)
+        model.update_timestamps()
+        model.put()
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
@@ -898,6 +902,7 @@ def save_user_skill_mastery(user_skill_mastery):
         skill_id=user_skill_mastery.skill_id,
         degree_of_mastery=user_skill_mastery.degree_of_mastery)
 
+    user_skill_mastery_model.update_timestamps()
     user_skill_mastery_model.put()
 
 
@@ -918,6 +923,8 @@ def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
                 user_id, skill_id),
             user_id=user_id, skill_id=skill_id,
             degree_of_mastery=degree_of_mastery))
+    user_models.UserSkillMasteryModel.update_timestamps_multi(
+        user_skill_mastery_models)
     user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
 
 

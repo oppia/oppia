@@ -16,12 +16,17 @@
  * @fileoverview Unit tests for ChangeQuestionDifficultyModalController.
  */
 
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
+
 describe('Change Question Difficulty Modal Controller', function() {
   let $scope = null;
   let $uibModalInstance = null;
 
   const linkedSkillsWithDifficulty = {};
   const skillIdToRubricsObject = 'skill1';
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {

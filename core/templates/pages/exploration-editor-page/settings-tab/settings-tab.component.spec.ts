@@ -44,8 +44,11 @@ import { UserExplorationPermissionsService } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 import { Subscription } from 'rxjs';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -96,6 +99,8 @@ describe('Settings Tab Component', function() {
     isWindowNarrow: () => true
   };
 
+  importAllAngularServices();
+
   beforeEach(function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
@@ -134,6 +139,9 @@ describe('Settings Tab Component', function() {
       getData: () => $q.resolve(),
       autosaveChangeList: () => {}
     });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   afterEach(() => {

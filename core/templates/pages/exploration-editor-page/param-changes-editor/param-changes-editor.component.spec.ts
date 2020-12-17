@@ -16,35 +16,37 @@
  * @fileoverview Unit tests for paramChangesEditor.
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { StateParamChangesService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-param-changes.service';
-import { AlertsService } from 'services/alerts.service';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
+import { EventEmitter, destroyPlatform } from '@angular/core';
+import { async, TestBed } from '@angular/core/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateParamChangesService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-param-changes.service';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
+import { AnswerGroupsCacheService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { StateEditorRefreshService } from
+  'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { AlertsService } from 'services/alerts.service';
+import { importAllAngularServices, setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
+import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
 describe('Param Changes Editor Component', function() {
   var ctrl = null;
@@ -62,6 +64,8 @@ describe('Param Changes Editor Component', function() {
   var postSaveHookSpy = jasmine.createSpy('postSaveHook', () => {});
 
   var mockExternalSaveEventEmitter = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -126,7 +130,7 @@ describe('Param Changes Editor Component', function() {
     }, {
       paramChangesService: stateParamChangesService,
       postSaveHook: postSaveHookSpy,
-      isCurrentlyInSettingsTab: () => false
+      isCurrentlyInSettingsTab: false
     });
     ctrl.$onInit();
   }));
@@ -399,4 +403,18 @@ describe('Param Changes Editor Component', function() {
       text: 'y'
     }]);
   });
+});
+
+describe('Upgraded component', () => {
+  beforeEach(() => destroyPlatform());
+  afterEach(() => destroyPlatform());
+  it('should create the upgraded component', async(() => {
+    setupAndGetUpgradedComponent(
+      'param-changes-editor',
+      'paramChangesEditor',
+      [ParamChangesEditorDirective]
+    ).then(
+      textContext => expect(textContext).toBe('Hello Oppia!')
+    );
+  }));
 });

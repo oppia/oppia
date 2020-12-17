@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
 import { StateObjectsBackendDict } from
@@ -22,11 +21,11 @@ import { ExplorationPermissions } from
   'domain/exploration/exploration-permissions.model';
 import { ExplorationImprovementsConfig } from
   'domain/improvements/exploration-improvements-config.model';
-import { HighBounceRateTaskObjectFactory } from
-  'domain/improvements/HighBounceRateTaskObjectFactory';
+import { HighBounceRateTask } from
+  'domain/improvements/high-bounce-rate-task.model';
 import { StateBackendDict } from 'domain/state/StateObjectFactory';
 import { ExplorationStats } from
-  'domain/statistics/ExplorationStatsObjectFactory';
+  'domain/statistics/exploration-stats.model';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { StateStats } from 'domain/statistics/state-stats-model';
@@ -45,7 +44,7 @@ import { StateTopAnswersStatsService } from
   'services/state-top-answers-stats.service';
 
 // TODO(#7222): Remove usage of UpgradedServices once upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 /**
  * @fileoverview Tests for ExplorationImprovementsService.
@@ -62,7 +61,6 @@ describe('ExplorationImprovementsService', function() {
   let explorationImprovementsTaskRegistryService:
     ExplorationImprovementsTaskRegistryService;
   let explorationStatsService: ExplorationStatsService;
-  let highBounceRateTaskObjectFactory: HighBounceRateTaskObjectFactory;
   let playthroughObjectFactory: PlaythroughObjectFactory;
   let playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
   let stateTopAnswersStatsService: StateTopAnswersStatsService;
@@ -145,15 +143,9 @@ describe('ExplorationImprovementsService', function() {
       new ExplorationPermissions(null, null, null, null, null, null, canEdit));
   };
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (const [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject($injector => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+  importAllAngularServices();
 
+  beforeEach(angular.mock.inject($injector => {
     $uibModal = $injector.get('$uibModal');
     changeListService = $injector.get('ChangeListService');
     contextService = $injector.get('ContextService');
@@ -168,8 +160,6 @@ describe('ExplorationImprovementsService', function() {
     explorationStatsService = $injector.get('ExplorationStatsService');
     playthroughIssuesBackendApiService = (
       $injector.get('PlaythroughIssuesBackendApiService'));
-    highBounceRateTaskObjectFactory = (
-      $injector.get('HighBounceRateTaskObjectFactory'));
     playthroughObjectFactory = $injector.get('PlaythroughObjectFactory');
     stateTopAnswersStatsService = $injector.get('StateTopAnswersStatsService');
     userExplorationPermissionsService = (
@@ -388,7 +378,7 @@ describe('ExplorationImprovementsService', function() {
       this.essGetExplorationStatsSpy.and.returnValue(Promise.resolve(expStats));
 
       // Mock a preexisting open HBR task provided by the back-end.
-      const hbrTask = highBounceRateTaskObjectFactory.createFromBackendDict({
+      const hbrTask = HighBounceRateTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: expId,
         entity_version: expVersion,
