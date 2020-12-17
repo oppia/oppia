@@ -215,15 +215,13 @@ class BaseModel(datastore_services.Model):
         return {}
 
     @classmethod
-    def get(cls, entity_id, strict=True, return_deleted=False):
+    def get(cls, entity_id, strict=True):
         """Gets an entity by id.
 
         Args:
             entity_id: str. The entity id.
             strict: bool. Whether to fail noisily if no entity with the given id
                 exists in the datastore. Default is True.
-            return_deleted: bool. Whether to return entity even if it is marked
-                as deleted. in the Default is False.
 
         Returns:
             None|*. None, if strict == False and no undeleted entity with the
@@ -236,7 +234,7 @@ class BaseModel(datastore_services.Model):
                 datastore.
         """
         entity = cls.get_by_id(entity_id)
-        if entity and entity.deleted and not return_deleted:
+        if entity and entity.deleted:
             entity = None
 
         if strict and entity is None:

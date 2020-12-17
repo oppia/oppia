@@ -2887,8 +2887,21 @@ class UserIdentifiersModel(base_models.BaseModel):
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @classmethod
+    def get_by_gae_id(cls, gae_id):
+        """Get an entry by GAE ID.
+
+        Args:
+            gae_id: str. The GAE ID.
+
+        Returns:
+            UserIdentifiersModel. The model with ID field equal to gae_id
+            argument.
+        """
+        return cls.get_by_id(gae_id)
+
+    @classmethod
     def get_by_user_id(cls, user_id):
-        """Fetch a entry by user ID.
+        """Fetch an entry by user ID.
 
         Args:
             user_id: str. The user ID.
@@ -2897,4 +2910,4 @@ class UserIdentifiersModel(base_models.BaseModel):
             UserIdentifiersModel. The model with user_id field equal to user_id
             argument.
         """
-        return cls.query(cls.user_id == user_id).get()
+        return cls.query.filter(cls.user_id == user_id).get()

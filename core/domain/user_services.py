@@ -774,8 +774,7 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
         Exception. The value of strict is True and given gae_id does not exist.
     """
     user_identifiers_model = (
-        user_models.UserIdentifiersModel.get(
-            gae_id, strict=False, return_deleted=True))
+        user_models.UserIdentifiersModel.get_by_gae_id(gae_id))
     user_id = (
         user_identifiers_model.user_id
         if user_identifiers_model is not None else None
