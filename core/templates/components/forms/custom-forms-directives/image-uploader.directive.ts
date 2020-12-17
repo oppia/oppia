@@ -38,7 +38,7 @@ angular.module('oppia').directive('imageUploader', [
         errorMessage: '@',
         width: '@',
         getAllowedImageFormats: '&allowedImageFormats',
-        backgroundWhileUploading: '@'
+        backgroundWhileUploading: '<'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
