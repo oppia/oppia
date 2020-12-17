@@ -18,11 +18,15 @@
  */
 
 import { EventEmitter } from '@angular/core';
+import { SpyLocation } from '@angular/common/testing';
+import { Location } from '@angular/common';
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
+import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
+import { angularServices } from 'services/angular-services.index';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
+
 
 describe('Topic editor tab directive', function() {
   importAllAngularServices();
@@ -39,6 +43,7 @@ describe('Topic editor tab directive', function() {
   var skillSummary = null;
   var story1 = null;
   var story2 = null;
+  let topicEditorRoutingService : TopicEditorRoutingService;
   var directive = null;
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
@@ -50,7 +55,6 @@ describe('Topic editor tab directive', function() {
   var SubtopicObjectFactory = null;
   var StoryReferenceObjectFactory = null;
   var UndoRedoService = null;
-  var TopicEditorRoutingService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
 
   var mockTasdReinitializedEventEmitter = null;
@@ -65,6 +69,23 @@ describe('Topic editor tab directive', function() {
     }
   };
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        TopicEditorRoutingService,
+        {provide: Location, useClass: SpyLocation}]
+    });
+  });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    for (let servicePair of angularServices) {
+      $provide.value(
+        servicePair[0], TestBed.get(servicePair[1]));
+    }
+    $provide.value(
+      'TopicEditorRoutingService', TestBed.get(TopicEditorRoutingService));
+    topicEditorRoutingService = TestBed.get(TopicEditorRoutingService);
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
@@ -91,7 +112,6 @@ describe('Topic editor tab directive', function() {
     EntityCreationService = $injector.get('EntityCreationService');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
-    TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
     mockTasdReinitializedEventEmitter = new EventEmitter();
 
     topicInitializedEventEmitter = new EventEmitter();
@@ -115,7 +135,6 @@ describe('Topic editor tab directive', function() {
       SkillCreationService: SkillCreationService,
       UndoRedoService: UndoRedoService,
       TopicUpdateService: TopicUpdateService,
-      TopicEditorRoutingService: TopicEditorRoutingService,
       WindowDimensionsService: MockWindowDimensionsService,
       StoryCreationService: StoryCreationService,
       TopicEditorStateService: TopicEditorStateService,
@@ -408,7 +427,7 @@ describe('Topic editor tab directive', function() {
 
   it('should call TopicEditorRoutingService to navigate to skill', function() {
     var topicThumbnailBGSpy = (
-      spyOn(TopicEditorRoutingService, 'navigateToSkillEditorWithId'));
+      spyOn(topicEditorRoutingService, 'navigateToSkillEditorWithId'));
     $scope.navigateToSkill('id1');
     expect(topicThumbnailBGSpy).toHaveBeenCalledWith('id1');
   });
@@ -454,7 +473,7 @@ describe('Topic editor tab directive', function() {
 
   it('should call TopicRoutingService to navigate to subtopic', function() {
     var topicRoutingSpy = (
-      spyOn(TopicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
+      spyOn(topicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
     $scope.navigateToSubtopic(2);
     expect(topicRoutingSpy).toHaveBeenCalledWith(2);
   });
