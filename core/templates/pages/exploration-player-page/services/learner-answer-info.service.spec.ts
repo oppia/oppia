@@ -25,7 +25,7 @@ import { State, StateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
-import { AnswerClassificationService } from
+import { AnswerClassificationService, InteractionRulesService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { LearnerAnswerInfoService } from
   'pages/exploration-player-page/services/learner-answer-info.service.ts';
@@ -42,7 +42,7 @@ describe('Learner answer info service', () =>{
   let firstState: State;
   let secondState: State;
   let thirdState: State;
-  let tirs: TextInputRulesService;
+  let tirs: InteractionRulesService;
   let mockAnswer: string;
   let ladbas: LearnerAnswerDetailsBackendApiService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
