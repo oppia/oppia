@@ -92,7 +92,7 @@ def create_http_task(
 
     # Use the CLIENT to build and send the task.
     # Note: retry=retry.Retry() means that the default retry arguments are used.
-    response = CLIENT.create_task(parent, task, retry=retry.Retry())
+    response = CLIENT.create_task(parent, task)
 
     logging.info('Created task %s' % response.name)
     return response

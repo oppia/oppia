@@ -8,9 +8,24 @@ queue:
   rate: 2/m
 - name: emails
   rate: 5/s
+  retry_parameters:
+    task_retry_limit: 8
+    min_backoff_seconds: 0.1
+    max_backoff_seconds: 12.8
+    max_doublings: 8
 - name: events
   rate: 5/s
+  retry_parameters:
+    task_retry_limit: 8
+    min_backoff_seconds: 0.1
+    max_backoff_seconds: 12.8
+    max_doublings: 8
 - name: one-off-jobs
   rate: 10/s
 - name: stats
   rate: 10/m
+  retry_parameters:
+    task_retry_limit: 8
+    min_backoff_seconds: 0.1
+    max_backoff_seconds: 12.8
+    max_doublings: 8
