@@ -35,7 +35,6 @@ angular.module('oppia', [
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { APP_BASE_HREF, HashLocationStrategy, Location, LocationStrategy } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -81,10 +80,7 @@ import { SubtopicsListComponent } from
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
-    },
-    {provide: APP_BASE_HREF, useValue: '/'},
-    Location,
-    {provide: LocationStrategy, useClass: HashLocationStrategy}
+    }
   ]
 })
 class TopicEditorPageModule {
