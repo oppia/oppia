@@ -47,7 +47,6 @@ export class AnswerSubmitActionComponent implements OnInit {
   _answer: Object = this.htmlEscaperService.escapedJsonToObj(this.answer);
 
   constructor(
-    // private attrs: Attr,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private htmlEscaperService: HtmlEscaperService,
     private interactionObjectFactory: InteractionObjectFactory
