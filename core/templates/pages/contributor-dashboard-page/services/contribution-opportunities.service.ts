@@ -35,7 +35,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     var moreVoiceoverOpportunitiesAvailable = true;
 
     var _getSkillOpportunities = function(cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
+      ContributionOpportunitiesBackendApiService.fetchSkillOpportunitiesAsync(
         cursor).then(({ opportunities, nextCursor, more }) => {
         skillOpportunitiesCursor = nextCursor;
         moreSkillOpportunitiesAvailable = more;
@@ -44,22 +44,24 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     };
     var _getTranslationOpportunities = function(
         languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchTranslationOpportunities(
-        languageCode, cursor).then(({ opportunities, nextCursor, more }) => {
-        translationOpportunitiesCursor = nextCursor;
-        moreTranslationOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
-      });
+      ContributionOpportunitiesBackendApiService
+        .fetchTranslationOpportunitiesAsync(
+          languageCode, cursor).then(({ opportunities, nextCursor, more }) => {
+          translationOpportunitiesCursor = nextCursor;
+          moreTranslationOpportunitiesAvailable = more;
+          successCallback(opportunities, more);
+        });
     };
     var _getVoiceoverOpportunities = function(
         languageCode, cursor, successCallback) {
-      ContributionOpportunitiesBackendApiService.fetchVoiceoverOpportunities(
-        languageCode, cursor
-      ).then(function({ opportunities, nextCursor, more }) {
-        voiceoverOpportunitiesCursor = nextCursor;
-        moreVoiceoverOpportunitiesAvailable = more;
-        successCallback(opportunities, more);
-      });
+      ContributionOpportunitiesBackendApiService
+        .fetchVoiceoverOpportunitiesAsync(
+          languageCode, cursor
+        ).then(function({ opportunities, nextCursor, more }) {
+          voiceoverOpportunitiesCursor = nextCursor;
+          moreVoiceoverOpportunitiesAvailable = more;
+          successCallback(opportunities, more);
+        });
     };
 
     var showRequiresLoginModal = function(argument) {
