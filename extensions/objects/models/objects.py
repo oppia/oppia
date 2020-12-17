@@ -1733,8 +1733,8 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
                 raise TypeError(
                     'Invalid content unicode: %s' % normalized_str)
 
-        normalizedStrSet = set(raw['normalizedStrSet'])
-        if len(normalizedStrSet) != len(raw['normalizedStrSet']):
+        normalized_str_set = set(raw['normalizedStrSet'])
+        if len(normalized_str_set) != len(raw['normalizedStrSet']):
             raise TypeError(
                 'Duplicate unicode found '
                 'in set: %s' % raw['normalizedStrSet'])
