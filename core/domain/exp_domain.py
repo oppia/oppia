@@ -583,14 +583,14 @@ class Exploration(python_utils.OBJECT):
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
-            init_state_name, states_dict, {}, [], 0,
+            init_state_name, states_dict, {}, [], feconf.INIT_VERSION,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
     @classmethod
     def from_dict(
             cls, exploration_dict,
-            exploration_version=0, exploration_created_on=None,
-            exploration_last_updated=None):
+            exploration_version=feconf.INIT_VERSION,
+            exploration_created_on=None, exploration_last_updated=None):
         """Return a Exploration domain object from a dict.
 
         Args:

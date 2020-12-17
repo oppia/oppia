@@ -663,7 +663,7 @@ class VersionedModel(BaseModel):
     # version number starts at 1 when the model instance is first created.
     # All data in this instance represents the version at HEAD; data about the
     # previous versions is stored in the snapshot models.
-    version = datastore_services.IntegerProperty(default=0)
+    version = datastore_services.IntegerProperty(default=feconf.INIT_VERSION)
 
     def _require_not_marked_deleted(self):
         """Checks whether the model instance is deleted."""
@@ -948,7 +948,7 @@ class VersionedModel(BaseModel):
                     'Invalid change list command: %s' % commit_cmd['cmd'])
 
         commit_type = (
-            self._COMMIT_TYPE_CREATE if self.version == 0 else
+            self._COMMIT_TYPE_CREATE if self.version == feconf.INIT_VERSION else
             self._COMMIT_TYPE_EDIT)
 
         self._trusted_commit(

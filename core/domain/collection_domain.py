@@ -324,11 +324,11 @@ class Collection(python_utils.OBJECT):
         """
         return cls(
             collection_id, title, category, objective, language_code, [],
-            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], 0)
+            feconf.CURRENT_COLLECTION_SCHEMA_VERSION, [], feconf.INIT_VERSION)
 
     @classmethod
     def from_dict(
-            cls, collection_dict, collection_version=0,
+            cls, collection_dict, collection_version=feconf.INIT_VERSION,
             collection_created_on=None, collection_last_updated=None):
         """Return a Collection domain object from a dict.
 

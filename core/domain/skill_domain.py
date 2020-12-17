@@ -842,8 +842,8 @@ class Skill(python_utils.OBJECT):
 
     @classmethod
     def from_dict(
-            cls, skill_dict, skill_version=0, skill_created_on=None,
-            skill_last_updated=None):
+            cls, skill_dict, skill_version=feconf.INIT_VERSION,
+            skill_created_on=None, skill_last_updated=None):
         """Returns a Skill domain object from a dict.
 
         Args:
@@ -918,7 +918,8 @@ class Skill(python_utils.OBJECT):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False, [])
+            constants.DEFAULT_LANGUAGE_CODE, feconf.INIT_VERSION, 0, None,
+            False, [])
 
     def generate_skill_misconception_id(self, misconception_id):
         """Given a misconception id, it returns the skill-misconception-id.

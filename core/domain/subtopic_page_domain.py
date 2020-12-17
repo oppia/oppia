@@ -222,7 +222,7 @@ class SubtopicPage(python_utils.OBJECT):
             subtopic_page_id, topic_id,
             SubtopicPageContents.create_default_subtopic_page_contents(),
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            constants.DEFAULT_LANGUAGE_CODE, feconf.INIT_VERSION)
 
     @classmethod
     def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
