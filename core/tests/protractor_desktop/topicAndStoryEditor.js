@@ -230,7 +230,7 @@ describe('Chapter editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
-  var storyId = null;
+  var storyName = 'Story 0';
   var explorationEditorPage = null;
   var dummyExplorationIds = [];
   var dummyExplorationInfo = [
@@ -282,17 +282,17 @@ describe('Chapter editor functionality', function() {
     await topicsAndSkillsDashboardPage.createTopic(
       topicName, topicUrlFragment, 'Description', false);
     await topicEditorPage.createStory(
-      'Story 0', 'topic-and-story-editor-two', 'Story description',
+      storyName, 'topic-and-story-editor-two', 'Story description',
       Constants.TEST_SVG_PATH);
-    var url = await browser.getCurrentUrl();
-    storyId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
     dummySkills = await createDummySkills(2);
   });
 
   beforeEach(async function() {
     await users.login(userEmail);
-    await storyEditorPage.get(storyId);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic(topicName);
+    await topicEditorPage.navigateToStoryWithTitle(storyName);
   });
 
   it('should create a basic chapter.', async function() {

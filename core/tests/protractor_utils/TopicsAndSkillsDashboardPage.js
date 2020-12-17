@@ -400,12 +400,9 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.editTopic = async function(topicName) {
     await this.waitForTopicsToLoad();
-    await topicNames.map(async(topic, index) => {
-      var name = await topic.getText();
-      if (name === topicName) {
-        await this.navigateToTopicWithIndex(index);
-      }
-    });
+    await this.filterTopicsByKeyword(topicName);
+    expect(await topicNames.count()).toEqual(1);
+    await this.navigateToTopicWithIndex(0);
   };
 
   this.expectSkillDescriptionToBe = async function(description, index) {
