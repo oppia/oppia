@@ -50,7 +50,7 @@ module.exports = {
       '@angular/upgrade/static': (
         '@angular/upgrade/bundles/upgrade-static.umd.js'),
       // These both are used so that we can refer to them in imports using their
-      // their full path: 'assets/{{filename}}'.
+      // full path: 'assets/{{filename}}'.
       'assets/constants': 'constants.ts',
       'assets/rich_text_components_definitions':
         'rich_text_components_definitions.ts'
