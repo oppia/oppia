@@ -929,7 +929,7 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
             else:
                 self.assertNotIn('Translatable', name)
 
-    def test_using_required_methods_with_implementation_raises_error(self):
+    def test_abstract_base_class_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
             NotImplementedError, 'Subclasses of BaseTranslatableObject should'):
             objects.BaseTranslatableObject.get_schema()

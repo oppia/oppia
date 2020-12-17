@@ -3037,8 +3037,9 @@ class Exploration(python_utils.OBJECT):
 
         for state_dict in states_dict.values():
             # As of Jan 2021, which is when this migration is to be run, only
-            # TextInput and SetInput have translatable rule inputs, and they
-            # both take exactly one translatable input named x.
+            # TextInput and SetInput have translatable rule inputs, and every
+            # rule for these interactions takes exactly one translatable input
+            # named x.
             interaction_id = state_dict['interaction']['id']
             if interaction_id not in ['TextInput', 'SetInput']:
                 continue
