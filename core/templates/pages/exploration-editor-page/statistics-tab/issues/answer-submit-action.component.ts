@@ -16,7 +16,7 @@
  * @fileoverview Component for the Answer Submit Learner Action.
  */
 
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory.ts';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service.ts';
@@ -29,11 +29,10 @@ import { HtmlEscaperService } from 'services/html-escaper.service.ts';
 })
 export class AnswerSubmitActionComponent implements OnInit {
   // Check these types are correct.
-  destStateName: string = '';
-  timeSpentInStateSecs: number = 0;
-  currentStateName: string = '';
-  actionIndex: number = 0;
-
+  destStateName: string;
+  timeSpentInStateSecs: number;
+  currentStateName: string;
+  actionIndex: number;
   _customizationArgs = (
     this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
       this.el.nativeElement.interactionId,
@@ -41,8 +40,8 @@ export class AnswerSubmitActionComponent implements OnInit {
         this.el.nativeElement.interactionCustomizationArgs)
     )
   );
-  _answer: Object = this.htmlEscaperService.escapedJsonToObj(
-    this.el.nativeElement.answer);
+  _answer: number = this.htmlEscaperService.escapedJsonToObj(
+    this.el.nativeElement.answer) as number;
 
   constructor(
     private el: ElementRef,
@@ -60,7 +59,7 @@ export class AnswerSubmitActionComponent implements OnInit {
 
   getShortAnswerHtml(): string {
     return this.explorationHtmlFormatterService.getShortAnswerHtml(
-      this._answer as number,
+      this._answer,
       this.el.nativeElement.interactionId,
       this._customizationArgs);
   }
