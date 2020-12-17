@@ -542,10 +542,7 @@ def is_user_id_valid(user_id):
     if user_id in feconf.SYSTEM_USERS.keys():
         return True
 
-    return all((
-        user_id.islower(),
-        user_id.startswith('uid_'),
-        len(user_id) == feconf.USER_ID_LENGTH))
+    return bool(re.match(feconf.USER_ID_REGEX, user_id))
 
 
 def is_user_or_pseudonymous_id(user_or_pseudonymous_id):
