@@ -33,6 +33,8 @@
   "files": [
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
+    "core/templates/domain/classifier/classifier.model.ts",
+    "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.spec.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.ts",
@@ -91,8 +93,6 @@
     "core/templates/services/math-interactions.service.spec.ts",
     "core/templates/services/stateful/background-mask.service.ts",
     "core/templates/services/stateful/background-mask.service.spec.ts",
-    "core/templates/domain/classifier/classifier.model.ts",
-    "core/templates/domain/classifier/classifier.model.spec.ts",
     "extensions/classifiers/count-vectorizer.service.ts",
     "extensions/classifiers/count-vectorizer.service.spec.ts",
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.ts",
@@ -106,3 +106,4 @@
   ],
   "include": ["typings/*.ts"]
 }
+
