@@ -43,9 +43,9 @@ CONSTANTS_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
 FECONF_REGEX = '^([A-Z_]+ = ).*$'
 CONSTANTS_REGEX = '^(  "[A-Z_]+": ).*$'
-TERMS_PAGE_URL = (
+TERMS_PAGE_FOLDER_URL = (
     'https://github.com/oppia/oppia/commits/develop/core/'
-    'templates/pages/terms-page/terms-page.component.html')
+    'templates/pages/terms-page')
 
 
 def apply_changes_based_on_config(
@@ -110,11 +110,11 @@ def check_updates_to_terms_of_service(
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
-    common.open_new_tab_in_browser_if_possible(TERMS_PAGE_URL)
+    common.open_new_tab_in_browser_if_possible(TERMS_PAGE_FOLDER_URL)
     python_utils.PRINT(
         'Are the terms of service changed? Check commits/changes made '
-        'to the file: terms-page.mainpage.html. Enter y/ye/yes if they '
-        'are changed else enter n/no.')
+        'to the files in: core/templates/pages/terms-page. '
+        'Enter y/ye/yes if they are changed else enter n/no.')
     terms_of_service_are_changed = python_utils.INPUT().lower()
     while terms_of_service_are_changed not in ['y', 'ye', 'yes', 'n', 'no']:
         python_utils.PRINT(
@@ -222,7 +222,7 @@ def main(
 
     if prompt_for_mailgun_and_terms_update:
         try:
-            python_utils.url_open(TERMS_PAGE_URL)
+            python_utils.url_open(TERMS_PAGE_FOLDER_URL)
         except Exception:
             raise Exception('Terms mainpage does not exist on Github.')
         add_mailgun_api_key(release_feconf_path)

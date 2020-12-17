@@ -44,10 +44,15 @@ ABOUT_PAGE_CONSTANTS_FILEPATH = os.path.join(
 AUTHORS_FILEPATH = os.path.join('', 'AUTHORS')
 CHANGELOG_FILEPATH = os.path.join('', 'CHANGELOG')
 CONTRIBUTORS_FILEPATH = os.path.join('', 'CONTRIBUTORS')
-PACKAGE_JSON_PATH = os.path.join('', 'package.json')
-GIT_CMD_CHECKOUT = 'git checkout -- %s %s %s %s' % (
-    CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-    ABOUT_PAGE_CONSTANTS_FILEPATH)
+PACKAGE_JSON_FILEPATH = os.path.join('', 'package.json')
+LIST_OF_FILEPATHS_TO_MODIFY = (
+    CHANGELOG_FILEPATH,
+    AUTHORS_FILEPATH,
+    CONTRIBUTORS_FILEPATH,
+    ABOUT_PAGE_CONSTANTS_FILEPATH,
+    PACKAGE_JSON_FILEPATH
+)
+GIT_CMD_CHECKOUT = 'git checkout -- %s' % ' '.join(LIST_OF_FILEPATHS_TO_MODIFY)
 
 # These constants should match the format defined in
 # about-page.constants.ts. If the patterns do not match,
@@ -376,7 +381,7 @@ def create_branch(
         repo, repo_fork, target_branch, github_username,
         current_release_version_number):
     """Creates a new branch with updates to AUTHORS, CHANGELOG,
-    CONTRIBUTORS and about-page.
+    CONTRIBUTORS, about-page, and package.json.
 
     Args:
         repo: github.Repository.Repository. The PyGithub object for the
@@ -389,14 +394,12 @@ def create_branch(
     """
     python_utils.PRINT(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
-        'CHANGELOG and about-page...')
+        'CHANGELOG, about-page, and package.json...')
     sb = repo.get_branch('develop')
     repo_fork.create_git_ref(
         ref='refs/heads/%s' % target_branch, sha=sb.commit.sha)
 
-    for filepath in [
-            CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-            ABOUT_PAGE_CONSTANTS_FILEPATH]:
+    for filepath in LIST_OF_FILEPATHS_TO_MODIFY:
         contents = repo_fork.get_contents(filepath, ref=target_branch)
         with python_utils.open_file(filepath, 'r') as f:
             repo_fork.update_file(
@@ -483,7 +486,7 @@ def update_package_json():
         common.get_current_branch_name())
 
     common.inplace_replace_file(
-        PACKAGE_JSON_PATH, '"version": ".*"',
+        PACKAGE_JSON_FILEPATH, '"version": ".*"',
         '"version": "%s"' % release_version)
 
 
@@ -572,11 +575,14 @@ def main():
     update_developer_names(release_summary_lines)
     update_package_json()
 
+    list_of_numbered_files = []
+    for i, filepath in enumerate(LIST_OF_FILEPATHS_TO_MODIFY, start=1):
+        list_of_numbered_files.append('%s. %s' % (i, filepath))
+
     message = (
         'Please check the changes and make updates if required in the '
-        'following files:\n1. %s\n2. %s\n3. %s\n4. %s\n5. %s\n' % (
-            CHANGELOG_FILEPATH, AUTHORS_FILEPATH, CONTRIBUTORS_FILEPATH,
-            ABOUT_PAGE_CONSTANTS_FILEPATH, PACKAGE_JSON_PATH))
+        'following files:\n%s\n' % '\n'.join(list_of_numbered_files)
+    )
     common.ask_user_to_confirm(message)
 
     create_branch(
