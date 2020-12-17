@@ -26,16 +26,17 @@ import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillRights } from 'domain/skill/skill-rights.model';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
+import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { AlertsService } from 'services/alerts.service';
 import { QuestionsListService } from 'services/questions-list.service';
 
-interface gsummaries {
+interface GroupedSkillSummaries {
   current: {
     id: string,
     description: string,
   }[],
-  others: unknown[]
+  others: SkillSummaryBackendDict[]
 }
 @Injectable({
   providedIn: 'root'
@@ -57,7 +58,7 @@ export class SkillEditorStateService {
   private assignedSkillTopicData = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
-  private _groupedSkillSummaries: gsummaries = {
+  private _groupedSkillSummaries: GroupedSkillSummaries = {
     current: [],
     others: []
   };
@@ -158,7 +159,7 @@ export class SkillEditorStateService {
     return this.assignedSkillTopicData;
   }
 
-  getGroupedSkillSummaries(): gsummaries {
+  getGroupedSkillSummaries(): GroupedSkillSummaries {
     return cloneDeep(this._groupedSkillSummaries);
   }
   /**
