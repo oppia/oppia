@@ -17,26 +17,15 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import atexit
-import contextlib
-import functools
-import os
-import re
-import signal
-import subprocess
-import sys
-import time
-import requests
 import datetime
+import os
 
 from core.tests import test_utils
-import feconf
 import python_utils
 
-from scripts import build
-from scripts import common
 from scripts import flake_checker
-from scripts import install_third_party_libs
+
+import requests
 
 
 class CheckIfOnCITests(test_utils.GenericTestBase):
@@ -58,7 +47,7 @@ class CheckIfOnCITests(test_utils.GenericTestBase):
 
     def test_returns_false_when_off_ci(self):
 
-        def mock_getenv(variable):
+        def mock_getenv(unused_variable):
             return False
 
         getenv_swap = self.swap_with_checks(
@@ -72,12 +61,13 @@ class CheckIfOnCITests(test_utils.GenericTestBase):
         self.assertFalse(on_ci)
 
 
-class MockDatetime:
+class MockDatetime(python_utils.OBJECT):
 
     def __init__(self, date):
         self.date = date
 
     def utcnow(self):
+        """Get datetime.datetime object."""
         return self.date
 
 
@@ -97,7 +87,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             }
             return environment_vars.get(variable)
 
-        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-args
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             pass
 
         expected_payload = {
@@ -136,7 +126,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             }
             return environment_vars.get(variable)
 
-        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-args
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             pass
 
         expected_payload = {
@@ -175,7 +165,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             }
             return environment_vars.get(variable)
 
-        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-args
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             raise requests.HTTPError()
 
         expected_payload = {
@@ -210,7 +200,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             environment_vars = dict()
             return environment_vars.get(variable)
 
-        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-args
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             raise AssertionError('requests.post called.')
 
         getenv_swap = self.swap(os, 'getenv', mock_getenv)
@@ -218,23 +208,27 @@ class ReportPassTests(test_utils.GenericTestBase):
 
         with getenv_swap, post_swap:
             with self.assertRaisesRegexp(
-                    Exception, 'Unknown build environment.'):
+                Exception, 'Unknown build environment.'):
                 flake_checker.report_pass('suiteName')
 
 
-class MockResponse:
+class MockResponse(python_utils.OBJECT):
 
     def __init__(
-            self, ok=True, json=dict(), status_code=200, reason='foo'):
+            self, ok=True, json=None, status_code=200, reason='foo'):
+        if json is None:
+            json = dict()
         self.ok = ok
         self.json_dict = json
         self.status_code = status_code
         self.reason = reason
 
     def json(self):
+        """Get json dict or raise ValueError if json_dict not a dict."""
         if not isinstance(self.json_dict, dict):
             raise ValueError('Payload not JSON.')
         return self.json_dict
+
 
 class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
@@ -252,7 +246,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }
             return environment_vars.get(variable)
 
-        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-args
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             response = {
                 'log': ['log1', 'log2'],
                 'result': True,
@@ -303,7 +297,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }
             return environment_vars.get(variable)
 
-        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-args
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             response = {
                 'log': ['log1', 'log2'],
                 'result': True,
@@ -354,7 +348,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }
             return environment_vars.get(variable)
 
-        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-args
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             raise requests.HTTPError()
 
         expected_payload = {
@@ -396,7 +390,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }
             return environment_vars.get(variable)
 
-        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-args
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             return MockResponse(False, None)
 
         expected_payload = {
@@ -438,7 +432,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }
             return environment_vars.get(variable)
 
-        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-args
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
             return MockResponse(True, None)
 
         expected_payload = {

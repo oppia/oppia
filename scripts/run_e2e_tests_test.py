@@ -1009,7 +1009,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 ],),
             ],
         )
-        args = run_e2e_tests._PARSER.parse_args([])
+        args = run_e2e_tests._PARSER.parse_args(args=[])  # pylint: disable=protected-access
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap:
                 with start_google_app_engine_server_swap:
@@ -1251,7 +1251,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with register_swap, run_swap, is_test_output_flaky_swap:
             with start_portserver_swap, cleanup_portserver_swap:
                 with on_ci_swap, cleanup_swap, exit_swap:
-                        run_e2e_tests.main(args=['--suite', 'mySuite'])
+                    run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_start_tests_skip_build(self):
 

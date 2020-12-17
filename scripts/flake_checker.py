@@ -52,7 +52,7 @@ CI_INFO = {
     }
 }
 
-RequestExceptions = (
+REQUEST_EXCEPTIONS = (
     requests.RequestException, requests.ConnectionError,
     requests.HTTPError, requests.TooManyRedirects, requests.Timeout)
 
@@ -117,7 +117,7 @@ def report_pass(suite_name):
             PASS_REPORT_URL, json=payload,
             allow_redirects=False,
             headers={'report_key': REPORT_API_KEY})
-    except RequestExceptions as e:
+    except REQUEST_EXCEPTIONS as e:
         _print_color_message((
             'Failed to contact E2E test logging server at %s.'
             'Please report to E2E team in case server is down.'
@@ -138,7 +138,7 @@ def is_test_output_flaky(output_lines, suite_name):
             FLAKE_CHECK_AND_REPORT_URL, json=payload,
             allow_redirects=False,
             headers={'report_key': REPORT_API_KEY})
-    except RequestExceptions as e:
+    except REQUEST_EXCEPTIONS as e:
         _print_color_message((
             'Failed to contact E2E test logging server at %s.'
             'Please report to E2E team in case server is down.'
