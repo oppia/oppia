@@ -884,8 +884,20 @@ class NormalizedRectangleTests(test_utils.GenericTestBase):
     def test_normalize(self):
         normalized_rectangle = objects.NormalizedRectangle2D()
         self.assertEqual(normalized_rectangle.normalize(
-            [[0, 1], [1, 0]]), [[0.0, 0.0], [0.0, 0.0]])
+            [[0, 1], [1, 0]]), [[0.0, 1.0], [1.0, 0.0]])
 
+    def test_normalize_values_out_of_range(self):
+        normalized_rectangle = objects.NormalizedRectangle2D()
+        self.assertEqual(normalized_rectangle.normalize(
+            [[-2, 5], [6, -3]]), [[0.0, 1.0], [1.0, 0.0]])
+
+    def test_normalize_values_in_range(self):
+        normalized_rectangle = objects.NormalizedRectangle2D()
+        self.assertEqual(normalized_rectangle.normalize(
+            [[0.2, 0.5], [0.6, 0.3]]), [[0.2, 0.5], [0.6, 0.3]])
+
+    def test_normalize_throws_exception(self):
+        normalized_rectangle = objects.NormalizedRectangle2D()
         with self.assertRaisesRegexp(
             TypeError, 'Cannot convert to Normalized Rectangle '):
             normalized_rectangle.normalize('')

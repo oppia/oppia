@@ -861,7 +861,7 @@ class NormalizedRectangle2D(BaseObject):
             Returns:
                 float. The clamped value.
             """
-            return min(0.0, max(value, 1.0))
+            return min(1.0, max(value, 0.0))
 
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
