@@ -380,7 +380,7 @@ angular.module('oppia').factory('$exceptionHandler', [
         // eslint-disable-next-line max-len
         // see: https://web.archive.org/web/20140210004225/http://msdn.microsoft.com/en-us/library/windows/apps/hh699850.aspx
         try {
-          throw new Error(exception);
+          throw new Error(`${exception}`);
         } catch (error) {
           exception = error;
         }
@@ -434,7 +434,7 @@ angular.module('oppia').factory('$exceptionHandler', [
           }
         );
       }
-      $log.error.apply($log, arguments);
+      $log.error(exception);
     };
   }
 ]);
