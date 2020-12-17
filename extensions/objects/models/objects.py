@@ -245,7 +245,7 @@ class Html(BaseObject):
         }
 
 
-# TODO(shavavo) Migrate SubtitledUnicode to TranslatableUnicode.
+# TODO(shavavo): Migrate SubtitledUnicode to TranslatableUnicode.
 class SubtitledUnicode(BaseObject):
     """SubtitledUnicode class."""
 
@@ -277,7 +277,7 @@ class SubtitledUnicode(BaseObject):
         }
 
 
-# TODO(shavavo) Migrate SubtitledHtml to TranslatableHtml.
+# TODO(shavavo): Migrate SubtitledHtml to TranslatableHtml.
 class SubtitledHtml(BaseObject):
     """SubtitledHtml class."""
 

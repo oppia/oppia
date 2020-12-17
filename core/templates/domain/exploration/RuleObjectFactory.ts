@@ -19,6 +19,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import _ from 'lodash';
 
 import { InteractionRuleInputs } from 'interactions/rule-input-defs';
 
@@ -65,6 +66,12 @@ export class RuleObjectFactory {
   createNew(
       type: string, inputs: RuleInputs, inputTypes: RuleInputTypes
   ): Rule {
+    if (!_.isEqual(
+      new Set(Object.keys(inputs)),
+      new Set(Object.keys(inputTypes))
+    )) {
+      throw new Error('The keys of inputs and inputTypes do not match.');
+    }
     return new Rule(type, inputs, inputTypes);
   }
 

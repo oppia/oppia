@@ -45,7 +45,18 @@ describe('RuleObjectFactory', () => {
 
   it('should create a new rule from createNew()', () => {
     let rulesDict = ruleObjectFactory.createNew(
-      'rule_type_1', inputBackend, {});
-    expect(rulesDict).toEqual(new Rule('rule_type_1', inputBackend, {}));
+      'rule_type_1', inputBackend, {
+        x: ''
+      });
+    expect(rulesDict).toEqual(new Rule('rule_type_1', inputBackend, {
+      x: ''
+    }));
+  });
+
+  it('should throw an error on createNew() if the keys in inputs and ' +
+    'inputTypes do not match', () => {
+    expect(() => {
+      ruleObjectFactory.createNew('rule_type_1', inputBackend, {});
+    }).toThrowError('The keys of inputs and inputTypes do not match.');
   });
 });
