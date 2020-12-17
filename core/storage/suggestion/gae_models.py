@@ -189,7 +189,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General suggestion needs to be pseudonymized for the user."""
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
+        """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
@@ -201,7 +203,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -296,6 +298,28 @@ class GeneralSuggestionModel(base_models.BaseModel):
             query = query.filter(getattr(cls, field) == value)
 
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_translation_suggestions_in_review_with_exp_id(cls, exp_id):
+        """Returns translation suggestions which are in review with target_id
+        == exp_id.
+
+        Args:
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of translation suggestions in review
+            with target_id of exp_id. The number of returned results is capped
+            by feconf.DEFAULT_QUERY_LIMIT.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.target_id == exp_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_translation_suggestion_ids_with_exp_ids(cls, exp_ids):
@@ -559,8 +583,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General voiceover application needs to be pseudonymized for the
-        user.
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
@@ -645,7 +669,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -750,9 +774,7 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -765,8 +787,8 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
+        """Model doesn't contain any data directly corresponding to a user
+        because the data is aggregated.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'translation_reviewer_counts_by_lang_code':
