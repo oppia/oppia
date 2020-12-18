@@ -130,6 +130,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
     user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob,
     user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
+    user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
