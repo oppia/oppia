@@ -911,7 +911,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                             with get_chrome_driver_version_swap, exit_swap:
                                 run_e2e_tests.main(args=[])
 
-    def test_strip_non_unicode_chars(self):
+    def test_work_with_non_ascii_chars(self):
 
         mock_process = MockProcessClass()
 
@@ -951,7 +951,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             result.stdout = python_utils.string_io(
-                buffer_value=u'sample\n✓\noutput\n')
+                buffer_value='sample\n✓\noutput\n')
             return result
 
         def mock_get_chrome_driver_version():
@@ -1017,7 +1017,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     with wait_swap, get_chrome_driver_version_swap:
                         with get_parameters_swap, popen_swap:
                             lines, _ = run_e2e_tests.run_tests(args)
-        self.assertEqual(lines, ['sample', 'output'])
+        self.assertEqual(lines, ['sample', u'✓', 'output'])
 
     def test_rerun_when_tests_fail(self):
 
@@ -1213,7 +1213,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         def mock_is_test_output_flaky(
                 unused_output, unused_suite_name):
-            return True
+            raise AssertionError('Tried to Check Flakiness.')
 
         def mock_register(unused_func, unused_arg=None):
             return
@@ -1238,11 +1238,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 (mock_cleanup_portserver, mock_portserver)])
         run_swap = self.swap(
             run_e2e_tests, 'run_tests', mock_run_tests)
-        is_test_output_flaky_swap = self.swap_with_checks(
+        is_test_output_flaky_swap = self.swap(
             flake_checker, 'is_test_output_flaky',
-            mock_is_test_output_flaky,
-            expected_args=[
-                ('sample\noutput', 'mySuite')])
+            mock_is_test_output_flaky)
         on_ci_swap = self.swap(
             flake_checker, 'check_if_on_ci', mock_check_if_on_ci)
         cleanup_swap = self.swap(
@@ -1695,6 +1693,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         # therefore needs to be killed.
         self.assertEqual(
             process.poll_count,
-            run_e2e_tests.KILL_PORTSERVER_TIMEOUT_SECS + 1
+            run_e2e_tests.KILL_TIMEOUT_SECS + 1
         )
         self.assertEqual(process.signals_received, [signal.SIGINT])

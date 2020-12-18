@@ -156,6 +156,17 @@ _PARSER.add_argument(
 SUBPROCESSES = []
 
 
+def _kill_process(process):
+    """Try to kill a process with SIGINT. If that fails, kill."""
+    process.send_signal(signal.SIGINT)
+    for _ in python_utils.RANGE(KILL_TIMEOUT_SECS):
+        time.sleep(1)
+        if not process.poll():
+            break
+    if process.poll():
+        process.kill()
+
+
 def cleanup():
     """Kill the running subprocesses and server fired in this program, set
     constants back to default values.
@@ -169,20 +180,9 @@ def cleanup():
         '.*%s.*' % re.escape(google_app_engine_path),
         '.*%s.*' % re.escape(webdriver_download_path)
     ]
-    # Try to shutdown process cleanly with SIGINT (CTRL-C).
     for p in SUBPROCESSES:
-        p.send_signal(signal.SIGINT)
+        _kill_process(p)
 
-    # If processes take too long to shut down, kill them.
-    for p in SUBPROCESSES:
-        for _ in python_utils.RANGE(KILL_TIMEOUT_SECS):
-            time.sleep(1)
-            if not p.poll():
-                break
-        if p.poll():
-            p.kill()
-
-    # Kill processes by regex.
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
 
@@ -510,13 +510,7 @@ def cleanup_portserver(portserver_process):
         portserver_process: subprocess.Popen. The Popen subprocess
             object for the portserver.
     """
-    portserver_process.send_signal(signal.SIGINT)
-    for _ in python_utils.RANGE(KILL_TIMEOUT_SECS):
-        time.sleep(1)
-        if not portserver_process.poll():
-            break
-    if portserver_process.poll():
-        portserver_process.kill()
+    _kill_process(portserver_process)
 
 
 def run_tests(args):
@@ -565,15 +559,13 @@ def run_tests(args):
         nextline = p.stdout.readline()
         if len(nextline) == 0 and p.poll() is not None:
             break
-        try:
-            sys.stdout.write(nextline)
-            sys.stdout.flush()
-            output_lines.append(python_utils.UNICODE(nextline.rstrip()))
-        except UnicodeError:
-            # Some characters, like the check-marks next to passing
-            # tests, are not in unicode. This should not affect the
-            # failure messages we are looking for.
-            pass
+        if isinstance(nextline, str):
+            # This is a failsafe line in case we get non-unicode input,
+            # but the tests provide all strings as unicode.
+            nextline = nextline.decode('utf-8')  # pragma: nocover
+        output_lines.append(nextline.rstrip())
+        # Replaces non-ASCII characters with '?'.
+        python_utils.PRINT(nextline.encode('ascii', errors='replace'))
 
     return output_lines, p.returncode
 
