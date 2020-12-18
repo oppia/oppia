@@ -23,12 +23,12 @@ require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminJobsTab', [
-  '$http', '$rootScope', '$timeout', 'AdminDataService', 'AdminBackendApiService',
-  'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  '$rootScope', '$timeout', 'AdminBackendApiService',
+  'AdminDataService', 'UrlInterpolationService',
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
   function(
-      $http, $rootScope, $timeout, AdminDataService, AdminBackendApiService,
-      UrlInterpolationService, ADMIN_HANDLER_URL,
+      $rootScope, $timeout, AdminBackendApiService,
+      AdminDataService, UrlInterpolationService,
       ADMIN_JOB_OUTPUT_URL_TEMPLATE) {
     return {
       restrict: 'E',
@@ -48,13 +48,13 @@ angular.module('oppia').directive('adminJobsTab', [
             });
           AdminBackendApiService.showJobOutput(adminJobOutputUrl)
             .then(function(response) {
-            ctrl.showingJobOutput = true;
-            ctrl.jobOutput = response.output || [];
-            ctrl.jobOutput.sort();
-            $timeout(function() {
-              document.querySelector('#job-output').scrollIntoView();
+              ctrl.showingJobOutput = true;
+              ctrl.jobOutput = response.output || [];
+              ctrl.jobOutput.sort();
+              $timeout(function() {
+                document.querySelector('#job-output').scrollIntoView();
+              });
             });
-          });
         };
 
         ctrl.startNewJob = function(jobType) {
@@ -62,12 +62,12 @@ angular.module('oppia').directive('adminJobsTab', [
 
           AdminBackendApiService.startNewJob(jobType)
             .then(function() {
-            ctrl.setStatusMessage('Job started successfully.');
-            window.location.reload();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.error.error);
-          });
+              ctrl.setStatusMessage('Job started successfully.');
+              window.location.reload();
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
+            });
         };
 
         ctrl.cancelJob = function(jobId, jobType) {
@@ -75,12 +75,12 @@ angular.module('oppia').directive('adminJobsTab', [
 
           AdminBackendApiService.cancelJob(jobId, jobType)
             .then(function() {
-            ctrl.setStatusMessage('Abort signal sent to job.');
-            window.location.reload();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.error.error);
-          });
+              ctrl.setStatusMessage('Abort signal sent to job.');
+              window.location.reload();
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
+            });
         };
 
         ctrl.startComputation = function(computationType) {
@@ -88,12 +88,12 @@ angular.module('oppia').directive('adminJobsTab', [
 
           AdminBackendApiService.startComputation(computationType)
             .then(function() {
-            ctrl.setStatusMessage('Computation started successfully.');
-            window.location.reload();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.error.error);
-          });
+              ctrl.setStatusMessage('Computation started successfully.');
+              window.location.reload();
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
+            });
         };
 
         ctrl.stopComputation = function(computationType) {
@@ -101,12 +101,12 @@ angular.module('oppia').directive('adminJobsTab', [
 
           AdminBackendApiService.stopComputation(computationType)
             .then(function() {
-            ctrl.setStatusMessage('Abort signal sent to computation.');
-            window.location.reload();
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.error.error);
-          });
+              ctrl.setStatusMessage('Abort signal sent to computation.');
+              window.location.reload();
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
+            });
         };
         ctrl.$onInit = function() {
           ctrl.HUMAN_READABLE_CURRENT_TIME = '';

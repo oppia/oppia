@@ -140,8 +140,8 @@ export class AdminBackendApiService {
       });
     });
   }
-  
-  startNewJob(jobType):Promise<void> {
+
+  startNewJob(jobType:string):Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'start_new_job',
@@ -150,7 +150,7 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  cancelJob(jobId, jobType):Promise<void> {
+  cancelJob(jobId:string, jobType:string):Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'cancel_job',
@@ -160,7 +160,7 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  startComputation(computationType):Promise<void> {
+  startComputation(computationType:string):Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'start_computation',
@@ -169,7 +169,7 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  stopComputation(computationType):Promise<void> {
+  stopComputation(computationType:string):Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'stop_computation',
@@ -177,8 +177,8 @@ export class AdminBackendApiService {
       }
     ).toPromise();
   }
-  
-  showJobOutput(adminJobOutputUrl):Promise<ArrayBuffer> {
+
+  showJobOutput(adminJobOutputUrl:string):Promise<ArrayBuffer> {
     return this.http.get<ArrayBuffer>(adminJobOutputUrl)
       .toPromise();
   }
