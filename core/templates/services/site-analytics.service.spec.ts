@@ -20,8 +20,6 @@ import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-const constants = require('constants.ts');
-
 describe('Site Analytics Service', () => {
   let sas = null;
   let ws = null;
@@ -30,15 +28,11 @@ describe('Site Analytics Service', () => {
   beforeEach(() => {
     sas = TestBed.get(SiteAnalyticsService);
     ws = TestBed.get(WindowRef);
-
-    constants.CAN_SEND_ANALYTICS_EVENTS = true;
+    spyOnProperty(sas, 'CAN_SEND_ANALYTICS_EVENTS', 'get')
+      .and.returnValue(true);
 
     ws.nativeWindow.ga = function() {};
     gaSpy = spyOn(ws.nativeWindow, 'ga').and.stub();
-  });
-
-  afterAll(() => {
-    constants.CAN_SEND_ANALYTICS_EVENTS = false;
   });
 
   it('should register start login event', () => {
