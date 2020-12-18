@@ -433,7 +433,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             return environment_vars.get(variable)
 
         def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
-            return MockResponse(True, None)
+            return MockResponse(True, 'not json')
 
         expected_payload = {
             'suite': 'suiteName',
