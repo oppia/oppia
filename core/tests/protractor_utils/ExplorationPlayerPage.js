@@ -292,6 +292,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = async function(ratingValue) {
+    await browser.waitForAngularEnabled(false);
     await action.click('Submit Button', ratingStars.get(ratingValue - 1));
     await waitFor.visibilityOfSuccessToast(
       'Success toast for rating takes too long to appear.');
