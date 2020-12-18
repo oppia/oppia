@@ -32,6 +32,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 (job_models,) = models.Registry.import_models([models.NAMES.job])
 
+
 class JobModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -191,6 +192,7 @@ class JobModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated JobModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
+
 
 class ContinuousComputationModelValidatorTests(test_utils.AuditJobsTestBase):
 
