@@ -468,6 +468,148 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
+class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that fixes the invalid values of created_on attribute in the
+    UserSettingsModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_settings_model):
+
+        user_id = user_settings_model.id
+
+        # Models in user storage module keyed by user_id.
+        completed_activities_model = (
+            user_models.CompletedActivitiesModel.get_by_id(user_id))
+        incomplete_activities_model = (
+            user_models.IncompleteActivitiesModel.get_by_id(user_id))
+        learner_playlist_model = (
+            user_models.LearnerPlaylistModel.get_by_id(user_id))
+        pending_deletion_request_model = (
+            user_models.PendingDeletionRequestModel.get_by_id(user_id))
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel.get_by_id(user_id))
+        user_bulk_emails_model = (
+            user_models.UserBulkEmailsModel.get_by_id(user_id))
+        user_contributions_model = (
+            user_models.UserContributionsModel.get_by_id(user_id))
+        user_contribution_rights_model = (
+            user_models.UserContributionRightsModel.get_by_id(user_id))
+        user_email_preferences_model = (
+            user_models.UserEmailPreferencesModel.get_by_id(user_id))
+        user_recent_changes_batch_model = (
+            user_models.UserRecentChangesBatchModel.get_by_id(user_id))
+        user_stats_model = (
+            user_models.UserStatsModel.get_by_id(user_id))
+        user_subscribers_model = (
+            user_models.UserSubscribersModel.get_by_id(user_id))
+        user_subscriptions_model = (
+            user_models.UserSubscriptionsModel.get_by_id(user_id))
+
+        # Models in user storage module having user_id as an attribute.
+        collection_progress_model = (
+            user_models.CollectionProgressModel.query(
+                user_models.CollectionProgressModel.user_id == user_id).get()
+        )
+        exp_user_last_playthrough_model = (
+            user_models.ExpUserLastPlaythroughModel.query(
+                user_models.ExpUserLastPlaythroughModel.user_id == user_id)
+            .get()
+        )
+        story_progress_model = (
+            user_models.StoryProgressModel.query(
+                user_models.StoryProgressModel.user_id == user_id).get()
+        )
+        user_contribution_proficiency_model = (
+            user_models.UserContributionProficiencyModel.query(
+                user_models.UserContributionProficiencyModel.user_id == user_id)
+            .get()
+        )
+        user_identifiers_model = (
+            user_models.UserIdentifiersModel.query(
+                user_models.UserIdentifiersModel.user_id == user_id).get()
+        )
+        user_skill_mastery_model = (
+            user_models.UserSkillMasteryModel.query(
+                user_models.UserSkillMasteryModel.user_id == user_id).get()
+        )
+        exploration_user_data_model = (
+            user_models.ExplorationUserDataModel.query(
+                user_models.ExplorationUserDataModel.user_id == user_id).get()
+        )
+
+        models_linked_with_user_settings_model = [
+            completed_activities_model,
+            incomplete_activities_model,
+            learner_playlist_model,
+            pending_deletion_request_model,
+            user_auth_details_model,
+            user_bulk_emails_model,
+            user_contributions_model,
+            user_contribution_rights_model,
+            user_email_preferences_model,
+            user_recent_changes_batch_model,
+            user_stats_model,
+            user_subscribers_model,
+            user_subscriptions_model,
+            collection_progress_model,
+            exp_user_last_playthrough_model,
+            story_progress_model,
+            user_contribution_proficiency_model,
+            user_identifiers_model,
+            user_skill_mastery_model,
+            exploration_user_data_model
+        ]
+
+        user_dates_list = [
+            user_settings_model.created_on,
+            user_settings_model.last_updated,
+            user_settings_model.last_agreed_to_terms,
+            user_settings_model.last_started_state_editor_tutorial,
+            user_settings_model.last_started_state_translation_tutorial,
+            user_settings_model.last_logged_in,
+            user_settings_model.last_edited_an_exploration,
+            user_settings_model.last_created_an_exploration,
+            user_settings_model.first_contribution_msec
+        ]
+
+        for model in models_linked_with_user_settings_model:
+            if model is not None:
+                user_dates_list.append(model.last_updated)
+                user_dates_list.append(model.created_on)
+
+        # Following models had some additional date/time fields.
+        if user_subscriptions_model is not None:
+            user_dates_list.append(user_subscriptions_model.last_checked)
+
+        if exploration_user_data_model is not None:
+            user_dates_list.append(exploration_user_data_model.rated_on)
+            user_dates_list.append(
+                exploration_user_data_model.draft_change_list_last_updated)
+
+        filtered_user_dates_list = [
+            date for date in user_dates_list if date is not None
+        ]
+
+        min_date = min(filtered_user_dates_list)
+        if min_date < user_settings_model.created_on:
+            user_settings_model.created_on = min_date
+            user_settings_model.update_timestamps()
+            user_settings_model.put()
+            yield ('SUCCESS_UPDATED', 1)
+        else:
+            yield ('SUCCESS_ALREADY_UP_TO_DATE', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
 class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that cleans up UserSubscribersModel by removing user id if it is
     present in subscriber ids.
