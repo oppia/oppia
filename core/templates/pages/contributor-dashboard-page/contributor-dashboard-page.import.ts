@@ -51,8 +51,7 @@ angular.module('oppia', [
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
 ]);
 
-require(
-  'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts');
+require('pages/contributor-dashboard-page/contributor-dashboard-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 import 'services/context.service';
@@ -60,5 +59,5 @@ require(
   'pages/contributor-dashboard-page/contributor-dashboard-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { ContributorDashboardPageModule } from 'pages/contributor-dashboard-page/contributor-dashboard-page.module.ts';
+import { ContributorDashboardPageModule } from 'pages/contributor-dashboard-page/contributor-dashboard-page.module';
 platformBrowserDynamic().bootstrapModule(ContributorDashboardPageModule);

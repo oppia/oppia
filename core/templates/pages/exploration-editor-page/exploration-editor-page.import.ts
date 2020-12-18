@@ -56,7 +56,7 @@ angular.module('oppia', [
 ]);
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-import 'pages/exploration-editor-page/exploration-editor-page.module.ts';
+require('pages/exploration-editor-page/exploration-editor-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
@@ -73,5 +73,5 @@ require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { ExplorationEditorPageModule } from 'pages/exploration-editor-page/exploration-editor-page.module.ts';
+import { ExplorationEditorPageModule } from 'pages/exploration-editor-page/exploration-editor-page.module';
 platformBrowserDynamic().bootstrapModule(ExplorationEditorPageModule);
