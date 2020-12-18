@@ -648,7 +648,16 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             self.COL_ID_4])
 
     def _create_search_query(self, terms, categories):
-        """Returns the search query derived from terms and categories."""
+        """Returns the search query derived from terms and categories.
+        Args:
+            terms: list[str]. A list of search terms where at least one term
+                should be included in any of the result documents' fields
+            categories: list[str] a list of values for the category field
+                to filter result documents by
+        
+        Returns:
+            str. A JSON-encoded query string.
+        """
         query = {
             'query': {
                 'bool': {

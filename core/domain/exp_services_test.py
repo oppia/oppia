@@ -336,16 +336,17 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
     def _create_search_query(self, terms, categories, languages):
-        """Creates elastic search query from list of arguments.
-
+                """Returns the search query derived from terms and categories.
         Args:
-            terms: list(str). A list of terms to be added in the query.
-            categories: list(str). A list of categories to be added in the
-                query.
-            languages: list(str). A list of languages to be added in the query.
-
+            terms: list[str]. A list of search terms where at least one term
+                should be included in any of the result documents' fields
+            categories: list[str] a list of values for the category field
+                to filter result documents by
+            languages: list[str] a list of values for the language_code field
+                to filter result documents by
+        
         Returns:
-            str. A search query string.
+            str. A JSON-encoded query string.
         """
         query = {
             'query': {
