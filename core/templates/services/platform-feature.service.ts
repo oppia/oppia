@@ -96,9 +96,6 @@ export class PlatformFeatureService {
    * is done.
    */
   async initialize(): Promise<void> {
-    if (!PlatformFeatureService.platformHasInitialized) {
-      // this._initialize();
-    }
     return PlatformFeatureService.initializationPromise;
   }
 
