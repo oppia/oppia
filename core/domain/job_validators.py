@@ -37,6 +37,7 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'UserImpactAggregator',
     'UserStatsAggregator']
 
+
 class JobModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating JobModels."""
 
@@ -130,6 +131,7 @@ class JobModelValidator(base_model_validators.BaseModelValidator):
             cls._validate_time_fields,
             cls._validate_error,
             cls._validate_output]
+
 
 class ContinuousComputationModelValidator(
         base_model_validators.BaseModelValidator):
