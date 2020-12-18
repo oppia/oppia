@@ -2616,7 +2616,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             })
         self.assertEqual(question.question_state_data.next_content_id_index, 5)
 
-    def test_migrate_question_state_from_v41_to_latest(self):
+    def test_migrate_question_state_from_v40_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
