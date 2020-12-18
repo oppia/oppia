@@ -30,6 +30,9 @@ describe('Question Suggestion Review Modal Controller', function() {
   let QuestionObjectFactory = null;
   let SiteAnalyticsService = null;
   let SuggestionModalService = null;
+  let acceptSuggestionSpy = null;
+  let rejectSuggestionSpy = null;
+  let cancelSuggestionSpy = null;
 
   const authorName = 'Username 1';
   const contentHtml = 'Content html';
@@ -47,6 +50,13 @@ describe('Question Suggestion Review Modal Controller', function() {
     }
   }));
 
+  beforeEach(angular.mock.inject(function($injector) {
+    SuggestionModalService = $injector.get('SuggestionModalService');
+    acceptSuggestionSpy = spyOn(SuggestionModalService, 'acceptSuggestion');
+    rejectSuggestionSpy = spyOn(SuggestionModalService, 'rejectSuggestion');
+    cancelSuggestionSpy = spyOn(SuggestionModalService, 'cancelSuggestion');
+  }));
+
   describe('when skill rubrics is specified', function() {
     const skillRubrics = [{
       explanations: ['explanation'],
@@ -57,7 +67,6 @@ describe('Question Suggestion Review Modal Controller', function() {
       const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-      SuggestionModalService = $injector.get('SuggestionModalService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
@@ -65,7 +74,6 @@ describe('Question Suggestion Review Modal Controller', function() {
       spyOn(
         SiteAnalyticsService,
         'registerContributorDashboardViewSuggestionForReview');
-      spyOnAllFunctions(SuggestionModalService);
 
       question = QuestionObjectFactory.createFromBackendDict({
         id: '1',
@@ -191,7 +199,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect(
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Question');
-      expect(SuggestionModalService.acceptSuggestion).toHaveBeenCalledWith(
+      expect(acceptSuggestionSpy).toHaveBeenCalledWith(
         $uibModalInstance, {
           action: 'accept',
           reviewMessage: 'Review message example',
@@ -211,7 +219,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect(
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Question');
-      expect(SuggestionModalService.rejectSuggestion).toHaveBeenCalledWith(
+      expect(rejectSuggestionSpy).toHaveBeenCalledWith(
         $uibModalInstance, {
           action: 'reject',
           reviewMessage: 'Review message example'
@@ -222,7 +230,7 @@ describe('Question Suggestion Review Modal Controller', function() {
     ' suggestion button', function() {
       $scope.cancel();
 
-      expect(SuggestionModalService.cancelSuggestion).toHaveBeenCalledWith(
+      expect(cancelSuggestionSpy).toHaveBeenCalledWith(
         $uibModalInstance);
     });
   });
@@ -233,12 +241,9 @@ describe('Question Suggestion Review Modal Controller', function() {
     beforeEach(angular.mock.inject(function($injector, $controller) {
       const $rootScope = $injector.get('$rootScope');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      SuggestionModalService = $injector.get('SuggestionModalService');
 
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
-
-      spyOnAllFunctions(SuggestionModalService);
 
       question = QuestionObjectFactory.createFromBackendDict({
         id: '1',
