@@ -16,17 +16,18 @@
  * @fileoverview Directive for the jobs tab in the admin panel.
  */
 
+require('domain/admin/admin-backend-api.service');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminJobsTab', [
-  '$http', '$rootScope', '$timeout', 'AdminDataService',
+  '$http', '$rootScope', '$timeout', 'AdminDataService', 'AdminBackendApiService',
   'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
   function(
-      $http, $rootScope, $timeout, AdminDataService,
+      $http, $rootScope, $timeout, AdminDataService, AdminBackendApiService,
       UrlInterpolationService, ADMIN_HANDLER_URL,
       ADMIN_JOB_OUTPUT_URL_TEMPLATE) {
     return {
@@ -58,10 +59,8 @@ angular.module('oppia').directive('adminJobsTab', [
         ctrl.startNewJob = function(jobType) {
           ctrl.setStatusMessage('Starting new job...');
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'start_new_job',
-            job_type: jobType
-          }).then(function() {
+          AdminBackendApiService.startNewJob(jobType)
+            .then(function() {
             ctrl.setStatusMessage('Job started successfully.');
             window.location.reload();
           }, function(errorResponse) {

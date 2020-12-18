@@ -140,6 +140,15 @@ export class AdminBackendApiService {
       });
     });
   }
+  
+  startNewJob(jobType):Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'start_new_job',
+        job_type: jobType
+      }
+    ).toPromise();
+  }
 }
 
 angular.module('oppia').factory(
