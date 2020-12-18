@@ -23,7 +23,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('pages/splash-page/splash-page.component.ts');
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 
 describe('Splash Page', function() {
   var $scope = null, ctrl = null;

@@ -30,15 +30,15 @@ describe('Opportunities List Item Component', function() {
       ctrl = $componentController('opportunitiesListItem', {
         $scope: $scope,
       }, {
-        getOpportunity: () => ({
+        opportunity: {
           labelText: 'Label text',
           labelColor: '#fff',
           progressPercentage: 50
-        }),
+        },
         onClickActionButton: () => jasmine.createSpy('click', () => {}),
-        isLabelRequired: () => true,
-        isProgressBarRequired: () => true,
-        getOpportunityHeadingTruncationLength: () => null
+        labelRequired: true,
+        progressBarRequired: true,
+        opportunityHeadingTruncationLength: 35
       });
       ctrl.$onInit();
     }));
@@ -66,11 +66,11 @@ describe('Opportunities List Item Component', function() {
       ctrl = $componentController('opportunitiesListItem', {
         $scope: $scope,
       }, {
-        getOpportunity: () => null,
+        opportunity: null,
         onClickActionButton: () => jasmine.createSpy('click', () => {}),
-        isLabelRequired: () => true,
-        isProgressBarRequired: () => true,
-        getOpportunityHeadingTruncationLength: () => null
+        labelRequired: true,
+        progressBarRequired: true,
+        opportunityHeadingTruncationLength: null
       });
       ctrl.$onInit();
     }));

@@ -68,7 +68,6 @@ require('services/stateful/focus-manager.service.ts');
 require('services/translation-file-hash-loader.service.ts');
 require('services/user.service.ts');
 require('google-analytics.initializer.ts');
-const sourceMappedStackTrace = require('sourcemapped-stacktrace');
 // The following file uses constants in app.constants.ts and hence needs to be
 // loaded *after* app.constants.ts.
 require('I18nFooter.ts');
@@ -80,6 +79,10 @@ require('default-passive-events');
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { angularServices } from 'services/angular-services.index';
 import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+
+
+import sourceMappedStackTrace from 'sourcemapped-stacktrace';
+
 angular.module('oppia').config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',
   '$interpolateProvider', '$locationProvider', '$sanitizeProvider',
@@ -277,7 +280,7 @@ angular.module('oppia').factory('$exceptionHandler', [
         // eslint-disable-next-line max-len
         // see: https://web.archive.org/web/20140210004225/http://msdn.microsoft.com/en-us/library/windows/apps/hh699850.aspx
         try {
-          throw new Error(exception);
+          throw new Error(`${exception}`);
         } catch (error) {
           exception = error;
         }
@@ -333,7 +336,7 @@ angular.module('oppia').factory('$exceptionHandler', [
           }
         );
       }
-      $log.error.apply($log, arguments);
+      $log.error(exception);
     };
   }
 ]);

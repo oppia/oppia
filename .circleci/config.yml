@@ -195,10 +195,6 @@ jobs:
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="library" --prod_env
       - run:
-          name: Run e2e classroomPage test
-          command: |
-            python -m scripts.run_e2e_tests --skip-install --skip-build --suite="classroomPage" --prod_env
-      - run:
           name: Run e2e collections test
           command: |
             python -m scripts.run_e2e_tests --skip-install --skip-build --suite="collections" --prod_env

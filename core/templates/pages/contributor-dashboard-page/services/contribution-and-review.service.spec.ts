@@ -32,7 +32,6 @@ describe('ContributionAndReviewService', function() {
   var opportunityDict1;
   var mockSuggestionsBackendObject;
   var expectedSuggestionDict;
-  var suggestionIdToSuggestions;
   var onSuccess;
 
   beforeEach(angular.mock.module('oppia'));
@@ -63,10 +62,6 @@ describe('ContributionAndReviewService', function() {
       suggestion: suggestion1,
       details: opportunityDict1,
     };
-    suggestionIdToSuggestions = {};
-    onSuccess = function(data) {
-      suggestionIdToSuggestions = data;
-    };
   }));
 
   afterEach(function() {
@@ -74,15 +69,15 @@ describe('ContributionAndReviewService', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  describe('getUserCreatedQuestionSuggestions', function() {
+  describe('getUserCreatedQuestionSuggestionsAsync', function() {
     it('should return available question suggestions and opportunity details',
       function() {
         $httpBackend.expect(
           'GET', '/getsubmittedsuggestions/skill/add_question').respond(
           200, mockSuggestionsBackendObject);
 
-        ContributionAndReviewService.getUserCreatedQuestionSuggestions(
-          onSuccess).then(function() {
+        ContributionAndReviewService.getUserCreatedQuestionSuggestionsAsync(
+        ).then(function(suggestionIdToSuggestions) {
           expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
             expectedSuggestionDict);
         });
@@ -90,15 +85,15 @@ describe('ContributionAndReviewService', function() {
       });
   });
 
-  describe('getReviewableQuestionSuggestions', function() {
+  describe('getReviewableQuestionSuggestionsAsync', function() {
     it('should return available question suggestions and opportunity details',
       function() {
         $httpBackend.expect(
           'GET', '/getreviewablesuggestions/skill/add_question').respond(
           200, mockSuggestionsBackendObject);
 
-        ContributionAndReviewService.getReviewableQuestionSuggestions(
-          onSuccess).then(function() {
+        ContributionAndReviewService.getReviewableQuestionSuggestionsAsync(
+          onSuccess).then(function(suggestionIdToSuggestions) {
           expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
             expectedSuggestionDict);
         });
