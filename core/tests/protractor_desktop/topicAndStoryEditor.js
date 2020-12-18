@@ -33,7 +33,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-describe('Topic editor functionality', function() {
+fdescribe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var storyEditorPage = null;
@@ -79,7 +79,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });
 
-  it('should create a question for a skill in the topic', async function() {
+  fit('should create a question for a skill in the topic', async function() {
     var skillId = null;
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();

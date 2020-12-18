@@ -178,57 +178,6 @@ class AnswerGroup(python_utils.OBJECT):
         outcome_html = self.outcome.feedback.html
         html_list += [outcome_html]
 
-        html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
-        for rule_spec in self.rule_specs:
-            for interaction_and_rule_details in (
-                    html_field_types_to_rule_specs_dict.values()):
-                # Check that the value corresponds to the answer group's
-                # associated interaction id.
-                if (
-                        interaction_and_rule_details['interactionId'] !=
-                        interaction_id):
-                    continue
-
-                rule_type_has_html = (
-                    rule_spec.rule_type in
-                    interaction_and_rule_details['ruleTypes'].keys())
-                if rule_type_has_html:
-                    html_type_format = interaction_and_rule_details['format']
-                    input_variables_from_html_mapping = (
-                        interaction_and_rule_details['ruleTypes'][
-                            rule_spec.rule_type][
-                                'htmlInputVariables'])
-                    input_variable_match_found = False
-                    for input_variable in rule_spec.inputs.keys():
-                        if input_variable in input_variables_from_html_mapping:
-                            input_variable_match_found = True
-                            rule_input_variable = (
-                                rule_spec.inputs[input_variable])
-                            if (html_type_format ==
-                                    feconf.HTML_RULE_VARIABLE_FORMAT_STRING):
-                                html_list += [rule_input_variable]
-                            elif (html_type_format ==
-                                  feconf.HTML_RULE_VARIABLE_FORMAT_SET):
-                                for value in rule_input_variable:
-                                    if isinstance(
-                                            value, python_utils.BASESTRING):
-                                        html_list += [value]
-                            elif (html_type_format ==
-                                  feconf.
-                                  HTML_RULE_VARIABLE_FORMAT_LIST_OF_SETS):
-                                for rule_spec_html in rule_input_variable:
-                                    html_list += rule_spec_html
-                            else:
-                                raise Exception(
-                                    'The rule spec does not belong to a valid'
-                                    ' format.')
-                    if not input_variable_match_found:
-                        raise Exception(
-                            'Rule spec should have at least one valid input '
-                            'variable with Html in it.')
-
         return html_list
 
     @staticmethod

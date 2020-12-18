@@ -1803,9 +1803,7 @@ class TranslatableHtmlContentId(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {
-            'type': UnicodeString.get_schema()
-        }
+        return UnicodeString.get_schema()
 
 
 class SetOfTranslatableHtmlContentId(BaseObject):

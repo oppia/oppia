@@ -3110,7 +3110,14 @@ class Exploration(python_utils.OBJECT):
             """
 
             def extract_content_id_from_choices(html):
-                """Given a 
+                """Given a html, find its associated content id in choices,
+                which is a list of subtitled html dicts.
+
+                Args:
+                    html: str. The html to find the content id of.
+
+                Returns:
+                    str. The content id of html.
                 """
                 for subtitled_html_dict in choices:
                     if subtitled_html_dict['html'] == html:
@@ -3123,14 +3130,14 @@ class Exploration(python_utils.OBJECT):
                 return [
                     migrate_rule_inputs(
                         'TranslatableHtmlContentId', html, choices
-                    ) for html in rule_input
+                    ) for html in value
                 ]
             
             if new_type == 'ListOfSetsOfTranslatableHtmlContentId':
                 return [
                     migrate_rule_inputs(
                         'SetOfTranslatableHtmlContentId', html_set, choices
-                    ) for html_set in rule_input
+                    ) for html_set in value
                 ]
 
         for state_dict in states_dict.values():
@@ -3227,7 +3234,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 46
+    CURRENT_EXP_SCHEMA_VERSION = 47
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
