@@ -17,6 +17,7 @@
  */
 import 'core-js/es7/reflect';
 import 'zone.js';
+import 'angular';
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
