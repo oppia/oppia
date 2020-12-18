@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -950,7 +951,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             result.stdout = python_utils.string_io(
-                buffer_value='sample\n\xe2\x9c\x93\noutput\n')
+                buffer_value=u'sample\n✓\noutput\n')
             return result
 
         def mock_get_chrome_driver_version():
