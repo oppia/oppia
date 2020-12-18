@@ -44,7 +44,7 @@ PROTRACTOR_BIN_PATH = os.path.join(
 # file will be created.
 PORTSERVER_SOCKET_FILEPATH = os.path.join(
     os.getcwd(), 'portserver.socket')
-KILL_PORTSERVER_TIMEOUT_SECS = 10
+KILL_TIMEOUT_SECS = 10
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
@@ -169,11 +169,23 @@ def cleanup():
         '.*%s.*' % re.escape(google_app_engine_path),
         '.*%s.*' % re.escape(webdriver_download_path)
     ]
+    # Try to shutdown process cleanly with SIGINT (CTRL-C).
     for p in SUBPROCESSES:
-        p.kill()
+        p.send_signal(signal.SIGINT)
 
+    # If processes take too long to shut down, kill them.
+    for p in SUBPROCESSES:
+        for _ in python_utils.RANGE(KILL_TIMEOUT_SECS):
+            time.sleep(1)
+            if not p.poll():
+                break
+        if p.poll():
+            p.kill()
+
+    # Kill processes by regex.
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
+
     build.set_constants_to_default()
     common.stop_redis_server()
 
@@ -489,17 +501,17 @@ def start_portserver():
 def cleanup_portserver(portserver_process):
     """Shut down the portserver.
 
-    We wait KILL_PORTSERVER_TIMEOUT_SECS seconds for the portserver to
-    shut down after sending CTRL-C (SIGINT). The portserver is configured
-    to shut down cleanly upon receiving this signal. If the server fails
-    to shut down, we kill the process.
+    We wait KILL_TIMEOUT_SECS seconds for the portserver to shut down
+    after sending CTRL-C (SIGINT). The portserver is configured to shut
+    down cleanly upon receiving this signal. If the server fails to shut
+    down, we kill the process.
 
     Args:
         portserver_process: subprocess.Popen. The Popen subprocess
             object for the portserver.
     """
     portserver_process.send_signal(signal.SIGINT)
-    for _ in python_utils.RANGE(KILL_PORTSERVER_TIMEOUT_SECS):
+    for _ in python_utils.RANGE(KILL_TIMEOUT_SECS):
         time.sleep(1)
         if not portserver_process.poll():
             break
@@ -580,15 +592,15 @@ def main(args=None):
         if return_code == 0:
             flake_checker.report_pass(parsed_args.suite)
             break
+        # Don't rerun off of CI.
+        if not flake_checker.check_if_on_ci():
+            python_utils.PRINT('No reruns because not running on CI.')
+            break
         flaky = flake_checker.is_test_output_flaky(
             output, parsed_args.suite)
         # Don't rerun if the test was non-flaky and we are not
         # rerunning non-flaky tests.
         if not flaky and not RERUN_NON_FLAKY:
-            break
-        # Don't rerun off of CI.
-        if not flake_checker.check_if_on_ci():
-            python_utils.PRINT('No reruns because not running on CI.')
             break
         # Prepare for rerun.
         cleanup()
