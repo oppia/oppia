@@ -27,6 +27,7 @@ import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { TopicSummary } from 'domain/topic/topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
@@ -197,4 +198,117 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
+});
+
+describe('Admin Backend API service for Jobs Tab', () => {
+  let adminBackendApiService: AdminBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [AdminBackendApiService]
+    });
+    httpTestingController = TestBed.get(HttpTestingController);
+    adminBackendApiService = TestBed.get(AdminBackendApiService);
+    csrfService = TestBed.get(CsrfTokenService);
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('sample-csrf-token');
+    });
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+  it('should start the new job with respect to its jobType',
+    fakeAsync(() => {
+      let jobType = 'ActivityContributorsSummaryOneOffJob';
+      adminBackendApiService.startNewJob(jobType)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should cancel the job with respects to its jobType and jobId',
+    fakeAsync(() => {
+      let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
+      let jobType = 'AuditContributorsOneOffJob';
+      adminBackendApiService.cancelJob(jobId, jobType)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should start computation with respect to its computationType',
+    fakeAsync(() => {
+      let computationType = 'FeedbackAnalyticsAggregator';
+      adminBackendApiService.startComputation(computationType)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should stop computation with respect to its computationType',
+    fakeAsync(() => {
+      let computationType = 'FeedbackAnalyticsAggregator';
+      adminBackendApiService.stopComputation(computationType)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should show the Output of valid Jobs',
+    fakeAsync(() => {
+      let adminJobOutputUrl =
+        '/adminjoboutput?job_id=RemoveGaeUserIdOneOffJob-1608282829960-668';
+      adminBackendApiService.showJobOutput(adminJobOutputUrl)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(adminJobOutputUrl);
+      expect(req.request.method).toEqual('GET');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
 });

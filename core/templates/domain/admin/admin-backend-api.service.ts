@@ -149,6 +149,39 @@ export class AdminBackendApiService {
       }
     ).toPromise();
   }
+
+  cancelJob(jobId, jobType):Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'cancel_job',
+        job_id: jobId,
+        job_type: jobType
+      }
+    ).toPromise();
+  }
+
+  startComputation(computationType):Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'start_computation',
+        computation_type: computationType
+      }
+    ).toPromise();
+  }
+
+  stopComputation(computationType):Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_HANDLER_URL, {
+        action: 'stop_computation',
+        computation_type: computationType
+      }
+    ).toPromise();
+  }
+  
+  showJobOutput(adminJobOutputUrl):Promise<ArrayBuffer> {
+    return this.http.get<ArrayBuffer>(adminJobOutputUrl)
+      .toPromise();
+  }
 }
 
 angular.module('oppia').factory(

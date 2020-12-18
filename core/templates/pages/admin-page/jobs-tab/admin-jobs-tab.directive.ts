@@ -46,9 +46,10 @@ angular.module('oppia').directive('adminJobsTab', [
             ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
               jobId: jobId
             });
-          $http.get(adminJobOutputUrl).then(function(response) {
+          AdminBackendApiService.showJobOutput(adminJobOutputUrl)
+            .then(function(response) {
             ctrl.showingJobOutput = true;
-            ctrl.jobOutput = response.data.output || [];
+            ctrl.jobOutput = response.output || [];
             ctrl.jobOutput.sort();
             $timeout(function() {
               document.querySelector('#job-output').scrollIntoView();
@@ -65,53 +66,46 @@ angular.module('oppia').directive('adminJobsTab', [
             window.location.reload();
           }, function(errorResponse) {
             ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse.error.error);
           });
         };
 
         ctrl.cancelJob = function(jobId, jobType) {
           ctrl.setStatusMessage('Cancelling job...');
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'cancel_job',
-            job_id: jobId,
-            job_type: jobType
-          }).then(function() {
+          AdminBackendApiService.cancelJob(jobId, jobType)
+            .then(function() {
             ctrl.setStatusMessage('Abort signal sent to job.');
             window.location.reload();
           }, function(errorResponse) {
             ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse.error.error);
           });
         };
 
         ctrl.startComputation = function(computationType) {
           ctrl.setStatusMessage('Starting computation...');
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'start_computation',
-            computation_type: computationType
-          }).then(function() {
+          AdminBackendApiService.startComputation(computationType)
+            .then(function() {
             ctrl.setStatusMessage('Computation started successfully.');
             window.location.reload();
           }, function(errorResponse) {
             ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse.error.error);
           });
         };
 
         ctrl.stopComputation = function(computationType) {
           ctrl.setStatusMessage('Stopping computation...');
 
-          $http.post(ADMIN_HANDLER_URL, {
-            action: 'stop_computation',
-            computation_type: computationType
-          }).then(function() {
+          AdminBackendApiService.stopComputation(computationType)
+            .then(function() {
             ctrl.setStatusMessage('Abort signal sent to computation.');
             window.location.reload();
           }, function(errorResponse) {
             ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
+              'Server error: ' + errorResponse.error.error);
           });
         };
         ctrl.$onInit = function() {
