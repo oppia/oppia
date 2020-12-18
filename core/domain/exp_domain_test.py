@@ -8774,8 +8774,7 @@ title: Title
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
     def test_load_from_v45_with_set_input_interaction(self):
-        """Tests the migration of SetInput rule inputs.
-        """
+        """Tests the migration of SetInput rule inputs."""
         sample_yaml_content = (
             """author_notes: ''
 auto_tts_enabled: true
