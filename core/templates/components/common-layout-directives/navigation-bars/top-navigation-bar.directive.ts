@@ -138,11 +138,6 @@ angular.module('oppia').directive('topNavigationBar', [
           };
 
           ctrl.isSidebarShown = function() {
-            if (SidebarStatusService.isSidebarShown()) {
-              angular.element(document.body).addClass('oppia-stop-scroll');
-            } else {
-              angular.element(document.body).removeClass('oppia-stop-scroll');
-            }
             return SidebarStatusService.isSidebarShown();
           };
           ctrl.toggleSidebar = function() {
