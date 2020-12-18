@@ -54,12 +54,12 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/creator-dashboard-page/creator-dashboard-page.module.ts');
+const { CreatorDashboardPageModule } = require(
+  'pages/creator-dashboard-page/creator-dashboard-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { CreatorDashboardPageModule } from './creator-dashboard-page.module';
 platformBrowserDynamic().bootstrapModule(CreatorDashboardPageModule);

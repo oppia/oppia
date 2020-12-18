@@ -18,7 +18,7 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
-import 'angular'; 
+import 'angular';
 
 import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
@@ -55,7 +55,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/story-viewer-page/story-viewer-page.module.ts');
+const { StoryViewerPageModule } = require(
+  'pages/story-viewer-page/story-viewer-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
@@ -63,5 +64,4 @@ require('base-components/base-content.directive.ts');
 require('pages/story-viewer-page/story-viewer-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { StoryViewerPageModule } from './story-viewer-page.module';
 platformBrowserDynamic().bootstrapModule(StoryViewerPageModule);

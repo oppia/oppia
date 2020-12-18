@@ -54,7 +54,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/profile-page/profile-page.module.ts');
+const { ProfilePageModule } = require(
+  'pages/profile-page/profile-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
@@ -62,5 +63,4 @@ require('pages/OppiaFooterDirective.ts');
 require('pages/profile-page/profile-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { ProfilePageModule } from './profile-page.module';
 platformBrowserDynamic().bootstrapModule(ProfilePageModule);

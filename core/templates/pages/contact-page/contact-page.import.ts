@@ -55,12 +55,12 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/contact-page/contact-page.module.ts');
+const { ContactPageModule } = require(
+  'pages/contact-page/contact-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { ContactPageModule } from './contact-page.module';
 platformBrowserDynamic().bootstrapModule(ContactPageModule);

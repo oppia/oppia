@@ -55,7 +55,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/collection-player-page/collection-player-page.module.ts');
+const { CollectionPlayerPageModule } = require(
+  'pages/collection-player-page/collection-player-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
@@ -72,5 +73,4 @@ require(
 require('pages/collection-player-page/collection-player-page.directive.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { CollectionPlayerPageModule } from './collection-player-page.module';
 platformBrowserDynamic().bootstrapModule(CollectionPlayerPageModule);

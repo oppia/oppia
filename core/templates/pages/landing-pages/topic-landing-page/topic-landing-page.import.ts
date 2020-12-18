@@ -55,12 +55,12 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
+const { TopicLandingPageModule } = require(
+  'pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/OppiaFooterDirective.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { TopicLandingPageModule } from './topic-landing-page.module';
 platformBrowserDynamic().bootstrapModule(TopicLandingPageModule);

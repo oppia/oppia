@@ -59,7 +59,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/story-editor-page/story-editor-page.module.ts');
+const { StoryEditorPageModule } = require(
+  'pages/story-editor-page/story-editor-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
@@ -74,5 +75,4 @@ require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
 require('pages/story-editor-page/story-editor-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { StoryEditorPageModule } from './story-editor-page.module';
 platformBrowserDynamic().bootstrapModule(StoryEditorPageModule);

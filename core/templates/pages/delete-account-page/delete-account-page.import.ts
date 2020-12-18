@@ -53,12 +53,11 @@ angular.module('oppia', [
 ]);
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('./delete-account-page.module.ts');
+const { DeleteAccountPageModule } = require('./delete-account-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('./delete-account-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { DeleteAccountPageModule } from './delete-account-page.module';
 platformBrowserDynamic().bootstrapModule(DeleteAccountPageModule);

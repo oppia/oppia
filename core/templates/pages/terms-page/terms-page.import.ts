@@ -53,12 +53,11 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/terms-page/terms-page.module.ts');
+const { TermsPageModule } = require('pages/terms-page/terms-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('base-components/base-content.directive.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { TermsPageModule } from './terms-page.module';
 platformBrowserDynamic().bootstrapModule(TermsPageModule);

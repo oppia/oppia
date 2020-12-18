@@ -52,7 +52,7 @@ angular.module('oppia', [
 ]);
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/donate-page/donate-page.module.ts');
+const { DonatePageModule } = require('pages/donate-page/donate-page.module.ts');
 require('pages/Base.ts');
 require('App.ts');
 require('base-components/base-content.directive.ts');
@@ -61,5 +61,4 @@ require('base-components/oppia-root.directive.ts');
 require('pages/OppiaFooterDirective.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { DonatePageModule } from './donate-page.module';
 platformBrowserDynamic().bootstrapModule(DonatePageModule);

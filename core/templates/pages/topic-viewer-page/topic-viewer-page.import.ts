@@ -55,7 +55,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/topic-viewer-page/topic-viewer-page.module.ts');
+const { TopicViewerPageModule } = require(
+  'pages/topic-viewer-page/topic-viewer-page.module.ts');
 require('App.ts');
 require('base-components/base-content.directive.ts');
 require('base-components/oppia-root.directive.ts');
@@ -66,5 +67,4 @@ require(
 require('pages/topic-viewer-page/topic-viewer-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { TopicViewerPageModule } from './topic-viewer-page.module';
 platformBrowserDynamic().bootstrapModule(TopicViewerPageModule);

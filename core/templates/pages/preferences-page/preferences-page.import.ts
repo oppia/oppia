@@ -53,7 +53,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/preferences-page/preferences-page.module.ts');
+const { PreferencesPageModule } = require(
+  'pages/preferences-page/preferences-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
@@ -62,5 +63,4 @@ require('pages/OppiaFooterDirective.ts');
 require('pages/preferences-page/preferences-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { PreferencesPageModule } from './preferences-page.module';
 platformBrowserDynamic().bootstrapModule(PreferencesPageModule);

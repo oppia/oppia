@@ -55,12 +55,12 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/moderator-page/moderator-page.module.ts');
+const { ModeratorPageModule } = require(
+  'pages/moderator-page/moderator-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/moderator-page/moderator-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { ModeratorPageModule } from './moderator-page.module';
 platformBrowserDynamic().bootstrapModule(ModeratorPageModule);

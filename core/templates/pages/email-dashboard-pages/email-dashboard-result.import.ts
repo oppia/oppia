@@ -54,12 +54,12 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/email-dashboard-pages/email-dashboard-result.module.ts');
+const { EmailDashboardResultModule } = require(
+  'pages/email-dashboard-pages/email-dashboard-result.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require('pages/email-dashboard-pages/email-dashboard-result.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { EmailDashboardResultModule } from './email-dashboard-result.module';
 platformBrowserDynamic().bootstrapModule(EmailDashboardResultModule);

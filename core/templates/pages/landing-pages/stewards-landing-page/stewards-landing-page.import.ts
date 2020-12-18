@@ -54,7 +54,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts');
+const { StewardsLandingPageModule } = require(
+  'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
@@ -63,5 +64,4 @@ require(
   'stewards-landing-page.component.ts');
 // Bootstrap the application.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { StewardsLandingPageModule } from './stewards-landing-page.module';
 platformBrowserDynamic().bootstrapModule(StewardsLandingPageModule);
