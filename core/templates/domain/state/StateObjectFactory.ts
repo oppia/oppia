@@ -122,8 +122,12 @@ export class StateObjectFactory {
     private subtitledHtmlObject: SubtitledHtmlObjectFactory,
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
+  get NEW_STATE_TEMPLATE(): StateBackendDict {
+    return constants.NEW_STATE_TEMPLATE;
+  }
+
   createDefaultState(newStateName: string): State {
-    var newStateTemplate = constants.NEW_STATE_TEMPLATE;
+    var newStateTemplate = this.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
       content: newStateTemplate.content,
