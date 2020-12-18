@@ -19,6 +19,7 @@
 import { TestBed, fakeAsync, flushMicrotasks, tick } from
   '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { of } from 'rxjs';
 
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PlatformFeatureService, platformFeatureInitFactory } from
@@ -91,10 +92,10 @@ describe('PlatformFeatureService', () => {
     spyOn(urlService, 'getPathname').and.callFake(() => pathName);
     mockPathName = path => pathName = path;
 
-    apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.resolveTo(
-      FeatureStatusSummary.createFromBackendDict({
+    apiSpy = spyOn(apiService, 'fetchFeatureFlags').and.returnValue(
+      of(FeatureStatusSummary.createFromBackendDict({
         [FeatureNames.DummyFeature]: true,
-      })
+      }))
     );
   });
 

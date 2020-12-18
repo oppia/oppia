@@ -58,8 +58,8 @@ describe('PlatformFeatureBackendApiService', () => {
           feature_b: false,
         };
 
-        platformFeatureBackendApiService.fetchFeatureFlags(context)
-          .then(successHandler, failHandler);
+        let subscription = platformFeatureBackendApiService.fetchFeatureFlags(
+          context).subscribe(successHandler, failHandler);
 
         flushMicrotasks();
 
@@ -70,6 +70,7 @@ describe('PlatformFeatureBackendApiService', () => {
         httpTestingController.expectOne(urlWithParams).flush(responseDict);
 
         flushMicrotasks();
+        subscription.unsubscribe();
         expect(successHandler).toHaveBeenCalledWith(
           FeatureStatusSummary.createFromBackendDict(responseDict)
         );
@@ -84,8 +85,8 @@ describe('PlatformFeatureBackendApiService', () => {
       const context = ClientContext.create('Web', 'Chrome');
       const contextDict = context.toBackendDict();
 
-      platformFeatureBackendApiService.fetchFeatureFlags(context)
-        .then(successHandler, failHandler);
+      let subscription = platformFeatureBackendApiService.fetchFeatureFlags(
+        context).subscribe(successHandler, failHandler);
 
       flushMicrotasks();
 
@@ -98,6 +99,7 @@ describe('PlatformFeatureBackendApiService', () => {
         .error(new ErrorEvent('Error'));
 
       flushMicrotasks();
+      subscription.unsubscribe();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
     }));
