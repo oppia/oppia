@@ -336,27 +336,6 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
     def _create_search_query(self, terms, categories, languages):
-        """Creates search query from list of arguments.
-
-        Args:
-            terms: list(str). A list of terms to be added in the query.
-            categories: list(str). A list of categories to be added in the
-                query.
-            languages: list(str). A list of languages to be added in the query.
-
-        Returns:
-            str. A search query string.
-        """
-        query = ' '.join(terms)
-        if categories:
-            query += ' category=(' + ' OR '.join([
-                '"%s"' % category for category in categories]) + ')'
-        if languages:
-            query += ' language_code=(' + ' OR '.join([
-                '"%s"' % language for language in languages]) + ')'
-        return query
-
-    def _create_elastic_search_query(self, terms, categories, languages):
         """Creates elastic search query from list of arguments.
 
         Args:
@@ -464,45 +443,45 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     def test_search_exploration_summaries(self):
         # Search within the 'Architecture' category.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_elastic_search_query([], ['Architecture'], []))
+            self._create_search_query([], ['Architecture'], []))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Search for explorations in Finnish.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_elastic_search_query([], [], ['fi']))
+            self._create_search_query([], [], ['fi']))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_1, self.EXP_ID_5])
 
         # Search for Finnish explorations in the 'Architecture' category.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_elastic_search_query([], ['Architecture'], ['fi']))
+            self._create_search_query([], ['Architecture'], ['fi']))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_1])
 
         # Search for explorations containing 'Oppia'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_elastic_search_query(['Oppia'], [], []))
+            self._create_search_query(['Oppia'], [], []))
         self.assertEqual(
             sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5])
 
         # Search for explorations containing 'Oppia' and 'Introduce'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_elastic_search_query(['Oppia', 'Introduce'], [], []))
+            self._create_search_query(['Oppia', 'Introduce'], [], []))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3])
 
         # Search for explorations containing 'England' in English.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_elastic_search_query(['England'], [], ['en']))
+            self._create_search_query(['England'], [], ['en']))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0])
 
         # Search for explorations containing 'in'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_elastic_search_query(['in'], [], []))
+            self._create_search_query(['in'], [], []))
         self.assertEqual(
             sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3, self.EXP_ID_6])
 
         # Search for explorations containing 'in' in the 'Architecture' and
         # 'Welcome' categories.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_elastic_search_query(
+            self._create_search_query(
                 ['in'], ['Architecture', 'Welcome'], []))
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3])
 

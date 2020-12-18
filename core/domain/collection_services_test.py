@@ -649,14 +649,6 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
 
     def _create_search_query(self, terms, categories):
         """Returns the search query derived from terms and categories."""
-        query = ' '.join(terms)
-        if categories:
-            query += ' category=(' + ' OR '.join([
-                '"%s"' % category for category in categories]) + ')'
-        return query
-
-    def _create_elastic_search_query(self, terms, categories):
-        """Returns the search query derived from terms and categories."""
         query = {
             'query': {
                 'bool': {
@@ -746,32 +738,32 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         # Search within the 'Architecture' category.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_elastic_search_query([], ['Architecture'])))[0]
+                self._create_search_query([], ['Architecture'])))[0]
         self.assertEqual(col_ids, [self.COL_ID_0])
 
         # Search for collections containing 'Oppia'.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_elastic_search_query(['Oppia'], [])))[0]
+                self._create_search_query(['Oppia'], [])))[0]
         self.assertEqual(sorted(col_ids), [self.COL_ID_1, self.COL_ID_2])
 
         # Search for collections containing 'Oppia' and 'Introduce'.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_elastic_search_query(
+                self._create_search_query(
                     ['Oppia', 'Introduce'], [])))[0]
         self.assertEqual(sorted(col_ids), [self.COL_ID_1, self.COL_ID_2])
 
         # Search for collections containing 'England'.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_elastic_search_query(['England'], [])))[0]
+                self._create_search_query(['England'], [])))[0]
         self.assertEqual(col_ids, [self.COL_ID_0])
 
         # Search for collections containing 'in'.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_elastic_search_query(['in'], [])))[0]
+                self._create_search_query(['in'], [])))[0]
         self.assertEqual(
             sorted(col_ids), [self.COL_ID_0, self.COL_ID_2, self.COL_ID_4])
 
@@ -779,7 +771,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         # 'Welcome' categories.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_elastic_search_query(
+                self._create_search_query(
                     ['in'], ['Architecture', 'Welcome'])))[0]
         self.assertEqual(sorted(col_ids), [self.COL_ID_0, self.COL_ID_2])
 
