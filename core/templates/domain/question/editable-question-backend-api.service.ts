@@ -45,7 +45,7 @@ export interface UpdateEditableQuestionBackendResponse {
 }
 export interface FetchQuestionResponse{
   questionObject: Question,
-  associated_skill_dicts: SkillBackendDict[];
+  'associated_skill_dicts': SkillBackendDict[];
 }
 export interface ImageData {
   filename: string,
