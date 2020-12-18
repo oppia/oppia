@@ -880,6 +880,130 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v41_dict_to_v42_dict(cls, question_state_dict):
+        """Converts from version 41 to 42. Version 42 changes rule input types
+        for DragAndDropSortInput and ItemSelectionInput interactions to better
+        support translations. Specifically, the rule inputs will store content
+        ids of the html rather than the raw html.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        def migrate_rule_inputs(new_type, value, choices):
+            """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentId,
+            ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentId,
+            and DragAndDropHtmlString to TranslatableHtmlContentId. These
+            migrations are necessary to have rules work easily for multiple
+            languages; instead of comparing html for equality, we compare
+            content_ids for equality.
+
+            Args:
+                new_type: str. The type to migrate to.
+                value: *. The value to migrate.
+                choices: list(dict). The list of subtitled html dicts to extract
+                    content ids from.
+
+            Returns:
+                *. The migrated rule input.
+            """
+
+            def extract_content_id_from_choices(html):
+                """Given a html, find its associated content id in choices,
+                which is a list of subtitled html dicts.
+
+                Args:
+                    html: str. The html to find the content id of.
+
+                Returns:
+                    str. The content id of html.
+                """
+                for subtitled_html_dict in choices:
+                    if subtitled_html_dict['html'] == html:
+                        return subtitled_html_dict['content_id']
+            
+            if new_type == 'TranslatableHtmlContentId':
+                return extract_content_id_from_choices(value)
+
+            if new_type == 'SetOfTranslatableHtmlContentId':
+                return [
+                    migrate_rule_inputs(
+                        'TranslatableHtmlContentId', html, choices
+                    ) for html in value
+                ]
+            
+            if new_type == 'ListOfSetsOfTranslatableHtmlContentId':
+                return [
+                    migrate_rule_inputs(
+                        'SetOfTranslatableHtmlContentId', html_set, choices
+                    ) for html_set in value
+                ]
+
+        interaction_id = question_state_dict['interaction']['id']
+        if interaction_id not in [
+            'DragAndDropSortInput', 'ItemSelectionInput']:
+            return question_state_dict
+
+        choices = question_state_dict['interaction']['customization_args'][
+            'choices']['value']
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                rule_type = rule_spec_dict['rule_type']
+                rule_inputs = rule_spec_dict['inputs']
+
+                if interaction_id == 'ItemSelectionInput':
+                    # All rule inputs for ItemSelectionInput will be
+                    # migrated from SetOfHtmlString to
+                    # SetOfTranslatableHtmlContentId.
+                    rule_inputs['x'] = migrate_rule_inputs(
+                        'SetOfTranslatableHtmlContentId',
+                        rule_inputs['x'],
+                        choices)
+                if interaction_id == 'DragAndDropSortInput':
+                    if rule_type in [
+                        'IsEqualToOrdering',
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                    ]:
+                        # For rule type IsEqualToOrdering and
+                        # IsEqualToOrderingWithOneItemAtIncorrectPosition,
+                        # the x input will be migrated from
+                        # ListOfSetsOfHtmlStrings to
+                        # ListOfSetsOfTranslatableHtmlContentId.
+                        rule_inputs['x'] = migrate_rule_inputs(
+                            'ListOfSetsOfTranslatableHtmlContentId',
+                            rule_inputs['x'],
+                            choices)
+                    elif rule_type == 'HasElementXAtPositionY':
+                        # For rule type HasElementXAtPositionY,
+                        # the x input will be migrated from
+                        # DragAndDropHtmlString to
+                        # TranslatableHtmlContentId, and the y input will
+                        # remain as DragAndDropPositiveInt.
+                        rule_inputs['x'] = migrate_rule_inputs(
+                            'TranslatableHtmlContentId',
+                            rule_inputs['x'],
+                            choices)
+                    elif rule_type == 'HasElementXBeforeElementY':
+                        # For rule type HasElementXBeforeElementY,
+                        # the x and y inputs will be migrated from
+                        # DragAndDropHtmlString to
+                        # TranslatableHtmlContentId.
+                        for rule_input_name in ['x', 'y']:
+                            rule_inputs[rule_input_name] = (
+                                migrate_rule_inputs(
+                                    'TranslatableHtmlContentId',
+                                    rule_inputs[rule_input_name],
+                                    choices))
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given

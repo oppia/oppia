@@ -3077,10 +3077,10 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v41_dict_to_v42_dict(cls, states_dict):
-        """Converts from version 41 to 42. Version 42 Changes rule input types
+        """Converts from version 41 to 42. Version 42 changes rule input types
         for DragAndDropSortInput and ItemSelectionInput interactions to better
         support translations. Specifically, the rule inputs will store content
-        ids of html rather than the raw html.
+        ids of the html rather than the raw html.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
