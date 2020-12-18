@@ -32,18 +32,6 @@ export class PageTitleService {
 
   setPageTitle(title: string): void {
     this.titleService.setTitle(title);
-    this.metaTagService.updateTag({
-      itemprop: 'name',
-      content: title
-    });
-    this.metaTagService.updateTag({
-      name: 'name',
-      content: title
-    });
-    this.metaTagService.updateTag({
-      property: 'og:title',
-      content: title
-    });
   }
 
   getPageTitle(): string {

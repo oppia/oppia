@@ -16,8 +16,6 @@
  * @fileoverview Component for the topic editor page.
  */
 
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
@@ -60,14 +58,15 @@ angular.module('oppia').directive('topicEditorPage', [
       controllerAs: '$ctrl',
       controller: [
         'BottomNavbarStatusService', 'ContextService', 'LoaderService',
+        'PageTitleService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'UndoRedoService', 'UrlService', 'WindowRef',
         function(
             BottomNavbarStatusService, ContextService, LoaderService,
+            PageTitleService,
             TopicEditorRoutingService, TopicEditorStateService,
             UndoRedoService, UrlService, WindowRef) {
           var ctrl = this;
-          const pageTitleService = OppiaAngularRootComponent.pageTitleService;
           ctrl.directiveSubscriptions = new Subscription();
           ctrl.getActiveTabName = function() {
             return TopicEditorRoutingService.getActiveTabName();
@@ -78,9 +77,9 @@ angular.module('oppia').directive('topicEditorPage', [
 
           var setPageTitle = function() {
             let topicName = TopicEditorStateService.getTopic().getName();
-            pageTitleService.setPageTitle(
+            PageTitleService.setPageTitle(
               topicName + ' - Oppia');
-            pageTitleService.setPageSubtitleForMobileView(topicName);
+            PageTitleService.setPageSubtitleForMobileView(topicName);
             ctrl.topic = TopicEditorStateService.getTopic();
             ctrl._validateTopic();
           };
@@ -207,7 +206,7 @@ angular.module('oppia').directive('topicEditorPage', [
                 () => setPageTitle()
               ));
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
-            pageTitleService.setPageTitleForMobileView('Topic Editor');
+            PageTitleService.setPageTitleForMobileView('Topic Editor');
             ctrl.setUpBeforeUnload();
             ctrl.validationIssues = [];
             ctrl.prepublishValidationIssues = [];
