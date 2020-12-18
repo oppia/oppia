@@ -2606,6 +2606,12 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
                 self.NONEXISTENT_USER_ID)
         )
 
+    def test_get_by_gae_id_for_correct_gae_id(self):
+        self.assertEqual(
+            user_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID),
+            user_models.UserIdentifiersModel.get_by_gae_id(self.USER_GAE_ID)
+        )
+
     def test_get_by_user_id_for_correct_user_id(self):
         self.assertEqual(
             user_models.UserIdentifiersModel.get_by_id(self.USER_GAE_ID),
