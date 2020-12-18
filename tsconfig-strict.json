@@ -97,6 +97,8 @@
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.spec.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
+    "extensions/interactions/LogicProof/directives/logic-proof-rules.service.ts",
+    "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts",
   ],
   "include": ["typings/*.ts"]
 }
