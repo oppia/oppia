@@ -129,14 +129,10 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
 
       $scope.canPublish = true;
 
-      $scope.refreshPermissions = function(permissions) {
-        $scope.canPublish = permissions.canPublish;
-      };
-
       $scope.showPublishButton = function() {
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
-            $scope.refreshPermissions(permissions);
+            $scope.canPublish = permissions.canPublish;
             $rootScope.$applyAsync();
           });
 

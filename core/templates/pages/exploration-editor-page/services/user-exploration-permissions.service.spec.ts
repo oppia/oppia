@@ -65,7 +65,7 @@ describe('User Exploration Permissions Service', () => {
   });
 
   it('should fetch the correct data', fakeAsync(() => {
-    ueps.getPermissionsAsync().then(function(response) {
+    ueps.getPermissionsAsync(false).then(function(response) {
       expect(response).toEqual(permissionsResponse);
     });
 
@@ -77,14 +77,22 @@ describe('User Exploration Permissions Service', () => {
   }));
 
   it('should cache rights data', fakeAsync(() => {
-    ueps.getPermissionsAsync();
+    ueps.getPermissionsAsync(false);
     let req = httpTestingController.expectOne(
       '/createhandler/permissions/' + sampleExplorationId);
     expect(req.request.method).toEqual('GET');
     req.flush(samplePermissionsData);
     flushMicrotasks();
 
-    ueps.getPermissionsAsync();
+    ueps.getPermissionsAsync(true);
+
+    let req2 = httpTestingController.expectOne(
+      '/createhandler/permissions/' + sampleExplorationId);
+    expect(req2.request.method).toEqual('GET');
+    req2.flush(samplePermissionsData);
+    flushMicrotasks();
+
+    ueps.getPermissionsAsync(false);
     httpTestingController.expectNone(
       '/createhandler/permissions/' + sampleExplorationId);
   }));

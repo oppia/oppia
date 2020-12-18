@@ -411,8 +411,6 @@ angular.module('oppia').component('settingsTab', {
         ctrl.TAG_REGEX = TAG_REGEX;
         ctrl.canDelete = false;
         ctrl.canModifyRoles = false;
-        ctrl.canReleaseOwnership = false;
-        ctrl.canUnpublish = false;
         ctrl.explorationId = ExplorationDataService.explorationId;
 
         UserExplorationPermissionsService.getPermissionsAsync()
@@ -467,15 +465,11 @@ angular.module('oppia').component('settingsTab', {
       ctrl.canReleaseOwnership = false;
       ctrl.canUnpublish = false;
 
-      ctrl.refreshPermissions = function(permissions) {
-        ctrl.canUnpublish = permissions.canUnpublish;
-        ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-      };
-
       ctrl.showUnpublishButton = function() {
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
-            ctrl.refreshPermissions(permissions);
+            ctrl.canUnpublish = permissions.canUnpublish;
+            ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
             $rootScope.$applyAsync();
           });
         return ctrl.canUnpublish;
