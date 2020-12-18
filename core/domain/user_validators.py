@@ -429,7 +429,8 @@ class UserSubscriptionsModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
-                'exploration_ids', exp_models.ExplorationModel,
+                'exploration_ids',
+                exp_models.ExplorationModel,
                 item.exploration_ids),
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
