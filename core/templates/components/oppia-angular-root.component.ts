@@ -319,8 +319,6 @@ import { PlaythroughIssuesBackendApiService } from
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
-import { PopulateRuleContentIdsService } from
-  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
