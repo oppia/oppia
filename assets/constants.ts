@@ -17,7 +17,7 @@
  * @fileoverview Initializes constants for the Oppia codebase.
  */
 
-export = {
+export default {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
@@ -5243,6 +5243,10 @@ export = {
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
+
+  // The default number of opportunities to show on the contributor dashboard
+  // page.
+  "OPPORTUNITIES_PAGE_SIZE": 10,
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
