@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
+
 from core.domain import collection_services
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -30,7 +32,8 @@ from core.platform import models
 from core.tests import test_utils
 import python_utils
 
-gae_search_services = models.Registry.import_search_services()
+
+es_search_services = models.Registry.import_search_services()
 
 
 class SearchServicesUnitTests(test_utils.GenericTestBase):
@@ -38,6 +41,26 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
     EXP_ID = 'An_exploration_id'
     COLLECTION_ID = 'A_collection_id'
+
+    def _create_search_query(self, term_string):
+        """Returns the search query derived from terms and categories.
+        Args:
+            terms: str. A string of search terms separated by spaces
+        Returns:
+            str. A JSON-encoded query string.
+        """
+        query = {
+            'query': {
+                'bool': {
+                    'must': [
+                        {'multi_match': {'query': term_string}}
+                    ],
+                    'filter':[]
+                }
+            }
+        }
+
+        return json.dumps(query)
 
     def setUp(self):
         super(SearchServicesUnitTests, self).setUp()
@@ -135,7 +158,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
             return doc_ids, expected_result_cursor
 
-        with self.swap(gae_search_services, 'search', mock_search):
+        with self.swap(es_search_services, 'search', mock_search):
             result, result_cursor = search_services.search_explorations(
                 expected_query_string,
                 expected_size,
@@ -165,7 +188,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
             return doc_ids, expected_result_cursor
 
-        with self.swap(gae_search_services, 'search', mock_search):
+        with self.swap(es_search_services, 'search', mock_search):
             result, result_cursor = search_services.search_collections(
                 expected_query_string,
                 expected_size,
@@ -176,35 +199,43 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, doc_ids)
 
     def test_demo_collections_are_added_to_search_index(self):
-        results = search_services.search_collections('Welcome', 2)[0]
+        results = search_services.search_collections(
+            self._create_search_query('Welcome'), 2)[0]
         self.assertEqual(results, [])
 
         collection_services.load_demo('0')
-        results = search_services.search_collections('Welcome', 2)[0]
+        results = search_services.search_collections(
+            self._create_search_query('Welcome'), 2)[0]
         self.assertEqual(results, ['0'])
 
     def test_demo_explorations_are_added_to_search_index(self):
-        results, _ = search_services.search_explorations('Welcome', 2)
+        results, _ = search_services.search_explorations(
+            self._create_search_query('Welcome'), 2)
         self.assertEqual(results, [])
 
         exp_services.load_demo('0')
-        results, _ = search_services.search_explorations('Welcome', 2)
+        results, _ = search_services.search_explorations(
+            self._create_search_query('Welcome'), 2)
         self.assertEqual(results, ['0'])
 
     def test_clear_exploration_search_index(self):
         exp_services.load_demo('0')
-        result = search_services.search_explorations('Welcome', 2)[0]
+        result = search_services.search_explorations(
+            self._create_search_query('Welcome'), 2)[0]
         self.assertEqual(result, ['0'])
         search_services.clear_exploration_search_index()
-        result = search_services.search_explorations('Welcome', 2)[0]
+        result = search_services.search_explorations(
+            self._create_search_query('Welcome'), 2)[0]
         self.assertEqual(result, [])
 
     def test_clear_collection_search_index(self):
         collection_services.load_demo('0')
-        result = search_services.search_collections('Welcome', 2)[0]
+        result = search_services.search_collections(
+            self._create_search_query('Welcome'), 2)[0]
         self.assertEqual(result, ['0'])
         search_services.clear_collection_search_index()
-        result = search_services.search_collections('Welcome', 2)[0]
+        result = search_services.search_collections(
+            self._create_search_query('Welcome'), 2)[0]
         self.assertEqual(result, [])
 
     def test_delete_explorations_from_search_index(self):
@@ -217,7 +248,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
 
         delete_docs_swap = self.swap(
-            gae_search_services, 'delete_documents_from_index',
+            es_search_services, 'delete_documents_from_index',
             delete_docs_counter)
 
         with delete_docs_swap:
@@ -235,7 +266,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
 
         delete_docs_swap = self.swap(
-            gae_search_services, 'delete_documents_from_index',
+            es_search_services, 'delete_documents_from_index',
             delete_docs_counter)
 
         with delete_docs_swap:
