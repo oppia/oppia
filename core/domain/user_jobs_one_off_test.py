@@ -1355,22 +1355,26 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
 
 class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob
+            user_jobs_one_off
+            .FillExplorationIdsInUserSubscriptionsModelOneOffJob
             .create_new()
         )
-        user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob.enqueue(
-            job_id)
+        (
+            user_jobs_one_off
+            .FillExplorationIdsInUserSubscriptionsModelOneOffJob.enqueue(
+                job_id))
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
-            user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob
+            user_jobs_one_off
+            .FillExplorationIdsInUserSubscriptionsModelOneOffJob
             .get_output(job_id)
         )
         eval_output = [ast.literal_eval(stringified_item) for
@@ -1411,7 +1415,8 @@ class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS', 3]])
         for i in python_utils.RANGE(3):
-            subscription_model = user_models.UserSubscriptionsModel.get('model_id_%s' % i)
+            subscription_model = (
+                user_models.UserSubscriptionsModel.get('model_id_%s' % i))
             self.assertEqual(subscription_model.exploration_ids, ['exp_%s' % i])
 
 
