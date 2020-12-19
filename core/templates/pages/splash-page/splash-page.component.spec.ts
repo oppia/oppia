@@ -23,8 +23,6 @@ import { UserService } from 'services/user.service';
 
 require('pages/splash-page/splash-page.component.ts');
 
-import constants from 'assets/constants';
-
 describe('Splash Page', function() {
   var $scope = null, ctrl = null;
   var $timeout = null;
@@ -34,11 +32,7 @@ describe('Splash Page', function() {
   var loadingMessage = null;
   var SiteAnalyticsService = null;
   var subscriptions = [];
-  var windowRefMock = {
-    nativeWindow: {
-      location: ''
-    }
-  };
+  var WindowDimensionsService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
@@ -47,7 +41,6 @@ describe('Splash Page', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('WindowRef', windowRefMock);
     $provide.value('UserService', TestBed.get(UserService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
@@ -56,6 +49,7 @@ describe('Splash Page', function() {
     userService = $injector.get('UserService');
     LoaderService = $injector.get('LoaderService');
     SiteAnalyticsService = $injector.get('SiteAnalyticsService');
+    WindowDimensionsService = $injector.get('WindowDimensionsService');
     subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
     ));
@@ -79,43 +73,42 @@ describe('Splash Page', function() {
       '/assets/images/path/to/image');
   });
 
-  it('should get static subject image url', function() {
-    expect(ctrl.getStaticSubjectImageUrl('subject-file-name')).toBe(
-      '/assets/images/subjects/subject-file-name.svg');
-  });
-
-  it('should redirect to login page', function() {
-    var startLoginEventSpy = spyOn(
-      SiteAnalyticsService, 'registerStartLoginEvent').and.callThrough();
-    ctrl.onRedirectToLogin('/login');
-    $timeout.flush(150);
-
-    expect(windowRefMock.nativeWindow.location).toBe('/login');
-    expect(startLoginEventSpy).toHaveBeenCalled();
-  });
-
-  it('should redirect to default classroom page', function() {
+  it('should record analytics when Browse Lessons is clicked', function() {
     var clickBrowseLibraryButtonEventSpy = spyOn(
       SiteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
       .and.callThrough();
     ctrl.onClickBrowseLessonsButton();
     $timeout.flush(150);
 
-    expect(windowRefMock.nativeWindow.location).toBe(
-      `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
     expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
   });
 
-  it('should redirect to create exploration page', function() {
-    var clickCreateExplorationButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickCreateExplorationButtonEvent')
-      .and.callThrough();
-    ctrl.onClickCreateExplorationButton();
-    $timeout.flush(150);
+  it('should check if window is narrow', function() {
+    spyOn(
+      WindowDimensionsService, 'isWindowNarrow').and.returnValues(false, true);
+    expect(ctrl.isWindowNarrow()).toBe(false);
+    expect(ctrl.isWindowNarrow()).toBe(true);
+  });
 
-    expect(windowRefMock.nativeWindow.location).toBe(
-      '/creator-dashboard?mode=create');
-    expect(clickCreateExplorationButtonEventSpy).toHaveBeenCalled();
+  it('should increment and decrement testimonial IDs correctly', function() {
+    ctrl.$onInit();
+    expect(ctrl.displayedTestimonialId).toBe(0);
+    ctrl.incrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(1);
+    ctrl.incrementDisplayedTestimonialId();
+    ctrl.incrementDisplayedTestimonialId();
+    ctrl.incrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(0);
+
+    ctrl.decrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(3);
+    ctrl.decrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(2);
+  });
+
+  it('should get testimonials correctly', function() {
+    ctrl.$onInit();
+    expect(ctrl.getTestimonials().length).toBe(ctrl.testimonialCount);
   });
 
   it('should evaluate if user is logged in', function() {
@@ -131,6 +124,7 @@ describe('Splash Page', function() {
 
     ctrl.$onInit();
     expect(ctrl.userIsLoggedIn).toBe(null);
+    expect(ctrl.classroomUrl).toBe('/learn/math');
     expect(loadingMessage).toBe('Loading');
 
     $scope.$digest();

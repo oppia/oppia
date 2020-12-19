@@ -19,6 +19,7 @@
 require('base-components/base-content.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 
@@ -29,47 +30,83 @@ import splashConstants from 'assets/constants';
 angular.module('oppia').component('splashPage', {
   template: require('./splash-page.component.html'),
   controller: [
-    '$rootScope', '$timeout', 'LoaderService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserService', 'WindowRef',
+    '$rootScope', '$translate', 'LoaderService', 'SiteAnalyticsService',
+    'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
     function(
-        $rootScope, $timeout, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UserService, WindowRef) {
+        $rootScope, $translate, LoaderService, SiteAnalyticsService,
+        UrlInterpolationService, UserService, WindowDimensionsService) {
       var ctrl = this;
       ctrl.getStaticImageUrl = function(imagePath) {
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      };
-      ctrl.getStaticSubjectImageUrl = function(subjectName) {
-        return UrlInterpolationService.getStaticImageUrl(
-          '/subjects/' + subjectName + '.svg');
-      };
-
-      ctrl.onRedirectToLogin = function(destinationUrl) {
-        SiteAnalyticsService.registerStartLoginEvent(
-          'splashPageCreateExplorationButton');
-        $timeout(function() {
-          WindowRef.nativeWindow.location = destinationUrl;
-        }, 150);
-        return false;
+        if (imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        }
       };
 
       ctrl.onClickBrowseLessonsButton = function() {
         SiteAnalyticsService.registerClickBrowseLessonsButtonEvent();
-        $timeout(function() {
-          WindowRef.nativeWindow.location = (
-            `/learn/${splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
-        }, 150);
         return false;
       };
 
-      ctrl.onClickCreateExplorationButton = function() {
-        SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
-        $timeout(function() {
-          WindowRef.nativeWindow.location = '/creator-dashboard?mode=create';
-        }, 150);
-        return false;
+      ctrl.isWindowNarrow = function() {
+        return WindowDimensionsService.isWindowNarrow();
       };
+
+      // The 2 functions below are to cycle between values:
+      // 0 to (testimonialCount - 1) for displayedTestimonialId.
+      ctrl.incrementDisplayedTestimonialId = function() {
+        // This makes sure that incrementing from (testimonialCount - 1)
+        // returns 0 instead of testimonialCount,since we want the testimonials
+        // to cycle through.
+        ctrl.displayedTestimonialId = (
+          ctrl.displayedTestimonialId + 1) % ctrl.testimonialCount;
+      };
+
+      ctrl.decrementDisplayedTestimonialId = function() {
+        // This makes sure that decrementing from 0, returns
+        // (testimonialCount - 1) instead of -1, since we want the testimonials
+        // to cycle through.
+        ctrl.displayedTestimonialId = (
+          ctrl.displayedTestimonialId + ctrl.testimonialCount - 1) %
+          ctrl.testimonialCount;
+      };
+
+      ctrl.getTestimonials = function() {
+        return [{
+          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_1'),
+          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_1'),
+          imageUrl: '/splash/mira.png',
+          imageUrlWebp: '/splash/mira.webp',
+          borderPresent: false
+        }, {
+          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_2'),
+          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_2'),
+          imageUrl: '/splash/Dheeraj_3.png',
+          imageUrlWebp: '/splash/Dheeraj_3.webp',
+          borderPresent: true
+        }, {
+          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_3'),
+          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_3'),
+          imageUrl: '/splash/sama.png',
+          imageUrlWebp: '/splash/sama.webp',
+          borderPresent: false
+        }, {
+          quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_4'),
+          studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_4'),
+          imageUrl: '/splash/Gaurav_2.png',
+          imageUrlWebp: '/splash/Gaurav_2.webp',
+          borderPresent: true
+        }];
+      };
+
       ctrl.$onInit = function() {
         ctrl.userIsLoggedIn = null;
+        ctrl.displayedTestimonialId = 0;
+        ctrl.testimonialCount = 4;
+        ctrl.testimonials = ctrl.getTestimonials();
+        ctrl.classroomUrl = UrlInterpolationService.interpolateUrl(
+          '/learn/<classroomUrlFragment>', {
+            classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+          });
         LoaderService.showLoadingScreen('Loading');
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
