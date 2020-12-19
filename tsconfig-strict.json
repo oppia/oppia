@@ -57,6 +57,8 @@
     "core/templates/pages/admin-page/services/admin-task-manager.service.spec.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts",
+    "core/templates/pages/exploration-player-page/services/learner-params.service.ts",
+    "core/templates/pages/exploration-player-page/services/learner-params.service.spec.ts",
     "core/templates/services/app.service.ts",
     "core/templates/services/app.service.spec.ts",
     "core/templates/services/external-save.service.ts",
@@ -75,6 +77,8 @@
     "core/templates/services/csrf-token.service.spec.ts",
     "core/templates/services/date-time-format.service.ts",
     "core/templates/services/date-time-format.service.spec.ts",
+    "core/templates/services/debouncer.service.ts",
+    "core/templates/services/debouncer.service.spec.ts",
     "core/templates/services/id-generation.service.ts",
     "core/templates/services/id-generation.service.spec.ts",
     "core/templates/services/editability.service.ts",
@@ -93,6 +97,7 @@
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service.spec.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
+    "extensions/interactions/EndExploration/directives/end-exploration-rules.service.ts",
   ],
   "include": ["typings/*.ts"]
 }
