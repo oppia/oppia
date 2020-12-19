@@ -144,6 +144,8 @@ import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
+import { PopulateRuleContentIdsService } from
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -243,6 +245,7 @@ import { StateClassifierMappingService } from 'pages/exploration-player-page/ser
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service.ts';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
@@ -317,10 +320,7 @@ import { UserBackendApiService } from 'services/user-backend-api.service.ts';
 import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
-import { PopulateRuleContentIdsService } from
-  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
-
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -561,6 +561,7 @@ export const angularServices: [string, unknown][] = [
   ['SiteAnalyticsService', SiteAnalyticsService],
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
+  ['SkillEditorStateService', SkillEditorStateService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],

@@ -319,8 +319,6 @@ import { PlaythroughIssuesBackendApiService } from
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
-import { PopulateRuleContentIdsService } from
-  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
 import { PretestQuestionBackendApiService } from
   'domain/question/pretest-question-backend-api.service';
@@ -679,7 +677,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
   static playthroughObjectFactory: PlaythroughObjectFactory;
   static playthroughService: PlaythroughService;
-  static populateRuleContentIdsService: PopulateRuleContentIdsService;
   static predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   static pretestQuestionBackendApiService: PretestQuestionBackendApiService;
   static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
@@ -976,7 +973,6 @@ private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
 private playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService,
 private playthroughObjectFactory: PlaythroughObjectFactory,
 private playthroughService: PlaythroughService,
-private populateRuleContentIdsService: PopulateRuleContentIdsService,
 private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
 private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
 private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
@@ -1381,8 +1377,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.playthroughBackendApiService = (
       this.playthroughBackendApiService);
     OppiaAngularRootComponent.playthroughService = this.playthroughService;
-    OppiaAngularRootComponent.populateRuleContentIdsService = (
-      this.populateRuleContentIdsService);
     OppiaAngularRootComponent.predictionAlgorithmRegistryService = (
       this.predictionAlgorithmRegistryService);
     OppiaAngularRootComponent.pretestQuestionBackendApiService = (
