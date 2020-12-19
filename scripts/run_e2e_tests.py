@@ -158,6 +158,8 @@ SUBPROCESSES = []
 
 def _kill_process(process):
     """Try to kill a process with SIGINT. If that fails, kill."""
+    if not process.poll():
+        return
     process.send_signal(signal.SIGINT)
     for _ in python_utils.RANGE(KILL_TIMEOUT_SECS):
         time.sleep(1)
@@ -565,7 +567,7 @@ def run_tests(args):
             nextline = nextline.decode('utf-8')  # pragma: nocover
         output_lines.append(nextline.rstrip())
         # Replaces non-ASCII characters with '?'.
-        python_utils.PRINT(nextline.encode('ascii', errors='replace'))
+        sys.stdout.write(nextline.encode('ascii', errors='replace'))
 
     return output_lines, p.returncode
 
