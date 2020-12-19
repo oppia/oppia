@@ -300,12 +300,6 @@ skip_files:
 - third_party/static/bower-material-1.1.19/
 - third_party/python_libs/google/appengine/
 - third_party/python_libs/google/net/
-- third_party/python_libs/google_auth_oauthlib/
-- third_party/python_libs/googleapiclient/
-- third_party/python_libs/httplib2/
-- third_party/python_libs/oauthlib/
-- third_party/python_libs/requests_oauthlib/
-- third_party/python_libs/uritemplate/
 - third_party/python_libs/google/pyglib/
 - third_party/python_libs/grpc/
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include

@@ -30,24 +30,11 @@ import time
 import python_utils
 from scripts import build
 from scripts import common
+from scripts import flake_checker
 from scripts import install_third_party_libs
 
-from google.oauth2 import service_account
-
-_SIMPLE_CRYPT_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools',
-    'simple-crypt-' + common.SIMPLE_CRYPT_VERSION)
-sys.path.insert(0, _SIMPLE_CRYPT_PATH)
-
-import simplecrypt # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
-_PYTHON_LIBS_PATH = os.path.join(
-    os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _PYTHON_LIBS_PATH)
-
-import googleapiclient.discovery # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
 MAX_RETRY_COUNT = 3
+RERUN_NON_FLAKY = True
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
@@ -57,7 +44,7 @@ PROTRACTOR_BIN_PATH = os.path.join(
 # file will be created.
 PORTSERVER_SOCKET_FILEPATH = os.path.join(
     os.getcwd(), 'portserver.socket')
-KILL_PORTSERVER_TIMEOUT_SECS = 10
+KILL_TIMEOUT_SECS = 10
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
@@ -169,6 +156,22 @@ _PARSER.add_argument(
 SUBPROCESSES = []
 
 
+def _kill_process(process):
+    """Try to kill a process with SIGINT. If that fails, kill."""
+    try:
+        process.send_signal(signal.SIGINT)
+    except OSError:
+        return  # OSError raised when the process has already died.
+    for _ in python_utils.RANGE(KILL_TIMEOUT_SECS):
+        time.sleep(1)
+        if not process.poll():
+            return
+    try:
+        process.kill()
+    except OSError:
+        pass  # Indicates process already dead.
+
+
 def cleanup():
     """Kill the running subprocesses and server fired in this program, set
     constants back to default values.
@@ -183,10 +186,11 @@ def cleanup():
         '.*%s.*' % re.escape(webdriver_download_path)
     ]
     for p in SUBPROCESSES:
-        p.kill()
+        _kill_process(p)
 
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
+
     build.set_constants_to_default()
     common.stop_redis_server()
 
@@ -502,110 +506,42 @@ def start_portserver():
 def cleanup_portserver(portserver_process):
     """Shut down the portserver.
 
-    We wait KILL_PORTSERVER_TIMEOUT_SECS seconds for the portserver to
-    shut down after sending CTRL-C (SIGINT). The portserver is configured
-    to shut down cleanly upon receiving this signal. If the server fails
-    to shut down, we kill the process.
+    We wait KILL_TIMEOUT_SECS seconds for the portserver to shut down
+    after sending CTRL-C (SIGINT). The portserver is configured to shut
+    down cleanly upon receiving this signal. If the server fails to shut
+    down, we kill the process.
 
     Args:
         portserver_process: subprocess.Popen. The Popen subprocess
             object for the portserver.
     """
-    portserver_process.send_signal(signal.SIGINT)
-    for _ in python_utils.RANGE(KILL_PORTSERVER_TIMEOUT_SECS):
-        time.sleep(1)
-        if not portserver_process.poll():
-            break
-    if portserver_process.poll():
-        portserver_process.kill()
+    _kill_process(portserver_process)
 
 
-def get_flaky_tests_data_from_sheets(sheet):
-    """Gets all flaky tests from the google sheet.
-
-    Args:
-        sheet: googleapiclient.discovery.Resource. The spreedsheet object.
-
-    Returns:
-        list(tuple(str, str, str, int)). A list of rows from the sheet.
-        The tuple has 4 entries. The entries represent
-        (suite_name, test_name, test_error_log, flake_count).
-    """
-    sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
-    flaky_tests_list = []
-    if sheet_id is not None:
-        result = sheet.values().get(
-            spreadsheetId=sheet_id,
-            range='Log!A5:T1000').execute()
-        values = result.get('values', [])
-
-        for row in values:
-            if len(row) < 3:
-                continue
-            if len(row) >= 6 and row[5] != '':
-                flaky_tests_list.append((row[0], row[1], row[2], int(row[5])))
-            else:
-                flaky_tests_list.append((row[0], row[1], row[2], 0))
-
-    return flaky_tests_list
-
-
-def update_flaky_tests_count(sheet, row_index, current_count):
-    """Updates the flaky tests count in the google sheet.
-
-    Args:
-        sheet: googleapiclient.discovery.Resource. The spreedsheet object.
-        row_index: int. The index of the row to update in the sheet.
-        current_count: int. The current count of this flake in the sheet.
-    """
-    sheet_id = os.getenv('FLAKY_E2E_TEST_SHEET_ID')
-    if sheet_id is not None:
-        values = [
-            [
-                current_count + 1
-            ]
-        ]
-
-        body = {
-            'values': values
-        }
-
-        sheet.values().update(
-            spreadsheetId=sheet_id,
-            range='Log!F' + python_utils.convert_to_bytes(row_index + 5),
-            valueInputOption='USER_ENTERED',
-            body=body).execute()
-        python_utils.PRINT('** NOTE: Updated sheet for first failing test **')
-
-
-def run_tests(args=None):
+def run_tests(args):
     """Run the scripts to start end-to-end tests."""
-
-    parsed_args = _PARSER.parse_args(args=args)
     oppia_instance_is_already_running = is_oppia_server_already_running()
 
     if oppia_instance_is_already_running:
         sys.exit(1)
-    setup_and_install_dependencies(parsed_args.skip_install)
+    setup_and_install_dependencies(args.skip_install)
 
     common.start_redis_server()
     atexit.register(cleanup)
 
-    dev_mode = not parsed_args.prod_env
+    dev_mode = not args.prod_env
 
-    if parsed_args.skip_build:
-        build.modify_constants(prod_env=parsed_args.prod_env)
+    if args.skip_build:
+        build.modify_constants(prod_env=args.prod_env)
     else:
         build_js_files(
-            dev_mode, deparallelize_terser=parsed_args.deparallelize_terser,
-            source_maps=parsed_args.source_maps)
-    version = parsed_args.chrome_driver_version or get_chrome_driver_version()
+            dev_mode, deparallelize_terser=args.deparallelize_terser,
+            source_maps=args.source_maps)
+    version = args.chrome_driver_version or get_chrome_driver_version()
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
-    portserver_process = start_portserver()
-    atexit.register(cleanup_portserver, portserver_process)
-    start_google_app_engine_server(dev_mode, parsed_args.server_log_level)
+    start_google_app_engine_server(dev_mode, args.server_log_level)
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
@@ -614,97 +550,59 @@ def run_tests(args=None):
         'core/tests/protractor.conf.js, you can view screenshots'
         'of the failed tests in ../protractor-screenshots/')
     commands = [common.NODE_BIN_PATH]
-    if parsed_args.debug_mode:
+    if args.debug_mode:
         commands.append('--inspect-brk')
     # This flag ensures tests fail if waitFor calls time out.
     commands.append('--unhandled-rejections=strict')
     commands.append(PROTRACTOR_BIN_PATH)
     commands.extend(get_e2e_test_parameters(
-        parsed_args.sharding_instances, parsed_args.suite, dev_mode))
+        args.sharding_instances, args.suite, dev_mode))
 
     p = subprocess.Popen(commands, stdout=subprocess.PIPE)
     output_lines = []
-    failure_seen = False
     while True:
         nextline = p.stdout.readline()
         if len(nextline) == 0 and p.poll() is not None:
             break
-        sys.stdout.write(nextline)
-        sys.stdout.flush()
-        new_output_line = nextline.strip()
-        if new_output_line.decode('utf-8') == FAILURE_OUTPUT_STRING:
-            failure_seen = True
-        output_lines.append(new_output_line)
+        if isinstance(nextline, str):
+            # This is a failsafe line in case we get non-unicode input,
+            # but the tests provide all strings as unicode.
+            nextline = nextline.decode('utf-8')  # pragma: nocover
+        output_lines.append(nextline.rstrip())
+        # Replaces non-ASCII characters with '?'.
+        sys.stdout.write(nextline.encode('ascii', errors='replace'))
 
-    flaky_tests_list = []
-    google_auth_decode_password = os.getenv('GOOGLE_AUTH_DECODE_PASSWORD')
-    if google_auth_decode_password is not None:
-        with python_utils.open_file(
-            'auth.json.enc', 'rb', encoding=None) as enc_file:
-            with python_utils.open_file('auth.json', 'w') as dec_file:
-                ciphertext = enc_file.read()
-                plaintext = simplecrypt.decrypt(
-                    google_auth_decode_password, ciphertext).decode('utf-8')
-                dec_file.write(plaintext)
-
-        sheets_scopes = ['https://www.googleapis.com/auth/spreadsheets']
-        creds = service_account.Credentials.from_service_account_file(
-            'auth.json', scopes=sheets_scopes)
-        sheet = googleapiclient.discovery.build(
-            'sheets', 'v4', credentials=creds).spreadsheets()
-        flaky_tests_list = get_flaky_tests_data_from_sheets(sheet)
-
-    suite_name = parsed_args.suite.lower()
-    if len(flaky_tests_list) > 0 and p.returncode != 0:
-        for i, line in enumerate(output_lines):
-            if line.decode('utf-8') == FAILURE_OUTPUT_STRING:
-                test_name = output_lines[i + 3][3:].strip().lower()
-
-                # Remove coloring characters.
-                ansi_escape = re.compile(
-                    r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-                failure_log = ansi_escape.sub('', output_lines[i + 4])
-                failure_log = failure_log.strip().lower()
-                for index, row in enumerate(flaky_tests_list):
-                    flaky_suite_name = row[0].strip().lower()
-                    flaky_test_message = row[1].strip().lower()
-                    flaky_error_message = row[2].strip().lower()
-                    if (
-                            suite_name == flaky_suite_name or
-                            flaky_suite_name == '[general]'):
-                        if (
-                                test_name == flaky_test_message or
-                                flaky_test_message == 'many'):
-                            if flaky_error_message in failure_log:
-                                update_flaky_tests_count(sheet, index, row[3])
-                                try:
-                                    cleanup_portserver(portserver_process)
-                                    cleanup()
-                                except Exception: # pragma: no cover
-                                    # This is marked as no cover because the
-                                    # exception happens due to some processes
-                                    # running on the local system, which might
-                                    # interfere with the cleanup stuff. This is
-                                    # added as a failsafe to make sure that
-                                    # even when it throws an exception, the
-                                    # test is retried.
-                                    pass # pragma: no cover
-                                return 'flake'
-    if failure_seen:
-        cleanup_portserver(portserver_process)
-        cleanup()
-        return 'fail'
-    return 'pass'
+    return output_lines, p.returncode
 
 
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
-    for count in python_utils.RANGE(MAX_RETRY_COUNT):
-        python_utils.PRINT('\n\n###### RUN COUNT %d ######\n\n' % (count + 1))
-        flake_state = run_tests(args=args)
-        if flake_state == 'pass':
+    parsed_args = _PARSER.parse_args(args=args)
+
+    portserver_process = start_portserver()
+    atexit.register(cleanup_portserver, portserver_process)
+
+    for attempt_num in python_utils.RANGE(MAX_RETRY_COUNT):
+        python_utils.PRINT('***Attempt %s.***' % (attempt_num + 1))
+        output, return_code = run_tests(parsed_args)
+        # Don't rerun passing tests.
+        if return_code == 0:
+            flake_checker.report_pass(parsed_args.suite)
             break
-    sys.exit(0 if flake_state == 'pass' else 1)
+        # Don't rerun off of CI.
+        if not flake_checker.check_if_on_ci():
+            python_utils.PRINT('No reruns because not running on CI.')
+            break
+        flaky = flake_checker.is_test_output_flaky(
+            output, parsed_args.suite)
+        # Don't rerun if the test was non-flaky and we are not
+        # rerunning non-flaky tests.
+        if not flaky and not RERUN_NON_FLAKY:
+            break
+        # Prepare for rerun.
+        cleanup()
+
+    sys.exit(return_code)
 
 
 if __name__ == '__main__':  # pragma: no cover
