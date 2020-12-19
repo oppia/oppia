@@ -44,7 +44,8 @@ CHROME_DRIVER_VERSION = '77.0.3865.40'
 
 class MockProcessClass(python_utils.OBJECT):
 
-    def __init__(self, clean_shutdown=True, stdout=''):
+    def __init__(
+            self, clean_shutdown=True, stdout='', accept_signal=True):
         """Create a mock process object.
         Attributes:
             poll_count: int. The number of times poll() has been called.
@@ -56,17 +57,22 @@ class MockProcessClass(python_utils.OBJECT):
                 signal is received.
             stdout: str. The text written to standard output by the
                 process.
+            accept_signal: bool. Whether to raise OSError in
+                send_signal.
 
         Args:
             clean_shutdown: bool. Whether to shut down when SIGINT received.
             stdout: str. The text written to standard output by the
                 process.
+            accept_signal: bool. Whether to raise OSError in
+                send_signal.
         """
         self.poll_count = 0
         self.signals_received = []
         self.kill_count = 0
         self.poll_return = True
         self.clean_shutdown = clean_shutdown
+        self.accept_signal = accept_signal
 
         self.stdout = python_utils.string_io(buffer_value=stdout)
 
@@ -100,6 +106,8 @@ class MockProcessClass(python_utils.OBJECT):
             signal_number: int. The number of the received signal.
         """
         self.signals_received.append(signal_number)
+        if not self.accept_signal:
+            raise OSError()
         if signal_number == signal.SIGINT and self.clean_shutdown:
             self.poll_return = False
 
@@ -1695,4 +1703,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             process.poll_count,
             run_e2e_tests.KILL_TIMEOUT_SECS + 1
         )
+        self.assertEqual(process.signals_received, [signal.SIGINT])
+
+    def test_cleanup_portserver_when_server_already_shutdown(self):
+        process = MockProcessClass(accept_signal=False)
+        run_e2e_tests.cleanup_portserver(process)
+        self.assertEqual(process.kill_count, 0)
+        # Server gets polled 11 times. 1 for each second of the wait
+        # loop and again to see that the process did not shut down and
+        # therefore needs to be killed.
+        self.assertEqual(process.poll_count, 0)
         self.assertEqual(process.signals_received, [signal.SIGINT])
