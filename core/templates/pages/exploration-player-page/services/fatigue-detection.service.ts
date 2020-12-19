@@ -19,12 +19,12 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { TakeBreakModalController } from 'pages/exploration-player-page/templates/take-a-break-modal.controller';
 
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class FatigueDetectionService {
   private submissionTimesMsec: number[] = [];
   private SPAM_COUNT_THRESHOLD: number = 4;
@@ -32,7 +32,8 @@ export class FatigueDetectionService {
   private windowStartTime: number;
   private windowEndTime: number;
 
-  constructor(private ngbModal: NgbModal) { }
+  constructor(
+    private ngbModal: NgbModal) { }
 
   recordSubmissionTimestamp(): void {
     this.submissionTimesMsec.push((new Date()).getTime());
@@ -52,7 +53,7 @@ export class FatigueDetectionService {
 
   displayTakeBreakMessage(): void {
     this.ngbModal.open(
-      'pages/exploration-player-page/templates/take-break-modal.template.html',
+      TakeBreakModalController,
       {
         backdrop: 'static'
       }).result.then(() => { }, () => {
