@@ -40,7 +40,7 @@ export class DebouncerService {
       } else {
         timeout;
         result = func.apply(context);
-        // Function was not taking any arguments so removed that args
+        // Function was not taking any arguments so removed that args.
         if (!timeout) {
           context;
           args;
@@ -49,7 +49,7 @@ export class DebouncerService {
     };
 
     return function() {
-      // There was no need of context so removed contex=this
+      // There was no need of context so removed contex=this.
       args = arguments;
       timestamp = new Date().getTime();
       if (!timeout) {
