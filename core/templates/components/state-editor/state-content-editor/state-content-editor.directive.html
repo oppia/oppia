@@ -44,7 +44,10 @@
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
   <schema-based-editor schema="HTML_SCHEMA" local-value="StateContentService.displayed._html">
   </schema-based-editor>
-
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning mt-2">
+    <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
+    <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
+  </div>
   <div class="mt-2">
     <button type="button"
             class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content float-right"
@@ -53,10 +56,6 @@
     </button>
     <button type="button" class="btn btn-secondary float-right" ng-click="cancelEdit()">Cancel</button>
     <div class="oppia-clear"></div>
-  </div>
-  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning mt-2">
-    <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
-    <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
   </div>
 </div>
 
