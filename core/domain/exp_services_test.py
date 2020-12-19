@@ -336,7 +336,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
     def _create_search_query(self, terms, categories, languages):
-                """Returns the search query derived from terms and categories.
+        """Returns the search query derived from terms and categories.
         Args:
             terms: list[str]. A list of search terms where at least one term
                 should be included in any of the result documents' fields

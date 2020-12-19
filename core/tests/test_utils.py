@@ -222,6 +222,8 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
             assert 'id' in document
             if index_name not in self._DB:
                 self._DB[index_name] = []
+            self._DB[index_name] = [
+                d for d in self._DB[index_name] if d['id'] != document['id']]
             self._DB[index_name].append(document)
 
     def delete_documents_from_index(self, doc_ids, index_name):
@@ -259,10 +261,10 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
 
         Args:
             doc_id: str. The document id.
-            index_name: str. The name of the index to clear.
+            index_name: str. The name of the index to get the document from.
 
         Returns:
-            dict. The document in a dictionary format.
+            dict or None. The document in a dict format or None if not found.
         """
         assert isinstance(index_name, python_utils.BASESTRING)
         for document in self._DB[index_name]:
@@ -270,7 +272,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
                 return document
 
     def _filter_search(self, query, result_docs):
-        """Helper method that returns filtered search results
+        """Helper method that returns filtered search results.
 
         Args:
             query: dict. A dictionary search definition that uses Query DSL.
@@ -344,7 +346,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         result_doc_ids = set()
         resulting_offset = None
 
-        # TODO(shubha-rajan): This block will make tests pass when the caller
+        # TODO(#11314): This block will make tests pass when the caller
         # passes in a cursor instead of an offset.
         # Remove once migration to ElasticSearch is complete.
         if cursor and not offset:
@@ -354,22 +356,18 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
 
         assert query_string is not None
 
-        if not index_name or index_name == '_all':
-            for _, documents in self._DB:
-                for doc in documents:
+        for db_index_name, docs in self._DB.items():
+            if index_name == db_index_name or index_name == '_all':
+                for doc in docs:
                     if not doc['id'] in result_doc_ids:
                         result_docs.append(doc)
                         result_doc_ids.add(doc['id'])
-        else:
-            for doc in self._DB[index_name]:
-                if not doc['id'] in result_doc_ids:
-                    result_docs.append(doc)
-                    result_doc_ids.add(doc['id'])
 
         try:
             query = json.loads(query_string)
         except ValueError:
-            pass
+            if query_string != "":
+                raise Exception("Invalid query string")
         else:
             result_docs = self._filter_search(query, result_docs)
 
