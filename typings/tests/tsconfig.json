@@ -4,7 +4,7 @@
 {
   "compilerOptions": {
     "lib": ["es2017", "dom", "webworker"],
-    "target": "es5",
+    "target": "es6",
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": false,
@@ -12,6 +12,8 @@
     "baseUrl": ".",
     "skipLibCheck": true,
     "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
     "paths": {
       "app.constants": ["../../core/templates/app.constants"],
       "app-type.constants": ["../../core/templates/app-type.constants"],
