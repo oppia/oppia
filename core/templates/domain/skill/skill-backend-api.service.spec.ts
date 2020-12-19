@@ -176,7 +176,7 @@ describe('Skill backend API service', () => {
       } as const;
 
       skillBackendApiService.updateSkill(
-        '1', 1, 'commit message', changeList).then(response => {
+        '1', 1, 'commit message', [changeList]).then(response => {
         expect(response).toEqual(skill);
       });
 
@@ -199,7 +199,8 @@ describe('Skill backend API service', () => {
       } as const;
 
       skillBackendApiService.updateSkill(
-        '1', 1, 'commit message', changeList).then(successHandler, failHandler);
+        '1', 1, 'commit message', [changeList]).then(
+        successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/skill_editor_handler/data/1');
       expect(req.request.method).toEqual('PUT');
