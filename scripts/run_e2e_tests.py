@@ -165,9 +165,11 @@ def _kill_process(process):
     for _ in python_utils.RANGE(KILL_TIMEOUT_SECS):
         time.sleep(1)
         if not process.poll():
-            break
-    if process.poll():
+            return
+    try:
         process.kill()
+    except OSError:
+        pass  # Indicates process already dead.
 
 
 def cleanup():
