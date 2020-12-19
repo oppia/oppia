@@ -169,116 +169,113 @@ describe('SvgSanitizerService', () => {
     expect(dimensions).toEqual(expectedDimension);
   });
 
-  describe('when SVG is malicious', () => {
+  it('should catch malicious SVGs', () => {
     const testCases: {
-      title: string, payload: string, expected: [number, number]}[] = [
-      {
+      title: string, payload: string, expected: [number, number]}[] = [{
         title: 'DOM clobbering attack using name=body',
-        payload: `<image name=body><image name=adoptNode>@mmrupp<image name=` +
-        `firstElementChild><svg onload=alert(1)>`,
+        payload: '<image name=body><image name=adoptNode>@mmrupp<image name=' +
+        'firstElementChild><svg onload=alert(1)>',
         expected: [0, 6]
       },
       {
         title: 'DOM clobbering attack using activeElement',
-        payload: `<image name=activeElement><svg onload=alert(1)>`,
+        payload: '<image name=activeElement><svg onload=alert(1)>',
         expected: [0, 6]
       },
       {
         title: 'DOM clobbering attack using name=body and injecting SVG + ke' +
         'ygen',
-        payload: `<image name=body><img src=x><svg onload=alert(1); autofocu` +
-        `s>,<keygen onfocus=alert(1); autofocus>`,
+        payload: '<image name=body><img src=x><svg onload=alert(1); autofocu' +
+        's>,<keygen onfocus=alert(1); autofocus>',
         expected: [0, 6]
       },
       {
         title: 'XSS attack using onerror',
-        payload: `<div id="128"><svg><style><img/src=x onerror=alert(128)// ` +
-        `</b>//["'\`-->]]>]</div>`,
+        payload: '<div id="128"><svg><style><img/src=x onerror=alert(128)// ' +
+        '</b>//["\'`-->]]>]</div>',
         expected: [0, 5]
       },
       {
         title: 'Inline SVG (data-uri)',
-        payload: `<div id="129"><svg><image style='filter:url("data:image/sv` +
-        `g+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><script>parent.al` +
-        `ert(129)</script></svg>")'>\n<!--\nSame effect with\n<image filter=` +
-        `'...'>\n-->\n</svg>//["'\`-->]]>]</div>`,
+        payload: '<div id="129"><svg><image style=\'filter:url("data:image/sv' +
+        'g+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><script>parent.al' +
+        'ert(129)</script></svg>")\'>\n<!--\nSame effect with\n<image filter=' +
+        '\'...\'>\n-->\n</svg>//["\'`-->]]>]</div>',
         expected: [0, 5]
       },
       {
         title: 'from="javascript:Malicious code"',
-        payload: `<div id="137"><svg>\n<a xmlns:xlink="http://www.w3.org/199` +
-        `9/xlink" xlink:href="?">\n<circle r="400"></circle>\n<animate attri` +
-        `buteName="xlink:href" begin="0" from="javascript:alert(137)" to="&"` +
-        ` />\n</a>//["'\`-->]]>]</div>`,
+        payload: '<div id="137"><svg>\n<a xmlns:xlink="http://www.w3.org/199' +
+        '9/xlink" xlink:href="?">\n<circle r="400"></circle>\n<animate attri' +
+        'buteName="xlink:href" begin="0" from="javascript:alert(137)" to="&"' +
+        ' />\n</a>//["\'`-->]]>]</div>',
         expected: [2, 5]
       },
       {
         title: 'mXSS behavior with SVG in Chrome 77 and alike 1/2',
-        payload: `<svg></p><textarea><title><style></textarea><img src=x one` +
-        `rror=alert(1)></style></title></svg>`,
+        payload: '<svg></p><textarea><title><style></textarea><img src=x one' +
+        'rror=alert(1)></style></title></svg>',
         expected: [0, 4]
       },
       {
         title: 'mXSS behavior with SVG in Chrome 77 and alike 2/2',
-        payload: `<svg></p><title><a id="</title><img src=x onerror=alert()>` +
-        `"></textarea></svg>`,
+        payload: '<svg></p><title><a id="</title><img src=x onerror=alert()>' +
+        '"></textarea></svg>',
         expected: [0, 4]
       },
       {
         title: 'mXSS behavior with SVG Templates in Chrome 77 and alike',
-        payload: `<svg></p><title><template><style></title><img src=x onerro` +
-        `r=alert(1)>`,
+        payload: '<svg></p><title><template><style></title><img src=x onerro' +
+        'r=alert(1)>',
         expected: [0, 4]
       },
       {
         title: 'mXSS behavior with embedded MathML/SVG',
-        payload: `<svg></p><math><title><style><img src=x onerror=alert(1)><` +
-        `/style></title>`,
+        payload: '<svg></p><math><title><style><img src=x onerror=alert(1)><' +
+        '/style></title>',
         expected: [0, 4]
       },
       {
         title: 'attribute-based mXSS behavior 1/3',
-        payload: `<svg><p><style><g title="</style><img src=x onerror=alert(` +
-        `1)>">`,
+        payload: '<svg><p><style><g title="</style><img src=x onerror=alert(' +
+        '1)>">',
         expected: [0, 5]
       },
       {
         title: 'attribute-based mXSS behavior 2/3',
-        payload: `<svg><foreignobject><p><style><p title="</style><iframe on` +
-        `load&#x3d;alert(1)<!--"></style>`,
+        payload: '<svg><foreignobject><p><style><p title="</style><iframe on' +
+        'load&#x3d;alert(1)<!--"></style>',
         expected: [0, 6]
       },
       {
         title: 'removal-based mXSS behavior 1/2',
-        payload: `<xmp><svg><b><style><b title='</style><img>'>`,
+        payload: '<xmp><svg><b><style><b title=\'</style><img>\'>',
         expected: [0, 6]
       },
       {
         title: 'removal-based mXSS behavior 2/2',
-        payload: `<noembed><svg><b><style><b title='</style><img>'>`,
+        payload: '<noembed><svg><b><style><b title=\'</style><img>\'>',
         expected: [0, 6]
       },
       {
         title: 'nesting-based mXSS behavior 4/5',
-        payload: `<form><math><mtext></form><form><mglyph><svg><mtext><style` +
-        `><path id="</style><img onerror=alert(1) src>">`,
+        payload: '<form><math><mtext></form><form><mglyph><svg><mtext><style' +
+        '><path id="</style><img onerror=alert(1) src>">',
         expected: [0, 7]
       },
       {
         title: 'nesting-based mXSS behavior 5/5',
-        payload: `<math><mtext><table><mglyph><svg><mtext><style><path id="<` +
-        `/style><img onerror=alert(1) src>">`,
+        payload: '<math><mtext><table><mglyph><svg><mtext><style><path id="<' +
+        '/style><img onerror=alert(1) src>">',
         expected: [0, 9]
-      }
-    ];
+      }];
     testCases.forEach((testCase, index) => {
-      it(`should return false. Case: ${testCase.title} used in SVGs)`, () => {
-        const testCaseResult = svgSanitizerService.getInvalidSvgTagsAndAttrs(
-          domParser.parseFromString(testCase.payload, 'image/svg+xml'));
-        expect(testCaseResult.attrs.length).toEqual(testCase.expected[0]);
-        expect(testCaseResult.tags.length).toEqual(testCase.expected[1]);
-      });
+      const testCaseResult = svgSanitizerService.getInvalidSvgTagsAndAttrs(
+        domParser.parseFromString(testCase.payload, 'image/svg+xml'));
+      expect(testCaseResult.attrs.length).toEqual(
+        testCase.expected[0], 'Attributes - Case:' + testCase.title);
+      expect(testCaseResult.tags.length).toEqual(
+        testCase.expected[1], 'Tags - Case:' + testCase.title);
     });
   });
-
 });
