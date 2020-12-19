@@ -49,7 +49,7 @@ export class DebouncerService {
     };
 
     return function() {
-      // There was no need of context so removed contex=this.
+      // There was no need of context so removed context=this.
       args = arguments;
       timestamp = new Date().getTime();
       if (!timeout) {
