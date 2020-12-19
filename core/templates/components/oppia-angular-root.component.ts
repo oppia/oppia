@@ -679,7 +679,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService;
   static playthroughObjectFactory: PlaythroughObjectFactory;
   static playthroughService: PlaythroughService;
-  static populateRuleContentIdsService: PopulateRuleContentIdsService;
   static predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   static pretestQuestionBackendApiService: PretestQuestionBackendApiService;
   static profileLinkImageBackendApiService: ProfileLinkImageBackendApiService;
@@ -976,7 +975,6 @@ private playthroughIssueObjectFactory: PlaythroughIssueObjectFactory,
 private playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService,
 private playthroughObjectFactory: PlaythroughObjectFactory,
 private playthroughService: PlaythroughService,
-private populateRuleContentIdsService: PopulateRuleContentIdsService,
 private predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService,
 private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
 private profileLinkImageBackendApiService: ProfileLinkImageBackendApiService,
@@ -1381,8 +1379,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.playthroughBackendApiService = (
       this.playthroughBackendApiService);
     OppiaAngularRootComponent.playthroughService = this.playthroughService;
-    OppiaAngularRootComponent.populateRuleContentIdsService = (
-      this.populateRuleContentIdsService);
     OppiaAngularRootComponent.predictionAlgorithmRegistryService = (
       this.predictionAlgorithmRegistryService);
     OppiaAngularRootComponent.pretestQuestionBackendApiService = (
