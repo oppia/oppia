@@ -87,7 +87,7 @@ describe('SvgSanitizerService', () => {
     'should return null when malicious SVG is requested as SafeResourceUrl',
     () => {
       expect(svgSanitizerService.getTrustedSvgResourceUrl(maliciousSvg)).toBe(
-        null);      
+        null);
     });
 
   it(
@@ -95,7 +95,7 @@ describe('SvgSanitizerService', () => {
     'SafeResourceUrl',
     () => {
       expect(svgSanitizerService.getTrustedSvgResourceUrl(safeSvg)).toBe(
-        safeSvg);      
+        safeSvg);
     });
 
   it('should remove the role attribute from the Math SVG string', () => {
