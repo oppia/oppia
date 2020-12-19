@@ -337,17 +337,16 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
     def _create_search_query(self, terms, categories, languages):
         """Returns the search query derived from terms and categories.
+
         Args:
-            terms: list[str]. A list of search terms where at least one term
-                should be included in any of the result documents' fields
-            categories: list[str] a list of values for the category field
-                to filter result documents by
-            languages: list[str] a list of values for the language_code field
-                to filter result documents by
-        
+            terms: list(str). A list of search terms.
+            categories: list(str). A list of values for the category field.
+            languages: list(str). A list of values for the language_code field.
+
         Returns:
             str. A JSON-encoded query string.
         """
+
         query = {
             'query': {
                 'bool': {

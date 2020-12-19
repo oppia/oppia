@@ -366,8 +366,8 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         try:
             query = json.loads(query_string)
         except ValueError:
-            if query_string != "":
-                raise Exception("Invalid query string")
+            if query_string != '':
+                raise Exception('Invalid query string')
         else:
             result_docs = self._filter_search(query, result_docs)
 

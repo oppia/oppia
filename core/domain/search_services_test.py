@@ -44,18 +44,21 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
     def _create_search_query(self, term_string):
         """Returns the search query derived from terms and categories.
+
         Args:
-            terms: str. A string of search terms separated by spaces
+            term_string: str. A string of search terms separated by spaces.
+
         Returns:
             str. A JSON-encoded query string.
         """
+
         query = {
             'query': {
                 'bool': {
                     'must': [
                         {'multi_match': {'query': term_string}}
                     ],
-                    'filter':[]
+                    'filter': []
                 }
             }
         }
