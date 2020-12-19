@@ -470,8 +470,14 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that fixes the invalid values of created_on attribute in the
-    UserSettingsModel.
+    UserSettingsModel. It is a one-off job and can be removed from the codebase
+    after we resolve this issue by running the job once.
     """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(FixUserSettingsCreatedOnOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -479,7 +485,6 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(user_settings_model):
-
         user_id = user_settings_model.id
 
         # Models in user storage module keyed by user_id.
@@ -517,8 +522,8 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         )
         exp_user_last_playthrough_model = (
             user_models.ExpUserLastPlaythroughModel.query(
-                user_models.ExpUserLastPlaythroughModel.user_id == user_id)
-            .get()
+                user_models.ExpUserLastPlaythroughModel.user_id == user_id
+            ).get()
         )
         story_progress_model = (
             user_models.StoryProgressModel.query(
@@ -526,8 +531,8 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         )
         user_contribution_proficiency_model = (
             user_models.UserContributionProficiencyModel.query(
-                user_models.UserContributionProficiencyModel.user_id == user_id)
-            .get()
+                user_models.UserContributionProficiencyModel.user_id == user_id
+            ).get()
         )
         user_identifiers_model = (
             user_models.UserIdentifiersModel.query(
@@ -598,7 +603,8 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         min_date = min(filtered_user_dates_list)
         if min_date < user_settings_model.created_on:
             user_settings_model.created_on = min_date
-            user_settings_model.update_timestamps()
+            user_settings_model.update_timestamps(
+                update_last_updated_time=False)
             user_settings_model.put()
             yield ('SUCCESS_UPDATED', 1)
         else:
