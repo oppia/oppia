@@ -1313,9 +1313,9 @@ span.sort-explorations-select .sort-order {
 
 .oppia-dashboard-intro-button {
   background-color: #015c53;
-  border-radius: 0;
+  border-radius: 4px;
   color: #fff;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   margin-top: 10px;
   text-transform: uppercase;
@@ -1674,6 +1674,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-editor-card-section {
   padding: 20px 50px 20px 35px;
+  word-break: break-word;
   word-wrap: break-word;
 }
 
@@ -1729,7 +1730,7 @@ pre.oppia-pre-wrapped-text {
   background-color: rgba(0,0,0,0.2);
   border-radius: 4px;
   color: rgba(255,255,255,1.0);
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   margin-left: 5px;
   margin-right: 5px;
@@ -3359,9 +3360,9 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-splash-button {
   background-color: #015c53;
-  border-radius: 0;
+  border-radius: 4px;
   color: #fff;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 16px;
   margin-top: -20px;
   min-width: 360px;
@@ -4085,12 +4086,12 @@ oppia-noninteractive-link {
 }
 
 .oppia-about-otter-speech-bubble:after {
-  background: #eee;
+  background: #e8e7e3;
   border-bottom-right-radius: 40px 50px;
   bottom: -1.7em;
   content: "";
   display: block;
-  height: 30px;
+  height: 27px;
   left: 1em;
   position: absolute;
   width: 20px;
@@ -4178,8 +4179,9 @@ oppia-noninteractive-link {
 
 .oppia-about-button {
   background-color: rgb(0, 121, 109);
+  border-radius: 4px;
   color: rgba(255,255,255,1.0);
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 18px;
   margin: 0 15px 15px 15px;
   max-width: 90%;
@@ -4382,6 +4384,7 @@ oppia-noninteractive-link {
   height: auto;
   min-height: 80px;
   padding: 8px;
+  word-break: break-word;
   word-wrap: break-word;
 }
 
