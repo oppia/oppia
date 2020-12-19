@@ -45,7 +45,7 @@
   <schema-based-editor schema="HTML_SCHEMA" local-value="StateContentService.displayed._html">
   </schema-based-editor>
 
-  <div class="buttons-holder">
+  <div class="mt-2">
     <button type="button"
             class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content float-right"
             ng-click="onSaveContentButtonClicked()">
@@ -54,16 +54,14 @@
     <button type="button" class="btn btn-secondary float-right" ng-click="cancelEdit()">Cancel</button>
     <div class="oppia-clear"></div>
   </div>
-  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning">
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning mt-2">
     <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
     <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
   </div>
 </div>
 
 <style>
-  .buttons-holder {
-    margin-top: 0.5rem;
-  }
+
   .material-icons {
     color: #827127;
   }
@@ -72,7 +70,6 @@
     border: 0.0625rem solid #827127;
     border-radius: 0.25rem;
     color: #333333;
-    margin-top: 0.5rem;
     padding-left: 0.25rem;
   }
   .oppia-shadow-preview-card {
