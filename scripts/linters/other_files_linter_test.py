@@ -53,11 +53,16 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
+        self.strict_ts_config = python_utils.string_io(
+            buffer_value='{\"files\": [\"some-file.ts\",'
+            '\"some-file.spec.ts\"]}')
         def mock_open_file(path, unused_permissions):
             if path == other_files_linter.MANIFEST_JSON_FILE_PATH:
                 return self.manifest_file
             elif path == other_files_linter.PACKAGE_JSON_FILE_PATH:
                 return self.package_file
+            elif path == other_files_linter.STRICT_TS_CONFIG_FILEPATH:
+                return self.strict_ts_config
         def mock_listdir(unused_path):
             return self.files_in_typings_dir
         self.open_file_swap = self.swap(
@@ -250,6 +255,33 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 'are for version 0.2. Please refer typings/README.md '
                 'for more details.'], error_messages.get_report())
             self.assertEqual('Third party type defs', error_messages.name)
+            self.assertTrue(error_messages.failed)
+
+    def test_check_valid_strict_checks(self):
+        expected_error_messages = 'SUCCESS  Strict TS config check passed'
+        with self.open_file_swap, self.print_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE).check_strict_ts_config()
+            self.assertEqual(
+                error_messages.get_report()[0], expected_error_messages)
+            self.assertEqual('Strict TS config', error_messages.name)
+            self.assertFalse(error_messages.failed)
+
+    def test_check_invalid_strict_checks(self):
+        self.strict_ts_config = python_utils.string_io(
+            buffer_value='{\"files\": [\"some-file.spec.ts\",'
+            '\"some-file.ts\"]}')
+        expected_error_messages = 'FAILED  Strict TS config check failed'
+        with self.open_file_swap, self.print_swap:
+            error_messages = other_files_linter.CustomLintChecksManager(
+                FILE_CACHE).check_strict_ts_config()
+            self.assertEqual(
+                error_messages.get_report()[1], expected_error_messages)
+            self.assert_same_list_elements(
+                ['Files in %s are not alphabetically sorted.' % (
+                    other_files_linter.STRICT_TS_CONFIG_FILE_NAME)],
+                error_messages.get_report())
+            self.assertEqual('Strict TS config', error_messages.name)
             self.assertTrue(error_messages.failed)
 
     def test_perform_all_lint_checks(self):
