@@ -51,6 +51,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import summary_services
 from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -311,6 +312,39 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
 
         self._DB.clear()
 
+    # TODO:(#11314): remove this method once ElasticSearch migration is complete
+    # and replace method in summary_services.
+    def generate_query_from_categories(self, categories, languages):
+        """Returns the search query derived from terms and categories.
+
+        Args:
+            categories: list(str). List of values for the category field.
+            languages: list(str). List of values for the language_code field.
+
+        Returns:
+            str. A JSON-encoded query string.
+        """
+
+        query = {
+            'query': {
+                'bool': {
+                    'must': [],
+                    'filter': [],
+                }
+            }
+        }
+        if categories:
+            category_string = ' '.join(['"%s"' % cat for cat in categories])
+            query['query']['bool']['filter'].append(
+                {'match': {'category': category_string}}
+            )
+        if languages:
+            language_string = ' '.join(['"%s"' % cat for cat in categories])
+            query['query']['bool']['filter'].append(
+                {'match': {'language_code': language_string}}
+            )
+        return json.dumps(query)
+
     def search(
             self, query_string, index_name, cursor=None, offset=0,
             size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
@@ -367,7 +401,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
             query = json.loads(query_string)
         except ValueError:
             if query_string != '':
-                raise Exception('Invalid query string')
+                raise Exception('Invalid query string %s'%query_string)
         else:
             result_docs = self._filter_search(query, result_docs)
 
@@ -1226,6 +1260,9 @@ tags: []
             stack.enter_context(self.swap(
                 search_services, 'search',
                 self._search_services_stub.search))
+            stack.enter_context(self.swap(
+                summary_services, '_generate_query',
+                self._search_services_stub.generate_query_from_categories))
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self._taskqueue_services_stub.create_http_task))
