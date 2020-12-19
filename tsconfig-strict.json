@@ -33,8 +33,6 @@
   "files": [
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
-    "core/templates/domain/classifier/classifier.model.ts",
-    "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.spec.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.ts",
@@ -61,8 +59,6 @@
     "core/templates/pages/admin-page/services/admin-task-manager.service.spec.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts",
-    "core/templates/pages/exploration-player-page/services/learner-params.service.ts",
-    "core/templates/pages/exploration-player-page/services/learner-params.service.spec.ts",
     "core/templates/services/app.service.ts",
     "core/templates/services/app.service.spec.ts",
     "core/templates/services/external-save.service.ts",
@@ -102,11 +98,11 @@
     "extensions/interactions/NumericInput/directives/numeric-input-rules.service.ts",
     "extensions/interactions/NumericInput/directives/numeric-input-rules.service.spec.ts",
     "extensions/interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service.ts",
-    "extensions/interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service.spec.ts"
+    "extensions/interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service.spec.ts",
   ],
-
   "include": ["typings/*.ts"]
 }
+
 
 
 
