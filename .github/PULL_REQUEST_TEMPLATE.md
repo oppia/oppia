@@ -24,4 +24,4 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 - Make sure your PR follows conventions in the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide), otherwise this will lead to review delays.
 - Never force push. If you do, your PR will be closed.
 - Oppiabot can assign anyone for review/help if you leave a comment like the following: "{{Question/comment}} @{{reviewer_username}} PTAL"
-- Some of the e2e tests are flaky and can lead to failure. If you aren't able to restart the test feel free to use Oppiabot to ask someone to restart the tests.
+- Some of the e2e tests are flaky and can lead to failure. If you aren't able to restart the tests, please check the ["If your build fails" wiki page](https://github.com/oppia/oppia/wiki/If-your-build-fails).
