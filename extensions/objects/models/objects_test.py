@@ -854,7 +854,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.get_schema())
                     count += 1
 
-        self.assertEqual(count, 52)
+        self.assertEqual(count, 55)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
@@ -927,7 +927,7 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
                     continue
                 self.assertEqual(name.index('Translatable'), 0)
             else:
-                self.assertNotIn('Translatable', name)
+                self.assertNotEqual(name.index('Translatable'), 0)
 
     def test_abstract_base_class_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
