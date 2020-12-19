@@ -10,14 +10,14 @@
         &#xE254;
       </i>
       <oppia-thumbnail-display ng-show="!thumbnailIsLoading"
-                                   [img-src]="editableThumbnailDataUrl"
-                                   [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
-                                   [background]="getBgColor()">
+                               [img-src]="editableThumbnailDataUrl"
+                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                               [background]="getBgColor()">
       </oppia-thumbnail-display>
       <oppia-thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
-                                   [img-src]="newThumbnailDataUrl"
-                                   [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
-                                   [background]="localStorageBgcolor">
+                               [img-src]="newThumbnailDataUrl"
+                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                               [background]="localStorageBgcolor">
       </oppia-thumbnail-display>
     </div>
   </div>
