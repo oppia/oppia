@@ -52,45 +52,22 @@ angular.module('oppia').component('splashPage', {
       };
 
       // The 2 functions below are to cycle between values:
-      // 0 to testimonialCount - 1 for displayedTestimonialId.
+      // 0 to (testimonialCount - 1) for displayedTestimonialId.
       ctrl.incrementDisplayedTestimonialId = function() {
-        // This makes sure that incrementing from testimonialCount - 1, returns
-        // 0 instead of testimonialCount,since we want the testimonials to cycle
-        // through.
+        // This makes sure that incrementing from (testimonialCount - 1)
+        // returns 0 instead of testimonialCount,since we want the testimonials
+        // to cycle through.
         ctrl.displayedTestimonialId = (
           ctrl.displayedTestimonialId + 1) % ctrl.testimonialCount;
       };
 
       ctrl.decrementDisplayedTestimonialId = function() {
         // This makes sure that decrementing from 0, returns
-        // testimonialCount - 1 instead of -1, since we want the testimonials to
-        // cycle through.
+        // (testimonialCount - 1) instead of -1, since we want the testimonials
+        // to cycle through.
         ctrl.displayedTestimonialId = (
-          ((ctrl.displayedTestimonialId - 1) % ctrl.testimonialCount) +
-          ctrl.testimonialCount
-        ) % ctrl.testimonialCount;
-      };
-
-      ctrl.getTestimonialBackgroundUrl = function() {
-        if (ctrl.isWindowNarrow()) {
-          return (
-            'url(' + ctrl.getStaticImageUrl(
-              '/splash/m_testimonial_background.png') + ')');
-        }
-        return (
-          'url(' + ctrl.getStaticImageUrl(
-            '/splash/dsk_testimonial_background.png') + ')');
-      };
-
-      ctrl.getCommunityBackgroundUrl = function() {
-        if (ctrl.isWindowNarrow()) {
-          return (
-            'url(' + ctrl.getStaticImageUrl(
-              '/splash/m_community_background.png') + ')');
-        }
-        return (
-          'url(' + ctrl.getStaticImageUrl(
-            '/splash/dsk_community_background.png') + ')');
+          ctrl.displayedTestimonialId + ctrl.testimonialCount - 1) %
+          ctrl.testimonialCount;
       };
 
       ctrl.getTestimonials = function() {
@@ -103,7 +80,7 @@ angular.module('oppia').component('splashPage', {
         }, {
           quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_2'),
           studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_2'),
-          imageUrl: '/splash/Dheeraj_3.jpeg',
+          imageUrl: '/splash/Dheeraj_3.png',
           imageUrlWebp: '/splash/Dheeraj_3.webp',
           borderPresent: true
         }, {
@@ -115,7 +92,7 @@ angular.module('oppia').component('splashPage', {
         }, {
           quote: $translate.instant('I18N_SPLASH_TESTIMONIAL_4'),
           studentDetails: $translate.instant('I18N_SPLASH_STUDENT_DETAILS_4'),
-          imageUrl: '/splash/Gaurav_2.jpeg',
+          imageUrl: '/splash/Gaurav_2.png',
           imageUrlWebp: '/splash/Gaurav_2.webp',
           borderPresent: true
         }];

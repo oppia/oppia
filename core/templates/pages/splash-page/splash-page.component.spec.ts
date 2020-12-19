@@ -106,26 +106,6 @@ describe('Splash Page', function() {
     expect(ctrl.displayedTestimonialId).toBe(2);
   });
 
-  it('should get correct background URLs', function() {
-    spyOn(
-      WindowDimensionsService, 'isWindowNarrow').and.returnValues(
-      false, true, false, true, false, true);
-
-    expect(
-      ctrl.getCommunityBackgroundUrl()).toContain(
-      '/splash/dsk_community_background.png');
-    expect(
-      ctrl.getCommunityBackgroundUrl()).toContain(
-      '/splash/m_community_background.png');
-
-    expect(
-      ctrl.getTestimonialBackgroundUrl()).toContain(
-      '/splash/dsk_testimonial_background.png');
-    expect(
-      ctrl.getTestimonialBackgroundUrl()).toContain(
-      '/splash/m_testimonial_background.png');
-  });
-
   it('should get testimonials correctly', function() {
     ctrl.$onInit();
     expect(ctrl.getTestimonials().length).toBe(ctrl.testimonialCount);

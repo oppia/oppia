@@ -538,6 +538,8 @@
 	"I18N_SPLASH_SECOND_EXPLORATION_DESCRIPTION": "Paragraph describing Oppia showed in the splash page next to an image.",
 	"I18N_SPLASH_SITE_FEEDBACK": "Text displayed in a floating tag at the bottom of the page - It links to the feedback page and should engage the user to give an opinion on the site. It should be only a couple words long.",
 	"I18N_SPLASH_START_CONTRIBUTING": "Text shown on the button in the volunteers section on the splash page.",
+	"I18N_SPLASH_START_LEARNING": "Text shown on the button in the students section in the splash page.",
+	"I18N_SPLASH_START_TEACHING": "Text shown on the button in the teachers section in the splash page.",
 	"I18N_SPLASH_STUDENTS_CONTENT": "Content displayed in the students section in the splash page.",
 	"I18N_SPLASH_STUDENTS_TITLE": "The main title in the students section of the splash page describing its content.",
 	"I18N_SPLASH_STUDENT_DETAILS_1": "Details of the first student displayed below their testimonial in the splash page.",

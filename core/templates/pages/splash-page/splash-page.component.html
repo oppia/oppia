@@ -56,7 +56,7 @@
       <h3 ng-if="$ctrl.isWindowNarrow()" translate="I18N_SPLASH_BENEFITS_TITLE"></h3>
       <picture class="splash-matthew-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.png')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.png')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.png')]>" alt="">
       </picture>
     </div>
@@ -81,7 +81,7 @@
     <div class="oppia-splash-section-four-image-mobile" ng-if="$ctrl.isWindowNarrow()">
       <picture class="splash-student-desk-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk_mobile.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk_mobile.png')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk_mobile.png')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/student_desk_mobile.png')]>" alt="">
       </picture>
     </div>
@@ -93,7 +93,7 @@
         <form action="<[$ctrl.classroomUrl]>">
           <button type="submit"
                   class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                  translate="I18N_SPLASH_LEARN_MORE">
+                  translate="I18N_SPLASH_START_LEARNING">
           </button>
         </form>
       </div>
@@ -101,7 +101,7 @@
     <div class="oppia-splash-section-four-right" ng-if="!$ctrl.isWindowNarrow()">
       <picture class="splash-student-desk-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk.png')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/student_desk.png')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/student_desk.png')]>" alt="">
       </picture>
     </div>
@@ -111,7 +111,7 @@
     <div class="oppia-splash-section-five-image" ng-if="$ctrl.isWindowNarrow()">
       <picture class="splash-student-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlWebp)]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrl)]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrl)]>">
         <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlPng)]>" ng-class="{'image-with-border': $ctrl.testimonials[$ctrl.displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
@@ -132,7 +132,7 @@
     <div class="oppia-splash-section-five-right" ng-if="!$ctrl.isWindowNarrow()">
       <picture class="splash-student-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlWebp)]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrl)]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrl)]>">
         <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlPng)]>" ng-class="{'image-with-border': $ctrl.testimonials[$ctrl.displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
@@ -142,7 +142,7 @@
     <div class="oppia-splash-section-six-left">
       <picture class="splash-books-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/books_dsk.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/books_dsk.png')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/books_dsk.png')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/books_dsk.png')]>" alt="">
       </picture>
     </div>
@@ -154,7 +154,7 @@
         <form action="/teach">
           <button type="submit"
                   class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                  translate="I18N_SPLASH_LEARN_MORE">
+                  translate="I18N_SPLASH_START_TEACHING">
           </button>
         </form>
       </div>
@@ -165,7 +165,7 @@
     <div class="oppia-splash-section-seven-image" ng-if="$ctrl.isWindowNarrow()">
       <picture class="splash-vol-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>" alt="">
       </picture>
     </div>
@@ -185,7 +185,7 @@
     <div class="oppia-splash-section-seven-right" ng-if="!$ctrl.isWindowNarrow()">
       <picture class="splash-vol-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/volunteer_section.png')]>" alt="">
       </picture>
     </div>
@@ -366,7 +366,12 @@
     width: 100vw;
   }
 
+  .splash-page .oppia-splash-section-five {
+    background-image: url(/assets/images/splash/dsk_testimonial_background.png);
+  }
+
   .splash-page .oppia-splash-section-seven {
+    background-image: url(/assets/images/splash/dsk_community_background.png);
     padding-top: 30vh;
   }
 
@@ -522,8 +527,9 @@
     font-weight: bold;
   }
 
-  .splash-page .oppia-splash-main-image img {
-    max-width: 900px;
+  .splash-page .oppia-splash-main-image img,
+  .splash-page .oppia-splash-main-image source {
+    max-width: 800px;
     width: 100%;
   }
 
@@ -561,6 +567,10 @@
       display: inherit;
     }
 
+    .splash-page .oppia-splash-section-five {
+      background-image: url(/assets/images/splash/m_testimonial_background.png);
+    }
+
     .splash-page .image-desktop {
       display: none;
     }
@@ -589,6 +599,7 @@
     }
 
     .splash-page .oppia-splash-section-seven {
+      background-image: url(/assets/images/splash/m_community_background.png);
       padding-top: 20vh;
     }
 
