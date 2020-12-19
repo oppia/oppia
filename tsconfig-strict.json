@@ -36,6 +36,8 @@
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.spec.ts",
+    "core/templates/domain/exploration/AnswerStatsObjectFactory.ts",
+    "core/templates/domain/exploration/AnswerStatsObjectFactorySpec.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.spec.ts",
     "core/templates/domain/objects/FractionObjectFactory.ts",
