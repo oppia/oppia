@@ -86,7 +86,7 @@ def get_verified_subject_id(response):
         Exception. The response was not authorized.
     """
     if 'Authorization' not in response.headers:
-        raise Exception('Authorization header is missing')
+        return None
     auth_header = response.headers.get('Authorization', '')
     bearer, _, token = auth_header.partition(' ')
     if bearer != 'Bearer':

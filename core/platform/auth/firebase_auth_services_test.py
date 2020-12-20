@@ -109,9 +109,9 @@ class FirebaseAuthServicesPublicApiTest(test_utils.TestBase):
 
     def test_verify_token_without_auth_header(self):
         with self.swap_verify_to_always_accept_tokens():
-            with self.assertRaisesRegexp(Exception, 'header is missing'):
+            self.assertIsNone(
                 firebase_auth_services.get_verified_subject_id(
-                    self.make_response(auth_header=None))
+                    self.make_response(auth_header=None)))
 
     def test_verify_token_with_empty_auth_header(self):
         with self.swap_verify_to_always_accept_tokens():
