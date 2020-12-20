@@ -30,9 +30,9 @@ angular.module('oppia').factory('GraphDataService', [
       ExplorationStatesService) {
     var _graphData = null;
     /**
-     * @return {Object} graphData - The input to a visualaization for a directed graph.
+     * @return {Object} graphData - Direct graph visuapization input.
      * @return {Object} graphData.nodes - A nodes object.
-     * @return {Object[]} graphData.links - A list of direct links betweeen two nodes.
+     * @return {Object[]} graphData.links - List of direct links two of nodes.
      * @return {string[]} graphData.finalStateIds - An array of state names.
      * @return {string} graphData.initStateId - The name of initial state.
      * @return {string} graphData.nodes.<stateName> - The name of the state.
