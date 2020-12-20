@@ -3046,3 +3046,74 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             Exception, 'Invalid review category: invalid_category'):
             user_services.get_contribution_reviewer_usernames(
                 'invalid_category', language_code='hi')
+
+
+class FirebaseSubUserIdAssociationOperationsTests(test_utils.GenericTestBase):
+
+    def put_association(self, sub, user_id):
+        """Commits the given association to storage manually."""
+        user_models.UserIdByFirebaseSubModel( # pylint: disable=protected-access
+            id=sub, user_id=user_id).put()
+
+    def test_get_association_that_exists(self):
+        self.put_association('sub', 'uid')
+
+        self.assertEqual(
+            user_services.get_user_id_from_sub('sub'), 'uid')
+
+    def test_get_association_that_does_not_exist(self):
+        self.assertIsNone(
+            user_services.get_user_id_from_sub('does_not_exist'))
+
+    def test_get_multi_associations_that_exist(self):
+        self.put_association('sub1', 'uid1')
+        self.put_association('sub2', 'uid2')
+        self.put_association('sub3', 'uid3')
+
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_subs(
+                ['sub1', 'sub2', 'sub3']),
+            ['uid1', 'uid2', 'uid3'])
+
+    def test_get_multi_associations_that_do_not_exist(self):
+        self.put_association('sub1', 'uid1')
+        # Mapping from sub2 -> uid2 missing.
+        self.put_association('sub3', 'uid3')
+
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_subs(
+                ['sub1', 'sub2', 'sub3']),
+            ['uid1', None, 'uid3'])
+
+    def test_associate_new_sub_to_user_id(self):
+        user_services.associate_sub_to_user_id('sub', 'uid')
+
+        self.assertEqual(
+            user_services.get_user_id_from_sub('sub'), 'uid')
+
+    def test_associate_existing_sub_to_user_id_raises(self):
+        user_services.associate_sub_to_user_id('sub', 'uid')
+
+        with self.assertRaisesRegexp(Exception, 'already mapped to user_id'):
+            user_services.associate_sub_to_user_id('sub', 'uid')
+
+    def test_associate_multi_new_subs_to_user_ids(self):
+        user_services.associate_multi_subs_to_user_ids(
+            ['sub1', 'sub2', 'sub3'], ['uid1', 'uid2', 'uid3'])
+
+        self.assertEqual(
+            user_services.get_multi_user_ids_from_subs(
+                ['sub1', 'sub2', 'sub3']),
+            ['uid1', 'uid2', 'uid3'])
+
+    def test_associate_multi_with_unequal_list_lengths_raises(self):
+        with self.assertRaisesRegexp(Exception, 'lists have unequal lengths'):
+            user_services.associate_multi_subs_to_user_ids(
+                ['sub1'], ['uid1', 'uid2', 'uid3'])
+
+    def test_associate_multi_an_existing_sub_to_user_id_mapping_raises(self):
+        user_services.associate_sub_to_user_id('sub1', 'uid1')
+
+        with self.assertRaisesRegexp(Exception, 'associations already exist'):
+            user_services.associate_multi_subs_to_user_ids(
+                ['sub1', 'sub2', 'sub3'], ['uid1', 'uid2', 'uid3'])

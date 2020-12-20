@@ -2821,3 +2821,80 @@ def log_username_change(committer_id, old_username, new_username):
     audit_models.UsernameChangeAuditModel(
         id=model_id, committer_id=committer_id, old_username=old_username,
         new_username=new_username).put()
+
+
+def get_user_id_from_sub(sub):
+    """Returns the user ID associated to the given subject identifier.
+
+    Args:
+        sub: str. The subject identifier.
+
+    Returns:
+        str|None. The user ID associated to the given subject, or None if no
+        association exists yet.
+    """
+    mapping = user_models.UserIdByFirebaseSubModel.get_by_id(sub)
+    return None if mapping is None else mapping.user_id
+
+
+def get_multi_user_ids_from_subs(subs):
+    """Returns the user IDs associated to the given subject identifiers.
+
+    Args:
+        subs: list(str). The subject identifiers.
+
+    Returns:
+        list(str|None). The user ID associated to each of the given subject,
+        or None for associations that don't exist.
+    """
+    return [None if mapping is None else mapping.user_id
+            for mapping in user_models.UserIdByFirebaseSubModel.get_multi(subs)]
+
+
+def associate_sub_to_user_id(sub, user_id):
+    """Commits the association between user ID and Firebase subject identifier.
+
+    Args:
+        sub: str. The subject identifier of the user.
+        user_id: str. The ID of the user.
+
+    Raises:
+        Exception. The subject identifier is already associated to a user_id.
+    """
+    claimed_user_id = get_user_id_from_sub(sub)
+    if claimed_user_id is not None:
+        raise Exception(
+            'sub=%r is already mapped to user_id=%r' % (sub, claimed_user_id))
+
+    mapping = user_models.UserIdByFirebaseSubModel(id=sub, user_id=user_id)
+    mapping.update_timestamps()
+    mapping.put()
+
+
+def associate_multi_subs_to_user_ids(subs, user_ids):
+    """Commits the associations between user IDs and Firebase subject
+    identifiers.
+
+    Args:
+        subs: list(str). The subject identifier of the users.
+        user_ids: list(str). The ID of the users.
+
+    Raises:
+        Exception. The list lengths don't match up, or a mapping already exists.
+    """
+    if len(user_ids) != len(subs):
+        raise Exception('input lists have unequal lengths')
+
+    claimed_user_ids = get_multi_user_ids_from_subs(subs)
+    if any(user_id is not None for user_id in claimed_user_ids):
+        existing_associations = sorted(
+            'sub=%r, user_id=%r' % (sub, user_id)
+            for sub, user_id in python_utils.ZIP(subs, claimed_user_ids)
+            if user_id is not None)
+        raise Exception(
+            'associations already exist for: %r' % (existing_associations,))
+
+    mappings = [user_models.UserIdByFirebaseSubModel(id=sub, user_id=user_id)
+                for sub, user_id in python_utils.ZIP(subs, user_ids)]
+    user_models.UserIdByFirebaseSubModel.update_timestamps_multi(mappings)
+    user_models.UserIdByFirebaseSubModel.put_multi(mappings)

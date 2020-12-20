@@ -2896,3 +2896,73 @@ class UserIdentifiersModel(base_models.BaseModel):
             argument.
         """
         return cls.query(cls.user_id == user_id).get()
+
+
+class UserIdByFirebaseSubModel(base_models.BaseModel):
+    """Stores the relationship between Firebase subject identifiers and user ID.
+
+    Instances of this class are keyed by Firebase subject identifier.
+    """
+
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """Model contains data to delete corresponding to a user: id,
+         and user_id fields.
+        """
+        return base_models.DELETION_POLICY.DELETE_AT_END
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Currently, the model holds identifiers relevant only for backend that
+        should not be exported.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls):
+        """Model doesn't contain any data directly corresponding to a user.
+        Currently, the model holds authentication details relevant only for
+        backend, and no exportable user data. It may contain user data in
+        the future.
+        """
+        return dict(
+            super(UserIdByFirebaseSubModel, cls).get_export_policy(),
+            **{'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE})
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserIdByFirebaseSubModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        datastore_services.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserIdByFirebaseSubModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any UserIdByFirebaseSubModel refers to the given user
+            ID.
+        """
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @classmethod
+    def get_by_user_id(cls, user_id):
+        """Fetch a entry by user ID.
+
+        Args:
+            user_id: str. The user ID.
+
+        Returns:
+            UserIdByFirebaseSubModel. The model with user_id field equal to
+            user_id argument.
+        """
+        return cls.query(cls.user_id == user_id).get()
