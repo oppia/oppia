@@ -770,20 +770,12 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     Raises:
         Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_id = None
     user_identifiers_model = (
-        user_models.UserIdentifiersModel.get(gae_id, strict=False))
-    # If the UserIdentifiersModels are not yet generated use
-    # UserAuthDetailsModel as the backup for retrieving the user_id.
-    # TODO(#11140): Remove this after we run the migration job.
-    if user_identifiers_model is None:
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, gae_id))
-        if user_auth_details_model is not None:
-            user_id = user_auth_details_model.id
-    else:
-        user_id = user_identifiers_model.user_id
+        user_models.UserIdentifiersModel.get_by_gae_id(gae_id))
+    user_id = (
+        user_identifiers_model.user_id
+        if user_identifiers_model is not None else None
+    )
 
     if user_id is not None:
         user_settings = _get_user_settings_from_model(
