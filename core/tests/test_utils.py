@@ -466,7 +466,7 @@ class TestBase(unittest.TestCase):
 
     @contextlib.contextmanager
     def swap_to_always_return(self, obj, attr, value=None):
-        """Swap obj.attr with a function that always returns `value`."""
+        """Swap obj.attr with a function that always returns the given value."""
         def function_that_always_returns(*unused_args, **unused_kwargs):
             """Returns the input value."""
             return value
@@ -474,11 +474,11 @@ class TestBase(unittest.TestCase):
             yield
 
     @contextlib.contextmanager
-    def swap_to_always_raise(self, obj, attr, exception_obj=Exception):
-        """Swap obj.attr with a function that always raises `exception_obj`."""
+    def swap_to_always_raise(self, obj, attr, error=Exception):
+        """Swap obj.attr with a function that always raises the given error."""
         def function_that_always_raises(*unused_args, **unused_kwargs):
             """Raises the input exception."""
-            raise exception_obj
+            raise error
         with self.swap(obj, attr, function_that_always_raises):
             yield
 

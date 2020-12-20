@@ -57,12 +57,12 @@ class FirebaseAuthServicesPublicApiTest(test_utils.TestBase):
             yield
 
     @contextlib.contextmanager
-    def swap_verify_to_always_reject_tokens(self, exception_obj=Exception):
+    def swap_verify_to_always_reject_tokens(self, error=Exception):
         """Mocks the Firebase SDK to always raise when inspecting tokens."""
         initialize_app_swap = self.swap_app_setup_and_teardown()
         auth_context = firebase_auth_services.acquire_auth_context()
         verify_id_token_swap = self.swap_to_always_raise(
-            firebase_admin.auth, 'verify_id_token', exception_obj=exception_obj)
+            firebase_admin.auth, 'verify_id_token', error=error)
         with initialize_app_swap, auth_context, verify_id_token_swap:
             yield
 
@@ -80,7 +80,7 @@ class FirebaseAuthServicesPublicApiTest(test_utils.TestBase):
 
     def test_error_in_initialize_propogates(self):
         app_that_will_not_initialize = self.swap_to_always_raise(
-            firebase_admin, 'initialize_app', exception_obj=Exception('error'))
+            firebase_admin, 'initialize_app', error=Exception('error'))
         with app_that_will_not_initialize:
             with self.assertRaisesRegexp(Exception, 'error'):
                 with firebase_auth_services.acquire_auth_context():
@@ -101,8 +101,8 @@ class FirebaseAuthServicesPublicApiTest(test_utils.TestBase):
                 '123')
 
     def test_verify_rejected_token(self):
-        err = Exception('untrusted!')
-        with self.swap_verify_to_always_reject_tokens(exception_obj=err):
+        error = Exception('untrusted!')
+        with self.swap_verify_to_always_reject_tokens(error=error):
             with self.assertRaisesRegexp(Exception, 'untrusted!'):
                 firebase_auth_services.get_verified_subject_id(
                     self.make_response(auth_header='Bearer MOCK_JWT_VALUE'))
