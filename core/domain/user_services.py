@@ -2886,7 +2886,7 @@ def associate_multi_subject_ids_to_user_ids(pairs):
             commit.
     """
     # Turn the list of pairs into a pair of lists: https://stackoverflow.com/a/7558990/4859885.
-    subject_ids, user_ids = (list(ids) for ids in python_utils.ZIP(*pairs))
+    subject_ids, user_ids = python_utils.ZIP(*pairs)
 
     claimed_user_ids = get_multi_user_ids_from_subject_ids(subject_ids)
     if any(user_id is not None for user_id in claimed_user_ids):
