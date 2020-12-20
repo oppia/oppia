@@ -3071,7 +3071,8 @@ class FirebaseSubjectIdUserIdAssociationOperationsTests(
 
     def test_get_association_that_does_not_exist(self):
         self.assertIsNone(
-            user_services.get_user_id_from_firebase_subject_id('does_not_exist'))
+            user_services.get_user_id_from_firebase_subject_id(
+                'does_not_exist'))
 
     def test_get_multi_associations_that_exist(self):
         self.put_association(
