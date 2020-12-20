@@ -39,6 +39,16 @@ angular.module('oppia').factory('GraphDataService', [
     //       of which are the names of the corresponding nodes.
     //   - initStateName: the name of the initial state.
     //   - finalStateName: the name of the final state.
+    /**
+     * @return {Object} graphData - The input to a visualaization for a directed graph.
+     * @return {Object} graphData.nodes - A nodes object.
+     * @return {Object[]} graphData.links - A list of direct links betweeen two nodes.
+     * @return {string[]} graphData.finalStateIds - An array of state names.
+     * @return {string} graphData.initStateId - The name of initial state.
+     * @return {string} graphData.nodes.<stateName> - The name of the state.
+     * @return {string} graphData.links[i].source - The source node.
+     * @return {string} graphData.links[i].target - The target node.
+     */
     var _recomputeGraphData = function() {
       if (!ExplorationInitStateNameService.savedMemento) {
         return;
