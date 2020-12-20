@@ -48,7 +48,7 @@ CI_INFO = {
             'build_url': None,
             'build_id': 'GITHUB_RUN_ID',
         },
-        'build_url_template': 'https://github.com/oppia/oppia/runs/%s'
+        'build_url_template': 'https://github.com/oppia/oppia/actions/runs/%s'
     }
 }
 
