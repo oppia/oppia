@@ -30,9 +30,8 @@ angular.module('oppia').directive('adminRolesTab', [
   '$rootScope', 'AdminBackendApiService',
   'AdminDataService', 'AdminTaskManagerService',
   'LanguageUtilService', 'UrlInterpolationService',
-  'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
-  'ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS',
-  'ADMIN_ROLE_HANDLER_URL', 'REVIEW_CATEGORY_QUESTION',
+  'ACTION_REMOVE_ALL_REVIEW_RIGHTS', 'ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS',
+  'REVIEW_CATEGORY_QUESTION',
   'REVIEW_CATEGORY_TRANSLATION', 'REVIEW_CATEGORY_VOICEOVER',
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
@@ -40,9 +39,9 @@ angular.module('oppia').directive('adminRolesTab', [
       AdminDataService, AdminTaskManagerService,
       LanguageUtilService, UrlInterpolationService,
       ACTION_REMOVE_ALL_REVIEW_RIGHTS, ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS,
-      REVIEW_CATEGORY_QUESTION, REVIEW_CATEGORY_TRANSLATION,
-      REVIEW_CATEGORY_VOICEOVER, USER_FILTER_CRITERION_ROLE,
-      USER_FILTER_CRITERION_USERNAME,) {
+      REVIEW_CATEGORY_QUESTION,
+      REVIEW_CATEGORY_TRANSLATION, REVIEW_CATEGORY_VOICEOVER,
+      USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
     return {
       restrict: 'E',
       scope: {},
@@ -85,6 +84,8 @@ angular.module('oppia').directive('adminRolesTab', [
 
           AdminTaskManagerService.startTask();
           ctrl.result = {};
+          console.log(formResponse.filterCriterion, formResponse.role,
+            formResponse.username)
           AdminBackendApiService.viewUsersRole(
             formResponse.filterCriterion, formResponse.role,
             formResponse.username

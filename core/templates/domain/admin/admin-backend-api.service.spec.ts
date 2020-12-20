@@ -200,7 +200,7 @@ describe('Admin backend api service', () => {
   );
 });
 
-describe('Admin Backend API service for Roles Tab', () => {
+fdescribe('Admin Backend API service for Roles Tab', () => {
   let adminBackendApiService: AdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
@@ -228,21 +228,73 @@ describe('Admin Backend API service for Roles Tab', () => {
   });
   it('should get the data of user regarding username',
     fakeAsync(() => {
-      let filterCriterion = 'role';
+      let filterCriterion = 'username';
       let role = null;
-      let username= 'validUser';
+      let username = 'validUser';
+      let result = {
+        validUser: 'ADMIN'
+      };
       adminBackendApiService.viewUsersRole(filterCriterion, role, username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/adminrolehandler');
-      expect(req.request.method).toEqual('POST');
-      req.flush(200);
+        '/adminrolehandler' +
+        '?filter_criterion=username&role=null&username=validUser');
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        { validUser: 'ADMIN'},
+        { status: 200, statusText: 'Success.'});
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith(result);
       expect(failHandler).not.toHaveBeenCalled();
     }
     ));
 
+  it('should get the data of user regarding role',
+    fakeAsync(() => {
+      let filterCriterion = 'role';
+      let role = 'ADMIN';
+      let username = null;
+      let result = {
+        validUser: 'ADMIN'
+      };
+      adminBackendApiService.viewUsersRole(filterCriterion, role, username)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminrolehandler' +
+        '?filter_criterion=role&role=ADMIN&username=null');
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        { validUser: 'ADMIN'},
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(result);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail to get the data of user when user does not exists',
+    fakeAsync(() => {
+      let filterCriterion = 'username';
+      let role = null;
+      let username = 'InvalidUser';
+      adminBackendApiService.viewUsersRole(filterCriterion, role, username)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminrolehandler' +
+        '?filter_criterion=username&role=null&username=InvalidUser');
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'User with given username does not exist'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }
+    ));
 });
