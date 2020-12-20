@@ -133,7 +133,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             'suite': 'suiteName',
             'metadata': {
                 'username': 'user',
-                'build_url': 'https://github.com/oppia/oppia/runs/1234',
+                'build_url': 'https://github.com/oppia/oppia/actions/runs/1234',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
             }
         }
@@ -314,7 +314,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             'output_lines': ['line1', 'line2'],
             'metadata': {
                 'username': 'user',
-                'build_url': 'https://github.com/oppia/oppia/runs/1234',
+                'build_url': 'https://github.com/oppia/oppia/actions/runs/1234',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
             }
         }
