@@ -29,51 +29,54 @@ import { TextInputRuleInputs } from 'interactions/rule-input-defs';
 export class TextInputRulesService {
   constructor(private nws: NormalizeWhitespacePipe) {}
   Equals(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
-    var normalizedAnswer = this.nws.transform(answer);
-    var normalizedInput = this.nws.transform(inputs.x);
-    return normalizedAnswer.toLowerCase() === normalizedInput.toLowerCase();
+    const normalizedAnswer = this.nws.transform(answer).toLowerCase();
+    return inputs.x.some(
+      input => this.nws.transform(input).toLowerCase() === normalizedAnswer);
   }
   FuzzyEquals(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
-    var normalizedAnswer = this.nws.transform(answer);
-    var answerString = normalizedAnswer.toLowerCase();
+    const normalizedAnswer = this.nws.transform(answer).toLowerCase();
+    const normalizedInput = inputs.x.map(
+      input => this.nws.transform(input).toLowerCase());
 
-    var normalizedInput = this.nws.transform(inputs.x);
-    var inputString = normalizedInput.toLowerCase();
-
-    if (inputString === answerString) {
-      return true;
-    }
-    var editDistance = [];
-    for (var i = 0; i <= inputString.length; i++) {
-      editDistance.push([i]);
-    }
-    for (var j = 1; j <= answerString.length; j++) {
-      editDistance[0].push(j);
-    }
-    for (var i = 1; i <= inputString.length; i++) {
-      for (var j = 1; j <= answerString.length; j++) {
-        if (inputString.charAt(i - 1) === answerString.charAt(j - 1)) {
-          editDistance[i][j] = editDistance[i - 1][j - 1];
-        } else {
-          editDistance[i][j] = Math.min(
-            editDistance[i - 1][j - 1], editDistance[i][j - 1],
-            editDistance[i - 1][j]) + 1;
+    const hasEditDistanceEqualToOne = (inputString, matchString) => {
+      if (inputString === matchString) {
+        return true;
+      }
+      var editDistance = [];
+      for (var i = 0; i <= inputString.length; i++) {
+        editDistance.push([i]);
+      }
+      for (var j = 1; j <= matchString.length; j++) {
+        editDistance[0].push(j);
+      }
+      for (var i = 1; i <= inputString.length; i++) {
+        for (var j = 1; j <= matchString.length; j++) {
+          if (inputString.charAt(i - 1) === matchString.charAt(j - 1)) {
+            editDistance[i][j] = editDistance[i - 1][j - 1];
+          } else {
+            editDistance[i][j] = Math.min(
+              editDistance[i - 1][j - 1], editDistance[i][j - 1],
+              editDistance[i - 1][j]) + 1;
+          }
         }
       }
-    }
-    return editDistance[inputString.length][answerString.length] === 1;
+      return editDistance[inputString.length][matchString.length] === 1;
+    };
+
+    return normalizedInput.some(
+      input => hasEditDistanceEqualToOne(input, normalizedAnswer));
   }
   StartsWith(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
-    var normalizedAnswer = this.nws.transform(answer);
-    var normalizedInput = this.nws.transform(inputs.x);
-    return normalizedAnswer.toLowerCase().indexOf(
-      normalizedInput.toLowerCase()) === 0;
+    const normalizedAnswer = this.nws.transform(answer).toLowerCase();
+    const normalizedInput = inputs.x.map(
+      input => this.nws.transform(input).toLowerCase());
+    return normalizedInput.some(input => normalizedAnswer.indexOf(input) === 0);
   }
   Contains(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
-    var normalizedAnswer = this.nws.transform(answer);
-    var normalizedInput = this.nws.transform(inputs.x);
-    return normalizedAnswer.toLowerCase().indexOf(
-      normalizedInput.toLowerCase()) !== -1;
+    const normalizedAnswer = this.nws.transform(answer).toLowerCase();
+    const normalizedInput = inputs.x.map(
+      input => this.nws.transform(input).toLowerCase());
+    return normalizedInput.some(input => normalizedAnswer.includes(input));
   }
 }
 

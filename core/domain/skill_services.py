@@ -777,10 +777,8 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
-    skill_model = skill_models.SkillModel.get(skill_id)
-    skill_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
-        force_deletion=force_deletion)
+    skill_models.SkillModel.delete_multi(
+        [skill_id], committer_id, '', force_deletion=force_deletion)
 
     # This must come after the skill is retrieved. Otherwise the memcache
     # key will be reinstated.
@@ -803,7 +801,10 @@ def delete_skill_summary(skill_id):
             be deleted.
     """
 
-    skill_models.SkillSummaryModel.get(skill_id).delete()
+    skill_summary_model = (
+        skill_models.SkillSummaryModel.get(skill_id, False))
+    if skill_summary_model is not None:
+        skill_summary_model.delete()
 
 
 def compute_summary_of_skill(skill):

@@ -302,6 +302,8 @@ import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
 import { PlatformFeatureBackendApiService } from
   'domain/platform_feature/platform-feature-backend-api.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from
@@ -466,6 +468,7 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserService } from 'services/user.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UtilsService } from 'services/utils.service';
@@ -664,6 +667,8 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static platformFeatureAdminBackendApiService:
     PlatformFeatureAdminBackendApiService;
   static platformFeatureBackendApiService: PlatformFeatureBackendApiService;
+  static platformFeatureDummyBackendApiService:
+    PlatformFeatureDummyBackendApiService;
   static platformFeatureService: PlatformFeatureService;
   static playerPositionService: PlayerPositionService;
   static playerTranscriptService: PlayerTranscriptService;
@@ -773,6 +778,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static unitsObjectFactory: UnitsObjectFactory;
   static urlInterpolationService: UrlInterpolationService;
   static urlService: UrlService;
+  static userService: UserService;
   static userExplorationPermissionsService: UserExplorationPermissionsService;
   static utilsService: UtilsService;
   static validatorsService: ValidatorsService;
@@ -955,6 +961,8 @@ private pencilCodeEditorValidationService:
 private platformFeatureAdminBackendApiService:
   PlatformFeatureAdminBackendApiService,
 private platformFeatureBackendApiService: PlatformFeatureBackendApiService,
+private platformFeatureDummyBackendApiService:
+  PlatformFeatureDummyBackendApiService,
 private platformFeatureService: PlatformFeatureService,
 private playerCorrectnessFeedbackEnabledService:
   PlayerCorrectnessFeedbackEnabledService,
@@ -1066,6 +1074,7 @@ private translateService: TranslateService,
 private unitsObjectFactory: UnitsObjectFactory,
 private urlInterpolationService: UrlInterpolationService,
 private urlService: UrlService,
+private userService: UserService,
 private userExplorationPermissionsService: UserExplorationPermissionsService,
 private utilsService: UtilsService,
 private validatorsService: ValidatorsService,
@@ -1349,6 +1358,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
       this.platformFeatureAdminBackendApiService);
     OppiaAngularRootComponent.platformFeatureBackendApiService = (
       this.platformFeatureBackendApiService);
+    OppiaAngularRootComponent.platformFeatureDummyBackendApiService = (
+      this.platformFeatureDummyBackendApiService);
     OppiaAngularRootComponent.platformFeatureService = (
       this.platformFeatureService);
     OppiaAngularRootComponent.playerCorrectnessFeedbackEnabledService = (
@@ -1534,6 +1545,8 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.urlInterpolationService = (
       this.urlInterpolationService);
     OppiaAngularRootComponent.urlService = this.urlService;
+    OppiaAngularRootComponent.userService = (
+      this.userService);
     OppiaAngularRootComponent.userExplorationPermissionsService = (
       this.userExplorationPermissionsService);
     OppiaAngularRootComponent.utilsService = this.utilsService;

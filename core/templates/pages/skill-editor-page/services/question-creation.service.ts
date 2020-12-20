@@ -207,9 +207,7 @@ angular.module('oppia').factory('QuestionCreationService', [
       QuestionUndoRedoService.clearChanges();
       var selectedSkillId = SkillEditorStateService.getSkill().getId();
       $location.hash(questionId);
-      var skillIdToNameMapping = (
-        [].reduce((obj, skill) => (
-          obj[skill.getId()] = skill.getDescription(), obj), {}));
+      var skillIdToNameMapping = {};
       var skillNames = [];
       var rubrics = [];
       skillNames = [skillIdToNameMapping[selectedSkillId]];
@@ -240,6 +238,10 @@ angular.module('oppia').factory('QuestionCreationService', [
       }).result.then(function() {
         $location.hash(null);
         saveAndPublishQuestion();
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       });
     };
     return {

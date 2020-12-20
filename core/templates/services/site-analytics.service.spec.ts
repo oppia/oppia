@@ -20,8 +20,6 @@ import { TestBed } from '@angular/core/testing';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-const constants = require('constants.ts');
-
 describe('Site Analytics Service', () => {
   let sas = null;
   let ws = null;
@@ -30,15 +28,11 @@ describe('Site Analytics Service', () => {
   beforeEach(() => {
     sas = TestBed.get(SiteAnalyticsService);
     ws = TestBed.get(WindowRef);
-
-    constants.CAN_SEND_ANALYTICS_EVENTS = true;
+    spyOnProperty(sas, 'CAN_SEND_ANALYTICS_EVENTS', 'get')
+      .and.returnValue(true);
 
     ws.nativeWindow.ga = function() {};
     gaSpy = spyOn(ws.nativeWindow, 'ga').and.stub();
-  });
-
-  afterAll(() => {
-    constants.CAN_SEND_ANALYTICS_EVENTS = false;
   });
 
   it('should register start login event', () => {
@@ -57,11 +51,11 @@ describe('Site Analytics Service', () => {
       'send', 'event', 'SignupButton', 'click', '');
   });
 
-  it('should register click browse library button event', () => {
-    sas.registerClickBrowseLibraryButtonEvent();
+  it('should register click browse lessons event', () => {
+    sas.registerClickBrowseLessonsButtonEvent();
 
     expect(gaSpy).toHaveBeenCalledWith(
-      'send', 'event', 'BrowseLibraryButton', 'click', '/context.html');
+      'send', 'event', 'BrowseLessonsButton', 'click', '/context.html');
   });
 
   it('should register go to donation site event', () => {
@@ -382,5 +376,51 @@ describe('Site Analytics Service', () => {
 
     expect(gaSpy).toHaveBeenCalledWith(
       'send', 'event', 'UploadRecordedAudio', 'click', explorationId);
+  });
+
+  it('should register Contributor Dashboard suggest event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardSuggestEvent(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardSuggest', 'click',
+      contributionType);
+  });
+
+  it('should register Contributor Dashboard submit suggestion event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardSubmitSuggestionEvent(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardSubmitSuggestion', 'click',
+      contributionType);
+  });
+
+  it('should register Contributor Dashboard view suggestion for review event',
+    () => {
+      const contributionType = 'Translation';
+      sas.registerContributorDashboardViewSuggestionForReview(contributionType);
+
+      expect(gaSpy).toHaveBeenCalledWith(
+        'send', 'event', 'ContributorDashboardViewSuggestionForReview', 'click',
+        contributionType);
+    });
+
+  it('should register Contributor Dashboard accept suggestion event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardAcceptSuggestion(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardAcceptSuggestion', 'click',
+      contributionType);
+  });
+
+  it('should register Contributor Dashboard reject suggestion event', () => {
+    const contributionType = 'Translation';
+    sas.registerContributorDashboardRejectSuggestion(contributionType);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ContributorDashboardRejectSuggestion', 'click',
+      contributionType);
   });
 });

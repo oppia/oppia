@@ -153,6 +153,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
     linked to the suggestion.
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # The type of suggestion.
     suggestion_type = datastore_services.StringProperty(
         required=True, indexed=True, choices=SUGGESTION_TYPE_CHOICES)
@@ -186,12 +189,21 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General suggestion needs to be pseudonymized for the user."""
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
+        """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple unshared instance since there
+        are multiple suggestions per user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'suggestion_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
@@ -199,11 +211,13 @@ class GeneralSuggestionModel(base_models.BaseModel):
             'target_version_at_submission':
                 base_models.EXPORT_POLICY.EXPORTED,
             'status': base_models.EXPORT_POLICY.EXPORTED,
-            'author_id': base_models.EXPORT_POLICY.EXPORTED,
-            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            # The author_id and final_reviewer_id are not exported since
+            # we do not want to reveal internal user ids.
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'change_cmd': base_models.EXPORT_POLICY.EXPORTED,
-            'score_category': base_models.EXPORT_POLICY.EXPORTED,
-            'language_code': base_models.EXPORT_POLICY.EXPORTED
+            'score_category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
     @classmethod
@@ -284,6 +298,28 @@ class GeneralSuggestionModel(base_models.BaseModel):
             query = query.filter(getattr(cls, field) == value)
 
         return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_translation_suggestions_in_review_with_exp_id(cls, exp_id):
+        """Returns translation suggestions which are in review with target_id
+        == exp_id.
+
+        Args:
+            exp_id: str. Exploration ID matching the target ID of the
+                translation suggestions.
+
+        Returns:
+            list(SuggestionModel). A list of translation suggestions in review
+            with target_id of exp_id. The number of returned results is capped
+            by feconf.DEFAULT_QUERY_LIMIT.
+        """
+        return (
+            cls.get_all()
+            .filter(cls.status == STATUS_IN_REVIEW)
+            .filter(cls.suggestion_type == SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            .filter(cls.target_id == exp_id)
+            .fetch(feconf.DEFAULT_QUERY_LIMIT)
+        )
 
     @classmethod
     def get_translation_suggestion_ids_with_exp_ids(cls, exp_ids):
@@ -516,6 +552,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     The ID of the voiceover application will be a random hashed value.
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY = True
+
     # The type of entity to which the user will be assigned as a voice artist
     # once the application will get approved.
     target_type = datastore_services.StringProperty(required=True, indexed=True)
@@ -544,8 +583,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """General voiceover application needs to be pseudonymized for the
-        user.
+        """Model contains data to pseudonymize corresponding to a user:
+        author_id, and final_reviewer_id fields.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
@@ -621,9 +660,16 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model is exported as multiple instances per user since there are
+        multiple voiceover applications relevant to a user.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'target_type': base_models.EXPORT_POLICY.EXPORTED,
             'target_id': base_models.EXPORT_POLICY.EXPORTED,
@@ -631,8 +677,10 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             'status': base_models.EXPORT_POLICY.EXPORTED,
             'content': base_models.EXPORT_POLICY.EXPORTED,
             'filename': base_models.EXPORT_POLICY.EXPORTED,
-            'author_id': base_models.EXPORT_POLICY.EXPORTED,
-            'final_reviewer_id': base_models.EXPORT_POLICY.EXPORTED,
+            # The author_id and final_reviewer_id are not exported in order to
+            # keep internal ids private.
+            'author_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'final_reviewer_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rejection_message': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -726,15 +774,21 @@ class CommunityContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_deletion_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """This model only contains general statistical information about the
+        contributor dashboard and does not include any individual user
+        information.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """NOT_APPLICABLE - this model does not directly contain user
-        information because the data is aggregated.
+        """Model doesn't contain any data directly corresponding to a user
+        because the data is aggregated.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'translation_reviewer_counts_by_lang_code':

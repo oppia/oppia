@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-const constants = require('constants.ts');
+import constants from 'assets/constants';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 // Service for sending events to Google Analytics.
@@ -35,11 +35,15 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 export class SiteAnalyticsService {
   constructor(private windowRef: WindowRef) {}
 
+  get CAN_SEND_ANALYTICS_EVENTS(): boolean {
+    return constants.CAN_SEND_ANALYTICS_EVENTS;
+  }
+
   // For definitions of the various arguments, please see:
   // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
   _sendEventToGoogleAnalytics(
       eventCategory: string, eventAction: string, eventLabel: string): void {
-    if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
+    if (this.windowRef.nativeWindow.ga && this.CAN_SEND_ANALYTICS_EVENTS) {
       this.windowRef.nativeWindow.ga(
         'send', 'event', eventCategory, eventAction, eventLabel);
     }
@@ -50,7 +54,7 @@ export class SiteAnalyticsService {
   // social-interactions.
   __sendSocialEventToGoogleAnalytics(
       network: string, action: string, targetUrl: string): void {
-    if (this.windowRef.nativeWindow.ga && constants.CAN_SEND_ANALYTICS_EVENTS) {
+    if (this.windowRef.nativeWindow.ga && this.CAN_SEND_ANALYTICS_EVENTS) {
       this.windowRef.nativeWindow.ga(
         'send', 'social', network, action, targetUrl);
     }
@@ -65,9 +69,9 @@ export class SiteAnalyticsService {
   registerNewSignupEvent(): void {
     this._sendEventToGoogleAnalytics('SignupButton', 'click', '');
   }
-  registerClickBrowseLibraryButtonEvent(): void {
+  registerClickBrowseLessonsButtonEvent(): void {
     this._sendEventToGoogleAnalytics(
-      'BrowseLibraryButton', 'click',
+      'BrowseLessonsButton', 'click',
       this.windowRef.nativeWindow.location.pathname);
   }
   registerGoToDonationSiteEvent(donationSiteName: string): void {
@@ -225,6 +229,29 @@ export class SiteAnalyticsService {
   registerUploadAudioEvent(explorationId: string): void {
     this._sendEventToGoogleAnalytics(
       'UploadRecordedAudio', 'click', explorationId);
+  }
+  // Contributor Dashboard Events.
+  registerContributorDashboardSuggestEvent(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardSuggest', 'click', contributionType);
+  }
+  registerContributorDashboardSubmitSuggestionEvent(
+      contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardSubmitSuggestion', 'click', contributionType);
+  }
+  registerContributorDashboardViewSuggestionForReview(
+      contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardViewSuggestionForReview', 'click', contributionType);
+  }
+  registerContributorDashboardAcceptSuggestion(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardAcceptSuggestion', 'click', contributionType);
+  }
+  registerContributorDashboardRejectSuggestion(contributionType: string): void {
+    this._sendEventToGoogleAnalytics(
+      'ContributorDashboardRejectSuggestion', 'click', contributionType);
   }
 }
 

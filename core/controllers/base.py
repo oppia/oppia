@@ -263,16 +263,8 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
-        try:
-            # If this is a CSRF request and the user is not yet loaded produce
-            # an error. The user might not be loaded due to an eventual
-            # consistency that does not guarantee that the UserAuthDetailsModel
-            # will be returned by a query even when we are sure that the model
-            # was added to the datastore. More info in #10951.
-            if 'csrf' in self.request.uri and self.gae_id and not self.user_id:
-                raise self.UnauthorizedUserException('User details not found.')
-
-            if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
+        if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
+            try:
                 # If user opens a new tab during signup process, the user_id
                 # parameter is set to None and this causes the signup session
                 # to expire. The code here checks if user is on the signup
@@ -295,11 +287,11 @@ class BaseHandler(webapp2.RequestHandler):
                     raise self.UnauthorizedUserException(
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
-        except Exception as e:
-            logging.error('%s: payload %s', e, self.payload)
+            except Exception as e:
+                logging.error('%s: payload %s', e, self.payload)
 
-            self.handle_exception(e, self.app.debug)
-            return
+                self.handle_exception(e, self.app.debug)
+                return
 
         super(BaseHandler, self).dispatch()
 
@@ -654,3 +646,25 @@ class CsrfTokenHandler(BaseHandler):
         self.render_json({
             'token': csrf_token,
         })
+
+
+class OppiaMLVMHandler(BaseHandler):
+    """Base class for the handlers that communicate with Oppia-ML VM instances.
+    """
+
+    def extract_request_message_vm_id_and_signature(self):
+        """Returns the OppiaMLAuthInfo domain object containing
+        information from the incoming request that is necessary for
+        authentication.
+
+        Since incoming request can be either a protobuf serialized binary or
+        a JSON object, the derived classes must implement the necessary
+        logic to decode the incoming request and return a tuple of size 3
+        where message is at index 0, vm_id is at index 1 and signature is at
+        index 2.
+
+        Raises:
+            NotImplementedError. The derived child classes must implement the
+                necessary logic as described above.
+        """
+        raise NotImplementedError

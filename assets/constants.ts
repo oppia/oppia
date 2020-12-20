@@ -17,7 +17,7 @@
  * @fileoverview Initializes constants for the Oppia codebase.
  */
 
-export = {
+export default {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
@@ -4767,6 +4767,9 @@ export = {
     "code": "da",
     "description": "dansk (Danish)"
   }, {
+    "code": "prs",
+    "description": "دری (Dari)"
+  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)"
   }, {
@@ -4884,10 +4887,13 @@ export = {
     "text": "العربية"
   }, {
     "id": "kab",
-    "text": "Taqbaylit"
+    "text": "Taqbaylit (Kabyle)"
   }, {
     "id": "vi",
     "text": "Tiếng Việt"
+  }, {
+    "id": "tr",
+    "text": "Türkçe (Turkish)"
   }, {
     "id": "hi",
     "text": "हिन्दी"
@@ -5238,6 +5244,10 @@ export = {
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 
+  // The default number of opportunities to show on the contributor dashboard
+  // page.
+  "OPPORTUNITIES_PAGE_SIZE": 10,
+
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
 
@@ -5271,6 +5281,7 @@ export = {
   // The recommended length for meta tag contents. Search engines will truncate
   // results greater than this limit.
   "MAX_CHARS_IN_META_TAG_CONTENT": 160,
+  "MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB": 50,
 
   "NEW_STATE_TEMPLATE": {
     "classifier_model_id": null,
@@ -5384,6 +5395,16 @@ export = {
     "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
 
+  // Allowed letters in the OSK.
+  "VALID_CUSTOM_OSK_LETTERS": [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
+    "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+    "T", "U", "V", "W", "X", "Y", "Z",
+    "α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι", "κ", "λ", "μ", "ν", "ξ", "π",
+    "ρ", "σ", "τ", "υ", "φ", "χ", "ψ", "ω", "Γ", "Δ", "Θ", "Λ", "Ξ", "Π", "Σ",
+    "Φ", "Ψ", "Ω"],
+
   // Number of custom letters allowed in the on-screen keyboard for math
   // interactions.
   "MAX_CUSTOM_LETTERS_FOR_OSK": 10,
@@ -5440,7 +5461,7 @@ export = {
   "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
 
   // Used to disable account removal until it is fully implemented.
-  "ENABLE_ACCOUNT_DELETION": false,
+  "ENABLE_ACCOUNT_DELETION": true,
 
   // Used to disable account data export until it is fully implemented.
   "ENABLE_ACCOUNT_EXPORT": true,
@@ -5451,9 +5472,12 @@ export = {
   // Maximum allowed length of a username.
   "MAX_USERNAME_LENGTH": 30,
 
+  // Maximum allowed length of a state name.
+  "MAX_STATE_NAME_LENGTH": 50,
+
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],
-  "PLATFORM_PARAMETER_ALLOWED_CLIENT_TYPES": ["Web", "Android", "Backend"],
+  "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
   // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
   // of corresponding flavors, which is used in app_version_flavor filter for
   // order comparison, with ordering: 'test' < 'alpha' < 'beta' < 'release'.
