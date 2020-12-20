@@ -27,6 +27,7 @@ import { JobStatusSummary } from 'domain/admin/job-status-summary.model';
 import { TopicSummary } from 'domain/topic/topic-summary.model';
 import { PlatformParameterFilterType } from 'domain/platform_feature/platform-parameter-filter.model';
 import { FeatureStage, PlatformParameter } from 'domain/platform_feature/platform-parameter.model';
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
@@ -197,4 +198,51 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
+});
+
+describe('Admin Backend API service for Roles Tab', () => {
+  let adminBackendApiService: AdminBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [AdminBackendApiService]
+    });
+    httpTestingController = TestBed.get(HttpTestingController);
+    adminBackendApiService = TestBed.get(AdminBackendApiService);
+    csrfService = TestBed.get(CsrfTokenService);
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('sample-csrf-token');
+    });
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+  it('should get the data of user regarding username',
+    fakeAsync(() => {
+      let filterCriterion = 'role';
+      let role = null;
+      let username= 'validUser';
+      adminBackendApiService.viewUsersRole(filterCriterion, role, username)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/adminrolehandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(200);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
 });

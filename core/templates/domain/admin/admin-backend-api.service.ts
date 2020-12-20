@@ -142,8 +142,8 @@ export class AdminBackendApiService {
   }
 
   viewUsersRole(
-    filterCriterion:string, role:string, username:string
-    ):Promise<ArrayBuffer> {
+      filterCriterion:string, role:string, username:string
+  ):Promise<ArrayBuffer> {
     return this.http.get<ArrayBuffer>(
       AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
         params: {
@@ -156,8 +156,8 @@ export class AdminBackendApiService {
   }
 
   updateUserRole(
-    newRole:string ,username:string, topicId:string
-    ):Promise<void> {
+      newRole:string, username:string, topicId:string
+  ):Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
         role: newRole,
@@ -168,8 +168,8 @@ export class AdminBackendApiService {
   }
 
   addContributionReviewer(
-    category:string, username:string, languageCode:string
-    ):Promise<void> {
+      category:string, username:string, languageCode:string
+  ):Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_JOB_ADD_CONTRIBUTION_REVIEWER_HANDLER, {
         review_category: category,
@@ -180,8 +180,8 @@ export class AdminBackendApiService {
   }
 
   viewContributionReviewers(
-    category:string, languageCode:string,
-    ):Promise<ArrayBuffer> {
+      category:string, languageCode:string,
+  ):Promise<ArrayBuffer> {
     return this.http.get<ArrayBuffer>(
       AdminPageConstants.ADMIN_JOB_GET_CONTRIBUTION_REVIEWERS, {
         params: {
@@ -202,9 +202,10 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  removeContributionReviewer(username:string, method:string,
-    category:string, languageCode:string
-    ):Promise<void> {
+  removeContributionReviewer(
+      username:string, method:string,
+      category:string, languageCode:string
+  ):Promise<void> {
     return this.http.put<void>(
       AdminPageConstants.ADMIN_JOB_REMOVE_CONTRIBUTION_REVIEWER, {
         username: username,

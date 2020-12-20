@@ -27,21 +27,22 @@ require('pages/admin-page/services/admin-task-manager.service.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminRolesTab', [
-  '$http', '$rootScope', 'AdminBackendApiService',
+  '$rootScope', 'AdminBackendApiService',
   'AdminDataService', 'AdminTaskManagerService',
   'LanguageUtilService', 'UrlInterpolationService',
-  'ACTION_REMOVE_ALL_REVIEW_RIGHTS', 'ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS',
+  'ACTION_REMOVE_ALL_REVIEW_RIGHTS',
+  'ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS',
   'ADMIN_ROLE_HANDLER_URL', 'REVIEW_CATEGORY_QUESTION',
   'REVIEW_CATEGORY_TRANSLATION', 'REVIEW_CATEGORY_VOICEOVER',
   'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
   function(
-      $http, $rootScope, AdminBackendApiService,
+      $rootScope, AdminBackendApiService,
       AdminDataService, AdminTaskManagerService,
       LanguageUtilService, UrlInterpolationService,
       ACTION_REMOVE_ALL_REVIEW_RIGHTS, ACTION_REMOVE_SPECIFIC_REVIEW_RIGHTS,
-      ADMIN_ROLE_HANDLER_URL, REVIEW_CATEGORY_QUESTION,
-      REVIEW_CATEGORY_TRANSLATION, REVIEW_CATEGORY_VOICEOVER,
-      USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
+      REVIEW_CATEGORY_QUESTION, REVIEW_CATEGORY_TRANSLATION,
+      REVIEW_CATEGORY_VOICEOVER, USER_FILTER_CRITERION_ROLE,
+      USER_FILTER_CRITERION_USERNAME,) {
     return {
       restrict: 'E',
       scope: {},
@@ -87,17 +88,17 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminBackendApiService.viewUsersRole(
             formResponse.filterCriterion, formResponse.role,
             formResponse.username
-            ).then(function(response) {
-              ctrl.result = response;
-              if (Object.keys(ctrl.result).length === 0) {
-                ctrl.resultRolesVisible = false;
-                ctrl.setStatusMessage('No results.');
-              } else {
-                ctrl.resultRolesVisible = true;
-                ctrl.setStatusMessage('Success.');
-              }
-              refreshFormData();
-            }, handleErrorResponse);
+          ).then(function(response) {
+            ctrl.result = response;
+            if (Object.keys(ctrl.result).length === 0) {
+              ctrl.resultRolesVisible = false;
+              ctrl.setStatusMessage('No results.');
+            } else {
+              ctrl.resultRolesVisible = true;
+              ctrl.setStatusMessage('Success.');
+            }
+            refreshFormData();
+          }, handleErrorResponse);
           AdminTaskManagerService.finishTask();
         };
 
@@ -111,13 +112,13 @@ angular.module('oppia').directive('adminRolesTab', [
             formResponse.newRole, formResponse.username,
             formResponse.topicId
           ).then(function(response) {
-              ctrl.setStatusMessage(
-                'Role of ' + formResponse.username + ' successfully updated to ' +
-                formResponse.newRole);
-              refreshFormData();
-            }, handleErrorResponse);
-            AdminTaskManagerService.finishTask();
-          };
+            ctrl.setStatusMessage(
+              'Role of ' + formResponse.username + ' successfully updated to ' +
+              formResponse.newRole);
+            refreshFormData();
+          }, handleErrorResponse);
+          AdminTaskManagerService.finishTask();
+        };
 
         ctrl.submitAddContributionReviewerForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -128,14 +129,14 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminBackendApiService.addContributionReviewer(
             formResponse.category, formResponse.username,
             formResponse.languageCode
-            ).then(function(response) {
-              ctrl.setStatusMessage(
-                'Successfully added "' + formResponse.username + '" as ' +
-                formResponse.category + ' reviewer.');
-              refreshFormData();
-            }, handleErrorResponse);
-            AdminTaskManagerService.finishTask();
-          };
+          ).then(function(response) {
+            ctrl.setStatusMessage(
+              'Successfully added "' + formResponse.username + '" as ' +
+              formResponse.category + ' reviewer.');
+            refreshFormData();
+          }, handleErrorResponse);
+          AdminTaskManagerService.finishTask();
+        };
 
         ctrl.submitViewContributionReviewersForm = function(formResponse) {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -156,7 +157,7 @@ angular.module('oppia').directive('adminRolesTab', [
             var voiceoverLanguages = [];
             AdminBackendApiService.contributionReviewerRights(
               formResponse.username
-              ).then(function(response) {
+            ).then(function(response) {
               translationLanguages = getLanguageDescriptions(
                 response.can_review_translation_for_language_codes);
               voiceoverLanguages = getLanguageDescriptions(
