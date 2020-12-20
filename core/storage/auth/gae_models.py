@@ -91,4 +91,3 @@ class UserIdByFirebaseSubjectIdModel(base_models.BaseModel):
             to user_id argument.
         """
         return cls.query(cls.user_id == user_id).get()
-
