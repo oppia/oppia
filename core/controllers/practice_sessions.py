@@ -42,7 +42,6 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
 
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
-
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_fetchers.get_topic_by_name(topic_name)

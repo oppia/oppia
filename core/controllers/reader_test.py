@@ -523,7 +523,6 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
     def test_assign_and_read_ratings(self):
         """Test the PUT and GET methods for ratings."""
-
         self.signup('user@example.com', 'user')
         self.login('user@example.com')
         csrf_token = self.get_new_csrf_token()
@@ -564,7 +563,6 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
     def test_non_logged_in_users_cannot_rate(self):
         """Check non logged-in users can view but not submit ratings."""
-
         self.signup('user@example.com', 'user')
         self.login('user@example.com')
         csrf_token = self.get_new_csrf_token()
@@ -584,7 +582,6 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
     def test_ratings_by_different_users(self):
         """Check that ratings by different users do not interfere."""
-
         self.signup('a@example.com', 'a')
         self.signup('b@example.com', 'b')
 
@@ -1110,7 +1107,6 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
         """Check that emails are sent to moderaters when a logged-in
         user reports.
         """
-
         # Login and flag exploration.
         self.login(self.NEW_USER_EMAIL)
 
@@ -1167,7 +1163,6 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
 
     def test_non_logged_in_users_cannot_report(self):
         """Check that non-logged in users cannot report."""
-
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.logout()
@@ -1252,7 +1247,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """Test handler for completion of explorations not in the context of
         collections.
         """
-
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1289,7 +1283,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """Test handler for completion of explorations in the context of
         collections.
         """
-
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1352,7 +1345,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
     def test_exp_incomplete_event_handler(self):
         """Test handler for leaving an exploration incomplete."""
-
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1459,7 +1451,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
 
     def test_remove_collection_from_incomplete_list_handler(self):
         """Test handler for removing collections from incomplete list."""
-
         self.login(self.USER_EMAIL)
 
         # Add two collections to incomplete list.
@@ -1852,7 +1843,6 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
     def test_stats_events_handler_raises_error_with_invalid_exp_stats_property(
             self):
-
         observed_log_messages = []
 
         def _mock_logging_function(msg):
@@ -1874,7 +1864,6 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
     def test_stats_events_handler_raise_error_with_invalid_state_stats_property(
             self):
-
         observed_log_messages = []
 
         def _mock_logging_function(msg):

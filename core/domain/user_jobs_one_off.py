@@ -371,7 +371,6 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         """Remove invalid ids in a UserSubscriptionsModel entity."""
-
         return [user_models.UserSubscriptionsModel]
 
     @staticmethod

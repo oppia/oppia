@@ -252,7 +252,6 @@ def get_all_stale_suggestion_ids():
         list(str). A list of suggestion ids that correspond to stale
         suggestions.
     """
-
     return (
         suggestion_models.GeneralSuggestionModel.get_all_stale_suggestion_ids()
     )
@@ -264,7 +263,6 @@ def _update_suggestion(suggestion):
     Args:
         suggestion: Suggestion. The suggestion to be updated.
     """
-
     _update_suggestions([suggestion])
 
 
@@ -423,7 +421,6 @@ def reject_suggestion(suggestion_id, reviewer_id, review_message):
     Raises:
         Exception. The suggestion is already handled.
     """
-
     reject_suggestions([suggestion_id], reviewer_id, review_message)
 
 
@@ -666,7 +663,6 @@ def _get_plain_text_from_html_content_string(html_content_string):
     Returns:
         str. The plain text string from the given html content string.
     """
-
     def _replace_rte_tag(rte_tag):
         """Replaces all of the <oppia-noninteractive-**> tags with their
         corresponding rte component name in square brackets.
@@ -1046,7 +1042,6 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
     Returns:
         bool. Whether the user can resubmit the suggestion.
     """
-
     suggestion = get_suggestion_by_id(suggestion_id)
 
     return suggestion.author_id == user_id

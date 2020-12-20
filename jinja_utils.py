@@ -114,7 +114,6 @@ def evaluate_object(obj, params):
     Returns:
         *. The copy of `obj` after parsing strings in it.
     """
-
     if isinstance(obj, python_utils.BASESTRING):
         return parse_string(obj, params)
     elif isinstance(obj, list):

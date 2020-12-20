@@ -214,7 +214,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, [])
 
     def test_delete_explorations_from_search_index(self):
-
         def _mock_delete_docs(ids, index):
             """Mocks delete_documents_from_index()."""
             self.assertEqual(ids, [self.EXP_ID])
@@ -232,7 +231,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(delete_docs_counter.times_called, 1)
 
     def test_delete_collections_from_search_index(self):
-
         def _mock_delete_docs(ids, index):
             """Mocks delete_documents_from_index()."""
             self.assertEqual(ids, [self.COLLECTION_ID])

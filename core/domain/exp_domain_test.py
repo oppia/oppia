@@ -9699,7 +9699,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
     """Test method to obtain all html strings."""
 
     def test_all_html_strings_are_collected(self):
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category')
         exploration.add_states(['state1', 'state2', 'state3', 'state4'])

@@ -282,7 +282,6 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_upload_empty_image(self):
         """Test upload of an empty image."""
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -301,7 +300,6 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_upload_bad_image(self):
         """Test upload of a malformed image."""
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -320,7 +318,6 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_upload_an_invalid_svg_image(self):
         """Test upload of an invalid SVG image."""
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -342,7 +339,6 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_upload_a_large_svg(self):
         """Test upload of an SVG image that exceeds the 100 KB size limit."""
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -366,14 +362,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_get_invalid_image(self):
         """Test retrieval of invalid images."""
-
         self.get_json(
             self._get_image_url('exploration', '0', 'bad_image'),
             expected_status_int=404)
 
     def test_bad_filenames_are_detected(self):
         # TODO(sll): Add more tests here.
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -590,7 +584,6 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         """Test that filenames with extensions that don't match the audio are
         detected.
         """
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -660,7 +653,6 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
     def test_upload_empty_audio(self):
         """Test upload of empty audio."""
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         # Upload empty audio.
@@ -677,7 +669,6 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
     def test_upload_bad_audio(self):
         """Test upload of malformed audio."""
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         response_dict = self.post_json(
@@ -695,7 +686,6 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
     def test_missing_extensions_are_detected(self):
         """Test upload of filenames with no extensions are caught."""
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -721,7 +711,6 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
     def test_exceed_max_length_detected(self):
         """Test that audio file is less than max playback length."""
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -747,7 +736,6 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         """Test that filenames with extensions that don't match the audio are
         detected.
         """
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 

@@ -451,7 +451,6 @@ class BaseSummaryModelValidator(BaseModelValidator):
                 validation of External Model properties linked to the
                 storage model.
         """
-
         for (
                 external_model_name,
                 external_model_field_key,
@@ -551,7 +550,6 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
                 validation of External Model properties linked to the
                 storage model.
         """
-
         if cls.EXTERNAL_MODEL_NAME == '':
             raise Exception('External model name should be specified')
 

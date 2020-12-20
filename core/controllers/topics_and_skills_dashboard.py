@@ -57,7 +57,6 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
         """Handles GET requests."""
-
         topic_summaries = topic_services.get_all_topic_summaries()
         topic_summary_dicts = [
             summary.to_dict() for summary in topic_summaries]
@@ -190,7 +189,6 @@ class SkillsDashboardPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_topics_and_skills_dashboard
     def post(self):
         """Handles POST requests."""
-
         classroom_name = self.payload.get('classroom_name')
         urlsafe_start_cursor = self.payload.get('next_cursor', None)
         keywords = self.payload.get('keywords')

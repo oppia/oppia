@@ -45,10 +45,8 @@ class GaeSuiteTests(test_utils.GenericTestBase):
             gae_suite.main(args=[])
 
     def test_failing_tests(self):
-
         def _mock_create_test_suites(**unused_test_target):
             """Mocks create_test_suites()."""
-
             loader = unittest.TestLoader()
             return [loader.loadTestsFromName('core.tests.data.failing_tests')]
 
@@ -62,7 +60,6 @@ class GaeSuiteTests(test_utils.GenericTestBase):
             gae_suite.main(args=[])
 
     def test_no_tests_run_with_invalid_filename(self):
-
         def _mock_create_test_suites(**unused_test_target):
             """Mocks create_test_suites()."""
             loader = unittest.TestLoader()

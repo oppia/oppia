@@ -519,7 +519,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         """Test that Preferences Handler correctly updates the email
         preferences of the user.
         """
-
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)

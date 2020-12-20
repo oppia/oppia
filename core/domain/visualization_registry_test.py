@@ -120,7 +120,6 @@ class VisualizationsNameTests(test_utils.GenericTestBase):
 
     def test_visualization_names(self):
         """This function checks for duplicate visualizations."""
-
         all_python_files = self._get_all_python_files()
         all_visualizations = []
 

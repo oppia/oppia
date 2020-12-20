@@ -221,7 +221,6 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_updated_story_failing_validation(self):
-
         def _mock_get_story_by_id(unused_story_id):
             """Mocks get_story_by_id()."""
             return 'invalid_story'
@@ -385,7 +384,6 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_regeneration_job_skips_invalid_story(self):
-
         def _mock_get_story_by_id(unused_story_id):
             """Mocks get_story_by_id()."""
             return 'invalid_story'

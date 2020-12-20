@@ -57,7 +57,6 @@ class FeedbackThread(python_utils.OBJECT):
             message_count, created_on, last_updated, last_nonempty_message_text,
             last_nonempty_message_author_id):
         """Initializes a FeedbackThread object."""
-
         self.id = thread_id
         self.entity_type = entity_type
         self.entity_id = entity_id
@@ -228,7 +227,6 @@ class FeedbackAnalytics(python_utils.OBJECT):
     def __init__(
             self, entity_type, entity_id, num_open_threads, num_total_threads):
         """Initializes a FeedbackAnalytics object."""
-
         self.id = entity_id
         self.entity_type = entity_type
         self.num_open_threads = num_open_threads

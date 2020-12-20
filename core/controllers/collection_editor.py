@@ -69,7 +69,6 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
     @acl_decorators.can_edit_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
-
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
                 collection_id, self.user,
@@ -84,7 +83,6 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
     @acl_decorators.can_edit_collection
     def put(self, collection_id):
         """Updates properties of the given collection."""
-
         collection = collection_services.get_collection_by_id(collection_id)
         version = self.payload.get('version')
         _require_valid_version(version, collection.version)

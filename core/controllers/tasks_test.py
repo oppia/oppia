@@ -135,7 +135,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
-
         user_id_b = self.user_id_b
         class MockActivityRights(python_utils.OBJECT):
             def __init__(
@@ -288,7 +287,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     def test_email_sent_to_moderator_after_flag(self):
         """Tests Flagged Exploration Email Handler."""
-
         def fake_get_user_ids_by_role(_):
             """Replaces get_user_ids_by_role for testing purposes."""
             return [self.moderator_id]

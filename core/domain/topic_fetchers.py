@@ -288,7 +288,6 @@ def get_topic_rights(topic_id, strict=True):
         EntityNotFoundError. The topic with ID topic_id was not
             found in the datastore.
     """
-
     model = topic_models.TopicRightsModel.get(topic_id, strict=strict)
 
     if model is None:
@@ -307,7 +306,6 @@ def get_topic_rights_from_model(topic_rights_model):
     Returns:
         TopicRights. The rights object created from the model.
     """
-
     return topic_domain.TopicRights(
         topic_rights_model.id,
         topic_rights_model.manager_ids,

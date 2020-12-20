@@ -92,7 +92,6 @@ class LogoutPage(webapp2.RequestHandler):
         """Logs the user out, and returns them to a specified follow-up
         page (or the home page if no follow-up page is specified).
         """
-
         _clear_login_cookies(self.response.headers)
         url_to_redirect_to = (
             python_utils.convert_to_bytes(
@@ -399,7 +398,6 @@ class BaseHandler(webapp2.RequestHandler):
             return_type: str. Indicator to return JSON or HTML.
             values: dict. The key-value pairs to include in the response.
         """
-
         method = self.request.environ['REQUEST_METHOD']
 
         if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
@@ -541,7 +539,6 @@ class CsrfTokenManager(python_utils.OBJECT):
     @classmethod
     def init_csrf_secret(cls):
         """Verify that non-default CSRF secret exists; creates one if not."""
-
         # Any non-default value is fine.
         if CSRF_SECRET.value and CSRF_SECRET.value != DEFAULT_CSRF_SECRET:
             return

@@ -137,7 +137,6 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         correctly and an old skill is converted to new
         version.
         """
-
         # Generate skill with old(v1) misconceptions schema
         # version and old(v1) skill contents schema version.
         skill_contents = {
@@ -199,7 +198,6 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_updated_skill_failing_validation(self):
-
         def _mock_get_skill_by_id(unused_skill_id):
             """Mocks get_skill_by_id()."""
             return 'invalid_skill'

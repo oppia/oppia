@@ -763,7 +763,6 @@ def validate_customization_args_in_tag(tag):
     Yields:
         str. Error message if the attributes of tag are invalid.
     """
-
     component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long
     simple_component_tag_names = (
         rte_component_registry.Registry.get_simple_component_tag_names())
@@ -1005,7 +1004,6 @@ def get_invalid_svg_tags_and_attrs(svg_string):
         and <attribute> represents the invalid attribute.
         eg. (['invalid-tag1', 'invalid-tag2'], ['path:invalid-attr'])
     """
-
     # We don't need to encode the svg_string here because, beautiful soup can
     # detect the encoding automatically and process the string.
     # see https://beautiful-soup-4.readthedocs.io/en/latest/#encodings for info
@@ -1053,7 +1051,6 @@ def get_latex_strings_without_svg_from_html(html_string):
         list(str). List of unique LaTeX strings from math-tags without svg
         filename.
     """
-
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
     latex_strings = set()
@@ -1082,7 +1079,6 @@ def extract_svg_filenames_in_math_rte_components(html_string):
     Returns:
         list(str). A list of svg_filenames present in the HTML.
     """
-
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
     filenames = []
@@ -1161,7 +1157,6 @@ def validate_math_tags_in_html(html_string):
     Returns:
         list(str). A list of invalid math tags in the HTML string.
     """
-
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
     error_list = []
@@ -1193,7 +1188,6 @@ def validate_math_tags_in_html_with_attribute_math_content(html_string):
     Returns:
         list(str). A list of invalid math tags in the HTML string.
     """
-
     soup = bs4.BeautifulSoup(
         html_string.encode(encoding='utf-8'), 'html.parser')
     error_list = []

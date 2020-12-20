@@ -600,10 +600,8 @@ def save_exp_issues_model(exp_issues):
     Args:
         exp_issues: ExplorationIssues. The exploration issues domain object.
     """
-
     def _save_exp_issues_model_transactional():
         """Implementation to be run in a transaction."""
-
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             exp_issues.exp_id, exp_issues.exp_version)
         exp_issues_model.exp_version = exp_issues.exp_version
@@ -653,7 +651,6 @@ def delete_playthroughs_multi(playthrough_ids):
     Args:
         playthrough_ids: list(str). List of playthrough IDs to be deleted.
     """
-
     def _delete_playthroughs_multi_transactional():
         """Implementation to be run in a transaction."""
         stats_models.PlaythroughModel.delete_multi(

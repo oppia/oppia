@@ -109,7 +109,6 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             })], 'Changes.')
 
     def test_voiceover_application_creation(self):
-
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(
                 self.applicant_id))

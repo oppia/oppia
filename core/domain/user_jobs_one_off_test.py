@@ -114,7 +114,6 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_null_case(self):
         """Tests the case where user has no created or edited explorations."""
-
         self._run_one_off_job()
         user_a_contributions_model = user_models.UserContributionsModel.get(
             self.user_a_id, strict=False)
@@ -125,7 +124,6 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         """Tests the case where user has created (and therefore edited)
         an exploration.
         """
-
         self._run_one_off_job()
         user_b_contributions_model = user_models.UserContributionsModel.get(
             self.user_b_id)
@@ -136,7 +134,6 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_edited_exp(self):
         """Tests the case where user has an edited exploration."""
-
         self._run_one_off_job()
         user_c_contributions_model = user_models.UserContributionsModel.get(
             self.user_c_id)
@@ -149,7 +146,6 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
         """Tests the case where user has an edited exploration, and edits
         it again making sure it is not duplicated.
         """
-
         self._run_one_off_job()
         user_d_contributions_model = user_models.UserContributionsModel.get(
             self.user_d_id)

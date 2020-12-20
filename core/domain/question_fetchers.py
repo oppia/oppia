@@ -103,7 +103,6 @@ def get_question_from_model(question_model):
     Returns:
         Question. The domain object representing the question model.
     """
-
     # Ensure the original question model does not get altered.
     versioned_question_state = {
         'state_schema_version': (

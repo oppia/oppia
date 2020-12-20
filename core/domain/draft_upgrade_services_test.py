@@ -126,7 +126,6 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             target_schema_version: string. The schema version to upgrade
                 the exploration to (eg. '30').
         """
-
         # Create an exploration change list with the command that will migrate
         # the schema from current_schema_version to target_schema_version.
         exp_migration_change_list = [

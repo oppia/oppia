@@ -358,7 +358,6 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
             forked repo.
         target_branch: str. The name of the target branch.
     """
-
     common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
     # The get_git_ref code is wrapped in try except block since the
     # function raises an exception if the target branch is not found.

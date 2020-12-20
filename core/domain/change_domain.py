@@ -45,7 +45,6 @@ def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
         ValidationError. Any required attribute is missing or an extra attribute
             exists or the value of an attribute is not allowed.
     """
-
     required_attribute_names = valid_cmd_attribute_specs[
         'required_attribute_names']
     optional_attribute_names = valid_cmd_attribute_specs[

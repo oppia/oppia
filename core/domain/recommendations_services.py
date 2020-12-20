@@ -102,7 +102,6 @@ def get_topic_similarities_dict():
     """Returns a 2d dict of topic similarities. Creates the default similarity
     dict if it does not exist yet.
     """
-
     topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
             recommendations_models.TOPIC_SIMILARITIES_ID, strict=False))
@@ -116,7 +115,6 @@ def save_topic_similarities(topic_similarities):
     """Stores topic similarities in the datastore. Returns the newly created or
     changed entity.
     """
-
     topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
             recommendations_models.TOPIC_SIMILARITIES_ID, strict=False))
@@ -141,7 +139,6 @@ def _create_default_topic_similarities():
 
     Returns the newly created TopicSimilaritiesModel.
     """
-
     topic_similarities_dict = {
         topic: {} for topic in RECOMMENDATION_CATEGORIES
     }
@@ -164,7 +161,6 @@ def get_topic_similarity(topic_1, topic_2):
     not, it returns the default similarity if the topics are different or 1 if
     the topics are the same.
     """
-
     if (topic_1 in RECOMMENDATION_CATEGORIES and
             topic_2 in RECOMMENDATION_CATEGORIES):
         topic_similarities = get_topic_similarities_dict()
@@ -264,7 +260,6 @@ def update_topic_similarities(data):
     not include every current topic. If a topic name is not in the data, its
     similarities remain as the previous value or the default.
     """
-
     validate_topic_similarities(data)
 
     data = data.splitlines()
@@ -299,7 +294,6 @@ def get_item_similarity(
     and whether the explorations have the same language or author. It
     returns 0.0 if compared_exp is private.
     """
-
     similarity_score = 0
 
     if compared_exp_status == rights_domain.ACTIVITY_STATUS_PRIVATE:
@@ -330,7 +324,6 @@ def set_exploration_recommendations(exp_id, new_recommendations):
         new_recommendations: list(str). The new recommended exploration IDs
             to set.
     """
-
     recommendations_models.ExplorationRecommendationsModel(
         id=exp_id, recommended_exploration_ids=new_recommendations).put()
 
@@ -346,7 +339,6 @@ def get_exploration_recommendations(exp_id):
     Returns:
         list(str). List of recommended explorations IDs.
     """
-
     recommendations_model = (
         recommendations_models.ExplorationRecommendationsModel.get(
             exp_id, strict=False))

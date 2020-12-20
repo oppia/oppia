@@ -31,7 +31,6 @@ class ActionUnitTests(test_utils.GenericTestBase):
 
     def test_action_properties_for_exp_start(self):
         """Test the standard properties of exploration start action."""
-
         action = action_registry.Registry.get_action_by_type(
             stats_models.ACTION_TYPE_EXPLORATION_START)
 
@@ -50,7 +49,6 @@ class ActionUnitTests(test_utils.GenericTestBase):
 
     def test_action_properties_for_answer_submit(self):
         """Test the standard properties of answer submit action."""
-
         action = action_registry.Registry.get_action_by_type(
             stats_models.ACTION_TYPE_ANSWER_SUBMIT)
 
@@ -104,7 +102,6 @@ class ActionUnitTests(test_utils.GenericTestBase):
 
     def test_action_properties_for_exp_quit(self):
         """Test the standard properties of exploration quit action."""
-
         action = action_registry.Registry.get_action_by_type(
             stats_models.ACTION_TYPE_EXPLORATION_QUIT)
 

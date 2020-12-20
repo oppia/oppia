@@ -330,7 +330,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_retrieval_of_classifier_training_jobs(self):
         """Test the get_classifier_training_job_by_id method."""
-
         with self.assertRaisesRegexp(Exception, (
             'Entity for class ClassifierTrainingJobModel with id fake_id '
             'not found')):
@@ -366,7 +365,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
     def test_deletion_of_classifier_training_jobs(self):
         """Test the delete_classifier_training_job method."""
-
         exp_id = u'1'
         state_name = 'Home'
         interaction_id = 'TextInput'
@@ -533,7 +531,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     def test_retrieval_of_classifier_training_jobs_from_exploration_attributes(
             self):
         """Test the get_classifier_training_jobs method."""
-
         exp_id = u'1'
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_name = u'टेक्स्ट'

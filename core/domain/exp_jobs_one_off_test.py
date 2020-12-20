@@ -114,7 +114,6 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
         then published again, the job uses the first publication time as the
         value for first_published_msec.
         """
-
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
@@ -146,7 +145,6 @@ class OneOffExplorationFirstPublishedJobTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
@@ -292,7 +290,6 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -882,7 +879,6 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_when_exploration_rights_is_none(self):
         """Test that no action is performed when exploration rights is none."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -910,7 +906,6 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -949,7 +944,6 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         """Checks that correct number of hints are tabulated when
         there is single exploration.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -999,7 +993,6 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         """Checks that correct number of hints are tabulated when
         there are multiple explorations.
         """
-
         exploration1 = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -1072,7 +1065,6 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -1257,7 +1249,6 @@ class ExplorationContentValidationJobForCKEditorTests(
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -1518,7 +1509,6 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
 
@@ -1545,7 +1535,6 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
         """Tests for the case when there are no invalid svg_filenames in the
         explorations.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
         exploration.add_states(['State1', 'State2'])
@@ -1827,7 +1816,6 @@ class ExplorationRteMathContentValidationOneOffJobTests(
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
 
@@ -1855,7 +1843,6 @@ class ExplorationRteMathContentValidationOneOffJobTests(
         """Tests for the case when there are no invalid svg_filenames in the
         explorations.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title=self.EXP_TITLE, category='category')
         exploration.add_states(['State1', 'State2'])
@@ -1943,7 +1930,6 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
         """Check expected errors are produced for invalid html strings in RTE
         components for a single exploration.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exploration.add_states(['State1', 'State2', 'State3'])
@@ -2030,7 +2016,6 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
         """Check expected errors are produced for invalid html strings in RTE
         components for multiple explorations.
         """
-
         exploration1 = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exploration1.add_states(['State1', 'State2', 'State3'])
@@ -2160,7 +2145,6 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -2376,7 +2360,6 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
 
     def test_no_action_is_performed_on_non_math_svgs(self):
         """Test that no action is performed on non-math SVGs."""
-
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
@@ -2411,7 +2394,6 @@ class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
@@ -2498,7 +2480,6 @@ class XmlnsAttributeInExplorationMathSvgImagesAuditJobTests(
 
     def test_no_action_is_performed_on_non_math_svgs(self):
         """Test that no action is performed on non-math SVGs."""
-
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
@@ -2533,7 +2514,6 @@ class XmlnsAttributeInExplorationMathSvgImagesAuditJobTests(
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         fs = fs_domain.AbstractFileSystem(
             fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))

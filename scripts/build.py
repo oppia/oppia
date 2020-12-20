@@ -430,7 +430,6 @@ def _compare_file_count(
         ValueError. The source directory list does not have the same file
             count as the target directory list.
     """
-
     file_counts = [0, 0]
     for first_dir_path in first_dir_list:
         file_counts[0] += get_file_count(first_dir_path)
@@ -605,7 +604,6 @@ def build_third_party_libs(third_party_directory_path):
     """Joins all third party css files into single css file and js files into
     single js file. Copies both files and all fonts into third party folder.
     """
-
     python_utils.PRINT(
         'Building third party libs at %s' % third_party_directory_path)
 
@@ -642,7 +640,6 @@ def build_using_webpack(config_path):
     Args:
         config_path: str. Webpack config to be used for building.
     """
-
     python_utils.PRINT('Building webpack')
 
     cmd = '%s %s --config %s' % (
@@ -1181,7 +1178,6 @@ def _verify_hashes(output_dirnames, file_hashes):
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
     """
-
     # Make sure that hashed file name matches with current hash dict.
     for built_dir in output_dirnames:
         for root, _, filenames in os.walk(built_dir):
@@ -1222,7 +1218,6 @@ def _verify_hashes(output_dirnames, file_hashes):
 
 def generate_hashes():
     """Generates hashes for files."""
-
     # The keys for hashes are filepaths relative to the subfolders of the future
     # /build folder. This is so that the replacing inside the HTML files works
     # correctly.

@@ -50,7 +50,6 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
-
         # SubtopicPage is created but not committed/saved.
         subtopic_page = subtopic_models.SubtopicPageModel(
             id=self.SUBTOPIC_PAGE_ID,

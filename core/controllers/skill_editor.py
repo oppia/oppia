@@ -81,7 +81,6 @@ def check_can_edit_skill_description(user):
     Returns:
         bool. Whether the given user can edit skill descriptions.
     """
-
     if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in user.actions:
         return False
     else:
@@ -227,7 +226,6 @@ class SkillDataHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, comma_separated_skill_ids):
         """Populates the data on skill pages of the skill ids."""
-
         skill_ids = comma_separated_skill_ids.split(',')
 
         try:
@@ -256,7 +254,6 @@ class FetchSkillsHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Returns all skill IDs linked to some topic."""
-
         skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
 
         try:

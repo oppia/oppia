@@ -614,7 +614,6 @@ class LogicQuestion(BaseObject):
         Raises:
             TypeError. Cannot convert to LogicQuestion schema.
         """
-
         def _validate_expression(expression):
             """Validates the given expression.
 

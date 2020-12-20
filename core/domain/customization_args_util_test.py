@@ -137,7 +137,6 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
 
     def test_validate_customization_args_and_values(self):
         """Test validate customization args and values method."""
-
         ca_item_selection_specs = (
             interaction_registry.Registry.get_interaction_by_id(
                 'ItemSelectionInput').customization_arg_specs

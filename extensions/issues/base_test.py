@@ -31,7 +31,6 @@ class IssueUnitTests(test_utils.GenericTestBase):
 
     def test_issue_properties_for_early_quit(self):
         """Test the standard properties of early quit issue."""
-
         issue = playthrough_issue_registry.Registry.get_issue_by_type(
             stats_models.ISSUE_TYPE_EARLY_QUIT)
 
@@ -61,7 +60,6 @@ class IssueUnitTests(test_utils.GenericTestBase):
         """Test the standard properties of multiple incorrect submissions
         issue.
         """
-
         issue = playthrough_issue_registry.Registry.get_issue_by_type(
             stats_models.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)
 
@@ -88,7 +86,6 @@ class IssueUnitTests(test_utils.GenericTestBase):
 
     def test_issue_properties_for_cyclic_state_transitions(self):
         """Test the standard properties of cyclic state transitions issue."""
-
         issue = playthrough_issue_registry.Registry.get_issue_by_type(
             stats_models.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS)
 

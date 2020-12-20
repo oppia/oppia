@@ -146,7 +146,6 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         Exploration. The exploration domain object corresponding to the given
         exploration model.
     """
-
     # Ensure the original exploration model does not get altered.
     versioned_exploration_states = {
         'states_schema_version': exploration_model.states_schema_version,
@@ -227,7 +226,6 @@ def get_exploration_summary_from_model(exp_summary_model):
         ExplorationSummary. The summary domain object correspoding to the
         given exploration summary model.
     """
-
     return exp_domain.ExplorationSummary(
         exp_summary_model.id, exp_summary_model.title,
         exp_summary_model.category, exp_summary_model.objective,

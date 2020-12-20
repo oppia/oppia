@@ -249,7 +249,6 @@ def get_questions_by_skill_ids(
         the order is sorted by absolute value of the difference between
         skill difficulty and the medium difficulty.
     """
-
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
         raise Exception(
             'Question count is too high, please limit the question count to '
@@ -328,7 +327,6 @@ def get_question_skill_link_from_model(
         QuestionSkillLink. The domain object representing the question skill
         link model.
     """
-
     return question_domain.QuestionSkillLink(
         question_skill_link_model.question_id,
         question_skill_link_model.skill_id, skill_description,
@@ -369,7 +367,6 @@ def get_question_skill_links_of_skill(skill_id, skill_description):
         domain objects that are linked to the skill ID or an empty list
         if the skill does not exist.
     """
-
     question_skill_links = [
         get_question_skill_link_from_model(
             model, skill_description) for model in

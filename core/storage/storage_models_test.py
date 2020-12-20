@@ -77,7 +77,6 @@ class StorageModelsTest(test_utils.GenericTestBase):
         VersionedModel, these are classes that are used directly for saving data
         and not just inherited from.
         """
-
         for clazz in self._get_model_classes():
             if clazz.__name__ in self.BASE_CLASSES:
                 continue

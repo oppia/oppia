@@ -180,7 +180,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
     def test_interaction_properties(self):
         """Test the standard properties of interactions."""
-
         interaction = interaction_registry.Registry.get_interaction_by_id(
             TEXT_INPUT_ID)
         self.assertEqual(interaction.id, TEXT_INPUT_ID)
@@ -352,7 +351,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
     def test_default_interactions_are_valid(self):
         """Test that the default interactions are valid."""
-
         all_interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
         for interaction_id in all_interaction_ids:
@@ -710,7 +708,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
     def test_linear_interactions(self):
         """Sanity-check for the number of linear interactions."""
-
         actual_linear_interaction_ids = self._get_linear_interaction_ids()
         self.assertEqual(len(actual_linear_interaction_ids), 1)
 

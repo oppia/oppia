@@ -2145,7 +2145,6 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.
         """
-
         return [
             (
                 suggestion_services
@@ -3727,7 +3726,6 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.
         """
-
         return [
             (
                 suggestion_services

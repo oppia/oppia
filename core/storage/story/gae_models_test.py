@@ -46,7 +46,6 @@ class StoryModelTest(test_utils.GenericTestBase):
 
     def test_story_model(self):
         """Method to test the StoryModel."""
-
         committer_id = 'test_committer_id'
         commit_message = 'test_commit_message'
         commit_cmds = [{'cmd': 'test_command'}]
@@ -125,7 +124,6 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
 
     def test_story_summary_model(self):
         """Method to test the StorySummaryModel."""
-
         story_summary_model = story_models.StorySummaryModel(
             id='id',
             title='title',

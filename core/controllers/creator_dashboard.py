@@ -138,7 +138,6 @@ class CreatorDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
-
         self.render_template('creator-dashboard-page.mainpage.html')
 
 
@@ -150,7 +149,6 @@ class CreatorDashboardHandler(base.BaseHandler):
     @acl_decorators.can_access_creator_dashboard
     def get(self):
         """Handles GET requests."""
-
         def _round_average_ratings(rating):
             """Returns the rounded average rating to display on the creator
             dashboard.

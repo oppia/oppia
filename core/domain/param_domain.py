@@ -72,7 +72,6 @@ class ParamSpec(python_utils.OBJECT):
 
     def validate(self):
         """Validate the existence of the object class."""
-
         # Ensure that this object class exists.
         obj_services.Registry.get_object_class_by_type(self.obj_type)
 

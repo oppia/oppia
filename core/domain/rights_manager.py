@@ -50,7 +50,6 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
     Returns:
         ActivityRights. The rights object created from the model.
     """
-
     return rights_domain.ActivityRights(
         activity_rights_model.id,
         activity_rights_model.owner_ids,
@@ -129,7 +128,6 @@ def _update_collection_summary(activity_rights):
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
-
     from core.domain import collection_services
     collection_services.regenerate_collection_summary(activity_rights.id, None)
 
@@ -576,7 +574,6 @@ def check_can_save_activity(user, activity_rights):
     Returns:
         bool. Whether the user can save given activity.
     """
-
     return (check_can_edit_activity(user, activity_rights) or (
         check_can_voiceover_activity(user, activity_rights)))
 

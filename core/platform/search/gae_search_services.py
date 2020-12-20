@@ -179,7 +179,6 @@ def _validate_list(key, value):
             must be either a python_utils.BASESTRING, datetime.date,
             datetime.datetime, numbers.Number.
     """
-
     for ind, element in enumerate(value):
         if not isinstance(element, (
                 python_utils.BASESTRING, datetime.date, datetime.datetime,

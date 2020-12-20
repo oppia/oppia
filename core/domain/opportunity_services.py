@@ -141,7 +141,6 @@ def _create_exploration_opportunity_summary(topic, story, exploration):
         ExplorationOpportunitySummary. The exploration opportunity summary
         object.
     """
-
     audio_language_codes = set([
         language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 

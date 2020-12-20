@@ -855,7 +855,6 @@ def delete_topic_summary(topic_id):
         topic_id: str. ID of the topic whose topic summary is to
             be deleted.
     """
-
     topic_models.TopicSummaryModel.get(topic_id).delete()
 
 
@@ -1031,7 +1030,6 @@ def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
         commit_cmds: list(TopicRightsChange). A list of commands describing
             what kind of commit was done.
     """
-
     model = topic_models.TopicRightsModel.get(topic_rights.id, strict=False)
 
     model.manager_ids = topic_rights.manager_ids

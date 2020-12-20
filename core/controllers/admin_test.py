@@ -91,7 +91,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_admin_page_rights(self):
         """Test access rights to the admin page."""
-
         self.get_html_response('/admin', expected_status_int=302)
 
         # Login as a non-admin.
@@ -106,7 +105,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_change_configuration_property(self):
         """Test that configuration properties can be changed."""
-
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         new_config_value = False

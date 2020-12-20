@@ -213,7 +213,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
     def test_export_data_for_profile_user_trivial_raises_error(self):
         """Trivial test of export_data functionality."""
-
         self.set_up_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
         with self.assertRaisesRegexp(NotImplementedError, error_msg):
@@ -221,7 +220,6 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
     def test_export_data_for_profile_user_nontrivial_raises_error(self):
         """Nontrivial test of export_data functionality."""
-
         self.set_up_non_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
         with self.assertRaisesRegexp(NotImplementedError, error_msg):

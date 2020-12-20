@@ -306,7 +306,6 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
             list(TaskResult). A list of TaskResult objects representing the
             results of the lint checks.
         """
-
         return [self.check_codeowner_file()]
 
 

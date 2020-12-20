@@ -47,7 +47,6 @@ class TopicLandingPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-
         self.render_template('topic-landing-page.mainpage.html')
 
 

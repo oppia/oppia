@@ -39,7 +39,6 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
     def test_wrapper_calls_subclass_methods(self):
         """Tests the basic functionality of FunctionWrapper."""
-
         # Keeps track of which functions have been called, to test that
         # pre_call_hook, the actual function, and post_call_hook are
         # called in the right order.
@@ -59,7 +58,6 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                     AssertionError. The argument doesn't match with the mock
                         name.
                 """
-
                 order.append('before')
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')

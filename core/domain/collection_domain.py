@@ -619,7 +619,6 @@ class Collection(python_utils.OBJECT):
         Returns:
             dict. The updated collection_contents dict.
         """
-
         skill_names = set()
         for node in collection_contents['nodes']:
             skill_names.update(node['acquired_skills'])
@@ -944,7 +943,6 @@ class Collection(python_utils.OBJECT):
             ValidationError. One or more attributes of the Collection are not
                 valid.
         """
-
         # NOTE TO DEVELOPERS: Please ensure that this validation logic is the
         # same as that in the frontend CollectionValidatorService.
 

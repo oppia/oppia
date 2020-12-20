@@ -78,7 +78,6 @@ def get_story_from_model(story_model):
         story. A Story domain object corresponding to the given
         story model.
     """
-
     # Ensure the original story model does not get altered.
     versioned_story_contents = {
         'schema_version': story_model.story_contents_schema_version,

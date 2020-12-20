@@ -283,7 +283,6 @@ class DragAndDropSortInputInteractionOneOffJobTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -486,7 +485,6 @@ class MultipleChoiceInteractionOneOffJobTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -694,7 +692,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -778,7 +775,6 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
         """Check that expected errors are produced for invalid
         customization args.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 
@@ -848,7 +844,6 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
 
     def test_no_action_is_performed_for_deleted_exploration(self):
         """Test that no action is performed on deleted explorations."""
-
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
 

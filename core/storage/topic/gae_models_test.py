@@ -52,7 +52,6 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
-
         topic_rights = topic_models.TopicRightsModel(
             id=self.TOPIC_ID,
             manager_ids=[],

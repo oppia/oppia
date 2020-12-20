@@ -374,7 +374,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for extracting all the HTML from a state having
         TextInput interaction.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
@@ -469,7 +468,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for extracting all the HTML from a state having
         ItemSelectionInput interaction.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
@@ -604,7 +602,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for extracting all the HTML from a state
         when the rule_spec has invalid html format.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
@@ -668,7 +665,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for updating interaction customization arguments
         when a content_id is invalid (set to None).
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
@@ -705,7 +701,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for extracting all the HTML from a state
         when the rule_spec has html but the input variable is invalid.
         """
-
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])

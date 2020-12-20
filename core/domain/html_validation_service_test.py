@@ -1368,7 +1368,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
     def test_add_dimensions_to_image_tags_with_invalid_filepath_with_value(
             self):
-
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):
@@ -1822,7 +1821,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         """Test that get_latex_strings_without_svg_from_html
         extracts filenames when some math tags have non empty filename field.
         """
-
         html_string = (
             '<p>Feedback</p><oppia-noninteractive-math math_content-with-v'
             'alue="{&amp;quot;raw_latex&amp;quot;: &amp;quot;\\\\frac{x}{y}'

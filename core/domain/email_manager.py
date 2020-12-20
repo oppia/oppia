@@ -382,7 +382,6 @@ def require_sender_id_is_valid(intent, sender_id):
         Exception. The email intent is invalid.
         Exception. The sender_id is not appropriate for the given intent.
     """
-
     if intent not in SENDER_VALIDATORS:
         raise Exception('Invalid email intent string: %s' % intent)
     else:
@@ -424,7 +423,6 @@ def _send_email(
             recipient_id does not exist or is deleted and their email cannot be
             retrieved via get_email_from_user_id.
     """
-
     if sender_name is None:
         sender_name = EMAIL_SENDER_NAME.value
 
@@ -551,7 +549,6 @@ def send_dummy_mail_to_admin(username):
     Args:
         username: str. Username of the sender.
     """
-
     email_body = 'This is a test mail from %s.' % (username)
     email_subject = 'Test Mail'
     system_name_email = '%s <%s>' % (
@@ -571,7 +568,6 @@ def send_mail_to_admin(email_subject, email_body):
         email_subject: str. Subject of the email.
         email_body: str. Body (message) of the email.
     """
-
     app_id = app_identity_services.get_application_id()
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
     system_name_email = '%s <%s>' % (
@@ -591,7 +587,6 @@ def send_post_signup_email(user_id, test_for_duplicate_email=False):
         user_id: str. User ID of the user that signed up.
         test_for_duplicate_email: bool. For testing duplicate emails.
     """
-
     if not test_for_duplicate_email:
         for key, content in SIGNUP_EMAIL_CONTENT.value.items():
             if content == SIGNUP_EMAIL_CONTENT.default_value[key]:
@@ -622,7 +617,6 @@ def get_moderator_unpublish_exploration_email():
         unpublishes an exploration, or an empty string if no email should
         be sent.
     """
-
     try:
         require_moderator_email_prereqs_are_satisfied()
         return config_domain.Registry.get_config_property(
@@ -638,7 +632,6 @@ def require_moderator_email_prereqs_are_satisfied():
         Exception. The feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
         Exception. The feconf.CAN_SEND_EMAILS is False.
     """
-
     if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
         raise Exception(
             'For moderator emails to be sent, please ensure that '
@@ -665,7 +658,6 @@ def send_moderator_action_email(
             moderator action was taken.
         email_body: str. The email content/message.
     """
-
     require_moderator_email_prereqs_are_satisfied()
     email_config = feconf.VALID_MODERATOR_ACTIONS[intent]
 
@@ -710,7 +702,6 @@ def send_role_notification_email(
         Exception. The role is invalid (i.e. not defined in
             EDITOR_ROLE_EMAIL_HTML_ROLES).
     """
-
     # Editor role email body and email subject templates.
     email_subject_template = (
         '%s - invitation to collaborate')
@@ -780,7 +771,6 @@ def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
         exploration_title: str. The title of the exploration which the creator
             has published.
     """
-
     creator_name = user_services.get_username(creator_id)
     email_subject = ('%s has published a new exploration!' % creator_name)
     email_body_template = (
@@ -937,7 +927,6 @@ def send_suggestion_email(
         author_id: str. The user ID of the author of the suggestion.
         recipient_list: list(str). The user IDs of the email recipients.
     """
-
     email_subject = 'New suggestion for "%s"' % exploration_title
 
     email_body_template = (
@@ -993,7 +982,6 @@ def send_instant_feedback_message_email(
         reply_to_id: str or None. The unique reply-to id used in reply-to email
             sent to recipient.
     """
-
     email_body_template = (
         'Hi %s,<br><br>'
         'New update to thread "%s" on '
@@ -1188,7 +1176,6 @@ def send_mail_to_onboard_new_reviewers(recipient_id, category):
             reviewer.
         category: str. The category that the user is being offered to review.
     """
-
     email_subject = 'Invitation to review suggestions'
 
     email_body_template = (
@@ -1237,7 +1224,6 @@ def send_mail_to_notify_users_to_review(recipient_id, category):
             suggestions.
         category: str. The category of the suggestions to review.
     """
-
     email_subject = 'Notification to review suggestions'
 
     email_body_template = (

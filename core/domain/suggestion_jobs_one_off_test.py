@@ -949,7 +949,6 @@ class SuggestionSvgFilenameValidationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
     def test_job_acts_only_on_suggestion_edit_state_content(self):
-
         change1 = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -2265,7 +2264,6 @@ class PopulateContributionStatsOneOffJobTests(
 
     def _create_edit_state_content_suggestion(self):
         """Creates an "edit state content" suggestion."""
-
         edit_state_content_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,

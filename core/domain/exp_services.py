@@ -1544,7 +1544,6 @@ def is_version_of_draft_valid(exp_id, version):
         bool. Whether the given version number is the same as the current
         version number of the exploration in the datastore.
     """
-
     return exp_fetchers.get_exploration_by_id(exp_id).version == version
 
 
@@ -1735,7 +1734,6 @@ def discard_draft(exp_id, user_id):
         exp_id: str. The id of the exploration.
         user_id: str. The id of the user whose draft is to be discarded.
     """
-
     exp_user_data = user_models.ExplorationUserDataModel.get(
         user_id, exp_id)
     if exp_user_data:

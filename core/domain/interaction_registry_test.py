@@ -73,7 +73,6 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
         response.mustcontain(no=['dependency_html.html'])
 
     def test_dependencies_loaded_in_exploration_editor(self):
-
         exp_services.load_demo('0')
 
         # Ensure that dependencies are added in the exploration editor page.
@@ -94,7 +93,6 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_specs(self):
         """Test the get_all_specs() method."""
-
         specs_dict = interaction_registry.Registry.get_all_specs()
         self.assertEqual(
             len(list(specs_dict.keys())),

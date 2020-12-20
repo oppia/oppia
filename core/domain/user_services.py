@@ -332,7 +332,6 @@ class UserSettings(python_utils.OBJECT):
             str. The truncated email address of this UserSettings
             domain object.
         """
-
         first_part = self.email[: self.email.find('@')]
         last_part = self.email[self.email.find('@'):]
         if len(first_part) <= 1:
@@ -351,7 +350,6 @@ class UserSettings(python_utils.OBJECT):
             str or None. If this object has a 'username' property, returns
             the normalized version of the username. Otherwise, returns None.
         """
-
         return self.normalize_username(self.username)
 
     @classmethod
@@ -366,7 +364,6 @@ class UserSettings(python_utils.OBJECT):
             str or None. The normalized version of the given username,
             or None if the passed-in username is None.
         """
-
         return username.lower() if username else None
 
     @classmethod
@@ -749,7 +746,6 @@ def get_user_settings(user_id, strict=False):
     Raises:
         Exception. The value of strict is True and given user_id does not exist.
     """
-
     user_settings = get_users_settings([user_id])[0]
     if strict and user_settings is None:
         logging.error('Could not find user with id %s' % user_id)
@@ -1329,7 +1325,6 @@ def create_new_profiles(gae_id, email, modifiable_user_data_list):
         Exception. The user_id is already set for any user in its corresponding
             modifiable_user_data object.
     """
-
     def _create_new_profile_transactional(
             user_settings, user_auth_details):
         """Save user models for new users as a transaction.
@@ -1972,7 +1967,6 @@ def record_user_logged_in(user_id):
     Args:
         user_id: str. The unique ID of the user.
     """
-
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_logged_in = datetime.datetime.utcnow()
     _save_user_settings(user_settings)
@@ -1987,7 +1981,6 @@ def update_last_logged_in(user_settings, new_last_logged_in):
         new_last_logged_in: datetime or None. The new datetime of the last
             logged in session.
     """
-
     user_settings.last_logged_in = new_last_logged_in
     _save_user_settings(user_settings)
 
@@ -2819,7 +2812,6 @@ def log_username_change(committer_id, old_username, new_username):
         new_username: str. The new username that the current one is being
             changed to.
     """
-
     model_id = '%s.%d' % (committer_id, utils.get_current_time_in_millisecs())
     audit_models.UsernameChangeAuditModel(
         id=model_id, committer_id=committer_id, old_username=old_username,

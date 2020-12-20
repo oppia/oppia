@@ -74,7 +74,6 @@ class ExplorationPage(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, unused_exploration_id):
         """Handles GET requests."""
-
         self.render_template('exploration-editor-page.mainpage.html')
 
 
@@ -161,7 +160,6 @@ class ExplorationHandler(EditorHandler):
     @acl_decorators.can_delete_exploration
     def delete(self, exploration_id):
         """Deletes the given exploration."""
-
         log_debug_string = '(%s) %s tried to delete exploration %s' % (
             self.role, self.user_id, exploration_id)
         logging.debug(log_debug_string)
@@ -351,7 +349,6 @@ class UserExplorationEmailsHandler(EditorHandler):
         Raises:
             InvalidInputException. Invalid message type.
         """
-
         mute = self.payload.get('mute')
         message_type = self.payload.get('message_type')
 
@@ -445,7 +442,6 @@ class ExplorationSnapshotsHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-
         snapshots = exp_services.get_exploration_snapshots_metadata(
             exploration_id)
 
@@ -634,7 +630,6 @@ class ImageUploadHandler(EditorHandler):
     @acl_decorators.can_edit_entity
     def post(self, entity_type, entity_id):
         """Saves an image uploaded by a content creator."""
-
         raw = self.request.get('image')
         filename = self.payload.get('filename')
         filename_prefix = self.payload.get('filename_prefix')
@@ -828,7 +823,6 @@ class LearnerAnswerInfoHandler(EditorHandler):
     @acl_decorators.can_edit_entity
     def delete(self, entity_type, entity_id):
         """Deletes the learner answer info by the given id."""
-
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.PageNotFoundException
 

@@ -98,7 +98,6 @@ def get_skill_from_model(skill_model):
     Returns:
         skill. A Skill domain object corresponding to the given skill model.
     """
-
     # Ensure the original skill model does not get altered.
     versioned_skill_contents = {
         'schema_version': skill_model.skill_contents_schema_version,

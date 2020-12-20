@@ -166,7 +166,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             dict. A dict which has key as filepath and value as contents of js
             and ts files after validating and parsing the files.
         """
-
         # Select JS files which need to be checked.
         files_to_check = self.all_filepaths
         parsed_js_and_ts_files = dict()
@@ -198,7 +197,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             dict. A dict which has key as filepath and value as the expressions
             in the script parsed using js and ts files.
         """
-
         parsed_expressions_in_files = collections.defaultdict(dict)
         components_to_check = ['controller', 'directive', 'factory', 'filter']
 
@@ -1008,7 +1006,6 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             list(TaskResult). A list of TaskResult objects representing the
             results of the lint checks.
         """
-
         if not self.all_filepaths:
             return [
                 concurrent_task_utils.TaskResult(

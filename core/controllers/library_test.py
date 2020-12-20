@@ -447,7 +447,6 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 
     def test_handler_for_top_rated_library_group_page(self):
         """Test library handler for top rated group page."""
-
         # Load a public demo exploration.
         exp_services.load_demo('0')
 

@@ -45,7 +45,6 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
     def test_subscribe_handler(self):
         """Test handler for new subscriptions to creators."""
-
         self.login(self.USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -93,7 +92,6 @@ class SubscriptionTests(test_utils.GenericTestBase):
 
     def test_unsubscribe_handler(self):
         """Test handler for unsubscriptions."""
-
         payload = {
             'creator_username': self.EDITOR_USERNAME
         }

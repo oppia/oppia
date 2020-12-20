@@ -100,7 +100,6 @@ class RoleDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_actions(self):
         """Test that get_all_actions works as expected."""
-
         # Case when wrong input is given.
         with self.assertRaisesRegexp(
             Exception, 'Role TEST_ROLE does not exist.'):

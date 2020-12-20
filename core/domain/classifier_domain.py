@@ -273,7 +273,6 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         Args:
             classifier_data: dict. The classifier model used for classification.
         """
-
         self._classifier_data = classifier_data
 
     def to_dict(self):
@@ -282,7 +281,6 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         Returns:
             dict. A dict representation of training job domain object.
         """
-
         return {
             'job_id': self._job_id,
             'algorithm_id': self._algorithm_id,
@@ -305,7 +303,6 @@ class ClassifierTrainingJob(python_utils.OBJECT):
             dict. A dict containing training job domain object's algorithm_id,
             classifier_data and data_schema_version.
         """
-
         return {
             'algorithm_id': self._algorithm_id,
             'classifier_data': self._classifier_data,
@@ -314,7 +311,6 @@ class ClassifierTrainingJob(python_utils.OBJECT):
 
     def validate(self):
         """Validates the training job before it is saved to storage."""
-
         algorithm_ids = []
         if not isinstance(self.job_id, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -479,7 +475,6 @@ class TrainingJobExplorationMapping(python_utils.OBJECT):
             dict. A dict representation of TrainingJobExplorationMapping domain
             object.
         """
-
         return {
             'exp_id': self._exp_id,
             'exp_version': self._exp_version,
@@ -489,7 +484,6 @@ class TrainingJobExplorationMapping(python_utils.OBJECT):
 
     def validate(self):
         """Validates the mapping before it is saved to storage."""
-
         if not isinstance(self.exp_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % self.exp_id)

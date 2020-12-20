@@ -218,7 +218,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     def test_unsuccessful_status_codes_raises_exception(self):
         """Test that unsuccessful status codes returned raises an exception."""
-
         email_exception = self.assertRaisesRegexp(
             Exception, 'Bulk email failed to send. Please try again later or' +
             ' contact us to report a bug at https://www.oppia.org/contact.')

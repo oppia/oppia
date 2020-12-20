@@ -575,7 +575,6 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_shard_count_is_updated_when_data_overflows(self):
-
         submitted_answer_list = [{'answer': 'value'}]
 
         stats_models.StateAnswersModel.insert_submitted_answers(
@@ -635,7 +634,6 @@ class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_model_returns_created_properties(self):
-
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             'exp_id', '1', 'state_name', '', 'calculation_id', '', {})
 
@@ -654,7 +652,6 @@ class StateAnswersCalcOutputModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(model1)
 
     def test_raise_exception_with_large_calculation_output(self):
-
         observed_log_messages = []
 
         def _mock_logging_function(msg, *args):

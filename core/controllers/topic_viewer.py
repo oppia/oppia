@@ -35,7 +35,6 @@ class TopicViewerPage(base.BaseHandler):
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _):
         """Handles GET requests."""
-
         self.render_template('topic-viewer-page.mainpage.html')
 
 
@@ -49,7 +48,6 @@ class TopicPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_name):
         """Handles GET requests."""
-
         topic = topic_fetchers.get_topic_by_name(topic_name)
         canonical_story_ids = topic.get_canonical_story_ids(
             include_only_published=True)

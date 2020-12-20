@@ -436,7 +436,6 @@ class ExplorationVersionsDiff(python_utils.OBJECT):
                 cmds from the old version of the exploration up to the next
                 version.
         """
-
         added_state_names = []
         deleted_state_names = []
         new_to_old_state_names = {}
@@ -3239,7 +3238,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v10.
         """
-
         exploration_dict['schema_version'] = 10
 
         # From v10 onwards, the title and schema version are stored in the YAML
@@ -3281,7 +3279,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v11.
         """
-
         exploration_dict['schema_version'] = 11
 
         exploration_dict['states'] = cls._convert_states_v7_dict_to_v8_dict(
@@ -3303,7 +3300,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v12.
         """
-
         exploration_dict['schema_version'] = 12
 
         exploration_dict['states'] = cls._convert_states_v8_dict_to_v9_dict(
@@ -3325,7 +3321,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v13.
         """
-
         exploration_dict['schema_version'] = 13
 
         exploration_dict['states'] = cls._convert_states_v9_dict_to_v10_dict(
@@ -3347,7 +3342,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v14.
         """
-
         exploration_dict['schema_version'] = 14
 
         exploration_dict['states'] = cls._convert_states_v10_dict_to_v11_dict(
@@ -3369,7 +3363,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v15.
         """
-
         exploration_dict['schema_version'] = 15
 
         exploration_dict['states'] = cls._convert_states_v11_dict_to_v12_dict(
@@ -3391,7 +3384,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v16.
         """
-
         exploration_dict['schema_version'] = 16
 
         exploration_dict['states'] = cls._convert_states_v12_dict_to_v13_dict(
@@ -3415,7 +3407,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v17.
         """
-
         exploration_dict['schema_version'] = 17
 
         if 'skin_customizations' in exploration_dict:
@@ -3437,7 +3428,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v18.
         """
-
         exploration_dict['schema_version'] = 18
 
         if exploration_dict['category'] == 'Languages':
@@ -3461,7 +3451,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v19.
         """
-
         exploration_dict['schema_version'] = 19
 
         exploration_dict['states'] = cls._convert_states_v13_dict_to_v14_dict(
@@ -3485,7 +3474,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v20.
         """
-
         exploration_dict['schema_version'] = 20
 
         exploration_dict['states'] = cls._convert_states_v14_dict_to_v15_dict(
@@ -3511,7 +3499,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v21.
         """
-
         exploration_dict['schema_version'] = 21
 
         exploration_dict['states'] = cls._convert_states_v15_dict_to_v16_dict(
@@ -3536,7 +3523,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v22.
         """
-
         exploration_dict['schema_version'] = 22
 
         exploration_dict['states'] = cls._convert_states_v16_dict_to_v17_dict(
@@ -3560,7 +3546,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v23.
         """
-
         exploration_dict['schema_version'] = 23
 
         exploration_dict['states'] = cls._convert_states_v17_dict_to_v18_dict(
@@ -3584,7 +3569,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v24.
         """
-
         exploration_dict['schema_version'] = 24
 
         exploration_dict['states'] = cls._convert_states_v18_dict_to_v19_dict(
@@ -3609,7 +3593,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v25.
         """
-
         exploration_dict['schema_version'] = 25
 
         exploration_dict['states'] = cls._convert_states_v19_dict_to_v20_dict(
@@ -3632,7 +3615,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v26.
         """
-
         exploration_dict['schema_version'] = 26
 
         exploration_dict['states'] = cls._convert_states_v20_dict_to_v21_dict(
@@ -3656,7 +3638,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v27.
         """
-
         exploration_dict['schema_version'] = 27
 
         exploration_dict['states'] = cls._convert_states_v21_dict_to_v22_dict(
@@ -3679,7 +3660,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v28.
         """
-
         exploration_dict['schema_version'] = 28
 
         exploration_dict['states'] = cls._convert_states_v22_dict_to_v23_dict(
@@ -3703,7 +3683,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v29.
         """
-
         exploration_dict['schema_version'] = 29
 
         exploration_dict['states'] = cls._convert_states_v23_dict_to_v24_dict(
@@ -3727,7 +3706,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v30.
         """
-
         exploration_dict['schema_version'] = 30
 
         exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
@@ -3751,7 +3729,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v31.
         """
-
         exploration_dict['schema_version'] = 31
 
         exploration_dict['states'] = cls._convert_states_v25_dict_to_v26_dict(
@@ -3774,7 +3751,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v32.
         """
-
         exploration_dict['schema_version'] = 32
 
         exploration_dict['states'] = cls._convert_states_v26_dict_to_v27_dict(
@@ -3798,7 +3774,6 @@ class Exploration(python_utils.OBJECT):
             dict. The dict representation of the Exploration domain object,
             following schema version v33.
         """
-
         exploration_dict['schema_version'] = 33
 
         exploration_dict['states'] = cls._convert_states_v27_dict_to_v28_dict(

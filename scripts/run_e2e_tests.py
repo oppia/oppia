@@ -594,7 +594,6 @@ def update_flaky_tests_count(sheet, row_index, current_count):
 
 def run_tests(args=None):
     """Run the scripts to start end-to-end tests."""
-
     parsed_args = _PARSER.parse_args(args=args)
     oppia_instance_is_already_running = is_oppia_server_already_running()
 

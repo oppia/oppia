@@ -851,7 +851,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def _create_translation_suggestion_with_language_code(self, language_code):
         """Creates a translation suggestion with the language code given."""
-
         add_translation_change_dict = {
             'cmd': exp_domain.CMD_ADD_TRANSLATION,
             'state_name': 'state_1',
@@ -1712,7 +1711,6 @@ class ReviewableSuggestionEmailInfoUnitTests(
 
     def _create_edit_state_content_suggestion(self):
         """Creates an "edit state content" suggestion."""
-
         edit_state_content_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -2351,7 +2349,6 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.
         """
-
         return [
             (
                 suggestion_services
@@ -2948,7 +2945,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
     def _create_edit_state_content_suggestion(self):
         """Creates an "edit state content" suggestion."""
-
         edit_state_content_change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -3460,7 +3456,6 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         """Creates a list of ReviewableSuggestionEmailInfo objects from
         the given suggestions.
         """
-
         return [
             (
                 suggestion_services

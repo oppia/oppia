@@ -159,7 +159,6 @@ class _Gae(Platform):
         Returns:
             list(class). The corresponding storage-layer model classes.
         """
-
         model_classes = []
         for module in cls.import_models(model_names):
             for member_name, member_obj in inspect.getmembers(module):

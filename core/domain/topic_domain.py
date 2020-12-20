@@ -1618,7 +1618,6 @@ class Topic(python_utils.OBJECT):
             Exception. The skill id should be present in the old subtopic
                 already before moving.
         """
-
         subtopic_index = self.get_subtopic_index(subtopic_id)
         if subtopic_index is None:
             raise Exception(

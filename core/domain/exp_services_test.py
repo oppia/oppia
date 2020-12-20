@@ -548,7 +548,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_soft_deletion_of_exploration(self):
         """Test that soft deletion of exploration works correctly."""
         # TODO(sll): Add tests for deletion of states and version snapshots.
-
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
         # The exploration shows up in queries.
         self.assertEqual(
@@ -603,7 +602,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_soft_deletion_of_multiple_explorations(self):
         """Test that soft deletion of explorations works correctly."""
         # TODO(sll): Add tests for deletion of states and version snapshots.
-
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
         self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
         # The explorations show up in queries.
@@ -3276,7 +3274,6 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             snapshots_metadata[2]['created_on_ms'])
 
     def test_versioning_with_add_and_delete_states(self):
-
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
 
@@ -4030,7 +4027,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
     def test_get_non_private_exploration_summaries(self):
-
         actual_summaries = exp_services.get_non_private_exploration_summaries()
 
         expected_summaries = {

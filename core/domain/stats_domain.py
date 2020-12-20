@@ -198,7 +198,6 @@ class ExplorationStats(python_utils.OBJECT):
 
     def validate(self):
         """Validates the ExplorationStats domain object."""
-
         exploration_stats_properties = [
             'num_starts_v1',
             'num_starts_v2',
@@ -502,7 +501,6 @@ class StateStats(python_utils.OBJECT):
 
     def validate(self):
         """Validates the StateStats domain object."""
-
         state_stats_properties = [
             'total_answers_count_v1',
             'total_answers_count_v2',
@@ -1101,7 +1099,6 @@ class StateAnswers(python_utils.OBJECT):
 
     def validate(self):
         """Validates StateAnswers domain object entity."""
-
         if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exploration_id to be a string, received %s'
@@ -1502,7 +1499,6 @@ class StateAnswersCalcOutput(python_utils.OBJECT):
         """Validates StateAnswersCalcOutputModel domain object entity before
         it is commited to storage.
         """
-
         # There is a danger of data overflow if answer_opts exceeds 1MB. This
         # will be addressed later if it happens regularly. At the moment, a
         # ValidationError is raised if an answer exceeds the maximum size.
@@ -1573,7 +1569,6 @@ class LearnerAnswerDetails(python_utils.OBJECT):
             learner_answer_info_schema_version: int. The schema version of the
                 LearnerAnswerInfo dict.
         """
-
         self.state_reference = state_reference
         self.entity_type = entity_type
         self.interaction_id = interaction_id
@@ -1629,7 +1624,6 @@ class LearnerAnswerDetails(python_utils.OBJECT):
 
     def validate(self):
         """Validates LearnerAnswerDetails domain object."""
-
         if not isinstance(self.state_reference, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected state_reference to be a string, received %s'
@@ -1789,7 +1783,6 @@ class LearnerAnswerInfo(python_utils.OBJECT):
         Returns:
             dict. A dict, mapping all fields of LearnerAnswerInfo instance.
         """
-
         return cls(
             learner_answer_info_dict['id'],
             learner_answer_info_dict['answer'],

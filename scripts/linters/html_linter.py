@@ -269,7 +269,6 @@ class HTMLLintChecksManager(python_utils.OBJECT):
             list(TaskResult). A list of TaskResult objects representing the
             results of the lint checks.
         """
-
         if not self.all_filepaths:
             return [
                 concurrent_task_utils.TaskResult(

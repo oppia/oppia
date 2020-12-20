@@ -395,7 +395,6 @@ def does_diff_include_js_or_ts_files(diff_files):
         bool. Whether the diff contains changes in any JavaScript or TypeScript
         files.
     """
-
     for file_path in diff_files:
         if file_path.endswith('.ts') or file_path.endswith('.js'):
             return True
@@ -411,7 +410,6 @@ def does_diff_include_ts_files(diff_files):
     Returns:
         bool. Whether the diff contains changes in any TypeScript files.
     """
-
     for file_path in diff_files:
         if file_path.endswith('.ts'):
             return True
@@ -428,7 +426,6 @@ def does_diff_include_travis_yml_or_js_files(diff_files):
         bool. Whether the diff contains changes in travis.yml or
         Javascript files.
     """
-
     for file_path in diff_files:
         if file_path.endswith('.js') or file_path.endswith('.travis.yml'):
             return True

@@ -499,7 +499,6 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         # This is an integration test depending on
         # get_completed_exploration_ids and logic interal to collection_domain
         # which is tested in isolation in collection_domain_test.
-
         # If the user doesn't exist, assume they haven't made any progress on
         # the collection. This means the initial explorations should be
         # suggested.
@@ -544,7 +543,6 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         # recorded correctly. This test actually validates both
         # test_get_completed_exploration_ids and
         # test_get_next_exploration_ids_to_complete_by_user.
-
         # By default, no completion model should exist for a given user and
         # collection.
         completion_model = self._get_progress_model(
@@ -909,7 +907,6 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
     def test_soft_deletion_of_multiple_collections(self):
         """Test that soft deletion of multiple collections works correctly."""
         # TODO(sll): Add tests for deletion of states and version snapshots.
-
         self.save_new_default_collection(self.COLLECTION_0_ID, self.owner_id)
         self.save_new_default_collection(self.COLLECTION_1_ID, self.owner_id)
         # The collections shows up in queries.
@@ -1085,7 +1082,6 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
     def test_collection_is_removed_from_index_when_deleted(self):
         """Tests that deleted collection is removed from the search index."""
-
         self.save_new_default_collection(self.COLLECTION_0_ID, self.owner_id)
 
         def mock_delete_docs(doc_ids, index):
@@ -1290,7 +1286,6 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
     def test_add_node_with_private_exploration_in_public_collection(self):
         """Ensures public collections cannot reference private explorations."""
-
         private_exp_id = 'private_exp_id0'
         self.save_new_valid_exploration(private_exp_id, self.owner_id)
         rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
@@ -1524,7 +1519,6 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 
     def test_unpublished_collections_can_accept_commit_message(self):
         """Test unpublished collections can accept optional commit messages."""
-
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, _get_collection_change_list(
                 collection_domain.COLLECTION_PROPERTY_TITLE,

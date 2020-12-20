@@ -964,7 +964,6 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
             ValidationError. One or more attributes of the
                 BaseVoiceoverApplication object are invalid.
         """
-
         if self.target_type not in suggestion_models.TARGET_TYPE_CHOICES:
             raise utils.ValidationError(
                 'Expected target_type to be among allowed choices, '

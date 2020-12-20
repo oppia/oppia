@@ -827,7 +827,6 @@ class Question(python_utils.OBJECT):
         object to contain an ID and a version. To be used to validate the
         question before it is finalized.
         """
-
         if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
@@ -928,7 +927,6 @@ class Question(python_utils.OBJECT):
 
     def validate(self):
         """Validates the Question domain object before it is saved."""
-
         if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.id)

@@ -34,7 +34,6 @@ class CollectionPage(base.BaseHandler):
     @acl_decorators.can_play_collection
     def get(self, _):
         """Handles GET requests."""
-
         self.render_template('collection-player-page.mainpage.html')
 
 

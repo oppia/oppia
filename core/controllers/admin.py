@@ -67,7 +67,6 @@ class AdminPage(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
-
         self.render_template('admin-page.mainpage.html')
 
 
@@ -505,7 +504,6 @@ class AdminHandler(base.BaseHandler):
                     title: str. The title of the story node.
                     description: str. The description of the story node.
                 """
-
                 story.add_node(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
                     title)
@@ -622,7 +620,6 @@ class AdminHandler(base.BaseHandler):
         Raises:
             Exception. Environment is not DEVMODE.
         """
-
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations' %

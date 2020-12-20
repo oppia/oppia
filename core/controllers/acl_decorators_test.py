@@ -763,7 +763,6 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
             return self.render_json({'query_id': query_id})
 
     def setUp(self):
-
         super(ManageEmailDashboardTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)

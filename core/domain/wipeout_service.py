@@ -202,7 +202,6 @@ def run_user_deletion(pending_deletion_request):
     Returns:
         str. The outcome of the deletion.
     """
-
     if pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_DELETION_ALREADY_DONE
     else:

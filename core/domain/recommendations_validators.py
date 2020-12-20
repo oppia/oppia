@@ -51,7 +51,6 @@ class ExplorationRecommendationsModelValidator(
             item: datastore_services.Model. ExplorationRecommendationsModel
                 to validate.
         """
-
         if item.id in item.recommended_exploration_ids:
             cls._add_error(
                 'item exploration %s' % (
@@ -86,7 +85,6 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
             item: datastore_services.Model. TopicSimilaritiesModel
                 to validate.
         """
-
         all_topics = list(item.content.keys())
         data = '%s\n' % ','.join(all_topics)
 

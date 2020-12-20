@@ -231,7 +231,6 @@ def _filter_skills_by_status(augmented_skill_summaries, status):
         list(AugmentedSkillSummary). The list of AugmentedSkillSummaries
         matching the given status.
     """
-
     if status is None or status == constants.SKILL_STATUS_OPTIONS['ALL']:
         return augmented_skill_summaries
 
@@ -266,7 +265,6 @@ def _filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
         list(AugmentedSkillSummary). The list of augmented skill summaries with
         the given classroom name.
     """
-
     if classroom_name is None or classroom_name == 'All':
         return augmented_skill_summaries
 
@@ -802,7 +800,6 @@ def delete_skill_summary(skill_id):
         skill_id: str. ID of the skill whose skill summary is to
             be deleted.
     """
-
     skill_models.SkillSummaryModel.get(skill_id).delete()
 
 
@@ -882,7 +879,6 @@ def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
         skill_id: str. The unique id of the skill.
         degree_of_mastery: float. The degree of mastery of user in the skill.
     """
-
     user_skill_mastery = skill_domain.UserSkillMastery(
         user_id, skill_id, degree_of_mastery)
     save_user_skill_mastery(user_skill_mastery)

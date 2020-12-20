@@ -219,31 +219,26 @@ class ConfigProperty(python_utils.OBJECT):
     @property
     def name(self):
         """Returns the name of the configuration property."""
-
         return self._name
 
     @property
     def schema(self):
         """Returns the schema of the configuration property."""
-
         return self._schema
 
     @property
     def description(self):
         """Returns the description of the configuration property."""
-
         return self._description
 
     @property
     def default_value(self):
         """Returns the default value of the configuration property."""
-
         return self._default_value
 
     @property
     def value(self):
         """Get the latest value from memcache, datastore, or use default."""
-
         memcached_items = caching_services.get_multi(
             caching_services.CACHE_NAMESPACE_CONFIG, None, [self.name])
         if self.name in memcached_items:

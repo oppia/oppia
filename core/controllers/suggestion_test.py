@@ -664,7 +664,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             response['error'], 'No suggestion found with given suggestion id')
 
     def test_resubmit_rejected_suggestion(self):
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 

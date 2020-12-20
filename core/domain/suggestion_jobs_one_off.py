@@ -356,7 +356,6 @@ class PopulateContributionStatsOneOffJob(
 
     @staticmethod
     def reduce(key, values):
-
         def _update_community_contribution_stats_transactional(
                 key, count_value):
             """Updates the CommunityContributionStatsModel according to the

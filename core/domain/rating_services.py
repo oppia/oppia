@@ -48,7 +48,6 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         new_rating: int. Value of assigned rating, should be between
             1 and 5 inclusive.
     """
-
     if not isinstance(new_rating, int):
         raise ValueError(
             'Expected the rating to be an integer, received %s' % new_rating)

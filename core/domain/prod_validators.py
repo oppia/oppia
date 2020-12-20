@@ -3672,7 +3672,6 @@ class DeletedUserModelValidator(base_model_validators.BaseUserModelValidator):
         Args:
             item: DeletedUserModel. Pending deletion request model to validate.
         """
-
         if not wipeout_service.verify_user_deleted(
                 item.id, include_delete_at_end_models=True):
             cls._add_error(

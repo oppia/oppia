@@ -31,7 +31,6 @@ class ConceptCardDataHandler(base.BaseHandler):
     @acl_decorators.can_view_skills
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
-
         skill_ids = comma_separated_skill_ids.split(',')
         skills = skill_fetchers.get_multi_skills(skill_ids)
 

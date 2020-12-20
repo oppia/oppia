@@ -612,7 +612,6 @@ def delete_story_summary(story_id):
         story_id: str. ID of the story whose story summary is to
             be deleted.
     """
-
     story_models.StorySummaryModel.get(story_id).delete()
 
 

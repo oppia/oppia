@@ -88,7 +88,6 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
 
     def test_access_skill_editor_page(self):
         """Test access to editor pages for the sample skill."""
-
         # Check that non-admins cannot access the editor page.
         self.login(self.NEW_USER_EMAIL)
         self.get_html_response(

@@ -241,7 +241,6 @@ class BaseJobManager(python_utils.OBJECT):
         Returns:
             list(str). The compressed stringified output values.
         """
-
         class _OrderedCounter(collections.Counter, collections.OrderedDict):
             """Counter that remembers the order elements are first encountered.
 
@@ -592,7 +591,6 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
             StoreMapReduceResults. Will be constructed with whatever output the
             caller sends back to the coroutine.
         """
-
         job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, metadata={
             job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id  # pylint: disable=protected-access

@@ -34,6 +34,5 @@ def inform_subscribers(creator_id, exploration_id, exploration_title):
         exploration_title: str. The title of the exploration which the creator
             has published.
     """
-
     email_manager.send_emails_to_subscribers(
         creator_id, exploration_id, exploration_title)

@@ -92,7 +92,6 @@ def compile_and_check_typescript(config_path):
 
 def main(args=None):
     """Run the typescript checks."""
-
     parsed_args = _PARSER.parse_args(args=args)
     compile_and_check_typescript(
         STRICT_TSCONFIG_FILEPATH

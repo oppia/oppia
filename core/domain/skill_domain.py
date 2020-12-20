@@ -1255,7 +1255,6 @@ class Skill(python_utils.OBJECT):
         Args:
             misconception: Misconception. The misconception to be added.
         """
-
         self.misconceptions.append(misconception)
         self.next_misconception_id = self.get_incremented_misconception_id(
             misconception.id)

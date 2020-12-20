@@ -1858,7 +1858,6 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         # recorded correctly. This test actually validates both
         # test_get_completed_node_ids and
         # test_get_next_node_id_to_be_completed_by_user.
-
         # By default, no completion model should exist for a given user and
         # story.
         completion_model = self._get_progress_model(

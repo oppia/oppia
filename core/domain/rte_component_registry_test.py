@@ -133,7 +133,6 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
     def test_rte_components_are_valid(self):
         """Test that the default RTE components are valid."""
-
         rte_components = (
             rte_component_registry.Registry.get_all_rte_components())
 
@@ -204,7 +203,6 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         """Test that the rich_text_components.html file contains script-imports
         for all directives of all RTE components.
         """
-
         rtc_ts_filenames = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
             component_dir = os.path.join(

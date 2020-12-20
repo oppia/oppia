@@ -840,7 +840,6 @@ class Story(python_utils.OBJECT):
         Args:
             title: str. The title to validate.
         """
-
         if not isinstance(title, python_utils.BASESTRING):
             raise utils.ValidationError('Title should be a string.')
         if title == '':

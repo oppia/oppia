@@ -111,7 +111,6 @@ def does_diff_include_package_lock_file():
     Raises:
         ValueError. If git command fails.
     """
-
     git_cmd = ['git', 'diff', '--name-only', '--cached']
     out, err = start_subprocess_for_result(git_cmd)
 

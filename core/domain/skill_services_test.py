@@ -1171,7 +1171,6 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
         #   1. The skill_ids should be sorted.
         #   2. The filtered skill_ids should be feconf.MAX_NUMBER_OF_SKILL_IDS
         # in number.
-
         # List of mastery values (float values between 0.0 and 1.0)
         masteries = [self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2, None]
 

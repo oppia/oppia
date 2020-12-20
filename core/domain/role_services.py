@@ -300,7 +300,6 @@ def check_if_path_exists_in_roles_graph(source_node, destination_node):
         Exception. The given role for source node does not exist.
         Exception. The given role for destination node does not exist.
     """
-
     if source_node not in PARENT_ROLES:
         raise Exception(
             'Role %s defined by the source node does not exist.' % source_node)

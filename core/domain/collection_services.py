@@ -106,7 +106,6 @@ def get_collection_from_model(collection_model):
         Collection. A Collection domain object corresponding to the given
         collection model.
     """
-
     # Ensure the original collection model does not get altered.
     versioned_collection_contents = {
         'schema_version': collection_model.schema_version,

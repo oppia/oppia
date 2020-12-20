@@ -389,7 +389,6 @@ class TopicEditorTests(
 
     def test_access_topic_editor_page(self):
         """Test access to editor pages for the sample topic."""
-
         # Check that non-admin and topic_manager cannot access the editor
         # page.
         self.login(self.NEW_USER_EMAIL)

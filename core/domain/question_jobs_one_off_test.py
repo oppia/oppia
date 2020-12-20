@@ -207,7 +207,6 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
 
     def test_job_skips_deleted_question(self):
         """Tests that the regenerate summary job skips deleted question."""
-
         question_services.delete_question(self.albert_id, self.QUESTION_ID)
 
         # Ensure the question is deleted.
@@ -235,7 +234,6 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
 
     def test_job_regenerates_valid_question(self):
         """Tests that the regenerate summary job skips deleted question."""
-
         # Start migration job on sample question.
         job_id = (
             question_jobs_one_off
@@ -252,7 +250,6 @@ class RegenerateQuestionSummaryOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_regeneration_job_skips_invalid_question(self):
-
         def _mock_get_question_by_id(unused_question_id):
             """Mocks get_question_by_id()."""
             return 'invalid_question'

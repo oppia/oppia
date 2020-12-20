@@ -598,7 +598,6 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-
         # This will be None if the exploration is not being played within the
         # context of a collection.
         collection_id = self.payload.get('collection_id')
@@ -827,7 +826,6 @@ class QuestionPlayerHandler(base.BaseHandler):
         """Handles GET request."""
         # Skill ids are given as a comma separated list because this is
         # a GET request.
-
         skill_ids = self.request.get('skill_ids').split(',')
         question_count = self.request.get('question_count')
         fetch_by_difficulty_value = self.request.get('fetch_by_difficulty')

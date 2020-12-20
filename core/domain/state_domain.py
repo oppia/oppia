@@ -466,7 +466,6 @@ class InteractionInstance(python_utils.OBJECT):
         Returns:
             dict. A dict mapping all fields of InteractionInstance instance.
         """
-
         # customization_args_dict here indicates a dict that maps customization
         # argument names to a customization argument dict, the dict
         # representation of InteractionCustomizationArg.
@@ -710,7 +709,6 @@ class InteractionInstance(python_utils.OBJECT):
         # customization argument values that are dictionaries, we first convert
         # the InteractionCustomizationArg domain objects into dictionaries
         # before passing it to the method.
-
         # First, do some basic validation.
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(
@@ -1046,7 +1044,6 @@ class InteractionCustomizationArg(python_utils.OBJECT):
         Returns:
             list(str). All html strings in the customization argument.
         """
-
         return InteractionCustomizationArg.traverse_by_schema_and_get(
             self.schema,
             self.value,

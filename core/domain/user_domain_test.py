@@ -501,7 +501,6 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
 
     def test_initialization(self):
         """Testing init method."""
-
         self.assertEqual(self.user_contribution_rights.id, 'user_id')
         self.assertEqual(
             self.user_contribution_rights

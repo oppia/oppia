@@ -105,7 +105,6 @@ class ActivityIdsInLearnerDashboard(python_utils.OBJECT):
                 'collection_playlist_ids': list(str). The ids of the
                     collections that are in the playlist.
         """
-
         return {
             'completed_exploration_ids': self.completed_exploration_ids,
             'completed_collection_ids': self.completed_collection_ids,

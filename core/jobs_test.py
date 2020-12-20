@@ -704,7 +704,6 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             cls, active_realtime_layer, event_type, exp_id, unused_exp_version,
             unused_state_name, unused_session_id, unused_params,
             unused_play_type):
-
         def _increment_counter():
             """Increments the count, if the realtime model corresponding to the
             active real-time model id exists.

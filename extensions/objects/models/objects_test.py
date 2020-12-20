@@ -496,7 +496,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_logic_error_category_validation(self):
         """Tests objects of type LogicErrorCategory."""
-
         mappings = [
             ('parsing', 'parsing'), ('typing', 'typing'),
             ('mistake', 'mistake')]
@@ -618,7 +617,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_graph_property_validation(self):
         """Tests objects of type GraphProperty."""
-
         mappings = [
             ('acyclic', 'acyclic'), ('regular', 'regular'),
             ('strongly_connected', 'strongly_connected'),
@@ -639,7 +637,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_set_of_html_string(self):
         """Tests objects of the type StringList."""
-
         mappings = [(['abc', 'abb'], [u'abc', u'abb']), ([], [])]
         invalid_values_with_error_messages = [
             ('123', 'Expected list, received 123'),
@@ -724,7 +721,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_position_of_terms_validation(self):
         """Tests objects of type PositionOfTerms."""
-
         mappings = [
             ('lhs', 'lhs'), ('rhs', 'rhs'), ('both', 'both'),
             ('irrelevant', 'irrelevant')]
@@ -764,7 +760,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_ratio_validation(self):
         """Tests objects of type RatioExpression."""
-
         mappings = [([1, 2], [1, 2]), ([1, 2, 3], [1, 2, 3])]
 
         invalid_values_with_error_messages = [
@@ -779,7 +774,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_set_of_algebraic_identifier_validation(self):
         """Tests objects of type SetOfAlgebraicIdentifier."""
-
         mappings = [
             (['a', 'b', 'gamma'], ['a', 'b', 'gamma']),
             (['alpha', 'x', 'Pi'], ['alpha', 'x', 'Pi']),

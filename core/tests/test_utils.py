@@ -1578,7 +1578,6 @@ tags: []
             interaction_id: str. The interaction id to set. Also sets the
                 default customization args for the given interaction id.
         """
-
         # We wrap next_content_id_index in a dict so that modifying it in the
         # inner function modifies the value.
         next_content_id_index_dict = {'value': state.next_content_id_index}

@@ -43,7 +43,6 @@ class FetchMultipleEntitiesTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_fetch_multiple_entities_by_ids_and_models(self):
-
         # Save a few explorations.
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.owner_id, title='Bridges in England',
@@ -126,7 +125,6 @@ class TransactionTests(test_utils.GenericTestBase):
     def test_returns_none_from_void_callback(self):
         def do_nothing():
             """Does nothing."""
-
             pass
 
         self.assertIsNone(gae_datastore_services.transaction(do_nothing))
@@ -134,7 +132,6 @@ class TransactionTests(test_utils.GenericTestBase):
     def test_raises_exception_from_callback(self):
         def raise_exception():
             """Raises an Exception."""
-
             raise Exception('uh-oh!')
 
         with self.assertRaisesRegexp(Exception, 'uh-oh!'):

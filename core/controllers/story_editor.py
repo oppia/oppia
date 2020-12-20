@@ -36,7 +36,6 @@ class StoryEditorPage(base.BaseHandler):
     @acl_decorators.can_edit_story
     def get(self, _):
         """Handles GET requests."""
-
         self.render_template('story-editor-page.mainpage.html')
 
 

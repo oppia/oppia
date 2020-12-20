@@ -259,7 +259,6 @@ def mock_datetime_for_datastore(mocked_now):
     Yields:
         None. Empty yield statement.
     """
-
     if not isinstance(mocked_now, datetime.datetime):
         raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
 
@@ -279,7 +278,6 @@ def mock_datetime_for_datastore(mocked_now):
         @classmethod
         def utcnow(cls):
             """Returns the mocked datetime."""
-
             return mocked_now
 
     setattr(datetime, 'datetime', MockDatetime)

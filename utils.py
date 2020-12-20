@@ -171,7 +171,6 @@ def get_comma_sep_string_from_list(items):
     Returns:
         str. String containing the items in the list separated by commas.
     """
-
     if not items:
         return ''
 

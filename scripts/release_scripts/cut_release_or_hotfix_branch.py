@@ -98,7 +98,6 @@ def verify_target_branch_does_not_already_exist(remote_alias, new_branch_name):
         Exception. The target branch name already exists on the remote
             oppia repository.
     """
-
     git_branch_output = subprocess.check_output(['git', 'branch'])
     if new_branch_name in git_branch_output:
         raise Exception(
@@ -244,7 +243,6 @@ def execute_branch_cut(target_version, hotfix_number):
         Exception. Travis tests are failing on the branch from which
             the new branch is cut.
     """
-
     # Construct the new branch name.
     if not hotfix_number:
         new_branch_type, new_branch_name = _get_release_branch_type_and_name(

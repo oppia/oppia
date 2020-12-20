@@ -82,7 +82,6 @@ class ExplorationDisplayableSummariesTest(
         - (2) User_4 edits the title of EXP_ID_4.
         - (3) User_4 edits the title of EXP_ID_4.
         """
-
         super(ExplorationDisplayableSummariesTest, self).setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -195,7 +194,6 @@ class ExplorationDisplayableSummariesTest(
         # EXP_ID_3 -- deleted exploration.
         # EXP_ID_5 -- private exploration owned by Bob.
         # Should only return [EXP_ID_2].
-
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
@@ -270,7 +268,6 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         - (3) Admin reloads exploration with id '2'.
         - (4) Admin logs out.
         """
-
         super(LibraryGroupsTest, self).setUp()
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -340,7 +337,6 @@ class FeaturedExplorationDisplayableSummariesTest(
         - (4) Albert publishes EXP_ID_2.
         - (5) Admin user is set up.
         """
-
         super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -591,7 +587,6 @@ class TopRatedExplorationDisplayableSummariesTest(
         - (18) Albert publishes EXP_ID_9.
         - (19) Admin user is set up.
         """
-
         super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -690,7 +685,6 @@ class TopRatedExplorationDisplayableSummariesTest(
 
     def test_only_explorations_with_ratings_are_returned(self):
         """Note that only explorations with ratings will be included."""
-
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_2, 5)
 
@@ -749,7 +743,6 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         - (6) Albert publishes EXP_ID_3.
         - (7) Admin user is set up.
         """
-
         super(
             RecentlyPublishedExplorationDisplayableSummariesTest, self).setUp()
 
@@ -777,7 +770,6 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
     def test_for_recently_published_explorations(self):
         """Tests for recently published explorations."""
-
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exp_summary_dicts(
                 feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FOR_LIBRARY_PAGE))
