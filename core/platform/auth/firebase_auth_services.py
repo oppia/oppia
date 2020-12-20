@@ -41,38 +41,33 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 
-from core.platform.datastore import gae_datastore_services as datastore_services
-from core.storage.base_model import gae_models as base_model
-import python_utils
-
 import firebase_admin
 from firebase_admin import auth
 
 
 @contextlib.contextmanager
 def acquire_auth_context():
-    """Context manager in which other auth-related services must be called from.
+    """Context manager from which other auth-related services must be called.
 
     This function establishes the necessary setup to make calls to the rest of
     the auth_services API. DO NOT MAKE OTHER CALLS WITHOUT ACQUIRING A CONTEXT
     FIRST!
 
     Yields:
-        None. Nada.
+        None. No relevant context expression.
 
     Raises:
         Exception. The context could not be established.
     """
     app = firebase_admin.initialize_app()
     try:
-        yield app
+        yield
     finally:
         firebase_admin.delete_app(app)
 
 
-def get_verified_sub(response):
-    """Returns the subject identifier for the signed-in user, if any, from the
-    response.
+def get_verified_subject_id(response):
+    """Returns the subject ID for the signed-in user, if any, from the response.
 
     Args:
         response: webapp2.Response. The HTTP response to inspect.

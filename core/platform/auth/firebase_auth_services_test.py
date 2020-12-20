@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import contextlib
 
 from core.platform.auth import firebase_auth_services
-from core.storage.base_model import gae_models as base_model
 from core.tests import test_utils
 
 import firebase_admin
@@ -89,7 +88,7 @@ class FirebaseAuthServicesPublicApiTest(test_utils.TestBase):
     def test_verify_accepted_token(self):
         with self.swap_verify_to_always_accept_tokens(sub='123'):
             self.assertEqual(
-                firebase_auth_services.get_verified_sub(
+                firebase_auth_services.get_verified_subject_id(
                     self.make_response(auth_header='Bearer MOCK_JWT_VALUE')),
                 '123')
 
@@ -97,29 +96,29 @@ class FirebaseAuthServicesPublicApiTest(test_utils.TestBase):
         err = Exception('untrusted!')
         with self.swap_verify_to_always_reject_tokens(exception_obj=err):
             with self.assertRaisesRegexp(Exception, 'untrusted!'):
-                firebase_auth_services.get_verified_sub(
+                firebase_auth_services.get_verified_subject_id(
                     self.make_response(auth_header='Bearer MOCK_JWT_VALUE'))
 
     def test_verify_token_without_auth_header(self):
         with self.swap_verify_to_always_accept_tokens():
             with self.assertRaisesRegexp(Exception, 'header is missing'):
-                firebase_auth_services.get_verified_sub(
+                firebase_auth_services.get_verified_subject_id(
                     self.make_response(auth_header=None))
 
     def test_verify_token_with_empty_auth_header(self):
         with self.swap_verify_to_always_accept_tokens():
             with self.assertRaisesRegexp(Exception, 'prefix is missing'):
-                firebase_auth_services.get_verified_sub(
+                firebase_auth_services.get_verified_subject_id(
                     self.make_response(auth_header=''))
 
     def test_verify_token_with_auth_header_missing_bearer_prefix(self):
         with self.swap_verify_to_always_accept_tokens():
             with self.assertRaisesRegexp(Exception, 'prefix is missing'):
-                firebase_auth_services.get_verified_sub(
+                firebase_auth_services.get_verified_subject_id(
                     self.make_response(auth_header='JWT_TOKEN'))
 
     def test_verify_token_with_auth_header_missing_space_after_bearer(self):
         with self.swap_verify_to_always_accept_tokens():
             with self.assertRaisesRegexp(Exception, 'prefix is missing'):
-                firebase_auth_services.get_verified_sub(
+                firebase_auth_services.get_verified_subject_id(
                     self.make_response(auth_header='BearerJWT_TOKEN'))

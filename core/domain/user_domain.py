@@ -19,12 +19,18 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
+
 from core.platform import models
 import feconf
 import python_utils
 import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
+
+FirebaseSubjectIdUserIdPair = collections.namedtuple(
+    'FirebaseSubjectIdUserIdPair', ['subject_id', 'user_id'])
 
 
 class UserGlobalPrefs(python_utils.OBJECT):

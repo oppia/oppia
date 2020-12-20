@@ -2613,8 +2613,8 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
         )
 
 
-class UserIdByFirebaseSubModelTests(test_utils.GenericTestBase):
-    """Tests for user_models.UserIdByFirebaseSubModel."""
+class UserIdByFirebaseSubjectIdModelTests(test_utils.GenericTestBase):
+    """Tests for user_models.UserIdByFirebaseSubjectIdModel."""
 
     NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
     NONEXISTENT_USER_ID = 'id_x'
@@ -2626,59 +2626,56 @@ class UserIdByFirebaseSubModelTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
-        super(UserIdByFirebaseSubModelTests, self).setUp()
+        super(UserIdByFirebaseSubjectIdModelTests, self).setUp()
 
-        user_models.UserIdByFirebaseSubModel( # pylint: disable=protected-access
+        user_models.UserIdByFirebaseSubjectIdModel(
             id=self.USER_GAE_ID, user_id=self.USER_ID).put()
 
     def test_get_deletion_policy_is_delete_at_end(self):
         self.assertEqual(
-            user_models.UserIdByFirebaseSubModel # pylint: disable=protected-access
-            .get_deletion_policy(),
+            user_models.UserIdByFirebaseSubjectIdModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(self):
         # Deleting a full user.
-        user_models.UserIdByFirebaseSubModel.apply_deletion_policy( # pylint: disable=protected-access
+        user_models.UserIdByFirebaseSubjectIdModel.apply_deletion_policy(
             self.USER_ID)
         self.assertIsNone(
-            user_models.UserIdByFirebaseSubModel.get_by_id( # pylint: disable=protected-access
-                self.USER_ID))
+            user_models.UserIdByFirebaseSubjectIdModel.get_by_id(self.USER_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
         self.assertIsNone(
-            user_models.UserIdByFirebaseSubModel.get_by_id( # pylint: disable=protected-access
+            user_models.UserIdByFirebaseSubjectIdModel.get_by_id(
                 self.NONEXISTENT_USER_ID))
-        user_models.UserIdByFirebaseSubModel.apply_deletion_policy( # pylint: disable=protected-access
+        user_models.UserIdByFirebaseSubjectIdModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_existing_user_id_is_true(self):
         self.assertTrue(
-            user_models.UserIdByFirebaseSubModel # pylint: disable=protected-access
-            .has_reference_to_user_id(self.USER_ID))
+            user_models.UserIdByFirebaseSubjectIdModel.has_reference_to_user_id(
+                self.USER_ID))
 
     def test_has_reference_to_non_existing_user_id_is_false(self):
         self.assertFalse(
-            user_models.UserIdByFirebaseSubModel # pylint: disable=protected-access
-            .has_reference_to_user_id(
+            user_models.UserIdByFirebaseSubjectIdModel.has_reference_to_user_id(
                 self.NONEXISTENT_USER_ID))
 
     def test_get_by_user_id_for_correct_user_id(self):
         self.assertEqual(
-            user_models.UserIdByFirebaseSubModel.get_by_id( # pylint: disable=protected-access
+            user_models.UserIdByFirebaseSubjectIdModel.get_by_id(
                 self.USER_GAE_ID),
-            user_models.UserIdByFirebaseSubModel.get_by_user_id( # pylint: disable=protected-access
+            user_models.UserIdByFirebaseSubjectIdModel.get_by_user_id(
                 self.USER_ID))
 
     def test_get_model_association_to_user(self):
         self.assertEqual(
-            user_models.UserIdByFirebaseSubModel # pylint: disable=protected-access
+            user_models.UserIdByFirebaseSubjectIdModel
             .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_get_export_policy(self):
         self.assertEqual(
-            user_models.UserIdByFirebaseSubModel # pylint: disable=protected-access
+            user_models.UserIdByFirebaseSubjectIdModel
             .get_export_policy(), {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
