@@ -106,6 +106,8 @@
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
     "extensions/interactions/EndExploration/directives/end-exploration-rules.service.ts",
+    "extensions/interactions/ImageClickInput/directives/image-click-input-rules.service.ts",
+    "extensions/interactions/ImageClickInput/directives/image-click-input-rules.service.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
     "core/templates/domain/classifier/classifier.model.spec.ts"
   ],
