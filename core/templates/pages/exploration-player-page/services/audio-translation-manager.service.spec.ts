@@ -72,7 +72,6 @@ describe('Audio translation manager service', () => {
   it('should properly set primary and secondary audio translations',
     () => {
       atms.setContentAudioTranslations(testAudioTranslations, '', '');
-      console.log(atms.getCurrentAudioTranslations());
       expect(atms.getCurrentAudioTranslations()).toEqual({
         en: vof.createFromBackendDict({
           filename: 'audio-en.mp3',
