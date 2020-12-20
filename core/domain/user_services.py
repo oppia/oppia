@@ -2885,8 +2885,8 @@ def associate_multi_subject_ids_to_user_ids(pairs):
         pairs: list(user_domain.SubjectIdUserIdPair). The associations to
             commit.
     """
-    subject_ids, user_ids = python_utils.ZIP(
-        (subject_id, user_id) for subject_id, user_id in pairs)
+    # Turn list(pair) -> pair(list). https://stackoverflow.com/a/7558990/4859885
+    subject_ids, user_ids = python_utils.ZIP(*pairs)
 
     claimed_user_ids = get_multi_user_ids_from_subject_ids(subject_ids)
     if any(user_id is not None for user_id in claimed_user_ids):
