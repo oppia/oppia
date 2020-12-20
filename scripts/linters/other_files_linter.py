@@ -249,13 +249,13 @@ class CustomLintChecksManager(python_utils.OBJECT):
             TaskResult. A TaskResult object representing the result of the lint
             check.
         """
-        name = 'Strict TS config'
+        name = 'Sorted strict TS config'
 
         failed = False
         error_messages = []
 
-        strict_ts_config = json.load(python_utils.open_file(
-            STRICT_TS_CONFIG_FILEPATH, 'r'))
+        strict_ts_config = json.load(
+            python_utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r'))
 
         # Remove .ts extension from filepath for sorting.
         files = [path[:-3] for path in strict_ts_config['files']]

@@ -258,20 +258,20 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertTrue(error_messages.failed)
 
     def test_check_valid_strict_checks(self):
-        expected_error_messages = 'SUCCESS  Strict TS config check passed'
+        expected_error_messages = 'SUCCESS  Sorted strict TS config check passed'
         with self.open_file_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_strict_ts_config()
             self.assertEqual(
                 error_messages.get_report()[0], expected_error_messages)
-            self.assertEqual('Strict TS config', error_messages.name)
+            self.assertEqual('Sorted strict TS config', error_messages.name)
             self.assertFalse(error_messages.failed)
 
     def test_check_invalid_strict_checks(self):
         self.strict_ts_config = python_utils.string_io(
             buffer_value='{\"files\": [\"some-file.spec.ts\",'
             '\"some-file.ts\"]}')
-        expected_error_messages = 'FAILED  Strict TS config check failed'
+        expected_error_messages = 'FAILED  Sorted strict TS config check failed'
         with self.open_file_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_strict_ts_config()
@@ -281,7 +281,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 ['Files in %s are not alphabetically sorted.' % (
                     other_files_linter.STRICT_TS_CONFIG_FILE_NAME)],
                 error_messages.get_report())
-            self.assertEqual('Strict TS config', error_messages.name)
+            self.assertEqual('Sorted strict TS config', error_messages.name)
             self.assertTrue(error_messages.failed)
 
     def test_perform_all_lint_checks(self):
