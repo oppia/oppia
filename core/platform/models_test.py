@@ -49,6 +49,14 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             expected_audit_models,
             self.registry_instance.import_models([models.NAMES.audit]))
 
+    def test_import_models_auth_model(self):
+        """Tests import_models function with auth option."""
+        from core.storage.auth import gae_models as auth_models
+        expected_auth_models = (auth_models,)
+        self.assertEqual(
+            expected_auth_models,
+            self.registry_instance.import_models([models.NAMES.auth]))
+
     def test_import_models_base_model(self):
         """Tests import_models function with base model option."""
         from core.storage.base_model import gae_models as base_models

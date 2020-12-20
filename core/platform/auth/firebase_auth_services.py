@@ -46,9 +46,9 @@ from core.platform import models
 import firebase_admin
 from firebase_admin import auth
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(auth_models,) = models.Registry.import_models([models.NAMES.auth])
 
-UserIdBySubjectIdModel = user_models.UserIdByFirebaseSubjectIdModel  # pylint: disable=invalid-name
+UserIdBySubjectIdModel = auth_models.UserIdByFirebaseSubjectIdModel  # pylint: disable=invalid-name
 
 
 @contextlib.contextmanager

@@ -28,10 +28,10 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
-    'email', 'exploration', 'feedback', 'improvements', 'job', 'opportunity',
-    'question', 'recommendations', 'skill', 'statistics', 'story', 'subtopic',
-    'suggestion', 'topic', 'user')
+    'activity', 'audit', 'auth', 'base_model', 'classifier', 'collection',
+    'config', 'email', 'exploration', 'feedback', 'improvements', 'job',
+    'opportunity', 'question', 'recommendations', 'skill', 'statistics',
+    'story', 'subtopic', 'suggestion', 'topic', 'user')
 
 # Types of deletion policies. The pragma comment is needed because Enums are
 # evaluated as classes in Python and they should use PascalCase, but using
@@ -86,6 +86,9 @@ class _Gae(Platform):
             elif name == NAMES.audit:
                 from core.storage.audit import gae_models as audit_models
                 returned_models.append(audit_models)
+            elif name == NAMES.auth:
+                from core.storage.auth import gae_models as auth_models
+                returned_models.append(auth_models)
             elif name == NAMES.base_model:
                 from core.storage.base_model import gae_models as base_models
                 returned_models.append(base_models)
