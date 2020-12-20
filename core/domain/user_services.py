@@ -2884,6 +2884,9 @@ def associate_multi_subject_ids_to_user_ids(pairs):
     Args:
         pairs: list(user_domain.SubjectIdUserIdPair). The associations to
             commit.
+
+    Raises:
+        Exception. One or more subject ID associations already exist.
     """
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
     subject_ids, user_ids = python_utils.ZIP(*pairs)
