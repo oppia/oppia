@@ -114,12 +114,6 @@ def get_collection_from_model(collection_model):
             copy.deepcopy(collection_model.collection_contents)
     }
 
-    # If collection is in version 2, copy nodes data to collection contents.
-    if collection_model.schema_version == 2:
-        versioned_collection_contents['collection_contents'] = {
-            'nodes': copy.deepcopy(collection_model.nodes)
-        }
-
     # Migrate the collection if it is not using the latest schema version.
     if (collection_model.schema_version !=
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
@@ -769,7 +763,8 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             collection_node.to_dict() for collection_node in collection.nodes
         ]
     }
-    collection_model.node_count = len(collection_model.collection_contents['nodes'])
+    collection_model.node_count = len(
+        collection_model.collection_contents['nodes'])
     collection_model.commit(committer_id, commit_message, change_list)
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id])
