@@ -104,7 +104,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             datetime, 'datetime', MockDatetime(self.example_date))
         post_swap = self.swap_with_checks(
             requests, 'post', mock_post, expected_args=[
-                (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
+                (flake_checker.PASS_REPORT_URL,)],
             expected_kwargs=[{
                 'json': expected_payload,
                 'allow_redirects': False,
@@ -143,7 +143,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             datetime, 'datetime', MockDatetime(self.example_date))
         post_swap = self.swap_with_checks(
             requests, 'post', mock_post, expected_args=[
-                (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
+                (flake_checker.PASS_REPORT_URL,)],
             expected_kwargs=[{
                 'json': expected_payload,
                 'allow_redirects': False,
@@ -182,7 +182,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             datetime, 'datetime', MockDatetime(self.example_date))
         post_swap = self.swap_with_checks(
             requests, 'post', mock_post, expected_args=[
-                (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
+                (flake_checker.PASS_REPORT_URL,)],
             expected_kwargs=[{
                 'json': expected_payload,
                 'allow_redirects': False,
