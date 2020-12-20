@@ -1627,7 +1627,7 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
                        stringified_item in stringified_output]
         return eval_output
 
-    def test_update_created_on_using_user_settings_model_only(self):
+    def test_update_using_last_updated_of_user_settings_model(self):
         user_settings_model = (
             user_models.UserSettingsModel(
                 id=self.USER_ID_1,
@@ -1637,15 +1637,47 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model.update_timestamps()
         original_created_on_timestamp = user_settings_model.created_on
         user_settings_model.created_on += datetime.timedelta(hours=10)
+        user_settings_model.put()
+
+        # We did not modify last_updated earlier, and hence it becomes the
+        # minimal timestamp value now.
+        final_created_on_timestamp = user_settings_model.last_updated
+
+        self.assertNotEqual(
+            user_settings_model.created_on, original_created_on_timestamp)
+        self.assertNotEqual(
+            user_settings_model.created_on, final_created_on_timestamp)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_UPDATED_USING_UserSettingsModel', 1]], output)
+
+        migrated_user_model = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+        self.assertEqual(
+            migrated_user_model.created_on, final_created_on_timestamp)
+
+    def test_update_using_other_attributes_of_user_settings_model(self):
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        original_created_on_timestamp = user_settings_model.created_on
+        user_settings_model.created_on += datetime.timedelta(hours=10)
+        user_settings_model.last_updated += datetime.timedelta(hours=10)
         user_settings_model.last_started_state_editor_tutorial = (
-            original_created_on_timestamp + datetime.timedelta(hours=1))
+            original_created_on_timestamp + datetime.timedelta(hours=11))
         user_settings_model.last_created_an_exploration = (
-            original_created_on_timestamp + datetime.timedelta(hours=2))
+            original_created_on_timestamp + datetime.timedelta(hours=12))
+        user_settings_model.last_logged_in = (
+            original_created_on_timestamp + datetime.timedelta(hours=1))
         user_settings_model.put()
 
-        # We did not modify last_updated earlier, and hence it becomes the
-        # minimal timestamp value now.
-        final_created_on_timestamp = user_settings_model.last_updated
+        # We had set the lowest timestamp for last_logged_in.
+        final_created_on_timestamp = user_settings_model.last_logged_in
 
         self.assertNotEqual(
             user_settings_model.created_on, original_created_on_timestamp)
@@ -1653,89 +1685,13 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
             user_settings_model.created_on, final_created_on_timestamp)
 
         output = self._run_one_off_job()
-        self.assertItemsEqual([['SUCCESS_UPDATED', 1]], output)
+        self.assertItemsEqual(
+            [['SUCCESS_UPDATED_USING_UserSettingsModel', 1]], output)
 
         migrated_user_model = (
             user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
         self.assertEqual(
             migrated_user_model.created_on, final_created_on_timestamp)
-
-    def test_multiple_runs_of_one_off_job_raises_no_error(self):
-        user_settings_model = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model.update_timestamps()
-        original_created_on_timestamp = user_settings_model.created_on
-        user_settings_model.created_on += datetime.timedelta(hours=10)
-        user_settings_model.put()
-
-        # We did not modify last_updated earlier, and hence it becomes the
-        # minimal timestamp value now.
-        final_created_on_timestamp = user_settings_model.last_updated
-
-        self.assertNotEqual(
-            user_settings_model.created_on, original_created_on_timestamp)
-        self.assertNotEqual(
-            user_settings_model.created_on, final_created_on_timestamp)
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual([['SUCCESS_UPDATED', 1]], output)
-        output = self._run_one_off_job()
-        self.assertItemsEqual([['SUCCESS_ALREADY_UP_TO_DATE', 1]], output)
-
-        migrated_user_model = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
-        self.assertEqual(
-            migrated_user_model.created_on, final_created_on_timestamp)
-
-    def test_update_created_on_works_correctly_for_multiple_users(self):
-        user_settings_model_1 = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model_1.update_timestamps()
-        original_created_on_timestamp_1 = user_settings_model_1.created_on
-        user_settings_model_1.created_on += datetime.timedelta(hours=10)
-        final_created_on_timestamp_1 = user_settings_model_1.last_updated
-        user_settings_model_1.put()
-
-        user_settings_model_2 = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_2,
-                email=self.EMAIL_2,
-            )
-        )
-        user_settings_model_2.update_timestamps()
-        original_created_on_timestamp_2 = user_settings_model_2.created_on
-        user_settings_model_2.created_on += datetime.timedelta(hours=5)
-        final_created_on_timestamp_2 = user_settings_model_2.last_updated
-        user_settings_model_2.put()
-
-        self.assertNotEqual(
-            user_settings_model_1.created_on, original_created_on_timestamp_1)
-        self.assertNotEqual(
-            user_settings_model_1.created_on, final_created_on_timestamp_1)
-        self.assertNotEqual(
-            user_settings_model_2.created_on, original_created_on_timestamp_2)
-        self.assertNotEqual(
-            user_settings_model_2.created_on, final_created_on_timestamp_2)
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual([['SUCCESS_UPDATED', 2]], output)
-
-        migrated_user_model_1 = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
-        migrated_user_model_2 = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_2))
-        self.assertEqual(
-            migrated_user_model_1.created_on, final_created_on_timestamp_1)
-        self.assertEqual(
-            migrated_user_model_2.created_on, final_created_on_timestamp_2)
 
     def test_update_using_created_on_and_last_updated_of_other_models(self):
         user_settings_model = (
@@ -1790,7 +1746,8 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
             user_settings_model.created_on, final_created_on_timestamp)
 
         output = self._run_one_off_job()
-        self.assertItemsEqual([['SUCCESS_UPDATED', 1]], output)
+        self.assertItemsEqual(
+            [['SUCCESS_UPDATED_USING_UserAuthDetailsModel', 1]], output)
 
         migrated_user_model = (
             user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
@@ -1846,11 +1803,91 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
             user_settings_model.created_on, final_created_on_timestamp)
 
         output = self._run_one_off_job()
-        self.assertItemsEqual([['SUCCESS_UPDATED', 1]], output)
+        self.assertItemsEqual(
+            [['SUCCESS_UPDATED_USING_UserSubscriptionsModel', 1]], output)
 
         migrated_user_model = (
             user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
 
+        self.assertEqual(
+            migrated_user_model.created_on, final_created_on_timestamp)
+
+    def test_update_for_multiple_users_works_correctly(self):
+        user_settings_model_1 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model_1.update_timestamps()
+        original_created_on_timestamp_1 = user_settings_model_1.created_on
+        user_settings_model_1.created_on += datetime.timedelta(hours=10)
+        final_created_on_timestamp_1 = user_settings_model_1.last_updated
+        user_settings_model_1.put()
+
+        user_settings_model_2 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_2,
+                email=self.EMAIL_2,
+            )
+        )
+        user_settings_model_2.update_timestamps()
+        original_created_on_timestamp_2 = user_settings_model_2.created_on
+        user_settings_model_2.created_on += datetime.timedelta(hours=5)
+        final_created_on_timestamp_2 = user_settings_model_2.last_updated
+        user_settings_model_2.put()
+
+        self.assertNotEqual(
+            user_settings_model_1.created_on, original_created_on_timestamp_1)
+        self.assertNotEqual(
+            user_settings_model_1.created_on, final_created_on_timestamp_1)
+        self.assertNotEqual(
+            user_settings_model_2.created_on, original_created_on_timestamp_2)
+        self.assertNotEqual(
+            user_settings_model_2.created_on, final_created_on_timestamp_2)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_UPDATED_USING_UserSettingsModel', 2]], output)
+
+        migrated_user_model_1 = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+        migrated_user_model_2 = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_2))
+        self.assertEqual(
+            migrated_user_model_1.created_on, final_created_on_timestamp_1)
+        self.assertEqual(
+            migrated_user_model_2.created_on, final_created_on_timestamp_2)
+
+    def test_multiple_runs_of_one_off_job_raises_no_error(self):
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        original_created_on_timestamp = user_settings_model.created_on
+        user_settings_model.created_on += datetime.timedelta(hours=10)
+        user_settings_model.put()
+
+        # We did not modify last_updated earlier, and hence it becomes the
+        # minimal timestamp value now.
+        final_created_on_timestamp = user_settings_model.last_updated
+
+        self.assertNotEqual(
+            user_settings_model.created_on, original_created_on_timestamp)
+        self.assertNotEqual(
+            user_settings_model.created_on, final_created_on_timestamp)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_UPDATED_USING_UserSettingsModel', 1]], output)
+        output = self._run_one_off_job()
+        self.assertItemsEqual([['SUCCESS_ALREADY_UP_TO_DATE', 1]], output)
+
+        migrated_user_model = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
         self.assertEqual(
             migrated_user_model.created_on, final_created_on_timestamp)
 

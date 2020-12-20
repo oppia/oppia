@@ -487,6 +487,20 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_settings_model):
         user_id = user_settings_model.id
 
+        user_dates_list = [
+            user_settings_model.created_on,
+            user_settings_model.last_updated,
+            user_settings_model.last_agreed_to_terms,
+            user_settings_model.last_started_state_editor_tutorial,
+            user_settings_model.last_started_state_translation_tutorial,
+            user_settings_model.last_logged_in,
+            user_settings_model.last_edited_an_exploration,
+            user_settings_model.last_created_an_exploration,
+            user_settings_model.first_contribution_msec
+        ]
+
+        model_names = ['UserSettingsModel'] * 9
+
         # Models in user storage module keyed by user_id.
         completed_activities_model = (
             user_models.CompletedActivitiesModel.get_by_id(user_id))
@@ -548,57 +562,58 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         )
 
         models_linked_with_user_settings_model = [
-            completed_activities_model,
-            incomplete_activities_model,
-            learner_playlist_model,
-            pending_deletion_request_model,
-            user_auth_details_model,
-            user_bulk_emails_model,
-            user_contributions_model,
-            user_contribution_rights_model,
-            user_email_preferences_model,
-            user_recent_changes_batch_model,
-            user_stats_model,
-            user_subscribers_model,
-            user_subscriptions_model,
-            collection_progress_model,
-            exp_user_last_playthrough_model,
-            story_progress_model,
-            user_contribution_proficiency_model,
-            user_identifiers_model,
-            user_skill_mastery_model,
-            exploration_user_data_model
+            ('CompletedActivitiesModel', completed_activities_model),
+            ('IncompleteActivitiesModel', incomplete_activities_model),
+            ('LearnerPlaylistModel', learner_playlist_model),
+            ('PendingDeletionRequestModel', pending_deletion_request_model),
+            ('UserAuthDetailsModel', user_auth_details_model),
+            ('UserBulkEmailsModel', user_bulk_emails_model),
+            ('UserContributionsModel', user_contributions_model),
+            ('UserContributionRightsModel', user_contribution_rights_model),
+            ('UserEmailPreferencesModel', user_email_preferences_model),
+            ('UserRecentChangesBatchModel', user_recent_changes_batch_model),
+            ('UserStatsModel', user_stats_model),
+            ('UserSubscribersModel', user_subscribers_model),
+            ('UserSubscriptionsModel', user_subscriptions_model),
+            ('CollectionProgressModel', collection_progress_model),
+            ('ExpUserLastPlaythroughModel', exp_user_last_playthrough_model),
+            ('StoryProgressModel', story_progress_model),
+            ('UserContributionProficiencyModel', (
+                user_contribution_proficiency_model)),
+            ('UserIdentifiersModel', user_identifiers_model),
+            ('UserSkillMasteryModel', user_skill_mastery_model),
+            ('ExplorationUserDataModel', exploration_user_data_model)
         ]
 
-        user_dates_list = [
-            user_settings_model.created_on,
-            user_settings_model.last_updated,
-            user_settings_model.last_agreed_to_terms,
-            user_settings_model.last_started_state_editor_tutorial,
-            user_settings_model.last_started_state_translation_tutorial,
-            user_settings_model.last_logged_in,
-            user_settings_model.last_edited_an_exploration,
-            user_settings_model.last_created_an_exploration,
-            user_settings_model.first_contribution_msec
-        ]
-
-        for model in models_linked_with_user_settings_model:
+        for model_name, model in models_linked_with_user_settings_model:
             if model is not None:
                 user_dates_list.append(model.last_updated)
                 user_dates_list.append(model.created_on)
+                model_names.append(model_name)
+                model_names.append(model_name)
 
         # Following models had some additional date/time fields.
         if user_subscriptions_model is not None:
             user_dates_list.append(user_subscriptions_model.last_checked)
+            model_names.append('UserSubscriptionsModel')
 
         if exploration_user_data_model is not None:
             user_dates_list.append(exploration_user_data_model.rated_on)
             user_dates_list.append(
                 exploration_user_data_model.draft_change_list_last_updated)
+            model_names.append('ExplorationUserDataModel')
+            model_names.append('ExplorationUserDataModel')
 
-        filtered_user_dates_list = [
-            date for date in user_dates_list if date is not None
-        ]
+        assert len(model_names) == len(user_dates_list)
+
+        filtered_user_dates_list, filtered_model_names = [], []
+
+        for model_name, date in python_utils.ZIP(model_names, user_dates_list):
+            if date is not None:
+                filtered_user_dates_list.append(date)
+                filtered_model_names.append(model_name)
+
+        assert len(filtered_user_dates_list) == len(filtered_model_names)
 
         min_date = min(filtered_user_dates_list)
         if min_date < user_settings_model.created_on:
@@ -606,7 +621,10 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_settings_model.update_timestamps(
                 update_last_updated_time=False)
             user_settings_model.put()
-            yield ('SUCCESS_UPDATED', 1)
+            min_date_index = filtered_user_dates_list.index(min_date)
+            model_name = filtered_model_names[min_date_index]
+            yield (
+                'SUCCESS_UPDATED_USING_' + python_utils.UNICODE(model_name), 1)
         else:
             yield ('SUCCESS_ALREADY_UP_TO_DATE', 1)
 
