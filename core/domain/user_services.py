@@ -35,6 +35,7 @@ import utils
 
 import requests
 
+auth_services = models.Registry.import_auth_services()
 current_user_services = models.Registry.import_current_user_services()
 (user_models, audit_models, suggestion_models) = models.Registry.import_models(
     [models.NAMES.user, models.NAMES.audit, models.NAMES.suggestion])
@@ -2823,8 +2824,8 @@ def log_username_change(committer_id, old_username, new_username):
         new_username=new_username).put()
 
 
-def get_user_id_from_firebase_subject_id(subject_id):
-    """Returns the user ID associated with the given Firebase subject ID.
+def get_user_id_from_subject_id(subject_id):
+    """Returns the user ID associated with the given subject ID.
 
     Args:
         subject_id: str. The subject ID.
@@ -2833,12 +2834,12 @@ def get_user_id_from_firebase_subject_id(subject_id):
         str|None. The user ID associated with the given subject ID, or None if
         no association exists.
     """
-    model = user_models.UserIdByFirebaseSubjectIdModel.get_by_id(subject_id)
+    model = auth_services.UserIdBySubjectIdModel.get_by_id(subject_id)
     return None if model is None else model.user_id
 
 
-def get_multi_user_ids_from_firebase_subject_ids(subject_ids):
-    """Returns the user IDs associated with the given Firebase subject IDs.
+def get_multi_user_ids_from_subject_ids(subject_ids):
+    """Returns the user IDs associated with the given subject IDs.
 
     Args:
         subject_ids: list(str). The subject IDs.
@@ -2849,16 +2850,15 @@ def get_multi_user_ids_from_firebase_subject_ids(subject_ids):
     """
     return [
         None if model is None else model.user_id
-        for model in user_models.UserIdByFirebaseSubjectIdModel.get_multi(
-            subject_ids)
+        for model in auth_services.UserIdBySubjectIdModel.get_multi(subject_ids)
     ]
 
 
-def associate_firebase_subject_id_to_user_id(pair):
-    """Commits the association between Firebase subject ID and user ID.
+def associate_subject_id_to_user_id(pair):
+    """Commits the association between subject ID and user ID.
 
     Args:
-        pair: user_domain.FirebaseSubjectIdUserIdPair. The association to
+        pair: user_domain.SubjectIdUserIdPair. The association to
             commit.
 
     Raises:
@@ -2866,31 +2866,28 @@ def associate_firebase_subject_id_to_user_id(pair):
     """
     subject_id, user_id = pair
 
-    claimed_user_id = get_user_id_from_firebase_subject_id(subject_id)
+    claimed_user_id = get_user_id_from_subject_id(subject_id)
     if claimed_user_id is not None:
         raise Exception(
             'subject_id=%r is already mapped to user_id=%r' % (
                 subject_id, claimed_user_id))
 
-    mapping = user_models.UserIdByFirebaseSubjectIdModel(
-        id=subject_id, user_id=user_id)
+    mapping = (
+        auth_services.UserIdBySubjectIdModel(id=subject_id, user_id=user_id))
     mapping.update_timestamps()
     mapping.put()
 
 
-def associate_multi_firebase_subject_ids_to_user_ids(pairs):
-    """Commits the associations between Firebase subject IDs and user IDs.
+def associate_multi_subject_ids_to_user_ids(pairs):
+    """Commits the associations between subject IDs and user IDs.
 
     Args:
-        pairs: list(user_domain.FirebaseSubjectIdUserIdPair). The associations
-            to commit.
+        pairs: list(user_domain.SubjectIdUserIdPair). The associations to
+            commit.
     """
-    subject_ids, user_ids = [], []
-    for subject_id, user_id in pairs:
-        subject_ids.append(subject_id)
-        user_ids.append(user_id)
+    subject_ids, user_ids = (list(ids) for ids in python_utils.ZIP(*pairs))
 
-    claimed_user_ids = get_multi_user_ids_from_firebase_subject_ids(subject_ids)
+    claimed_user_ids = get_multi_user_ids_from_subject_ids(subject_ids)
     if any(user_id is not None for user_id in claimed_user_ids):
         existing_associations = sorted(
             'subject_id=%r, user_id=%r' % (subject_id, user_id)
@@ -2901,9 +2898,8 @@ def associate_multi_firebase_subject_ids_to_user_ids(pairs):
             'associations already exist for: %r' % (existing_associations,))
 
     mappings = [
-        user_models.UserIdByFirebaseSubjectIdModel(
-            id=subject_id, user_id=user_id)
+        auth_services.UserIdBySubjectIdModel(id=subject_id, user_id=user_id)
         for subject_id, user_id in python_utils.ZIP(subject_ids, user_ids)
     ]
-    user_models.UserIdByFirebaseSubjectIdModel.update_timestamps_multi(mappings)
-    user_models.UserIdByFirebaseSubjectIdModel.put_multi(mappings)
+    auth_services.UserIdBySubjectIdModel.update_timestamps_multi(mappings)
+    auth_services.UserIdBySubjectIdModel.put_multi(mappings)

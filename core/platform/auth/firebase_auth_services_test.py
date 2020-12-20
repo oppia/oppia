@@ -27,6 +27,11 @@ from core.tests import test_utils
 import firebase_admin
 import webapp2
 
+from core.platform import models
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
+
+
 
 class FirebaseAuthServicesPublicApiTest(test_utils.TestBase):
     """Test cases for the public Firebase-specific APIs."""
@@ -69,6 +74,11 @@ class FirebaseAuthServicesPublicApiTest(test_utils.TestBase):
         if auth_header is not None:
             response.headers['Authorization'] = auth_header
         return response
+
+    def test_user_id_association_model_is_for_firebase(self):
+        self.assertIs(
+            firebase_auth_services.UserIdBySubjectIdModel,
+            user_models.UserIdByFirebaseSubjectIdModel)
 
     def test_error_in_initialize_propogates(self):
         app_that_will_not_initialize = self.swap_to_always_raise(

@@ -29,8 +29,8 @@ import utils
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-FirebaseSubjectIdUserIdPair = collections.namedtuple(
-    'FirebaseSubjectIdUserIdPair', ['subject_id', 'user_id'])
+SubjectIdUserIdPair = (
+    collections.namedtuple('SubjectIdUserIdPair', ['subject_id', 'user_id']))
 
 
 class UserGlobalPrefs(python_utils.OBJECT):

@@ -40,6 +40,7 @@ import python_utils
 import requests_mock
 import utils
 
+auth_services = models.Registry.import_auth_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
@@ -3048,76 +3049,68 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
                 'invalid_category', language_code='hi')
 
 
-class FirebaseSubjectIdUserIdAssociationOperationsTests(
-        test_utils.GenericTestBase):
+class SubjectIdUserIdAssociationOperationsTests(test_utils.GenericTestBase):
 
     def get_associated_user_id(self, subject_id):
         """Fetches the given associated user ID from storage manually."""
-        model = user_models.UserIdByFirebaseSubjectIdModel.get_by_id(subject_id)
+        model = auth_services.UserIdBySubjectIdModel.get_by_id(subject_id)
         return None if model is None else model.user_id
 
     def put_association(self, pair):
         """Commits the given association to storage manually."""
         subject_id, user_id = pair
-        user_models.UserIdByFirebaseSubjectIdModel(
+        auth_services.UserIdBySubjectIdModel(
             id=subject_id, user_id=user_id).put()
 
     def test_get_association_that_exists(self):
-        self.put_association(
-            user_domain.FirebaseSubjectIdUserIdPair('sub', 'uid'))
+        self.put_association(user_domain.SubjectIdUserIdPair('sub', 'uid'))
 
         self.assertEqual(
-            user_services.get_user_id_from_firebase_subject_id('sub'), 'uid')
+            user_services.get_user_id_from_subject_id('sub'), 'uid')
 
     def test_get_association_that_does_not_exist(self):
         self.assertIsNone(
-            user_services.get_user_id_from_firebase_subject_id(
-                'does_not_exist'))
+            user_services.get_user_id_from_subject_id('does_not_exist'))
 
     def test_get_multi_associations_that_exist(self):
-        self.put_association(
-            user_domain.FirebaseSubjectIdUserIdPair('sub1', 'uid1'))
-        self.put_association(
-            user_domain.FirebaseSubjectIdUserIdPair('sub2', 'uid2'))
-        self.put_association(
-            user_domain.FirebaseSubjectIdUserIdPair('sub3', 'uid3'))
+        self.put_association(user_domain.SubjectIdUserIdPair('sub1', 'uid1'))
+        self.put_association(user_domain.SubjectIdUserIdPair('sub2', 'uid2'))
+        self.put_association(user_domain.SubjectIdUserIdPair('sub3', 'uid3'))
 
         self.assertEqual(
-            user_services.get_multi_user_ids_from_firebase_subject_ids(
+            user_services.get_multi_user_ids_from_subject_ids(
                 ['sub1', 'sub2', 'sub3']),
             ['uid1', 'uid2', 'uid3'])
 
     def test_get_multi_associations_that_do_not_exist(self):
-        self.put_association(
-            user_domain.FirebaseSubjectIdUserIdPair('sub1', 'uid1'))
+        self.put_association(user_domain.SubjectIdUserIdPair('sub1', 'uid1'))
         # Mapping from sub2 -> uid2 missing.
-        self.put_association(
-            user_domain.FirebaseSubjectIdUserIdPair('sub3', 'uid3'))
+        self.put_association(user_domain.SubjectIdUserIdPair('sub3', 'uid3'))
 
         self.assertEqual(
-            user_services.get_multi_user_ids_from_firebase_subject_ids(
+            user_services.get_multi_user_ids_from_subject_ids(
                 ['sub1', 'sub2', 'sub3']),
             ['uid1', None, 'uid3'])
 
     def test_associate_new_subject_id_to_user_id(self):
-        user_services.associate_firebase_subject_id_to_user_id(
-            user_domain.FirebaseSubjectIdUserIdPair('sub', 'uid'))
+        user_services.associate_subject_id_to_user_id(
+            user_domain.SubjectIdUserIdPair('sub', 'uid'))
 
         self.assertEqual(self.get_associated_user_id('sub'), 'uid')
 
     def test_associate_existing_subject_id_to_user_id_raises(self):
-        user_services.associate_firebase_subject_id_to_user_id(
-            user_domain.FirebaseSubjectIdUserIdPair('sub', 'uid'))
+        user_services.associate_subject_id_to_user_id(
+            user_domain.SubjectIdUserIdPair('sub', 'uid'))
 
         with self.assertRaisesRegexp(Exception, 'already mapped to user_id'):
-            user_services.associate_firebase_subject_id_to_user_id(
-                user_domain.FirebaseSubjectIdUserIdPair('sub', 'uid'))
+            user_services.associate_subject_id_to_user_id(
+                user_domain.SubjectIdUserIdPair('sub', 'uid'))
 
     def test_associate_multi_new_subject_ids_to_user_ids(self):
-        user_services.associate_multi_firebase_subject_ids_to_user_ids([
-            user_domain.FirebaseSubjectIdUserIdPair('sub1', 'uid1'),
-            user_domain.FirebaseSubjectIdUserIdPair('sub2', 'uid2'),
-            user_domain.FirebaseSubjectIdUserIdPair('sub3', 'uid3'),
+        user_services.associate_multi_subject_ids_to_user_ids([
+            user_domain.SubjectIdUserIdPair('sub1', 'uid1'),
+            user_domain.SubjectIdUserIdPair('sub2', 'uid2'),
+            user_domain.SubjectIdUserIdPair('sub3', 'uid3'),
         ])
 
         self.assertEqual(
@@ -3128,12 +3121,12 @@ class FirebaseSubjectIdUserIdAssociationOperationsTests(
 
     def test_associate_multi_an_existing_subject_id_to_user_id_mapping_raises(
             self):
-        user_services.associate_firebase_subject_id_to_user_id(
-            user_domain.FirebaseSubjectIdUserIdPair('sub1', 'uid1'))
+        user_services.associate_subject_id_to_user_id(
+            user_domain.SubjectIdUserIdPair('sub1', 'uid1'))
 
         with self.assertRaisesRegexp(Exception, 'associations already exist'):
-            user_services.associate_multi_firebase_subject_ids_to_user_ids([
-                user_domain.FirebaseSubjectIdUserIdPair('sub1', 'uid1'),
-                user_domain.FirebaseSubjectIdUserIdPair('sub2', 'uid2'),
-                user_domain.FirebaseSubjectIdUserIdPair('sub3', 'uid3'),
+            user_services.associate_multi_subject_ids_to_user_ids([
+                user_domain.SubjectIdUserIdPair('sub1', 'uid1'),
+                user_domain.SubjectIdUserIdPair('sub2', 'uid2'),
+                user_domain.SubjectIdUserIdPair('sub3', 'uid3'),
             ])

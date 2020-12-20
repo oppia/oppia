@@ -44,6 +44,13 @@ import contextlib
 import firebase_admin
 from firebase_admin import auth
 
+from core.platform import models
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
+
+
+UserIdBySubjectIdModel = user_models.UserIdByFirebaseSubjectIdModel
+
 
 @contextlib.contextmanager
 def acquire_auth_context():
