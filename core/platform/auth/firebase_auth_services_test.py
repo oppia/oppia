@@ -21,16 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 
+from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 
 import firebase_admin
 import webapp2
 
-from core.platform import models
-
 (user_models,) = models.Registry.import_models([models.NAMES.user])
-
 
 
 class FirebaseAuthServicesPublicApiTest(test_utils.TestBase):
