@@ -2850,7 +2850,7 @@ def associate_subject_id_to_user_id(pair):
     """Commits the association between subject ID and user ID.
 
     Args:
-        pair: user_domain.SubjectIdUserIdPair. The association to
+        pair: user_domain.AuthSubjectIdUserIdPair. The association to
             commit.
 
     Raises:
@@ -2874,7 +2874,7 @@ def associate_multi_subject_ids_to_user_ids(pairs):
     """Commits the associations between subject IDs and user IDs.
 
     Args:
-        pairs: list(user_domain.SubjectIdUserIdPair). The associations to
+        pairs: list(user_domain.AuthSubjectIdUserIdPair). The associations to
             commit.
 
     Raises:

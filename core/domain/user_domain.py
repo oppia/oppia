@@ -29,8 +29,8 @@ import utils
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-SubjectIdUserIdPair = (
-    collections.namedtuple('SubjectIdUserIdPair', ['subject_id', 'user_id']))
+AuthSubjectIdUserIdPair = collections.namedtuple(
+    'AuthSubjectIdUserIdPair', ['subject_id', 'user_id'])
 
 
 class UserGlobalPrefs(python_utils.OBJECT):
