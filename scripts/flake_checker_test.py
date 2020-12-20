@@ -122,7 +122,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             environment_vars = {
                 'GITHUB_ACTIONS': 1,
                 'GITHUB_ACTOR': 'user',
-                'GITHUB_ACTION': 1234,
+                'GITHUB_RUN_ID': 1234,
             }
             return environment_vars.get(variable)
 
@@ -293,7 +293,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             environment_vars = {
                 'GITHUB_ACTIONS': 1,
                 'GITHUB_ACTOR': 'user',
-                'GITHUB_ACTION': 1234,
+                'GITHUB_RUN_ID': 1234,
             }
             return environment_vars.get(variable)
 

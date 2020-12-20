@@ -46,7 +46,7 @@ CI_INFO = {
             'identifier': 'GITHUB_ACTIONS',
             'user_info': 'GITHUB_ACTOR',
             'build_url': None,
-            'build_id': 'GITHUB_ACTION'
+            'build_id': 'GITHUB_RUN_ID',
         },
         'build_url_template': 'https://github.com/oppia/oppia/runs/%s'
     }
