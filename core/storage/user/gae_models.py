@@ -2908,8 +2908,7 @@ class UserIdByFirebaseSubjectIdModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Model contains data to delete corresponding to users: id and user_id.
-        """
+        """Model has data to delete corresponding to users: id and user_id."""
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
