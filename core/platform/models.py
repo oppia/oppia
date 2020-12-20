@@ -187,6 +187,16 @@ class _Gae(Platform):
         return cls.get_storage_model_classes(model_names)
 
     @classmethod
+    def import_auth_services(cls):
+        """Imports and returns firebase_auth_services module.
+
+        Returns:
+            module. The firebase_auth_services module.
+        """
+        from core.platform.auth import firebase_auth_services
+        return firebase_auth_services
+
+    @classmethod
     def import_transaction_services(cls):
         """Imports and returns gae_transaction_services module.
 
@@ -345,6 +355,15 @@ class Registry(python_utils.OBJECT):
             list(class). The corresponding storage-layer model classes.
         """
         return cls._get().get_all_storage_model_classes()
+
+    @classmethod
+    def import_auth_services(cls):
+        """Imports and returns auth_services module.
+
+        Returns:
+            module. The auth_services module.
+        """
+        return cls._get().import_auth_services()
 
     @classmethod
     def import_current_user_services(cls):
