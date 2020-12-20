@@ -13,37 +13,37 @@
 // limitations under the License.
 
 /**
- * @fileoverview Backend api service for all tutorials to be run only for
- * the first time.
+ * @fileoverview Backend api service for all tutorials events.
  */
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+
 @Injectable({
   providedIn: 'root'
 })
-export class StateTutorialFirstTimeBackendApiService {
-  STARTED_EDITOR_TUTORIAL_EVENT_URL: string = '/createhandler/' +
-  'started_tutorial_event';
-  STARTED_TRANSLATION_TUTORIAL_EVENT_URL: string = '/createhandler/' +
-  'started_translation_tutorial_event';
+export class TutorialEventsBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
 
-  constructor(private http: HttpClient) {}
-
-  startEditorTutorial(expId: string): Promise<unknown> {
+  recordStartedEditorTutorialEvent(expId: string): Promise<Object> {
     return this.http.post(
-      this.STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId, {}).toPromise();
+      this.urlInterpolationService.interpolateUrl(
+        '/createhandler/started_tutorial_event/<expId>', { expId: expId }), {}
+    ).toPromise();
   }
 
-  startTranslationTutorial(expId: string): Promise<unknown> {
-    return this.http.post(
-      this.STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId, {}
-    ).toPromise();
+  recordStartedTranslationTutorialEvent(expId: string): Promise<Object> {
+    return this.http.post(this.urlInterpolationService.interpolateUrl(
+      '/createhandler/started_translation_tutorial_event/<expId>',
+      { expId: expId }), {}).toPromise();
   }
 }
 
 angular.module('oppia').factory(
-  'StateTutorialFirstTimeBackendApiService',
-  downgradeInjectable(StateTutorialFirstTimeBackendApiService));
+  'TutorialEventsBackendApiService',
+  downgradeInjectable(TutorialEventsBackendApiService));

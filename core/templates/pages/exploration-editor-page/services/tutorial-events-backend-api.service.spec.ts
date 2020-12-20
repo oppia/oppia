@@ -19,10 +19,10 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { StateTutorialFirstTimeBackendApiService } from 'pages/exploration-editor-page/services/state-tutorial-first-time-backend-api.service';
+import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 
-describe('State tutorial first-time backend service', () => {
-  let stateTutorialFirstTimeBackendApiService = null;
+describe('Tutorial events backend service', () => {
+  let tutorialEventsBackendApiService = null;
   let httpTestingController: HttpTestingController = null;
 
   beforeEach(() => {
@@ -30,8 +30,8 @@ describe('State tutorial first-time backend service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    stateTutorialFirstTimeBackendApiService = TestBed.get(
-      StateTutorialFirstTimeBackendApiService);
+    tutorialEventsBackendApiService = TestBed.get(
+      TutorialEventsBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -45,8 +45,8 @@ describe('State tutorial first-time backend service', () => {
 
     let expId = 'abc';
 
-    stateTutorialFirstTimeBackendApiService.startEditorTutorial(expId).then(
-      successHandler, failHandler);
+    tutorialEventsBackendApiService.recordStartedEditorTutorialEvent(expId)
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
       '/createhandler/started_tutorial_event/' + expId);
@@ -66,8 +66,8 @@ describe('State tutorial first-time backend service', () => {
 
       let expId = 'abc';
 
-      stateTutorialFirstTimeBackendApiService.startEditorTutorial(expId).then(
-        successHandler, failHandler);
+      tutorialEventsBackendApiService.recordStartedEditorTutorialEvent(expId)
+        .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         '/createhandler/started_tutorial_event/' + expId);
@@ -88,7 +88,7 @@ describe('State tutorial first-time backend service', () => {
 
     let expId = 'abc';
 
-    stateTutorialFirstTimeBackendApiService.startTranslationTutorial(
+    tutorialEventsBackendApiService.recordStartedTranslationTutorialEvent(
       expId).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -109,7 +109,7 @@ describe('State tutorial first-time backend service', () => {
 
       let expId = 'abc';
 
-      stateTutorialFirstTimeBackendApiService.startTranslationTutorial(
+      tutorialEventsBackendApiService.recordStartedTranslationTutorialEvent(
         expId).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(

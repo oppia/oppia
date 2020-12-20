@@ -224,7 +224,7 @@ import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/serv
 import { ExplorationDiffService } from 'pages/exploration-editor-page/services/exploration-diff.service';
 import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { StateTutorialFirstTimeService } from 'pages/exploration-editor-page/services/state-tutorial-first-time.service';
-import { StateTutorialFirstTimeBackendApiService } from 'pages/exploration-editor-page/services/state-tutorial-first-time-backend-api.service';
+import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
@@ -593,8 +593,8 @@ export const angularServices: [string, unknown][] = [
   ['StateTopAnswersStatsObjectFactory', StateTopAnswersStatsObjectFactory],
   ['StateTopAnswersStatsService', StateTopAnswersStatsService],
   ['StateTutorialFirstTimeService', StateTutorialFirstTimeService],
-  ['StateTutorialFirstTimeBackendApiService',
-    StateTutorialFirstTimeBackendApiService],
+  ['TutorialEventsBackendApiService',
+    TutorialEventsBackendApiService],
   ['StateWrittenTranslationsService', StateWrittenTranslationsService],
   ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
