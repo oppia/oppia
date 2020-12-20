@@ -470,7 +470,9 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that fixes the invalid values of created_on attribute in the
-    UserSettingsModel. It is a one-off job and can be removed from the codebase
+    UserSettingsModel.
+
+    This is a one-off job and can be removed from the codebase
     after we resolve this issue by running the job once.
     """
 
