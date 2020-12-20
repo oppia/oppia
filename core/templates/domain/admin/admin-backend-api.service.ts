@@ -140,6 +140,80 @@ export class AdminBackendApiService {
       });
     });
   }
+
+  viewUsersRole(
+    filterCriterion:string, role:string, username:string
+    ):Promise<ArrayBuffer> {
+    return this.http.get<ArrayBuffer>(
+      AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
+        params: {
+          filter_criterion: filterCriterion,
+          role: role,
+          username: username
+        }
+      }
+    ).toPromise();
+  }
+
+  updateUserRole(
+    newRole:string ,username:string, topicId:string
+    ):Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
+        role: newRole,
+        username: username,
+        topic_id: topicId
+      }
+    ).toPromise();
+  }
+
+  addContributionReviewer(
+    category:string, username:string, languageCode:string
+    ):Promise<void> {
+    return this.http.post<void>(
+      AdminPageConstants.ADMIN_JOB_ADD_CONTRIBUTION_REVIEWER_HANDLER, {
+        review_category: category,
+        username: username,
+        language_code: languageCode
+      }
+    ).toPromise();
+  }
+
+  viewContributionReviewers(
+    category:string, languageCode:string,
+    ):Promise<ArrayBuffer> {
+    return this.http.get<ArrayBuffer>(
+      AdminPageConstants.ADMIN_JOB_GET_CONTRIBUTION_REVIEWERS, {
+        params: {
+          review_category: category,
+          language_code: languageCode
+        }
+      }
+    ).toPromise();
+  }
+
+  contributionReviewerRights(username:string):Promise<ArrayBuffer> {
+    return this.http.get<ArrayBuffer>(
+      AdminPageConstants.ADMIN_JOB_CONTRIBUTION_REVIEWER_RIGHTS_HANDLER, {
+        params: {
+          username: username
+        }
+      }
+    ).toPromise();
+  }
+
+  removeContributionReviewer(username:string, method:string,
+    category:string, languageCode:string
+    ):Promise<void> {
+    return this.http.put<void>(
+      AdminPageConstants.ADMIN_JOB_REMOVE_CONTRIBUTION_REVIEWER, {
+        username: username,
+        removal_type: method,
+        review_category: category,
+        language_code: languageCode
+      }
+    ).toPromise();
+  }
 }
 
 angular.module('oppia').factory(
