@@ -1,5 +1,5 @@
 <ul class="nav navbar-nav oppia-navbar-nav float-right oppia-navbar-pencil-icon">
-  <li *ng-if="canEdit" class="nav-item">
+  <li *ngIf="canEdit" class="nav-item">
     <a ng-href="'/collection_editor/create/' + collectionId" uib-tooltip="Edit" tooltip-placement="bottom" target="_blank" rel="noopener" class="nav-link">
       <i class="material-icons">&#xE254;</i>
       <span class="oppia-icon-accessibility-label">Edit</span>
