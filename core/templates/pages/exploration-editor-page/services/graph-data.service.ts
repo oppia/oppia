@@ -44,8 +44,8 @@ angular.module('oppia').factory('GraphDataService', [
         _recomputeGraphData();
       },
       /**
-       * @return graphData - Direct graph visuapization input. Following keys
-       * are included.
+       * @return graphData - Directed graph visualization input. This object
+       * includes the following keys:
        * - nodes: Objects with keys of nodeids and values of node names.
        * - links: list of objects. Each object represents a directed link
        * between two nodes, and has keys 'source' and 'target', the values
