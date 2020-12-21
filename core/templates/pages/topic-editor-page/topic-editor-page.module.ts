@@ -16,26 +16,9 @@
  * @fileoverview Module for the story viewer page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-import 'angular-ui-sortable';
-import uiValidate from 'angular-ui-validate';
-import 'third-party-imports/dnd-lists.import';
-import 'third-party-imports/ui-codemirror.import';
-import 'third-party-imports/ui-tree.import';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'dndLists', 'headroom', 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.codemirror', 'ui.sortable', 'ui.tree',
-  uiValidate
-]);
-
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { APP_BASE_HREF, HashLocationStrategy, Location, LocationStrategy } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -81,10 +64,7 @@ import { SubtopicsListComponent } from
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true
-    },
-    {provide: APP_BASE_HREF, useValue: '/'},
-    Location,
-    {provide: LocationStrategy, useClass: HashLocationStrategy}
+    }
   ]
 })
 class TopicEditorPageModule {
