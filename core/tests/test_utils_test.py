@@ -304,22 +304,22 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.assertIsNone(mock.method())
 
     def test_swap_to_always_return_with_value(self):
-        right_object = python_utils.OBJECT()
-        wrong_object = python_utils.OBJECT()
-        self.assertIsNot(right_object, wrong_object)
+        right_obj = python_utils.OBJECT()
+        wrong_obj = python_utils.OBJECT()
+        self.assertIsNot(right_obj, wrong_obj)
 
         class MockClass(python_utils.OBJECT):
             """Test-only class."""
 
             def method(self):
                 """Returns self."""
-                return wrong_object
+                return wrong_obj
 
         mock = MockClass()
-        self.assertIs(mock.method(), wrong_object)
+        self.assertIs(mock.method(), wrong_obj)
 
-        with self.swap_to_always_return(mock, 'method', value=right_object):
-            self.assertIs(mock.method(), right_object)
+        with self.swap_to_always_return(mock, 'method', value=right_obj):
+            self.assertIs(mock.method(), right_obj)
 
     def test_swap_to_always_raise_empty_exception_by_default(self):
         class MockClass(python_utils.OBJECT):
