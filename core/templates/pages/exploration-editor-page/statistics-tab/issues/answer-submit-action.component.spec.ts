@@ -41,10 +41,6 @@ class MockElementRef {
   timeSpentInStateSecs: 2000
 }
 
-class MockHtmlEscaperService {
-
-}
-
 let component: AnswerSubmitActionComponent;
 let fixture: ComponentFixture<AnswerSubmitActionComponent>;
 
