@@ -26,9 +26,9 @@ from core.platform import models
     [models.NAMES.auth, models.NAMES.user])
 
 
-class UserIdByFirebaseSubjectIdModelValidator(
+class UserIdByFirebaseAuthIdModelValidator(
         base_model_validators.BaseModelValidator):
-    """Class for validating UserIdByFirebaseSubjectIdModels."""
+    """Class for validating UserIdByFirebaseAuthIdModels."""
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -42,7 +42,7 @@ class UserIdByFirebaseSubjectIdModelValidator(
         Returns:
             str. A regex pattern to be followed by the model id.
         """
-        return '^[a-zA-Z0-9]{1,28}$'
+        return '^[\x00-\x7F]{1,255}$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -54,5 +54,5 @@ class UserIdByFirebaseSubjectIdModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'user_auth_details_ids',
                 user_models.UserAuthDetailsModel,
-                [item.user_id]),
+                [item.user_id])
         ]

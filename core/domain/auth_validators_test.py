@@ -30,22 +30,23 @@ auth_models, user_models = (
 datastore_services = models.Registry.import_datastore_services()
 
 
-class UserIdByFirebaseSubjectIdModelValidatorTests(
-        test_utils.AuditJobsTestBase):
+class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
 
     USER_EMAIL = 'useremail@example.com'
     USER_NAME = 'username'
 
     def setUp(self):
-        super(UserIdByFirebaseSubjectIdModelValidatorTests, self).setUp()
-        self.maxDiff = None
+        # We want full control over which user models are in storage, so skip
+        # creating the default superadmin user.
+        with self.swap_to_always_return(self, 'signup_superadmin_user'):
+            super(UserIdByFirebaseAuthIdModelValidatorTests, self).setUp()
 
         self.signup(self.USER_EMAIL, self.USER_NAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        self.subject_id = 'mocksub1'
+        self.auth_id = 'user_auth_id'
 
-        new_model = auth_models.UserIdByFirebaseSubjectIdModel(
-            id=self.subject_id, user_id=self.user_id)
+        new_model = auth_models.UserIdByFirebaseAuthIdModel(
+            id=self.auth_id, user_id=self.user_id)
         new_model.update_timestamps()
         new_model.put()
 
@@ -54,15 +55,14 @@ class UserIdByFirebaseSubjectIdModelValidatorTests(
         # test since superadmin signup is also done in
         # test_utils.AuditJobsTestBase.
         self.model_instance = (
-            auth_models.UserIdByFirebaseSubjectIdModel.get_by_id(
-                self.subject_id))
+            auth_models.UserIdByFirebaseAuthIdModel.get_by_id(self.auth_id))
         self.job_class = (
             prod_validation_jobs_one_off
-            .UserIdByFirebaseSubjectIdModelAuditOneOffJob)
+            .UserIdByFirebaseAuthIdModelAuditOneOffJob)
 
     def test_audit_standard_operation_passes(self):
         expected_output = [
-            u'[u\'fully-validated UserIdByFirebaseSubjectIdModel\', 2]']
+            u'[u\'fully-validated UserIdByFirebaseAuthIdModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -71,31 +71,31 @@ class UserIdByFirebaseSubjectIdModelValidatorTests(
             self.model_instance.last_updated + datetime.timedelta(days=1))
         self.model_instance.update_timestamps()
         self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of UserIdByFirebaseSubjectIdModel\', '
+        expected_output = [
+            '[u\'failed validation check for time field relation check '
+            'of UserIdByFirebaseAuthIdModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.subject_id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            ), u'[u\'fully-validated UserIdByFirebaseSubjectIdModel\', 1]']
+            '%s of last_updated field\']]' % (
+                self.auth_id, self.model_instance.created_on,
+                self.model_instance.last_updated)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
     def test_audit_with_last_updated_greater_than_current_time_fails(self):
-        auth_models.UserIdByFirebaseSubjectIdModel.get_by_id(
-            self.subject_id
-        ).delete()
+        utcnow = datetime.datetime.utcnow()
+        self.model_instance.last_updated = utcnow
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
         expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'UserIdByFirebaseSubjectIdModel\', '
+            '[u\'failed validation check for current time check of '
+            'UserIdByFirebaseAuthIdModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
-        ) % (self.subject_id, self.model_instance.last_updated)]
+        ) % (self.auth_id, self.model_instance.last_updated)]
 
-        mocked_datetime = (
-            datetime.datetime.utcnow() - datetime.timedelta(hours=13))
+        mocked_datetime = utcnow - datetime.timedelta(hours=13)
         with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
                 expected_output, sort=False, literal_eval=False)
@@ -103,29 +103,27 @@ class UserIdByFirebaseSubjectIdModelValidatorTests(
     def test_audit_with_missing_user_settings_model_fails(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
-            (
-                u'[u\'failed validation check for user_settings_ids '
-                'field check of UserIdByFirebaseSubjectIdModel\', '
-                '[u"Entity id %s: based on '
-                'field user_settings_ids having value '
-                '%s, expected model UserSettingsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.subject_id, self.user_id, self.user_id),
-            u'[u\'fully-validated UserIdByFirebaseSubjectIdModel\', 1]']
+            u'[u\'failed validation check for user_settings_ids '
+            'field check of UserIdByFirebaseAuthIdModel\', '
+            '[u"Entity id %s: based on '
+            'field user_settings_ids having value '
+            '%s, expected model UserSettingsModel '
+            'with id %s but it doesn\'t exist"]]' % (
+                self.auth_id, self.user_id, self.user_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
     def test_audit_with_missing_user_auth_details_model_fails(self):
         user_models.UserAuthDetailsModel.get_by_id(self.user_id).delete()
         expected_output = [
-            (
-                u'[u\'failed validation check for user_auth_details_ids '
-                'field check of UserIdByFirebaseSubjectIdModel\', '
-                '[u"Entity id %s: based on '
-                'field user_auth_details_ids having value '
-                '%s, expected model UserAuthDetailsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.subject_id, self.user_id, self.user_id),
-            u'[u\'fully-validated UserIdByFirebaseSubjectIdModel\', 1]']
+            u'[u\'failed validation check for user_auth_details_ids '
+            'field check of UserIdByFirebaseAuthIdModel\', '
+            '[u"Entity id %s: based on '
+            'field user_auth_details_ids having value '
+            '%s, expected model UserAuthDetailsModel '
+            'with id %s but it doesn\'t exist"]]' % (
+                self.auth_id, self.user_id, self.user_id)
+        ]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
