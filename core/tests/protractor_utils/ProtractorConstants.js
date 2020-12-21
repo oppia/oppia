@@ -16,9 +16,12 @@
  * @fileoverview Provides constant global variables, for use in Protractor
  * tests.
  */
+var path = require('path');
+var DOWNLOAD_PATH = path.resolve(__dirname, '../downloads');
 
 module.exports = {
   SKILL_STATUS_UNASSIGNED: 'Unassigned',
   SKILL_STATUS_ASSIGNED: 'Assigned',
-  TEST_SVG_PATH: '../data/test_svg.svg'
+  TEST_SVG_PATH: '../data/test_svg.svg',
+  DOWNLOAD_PATH: DOWNLOAD_PATH
 };

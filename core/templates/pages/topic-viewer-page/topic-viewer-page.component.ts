@@ -90,7 +90,8 @@ export class TopicViewerPageComponent implements OnInit {
         this.topicName = readOnlyTopic.getTopicName();
         this.topicDescription = readOnlyTopic.getTopicDescription();
         this.pageTitleService.setPageTitle(
-          `Learn ${this.topicName} | ${this.topicDescription} | Oppia`);
+          `Learn ${this.topicName} | ` +
+          `${readOnlyTopic.getPageTitleFragmentForWeb()} | Oppia`);
         this.pageTitleService.updateMetaTag(readOnlyTopic.getMetaTagContent());
         this.canonicalStorySummaries = (
           readOnlyTopic.getCanonicalStorySummaries());

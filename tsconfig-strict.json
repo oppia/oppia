@@ -6,7 +6,7 @@
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
     "skipLibCheck": true,
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true,
     "strict": true,
     "typeRoots": ["./node_modules/@types"],
@@ -15,6 +15,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
       "app.constants": ["core/templates/app.constants"],
@@ -31,6 +32,8 @@
     }
   },
   "files": [
+    "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
+    "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.spec.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.ts",
@@ -98,6 +101,8 @@
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
     "extensions/interactions/EndExploration/directives/end-exploration-rules.service.ts",
+    "core/templates/domain/classifier/classifier.model.ts",
+    "core/templates/domain/classifier/classifier.model.spec.ts"
   ],
   "include": ["typings/*.ts"]
 }

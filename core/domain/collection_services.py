@@ -811,7 +811,8 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
     )
     model.commit(committer_id, commit_message, commit_cmds)
     collection.version += 1
-    regenerate_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary_with_new_contributor(
+        collection.id, committer_id)
 
 
 def save_new_collection(committer_id, collection):
@@ -954,7 +955,8 @@ def update_collection(
     collection = apply_change_list(collection_id, change_list)
 
     _save_collection(committer_id, collection, commit_message, change_list)
-    regenerate_collection_summary(collection.id, committer_id)
+    regenerate_collection_summary_with_new_contributor(
+        collection.id, committer_id)
 
     if (not rights_manager.is_collection_private(collection.id) and
             committer_id != feconf.MIGRATION_BOT_USER_ID):
@@ -962,29 +964,44 @@ def update_collection(
             committer_id, utils.get_current_time_in_millisecs())
 
 
-def regenerate_collection_summary(collection_id, contributor_id_to_add):
-    """Regenerate a summary of the given collection. If the summary does not
-    exist, this function generates a new one.
+def regenerate_collection_summary_with_new_contributor(
+        collection_id, contributor_id):
+    """Regenerate a summary of the given collection and add a new contributor to
+    the contributors summary. If the summary does not exist, this function
+    generates a new one.
 
     Args:
         collection_id: str. ID of the collection.
-        contributor_id_to_add: str|None. ID of the contributor to be added to
-            the collection summary.
+        contributor_id: str. ID of the contributor to be added to the collection
+            summary.
     """
     collection = get_collection_by_id(collection_id)
-    collection_summary = compute_summary_of_collection(
-        collection, contributor_id_to_add)
+    collection_summary = _compute_summary_of_collection(collection)
+    collection_summary.add_contribution_by_user(contributor_id)
     save_collection_summary(collection_summary)
 
 
-def compute_summary_of_collection(collection, contributor_id_to_add):
+def regenerate_collection_and_contributors_summaries(collection_id):
+    """Regenerate a summary of the given collection and also regenerate
+    the contributors summary from the snapshots. If the summary does not exist,
+    this function generates a new one.
+
+    Args:
+        collection_id: str. ID of the collection.
+    """
+    collection = get_collection_by_id(collection_id)
+    collection_summary = _compute_summary_of_collection(collection)
+    collection_summary.contributors_summary = (
+        compute_collection_contributors_summary(collection_summary.id))
+    save_collection_summary(collection_summary)
+
+
+def _compute_summary_of_collection(collection):
     """Create a CollectionSummary domain object for a given Collection domain
     object and return it.
 
     Args:
         collection: Collection. The domain object.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            collection summary.
 
     Returns:
         CollectionSummary. The computed summary for the given collection.
@@ -994,21 +1011,10 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     collection_summary_model = (
         collection_models.CollectionSummaryModel.get_by_id(collection.id))
 
-    # Update the contributor id list if necessary (contributors
-    # defined as humans who have made a positive (i.e. not just
-    # a revert) change to an collection's content).
     contributors_summary = (
         collection_summary_model.contributors_summary
-        if collection_summary_model else {})
-
-    if contributor_id_to_add is None:
-        # Recalculate the contributors because revert was done.
-        contributors_summary = compute_collection_contributors_summary(
-            collection.id)
-    elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        contributors_summary[contributor_id_to_add] = (
-            contributors_summary.get(contributor_id_to_add, 0) + 1)
-
+        if collection_summary_model else {}
+    )
     contributor_ids = list(contributors_summary.keys())
 
     collection_model_last_updated = collection.last_updated
@@ -1083,7 +1089,7 @@ def save_collection_summary(collection_summary):
         'owner_ids': collection_summary.owner_ids,
         'editor_ids': collection_summary.editor_ids,
         'viewer_ids': collection_summary.viewer_ids,
-        'contributor_ids': collection_summary.contributor_ids,
+        'contributor_ids': list(collection_summary.contributors_summary.keys()),
         'contributors_summary': collection_summary.contributors_summary,
         'version': collection_summary.version,
         'node_count': collection_summary.node_count,
