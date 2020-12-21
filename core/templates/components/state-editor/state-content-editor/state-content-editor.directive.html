@@ -12,6 +12,10 @@
 </div>
 
 <div ng-if="!contentEditorIsOpen">
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning">
+    <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
+    <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
+  </div>
   <div class="protractor-test-edit-content"
        ng-class="{'oppia-editable-section': isEditable()}"
        ng-click="openStateContentEditor()">
@@ -40,8 +44,11 @@
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
   <schema-based-editor schema="HTML_SCHEMA" local-value="StateContentService.displayed._html">
   </schema-based-editor>
-
-  <div>
+  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning mt-2">
+    <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xe002;</i>
+    <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
+  </div>
+  <div class="mt-2">
     <button type="button"
             class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content float-right"
             ng-click="onSaveContentButtonClicked()">
@@ -50,19 +57,19 @@
     <button type="button" class="btn btn-secondary float-right" ng-click="cancelEdit()">Cancel</button>
     <div class="oppia-clear"></div>
   </div>
-  <div ng-if="isCardHeightLimitReached() && cardHeightLimitWarningIsShown">
-    <span class="oppia-card-height-limit-warning">
-      <i class="material-icons oppia-hide-card-height-warning-icon" uib-tooltip="Hide warning" ng-click="hideCardHeightLimitWarning()">&#xE88F;</i>
-      <span translate="I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE"></span>
-    </span>
-  </div>
 </div>
 
 <style>
-  .oppia-card-height-limit-warning {
-    color: #0277BD;
+  .material-icons {
+    color: #827127;
   }
-
+  .oppia-card-height-limit-warning {
+    background: #FFF5C8;
+    border: 0.0625rem solid #827127;
+    border-radius: 0.25rem;
+    color: #333333;
+    padding-left: 0.25rem;
+  }
   .oppia-shadow-preview-card {
     left: -30000px;
     max-width: 560px;
