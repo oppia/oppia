@@ -16,10 +16,6 @@
  * @fileoverview Unit tests for the Exploration data backend api service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils';
-// ^^^ This block is to be removed.
 import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {ResolveAnswerResponse, ExplorationAutosaveChangeListRequest} from 'pages/exploration-editor-page/services/exploration-data.service';
@@ -62,8 +58,6 @@ describe('Exploration data Backend Api Service', function() {
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
