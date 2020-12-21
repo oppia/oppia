@@ -1006,7 +1006,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'You do not have credentials to upload exploration.')
+            'You do not have credentials to upload explorations.')
 
         self.logout()
 
