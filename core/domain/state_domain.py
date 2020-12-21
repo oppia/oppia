@@ -158,10 +158,6 @@ class AnswerGroup(python_utils.OBJECT):
     def get_all_html_content_strings(self):
         """Get all html content strings in the AnswerGroup.
 
-        Args:
-            interaction_id: str. The interaction id that the answer group is
-                associated with.
-
         Returns:
             list(str). The list of all html content strings in the interaction.
         """

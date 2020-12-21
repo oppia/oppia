@@ -3132,7 +3132,7 @@ class Exploration(python_utils.OBJECT):
                         'TranslatableHtmlContentId', html, choices
                     ) for html in value
                 ]
-            
+
             if new_type == 'ListOfSetsOfTranslatableHtmlContentId':
                 return [
                     migrate_rule_inputs(
