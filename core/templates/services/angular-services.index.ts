@@ -415,7 +415,7 @@ export const angularServices: [string, unknown][] = [
   ['ExternalSaveService', ExternalSaveService],
   ['ExtractImageFilenamesFromStateService',
     ExtractImageFilenamesFromStateService],
-  ['FatigueDetectionService',FatigueDetectionService],
+  ['FatigueDetectionService', FatigueDetectionService],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],

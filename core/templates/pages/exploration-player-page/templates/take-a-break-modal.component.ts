@@ -41,4 +41,3 @@ export class TakeBreakModalComponent {
     this.activeModal.close();
   }
 }
-
