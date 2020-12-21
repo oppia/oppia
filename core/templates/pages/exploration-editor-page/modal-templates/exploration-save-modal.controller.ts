@@ -33,13 +33,6 @@ angular.module('oppia').controller('ExplorationSaveModalController', [
     $scope.showDiff = false;
     $scope.onClickToggleDiffButton = function() {
       $scope.showDiff = !$scope.showDiff;
-      if ($scope.showDiff) {
-        $('.oppia-save-exploration-modal').addClass(
-          'oppia-save-exploration-wide-modal');
-      } else {
-        $('.oppia-save-exploration-modal').removeClass(
-          'oppia-save-exploration-wide-modal');
-      }
     };
 
     $scope.diffData = diffData;
