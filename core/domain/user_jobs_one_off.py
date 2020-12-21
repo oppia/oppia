@@ -488,20 +488,29 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(user_settings_model):
         user_id = user_settings_model.id
-
         user_dates_list = [
-            user_settings_model.created_on,
-            user_settings_model.last_updated,
-            user_settings_model.last_agreed_to_terms,
-            user_settings_model.last_started_state_editor_tutorial,
-            user_settings_model.last_started_state_translation_tutorial,
-            user_settings_model.last_logged_in,
-            user_settings_model.last_edited_an_exploration,
-            user_settings_model.last_created_an_exploration,
-            user_settings_model.first_contribution_msec
+            ('UserSettingsModel', user_settings_model.created_on),
+            ('UserSettingsModel', user_settings_model.last_updated),
+            ('UserSettingsModel', user_settings_model.last_agreed_to_terms),
+            ('UserSettingsModel', user_settings_model.last_logged_in),
+            ('UserSettingsModel', user_settings_model.first_contribution_msec),
+            (
+                'UserSettingsModel',
+                user_settings_model.last_started_state_editor_tutorial
+            ),
+            (
+                'UserSettingsModel',
+                user_settings_model.last_started_state_translation_tutorial
+            ),
+            (
+                'UserSettingsModel',
+                user_settings_model.last_edited_an_exploration
+            ),
+            (
+                'UserSettingsModel',
+                user_settings_model.last_created_an_exploration
+            ),
         ]
-
-        model_names = ['UserSettingsModel'] * 9
 
         # Models in user storage module keyed by user_id.
         completed_activities_model = (
@@ -589,42 +598,43 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         for model_name, model in models_linked_with_user_settings_model:
             if model is not None:
-                user_dates_list.append(model.last_updated)
-                user_dates_list.append(model.created_on)
-                model_names.append(model_name)
-                model_names.append(model_name)
+                user_dates_list.append((model_name, model.last_updated))
+                user_dates_list.append((model_name, model.created_on))
 
         # Following models had some additional date/time fields.
         if user_subscriptions_model is not None:
-            user_dates_list.append(user_subscriptions_model.last_checked)
-            model_names.append('UserSubscriptionsModel')
+            user_dates_list.append(
+                (
+                    'UserSubscriptionsModel',
+                    user_subscriptions_model.last_checked
+                )
+            )
 
         if exploration_user_data_model is not None:
-            user_dates_list.append(exploration_user_data_model.rated_on)
             user_dates_list.append(
-                exploration_user_data_model.draft_change_list_last_updated)
-            model_names.append('ExplorationUserDataModel')
-            model_names.append('ExplorationUserDataModel')
+                (
+                    'ExplorationUserDataModel',
+                    exploration_user_data_model.rated_on
+                )
+            )
+            user_dates_list.append(
+                (
+                    'ExplorationUserDataModel',
+                    exploration_user_data_model.draft_change_list_last_updated
+                )
+            )
 
-        assert len(model_names) == len(user_dates_list)
+        filtered_user_dates_list = [
+            (model_name, date) for model_name, date in user_dates_list
+            if date is not None
+        ]
 
-        filtered_user_dates_list, filtered_model_names = [], []
-
-        for model_name, date in python_utils.ZIP(model_names, user_dates_list):
-            if date is not None:
-                filtered_user_dates_list.append(date)
-                filtered_model_names.append(model_name)
-
-        assert len(filtered_user_dates_list) == len(filtered_model_names)
-
-        min_date = min(filtered_user_dates_list)
+        model_name, min_date = min(filtered_user_dates_list, key=lambda x: x[1])
         if min_date < user_settings_model.created_on:
             user_settings_model.created_on = min_date
             user_settings_model.update_timestamps(
                 update_last_updated_time=False)
             user_settings_model.put()
-            min_date_index = filtered_user_dates_list.index(min_date)
-            model_name = filtered_model_names[min_date_index]
             yield (
                 'SUCCESS_UPDATED_USING_' + python_utils.UNICODE(model_name), 1)
         else:
