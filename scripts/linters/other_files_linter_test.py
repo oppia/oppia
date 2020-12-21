@@ -258,7 +258,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertTrue(error_messages.failed)
 
     def test_check_valid_strict_checks(self):
-        expected_error_messages = 'SUCCESS  Sorted strict TS config check passed'
+        expected_error_messages = (
+            'SUCCESS  Sorted strict TS config check passed')
         with self.open_file_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_strict_ts_config()
