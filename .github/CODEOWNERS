@@ -279,19 +279,19 @@
 
 # Interaction project.
 /core/domain/customization_args_util*.py @brianrodri
-/core/domain/expression_parser*.py @aks681
-/core/domain/interaction_registry*.py @aks681
-/core/domain/obj_services*.py @aks681
-/core/templates/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
-/core/templates/domain/objects/ @aks681
+/core/domain/expression_parser*.py @iamprayush
+/core/domain/interaction_registry*.py @iamprayush
+/core/domain/obj_services*.py @iamprayush
+/core/templates/components/version-diff-visualization/codemirror-mergeview.directive.ts @iamprayush
+/core/templates/domain/objects/ @iamprayush
 /core/templates/expressions/ @brianrodri
-/core/templates/services/code-normalizer.service*.ts @aks681
-/core/templates/services/guppy-configuration.service.ts @aks681
-/core/templates/services/guppy-initialization.service.ts @aks681
-/core/templates/services/math-interactions.service.ts @aks681
+/core/templates/services/code-normalizer.service*.ts @iamprayush
+/core/templates/services/guppy-configuration.service.ts @iamprayush
+/core/templates/services/guppy-initialization.service.ts @iamprayush
+/core/templates/services/math-interactions.service.ts @iamprayush
 /extensions/domain*.py @brianrodri
-/extensions/interactions/ @aks681 @vojtechjelinek
-/extensions/objects/ @aks681
+/extensions/interactions/ @iamprayush @vojtechjelinek
+/extensions/objects/ @iamprayush
 /extensions/value_generators/ @vojtechjelinek
 /extensions/__init__.py @aks681
 
