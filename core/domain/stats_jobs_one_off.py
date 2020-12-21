@@ -1694,3 +1694,105 @@ class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 yield (key, value)
         else:
             yield (key, sum(int(v) for v in values))
+
+class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(latest_exp_model):
+        exp_versions = list(range(1, latest_exp_model.version))
+        exp_stats_model_list = stats_models.ExplorationStatsModel.get_multi(
+            latest_exp_model.id, exp_versions)
+
+        exp_stats_list = [
+            stats_services.get_exploration_stats_from_model(exp_stats_model)
+            if exp_stats_model else None
+            for exp_stats_model in exp_stats_model_list
+        ]
+
+        exp_list = exp_fetchers.get_multiple_explorations_by_version(
+            latest_exp_model.id, exp_versions)
+
+        change_lists = [
+            [
+                exp_domain.ExplorationChange(commit_cmd)
+                for commit_cmd in snapshot['commit_cmds']
+            ]
+            for snapshot in exp_models.ExplorationModel.get_snapshots_metadata(
+                latest_exp_model.id,
+                python_utils.RANGE(1, latest_exp_model.version + 1))
+        ]
+
+        zipped_items = list(zip(exp_stats_list, exp_list, change_lists))
+
+        for i, (exp_stats, exp, change_list) in enumerate(zipped_items):
+            revert_cmd = next(
+                (
+                    change for change in change_list
+                    if change.cmd == CMD_REVERT_COMMIT
+                ), None)
+            revert_to_version = revert_cmd and revert_cmd.version_number
+
+            if revert_to_version is not None:
+                exp_versions_diff = None
+                prev_exp_stats = exp_stats_list[revert_to_version - 1]
+                prev_exp = exp_list[revert_to_version - 1]
+            else:
+                exp_versions_diff = ExplorationVersionsDiff(change_lists)
+                prev_exp_stats = exp_stats_list[exp.version - 1]
+                prev_exp = exp_list[exp.version - 1]
+
+            # FILL MISSING EXPLORATION-LEVEL STATS.
+            if exp_stats is not None:
+                num_valid_exp_stats += 1
+            else:
+                exp_stats = prev_exp_stats.clone()
+                if exp_versions_diff is not None:
+                    stats_services.advance_version_of_exp_stats(
+                        exp_stats, exp.states.keys(), exp_versions_diff, None)
+                else:
+                    exp_stats.version = exp.version
+
+                exp_stats_list[i] = exp_stats
+                missing_exp_stats.append((exp_id, exp_version))
+
+            # FILL MISSING STATE-LEVEL STATS.
+            state_stats_mapping = exp_stats.state_stats_mapping
+            for state_name, state_content in exp.states.items():
+                if state_name in state_stats_mapping:
+                    num_valid_state_statsf += 1
+                    continue
+
+                if exp_versions_diff is not None:
+                    prev_state_name = (
+                        exp_versions_diff.new_to_old_state_names.get(
+                            state_name, state_name))
+                else:
+                    prev_state_name = state_name
+
+                state_stats_mapping[state_name] = (
+                    prev_exp_stats.state_stats_mapping[prev_state_name].clone()
+                    if exp.interaction.id == prev_exp.interaction.id else
+                    stats_domain.StateStats.create_default())
+                missing_state_stats.append((exp_id, exp_version, state_name))
+
+        for exp_stats in exp_stats_list:
+            stats_domain.save_stats_model(exp_stats)
+
+        for item in missing_exp_stats:
+            yield (INVALID_EXP_STATS_KEY, item)
+        yield (VALID_EXP_STATS_KEY, num_valid_exp_stats)
+
+        for item in missing_state_stats:
+            yield (INVALID_STATE_STATS_KEY, item)
+        yield (VALID_STATE_STATS_KEY, num_valid_state_stats)
+
+    @staticmethod
+    def reduce(key, items):
+        if key in (VALID_EXP_STATS_KEY, VALID_STATE_STATS_KEY):
+            yield (key, sum(int(i) for i in items))
+        else:
+            for item in items:
+                yield (key, item)
