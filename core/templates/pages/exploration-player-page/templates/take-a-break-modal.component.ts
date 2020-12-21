@@ -17,16 +17,15 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
   selector: 'take-break-modal',
-  templateUrl: 'take-break-modal.template.html',
+  templateUrl: './take-break-modal.template.html',
   styleUrls: []
 })
-export class TakeBreakModalController {
+export class TakeBreakModalComponent {
   constructor(
     private activeModal: NgbActiveModal
   ) {}
@@ -43,5 +42,3 @@ export class TakeBreakModalController {
   }
 }
 
-angular.module('oppia').factory('TakeBreakModalController',
-  downgradeInjectable(TakeBreakModalController));

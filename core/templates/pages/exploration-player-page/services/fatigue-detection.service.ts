@@ -19,7 +19,7 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TakeBreakModalController } from 'pages/exploration-player-page/templates/take-a-break-modal.controller';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-a-break-modal.component';
 
 
 @Injectable({
@@ -53,7 +53,7 @@ export class FatigueDetectionService {
 
   displayTakeBreakMessage(): void {
     this.ngbModal.open(
-      TakeBreakModalController,
+      TakeBreakModalComponent,
       {
         backdrop: 'static'
       }).result.then(() => { }, () => {
