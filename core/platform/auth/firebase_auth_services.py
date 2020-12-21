@@ -130,7 +130,7 @@ def get_user_id_from_auth_id(auth_id):
         str|None. The user ID associated with the given auth ID, or None if no
         association exists.
     """
-    model = auth_models.UserIdByFirebaseAuthIdModel.get_by_id(auth_id)
+    model = auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False)
     return None if model is None else model.user_id
 
 

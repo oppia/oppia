@@ -54,12 +54,13 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
         auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(
             self.USER_ID)
         self.assertIsNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get_by_id(self.USER_ID))
+            auth_models.UserIdByFirebaseAuthIdModel.get(
+                self.USER_ID, strict=False))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
         self.assertIsNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get_by_id(
-                self.NONEXISTENT_USER_ID))
+            auth_models.UserIdByFirebaseAuthIdModel.get(
+                self.NONEXISTENT_USER_ID, strict=False))
         auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
@@ -75,7 +76,7 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
 
     def test_get_by_user_id_for_correct_user_id(self):
         self.assertEqual(
-            auth_models.UserIdByFirebaseAuthIdModel.get_by_id(
+            auth_models.UserIdByFirebaseAuthIdModel.get(
                 self.USER_AUTH_ID),
             auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(
                 self.USER_ID))

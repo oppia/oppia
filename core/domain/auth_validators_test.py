@@ -55,7 +55,7 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
         # test since superadmin signup is also done in
         # test_utils.AuditJobsTestBase.
         self.model_instance = (
-            auth_models.UserIdByFirebaseAuthIdModel.get_by_id(self.auth_id))
+            auth_models.UserIdByFirebaseAuthIdModel.get(self.auth_id))
         self.job_class = (
             prod_validation_jobs_one_off
             .UserIdByFirebaseAuthIdModelAuditOneOffJob)
@@ -101,7 +101,7 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
                 expected_output, sort=False, literal_eval=False)
 
     def test_audit_with_missing_user_settings_model_fails(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        user_models.UserSettingsModel.get(self.user_id).delete()
         expected_output = [
             u'[u\'failed validation check for user_settings_ids '
             'field check of UserIdByFirebaseAuthIdModel\', '
@@ -115,7 +115,7 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_audit_with_missing_user_auth_details_model_fails(self):
-        user_models.UserAuthDetailsModel.get_by_id(self.user_id).delete()
+        user_models.UserAuthDetailsModel.get(self.user_id).delete()
         expected_output = [
             u'[u\'failed validation check for user_auth_details_ids '
             'field check of UserIdByFirebaseAuthIdModel\', '

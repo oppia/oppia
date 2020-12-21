@@ -105,7 +105,8 @@ class AuthIdUserIdAssociationOperationsTests(test_utils.GenericTestBase):
 
     def get_associated_user_id(self, auth_id):
         """Fetches the given associated user ID from storage manually."""
-        model = auth_models.UserIdByFirebaseAuthIdModel.get_by_id(auth_id)
+        model = (
+            auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False))
         return None if model is None else model.user_id
 
     def put_association(self, pair):
