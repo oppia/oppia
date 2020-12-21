@@ -993,13 +993,12 @@ class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [user_models.UserIdentifiersModel]
 
 
-class UserIdByFirebaseSubjectIdModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates UserIdByFirebaseSubjectIdModel."""
+class UserIdByFirebaseAuthIdModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserIdByFirebaseAuthIdModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [auth_models.UserIdByFirebaseSubjectIdModel]
+        return [auth_models.UserIdByFirebaseAuthIdModel]
 
 
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):
