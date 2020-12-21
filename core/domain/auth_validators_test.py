@@ -16,9 +16,12 @@
 
 """Unit tests for core.domain.auth_validators_test."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 
-from core.domain import auth_jobs_one_off
+from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
 
@@ -54,7 +57,8 @@ class UserIdByFirebaseSubjectIdModelValidatorTests(
             auth_models.UserIdByFirebaseSubjectIdModel.get_by_id(
                 self.subject_id))
         self.job_class = (
-            auth_jobs_one_off.UserIdByFirebaseSubjectIdModelAuditOneOffJob)
+            prod_validation_jobs_one_off
+            .UserIdByFirebaseSubjectIdModelAuditOneOffJob)
 
     def test_audit_standard_operation_passes(self):
         expected_output = [

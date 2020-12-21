@@ -56,11 +56,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from core.platform import models
+import python_utils
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
-from firebase_admin import exceptions as firebase_exceptions
-import python_utils
 
 (auth_models,) = models.Registry.import_models([models.NAMES.auth])
 

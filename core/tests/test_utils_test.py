@@ -304,8 +304,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.assertIsNone(mock.method())
 
     def test_swap_to_always_return_with_value(self):
-        right_object = object()
-        wrong_object = object()
+        right_object = python_utils.OBJECT()
+        wrong_object = python_utils.OBJECT()
         self.assertIsNot(right_object, wrong_object)
 
         class MockClass(python_utils.OBJECT):
