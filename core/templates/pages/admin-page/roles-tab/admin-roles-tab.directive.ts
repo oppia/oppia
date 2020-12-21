@@ -84,8 +84,6 @@ angular.module('oppia').directive('adminRolesTab', [
 
           AdminTaskManagerService.startTask();
           ctrl.result = {};
-          console.log(formResponse.filterCriterion, formResponse.role,
-            formResponse.username)
           AdminBackendApiService.viewUsersRole(
             formResponse.filterCriterion, formResponse.role,
             formResponse.username
