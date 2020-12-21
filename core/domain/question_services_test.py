@@ -2520,7 +2520,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             cust_args['placeholder'].value.unicode_str,
             'Type an expression here, using only numbers.')
 
-    def test_migrate_question_state_from_v40_to_latest(self):
+    def test_migrate_question_state_with_text_input_from_v40_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -2616,7 +2616,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             })
         self.assertEqual(question.question_state_data.next_content_id_index, 5)
 
-    def test_migrate_question_state_from_v40_to_latest(self):
+    def test_migrate_question_state_with_set_input_from_v40_to_latest(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -2711,7 +2711,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             })
         self.assertEqual(question.question_state_data.next_content_id_index, 5)
 
-    def test_migrate_question_state_from_v41_with_item_selection_input_interaction_to_latest(self):
+    def test_migrate_question_state_from_v41_with_item_selection_input_interaction_to_latest(self): # pylint: disable=line-too-long
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -2807,7 +2807,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             rule_spec.inputs['x'],
             ['ca_choices_2', 'ca_choices_3'])
 
-    def test_migrate_question_state_from_v41_with_drag_and_drop_sort_input_interaction_to_latest(self):
+    def test_migrate_question_state_from_v41_with_drag_and_drop_sort_input_interaction_to_latest(self): # pylint: disable=line-too-long
         answer_group = {
             'outcome': {
                 'dest': 'abc',

@@ -3122,7 +3122,7 @@ class Exploration(python_utils.OBJECT):
                 for subtitled_html_dict in choices:
                     if subtitled_html_dict['html'] == html:
                         return subtitled_html_dict['content_id']
-            
+
             if new_type == 'TranslatableHtmlContentId':
                 return extract_content_id_from_choices(value)
 
@@ -3143,7 +3143,7 @@ class Exploration(python_utils.OBJECT):
         for state_dict in states_dict.values():
             interaction_id = state_dict['interaction']['id']
             if interaction_id not in [
-                'DragAndDropSortInput', 'ItemSelectionInput']:
+                    'DragAndDropSortInput', 'ItemSelectionInput']:
                 continue
 
             choices = state_dict['interaction']['customization_args'][
@@ -3162,10 +3162,11 @@ class Exploration(python_utils.OBJECT):
                             rule_inputs['x'],
                             choices)
                     if interaction_id == 'DragAndDropSortInput':
-                        if rule_type in [
+                        rule_types_with_list_of_sets = [
                             'IsEqualToOrdering',
                             'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-                        ]:
+                        ]
+                        if rule_type in rule_types_with_list_of_sets:
                             # For rule type IsEqualToOrdering and
                             # IsEqualToOrderingWithOneItemAtIncorrectPosition,
                             # the x input will be migrated from

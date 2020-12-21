@@ -155,7 +155,7 @@ class AnswerGroup(python_utils.OBJECT):
 
         self.outcome.validate()
 
-    def get_all_html_content_strings(self, interaction_id):
+    def get_all_html_content_strings(self):
         """Get all html content strings in the AnswerGroup.
 
         Args:
@@ -732,8 +732,7 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-            html_list += answer_group.get_all_html_content_strings(
-                self.id)
+            html_list += answer_group.get_all_html_content_strings()
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html

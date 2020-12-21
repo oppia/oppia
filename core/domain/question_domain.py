@@ -926,7 +926,7 @@ class Question(python_utils.OBJECT):
                 for subtitled_html_dict in choices:
                     if subtitled_html_dict['html'] == html:
                         return subtitled_html_dict['content_id']
-            
+
             if new_type == 'TranslatableHtmlContentId':
                 return extract_content_id_from_choices(value)
 
@@ -936,7 +936,7 @@ class Question(python_utils.OBJECT):
                         'TranslatableHtmlContentId', html, choices
                     ) for html in value
                 ]
-            
+
             if new_type == 'ListOfSetsOfTranslatableHtmlContentId':
                 return [
                     migrate_rule_inputs(
@@ -946,7 +946,7 @@ class Question(python_utils.OBJECT):
 
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id not in [
-            'DragAndDropSortInput', 'ItemSelectionInput']:
+                'DragAndDropSortInput', 'ItemSelectionInput']:
             return question_state_dict
 
         choices = question_state_dict['interaction']['customization_args'][
@@ -966,10 +966,11 @@ class Question(python_utils.OBJECT):
                         rule_inputs['x'],
                         choices)
                 if interaction_id == 'DragAndDropSortInput':
-                    if rule_type in [
+                    rule_types_with_list_of_sets = [
                         'IsEqualToOrdering',
                         'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-                    ]:
+                    ]
+                    if rule_type in rule_types_with_list_of_sets:
                         # For rule type IsEqualToOrdering and
                         # IsEqualToOrderingWithOneItemAtIncorrectPosition,
                         # the x input will be migrated from
