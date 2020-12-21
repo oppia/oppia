@@ -18,7 +18,7 @@
 
 import { waitForAsync, TestBed, ComponentFixture } from '@angular/core/testing';
 import { AnswerSubmitActionComponent } from './answer-submit-action.component';
-import { ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
@@ -45,17 +45,28 @@ let component: AnswerSubmitActionComponent;
 let fixture: ComponentFixture<AnswerSubmitActionComponent>;
 
 describe('Answer Submit Action directive', () => {
-  let elementRef: MockElementRef;
-  // let explorationHtmlFormatterService = null;
-  // let htmlEscaperService = null;
-  // let interactionObjectFactory = null;
-
   beforeEach(waitForAsync(() => {
-    elementRef = new MockElementRef;
     TestBed.configureTestingModule({
       declarations: [AnswerSubmitActionComponent],
       providers: [
-        { provide: ElementRef, useValue: elementRef },
+        { provide: 'action-index', value: 2 },
+        { provide: 'answer', value: '"This is an answer string.' },
+        { provide: 'current-state-name', value: 'State name' },
+        { provide: 'dest-state-name', value: 'Introduction' },
+        { 
+          provide: 'interaction-customization-arges',
+          value: `{
+            "choices": {
+              "value": [{
+                "content_id": "",
+                "html": "Value"
+              }]
+            },
+            "showChoicesInShuffledOrder": {"value": true}
+          }`
+        },
+        { provide: 'interaction-id', value: 'MultipleChoiceInput' },
+        { provide: 'time-spent-in-state-secs', value: 2000},
         ExplorationHtmlFormatterService,
         HtmlEscaperService,
         InteractionObjectFactory

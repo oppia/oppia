@@ -28,6 +28,13 @@ import { HtmlEscaperService } from 'services/html-escaper.service.ts';
   styleUrls: []
 })
 export class AnswerSubmitActionComponent implements OnInit {
+  currentStateName: string;
+  destStateName: string;
+  actionIndex: number;
+  timeSpentInStateSecs: number;
+  interactionId: string;
+  interactionCustomizationArgs: string;
+  answer: string;
   _customizationArgs = (
     this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
       this.interactionId,
@@ -39,24 +46,23 @@ export class AnswerSubmitActionComponent implements OnInit {
     this.answer) as number;
 
   constructor(
-    @Attribute('answer') public answer: string,
-    @Attribute('dest-state-name') public destStateName: string,
-    @Attribute('time-spent-in-state-secs') public timeSpentInStateSecs: number,
-    @Attribute('current-state-name') public currentStateName: string,
-    @Attribute('action-index') public actionIndex: number,
-    @Attribute('interaction-id') public interactionId: string,
-    @Attribute('interaction-customization-args')
-      public interactionCustomizationArgs: string,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private htmlEscaperService: HtmlEscaperService,
     private interactionObjectFactory: InteractionObjectFactory
   ) {}
 
   ngOnInit(): void {
-    // this.currentStateName = this.el.nativeElement.currentStateName;
-    // this.destStateName = this.el.nativeElement.destStateName;
-    // this.actionIndex = this.el.nativeElement.actionIndex;
-    // this.timeSpentInStateSecs = this.el.nativeElement.timeSpentInStateSecs;
+    this.currentStateName = angular.element(this).attr('current-state-name')
+    this.destStateName = angular.element(this).attr('dest-state-name')
+    this.actionIndex = Number(angular.element(this).attr('action-index'))
+    this.timeSpentInStateSecs = Number(
+      angular.element(this).attr('time-spent-in-state-secs')
+    )
+    this.interactionId = angular.element(this).attr('interaction-id')
+    this.interactionCustomizationArgs = angular.element(this).attr(
+      'interaction-customization-args'
+    )
+    this.answer = angular.element(this).attr('answer')
   }
 
   getShortAnswerHtml(): string {
