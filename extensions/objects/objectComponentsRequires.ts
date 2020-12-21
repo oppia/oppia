@@ -30,7 +30,7 @@ require('objects/templates/html-editor.directive.ts');
 require('objects/templates/image-with-regions-editor.directive.ts');
 require('objects/templates/int-editor.directive.ts');
 // eslint-disable-next-line max-len
-require('objects/templates/list-of-sets-of-translatable-html-content-id-editor.directive.ts');
+require('objects/templates/list-of-sets-of-translatable-html-content-id-editor.component.ts');
 require('objects/templates/list-of-tabs-editor.directive.ts');
 require('objects/templates/list-of-unicode-string-editor.directive.ts');
 require('objects/templates/logic-error-category-editor.directive.ts');

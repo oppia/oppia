@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for set of translatable html content id editor.
+ * @fileoverview Component for set of translatable html content id editor.
  */
 
 angular.module('oppia').component('setOfTranslatableHtmlContentIdEditor', {
