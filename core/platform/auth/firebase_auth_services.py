@@ -66,6 +66,7 @@ from firebase_admin import exceptions as firebase_exceptions
 
 firebase_auth.ImportUserRecord('f')
 
+
 def _ensure_firebase_is_initialized():
     """Initializes the Firebase Admin SDK."""
     try:
