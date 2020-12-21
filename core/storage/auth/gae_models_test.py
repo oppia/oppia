@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for core.storage.auth.gae_models."""
+"""Tests for core.storage.auth.auth_models."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -26,70 +26,69 @@ base_models, auth_models = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.auth])
 
 
-class UserIdByFirebaseSubjectIdModelTests(test_utils.GenericTestBase):
-    """Tests for auth_models.UserIdByFirebaseSubjectIdModel."""
+class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
+    """Tests for auth_models.UserIdByFirebaseAuthIdModel."""
 
     NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
     NONEXISTENT_USER_ID = 'id_x'
-    NONREGISTERED_GAE_ID = 'gae_id_x'
+    NONREGISTERED_AUTH_ID = 'auth_id_x'
     USER_ID = 'user_id'
-    USER_GAE_ID = 'gae_id'
+    USER_AUTH_ID = 'auth_id'
     PROFILE_ID = 'profile_id'
     PROFILE_2_ID = 'profile_2_id'
 
     def setUp(self):
         """Set up user models in datastore for use in testing."""
-        super(UserIdByFirebaseSubjectIdModelTests, self).setUp()
+        super(UserIdByFirebaseAuthIdModelTests, self).setUp()
 
-        auth_models.UserIdByFirebaseSubjectIdModel(
-            id=self.USER_GAE_ID, user_id=self.USER_ID).put()
+        auth_models.UserIdByFirebaseAuthIdModel(
+            id=self.USER_AUTH_ID, user_id=self.USER_ID).put()
 
     def test_get_deletion_policy_is_delete_at_end(self):
         self.assertEqual(
-            auth_models.UserIdByFirebaseSubjectIdModel.get_deletion_policy(),
+            auth_models.UserIdByFirebaseAuthIdModel.get_deletion_policy(),
             base_models.DELETION_POLICY.DELETE_AT_END)
 
     def test_apply_deletion_policy_for_registered_user_deletes_them(self):
         # Deleting a full user.
-        auth_models.UserIdByFirebaseSubjectIdModel.apply_deletion_policy(
+        auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(
             self.USER_ID)
         self.assertIsNone(
-            auth_models.UserIdByFirebaseSubjectIdModel.get_by_id(self.USER_ID))
+            auth_models.UserIdByFirebaseAuthIdModel.get_by_id(self.USER_ID))
 
     def test_apply_deletion_policy_nonexistent_user_raises_no_exception(self):
         self.assertIsNone(
-            auth_models.UserIdByFirebaseSubjectIdModel.get_by_id(
+            auth_models.UserIdByFirebaseAuthIdModel.get_by_id(
                 self.NONEXISTENT_USER_ID))
-        auth_models.UserIdByFirebaseSubjectIdModel.apply_deletion_policy(
+        auth_models.UserIdByFirebaseAuthIdModel.apply_deletion_policy(
             self.NONEXISTENT_USER_ID)
 
     def test_has_reference_to_existing_user_id_is_true(self):
         self.assertTrue(
-            auth_models.UserIdByFirebaseSubjectIdModel.has_reference_to_user_id(
+            auth_models.UserIdByFirebaseAuthIdModel.has_reference_to_user_id(
                 self.USER_ID))
 
     def test_has_reference_to_non_existing_user_id_is_false(self):
         self.assertFalse(
-            auth_models.UserIdByFirebaseSubjectIdModel.has_reference_to_user_id(
+            auth_models.UserIdByFirebaseAuthIdModel.has_reference_to_user_id(
                 self.NONEXISTENT_USER_ID))
 
     def test_get_by_user_id_for_correct_user_id(self):
         self.assertEqual(
-            auth_models.UserIdByFirebaseSubjectIdModel.get_by_id(
-                self.USER_GAE_ID),
-            auth_models.UserIdByFirebaseSubjectIdModel.get_by_user_id(
+            auth_models.UserIdByFirebaseAuthIdModel.get_by_id(
+                self.USER_AUTH_ID),
+            auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(
                 self.USER_ID))
 
     def test_get_model_association_to_user(self):
         self.assertEqual(
-            auth_models.UserIdByFirebaseSubjectIdModel
+            auth_models.UserIdByFirebaseAuthIdModel
             .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_get_export_policy(self):
         self.assertEqual(
-            auth_models.UserIdByFirebaseSubjectIdModel
-            .get_export_policy(), {
+            auth_models.UserIdByFirebaseAuthIdModel.get_export_policy(), {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,

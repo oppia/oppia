@@ -289,6 +289,74 @@ class TestUtilsTests(test_utils.GenericTestBase):
             self.get_response_without_checking_for_errors(
                 'random_url', [200], params='invalid_params')
 
+    def test_swap_to_always_return_uses_none_by_default(self):
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return self
+
+        mock = MockClass()
+        self.assertIs(mock.method(), mock)
+
+        with self.swap_to_always_return(mock, 'method'):
+            self.assertIsNone(mock.method())
+
+    def test_swap_to_always_return_with_value(self):
+        right_object = object()
+        wrong_object = object()
+        self.assertIsNot(right_object, wrong_object)
+
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return wrong_object
+
+        mock = MockClass()
+        self.assertIs(mock.method(), wrong_object)
+
+        with self.swap_to_always_return(mock, 'method', value=right_object):
+            self.assertIs(mock.method(), right_object)
+
+    def test_swap_to_always_raise_empty_exception_by_default(self):
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return self
+
+        mock = MockClass()
+        self.assertIs(mock.method(), mock)
+
+        with self.swap_to_always_raise(mock, 'method'):
+            try:
+                mock.method()
+            except Exception:
+                pass
+            else:
+                self.fail(msg='Exception was not raise as expected')
+
+    def test_swap_to_always_raise_with_error(self):
+        right_error = Exception('right error')
+        wrong_error = Exception('wrong error')
+
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                raise wrong_error
+
+        mock = MockClass()
+        self.assertRaisesRegexp(Exception, 'wrong error', mock.method)
+
+        with self.swap_to_always_raise(mock, 'method', error=right_error):
+            self.assertRaisesRegexp(Exception, 'right error', mock.method)
+
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():
             return

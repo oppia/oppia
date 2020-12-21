@@ -53,7 +53,6 @@ Terminology:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import collections
 import logging
 
 from core.platform import models
@@ -70,14 +69,12 @@ def _ensure_firebase_is_initialized():
     """Initializes the Firebase Admin SDK."""
     try:
         firebase_admin.get_app()
-    except ValueError:
+    except Exception:
         firebase_admin.initialize_app()
 
 
-def authenticate_sender(request):
+def authenticate_request(request):
     """Authenticates the request and returns the user who authorized it, if any.
-
-    If the request could not be authenticated, the returns None instead.
 
     Oppia follows the OAuth Bearer authentication scheme.
 
@@ -105,105 +102,103 @@ def authenticate_sender(request):
         str|None. The ID of the user that authorized the request. If the request
         could not be authenticated, then returns None instead.
     """
-    auth_scheme, _, id_token = (
-        request.headers.get('Authorization', '').partition(' '))
-    if auth_scheme != 'Bearer':
-        return None
-
-    _ensure_firebase_is_initialized()
     try:
-        claims = firebase_auth.verify_id_token(id_token)
-    except (ValueError, firebase_exceptions.FirebaseError) as e:
+        _ensure_firebase_is_initialized()
+    except Exception as e:
         logging.error(e)
         return None
 
-    if 'sub' not in claims:
+    scheme, _, token = request.headers.get('Authorization', '').partition(' ')
+    if scheme != 'Bearer':
         return None
-    else:
-        return get_user_id_from_subject_id(claims['sub'])
+
+    try:
+        claims = firebase_auth.verify_id_token(token)
+    except Exception as e:
+        logging.error(e)
+        return None
+
+    return claims.get('sub', None)
 
 
-def get_user_id_from_subject_id(subject_id):
-    """Returns the user ID associated with the given subject ID.
+def get_user_id_from_auth_id(auth_id):
+    """Returns the user ID associated with the given auth ID.
 
     Args:
-        subject_id: str. The subject ID.
+        auth_id: str. The auth ID.
 
     Returns:
-        str|None. The user ID associated with the given subject ID, or None if
-        no association exists.
+        str|None. The user ID associated with the given auth ID, or None if no
+        association exists.
     """
-    model = auth_models.UserIdByFirebaseSubjectIdModel.get_by_id(subject_id)
+    model = auth_models.UserIdByFirebaseAuthIdModel.get_by_id(auth_id)
     return None if model is None else model.user_id
 
 
-def get_multi_user_ids_from_subject_ids(subject_ids):
-    """Returns the user IDs associated with the given subject IDs.
+def get_multi_user_ids_from_auth_ids(auth_ids):
+    """Returns the user IDs associated with the given auth IDs.
 
     Args:
-        subject_ids: list(str). The subject IDs.
+        auth_ids: list(str). The auth IDs.
 
     Returns:
-        list(str|None). The user IDs associated with each of the given subject
-        IDs, or None for associations which don't exist.
+        list(str|None). The user IDs associated with each of the given auth IDs,
+        or None for associations which don't exist.
     """
     return [
         None if model is None else model.user_id
-        for model in auth_models.UserIdByFirebaseSubjectIdModel.get_multi(
-            subject_ids)
+        for model in auth_models.UserIdByFirebaseAuthIdModel.get_multi(auth_ids)
     ]
 
 
-def associate_subject_id_to_user_id(pair):
-    """Commits the association between subject ID and user ID.
+def associate_auth_id_to_user_id(pair):
+    """Commits the association between auth ID and user ID.
 
     Args:
-        pair: user_domain.AuthSubjectIdUserIdPair. The association to commit.
+        pair: auth_domain.AuthIdUserIdPair. The association to commit.
 
     Raises:
-        Exception. The subject ID is already associated with a user ID.
+        Exception. The auth ID is already associated with a user ID.
     """
-    subject_id, user_id = pair
+    auth_id, user_id = pair
 
-    claimed_user_id = get_user_id_from_subject_id(subject_id)
+    claimed_user_id = get_user_id_from_auth_id(auth_id)
     if claimed_user_id is not None:
         raise Exception(
-            'subject_id=%r is already mapped to user_id=%r' % (
-                subject_id, claimed_user_id))
+            'auth_id=%r is already mapped to user_id=%r' % (
+                auth_id, claimed_user_id))
 
-    mapping = auth_models.UserIdByFirebaseSubjectIdModel(
-        id=subject_id, user_id=user_id)
+    mapping = (
+        auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id))
     mapping.update_timestamps()
     mapping.put()
 
 
-def associate_multi_subject_ids_to_user_ids(pairs):
-    """Commits the associations between subject IDs and user IDs.
+def associate_multi_auth_ids_to_user_ids(pairs):
+    """Commits the associations between auth IDs and user IDs.
 
     Args:
-        pairs: list(user_domain.AuthSubjectIdUserIdPair). The associations to
+        pairs: list(auth_domain.AuthIdUserIdPair). The associations to
             commit.
 
     Raises:
-        Exception. One or more subject ID associations already exist.
+        Exception. One or more auth ID associations already exist.
     """
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
-    subject_ids, user_ids = python_utils.ZIP(*pairs)
+    auth_ids, user_ids = python_utils.ZIP(*pairs)
 
-    claimed_user_ids = get_multi_user_ids_from_subject_ids(subject_ids)
+    claimed_user_ids = get_multi_user_ids_from_auth_ids(auth_ids)
     if any(user_id is not None for user_id in claimed_user_ids):
         existing_associations = sorted(
-            'subject_id=%r, user_id=%r' % (subject_id, user_id)
-            for subject_id, user_id in python_utils.ZIP(
-                subject_ids, claimed_user_ids)
+            'auth_id=%r, user_id=%r' % (auth_id, user_id)
+            for auth_id, user_id in python_utils.ZIP(auth_ids, claimed_user_ids)
             if user_id is not None)
         raise Exception(
             'associations already exist for: %r' % (existing_associations,))
 
     mappings = [
-        auth_models.UserIdByFirebaseSubjectIdModel(
-            id=subject_id, user_id=user_id)
-        for subject_id, user_id in python_utils.ZIP(subject_ids, user_ids)
+        auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
+        for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
     ]
-    auth_models.UserIdByFirebaseSubjectIdModel.update_timestamps_multi(mappings)
-    auth_models.UserIdByFirebaseSubjectIdModel.put_multi(mappings)
+    auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(mappings)
+    auth_models.UserIdByFirebaseAuthIdModel.put_multi(mappings)

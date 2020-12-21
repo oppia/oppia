@@ -25,10 +25,10 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 
 
-class UserIdByFirebaseSubjectIdModel(base_models.BaseModel):
-    """Stores the relationship between user ID and Firebase subject ID.
+class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
+    """Stores the relationship between user ID and Firebase auth ID.
 
-    Instances of this class are keyed by Firebase subject ID.
+    Instances of this class are keyed by Firebase auth ID.
     """
 
     user_id = datastore_services.StringProperty(required=True, indexed=True)
@@ -53,12 +53,12 @@ class UserIdByFirebaseSubjectIdModel(base_models.BaseModel):
         future.
         """
         return dict(
-            super(UserIdByFirebaseSubjectIdModel, cls).get_export_policy(),
+            super(UserIdByFirebaseAuthIdModel, cls).get_export_policy(),
             **{'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE})
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
-        """Delete instances of UserIdByFirebaseSubjectIdModel for the user.
+        """Delete instances of UserIdByFirebaseAuthIdModel for the user.
 
         Args:
             user_id: str. The ID of the user whose data should be deleted.
@@ -68,13 +68,13 @@ class UserIdByFirebaseSubjectIdModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether UserIdByFirebaseSubjectIdModel exists for given user.
+        """Check whether UserIdByFirebaseAuthIdModel exists for given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether any UserIdByFirebaseSubjectIdModel refers to the given
+            bool. Whether any UserIdByFirebaseAuthIdModel refers to the given
             user ID.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
@@ -87,7 +87,7 @@ class UserIdByFirebaseSubjectIdModel(base_models.BaseModel):
             user_id: str. The user ID.
 
         Returns:
-            UserIdByFirebaseSubjectIdModel. The model with user_id field equal
+            UserIdByFirebaseAuthIdModel. The model with user_id field equal
             to user_id argument.
         """
         return cls.query(cls.user_id == user_id).get()
