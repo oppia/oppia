@@ -29,7 +29,9 @@ export class DebouncerService {
   debounce(func: () => void, millisecsToWait: number): () => void {
     let timeout: ReturnType<typeof setTimeout>|null;
     let context: this|null = this;
-    let args: IArguments|null = arguments;
+    // Arguments are of no use in the function
+    // as they are not getting any value also
+    // so removed args = Arguments.
     let timestamp: number;
     let result: void;
 
@@ -43,7 +45,6 @@ export class DebouncerService {
         // Args was not getting any value so removed arguments from func.apply.
         if (!timeout) {
           context = null;
-          args = null;
         }
       }
     };
