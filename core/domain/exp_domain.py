@@ -3080,7 +3080,9 @@ class Exploration(python_utils.OBJECT):
         """Converts from version 41 to 42. Version 42 changes rule input types
         for DragAndDropSortInput and ItemSelectionInput interactions to better
         support translations. Specifically, the rule inputs will store content
-        ids of the html rather than the raw html.
+        ids of the html rather than the raw html. Solution answers for
+        DragAndDropSortInput and ItemSelectionInput interactions are also
+        updated.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -3091,7 +3093,7 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
 
-        def migrate_rule_inputs(new_type, value, choices):
+        def migrate_rule_inputs_and_answers(new_type, value, choices):
             """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentId,
             ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentId,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
@@ -3128,14 +3130,14 @@ class Exploration(python_utils.OBJECT):
 
             if new_type == 'SetOfTranslatableHtmlContentId':
                 return [
-                    migrate_rule_inputs(
+                    migrate_rule_inputs_and_answers(
                         'TranslatableHtmlContentId', html, choices
                     ) for html in value
                 ]
 
             if new_type == 'ListOfSetsOfTranslatableHtmlContentId':
                 return [
-                    migrate_rule_inputs(
+                    migrate_rule_inputs_and_answers(
                         'SetOfTranslatableHtmlContentId', html_set, choices
                     ) for html_set in value
                 ]
@@ -3145,9 +3147,31 @@ class Exploration(python_utils.OBJECT):
             if interaction_id not in [
                     'DragAndDropSortInput', 'ItemSelectionInput']:
                 continue
-
+            
+            solution = state_dict['interaction']['solution']
             choices = state_dict['interaction']['customization_args'][
                 'choices']['value']
+            if interaction_id == 'ItemSelectionInput':
+                # The solution type will be migrated from SetOfHtmlString to
+                # SetOfTranslatableHtmlContentId.
+                if solution is not None:
+                    solution['correct_answer'] = (
+                        migrate_rule_inputs_and_answers(
+                            'SetOfTranslatableHtmlContentId',
+                            solution['correct_answer'],
+                            choices)
+                    )
+            if interaction_id == 'DragAndDropSortInput':
+                # The solution type will be migrated from ListOfSetsOfHtmlString
+                # to ListOfSetsOfTranslatableHtmlContentId.
+                if solution is not None:
+                    solution['correct_answer'] = (
+                        migrate_rule_inputs_and_answers(
+                            'ListOfSetsOfTranslatableHtmlContentId',
+                            solution['correct_answer'],
+                            choices)
+                    )
+
             for answer_group_dict in state_dict['interaction']['answer_groups']:
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     rule_type = rule_spec_dict['rule_type']
@@ -3157,7 +3181,7 @@ class Exploration(python_utils.OBJECT):
                         # All rule inputs for ItemSelectionInput will be
                         # migrated from SetOfHtmlString to
                         # SetOfTranslatableHtmlContentId.
-                        rule_inputs['x'] = migrate_rule_inputs(
+                        rule_inputs['x'] = migrate_rule_inputs_and_answers(
                             'SetOfTranslatableHtmlContentId',
                             rule_inputs['x'],
                             choices)
@@ -3172,7 +3196,7 @@ class Exploration(python_utils.OBJECT):
                             # the x input will be migrated from
                             # ListOfSetsOfHtmlStrings to
                             # ListOfSetsOfTranslatableHtmlContentId.
-                            rule_inputs['x'] = migrate_rule_inputs(
+                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
                                 'ListOfSetsOfTranslatableHtmlContentId',
                                 rule_inputs['x'],
                                 choices)
@@ -3182,7 +3206,7 @@ class Exploration(python_utils.OBJECT):
                             # DragAndDropHtmlString to
                             # TranslatableHtmlContentId, and the y input will
                             # remain as DragAndDropPositiveInt.
-                            rule_inputs['x'] = migrate_rule_inputs(
+                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
                                 'TranslatableHtmlContentId',
                                 rule_inputs['x'],
                                 choices)
@@ -3193,7 +3217,7 @@ class Exploration(python_utils.OBJECT):
                             # TranslatableHtmlContentId.
                             for rule_input_name in ['x', 'y']:
                                 rule_inputs[rule_input_name] = (
-                                    migrate_rule_inputs(
+                                    migrate_rule_inputs_and_answers(
                                         'TranslatableHtmlContentId',
                                         rule_inputs[rule_input_name],
                                         choices))

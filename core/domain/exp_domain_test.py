@@ -9184,7 +9184,13 @@ states:
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
-      solution: null
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - <p>Choice 1</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -9194,6 +9200,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -9202,6 +9209,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
   END:
     classifier_model_id: null
     content:
@@ -9291,7 +9299,13 @@ states:
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
-      solution: null
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - ca_choices_2
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -9301,6 +9315,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -9309,6 +9324,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
   END:
     classifier_model_id: null
     content:
@@ -9413,7 +9429,14 @@ states:
         refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
-      solution: null
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - <p>Choice 1</p>
+          - <p>Choice 2</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -9423,6 +9446,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -9431,6 +9455,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
   END:
     classifier_model_id: null
     content:
@@ -9530,7 +9555,14 @@ states:
         refresher_exploration_id: null
       hints: []
       id: DragAndDropSortInput
-      solution: null
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_2
+          - ca_choices_3
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
     next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
@@ -9540,6 +9572,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -9548,6 +9581,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        solution: {}
   END:
     classifier_model_id: null
     content:

@@ -2774,7 +2774,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': ['<p>Choice 1</p>'],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': 'This is <i>solution</i> for state1'
+                    }
+                },
                 'id': 'ItemSelectionInput'
             },
             'next_content_id_index': 4,
@@ -2802,10 +2809,13 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_group = question.question_state_data.interaction.answer_groups[0]
+        solution = question.question_state_data.interaction.solution
         rule_spec = answer_group.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'],
             ['ca_choices_2', 'ca_choices_3'])
+        self.assertEqual(
+            solution.correct_answer, ['ca_choices_2'])
 
     def test_migrate_question_state_from_v41_with_drag_and_drop_sort_input_interaction_to_latest(self): # pylint: disable=line-too-long
         answer_group = {
@@ -2886,7 +2896,14 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': {
+                    'answer_is_exclusive': True,
+                    'correct_answer': [['<p>Choice 1</p>', '<p>Choice 2</p>']],
+                    'explanation': {
+                        'content_id': 'solution',
+                        'html': 'This is <i>solution</i> for state1'
+                    }
+                },
                 'id': 'DragAndDropSortInput'
             },
             'next_content_id_index': 4,
@@ -2914,6 +2931,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         answer_group = question.question_state_data.interaction.answer_groups[0]
+        solution = question.question_state_data.interaction.solution
         self.assertEqual(
             answer_group.rule_specs[0].inputs['x'],
             [['ca_choices_2', 'ca_choices_3']])
@@ -2926,3 +2944,5 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             answer_group.rule_specs[3].inputs,
             {'x': 'ca_choices_2', 'y': 'ca_choices_3'})
+        self.assertEqual(
+            solution.correct_answer, [['ca_choices_2', 'ca_choices_3']])
