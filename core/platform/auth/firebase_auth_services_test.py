@@ -27,6 +27,7 @@ from core.platform.auth import firebase_auth_services as auth_services
 from core.tests import test_utils
 
 import firebase_admin
+from firebase_admin import exceptions as firebase_exceptions
 import webapp2
 
 (auth_models,) = models.Registry.import_models([models.NAMES.auth])
@@ -60,6 +61,16 @@ class AuthenticateRequestTests(test_utils.TestBase):
             request.headers['Authorization'] = auth_header
         return request
 
+    def test_returns_none_when_firebase_init_fails(self):
+        firebase_error = firebase_exceptions.UnknownError('bad things happened')
+        get_swap = self.swap_to_always_raise(
+            firebase_admin, 'get_app', error=firebase_error)
+        init_swap = self.swap_to_always_raise(
+            firebase_admin, 'initialize_app', error=firebase_error)
+        with get_swap, init_swap:
+            request = self.make_request(auth_header='DummyToken')
+            self.assertIsNone(auth_services.authenticate_request(request))
+
     @mock_successful_firebase_initialization
     def test_returns_auth_id_from_valid_auth_token(self):
         verify_swap = self.swap_to_always_return(
@@ -68,13 +79,6 @@ class AuthenticateRequestTests(test_utils.TestBase):
             request = self.make_request(auth_header='Bearer DUMMY_JWT')
             self.assertEqual(
                 auth_services.authenticate_request(request), 'auth_id')
-
-    def test_returns_none_when_firebase_init_fails(self):
-        get_swap = self.swap_to_always_raise(firebase_admin, 'get_app')
-        init_swap = self.swap_to_always_raise(firebase_admin, 'initialize_app')
-        with get_swap, init_swap:
-            request = self.make_request(auth_header='DummyToken')
-            self.assertIsNone(auth_services.authenticate_request(request))
 
     @mock_successful_firebase_initialization
     def test_returns_none_when_auth_header_is_missing(self):
@@ -88,8 +92,11 @@ class AuthenticateRequestTests(test_utils.TestBase):
 
     @mock_successful_firebase_initialization
     def test_returns_none_when_auth_token_is_invalid(self):
-        request = self.make_request(auth_header='Bearer DUMMY_JWT')
-        with self.swap_to_always_raise(firebase_admin.auth, 'verify_id_token'):
+        verify_swap = self.swap_to_always_raise(
+            firebase_admin.auth, 'verify_id_token',
+            error=firebase_exceptions.InvalidArgumentError('bad!'))
+        with verify_swap:
+            request = self.make_request(auth_header='Bearer DUMMY_JWT')
             self.assertIsNone(auth_services.authenticate_request(request))
 
     @mock_successful_firebase_initialization

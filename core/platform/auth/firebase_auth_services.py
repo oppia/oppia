@@ -60,16 +60,24 @@ import python_utils
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
+from firebase_admin import exceptions as firebase_exceptions
 
 (auth_models,) = models.Registry.import_models([models.NAMES.auth])
 
+firebase_auth.ImportUserRecord('f')
 
 def _ensure_firebase_is_initialized():
     """Initializes the Firebase Admin SDK."""
     try:
-        firebase_admin.get_app()
-    except Exception:
-        firebase_admin.initialize_app()
+        return firebase_admin.get_app()
+    except (ValueError, firebase_exceptions.FirebaseError):
+        pass
+
+    try:
+        return firebase_admin.initialize_app()
+    except (ValueError, firebase_exceptions.FirebaseError) as e:
+        logging.error(e)
+        raise
 
 
 def authenticate_request(request):
@@ -103,7 +111,7 @@ def authenticate_request(request):
     """
     try:
         _ensure_firebase_is_initialized()
-    except Exception as e:
+    except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.error(e)
         return None
 
@@ -113,7 +121,7 @@ def authenticate_request(request):
 
     try:
         claims = firebase_auth.verify_id_token(token)
-    except Exception as e:
+    except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.error(e)
         return None
 

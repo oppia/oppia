@@ -24,6 +24,7 @@ import datetime
 from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -62,9 +63,76 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_audit_standard_operation_passes(self):
         expected_output = [
-            u'[u\'fully-validated UserIdByFirebaseAuthIdModel\', 1]']
+            '[u\'fully-validated UserIdByFirebaseAuthIdModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
+
+    def test_audit_with_valid_id_passes(self):
+        valid_auth_id = 'i'*128
+        self.signup('email@test.com', 'testUser')
+        user_id = self.get_user_id_from_email('email@test.com')
+        model_instance = auth_models.UserIdByFirebaseAuthIdModel(
+            id=valid_auth_id, user_id=user_id)
+        model_instance.update_timestamps()
+        model_instance.put()
+        expected_output = [
+            '[u\'fully-validated UserIdByFirebaseAuthIdModel\', 2]',
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_audit_with_invalid_id_fails(self):
+        auth_id_that_is_too_long = 'i'*129
+        self.signup('email@test.com', 'testUser')
+        user_id = self.get_user_id_from_email('email@test.com')
+        model_instance = auth_models.UserIdByFirebaseAuthIdModel(
+            id=auth_id_that_is_too_long, user_id=user_id)
+        model_instance.update_timestamps()
+        model_instance.put()
+        expected_output = [
+            '[u\'failed validation check for model id check of '
+            'UserIdByFirebaseAuthIdModel\', [u\'Entity id %s: Firebase ID len '
+            'must be in range [1, 128)\']]' % (auth_id_that_is_too_long,),
+            '[u\'fully-validated UserIdByFirebaseAuthIdModel\', 1]',
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_audit_with_valid_unicode_id_passes(self):
+        # The ¿ character is 2-bytes long with utf-8 encoding, so the length of
+        # the ID is 128 characters; just within the limit.
+        valid_auth_id = '¿'*64
+        self.signup('email@test.com', 'testUser')
+        user_id = self.get_user_id_from_email('email@test.com')
+        model_instance = auth_models.UserIdByFirebaseAuthIdModel(
+            id=valid_auth_id, user_id=user_id)
+        model_instance.update_timestamps()
+        model_instance.put()
+        expected_output = [
+            '[u\'fully-validated UserIdByFirebaseAuthIdModel\', 2]',
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=True)
+
+    def test_audit_with_invalid_unicode_id_fails(self):
+        # The ¿ character is 2-bytes long with utf-8 encoding, so the length of
+        # the ID is 129 characters; just outside the limit.
+        auth_id_that_is_too_long = '¿'*64 + '?'
+        self.signup('email@test.com', 'testUser')
+        user_id = self.get_user_id_from_email('email@test.com')
+        model_instance = auth_models.UserIdByFirebaseAuthIdModel(
+            id=auth_id_that_is_too_long, user_id=user_id)
+        model_instance.update_timestamps()
+        model_instance.put()
+        expected_output = [
+            '[u\'failed validation check for model id check of '
+            'UserIdByFirebaseAuthIdModel\', [u\'Entity id %s: Firebase ID len '
+            'must be in range [1, 128)\']]' % (auth_id_that_is_too_long,),
+            '[u\'fully-validated UserIdByFirebaseAuthIdModel\', 1]',
+        ]
+
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=True)
 
     def test_audit_with_created_on_greater_than_last_updated_fails(self):
         self.model_instance.created_on = (
@@ -103,7 +171,7 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_audit_with_missing_user_settings_model_fails(self):
         user_models.UserSettingsModel.get(self.user_id).delete()
         expected_output = [
-            u'[u\'failed validation check for user_settings_ids '
+            '[u\'failed validation check for user_settings_ids '
             'field check of UserIdByFirebaseAuthIdModel\', '
             '[u"Entity id %s: based on '
             'field user_settings_ids having value '
@@ -117,7 +185,7 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_audit_with_missing_user_auth_details_model_fails(self):
         user_models.UserAuthDetailsModel.get(self.user_id).delete()
         expected_output = [
-            u'[u\'failed validation check for user_auth_details_ids '
+            '[u\'failed validation check for user_auth_details_ids '
             'field check of UserIdByFirebaseAuthIdModel\', '
             '[u"Entity id %s: based on '
             'field user_auth_details_ids having value '

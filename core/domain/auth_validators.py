@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
 from core.platform import models
+import python_utils
 
 (auth_models, user_models) = models.Registry.import_models(
     [models.NAMES.auth, models.NAMES.user])
@@ -31,18 +32,20 @@ class UserIdByFirebaseAuthIdModelValidator(
     """Class for validating UserIdByFirebaseAuthIdModels."""
 
     @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        """Returns a regex for model id.
-
-        This method can be overridden by subclasses, if needed.
+    def _validate_model_id(cls, item):
+        """Checks whether the id of model matches the regex specified for
+        the model.
 
         Args:
-            unused_item: datastore_services.Model. Entity to validate.
-
-        Returns:
-            str. A regex pattern to be followed by the model id.
+            item: datastore_services.Model. Entity to validate.
         """
-        return '^[\x00-\x7F]{1,255}$'
+        # Firebase only constrains IDs to be between 1 and 128 characters:
+        # https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
+        if len(item.id) > 128:
+            cls._add_error(
+                'model %s' % (base_model_validators.ERROR_CATEGORY_ID_CHECK,),
+                'Entity id %s: Firebase ID len must be in range [1, 128)' % (
+                    item.id.decode('utf-8')))
 
     @classmethod
     def _get_external_id_relationships(cls, item):
