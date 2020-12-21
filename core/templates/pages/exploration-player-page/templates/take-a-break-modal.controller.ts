@@ -23,7 +23,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'take-break-modal',
-  templateUrl: './take-break-modal.template.html',
+  templateUrl: 'take-break-modal.template.html',
   styleUrls: []
 })
 export class TakeBreakModalController {

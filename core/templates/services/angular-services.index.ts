@@ -274,6 +274,7 @@ import { ExplorationImprovementsTaskRegistryService } from 'services/exploration
 import { ExplorationStatsBackendApiService } from 'services/exploration-stats-backend-api.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
+import { FatigueDetectionService } from 'core/templates/pages/exploration-player-page/services/fatigue-detection.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
@@ -414,6 +415,7 @@ export const angularServices: [string, unknown][] = [
   ['ExternalSaveService', ExternalSaveService],
   ['ExtractImageFilenamesFromStateService',
     ExtractImageFilenamesFromStateService],
+  ['FatigueDetectionService',FatigueDetectionService],
   ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FocusManagerService', FocusManagerService],
   ['FormatTimePipe', FormatTimePipe],
