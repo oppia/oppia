@@ -83,14 +83,14 @@ angular.module('oppia').factory('LearnerActionRenderService', [
         answer, destStateName, timeSpentInStateMsecs, currentStateName,
         actionIndex, interaction) {
       var el = $('<answer-submit-action>');
-      el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
-      el.attr('dest-state-name', destStateName);
-      el.attr('time-spent-in-state-secs', timeSpentInStateMsecs / 1000);
-      el.attr('current-state-name', currentStateName);
-      el.attr('action-index', actionIndex);
-      el.attr('interaction-id', interaction.id);
+      el.attr('[answer]', HtmlEscaperService.objToEscapedJson(answer));
+      el.attr('[dest-state-name]', destStateName);
+      el.attr('[time-spent-in-state-secs]', timeSpentInStateMsecs / 1000);
+      el.attr('[current-state-name]', currentStateName);
+      el.attr('[action-index]', actionIndex);
+      el.attr('[interaction-id]', interaction.id);
       el.attr(
-        'interaction-customization-args',
+        '[interaction-customization-args]',
         HtmlEscaperService.objToEscapedJson(
           Interaction.convertCustomizationArgsToBackendDict(
             interaction.customizationArgs)

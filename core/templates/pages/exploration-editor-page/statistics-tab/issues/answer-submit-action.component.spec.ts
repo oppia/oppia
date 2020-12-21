@@ -23,12 +23,15 @@ import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFa
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
-class MockElementRef {
-  actionIndex = 2;
-  answer = '"This is an answer string."';
-  currentStateName = 'State name';
-  destStateName = 'Introduction';
-  interactionCustomizationArgs = `{
+let component: AnswerSubmitActionComponent;
+let fixture: ComponentFixture<AnswerSubmitActionComponent>;
+
+describe('Answer Submit Action directive', () => {
+  let actionIndex = 2;
+  let answer = '"This is an answer string."';
+  let currentStateName = 'State name';
+  let destStateName = 'Introduction';
+  let interactionCustomizationArgs = `{
     "choices": {
       "value": [{
         "content_id": "",
@@ -37,36 +40,13 @@ class MockElementRef {
     },
     "showChoicesInShuffledOrder": {"value": true}
   }`;
-  interactionId = 'MultipleChoiceInput';
-  timeSpentInStateSecs: 2000
-}
+  let interactionId = 'MultipleChoiceInput';
+  let timeSpentInStateSecs: 2000
 
-let component: AnswerSubmitActionComponent;
-let fixture: ComponentFixture<AnswerSubmitActionComponent>;
-
-describe('Answer Submit Action directive', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AnswerSubmitActionComponent],
       providers: [
-        { provide: 'action-index', value: 2 },
-        { provide: 'answer', value: '"This is an answer string.' },
-        { provide: 'current-state-name', value: 'State name' },
-        { provide: 'dest-state-name', value: 'Introduction' },
-        { 
-          provide: 'interaction-customization-arges',
-          value: `{
-            "choices": {
-              "value": [{
-                "content_id": "",
-                "html": "Value"
-              }]
-            },
-            "showChoicesInShuffledOrder": {"value": true}
-          }`
-        },
-        { provide: 'interaction-id', value: 'MultipleChoiceInput' },
-        { provide: 'time-spent-in-state-secs', value: 2000},
         ExplorationHtmlFormatterService,
         HtmlEscaperService,
         InteractionObjectFactory
@@ -78,6 +58,13 @@ describe('Answer Submit Action directive', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AnswerSubmitActionComponent);
     component = fixture.componentInstance;
+    component.actionIndex = actionIndex;
+    component.answer = answer;
+    component.currentStateName = currentStateName;
+    component.destStateName = destStateName;
+    component.interactionCustomizationArgs = interactionCustomizationArgs;
+    component.interactionId = interactionId;
+    component.timeSpentInStateSecs = timeSpentInStateSecs;
     fixture.detectChanges();
   });
 

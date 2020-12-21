@@ -16,7 +16,7 @@
  * @fileoverview Component for the Answer Submit Learner Action.
  */
 
-import { Attribute, Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory.ts';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service.ts';
@@ -28,13 +28,13 @@ import { HtmlEscaperService } from 'services/html-escaper.service.ts';
   styleUrls: []
 })
 export class AnswerSubmitActionComponent implements OnInit {
-  currentStateName: string;
-  destStateName: string;
-  actionIndex: number;
-  timeSpentInStateSecs: number;
-  interactionId: string;
-  interactionCustomizationArgs: string;
-  answer: string;
+  @Input() currentStateName: string;
+  @Input() destStateName: string;
+  @Input() actionIndex: number;
+  @Input() timeSpentInStateSecs: number;
+  @Input() interactionId: string = '';
+  @Input() interactionCustomizationArgs: string = '';
+  @Input() answer: string = '';
   _customizationArgs = (
     this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
       this.interactionId,
@@ -52,17 +52,6 @@ export class AnswerSubmitActionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.currentStateName = angular.element(this).attr('current-state-name')
-    this.destStateName = angular.element(this).attr('dest-state-name')
-    this.actionIndex = Number(angular.element(this).attr('action-index'))
-    this.timeSpentInStateSecs = Number(
-      angular.element(this).attr('time-spent-in-state-secs')
-    )
-    this.interactionId = angular.element(this).attr('interaction-id')
-    this.interactionCustomizationArgs = angular.element(this).attr(
-      'interaction-customization-args'
-    )
-    this.answer = angular.element(this).attr('answer')
   }
 
   getShortAnswerHtml(): string {
