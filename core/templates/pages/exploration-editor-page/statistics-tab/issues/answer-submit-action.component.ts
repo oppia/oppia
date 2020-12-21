@@ -16,7 +16,7 @@
  * @fileoverview Component for the Answer Submit Learner Action.
  */
 
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Attribute, Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory.ts';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service.ts';
@@ -28,39 +28,41 @@ import { HtmlEscaperService } from 'services/html-escaper.service.ts';
   styleUrls: []
 })
 export class AnswerSubmitActionComponent implements OnInit {
-  // Check these types are correct.
-  destStateName: string;
-  timeSpentInStateSecs: number;
-  currentStateName: string;
-  actionIndex: number;
   _customizationArgs = (
     this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
-      this.el.nativeElement.interactionId,
+      this.interactionId,
       this.htmlEscaperService.escapedJsonToObj(
-        this.el.nativeElement.interactionCustomizationArgs)
+        this.interactionCustomizationArgs)
     )
   );
   _answer: number = this.htmlEscaperService.escapedJsonToObj(
-    this.el.nativeElement.answer) as number;
+    this.answer) as number;
 
   constructor(
-    private el: ElementRef,
+    @Attribute('answer') public answer: string,
+    @Attribute('dest-state-name') public destStateName: string,
+    @Attribute('time-spent-in-state-secs') public timeSpentInStateSecs: number,
+    @Attribute('current-state-name') public currentStateName: string,
+    @Attribute('action-index') public actionIndex: number,
+    @Attribute('interaction-id') public interactionId: string,
+    @Attribute('interaction-customization-args')
+      public interactionCustomizationArgs: string,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private htmlEscaperService: HtmlEscaperService,
     private interactionObjectFactory: InteractionObjectFactory
   ) {}
 
   ngOnInit(): void {
-    this.currentStateName = this.el.nativeElement.currentStateName;
-    this.destStateName = this.el.nativeElement.destStateName;
-    this.actionIndex = this.el.nativeElement.actionIndex;
-    this.timeSpentInStateSecs = this.el.nativeElement.timeSpentInStateSecs;
+    // this.currentStateName = this.el.nativeElement.currentStateName;
+    // this.destStateName = this.el.nativeElement.destStateName;
+    // this.actionIndex = this.el.nativeElement.actionIndex;
+    // this.timeSpentInStateSecs = this.el.nativeElement.timeSpentInStateSecs;
   }
 
   getShortAnswerHtml(): string {
     return this.explorationHtmlFormatterService.getShortAnswerHtml(
       this._answer,
-      this.el.nativeElement.interactionId,
+      this.interactionId,
       this._customizationArgs);
   }
 }
