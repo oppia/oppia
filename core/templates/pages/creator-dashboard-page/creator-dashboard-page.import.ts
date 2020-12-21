@@ -16,6 +16,19 @@
  * @fileoverview Directive scripts for the creator dashboard.
  */
 
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+import 'angular-ui-sortable';
+import 'third-party-imports/ui-tree.import';
+import uiValidate from 'angular-ui-validate';
+
+angular.module('oppia', [
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', uiValidate
+]);
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/creator-dashboard-page/creator-dashboard-page.module.ts');
