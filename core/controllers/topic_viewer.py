@@ -132,6 +132,7 @@ class TopicPageDataHandler(base.BaseHandler):
             'degrees_of_mastery': degrees_of_mastery,
             'skill_descriptions': skill_descriptions,
             'practice_tab_is_displayed': topic.practice_tab_is_displayed,
-            'meta_tag_content': topic.meta_tag_content
+            'meta_tag_content': topic.meta_tag_content,
+            'page_title_fragment_for_web': topic.page_title_fragment_for_web
         })
         self.render_json(self.values)

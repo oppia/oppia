@@ -91,6 +91,18 @@ platform_taskqueue_services = models.Registry.import_taskqueue_services()
 # We are using the b' prefix as all the stdouts are in bytes.
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 
+# List of model classes that don't have Wipeout or Takeout, related class
+# methods defined because they're not used directly but only as
+# base classes for the other models.
+BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES = (
+    'BaseCommitLogEntryModel',
+    'BaseMapReduceBatchResultsModel',
+    'BaseModel',
+    'BaseSnapshotContentModel',
+    'BaseSnapshotMetadataModel',
+    'VersionedModel',
+)
+
 
 def get_filepath_from_filename(filename, rootdir):
     """Returns filepath using the filename. Different files are present in
@@ -159,6 +171,29 @@ def check_image_png_or_webp(image_string):
         bool. Returns true if image is in WebP format.
     """
     return image_string.startswith(('data:image/png', 'data:image/webp'))
+
+
+def get_storage_model_module_names():
+    """Get all module names in storage."""
+    # As models.NAMES is an enum, it cannot be iterated over. So we use the
+    # __dict__ property which can be iterated over.
+    for name in models.NAMES.__dict__:
+        if '__' not in name:
+            yield name
+
+
+def get_storage_model_classes():
+    """Get all model classes in storage."""
+    for module_name in get_storage_model_module_names():
+        (module,) = models.Registry.import_models([module_name])
+        for member_name, member_obj in inspect.getmembers(module):
+            if inspect.isclass(member_obj):
+                clazz = getattr(module, member_name)
+                all_base_classes = [
+                    base_class.__name__ for base_class in inspect.getmro(
+                        clazz)]
+                if 'Model' in all_base_classes:
+                    yield clazz
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -2076,7 +2111,8 @@ tags: []
             subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False):
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='topic page title'):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -2103,6 +2139,8 @@ tags: []
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
+            page_title_fragment_for_web: str. The page title fragment for the
+                topic.
 
         Returns:
             Topic. A newly-created topic.
@@ -2123,7 +2161,8 @@ tags: []
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            meta_tag_content, practice_tab_is_displayed)
+            meta_tag_content, practice_tab_is_displayed,
+            page_title_fragment_for_web)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
@@ -2134,7 +2173,8 @@ tags: []
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False):
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='topic page title'):
         """Saves a new topic with a default version 1 subtopic data dict.
 
         This function should only be used for creating topics in tests involving
@@ -2170,6 +2210,8 @@ tags: []
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
+            page_title_fragment_for_web: str. The page title fragment for the
+                topic.
         """
         topic_rights_model = topic_models.TopicRightsModel(
             id=topic_id, manager_ids=[], topic_is_published=True)
@@ -2188,7 +2230,8 @@ tags: []
             next_subtopic_id=next_subtopic_id,
             subtopics=[self.VERSION_1_SUBTOPIC_DICT],
             meta_tag_content=meta_tag_content,
-            practice_tab_is_displayed=practice_tab_is_displayed)
+            practice_tab_is_displayed=practice_tab_is_displayed,
+            page_title_fragment_for_web=page_title_fragment_for_web)
         commit_message = 'New topic created with name \'%s\'.' % name
         topic_rights_model.commit(
             committer_id=owner_id,
