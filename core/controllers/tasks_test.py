@@ -244,6 +244,42 @@ class TasksTests(test_utils.EmailTestBase):
                 ' via the Preferences page.')
             self.assertEqual(messages[0].body.decode(), expected_message)
 
+    def test_instant_feedback_reply_email_when_feedback_is_none(self):
+        """Tests Instant feedback message handler."""
+        with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:
+            feedback_services.create_thread(
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
+                self.user_id_a, 'a subject', 'some text')
+            threadlist = feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
+            thread_id = threadlist[0].id
+            # Create reply message.
+            feedback_services.create_message(
+                thread_id, self.user_id_b, None, None, 'user b message')
+            # Get all messages in the thread.
+            messages = feedback_services.get_messages(thread_id)
+            # Make sure there are only 2 messages in thread.
+            self.assertEqual(len(messages), 2)
+
+            # Ensure that user A has no emails sent yet.
+            messages = self._get_sent_email_messages(
+                self.USER_A_EMAIL)
+            self.assertEqual(len(messages), 0)
+
+            email_reply_to_id_model = (
+                email_models.GeneralFeedbackEmailReplyToIdModel.get(
+                    self.user_id_a, thread_id, strict=False))
+            email_reply_to_id_model.delete()
+
+            raises_feedback_thread_does_not_exist = self.assertRaisesRegexp(
+                Exception,
+                'Feedback thread for current user and thread_id does not exist'
+            )
+            with raises_feedback_thread_does_not_exist:
+                # Invoke InstantFeedbackMessageEmail which sends
+                # instantFeedbackMessage.
+                self.process_and_flush_pending_tasks()
+
     def test_email_sent_when_status_changed(self):
         """Tests Feedback Thread Status Change Email Handler."""
         with self.can_send_feedback_email_ctx, self.can_send_emails_ctx:

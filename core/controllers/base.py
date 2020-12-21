@@ -176,6 +176,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
 
+        # TODO(#11462): This part should be moved to the service layer when we
+        # migrate to Firebase.
         if self.gae_id:
             user_settings = user_services.get_user_settings_by_gae_id(
                 self.gae_id, strict=False)
