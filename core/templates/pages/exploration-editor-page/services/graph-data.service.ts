@@ -29,16 +29,7 @@ angular.module('oppia').factory('GraphDataService', [
       ComputeGraphService, ExplorationInitStateNameService,
       ExplorationStatesService) {
     var _graphData = null;
-    /**
-     * @return {Object} graphData - Direct graph visuapization input.
-     * @return {Object} graphData.nodes - A nodes object.
-     * @return {Object[]} graphData.links - List of direct links two of nodes.
-     * @return {string[]} graphData.finalStateIds - An array of state names.
-     * @return {string} graphData.initStateId - The name of initial state.
-     * @return {string} graphData.nodes.<stateName> - The name of the state.
-     * @return {string} graphData.links[i].source - The source node.
-     * @return {string} graphData.links[i].target - The target node.
-     */
+    
     var _recomputeGraphData = function() {
       if (!ExplorationInitStateNameService.savedMemento) {
         return;
@@ -53,6 +44,18 @@ angular.module('oppia').factory('GraphDataService', [
       recompute: function() {
         _recomputeGraphData();
       },
+
+    /**
+     * @return graphData - Direct graph visuapization input.
+     * @return graphData.nodes - A nodes object.
+     * @return graphData.links - List of direct links two of nodes.
+     * @return graphData.finalStateIds - An array of state names.
+     * @return graphData.initStateId - The name of initial state.
+     * @return graphData.nodes.<stateName> - The name of the state.
+     * @return graphData.links[i].source - The source node.
+     * @return graphData.links[i].target - The target node.
+     */
+    
       getGraphData: function() {
         return angular.copy(_graphData);
       }
