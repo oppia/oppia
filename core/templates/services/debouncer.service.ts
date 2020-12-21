@@ -27,9 +27,9 @@ export class DebouncerService {
   // be invoked. The function only gets executed after it stops being called
   // for `wait` milliseconds.
   debounce(func: () => void, millisecsToWait: number): () => void {
-    let timeout: ReturnType<typeof setTimeout>;
-    let context = this;
-    let args = arguments;
+    let timeout: ReturnType<typeof setTimeout>|null;
+    let context: this|null = this;
+    let args: IArguments|null = arguments;
     let timestamp: number;
     let result: void;
 
@@ -38,19 +38,18 @@ export class DebouncerService {
       if (last < millisecsToWait) {
         timeout = setTimeout(later, millisecsToWait - last);
       } else {
-        timeout;
+        timeout = null;
         result = func.apply(context);
-        // Function was not taking any arguments so removed that args.
+        // Args was not getting any value so removed arguments from func.apply.
         if (!timeout) {
-          context;
-          args;
+          context = null;
+          args = null;
         }
       }
     };
 
     return function() {
-      // There was no need of context so removed context=this.
-      args = arguments;
+      // This and Arguments were of no use here so removed them.
       timestamp = new Date().getTime();
       if (!timeout) {
         timeout = setTimeout(later, millisecsToWait);
