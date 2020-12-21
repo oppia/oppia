@@ -33,14 +33,15 @@ EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'integrations/*', 'integrations_dev/*', '*.svg', '*.gif', '*.png',
     '*.webp', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
-    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
-    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
-    'webpack_bundles/*', 'core/tests/services_sources/*',
-    'core/tests/release_sources/tmp_unzip.zip', 'scripts/linters/test_files/*',
+    'assets/scripts/*', 'core/domain/proto/*.py', 'core/tests/data/*',
+    'core/tests/build_sources/*', '*.mp3', '*.mp4', 'node_modules/*',
+    'typings/*', 'local_compiled_js/*', 'webpack_bundles/*',
+    'core/tests/services_sources/*', 'core/tests/release_sources/tmp_unzip.zip',
+    'scripts/linters/test_files/*', 'proto/*',
     'core/tests/release_sources/tmp_unzip.tar.gz',
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
-    'auth.json.enc',
+    'core/templates/google-analytics.initializer.ts',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (

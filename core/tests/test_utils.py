@@ -37,6 +37,8 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
@@ -59,6 +61,7 @@ import feconf
 import main
 import main_mail
 import main_taskqueue
+from proto import text_classifier_pb2
 import python_utils
 import requests_mock
 import schema_utils
@@ -87,6 +90,18 @@ platform_taskqueue_services = models.Registry.import_taskqueue_services()
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
+
+# List of model classes that don't have Wipeout or Takeout, related class
+# methods defined because they're not used directly but only as
+# base classes for the other models.
+BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES = (
+    'BaseCommitLogEntryModel',
+    'BaseMapReduceBatchResultsModel',
+    'BaseModel',
+    'BaseSnapshotContentModel',
+    'BaseSnapshotMetadataModel',
+    'VersionedModel',
+)
 
 
 def get_filepath_from_filename(filename, rootdir):
@@ -156,6 +171,29 @@ def check_image_png_or_webp(image_string):
         bool. Returns true if image is in WebP format.
     """
     return image_string.startswith(('data:image/png', 'data:image/webp'))
+
+
+def get_storage_model_module_names():
+    """Get all module names in storage."""
+    # As models.NAMES is an enum, it cannot be iterated over. So we use the
+    # __dict__ property which can be iterated over.
+    for name in models.NAMES.__dict__:
+        if '__' not in name:
+            yield name
+
+
+def get_storage_model_classes():
+    """Get all model classes in storage."""
+    for module_name in get_storage_model_module_names():
+        (module,) = models.Registry.import_models([module_name])
+        for member_name, member_obj in inspect.getmembers(module):
+            if inspect.isclass(member_obj):
+                clazz = getattr(module, member_name)
+                all_base_classes = [
+                    base_class.__name__ for base_class in inspect.getmro(
+                        clazz)]
+                if 'Model' in all_base_classes:
+                    yield clazz
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -2072,7 +2110,8 @@ tags: []
             subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False):
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='topic page title'):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -2099,6 +2138,8 @@ tags: []
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
+            page_title_fragment_for_web: str. The page title fragment for the
+                topic.
 
         Returns:
             Topic. A newly-created topic.
@@ -2119,7 +2160,8 @@ tags: []
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            meta_tag_content, practice_tab_is_displayed)
+            meta_tag_content, practice_tab_is_displayed,
+            page_title_fragment_for_web)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
@@ -2130,7 +2172,8 @@ tags: []
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False):
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='topic page title'):
         """Saves a new topic with a default version 1 subtopic data dict.
 
         This function should only be used for creating topics in tests involving
@@ -2166,6 +2209,8 @@ tags: []
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
+            page_title_fragment_for_web: str. The page title fragment for the
+                topic.
         """
         topic_rights_model = topic_models.TopicRightsModel(
             id=topic_id, manager_ids=[], topic_is_published=True)
@@ -2184,7 +2229,8 @@ tags: []
             next_subtopic_id=next_subtopic_id,
             subtopics=[self.VERSION_1_SUBTOPIC_DICT],
             meta_tag_content=meta_tag_content,
-            practice_tab_is_displayed=practice_tab_is_displayed)
+            practice_tab_is_displayed=practice_tab_is_displayed,
+            page_title_fragment_for_web=page_title_fragment_for_web)
         commit_message = 'New topic created with name \'%s\'.' % name
         topic_rights_model.commit(
             committer_id=owner_id,
@@ -2814,6 +2860,78 @@ class GenericEmailTestBase(GenericTestBase):
 
 
 EmailTestBase = GenericEmailTestBase
+
+
+class ClassifierTestBase(GenericEmailTestBase):
+    """Base class for classifier test classes that need common functions
+    for related to reading classifier data and mocking the flow of the
+    storing the trained models through post request.
+
+    This class is derived from GenericEmailTestBase because the
+    TrainedClassifierHandlerTests test suite requires email services test
+    functions in addition to the classifier functions defined below.
+    """
+
+    def post_blob(self, url, payload, expected_status_int=200):
+        """Post a BLOB object to the server; return the received object.
+
+        Note that this method should only be used for
+        classifier.TrainedClassifierHandler handler and for no one else. The
+        reason being, we don't have any general mechanism for security for
+        transferring binary data. TrainedClassifierHandler implements a
+        specific mechanism which is restricted to the handler.
+
+        Args:
+            url: str. The URL to which BLOB object in payload should be sent
+                through a post request.
+            payload: bytes. Binary data which needs to be sent.
+            expected_status_int: int. The status expected as a response of post
+                request.
+
+        Returns:
+            dict. Parsed JSON response received upon invoking the post request.
+        """
+        data = payload
+
+        expect_errors = False
+        if expected_status_int >= 400:
+            expect_errors = True
+        response = self._send_post_request(
+            self.testapp, url, data,
+            expect_errors, expected_status_int=expected_status_int,
+            headers={b'content-type': b'application/octet-stream'})
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+
+        self.assertEqual(response.status_int, expected_status_int)
+        return self._parse_json_response(response, expect_errors)
+
+    def _get_classifier_data_from_classifier_training_job(
+            self, classifier_training_job):
+        """Retrieves classifier training job from GCS using metadata stored in
+        classifier_training_job.
+
+        Args:
+            classifier_training_job: ClassifierTrainingJob. Domain object
+                containing metadata of the training job which is used to
+                retrieve the trained model.
+
+        Returns:
+            FrozenModel. Protobuf object containing classifier data.
+        """
+        filename = classifier_training_job.classifier_data_filename
+        file_system_class = fs_services.get_entity_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id))
+        classifier_data = utils.decompress_from_zlib(fs.get(filename))
+        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
+        classifier_data_proto.ParseFromString(classifier_data)
+        return classifier_data_proto
 
 
 class FunctionWrapper(python_utils.OBJECT):

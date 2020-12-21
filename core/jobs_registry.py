@@ -35,7 +35,6 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import suggestion_jobs_one_off
-from core.domain import takeout_domain_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
@@ -47,6 +46,7 @@ ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
     activity_jobs_one_off.AddContentUserIdsContentJob,
     activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob,
+    activity_jobs_one_off.AddMissingCommitLogsOneOffJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
@@ -61,7 +61,6 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationRteMathContentValidationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
-    exp_jobs_one_off.PopulateXmlnsAttributeInExplorationMathSvgImagesJob,
     exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
@@ -86,7 +85,6 @@ ONE_OFF_JOB_MANAGERS = [
         RenameExplorationOpportunitySummaryModelPropertiesJob),
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
-    question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
     question_jobs_one_off.MissingQuestionMigrationOneOffJob,
     recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
@@ -104,17 +102,13 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAuditV2,
     stats_jobs_one_off.StatisticsAudit,
     stats_jobs_one_off.StatisticsCustomizationArgsAudit,
-    story_jobs_one_off.DeleteOrphanStoriesOneOffJob,
+    stats_jobs_one_off.WipeExplorationIssuesOneOffJob,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
-    story_jobs_one_off.OrphanStoriesAuditJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     suggestion_jobs_one_off.PopulateFinalReviewerIdOneOffJob,
-    suggestion_jobs_one_off.PopulateSuggestionLanguageCodeMigrationOneOffJob,
     suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
-    suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
-    takeout_domain_jobs_one_off.SnapshotMetadataCommitMsgMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionSvgFilenameValidationOneOffJob,
     topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
@@ -257,7 +251,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
-        .TrainingJobExplorationMappingModelAuditOneOffJob
+        .StateTrainingJobsMappingModelAuditOneOffJob
     ),
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,

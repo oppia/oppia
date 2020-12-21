@@ -29,6 +29,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
   let QuestionObjectFactory = null;
   let QuestionSuggestionService = null;
   let QuestionUndoRedoService = null;
+  let SiteAnalyticsService = null;
   let SkillObjectFactory = null;
   let StateEditorService = null;
 
@@ -51,6 +52,7 @@ describe('Question Suggestion Editor Modal Controller', function() {
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionSuggestionService = $injector.get('QuestionSuggestionService');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
+      SiteAnalyticsService = $injector.get('SiteAnalyticsService');
       SkillObjectFactory = $injector.get('SkillObjectFactory');
       StateEditorService = $injector.get('StateEditorService');
 
@@ -192,6 +194,17 @@ describe('Question Suggestion Editor Modal Controller', function() {
       $httpBackend.flush();
 
       expect($uibModalInstance.close).toHaveBeenCalled();
+    });
+
+    it('should register Contributor Dashboard submit suggestion event on' +
+      ' submit', function() {
+      spyOn(
+        SiteAnalyticsService,
+        'registerContributorDashboardSubmitSuggestionEvent');
+      $scope.done();
+      expect(
+        SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
+        .toHaveBeenCalledWith('Question');
     });
 
     it('should dismiss modal if there is no pending changes', function() {

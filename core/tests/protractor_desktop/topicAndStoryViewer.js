@@ -85,6 +85,7 @@ describe('Story viewer functionality', function() {
       'Topic TASV1', 'topic-tasv-one', 'Description', false);
     await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
     await topicEditorPage.saveTopic('Added thumbnail.');
     var url = await browser.getCurrentUrl();
     var topicId = url.split('/')[4].slice(0, -1);
