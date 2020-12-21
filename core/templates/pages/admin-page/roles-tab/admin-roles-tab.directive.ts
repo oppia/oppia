@@ -183,7 +183,7 @@ angular.module('oppia').directive('adminRolesTab', [
           AdminTaskManagerService.startTask();
           AdminBackendApiService.removeContributionReviewer(
             formResponse.username, formResponse.method,
-            formResponse.category, formResponse.anguageCode
+            formResponse.category, formResponse.languageCode
           ).then(function(response) {
             ctrl.setStatusMessage('Success.');
             refreshFormData();

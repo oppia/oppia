@@ -200,7 +200,7 @@ describe('Admin backend api service', () => {
   );
 });
 
-fdescribe('Admin Backend API service for Roles Tab', () => {
+describe('Admin Backend API service for Roles Tab', () => {
   let adminBackendApiService: AdminBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService = null;
@@ -288,6 +288,217 @@ fdescribe('Admin Backend API service for Roles Tab', () => {
         '/adminrolehandler' +
         '?filter_criterion=username&role=null&username=InvalidUser');
       expect(req.request.method).toEqual('GET');
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'User with given username does not exist'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }
+    ));
+
+  it('should update the role of the user',
+    fakeAsync(() => {
+      let topicId = null;
+      let newRole = 'ADMIN';
+      let username = 'validUser';
+      adminBackendApiService.updateUserRole(newRole, username, topicId)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/adminrolehandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail to update the role of user when user does not exists',
+    fakeAsync(() => {
+      let topicId = null;
+      let newRole = 'ADMIN';
+      let username = 'InvalidUser';
+      adminBackendApiService.updateUserRole(newRole, username, topicId)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/adminrolehandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'User with given username does not exist'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }
+    ));
+
+  it('should add contribution Reviewer',
+    fakeAsync(() => {
+      let category = 'voiceover';
+      let languageCode = 'en';
+      let username = 'validUser';
+      adminBackendApiService.addContributionReviewer(
+        category, username, languageCode
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/addcontributionreviewerhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail to add contribution Reviewer',
+    fakeAsync(() => {
+      let category = 'voiceover';
+      let languageCode = 'en';
+      let username = 'InvalidUser';
+      adminBackendApiService.addContributionReviewer(
+        category, username, languageCode
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/addcontributionreviewerhandler');
+      expect(req.request.method).toEqual('POST');
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'User with given username does not exist'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }
+    ));
+
+  it('should get the data of ContributionReviewer regarding role',
+    fakeAsync(() => {
+      let category = 'voiceover';
+      let languageCode = 'en';
+      let result = ['validUsername'];
+      adminBackendApiService.viewContributionReviewers(
+        category, languageCode
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/getcontributionreviewershandler' +
+        '?review_category=voiceover&language_code=en');
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        ['validUsername'],
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(result);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should get the data of ContributionReviewer regarding username',
+    fakeAsync(() => {
+      let username = 'validUsername';
+      adminBackendApiService.contributionReviewerRights(username)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/contributionreviewerrightsdatahandler' +
+        '?username=validUsername');
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail to get the data of ContributionReviewer',
+    fakeAsync(() => {
+      let username = 'InvalidUsername';
+      adminBackendApiService.contributionReviewerRights(username)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/contributionreviewerrightsdatahandler' +
+        '?username=InvalidUsername');
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        { error: 'User with given username does not exist'},
+        { status: 500, statusText: 'User with given username does not exist'});
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }
+    ));
+
+  it('should remove all contribution Reviewers regarding username',
+    fakeAsync(() => {
+      let category = 'voiceover';
+      let languageCode = null;
+      let username = 'validUser';
+      let method = 'all';
+      adminBackendApiService.removeContributionReviewer(
+        username, method, category, languageCode
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/removecontributionreviewerhandler');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should remove specific contribution Reviewers regarding username',
+    fakeAsync(() => {
+      let category = 'voiceover';
+      let languageCode = 'en';
+      let username = 'validUser';
+      let method = 'specific';
+      adminBackendApiService.removeContributionReviewer(
+        username, method, category, languageCode
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/removecontributionreviewerhandler');
+      expect(req.request.method).toEqual('PUT');
+      req.flush(
+        { status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+    ));
+
+  it('should fail to remove contribution Reviewers',
+    fakeAsync(() => {
+      let category = 'voiceover';
+      let languageCode = null;
+      let username = 'validUser';
+      let method = 'all';
+      adminBackendApiService.removeContributionReviewer(
+        username, method, category, languageCode
+      ).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/removecontributionreviewerhandler');
+      expect(req.request.method).toEqual('PUT');
       req.flush(
         { error: 'User with given username does not exist'},
         { status: 500, statusText: 'User with given username does not exist'});
