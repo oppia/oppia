@@ -31,6 +31,10 @@ sys.path.insert(0, _FUTURE_PATH)
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
 
+_CERTIFI_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools', 'certifi-2020.12.5')
+sys.path.insert(0, _CERTIFI_PATH)
+
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -288,7 +292,7 @@ def url_retrieve(source_url, filename=None):
     """
     import certifi
     import ssl
-    context = ssl.create_default_context(capath=certifi.where())
+    context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib
         # Change the User-Agent to prevent servers from blocking requests.
@@ -317,7 +321,7 @@ def url_open(source_url):
     """
     import certifi
     import ssl
-    context = ssl.create_default_context(capath=certifi.where())
+    context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib2
         return urllib2.urlopen(source_url, context=context)
