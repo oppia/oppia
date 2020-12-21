@@ -64,8 +64,6 @@ from firebase_admin import exceptions as firebase_exceptions
 
 (auth_models,) = models.Registry.import_models([models.NAMES.auth])
 
-firebase_auth.ImportUserRecord('f')
-
 
 def _ensure_firebase_is_initialized():
     """Initializes the Firebase Admin SDK."""
