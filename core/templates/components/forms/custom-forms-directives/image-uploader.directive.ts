@@ -47,6 +47,8 @@ angular.module('oppia').directive('imageUploader', [
         var onDragEnd = function(e) {
           e.preventDefault();
           scope.backgroundWhileUploading = false;
+          // Since we are using JQlite for event handling
+          // we should trigger scope.$apply() Manually.
           scope.$apply();
         };
 
@@ -123,6 +125,8 @@ angular.module('oppia').directive('imageUploader', [
         $(elt).bind('dragover', function(e) {
           e.preventDefault();
           scope.backgroundWhileUploading = true;
+          // Since we are using JQlite for event handling
+          // we should trigger scope.$apply() Manually.
           scope.$apply();
         });
 
