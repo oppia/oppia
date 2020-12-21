@@ -44,14 +44,14 @@ angular.module('oppia').factory('GraphDataService', [
         _recomputeGraphData();
       },
       /**
-       * @return graphData - Direct graph visuapization input.
-       * @return graphData.nodes - A nodes object.
-       * @return graphData.links - List of direct links two of nodes.
-       * @return graphData.finalStateIds - An array of state names.
-       * @return graphData.initStateId - The name of initial state.
-       * @return graphData.nodes.<stateName> - The name of the state.
-       * @return graphData.links[i].source - The source node.
-       * @return graphData.links[i].target - The target node.
+       * @return graphData - Direct graph visuapization input. Following keys
+       * are included.
+       * - nodes: Objects with keys of nodeids and values of node names.
+       * - links: list of objects. Each object represents a directed link
+       * between two nodes, and has keys 'source' and 'target', the values
+       * of which are the names of the corresponding nodes.
+       * - initStateName: the name of the initial state.
+       * - finalStateName: the name of the final state.
        */
       getGraphData: function() {
         return angular.copy(_graphData);
