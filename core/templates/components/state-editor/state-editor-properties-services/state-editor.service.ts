@@ -18,6 +18,7 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
+import { Observable } from 'rxjs';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
@@ -39,7 +40,7 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { State } from 'domain/state/StateObjectFactory';
 
-interface AnswerChoice {
+export interface AnswerChoice {
   val: string | number;
   label: string;
 }
@@ -60,6 +61,7 @@ export class StateEditorService {
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
+  private _stateNamesChangedEventEmitter = new EventEmitter<void>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -108,6 +110,10 @@ export class StateEditorService {
 
   updateCurrentRuleInputIsValid(value: boolean): void {
     this.currentRuleInputIsValid = value;
+  }
+
+  get onStateNamesChanged(): Observable<void> {
+    return this._stateNamesChangedEventEmitter;
   }
 
   checkCurrentRuleInputIsValid(): boolean {
@@ -248,6 +254,7 @@ export class StateEditorService {
 
   setStateNames(newStateNames: string[]): void {
     this.stateNames = newStateNames;
+    this._stateNamesChangedEventEmitter.emit();
   }
 
   getStateNames(): string[] {

@@ -112,6 +112,7 @@ import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-backend-api.service';
 import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service.ts';
+import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
 import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
@@ -237,11 +238,14 @@ import { PlayerCorrectnessFeedbackEnabledService } from 'pages/exploration-playe
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import { QuestionPlayerEngineService } from 'pages/exploration-player-page/services/question-player-engine.service';
 import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
 import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
 import { ProfilePageBackendApiService } from 'pages/profile-page/profile-page-backend-api.service';
 import { ReviewTestEngineService } from 'pages/review-test-page/review-test-engine.service.ts';
+import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { StoryEditorNavigationService } from 'pages/story-editor-page/services/story-editor-navigation.service';
+import { StoryEditorStateService } from 'pages/story-editor-page/services/story-editor-state.service';
 import { TopicsAndSkillsDashboardPageService } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service';
 import { AlertsService } from 'services/alerts.service';
 import { AppService } from 'services/app.service';
@@ -304,6 +308,7 @@ import { StateTopAnswersStatsBackendApiService } from 'services/state-top-answer
 import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
 import { BackgroundMaskService } from 'services/stateful/background-mask.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionsService } from 'services/suggestions.service';
 import { TranslateService } from 'services/translate.service';
@@ -315,7 +320,6 @@ import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
-
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -524,6 +528,7 @@ export const angularServices: [string, unknown][] = [
   ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionBackendApiService', QuestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
+  ['QuestionPlayerEngineService', QuestionPlayerEngineService],
   ['QuestionSummaryForOneSkillObjectFactory',
     QuestionSummaryForOneSkillObjectFactory],
   ['QuestionSummaryObjectFactory', QuestionSummaryObjectFactory],
@@ -540,6 +545,7 @@ export const angularServices: [string, unknown][] = [
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
   ['ReviewTestEngineService', ReviewTestEngineService],
+  ['ResponsesService', ResponsesService],
   ['RubricObjectFactory', RubricObjectFactory],
   ['RuleObjectFactory', RuleObjectFactory],
   ['SVMPredictionService', SVMPredictionService],
@@ -554,9 +560,11 @@ export const angularServices: [string, unknown][] = [
   ['SiteAnalyticsService', SiteAnalyticsService],
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
+  ['SkillEditorStateService', SkillEditorStateService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
+  ['SkillUpdateService', SkillUpdateService],
   ['SolutionObjectFactory', SolutionObjectFactory],
   ['SolutionValidityService', SolutionValidityService],
   ['SolutionVerificationService', SolutionVerificationService],
@@ -591,6 +599,7 @@ export const angularServices: [string, unknown][] = [
   ['StatsReportingService', StatsReportingService],
   ['StoryContentsObjectFactory', StoryContentsObjectFactory],
   ['StoryEditorNavigationService', StoryEditorNavigationService],
+  ['StoryEditorStateService', StoryEditorStateService],
   ['StoryObjectFactory', StoryObjectFactory],
   ['StoryReferenceObjectFactory', StoryReferenceObjectFactory],
   ['StoryValidationService', StoryValidationService],
@@ -626,6 +635,7 @@ export const angularServices: [string, unknown][] = [
   ['TranslationsBackendApiService', TranslationsBackendApiService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TruncatePipe', TruncatePipe],
+  ['UndoRedoService', UndoRedoService],
   ['UnitsObjectFactory', UnitsObjectFactory],
   ['UrlInterpolationService', UrlInterpolationService],
   ['UrlService', UrlService],
