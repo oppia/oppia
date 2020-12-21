@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import activity_jobs_one_off
+from core.domain import auth_jobs_one_off
 from core.domain import collection_jobs_one_off
 from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
@@ -135,6 +136,7 @@ ONE_OFF_JOB_MANAGERS = [
 # List of all manager classes for prod validation one-off batch jobs for which
 # to show controls on the admin dashboard.
 AUDIT_JOB_MANAGERS = [
+    auth_jobs_one_off.UserIdByFirebaseSubjectIdModelAuditOneOffJob,
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,

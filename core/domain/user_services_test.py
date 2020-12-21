@@ -40,7 +40,6 @@ import python_utils
 import requests_mock
 import utils
 
-auth_services = models.Registry.import_auth_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
@@ -356,7 +355,56 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
 
-    def test_get_user_settings_by_gae_id_returns_user_settings(self):
+    def test_get_user_settings_by_gae_id_for_existing_user_is_correct(self):
+        gae_id = 'gae_id'
+        email = 'user@example.com'
+        user_id = 'user_id'
+        username = 'username'
+        user_models.UserSettingsModel(
+            id=user_id,
+            email=email,
+            username=username,
+        ).put()
+        user_models.UserIdentifiersModel(
+            id=gae_id,
+            user_id=user_id
+        ).put()
+        user_models.UserAuthDetailsModel(
+            id=user_id,
+            gae_id=gae_id
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+        self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.email, user_settings.email)
+        self.assertEqual(user_settings_model.username, user_settings.username)
+
+    def test_get_user_settings_by_gae_id_for_nonexistent_gae_id_is_none(self):
+        self.assertIsNone(user_services.get_user_settings_by_gae_id('gae_id_x'))
+
+    def test_get_user_settings_by_gae_id_with_missing_user_identifiers_works(
+            self):
+        gae_id = 'gae_id'
+        email = 'user@example.com'
+        user_id = 'user_id'
+        username = 'username'
+        user_models.UserSettingsModel(
+            id=user_id,
+            email=email,
+            username=username,
+        ).put()
+        user_models.UserAuthDetailsModel(
+            id=user_id,
+            gae_id=gae_id
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+        self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.email, user_settings.email)
+        self.assertEqual(user_settings_model.username, user_settings.username)
+
+    def test_get_user_settings_by_gae_id_with_missing_user_auth_details_works(
+            self):
         gae_id = 'gae_id'
         email = 'user@example.com'
         user_id = 'user_id'
@@ -376,10 +424,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
-    def test_get_user_settings_by_gae_id_for_nonexistent_gae_id_is_none(self):
+    def test_get_auth_details_by_gae_id_for_nonexistent_gae_id_is_none(self):
         self.assertIsNone(user_services.get_user_settings_by_gae_id('gae_id_x'))
 
-    def test_get_user_settings_by_gae_id_strict_returns_user_settings(self):
+    def test_get_user_settings_by_gae_id_strict_existing_user_is_correct(self):
+        non_existent_user_id = 'id_x'
         gae_id = 'gae_id'
         email = 'user@example.com'
         user_id = 'user_id'
@@ -389,22 +438,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email=email,
             username=username,
         ).put()
-        user_models.UserIdentifiersModel(
-            id=gae_id,
-            user_id=user_id
+        user_models.UserAuthDetailsModel(
+            id=user_id,
+            gae_id=gae_id
         ).put()
-        user_settings_model = user_models.UserSettingsModel.get_by_id(
-            user_id)
-        user_settings = (
-            user_services.get_user_settings_by_gae_id(gae_id, strict=True))
+        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
         self.assertEqual(user_settings_model.id, user_settings.user_id)
         self.assertEqual(user_settings_model.email, user_settings.email)
         self.assertEqual(user_settings_model.username, user_settings.username)
 
-    def test_get_user_settings_by_gae_id_strict_for_nonexistent_gae_id_is_none(
-            self):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
-            user_services.get_user_settings_by_gae_id('gae_id_x', strict=True)
+            user_services.get_user_settings_by_gae_id(
+                non_existent_user_id, strict=True)
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
@@ -3000,91 +3046,3 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             Exception, 'Invalid review category: invalid_category'):
             user_services.get_contribution_reviewer_usernames(
                 'invalid_category', language_code='hi')
-
-
-class SubjectIdUserIdAssociationOperationsTests(test_utils.GenericTestBase):
-
-    def get_associated_user_id(self, subject_id):
-        """Fetches the given associated user ID from storage manually."""
-        model = auth_services.UserIdBySubjectIdModel.get_by_id(subject_id)
-        return None if model is None else model.user_id
-
-    def put_association(self, pair):
-        """Commits the given association to storage manually."""
-        subject_id, user_id = pair
-        auth_services.UserIdBySubjectIdModel(
-            id=subject_id, user_id=user_id).put()
-
-    def test_get_association_that_exists(self):
-        self.put_association(user_domain.AuthSubjectIdUserIdPair('sub', 'uid'))
-
-        self.assertEqual(
-            user_services.get_user_id_from_subject_id('sub'), 'uid')
-
-    def test_get_association_that_does_not_exist(self):
-        self.assertIsNone(
-            user_services.get_user_id_from_subject_id('does_not_exist'))
-
-    def test_get_multi_associations_that_exist(self):
-        self.put_association(
-            user_domain.AuthSubjectIdUserIdPair('sub1', 'uid1'))
-        self.put_association(
-            user_domain.AuthSubjectIdUserIdPair('sub2', 'uid2'))
-        self.put_association(
-            user_domain.AuthSubjectIdUserIdPair('sub3', 'uid3'))
-
-        self.assertEqual(
-            user_services.get_multi_user_ids_from_subject_ids(
-                ['sub1', 'sub2', 'sub3']),
-            ['uid1', 'uid2', 'uid3'])
-
-    def test_get_multi_associations_that_do_not_exist(self):
-        self.put_association(
-            user_domain.AuthSubjectIdUserIdPair('sub1', 'uid1'))
-        # Mapping from sub2 -> uid2 missing.
-        self.put_association(
-            user_domain.AuthSubjectIdUserIdPair('sub3', 'uid3'))
-
-        self.assertEqual(
-            user_services.get_multi_user_ids_from_subject_ids(
-                ['sub1', 'sub2', 'sub3']),
-            ['uid1', None, 'uid3'])
-
-    def test_associate_new_subject_id_to_user_id(self):
-        user_services.associate_subject_id_to_user_id(
-            user_domain.AuthSubjectIdUserIdPair('sub', 'uid'))
-
-        self.assertEqual(self.get_associated_user_id('sub'), 'uid')
-
-    def test_associate_existing_subject_id_to_user_id_raises(self):
-        user_services.associate_subject_id_to_user_id(
-            user_domain.AuthSubjectIdUserIdPair('sub', 'uid'))
-
-        with self.assertRaisesRegexp(Exception, 'already mapped to user_id'):
-            user_services.associate_subject_id_to_user_id(
-                user_domain.AuthSubjectIdUserIdPair('sub', 'uid'))
-
-    def test_associate_multi_new_subject_ids_to_user_ids(self):
-        user_services.associate_multi_subject_ids_to_user_ids([
-            user_domain.AuthSubjectIdUserIdPair('sub1', 'uid1'),
-            user_domain.AuthSubjectIdUserIdPair('sub2', 'uid2'),
-            user_domain.AuthSubjectIdUserIdPair('sub3', 'uid3'),
-        ])
-
-        self.assertEqual(
-            [self.get_associated_user_id('sub1'),
-             self.get_associated_user_id('sub2'),
-             self.get_associated_user_id('sub3')],
-            ['uid1', 'uid2', 'uid3'])
-
-    def test_associate_multi_an_existing_subject_id_to_user_id_mapping_raises(
-            self):
-        user_services.associate_subject_id_to_user_id(
-            user_domain.AuthSubjectIdUserIdPair('sub1', 'uid1'))
-
-        with self.assertRaisesRegexp(Exception, 'associations already exist'):
-            user_services.associate_multi_subject_ids_to_user_ids([
-                user_domain.AuthSubjectIdUserIdPair('sub1', 'uid1'),
-                user_domain.AuthSubjectIdUserIdPair('sub2', 'uid2'),
-                user_domain.AuthSubjectIdUserIdPair('sub3', 'uid3'),
-            ])
