@@ -27,9 +27,9 @@ require('services/stateful/focus-manager.service.ts');
 angular.module('oppia').directive('focusOn', [
   'FocusManagerService', 'LABEL_FOR_CLEARING_FOCUS',
   function(FocusManagerService, LABEL_FOR_CLEARING_FOCUS) {
-    this.directiveSubscriptions = new Subscription();
     return (scope, elt, attrs) => {
-      this.directiveSubscriptions.add(
+      const directiveSubscriptions = new Subscription();
+      directiveSubscriptions.add(
         FocusManagerService.onFocus.subscribe(
           (name) => {
             if (name === attrs.focusOn) {
@@ -45,7 +45,7 @@ angular.module('oppia').directive('focusOn', [
         )
       );
       scope.$on('$destroy', function() {
-        this.directiveSubscriptions.unsubscribe();
+        directiveSubscriptions.unsubscribe();
       });
     };
   }
