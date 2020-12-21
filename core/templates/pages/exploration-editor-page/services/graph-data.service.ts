@@ -54,8 +54,8 @@ angular.module('oppia').factory('GraphDataService', [
        * @return graphData.links[i].target - The target node.
        */
       getGraphData: function() {
-          return angular.copy(_graphData);
-        }
-      };
+        return angular.copy(_graphData);
+      }
+    };
   }
 ]);
