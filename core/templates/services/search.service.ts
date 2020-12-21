@@ -19,7 +19,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
 
-import { ServicesConstants } from 'services/services.constants';
 import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
 import { SearchBackendApiService, SelectionDetails, SelectionList } from './search-backend-api.service';
 
@@ -108,7 +107,7 @@ export class SearchService {
   }
 
   getQueryUrl(searchUrlQueryString: string):string {
-    return ServicesConstants.SEARCH_DATA_URL + '?q=' + searchUrlQueryString;
+    return '?q=' + searchUrlQueryString;
   }
 
   getSearchUrlQueryString(

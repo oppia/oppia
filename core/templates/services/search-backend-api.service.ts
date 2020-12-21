@@ -20,6 +20,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
+import { ServicesConstants } from './services.constants';
 
 export interface SelectionList {[key: string]: boolean}
 
@@ -53,7 +54,8 @@ export class SearchBackendApiService {
   constructor(private http: HttpClient) {}
 
   async getSearchResults(searchQuery:string): Promise<SearchResponse> {
-    return this.http.get<SearchResponse>(searchQuery).toPromise();
+    return this.http.get<SearchResponse>(
+      ServicesConstants.SEARCH_DATA_URL + searchQuery).toPromise();
   }
 }
 
