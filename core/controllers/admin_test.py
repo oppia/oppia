@@ -1327,6 +1327,25 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(extracted_answers), 1)
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
 
+    def test_handler_when_exp_version_is_not_int_throws_exception(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        # Test that it returns all answers when 'num_answers' is 0.
+        payload = {
+            'exp_id': self.EXP_ID,
+            'exp_version': 'a',
+            'state_name': self.exploration.init_state_name,
+            'num_answers': 0
+        }
+
+        response = self.get_json(
+            '/explorationdataextractionhandler',
+            params=payload,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'], 'Version a cannot be converted to int.')
+
     def test_that_handler_raises_exception(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         payload = {
