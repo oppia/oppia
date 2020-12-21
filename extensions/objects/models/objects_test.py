@@ -671,21 +671,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.GraphProperty, mappings, invalid_values_with_error_messages)
 
-    def test_set_of_html_string(self):
-        """Tests objects of the type StringList."""
-
-        mappings = [(['abc', 'abb'], [u'abc', u'abb']), ([], [])]
-        invalid_values_with_error_messages = [
-            ('123', 'Expected list, received 123'),
-            ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
-            (3.0, 'Expected list, received 3.0'),
-            (None, 'Expected list, received None'),
-            ([3, 'a'], 'Expected unicode HTML string, received 3'),
-            ([1, 2, 1], 'Expected unicode HTML string, received 1')]
-        self.check_normalization(
-            objects.SetOfHtmlString, mappings,
-            invalid_values_with_error_messages)
-
     def test_fraction(self):
         """Tests objects of type Fraction."""
         mappings = [(

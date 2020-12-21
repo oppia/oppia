@@ -69,23 +69,29 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
         // Special case for MultipleChoiceInput, ImageClickInput, and
         // ItemSelectionInput.
         if (choices) {
-          if (varType === 'SetOfHtmlString') {
+          if (varType === 'SetOfTranslatableHtmlContentId') {
             replacementText = '[';
-            var key = inputs[varName];
+            const key = inputs[varName];
+            const contentIds = choices.map(choice => choice.val);
+
             for (var i = 0; i < key.length; i++) {
-              replacementText += $filter('formatRtePreview')(key[i]);
+              replacementText += $filter('formatRtePreview')(
+                choices[contentIds.indexOf(key[i])].label);
               if (i < key.length - 1) {
                 replacementText += ',';
               }
             }
             replacementText += ']';
-          } else if (varType === 'ListOfSetsOfHtmlStrings') {
+          } else if (varType === 'ListOfSetsOfTranslatableHtmlContentId') {
             replacementText = '[';
-            var key = inputs[varName];
+            const key = inputs[varName];
+            const contentIds = choices.map(choice => choice.val);
+
             for (var i = 0; i < key.length; i++) {
               replacementText += '[';
               for (var j = 0; j < key[i].length; j++) {
-                replacementText += $filter('formatRtePreview')(key[i][j]);
+                replacementText += $filter('formatRtePreview')(
+                  choices[contentIds.indexOf(key[i][j])].label);
                 if (j < key[i].length - 1) {
                   replacementText += ',';
                 }
@@ -100,7 +106,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
             replacementText = inputs[varName] + '';
           } else {
             // The following case is for MultipleChoiceInput and
-            // DragAndDropHtmlString.
+            // TranslatableHtmlContentId.
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
                 var filteredLabelText =

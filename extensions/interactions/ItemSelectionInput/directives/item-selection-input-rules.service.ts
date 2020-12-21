@@ -16,8 +16,6 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { RemoveDuplicatesInArrayPipe } from
-  'filters/remove-duplicates-in-array.pipe';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -28,50 +26,31 @@ import { ItemSelectionRuleInputs } from 'interactions/rule-input-defs';
   providedIn: 'root'
 })
 export class ItemSelectionInputRulesService {
-  private removeDuplicatesInArrayPipe: RemoveDuplicatesInArrayPipe = (
-    new RemoveDuplicatesInArrayPipe());
-
   Equals(
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
-    var normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
-    var normalizedInput = this.removeDuplicatesInArrayPipe.transform(inputs.x);
-    return normalizedAnswer.length === normalizedInput.length &&
-        normalizedAnswer.every((val) => {
-          return normalizedInput.indexOf(val) !== -1;
-        });
+    return answer.length === inputs.x.length &&
+    answer.every(val => inputs.x.indexOf(val) !== -1);
   }
   ContainsAtLeastOneOf(
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
-    var normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
-    var normalizedInput = this.removeDuplicatesInArrayPipe.transform(inputs.x);
-    return normalizedAnswer.some((val) => {
-      return normalizedInput.indexOf(val) !== -1;
-    });
+    return answer.some(val => inputs.x.indexOf(val) !== -1);
   }
   // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping
   // in sync with the backend migration of the same rule.
   DoesNotContainAtLeastOneOf(
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
-    var normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
-    var normalizedInput = this.removeDuplicatesInArrayPipe.transform(inputs.x);
-    return normalizedInput.some((val) => {
-      return normalizedAnswer.indexOf(val) === -1;
-    });
+    return inputs.x.some(val => answer.indexOf(val) === -1);
   }
   // This function checks if the answer
   // given by the user is a subset of the correct answers.
   IsProperSubsetOf(
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
-    var normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
-    var normalizedInput = this.removeDuplicatesInArrayPipe.transform(inputs.x);
-    return normalizedAnswer.length < normalizedInput.length &&
-        normalizedAnswer.every((val) => {
-          return normalizedInput.indexOf(val) !== -1;
-        });
+    return answer.length < inputs.x.length &&
+    answer.every(val => inputs.x.indexOf(val) !== -1);
   }
 }
 
