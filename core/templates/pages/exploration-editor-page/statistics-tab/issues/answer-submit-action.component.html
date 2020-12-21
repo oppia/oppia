@@ -1,9 +1,9 @@
 {{ actionIndex }}. Submitted answer "
 <angular-html-bind html-data="getShortAnswerHtml()"></angular-html-bind>
-<span *ng-if="currentStateName == $destStateName">
+<span *ngIf="currentStateName == $destStateName">
   " in card "{{ currentStateName }}".
 </span>
-<span *ng-if="currentStateName != destStateName">
+<span *ngIf="currentStateName != destStateName">
   " and moved to card "{{ destStateName }}" after spending {{ timeSpentInStateSecs }}
   seconds on card "{{ currentStateName }}".
 </span>
