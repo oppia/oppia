@@ -52,7 +52,7 @@ export interface SearchResponse {
 export class SearchBackendApiService {
   constructor(private http: HttpClient) {}
 
-  async getSearchresults(searchQuery:string): Promise<SearchResponse> {
+  async getSearchResults(searchQuery:string): Promise<SearchResponse> {
     return this.http.get<SearchResponse>(searchQuery).toPromise();
   }
 }

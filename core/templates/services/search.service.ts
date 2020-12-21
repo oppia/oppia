@@ -133,7 +133,7 @@ export class SearchService {
 
     this.isCurrentlyFetchingResults = true;
     this.numSearchesInProgress++;
-    this.searchBackendApiService.getSearchresults(queryUrl)
+    this.searchBackendApiService.getSearchResults(queryUrl)
       .then((response) => {
         this.lastQuery = searchQuery;
         this.lastSelectedCategories = angular.copy(selectedCategories);
