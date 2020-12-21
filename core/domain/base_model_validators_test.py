@@ -193,21 +193,24 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         )
 
     def test_remove_system_users(self):
-        external_model = base_model_validators.ExternalModelFetcherDetails(
-            'committer_ids', MockModel,
-            [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
-            remove_system_user_ids=True
-        )
+        user_settings_model = (
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', MockModel,
+                [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
+                system_user_ids_removed=True
+            ))
 
         self.assertItemsEqual(
-            external_model.model_ids, ['User-1', self.PSEUDONYMOUS_ID])
+            user_settings_model.model_ids, ['User-1', self.PSEUDONYMOUS_ID])
 
     def test_remove_pseudonymous_users(self):
-        external_model = base_model_validators.ExternalModelFetcherDetails(
-            'committer_ids', MockModel,
-            [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
-            remove_pseudonymous_ids=True
-        )
+        user_settings_model = (
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', MockModel,
+                [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
+                pseudonymous_ids_removed=True
+            ))
 
         self.assertItemsEqual(
-            external_model.model_ids, [feconf.MIGRATION_BOT_USER_ID, 'User-1'])
+            user_settings_model.model_ids,
+            [feconf.MIGRATION_BOT_USER_ID, 'User-1'])

@@ -178,11 +178,11 @@ class TopicSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id],
-                remove_system_user_ids=True,
-                remove_pseudonymous_ids=True
+                system_user_ids_removed=True,
+                pseudonymous_ids_removed=True
             )]
 
 
@@ -240,11 +240,11 @@ class TopicRightsSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'topic_rights_ids', topic_models.TopicRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id],
-                remove_system_user_ids=True,
-                remove_pseudonymous_ids=True
+                system_user_ids_removed=True,
+                pseudonymous_ids_removed=True
             )]
 
 
@@ -294,11 +294,11 @@ class TopicCommitLogEntryModelValidator(
         external_id_relationships = [
             base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel, [item.topic_id]),
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'user_id',
                 user_models.UserSettingsModel, [item.user_id],
-                remove_system_user_ids=True,
-                remove_pseudonymous_ids=True
+                system_user_ids_removed=True,
+                pseudonymous_ids_removed=True
             )]
         if item.id.startswith('rights'):
             external_id_relationships.append(

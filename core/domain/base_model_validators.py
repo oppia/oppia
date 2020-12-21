@@ -70,11 +70,12 @@ VALIDATION_MODE_NON_STRICT = 'non-strict'
 
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
-    """Value object providing the class and ids to fetch an external model."""
+    """Value object providing the class and ids to fetch an external model.
+    Note: For the UserSettingsModel use the UserSettingsModelFetcherDetails.
+    """
 
     def __init__(
-            self, field_name, model_class, model_ids,
-            remove_system_user_ids=False, remove_pseudonymous_ids=False):
+            self, field_name, model_class, model_ids):
         """Initializes an ExternalModelFetcherDetails domain object.
 
         Args:
@@ -86,16 +87,41 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
             model_class: ClassObject. The external model class.
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
-            remove_system_user_ids: bool. Whether to remove the system user IDs
+        """
+        self.field_name = field_name
+        self.model_class = model_class
+        self.model_ids = model_ids
+
+
+class UserSettingsModelFetcherDetails(python_utils.OBJECT):
+    """Value object providing the class and ids to fetch the
+    user settings model.
+    """
+
+    def __init__(
+            self, field_name, model_class, model_ids,
+            system_user_ids_removed=False, pseudonymous_ids_removed=False):
+        """Initializes the UserSettingsModelFetcherDetails domain object.
+
+        Args:
+            field_name: str. A specific name used as an identifier by the
+                storage model which is used to identify the external model
+                reference. For example: 'exp_ids': ExplorationModel, exp_ids
+                is the field name to identify the external model
+                ExplorationModel.
+            model_class: ClassObject. The external model class.
+            model_ids: list(str). The list of external model ids to fetch the
+                external models.
+            system_user_ids_removed: bool. Whether to remove the system user IDs
                 from the model_ids.
-            remove_pseudonymous_ids: bool. Whether to remove pseudonymous user
+            pseudonymous_ids_removed: bool. Whether to remove pseudonymous user
                 IDs from the model_ids.
         """
         filtered_model_ids = model_ids
-        if remove_system_user_ids:
+        if system_user_ids_removed:
             filtered_model_ids = list(
                 set(filtered_model_ids) - set(feconf.SYSTEM_USERS.values()))
-        if remove_pseudonymous_ids:
+        if pseudonymous_ids_removed:
             filtered_model_ids = [
                 i for i in filtered_model_ids
                 if not utils.is_pseudonymous_id(i)

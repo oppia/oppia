@@ -158,11 +158,11 @@ class ExplorationSnapshotMetadataModelValidator(
                 'exploration_ids',
                 exp_models.ExplorationModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id],
-                remove_system_user_ids=True,
-                remove_pseudonymous_ids=True
+                system_user_ids_removed=True,
+                pseudonymous_ids_removed=True
             )]
 
 
@@ -262,11 +262,11 @@ class ExplorationRightsSnapshotMetadataModelValidator(
                 'exploration_rights_ids',
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids',
                 user_models.UserSettingsModel, [item.committer_id],
-                remove_system_user_ids=True,
-                remove_pseudonymous_ids=True
+                system_user_ids_removed=True,
+                pseudonymous_ids_removed=True
             )]
 
 
@@ -318,11 +318,11 @@ class ExplorationCommitLogEntryModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
                 exp_models.ExplorationModel, [item.exploration_id]),
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'user_id',
                 user_models.UserSettingsModel, [item.user_id],
-                remove_system_user_ids=True,
-                remove_pseudonymous_ids=True
+                system_user_ids_removed=True,
+                pseudonymous_ids_removed=True
             )]
         if item.id.startswith('rights'):
             external_id_relationships.append(
@@ -517,10 +517,10 @@ class GeneralFeedbackThreadModelValidator(
                 user_services.is_user_id_valid(item.original_author_id)
         ):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
+                base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', user_models.UserSettingsModel,
                     [item.original_author_id],
-                    remove_pseudonymous_ids=True
+                    pseudonymous_ids_removed=True
                 ))
         if item.has_suggestion:
             field_name_to_external_model_references.append(
@@ -539,11 +539,11 @@ class GeneralFeedbackThreadModelValidator(
                     item.last_nonempty_message_author_id)
         ):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
+                base_model_validators.UserSettingsModelFetcherDetails(
                     'last_nonempty_message_author_ids',
                     user_models.UserSettingsModel,
                     [item.last_nonempty_message_author_id],
-                    remove_pseudonymous_ids=True
+                    pseudonymous_ids_removed=True
                 ))
         return field_name_to_external_model_references
 
@@ -652,11 +652,11 @@ class GeneralFeedbackMessageModelValidator(
                 user_services.is_user_id_valid(item.author_id)
         ):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
+                base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids',
                     user_models.UserSettingsModel,
                     [item.author_id],
-                    remove_pseudonymous_ids=True
+                    pseudonymous_ids_removed=True
                 )
             )
         return field_name_to_external_model_references
@@ -1045,11 +1045,11 @@ class SubtopicPageSnapshotMetadataModelValidator(
                 'subtopic_page_ids',
                 subtopic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id],
-                remove_system_user_ids=True,
-                remove_pseudonymous_ids=True
+                system_user_ids_removed=True,
+                pseudonymous_ids_removed=True
             )]
 
 
@@ -1104,9 +1104,9 @@ class SubtopicPageCommitLogEntryModelValidator(
                 'subtopic_page_ids',
                 subtopic_models.SubtopicPageModel,
                 [item.subtopic_page_id]),
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'user_id',
                 user_models.UserSettingsModel, [item.user_id],
-                remove_system_user_ids=True,
-                remove_pseudonymous_ids=True
+                system_user_ids_removed=True,
+                pseudonymous_ids_removed=True
             )]
