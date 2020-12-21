@@ -48,8 +48,8 @@ angular.module('oppia').factory('GraphDataService', [
        * includes the following keys:
        * - nodes: Objects with keys of nodeids and values of node names.
        * - links: list of objects. Each object represents a directed link
-       * between two nodes, and has keys 'source' and 'target', the values
-       * of which are the names of the corresponding nodes.
+       *    between two nodes, and has keys 'source' and 'target', the values
+       *    of which are the names of the corresponding nodes.
        * - initStateName: the name of the initial state.
        * - finalStateName: the name of the final state.
        */
