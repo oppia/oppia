@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import logging
+import sys
 
 from core.domain import caching_services
 from core.domain import feedback_services
@@ -40,6 +41,8 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
+
+import six
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -303,147 +306,159 @@ def apply_change_list(topic_id, change_list):
             topic_id, existing_subtopic_page_ids_to_be_modified))
     for subtopic_page in modified_subtopic_pages_list:
         modified_subtopic_pages[subtopic_page.id] = subtopic_page
-    for change in change_list:
-        if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
-            topic.add_subtopic(change.subtopic_id, change.title)
-            subtopic_page_id = (
-                subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                    topic_id, change.subtopic_id))
-            modified_subtopic_pages[subtopic_page_id] = (
-                subtopic_page_domain.SubtopicPage.create_default_subtopic_page( # pylint: disable=line-too-long
-                    change.subtopic_id, topic_id)
-            )
-            modified_subtopic_change_cmds[subtopic_page_id].append(
-                subtopic_page_domain.SubtopicPageChange({
-                    'cmd': 'create_new',
-                    'topic_id': topic_id,
-                    'subtopic_id': change.subtopic_id
-                }))
-            newly_created_subtopic_ids.append(change.subtopic_id)
-        elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
-            topic.delete_subtopic(change.subtopic_id)
-            if change.subtopic_id in newly_created_subtopic_ids:
-                raise Exception(
-                    'The incoming changelist had simultaneous'
-                    ' creation and deletion of subtopics.')
-            deleted_subtopic_ids.append(change.subtopic_id)
-        elif change.cmd == topic_domain.CMD_ADD_CANONICAL_STORY:
-            topic.add_canonical_story(change.story_id)
-        elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
-            topic.delete_canonical_story(change.story_id)
-        elif change.cmd == topic_domain.CMD_REARRANGE_CANONICAL_STORY:
-            topic.rearrange_canonical_story(
-                change.from_index, change.to_index)
-        elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
-            topic.add_additional_story(change.story_id)
-        elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
-            topic.delete_additional_story(change.story_id)
-        elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
-            topic.add_uncategorized_skill_id(
-                change.new_uncategorized_skill_id)
-        elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
-            topic.remove_uncategorized_skill_id(
-                change.uncategorized_skill_id)
-        elif change.cmd == topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
-            topic.move_skill_id_to_subtopic(
-                change.old_subtopic_id, change.new_subtopic_id,
-                change.skill_id)
-        elif change.cmd == topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC:
-            topic.rearrange_skill_in_subtopic(
-                change.subtopic_id, change.from_index, change.to_index)
-        elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
-            topic.rearrange_subtopic(change.from_index, change.to_index)
-        elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
-            topic.remove_skill_id_from_subtopic(
-                change.subtopic_id, change.skill_id)
-        elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
-            if (change.property_name ==
-                    topic_domain.TOPIC_PROPERTY_NAME):
-                topic.update_name(change.new_value)
-            elif (change.property_name ==
-                  topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME):
-                topic.update_abbreviated_name(change.new_value)
-            elif (change.property_name ==
-                  topic_domain.TOPIC_PROPERTY_URL_FRAGMENT):
-                topic.update_url_fragment(change.new_value)
-            elif (change.property_name ==
-                  topic_domain.TOPIC_PROPERTY_DESCRIPTION):
-                topic.update_description(change.new_value)
-            elif (change.property_name ==
-                  topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
-                topic.update_language_code(change.new_value)
-            elif (change.property_name ==
-                  topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
-                topic.update_thumbnail_filename(change.new_value)
-            elif (change.property_name ==
-                  topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
-                topic.update_thumbnail_bg_color(change.new_value)
-            elif (change.property_name ==
-                  topic_domain.TOPIC_PROPERTY_META_TAG_CONTENT):
-                topic.update_meta_tag_content(change.new_value)
-            elif (change.property_name ==
-                  topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED):
-                topic.update_practice_tab_is_displayed(change.new_value)
-            elif (change.property_name ==
-                  topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB):
-                topic.update_page_title_fragment_for_web(change.new_value)
-        elif (change.cmd ==
-              subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
-            subtopic_page_id = (
-                subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                    topic_id, change.subtopic_id))
-            if ((modified_subtopic_pages[subtopic_page_id] is None) or
-                    (change.subtopic_id in deleted_subtopic_ids)):
-                raise Exception(
-                    'The subtopic with id %s doesn\'t exist' % (
-                        change.subtopic_id))
 
-            if (change.property_name ==
-                    subtopic_page_domain.
-                    SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
-                page_contents = state_domain.SubtitledHtml.from_dict(
-                    change.new_value)
-                page_contents.validate()
-                modified_subtopic_pages[
-                    subtopic_page_id].update_page_contents_html(
-                        page_contents)
+    try:
+        for change in change_list:
+            if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
+                topic.add_subtopic(change.subtopic_id, change.title)
+                subtopic_page_id = (
+                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                        topic_id, change.subtopic_id))
+                modified_subtopic_pages[subtopic_page_id] = (
+                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( # pylint: disable=line-too-long
+                        change.subtopic_id, topic_id)
+                )
+                modified_subtopic_change_cmds[subtopic_page_id].append(
+                    subtopic_page_domain.SubtopicPageChange({
+                        'cmd': 'create_new',
+                        'topic_id': topic_id,
+                        'subtopic_id': change.subtopic_id
+                    }))
+                newly_created_subtopic_ids.append(change.subtopic_id)
+            elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
+                topic.delete_subtopic(change.subtopic_id)
+                if change.subtopic_id in newly_created_subtopic_ids:
+                    raise Exception(
+                        'The incoming changelist had simultaneous'
+                        ' creation and deletion of subtopics.')
+                deleted_subtopic_ids.append(change.subtopic_id)
+            elif change.cmd == topic_domain.CMD_ADD_CANONICAL_STORY:
+                topic.add_canonical_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_DELETE_CANONICAL_STORY:
+                topic.delete_canonical_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_REARRANGE_CANONICAL_STORY:
+                topic.rearrange_canonical_story(
+                    change.from_index, change.to_index)
+            elif change.cmd == topic_domain.CMD_ADD_ADDITIONAL_STORY:
+                topic.add_additional_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
+                topic.delete_additional_story(change.story_id)
+            elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
+                topic.add_uncategorized_skill_id(
+                    change.new_uncategorized_skill_id)
+            elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
+                topic.remove_uncategorized_skill_id(
+                    change.uncategorized_skill_id)
+            elif change.cmd == topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
+                topic.move_skill_id_to_subtopic(
+                    change.old_subtopic_id, change.new_subtopic_id,
+                    change.skill_id)
+            elif change.cmd == topic_domain.CMD_REARRANGE_SKILL_IN_SUBTOPIC:
+                topic.rearrange_skill_in_subtopic(
+                    change.subtopic_id, change.from_index, change.to_index)
+            elif change.cmd == topic_domain.CMD_REARRANGE_SUBTOPIC:
+                topic.rearrange_subtopic(change.from_index, change.to_index)
+            elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
+                topic.remove_skill_id_from_subtopic(
+                    change.subtopic_id, change.skill_id)
+            elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
+                if (change.property_name ==
+                        topic_domain.TOPIC_PROPERTY_NAME):
+                    topic.update_name(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME):
+                    topic.update_abbreviated_name(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_URL_FRAGMENT):
+                    topic.update_url_fragment(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_DESCRIPTION):
+                    topic.update_description(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
+                    topic.update_language_code(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
+                    topic.update_thumbnail_filename(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
+                    topic.update_thumbnail_bg_color(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_META_TAG_CONTENT):
+                    topic.update_meta_tag_content(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED):
+                    topic.update_practice_tab_is_displayed(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB):
+                    topic.update_page_title_fragment_for_web(change.new_value)
+            elif (change.cmd ==
+                  subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
+                subtopic_page_id = (
+                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                        topic_id, change.subtopic_id))
+                if ((modified_subtopic_pages[subtopic_page_id] is None) or
+                        (change.subtopic_id in deleted_subtopic_ids)):
+                    raise Exception(
+                        'The subtopic with id %s doesn\'t exist' % (
+                            change.subtopic_id))
 
-            elif (change.property_name ==
-                  subtopic_page_domain.
-                  SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
-                modified_subtopic_pages[
-                    subtopic_page_id].update_page_contents_audio(
-                        state_domain.RecordedVoiceovers.from_dict(
-                            change.new_value))
-        elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
-            if (change.property_name ==
-                    topic_domain.SUBTOPIC_PROPERTY_TITLE):
-                topic.update_subtopic_title(
-                    change.subtopic_id, change.new_value)
-            if (change.property_name ==
-                    topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME):
-                topic.update_subtopic_thumbnail_filename(
-                    change.subtopic_id, change.new_value)
-            if (change.property_name ==
-                    topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
-                topic.update_subtopic_thumbnail_bg_color(
-                    change.subtopic_id, change.new_value)
-            if (change.property_name ==
-                    topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT):
-                topic.update_subtopic_url_fragment(
-                    change.subtopic_id, change.new_value)
+                if (change.property_name ==
+                        subtopic_page_domain.
+                        SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML):
+                    page_contents = state_domain.SubtitledHtml.from_dict(
+                        change.new_value)
+                    page_contents.validate()
+                    modified_subtopic_pages[
+                        subtopic_page_id].update_page_contents_html(
+                            page_contents)
 
-        elif (
-                change.cmd ==
-                topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION):
-            # Loading the topic model from the datastore into a
-            # Topic domain object automatically converts it to use the
-            # latest schema version. As a result, simply resaving the
-            # topic is sufficient to apply the schema migration.
-            continue
-    return (
-        topic, modified_subtopic_pages, deleted_subtopic_ids,
-        newly_created_subtopic_ids, modified_subtopic_change_cmds)
+                elif (change.property_name ==
+                      subtopic_page_domain.
+                      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO):
+                    modified_subtopic_pages[
+                        subtopic_page_id].update_page_contents_audio(
+                            state_domain.RecordedVoiceovers.from_dict(
+                                change.new_value))
+            elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_TITLE):
+                    topic.update_subtopic_title(
+                        change.subtopic_id, change.new_value)
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME):
+                    topic.update_subtopic_thumbnail_filename(
+                        change.subtopic_id, change.new_value)
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR):
+                    topic.update_subtopic_thumbnail_bg_color(
+                        change.subtopic_id, change.new_value)
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_URL_FRAGMENT):
+                    topic.update_subtopic_url_fragment(
+                        change.subtopic_id, change.new_value)
+
+            elif (
+                    change.cmd ==
+                    topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION):
+                # Loading the topic model from the datastore into a
+                # Topic domain object automatically converts it to use the
+                # latest schema version. As a result, simply resaving the
+                # topic is sufficient to apply the schema migration.
+                continue
+        return (
+            topic, modified_subtopic_pages, deleted_subtopic_ids,
+            newly_created_subtopic_ids, modified_subtopic_change_cmds)
+
+    except Exception as e:
+        logging.error(
+            '%s %s %s %s' % (
+                e.__class__.__name__, e, topic_id, change_list)
+        )
+        # This code is needed in order to reraise the error properly with
+        # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
+        exec_info = sys.exc_info()
+        six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
 def _save_topic(committer_id, topic, commit_message, change_list):

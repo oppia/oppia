@@ -29,6 +29,7 @@ import collections
 import copy
 import logging
 import os
+import sys
 
 from constants import constants
 from core.domain import activity_services
@@ -45,6 +46,8 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
+
+import six
 
 (collection_models, user_models) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.user])
@@ -629,40 +632,54 @@ def apply_change_list(collection_id, change_list):
         Collection. The resulting collection domain object.
     """
     collection = get_collection_by_id(collection_id)
-    changes = [collection_domain.CollectionChange(change_dict)
-               for change_dict in change_list]
 
-    for change in changes:
-        if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
-            collection.add_node(change.exploration_id)
-        elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
-            collection.delete_node(change.exploration_id)
-        elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
-            collection.swap_nodes(change.first_index, change.second_index)
-        elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
-            if (change.property_name ==
-                    collection_domain.COLLECTION_PROPERTY_TITLE):
-                collection.update_title(change.new_value)
-            elif (change.property_name ==
-                  collection_domain.COLLECTION_PROPERTY_CATEGORY):
-                collection.update_category(change.new_value)
-            elif (change.property_name ==
-                  collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
-                collection.update_objective(change.new_value)
-            elif (change.property_name ==
-                  collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
-                collection.update_language_code(change.new_value)
-            elif (change.property_name ==
-                  collection_domain.COLLECTION_PROPERTY_TAGS):
-                collection.update_tags(change.new_value)
-        elif (change.cmd ==
-              collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
-            # Loading the collection model from the datastore into an
-            # Collection domain object automatically converts it to use the
-            # latest schema version. As a result, simply resaving the
-            # collection is sufficient to apply the schema migration.
-            continue
-    return collection
+    try:
+        changes = [
+            collection_domain.CollectionChange(change_dict)
+            for change_dict in change_list
+        ]
+        for change in changes:
+            if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
+                collection.add_node(change.exploration_id)
+            elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
+                collection.delete_node(change.exploration_id)
+            elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
+                collection.swap_nodes(change.first_index, change.second_index)
+            elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
+                if (change.property_name ==
+                        collection_domain.COLLECTION_PROPERTY_TITLE):
+                    collection.update_title(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_CATEGORY):
+                    collection.update_category(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_OBJECTIVE):
+                    collection.update_objective(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_LANGUAGE_CODE):
+                    collection.update_language_code(change.new_value)
+                elif (change.property_name ==
+                      collection_domain.COLLECTION_PROPERTY_TAGS):
+                    collection.update_tags(change.new_value)
+            elif (change.cmd ==
+                  collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+                # Loading the collection model from the datastore into an
+                # Collection domain object automatically converts it to use the
+                # latest schema version. As a result, simply resaving the
+                # collection is sufficient to apply the schema migration.
+                continue
+
+        return collection
+
+    except Exception as e:
+        logging.error(
+            '%s %s %s %s' % (
+                e.__class__.__name__, e, collection_id, change_list)
+        )
+        # This code is needed in order to reraise the error properly with
+        # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
+        exec_info = sys.exc_info()
+        six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
 def validate_exps_in_collection_are_public(collection):

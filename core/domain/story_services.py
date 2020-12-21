@@ -24,6 +24,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import logging
+import sys
 
 from constants import constants
 from core.domain import android_validation_constants
@@ -38,6 +40,8 @@ from core.domain import topic_fetchers
 from core.platform import models
 import feconf
 import utils
+
+import six
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
@@ -115,102 +119,113 @@ def apply_change_list(story_id, change_list):
     """
     story = story_fetchers.get_story_by_id(story_id)
     exp_ids_in_old_story = story.story_contents.get_all_linked_exp_ids()
-    for change in change_list:
-        if not isinstance(change, story_domain.StoryChange):
-            raise Exception('Expected change to be of type StoryChange')
-        if change.cmd == story_domain.CMD_ADD_STORY_NODE:
-            story.add_node(change.node_id, change.title)
-        elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
-            story.delete_node(change.node_id)
-        elif (change.cmd ==
-              story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS):
-            if change.new_value:
-                story.mark_node_outline_as_finalized(change.node_id)
-            else:
-                story.mark_node_outline_as_unfinalized(change.node_id)
-        elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
-            if (change.property_name ==
-                    story_domain.STORY_NODE_PROPERTY_OUTLINE):
-                story.update_node_outline(change.node_id, change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_NODE_PROPERTY_TITLE):
-                story.update_node_title(change.node_id, change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
-                story.update_node_description(
-                    change.node_id, change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
-                story.update_node_thumbnail_filename(
-                    change.node_id, change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
-                story.update_node_thumbnail_bg_color(
-                    change.node_id, change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
-                story.update_node_acquired_skill_ids(
-                    change.node_id, change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
-                story.update_node_prerequisite_skill_ids(
-                    change.node_id, change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
-                story.update_node_destination_node_ids(
-                    change.node_id, change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
-                story.update_node_exploration_id(
-                    change.node_id, change.new_value)
-        elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
-            if (change.property_name ==
-                    story_domain.STORY_PROPERTY_TITLE):
-                story.update_title(change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
-                story.update_thumbnail_filename(change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
-                story.update_thumbnail_bg_color(change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_PROPERTY_DESCRIPTION):
-                story.update_description(change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_PROPERTY_NOTES):
-                story.update_notes(change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_PROPERTY_LANGUAGE_CODE):
-                story.update_language_code(change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_PROPERTY_URL_FRAGMENT):
-                story.update_url_fragment(change.new_value)
-            elif (change.property_name ==
-                  story_domain.STORY_PROPERTY_META_TAG_CONTENT):
-                story.update_meta_tag_content(change.new_value)
-        elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
-            if (change.property_name ==
-                    story_domain.INITIAL_NODE_ID):
-                story.update_initial_node(change.new_value)
-            if change.property_name == story_domain.NODE:
-                story.rearrange_node_in_story(
-                    change.old_value, change.new_value)
-        elif (
-                change.cmd ==
-                story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
-            # Loading the story model from the datastore into a
-            # Story domain object automatically converts it to use the
-            # latest schema version. As a result, simply resaving the
-            # story is sufficient to apply the schema migration.
-            continue
+    try:
+        for change in change_list:
+            if not isinstance(change, story_domain.StoryChange):
+                raise Exception('Expected change to be of type StoryChange')
+            if change.cmd == story_domain.CMD_ADD_STORY_NODE:
+                story.add_node(change.node_id, change.title)
+            elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
+                story.delete_node(change.node_id)
+            elif (change.cmd ==
+                  story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS):
+                if change.new_value:
+                    story.mark_node_outline_as_finalized(change.node_id)
+                else:
+                    story.mark_node_outline_as_unfinalized(change.node_id)
+            elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
+                if (change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_OUTLINE):
+                    story.update_node_outline(change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_TITLE):
+                    story.update_node_title(change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_DESCRIPTION):
+                    story.update_node_description(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME):
+                    story.update_node_thumbnail_filename(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR):
+                    story.update_node_thumbnail_bg_color(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
+                    story.update_node_acquired_skill_ids(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
+                    story.update_node_prerequisite_skill_ids(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
+                    story.update_node_destination_node_ids(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
+                    story.update_node_exploration_id(
+                        change.node_id, change.new_value)
+            elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
+                if (change.property_name ==
+                        story_domain.STORY_PROPERTY_TITLE):
+                    story.update_title(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
+                    story.update_thumbnail_filename(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR):
+                    story.update_thumbnail_bg_color(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_DESCRIPTION):
+                    story.update_description(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_NOTES):
+                    story.update_notes(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_LANGUAGE_CODE):
+                    story.update_language_code(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_URL_FRAGMENT):
+                    story.update_url_fragment(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_META_TAG_CONTENT):
+                    story.update_meta_tag_content(change.new_value)
+            elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
+                if (change.property_name ==
+                        story_domain.INITIAL_NODE_ID):
+                    story.update_initial_node(change.new_value)
+                if change.property_name == story_domain.NODE:
+                    story.rearrange_node_in_story(
+                        change.old_value, change.new_value)
+            elif (
+                    change.cmd ==
+                    story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+                # Loading the story model from the datastore into a
+                # Story domain object automatically converts it to use the
+                # latest schema version. As a result, simply resaving the
+                # story is sufficient to apply the schema migration.
+                continue
 
-    exp_ids_in_modified_story = (
-        story.story_contents.get_all_linked_exp_ids())
-    exp_ids_removed_from_story = list(
-        set(exp_ids_in_old_story).difference(exp_ids_in_modified_story))
-    exp_ids_added_to_story = list(
-        set(exp_ids_in_modified_story).difference(exp_ids_in_old_story))
-    return story, exp_ids_removed_from_story, exp_ids_added_to_story
+        exp_ids_in_modified_story = (
+            story.story_contents.get_all_linked_exp_ids())
+        exp_ids_removed_from_story = list(
+            set(exp_ids_in_old_story).difference(exp_ids_in_modified_story))
+        exp_ids_added_to_story = list(
+            set(exp_ids_in_modified_story).difference(exp_ids_in_old_story))
+        return story, exp_ids_removed_from_story, exp_ids_added_to_story
+
+    except Exception as e:
+        logging.error(
+            '%s %s %s %s' % (
+                e.__class__.__name__, e, story_id, change_list)
+        )
+        # This code is needed in order to reraise the error properly with
+        # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
+        exec_info = sys.exc_info()
+        six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
 def does_story_exist_with_url_fragment(url_fragment):

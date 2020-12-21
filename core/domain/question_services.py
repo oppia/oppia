@@ -18,6 +18,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
+import logging
+import sys
 
 from constants import constants
 from core.domain import opportunity_services
@@ -29,6 +31,8 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
+
+import six
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
@@ -544,25 +548,36 @@ def apply_change_list(question_id, change_list):
     question = get_question_by_id(question_id)
     question_property_inapplicable_skill_misconception_ids = (
         question_domain.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS)
-    for change in change_list:
-        if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
-            if (change.property_name ==
-                    question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
-                question.update_language_code(change.new_value)
-            elif (change.property_name ==
-                  question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
-                state_domain_object = state_domain.State.from_dict(
-                    change.new_value)
-                question.update_question_state_data(state_domain_object)
-            elif (change.property_name ==
-                  question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
-                question.update_linked_skill_ids(change.new_value)
-            elif (change.property_name ==
-                  question_property_inapplicable_skill_misconception_ids):
-                question.update_inapplicable_skill_misconception_ids(
-                    change.new_value)
+    try:
+        for change in change_list:
+            if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
+                if (change.property_name ==
+                        question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
+                    question.update_language_code(change.new_value)
+                elif (change.property_name ==
+                      question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
+                    state_domain_object = state_domain.State.from_dict(
+                        change.new_value)
+                    question.update_question_state_data(state_domain_object)
+                elif (change.property_name ==
+                      question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
+                    question.update_linked_skill_ids(change.new_value)
+                elif (change.property_name ==
+                      question_property_inapplicable_skill_misconception_ids):
+                    question.update_inapplicable_skill_misconception_ids(
+                        change.new_value)
 
-    return question
+        return question
+
+    except Exception as e:
+        logging.error(
+            '%s %s %s %s' % (
+                e.__class__.__name__, e, question_id, change_list)
+        )
+        # This code is needed in order to reraise the error properly with
+        # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
+        exec_info = sys.exc_info()
+        six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
 
 
 def _save_question(committer_id, question, change_list, commit_message):
