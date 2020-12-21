@@ -38,12 +38,12 @@ class UserIdByFirebaseAuthIdModelValidator(
         Args:
             item: datastore_services.Model. Entity to validate.
         """
-        # Firebase only constrains IDs to be between 1 and 128 characters:
+        # Firebase only constrains IDs fit to within 1 and 128 ASCII characters:
         # https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
         if len(item.id) > 128:
             cls._add_error(
                 'model %s' % (base_model_validators.ERROR_CATEGORY_ID_CHECK,),
-                'Entity id %s: Firebase ID len must be in range [1, 128)' % (
+                'Entity id %s: Firebase ID length must be in range [1, 128)' % (
                     item.id.decode('utf-8')))
 
     @classmethod
