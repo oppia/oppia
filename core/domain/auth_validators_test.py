@@ -97,42 +97,6 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_audit_with_valid_unicode_id_passes(self):
-        # The ¿ character is 2-bytes long with utf-8 encoding, so the length of
-        # the ID is 128 characters; just within the limit.
-        valid_auth_id = '¿' * 64
-        self.signup('email@test.com', 'testUser')
-        user_id = self.get_user_id_from_email('email@test.com')
-        model_instance = auth_models.UserIdByFirebaseAuthIdModel(
-            id=valid_auth_id, user_id=user_id)
-        model_instance.update_timestamps()
-        model_instance.put()
-        expected_output = [
-            '[u\'fully-validated UserIdByFirebaseAuthIdModel\', 2]',
-        ]
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=True)
-
-    def test_audit_with_invalid_unicode_id_fails(self):
-        # The ¿ character is 2-bytes long with utf-8 encoding, so the length of
-        # the ID is 129 characters; just outside the limit.
-        auth_id_that_is_too_long = ('¿' * 64) + '?'
-        self.signup('email@test.com', 'testUser')
-        user_id = self.get_user_id_from_email('email@test.com')
-        model_instance = auth_models.UserIdByFirebaseAuthIdModel(
-            id=auth_id_that_is_too_long, user_id=user_id)
-        model_instance.update_timestamps()
-        model_instance.put()
-        expected_output = [
-            '[u\'failed validation check for model id check of '
-            'UserIdByFirebaseAuthIdModel\', [u\'Entity id %s: Firebase ID len '
-            'must be in range [1, 128)\']]' % (auth_id_that_is_too_long,),
-            '[u\'fully-validated UserIdByFirebaseAuthIdModel\', 1]',
-        ]
-
-        self.run_job_and_check_output(
-            expected_output, sort=True, literal_eval=True)
-
     def test_audit_with_created_on_greater_than_last_updated_fails(self):
         self.model_instance.created_on = (
             self.model_instance.last_updated + datetime.timedelta(days=1))
