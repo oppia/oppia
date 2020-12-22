@@ -46,10 +46,6 @@ describe('Topic editor state service', () => {
   let subtopicPageObject:SubtopicPageBackendDict = null;
   let secondSubtopicPageObject: SubtopicPageBackendDict = null;
 
-  // Let httpClient: HttpClient;
-  // let $rootScope = null;
-  // let $q = null;
-
   let testSubscriptions = null;
   let subtopicPageLoadedSpy = null;
 

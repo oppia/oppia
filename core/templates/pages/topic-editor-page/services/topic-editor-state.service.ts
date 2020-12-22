@@ -34,10 +34,8 @@ import { RubricObjectFactory, RubricBackendDict } from 'domain/skill/RubricObjec
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service.ts';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service.ts';
 import { AlertsService } from 'services/alerts.service';
-import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { SkillIdToDescriptionMap } from 'domain/topic/SubtopicObjectFactory';
-import { QuestionBackendDict } from 'domain/question/QuestionObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -69,8 +67,9 @@ export class TopicEditorStateService {
   private _topicWithNameExists: boolean = false;
   private _topicWithUrlFragmentExists: boolean = false;
   private _canonicalStorySummaries: StorySummary[] = [];
-  private _skillIdToRubricsObject: RubricBackendDict[] = [];
-  private _skillQuestionCountDict: QuestionBackendDict[] = [];
+  private _skillIdToRubricsObject : RubricBackendDict[] = [];
+  private _skillQuestionCountDict:
+  { [skillId: string]: number; } | undefined[] = [];
   private _groupedSkillSummaries = {
     current: [],
     others: []
@@ -166,7 +165,7 @@ export class TopicEditorStateService {
     this._topicRights.copyFromTopicRights(topicRights);
   }
   private _updateTopicRights(
-      newBackendTopicRightsObject: unknown): void {
+      newBackendTopicRightsObject): void {
     this._setTopicRights(TopicRights.createFromBackendDict(
       newBackendTopicRightsObject));
   }
@@ -239,7 +238,7 @@ export class TopicEditorStateService {
     return angular.copy(this._groupedSkillSummaries);
   }
 
-  getSkillQuestionCountDict(): QuestionBackendDict[] {
+  getSkillQuestionCountDict(): { [skillId: string]: number; } | undefined[] {
     return this._skillQuestionCountDict;
   }
 
@@ -296,7 +295,7 @@ export class TopicEditorStateService {
     return this._topicIsInitialized;
   }
 
-  getSkillIdToRubricsObject():RubricBackendDict[] {
+  getSkillIdToRubricsObject(): RubricBackendDict[] {
     return this._skillIdToRubricsObject;
   }
 
@@ -454,7 +453,7 @@ export class TopicEditorStateService {
         );
         this._updateSkillIdToRubricsObject(
           topicBackendObject.skillIdToRubricsDict);
-        let changeList:BackendChangeObject[] =
+        let changeList =
          this.undoRedoService.getCommittableChangeList();
         for (let i = 0; i < changeList.length; i++) {
           if (changeList[i].cmd === 'delete_canonical_story' ||
@@ -560,4 +559,3 @@ export class TopicEditorStateService {
 
 angular.module('oppia').factory(
   'TopicEditorStateService', downgradeInjectable(TopicEditorStateService));
-
