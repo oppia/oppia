@@ -58,7 +58,6 @@ IMAGE_PATH_REGEX = (
 AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
-USER_ID_REGEX = 'uid_[a-z]{32}'
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'DashboardRecentUpdatesAggregator',
     'ExplorationRecommendationsAggregator',
@@ -730,7 +729,7 @@ class GeneralFeedbackThreadUserModelValidator(
         thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_=]{1,}' % (
             ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
             base_models.ID_LENGTH)
-        regex_string = '^%s\\.%s$' % (USER_ID_REGEX, thread_id_string)
+        regex_string = '^%s\\.%s$' % (feconf.USER_ID_REGEX, thread_id_string)
         return regex_string
 
     @classmethod
@@ -767,7 +766,7 @@ class UnsentFeedbackEmailModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^%s$' % USER_ID_REGEX
+        return '^%s$' % feconf.USER_ID_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
