@@ -1253,3 +1253,39 @@ MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 # to go unrecorded.
 # https://cloud.google.com/appengine/docs/standard/python/outbound-requests#request_timeouts
 DEFAULT_TASKQUEUE_TIMEOUT_SECONDS = 30
+
+# Mapping from issue type to issue keyname in the issue customization dict. This
+# mapping is useful to uniquely identify issues by the combination of their
+# issue type and other type-specific information (such as the list of states
+# involved).
+CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
+    'EarlyQuit': 'state_name',
+    'MultipleIncorrectSubmissions': 'state_name',
+    'CyclicStateTransitions': 'state_names'
+}
+
+# Constants defining various suggestion types.
+SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
+SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
+
+# Suggestion fields that can be queried.
+ALLOWED_SUGGESTION_QUERY_FIELDS = [
+    'suggestion_type', 'target_type', 'target_id', 'status', 'author_id',
+    'final_reviewer_id', 'score_category', 'language_code'
+]
+
+# Possible targets that the suggestions can modify.
+SUGGESTION_TARGET_TYPE_CHOICES = [
+    ENTITY_TYPE_EXPLORATION,
+    ENTITY_TYPE_QUESTION,
+    ENTITY_TYPE_SKILL,
+    ENTITY_TYPE_TOPIC
+]
+
+# Possible suggestion types.
+SUGGESTION_TYPE_CHOICES = [
+    SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]

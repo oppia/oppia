@@ -48,6 +48,9 @@ export default {
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
 
+  "ACTION_ACCEPT_SUGGESTION": "accept",
+  "ACTION_REJECT_SUGGESTION": "reject",
+
   "SKILL_STATUS_OPTIONS": {
     "ALL": "All",
     "ASSIGNED": "Assigned",

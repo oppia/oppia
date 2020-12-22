@@ -53,12 +53,9 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.domain import wipeout_service
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-current_user_services = models.Registry.import_current_user_services()
 
 
 class AdminPage(base.BaseHandler):

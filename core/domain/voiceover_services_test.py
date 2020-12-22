@@ -31,6 +31,7 @@ from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 import python_utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
@@ -116,7 +117,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_voiceover_applications, [])
 
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
 
         user_voiceover_applications = (
@@ -156,7 +157,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_voiceover_applications, [])
 
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
 
         user_voiceover_applications = (
@@ -174,7 +175,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(voiceover_applications, [])
 
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
 
         voiceover_applications = (
@@ -187,7 +188,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
 
     def test_accept_application_assigns_role_to_entity(self):
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
 
         user_voiceover_applications = (
@@ -218,7 +219,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
 
     def test_accept_application_removes_exploration_voiceover_opportunity(self):
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
 
         user_voiceover_applications = (
@@ -254,11 +255,11 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     def test_accept_application_removes_rejectes_other_similar_applications(
             self):
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
 
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.owner_id)
 
         user_voiceover_applications = (
@@ -306,7 +307,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
 
     def test_author_accepts_own_voiceover_application_raise_exception(self):
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(
@@ -321,7 +322,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
 
     def test_reject_voiceover_application(self):
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
 
         user_voiceover_applications = (
@@ -356,7 +357,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
 
     def test_author_rejects_own_voiceover_application_raise_exception(self):
         voiceover_services.create_new_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en', '',
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
             'audio_file.mp3', self.applicant_id)
         user_voiceover_applications = (
             voiceover_services.get_user_submitted_voiceover_applications(
@@ -384,7 +385,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 })], 'Adds new content to init state')
 
         content = voiceover_services.get_text_to_create_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en')
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en')
         self.assertEqual(content, '<p>The new content to voiceover</p>')
 
     def test_get_text_to_create_voiceover_application_in_diff_language(self):
@@ -409,7 +410,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 })], 'Adds new content to init state and its translation')
 
         content = voiceover_services.get_text_to_create_voiceover_application(
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'hi')
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'hi')
         self.assertEqual(content, '<p>Translation in Hindi</p>')
 
     def test_get_text_to_create_voiceover_application_for_invalid_type(self):

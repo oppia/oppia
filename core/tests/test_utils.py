@@ -2344,10 +2344,10 @@ tags: []
             suggestion_id = (
                 feedback_models.GeneralFeedbackThreadModel.
                 generate_new_thread_id(
-                    suggestion_models.TARGET_TYPE_SKILL, skill_id))
+                    feconf.ENTITY_TYPE_SKILL, skill_id))
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             suggestion_models.STATUS_IN_REVIEW, author_id, None, change,
             score_category, suggestion_id, language_code)
 

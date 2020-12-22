@@ -32,12 +32,9 @@ from core.domain import summary_services
 from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-current_user_services = models.Registry.import_current_user_services()
 
 
 class ProfilePage(base.BaseHandler):
@@ -464,7 +461,7 @@ class UserInfoHandler(base.BaseHandler):
                     user_services.is_at_least_moderator(self.user_id)),
                 'is_admin': user_services.is_admin(self.user_id),
                 'is_super_admin': (
-                    current_user_services.is_current_user_super_admin()),
+                    user_services.is_current_user_super_admin()),
                 'is_topic_manager': (
                     user_services.is_topic_manager(self.user_id)),
                 'can_create_collections': bool(
@@ -488,14 +485,12 @@ class UrlHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        login_url = None
         if self.user_id:
             self.render_json({'login_url': None})
         else:
             if self.request and self.request.get('current_url'):
                 target_url = self.request.get('current_url')
-                login_url = (
-                    current_user_services.create_login_url(target_url))
+                login_url = user_services.create_login_url(target_url)
                 self.render_json({'login_url': login_url})
             else:
                 raise self.InvalidInputException(

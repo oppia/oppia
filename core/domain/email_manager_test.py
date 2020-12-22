@@ -2095,8 +2095,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         }
 
         translation_suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description')
@@ -2129,8 +2129,8 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
             }
 
         question_suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description')
@@ -3678,8 +3678,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
         with self.mock_datetime_utcnow(submission_datetime):
             translation_suggestion = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, add_translation_change_dict,
                 'test description')
@@ -3712,8 +3712,8 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
         with self.mock_datetime_utcnow(submission_datetime):
             question_suggestion = suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-                suggestion_models.TARGET_TYPE_SKILL,
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_SKILL,
                 self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
                 self.author_id, add_question_change_dict,
                 'test description')
@@ -4436,8 +4436,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description'
@@ -4461,8 +4461,8 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
@@ -4533,7 +4533,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             logging, 'info', self._mock_logging_info)
 
         self.suggestion_types_needing_reviewers = {
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
         }
 
     def test_email_not_sent_if_can_send_emails_is_false(self):
@@ -4630,7 +4630,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
         expected_email_html_body = (
             'Hi user1,'
             '<br><br>'
@@ -4674,7 +4674,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
             '<br><br>'
@@ -4745,7 +4745,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
         expected_email_html_body = (
             'Hi user1,'
             '<br><br>'
@@ -4788,7 +4788,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'hi'}})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
             '<br><br>'
@@ -4858,7 +4858,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'fr', 'hi'}})
         expected_email_html_body = (
             'Hi user1,'
@@ -4908,7 +4908,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'fr', 'hi'}})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
@@ -4991,9 +4991,9 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
             {
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                     'fr', 'hi'},
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
+                feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
             })
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'

@@ -57,15 +57,7 @@ ALLOWED_ACTION_TYPES = [
     ACTION_TYPE_ANSWER_SUBMIT,
     ACTION_TYPE_EXPLORATION_QUIT
 ]
-# Mapping from issue type to issue keyname in the issue customization dict. This
-# mapping is useful to uniquely identify issues by the combination of their
-# issue type and other type-specific information (such as the list of states
-# involved).
-CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
-    'EarlyQuit': 'state_name',
-    'MultipleIncorrectSubmissions': 'state_name',
-    'CyclicStateTransitions': 'state_names'
-}
+
 # The entity types for which the LearnerAnswerDetailsModel instance
 # can be created.
 ALLOWED_ENTITY_TYPES = [

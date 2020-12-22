@@ -1675,8 +1675,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
             'new_value': 'new suggestion content'
         }
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0',
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
             self.admin_id, change, score_category, self.thread_id, None)
 

@@ -69,13 +69,13 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'UserImpactAggregator',
     'UserStatsAggregator']
 TARGET_TYPE_TO_TARGET_MODEL = {
-    suggestion_models.TARGET_TYPE_EXPLORATION: (
+    feconf.ENTITY_TYPE_EXPLORATION: (
         exp_models.ExplorationModel),
-    suggestion_models.TARGET_TYPE_QUESTION: (
+    feconf.ENTITY_TYPE_QUESTION: (
         question_models.QuestionModel),
-    suggestion_models.TARGET_TYPE_SKILL: (
+    feconf.ENTITY_TYPE_SKILL: (
         skill_models.SkillModel),
-    suggestion_models.TARGET_TYPE_TOPIC: (
+    feconf.ENTITY_TYPE_TOPIC: (
         topic_models.TopicModel)
 }
 
@@ -728,7 +728,7 @@ class GeneralFeedbackThreadUserModelValidator(
     def _get_model_id_regex(cls, unused_item):
         # Valid id: [user_id].[thread_id]
         thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_=]{1,}' % (
-            ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
+            ('|').join(feconf.SUGGESTION_TARGET_TYPE_CHOICES),
             base_models.ID_LENGTH)
         regex_string = '^%s\\.%s$' % (USER_ID_REGEX, thread_id_string)
         return regex_string

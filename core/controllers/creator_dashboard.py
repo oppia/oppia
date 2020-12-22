@@ -37,13 +37,9 @@ from core.domain import summary_services
 from core.domain import topic_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-(feedback_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.feedback, models.NAMES.suggestion])
 
 EXPLORATION_ID_KEY = 'exploration_id'
 COLLECTION_ID_KEY = 'collection_id'
@@ -276,7 +272,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             [('author_id', self.user_id),
              (
                  'suggestion_type',
-                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)])
+                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)])
         suggestions_which_can_be_reviewed = (
             suggestion_services
             .get_all_suggestions_that_can_be_reviewed_by_user(self.user_id))

@@ -35,16 +35,14 @@ require('pages/exploration-editor-page/services/router.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
   '$log', '$rootScope', '$uibModal', 'ExplorationDataService',
-  'ExplorationStatesService', 'RouterService',
-  'StateEditorRefreshService', 'StateObjectFactory',
-  'SuggestionModalService', 'ThreadDataBackendApiService',
-  'UrlInterpolationService',
+  'ExplorationStatesService', 'RouterService', 'StateEditorRefreshService',
+  'StateObjectFactory', 'ThreadDataBackendApiService',
+  'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
   function(
       $log, $rootScope, $uibModal, ExplorationDataService,
-      ExplorationStatesService, RouterService,
-      StateEditorRefreshService, StateObjectFactory,
-      SuggestionModalService, ThreadDataBackendApiService,
-      UrlInterpolationService) {
+      ExplorationStatesService, RouterService, StateEditorRefreshService,
+      StateObjectFactory, ThreadDataBackendApiService,
+      UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
     let showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
         setActiveThread = (threadId => {}), threadUibModalInstance = null) {
@@ -75,8 +73,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
           () => {
             setActiveThread(activeThread.threadId);
             // Immediately update editor to reflect accepted suggestion.
-            if (result.action ===
-                SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
+            if (result.action === ACTION_ACCEPT_SUGGESTION) {
               let suggestion = activeThread.getSuggestion();
               let stateName = suggestion.stateName;
               let stateDict = ExplorationDataService.data.states[stateName];

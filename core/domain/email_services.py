@@ -59,7 +59,7 @@ def get_feedback_thread_reply_info_by_reply_to_id(reply_to_id):
     return get_feedback_thread_reply_info_from_model(model)
 
 
-def get_feedback_thread_reply_info_by_user_and_thread_ids(user_id, thread_id):
+def get_feedback_thread_reply_info_by_user_and_thread(user_id, thread_id):
     """Gets the domain object corresponding to the model which is fetched by
     user_id and thread_id.
 

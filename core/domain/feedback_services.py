@@ -902,6 +902,7 @@ def _add_feedback_message_reference(user_id, reference):
         enqueue_feedback_message_batch_email_task(user_id)
 
 
+@transaction_services.run_in_transaction_wrapper
 def update_feedback_email_retries(user_id):
     """If sufficient time has passed, increment the number of retries for the
     corresponding user's UnsentEmailFeedbackModel.
@@ -920,6 +921,7 @@ def update_feedback_email_retries(user_id):
         model.put()
 
 
+@transaction_services.run_in_transaction_wrapper
 def pop_feedback_message_references(user_id, num_references_to_pop):
     """Pops feedback message references of the given user which have been
     processed already.
@@ -945,6 +947,7 @@ def pop_feedback_message_references(user_id, num_references_to_pop):
         enqueue_feedback_message_batch_email_task(user_id)
 
 
+@transaction_services.run_in_transaction_wrapper
 def clear_feedback_message_references(user_id, exploration_id, thread_id):
     """Removes feedback message references associated with a feedback thread.
 

@@ -47,9 +47,6 @@ export const ExplorationEditorPageConstants = {
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE:
     'The current solution is no longer valid.',
 
-  ACTION_ACCEPT_SUGGESTION: 'accept',
-  ACTION_REJECT_SUGGESTION: 'reject',
-
   COMPONENT_NAME_DEFAULT_OUTCOME: 'default_outcome',
 
   STATUS_COMPLIMENT: 'compliment',

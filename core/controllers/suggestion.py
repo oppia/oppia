@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import fs_services
@@ -29,11 +30,8 @@ from core.domain import image_validation_services
 from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import suggestion_services
-from core.platform import models
 import feconf
 import utils
-
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
 def _get_target_id_to_exploration_opportunity_dict(suggestions):
@@ -158,7 +156,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     def put(self, target_id, suggestion_id):
         if (
                 suggestion_id.split('.')[0] !=
-                suggestion_models.TARGET_TYPE_EXPLORATION):
+                feconf.ENTITY_TYPE_EXPLORATION):
             raise self.InvalidInputException(
                 'This handler allows actions only'
                 ' on suggestions to explorations.')
@@ -175,7 +173,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(
                 'You cannot accept/reject your own suggestion.')
 
-        if action == suggestion_models.ACTION_TYPE_ACCEPT:
+        if action == constants.ACTION_ACCEPT_SUGGESTION:
             commit_message = self.payload.get('commit_message')
             if (commit_message is not None and
                     len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH):
@@ -185,7 +183,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
-        elif action == suggestion_models.ACTION_TYPE_REJECT:
+        elif action == constants.ACTION_REJECT_SUGGESTION:
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id, self.payload.get('review_message'))
         else:
@@ -215,7 +213,7 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
-        if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_SKILL:
+        if suggestion_id.split('.')[0] != feconf.ENTITY_TYPE_SKILL:
             raise self.InvalidInputException(
                 'This handler allows actions only on suggestions to skills.')
 
@@ -226,12 +224,12 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
 
         action = self.payload.get('action')
 
-        if action == suggestion_models.ACTION_TYPE_ACCEPT:
+        if action == constants.ACTION_ACCEPT_SUGGESTION:
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
                 suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
-        elif action == suggestion_models.ACTION_TYPE_REJECT:
+        elif action == constants.ACTION_REJECT_SUGGESTION:
             suggestion_services.reject_suggestion(
                 suggestion_id, self.user_id, self.payload.get('review_message'))
         else:
@@ -257,11 +255,11 @@ class SuggestionsProviderHandler(base.BaseHandler):
             InvalidInputException. If the given target_type of suggestion_type
                 are invalid.
         """
-        if target_type not in suggestion_models.TARGET_TYPE_CHOICES:
+        if target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
             raise self.InvalidInputException(
                 'Invalid target_type: %s' % target_type)
 
-        if suggestion_type not in suggestion_models.SUGGESTION_TYPE_CHOICES:
+        if suggestion_type not in feconf.SUGGESTION_TYPE_CHOICES:
             raise self.InvalidInputException(
                 'Invalid suggestion_type: %s' % suggestion_type)
 
@@ -272,7 +270,7 @@ class SuggestionsProviderHandler(base.BaseHandler):
             target_type: str. The suggestion type.
             suggestions: list(BaseSuggestion). A list of suggestions to render.
         """
-        if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+        if target_type == feconf.ENTITY_TYPE_EXPLORATION:
             target_id_to_opportunity_dict = (
                 _get_target_id_to_exploration_opportunity_dict(suggestions))
             self.render_json({
@@ -280,7 +278,7 @@ class SuggestionsProviderHandler(base.BaseHandler):
                 'target_id_to_opportunity_dict':
                     target_id_to_opportunity_dict
             })
-        elif target_type == suggestion_models.TARGET_TYPE_SKILL:
+        elif target_type == feconf.ENTITY_TYPE_SKILL:
             target_id_to_opportunity_dict = (
                 _get_target_id_to_skill_opportunity_dict(suggestions))
             self.render_json({
@@ -338,7 +336,7 @@ class SuggestionListHandler(base.BaseHandler):
         query_fields_and_values = list(self.request.GET.items())
 
         for query in query_fields_and_values:
-            if query[0] not in suggestion_models.ALLOWED_QUERY_FIELDS:
+            if query[0] not in feconf.ALLOWED_SUGGESTION_QUERY_FIELDS:
                 raise self.InvalidInputException(
                     'Not allowed to query on field %s' % query[0])
 

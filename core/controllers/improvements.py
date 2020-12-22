@@ -19,17 +19,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import improvements_domain
 from core.domain import improvements_services
-from core.platform import models
 import feconf
-
-(improvements_models,) = (
-    models.Registry.import_models([models.NAMES.improvements]))
 
 
 class ExplorationImprovementsHandler(base.BaseHandler):
@@ -74,11 +71,11 @@ class ExplorationImprovementsHandler(base.BaseHandler):
             issue_description = task_entry.get('issue_description', None)
             task_entries_to_put.append(
                 improvements_domain.TaskEntry(
-                    improvements_models.TASK_ENTITY_TYPE_EXPLORATION,
+                    constants.TASK_ENTITY_TYPE_EXPLORATION,
                     exploration_id,
                     entity_version,
                     task_type,
-                    improvements_models.TASK_TARGET_TYPE_STATE,
+                    constants.TASK_TARGET_TYPE_STATE,
                     target_id,
                     issue_description,
                     status,

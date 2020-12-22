@@ -411,8 +411,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description')
@@ -582,8 +582,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description'
@@ -607,8 +607,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
@@ -682,9 +682,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             ) for suggestion in [suggestion_1, suggestion_2, suggestion_3]
         ]
         self.expected_suggestion_types_needing_reviewers = {
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'en', 'fr'},
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
         }
 
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)

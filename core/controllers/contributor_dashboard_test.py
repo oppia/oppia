@@ -467,8 +467,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'translation_html': '<p>Translation for content.</p>'
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.owner_id, change_dict, 'description')
 
         output = self.get_json('/gettranslatabletexthandler', params={

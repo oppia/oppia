@@ -826,8 +826,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
         suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, self.SKILL_ID, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, self.SKILL_ID, 1,
             self.user_id_a, suggestion_change, 'test description'
         )
         skill_services.delete_skill(

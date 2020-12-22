@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for SuggestionModalService.
  */
 import { TestBed } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
 import { SuggestionModalService } from './suggestion-modal.service';
 
 describe('Suggestion Modal Service', () => {
@@ -32,7 +33,7 @@ describe('Suggestion Modal Service', () => {
   it('should accept suggestion', () => {
     const closeSpy = spyOn(uibModalInstanceMock, 'close').and.callThrough();
     const paramDict = {
-      action: sms.ACTION_ACCEPT_SUGGESTION,
+      action: AppConstants.ACTION_ACCEPT_SUGGESTION,
       commitMessage: '',
       reviewMessage: ''
     };
@@ -44,7 +45,7 @@ describe('Suggestion Modal Service', () => {
   it('should reject suggestion', () => {
     const closeSpy = spyOn(uibModalInstanceMock, 'close').and.callThrough();
     const paramDict = {
-      action: sms.ACTION_REJECT_SUGGESTION,
+      action: AppConstants.ACTION_REJECT_SUGGESTION,
       commitMessage: '',
       reviewMessage: ''
     };

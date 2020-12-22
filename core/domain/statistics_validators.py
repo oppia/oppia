@@ -25,6 +25,7 @@ from core.domain import base_model_validators
 from core.domain import config_domain
 from core.domain import stats_services
 from core.platform import models
+import feconf
 
 (base_models, exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
@@ -128,7 +129,7 @@ class PlaythroughModelValidator(base_model_validators.BaseModelValidator):
                         and issue_type == item.issue_type):
                     issue_customization_args = issue['issue_customization_args']
                     identifying_arg = (
-                        stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
+                        feconf.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
                             issue_type])
                     if (
                             issue_customization_args[identifying_arg] ==

@@ -875,8 +875,8 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
         model1.put()
 
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', 1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
             self.owner_id_2, change_dict, 'category1',
             'exploration.exp1.thread_1', None)
@@ -1006,7 +1006,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'You do not have credentials to upload exploration.')
+            'You do not have credentials to upload explorations.')
 
         self.logout()
 

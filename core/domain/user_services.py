@@ -2813,3 +2813,43 @@ def log_username_change(committer_id, old_username, new_username):
     audit_models.UsernameChangeAuditModel(
         id=model_id, committer_id=committer_id, old_username=old_username,
         new_username=new_username).put()
+
+
+def create_login_url(target_url):
+    """Creates a login url.
+
+    Args:
+        target_url: str. The URL to redirect to after login.
+
+    Returns:
+        str. The correct login URL that includes the page to redirect to.
+    """
+    return current_user_services.create_login_url(target_url)
+
+
+def is_current_user_super_admin():
+    """Checks whether the current logged user is super admin.
+
+    Returns:
+        bool. Whether the current logged user is super admin. When the user is
+        not logged in False is returned.
+    """
+    return current_user_services.is_current_user_super_admin()
+
+
+def get_current_gae_id():
+    """Gets the GAE ID of current user.
+
+    Returns:
+        str or None. GAE ID of the current user. None if user is not logged in.
+    """
+    return current_user_services.get_current_gae_id()
+
+
+def get_current_user_email():
+    """Get the email of current user.
+
+    Returns:
+        str or None. Email of the current user. None if user is not logged in.
+    """
+    return current_user_services.get_current_user_email()

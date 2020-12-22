@@ -28,14 +28,9 @@ from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-(base_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration])
-current_user_services = models.Registry.import_current_user_services()
 
 
 def get_matching_activity_dicts(query_string, search_cursor):

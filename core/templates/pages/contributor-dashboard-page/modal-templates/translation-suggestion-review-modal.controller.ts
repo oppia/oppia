@@ -22,12 +22,14 @@ require('services/suggestion-modal.service.ts');
 angular.module('oppia').controller(
   'TranslationSuggestionReviewModalController', [
     '$scope', '$uibModalInstance', 'ContributionAndReviewService',
-    'SiteAnalyticsService', 'SuggestionModalService',
-    'initialSuggestionId', 'reviewable', 'suggestionIdToSuggestion',
+    'SiteAnalyticsService', 'initialSuggestionId', 'reviewable',
+    'suggestionIdToSuggestion', 'ACTION_ACCEPT_SUGGESTION',
+    'ACTION_REJECT_SUGGESTION',
     function(
         $scope, $uibModalInstance, ContributionAndReviewService,
-        SiteAnalyticsService, SuggestionModalService,
-        initialSuggestionId, reviewable, suggestionIdToSuggestion) {
+        SiteAnalyticsService, initialSuggestionId, reviewable,
+        suggestionIdToSuggestion, ACTION_ACCEPT_SUGGESTION,
+        ACTION_REJECT_SUGGESTION) {
       var resolvedSuggestionIds = [];
       $scope.reviewable = reviewable;
       $scope.activeSuggestionId = initialSuggestionId;
@@ -79,7 +81,7 @@ angular.module('oppia').controller(
 
         ContributionAndReviewService.resolveSuggestionToExploration(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
-          SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+          ACTION_ACCEPT_SUGGESTION,
           $scope.reviewMessage, generateCommitMessage(),
           $scope.showNextItemToReview);
       };
@@ -90,9 +92,8 @@ angular.module('oppia').controller(
 
         ContributionAndReviewService.resolveSuggestionToExploration(
           $scope.activeSuggestion.target_id, $scope.activeSuggestionId,
-          SuggestionModalService.ACTION_REJECT_SUGGESTION,
-          $scope.reviewMessage, generateCommitMessage(),
-          $scope.showNextItemToReview);
+          ACTION_REJECT_SUGGESTION, $scope.reviewMessage,
+          generateCommitMessage(), $scope.showNextItemToReview);
       };
 
       $scope.cancel = function() {
