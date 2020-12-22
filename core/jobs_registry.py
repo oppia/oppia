@@ -35,10 +35,10 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import suggestion_jobs_one_off
+from core.domain import takeout_commit_message_truncate_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
-from core.domain import takeout_commit_message_truncate_jobs_one_off
 import python_utils
 
 # List of all manager classes for one-off batch jobs for which to show controls
