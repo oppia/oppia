@@ -69,4 +69,8 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 sys.executable, '-m', 'pip', 'install',
                 'future==0.18.2', '--target',
                 'third_party/python_libs',
+                '--user', '--prefix=', '--system',
+                sys.executable, '-m', 'pip', 'install',
+                'certifi==0.18.2', '--target',
+                '../oppia_tools/certifi-2020.12.5',
                 '--user', '--prefix=', '--system'])
