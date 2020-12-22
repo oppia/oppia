@@ -93,6 +93,7 @@ ONE_OFF_JOB_MANAGERS = [
     skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
     skill_jobs_one_off.MissingSkillMigrationOneOffJob,
     stats_jobs_one_off.ExplorationMissingStatsAudit,
+    stats_jobs_one_off.FillExplorationStatsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
     stats_jobs_one_off.RegenerateMissingStateStatsOneOffJob,

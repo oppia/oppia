@@ -23,6 +23,7 @@ import ast
 import collections
 import copy
 import itertools
+import logging
 
 from core import jobs
 from core.domain import action_registry
@@ -1696,6 +1697,8 @@ class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, sum(int(v) for v in values))
 
 class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    INVALID_STATE_STATS_KEY = 'invalid'
+    VALID_STATE_STATS_KEY = 'valid'
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
@@ -1726,12 +1729,12 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         ]
 
         zipped_items = list(zip(exp_stats_list, exp_list, change_lists))
-
+        revert_commit_cmd = exp_models.ExplorationModel.CMD_REVERT_COMMIT
         for i, (exp_stats, exp, change_list) in enumerate(zipped_items):
             revert_cmd = next(
                 (
                     change for change in change_list
-                    if change.cmd == CMD_REVERT_COMMIT
+                    if change.cmd == revert_commit_cmd
                 ), None)
             revert_to_version = revert_cmd and revert_cmd.version_number
 
@@ -1740,7 +1743,8 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 prev_exp_stats = exp_stats_list[revert_to_version - 1]
                 prev_exp = exp_list[revert_to_version - 1]
             else:
-                exp_versions_diff = ExplorationVersionsDiff(change_lists)
+                exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                    change_list)
                 prev_exp_stats = exp_stats_list[exp.version - 1]
                 prev_exp = exp_list[exp.version - 1]
 
@@ -1748,7 +1752,7 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if exp_stats is not None:
                 num_valid_exp_stats += 1
             else:
-                exp_stats = prev_exp_stats.clone()
+                exp_stats = prev_exp_stats and prev_exp_stats.clone()
                 if exp_versions_diff is not None:
                     stats_services.advance_version_of_exp_stats(
                         exp_stats, exp.states.keys(), exp_versions_diff, None)
