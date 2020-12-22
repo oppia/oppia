@@ -623,7 +623,6 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
     def test_invalid_extension_is_detected(self):
         """Test that invalid extensions are caught."""
-
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 

@@ -95,14 +95,14 @@ class EvaluationContext(python_utils.OBJECT):
 
     @property
     def app_version(self):
-        # TODO(#11208): Update the documentation below to reflect the change
-        # when the GAE app version is used for web & backend.
         """Returns client application version.
 
         Returns:
             str|None. The version of native application, e.g. '1.0.0',
             None if the platform type is Web.
         """
+        # TODO(#11208): Update the documentation below to reflect the change
+        # when the GAE app version is used for web & backend.
         return self._app_version
 
     @property

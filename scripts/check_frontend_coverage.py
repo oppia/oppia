@@ -381,6 +381,7 @@ NOT_FULLY_COVERED_FILENAMES = [
 
 class LcovStanzaRelevantLines(python_utils.OBJECT):
     """Gets the relevant lines from a lcov stanza."""
+
     def __init__(self, stanza):
         """Initialize the object which provides relevant data of a lcov
         stanza in order to calculate any decrease in frontend test coverage.
@@ -393,7 +394,6 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
             Exception. Total lines number is not found.
             Exception. Covered lines number is not found.
         """
-
         match = re.search('SF:(.+)\n', stanza)
         if match is None:
             raise Exception(

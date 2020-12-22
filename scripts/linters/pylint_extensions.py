@@ -1851,8 +1851,8 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                         'single-space-after-keyword',
                         args=(token),
                         line=line_num)
-                    
-                    
+
+
 class InequalityWithNoneChecker(checkers.BaseChecker):
     """Custom pylint checker prohibiting use of "if x != None" and
     enforcing use of "if x is not None" instead.
@@ -1887,6 +1887,7 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
             if 'value' in vars(operand) and operand.value is None:
                 self.add_message('inequality-with-none', node=node)
 
+
 class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
     """Custom pylint checker which ensures that there isn't a blank space
     below a function definition.
@@ -1918,6 +1919,8 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
         if node.args.args:
             line_dif = (node.args.args[-1].lineno - node.lineno)
             line_number += line_dif
+        if node.decorators:
+            line_number += 1
         while linecache.getline(
                 node.root().file, line_number).strip().startswith(b'#'):
             line_number += 1
@@ -1927,7 +1930,6 @@ class BlankLineBelowFunctionDefChecker(checkers.BaseChecker):
                     'blank-line-below-function-definition', node=node)
 
 
-                
 def register(linter):
     """Registers the checker with pylint.
 

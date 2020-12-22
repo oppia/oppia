@@ -270,7 +270,6 @@ class ClassifierTrainingJob(python_utils.OBJECT):
         Returns:
             dict. A dict representation of training job domain object.
         """
-        
         return {
             'job_id': self._job_id,
             'algorithm_id': self._algorithm_id,

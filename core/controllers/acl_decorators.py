@@ -1532,7 +1532,6 @@ def require_user_id_else_redirect_to_homepage(handler):
         if a given user_id is associated with the current
         session.
     """
-
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in.
         If not, redirects the user to the home page.
@@ -1679,7 +1678,6 @@ def can_view_question_editor(handler):
         function. The newly decorated function that now also checks
         if the user has permission to view any question editor.
     """
-
     def test_can_view_question_editor(self, question_id, **kwargs):
         """Checks whether the user can view the question editor.
 

@@ -442,7 +442,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         with install_swap:
             run_e2e_tests.setup_and_install_dependencies(False)
-            
+
     def test_setup_and_install_dependencies_with_skip(self):
         def mock_install_third_party_libs_main(unused_args):
             return
@@ -1025,7 +1025,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.assertEqual(lines, ['sample', u'✓', 'output'])
 
     def test_rerun_when_tests_fail(self):
-
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():
@@ -1085,7 +1084,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_do_not_rerun_when_tests_fail(self):
-
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():
@@ -1144,7 +1142,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                         run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_rerun_when_tests_flake(self):
-
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():
@@ -1204,7 +1201,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.main(args=['--suite', 'mySuite'])
 
     def test_no_reruns_off_ci(self):
-
         mock_portserver = MockProcessClass()
 
         def mock_check_if_on_ci():

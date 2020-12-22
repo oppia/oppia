@@ -430,7 +430,6 @@ class CommonTests(test_utils.GenericTestBase):
             target_stdout.getvalue(), 'These\n\nare\n\nsample\n\nstrings.\n\n')
 
     def test_install_npm_library(self):
-
         def _mock_subprocess_check_call(unused_command):
             """Mocks subprocess.check_call() to create a temporary file instead
             of the actual npm library.

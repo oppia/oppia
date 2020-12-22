@@ -2864,7 +2864,6 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-
 class InequalityWithNoneCheckerTests(unittest.TestCase):
 
     def setUp(self):

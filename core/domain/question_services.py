@@ -305,7 +305,6 @@ def delete_question(
             still retained in the datastore. This last option is the preferred
             one.
     """
-
     def delete_question_model(question_id, committer_id, force_deletion):
         """Inner function that is to be done in a transaction."""
         question_model = question_models.QuestionModel.get_by_id(question_id)

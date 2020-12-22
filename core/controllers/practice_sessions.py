@@ -31,7 +31,6 @@ class PracticeSessionsPage(base.BaseHandler):
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _):
         """Handles GET requests."""
-
         self.render_template('practice-session-page.mainpage.html')
 
 
