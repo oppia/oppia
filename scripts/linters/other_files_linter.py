@@ -257,7 +257,8 @@ class CustomLintChecksManager(python_utils.OBJECT):
         strict_ts_config = json.load(
             python_utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r'))
 
-        # Remove .ts extension from filepath for sorting.
+        # Remove .ts extension from filepath for sorting to ensure that
+        # spec files are always below the main files.
         files = [path[:-3] for path in strict_ts_config['files']]
         sorted_files = sorted(files)
 
