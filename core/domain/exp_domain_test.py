@@ -8977,8 +8977,8 @@ title: Title
         exploration = exp_domain.Exploration.from_yaml(
             'eid', v45_exploration_with_set_input_yaml)
         self.assertEqual(
-          exploration.to_yaml(),
-          latest_exploration_with_set_input_yaml)
+            exploration.to_yaml(),
+            latest_exploration_with_set_input_yaml)
 
     def test_cannot_load_from_yaml_with_no_schema_version(self):
         sample_yaml_content = (
