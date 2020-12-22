@@ -8919,7 +8919,7 @@ title: Title
 
     def test_load_from_v45_with_set_input_interaction(self):
         """Tests the migration of SetInput rule inputs."""
-        sample_yaml_content = (
+        v45_exploration_with_set_input_yaml = (
             """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -9017,7 +9017,7 @@ tags: []
 title: Title
 """)
 
-        latest_sample_yaml_content = (
+        latest_exploration_with_set_input_yaml = (
             """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -9119,8 +9119,10 @@ tags: []
 title: Title
 """)
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', sample_yaml_content)
-        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
+            'eid', v45_exploration_with_set_input_yaml)
+        self.assertEqual(
+          exploration.to_yaml(),
+          latest_exploration_with_set_input_yaml)
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
