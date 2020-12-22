@@ -28,7 +28,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models,) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class MockModel(base_models.BaseModel):
@@ -192,10 +193,23 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             }
         )
 
+    def test_external_model_fetcher_with_user_settings(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please use the UserSettingsModelFetcherDetails' +
+            ' for UserSettingsModel'):
+            base_model_validators.ExternalModelFetcherDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [
+                    feconf.MIGRATION_BOT_USER_ID, 'User-1',
+                    self.PSEUDONYMOUS_ID
+                ]
+            )
+
     def test_remove_system_users(self):
         user_settings_model = (
             base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids', MockModel,
+                'committer_ids',
                 [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
                 system_user_ids_removed=True
             ))
@@ -206,7 +220,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_remove_pseudonymous_users(self):
         user_settings_model = (
             base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids', MockModel,
+                'committer_ids',
                 [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
                 pseudonymous_ids_removed=True
             ))

@@ -30,7 +30,8 @@ import feconf
 import python_utils
 import utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models,) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
 USER_ID_REGEX = 'uid_[a-z]{32}'
@@ -87,7 +88,15 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
             model_class: ClassObject. The external model class.
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
+
+        Raises:
+            Exception. This class was used instead of using the
+                UserSettingsModelFetcherDetails for the UserSettingsModel.
         """
+        if model_class == user_models.UserSettingsModel:
+            raise Exception(
+                'Please use the UserSettingsModelFetcherDetails' +
+                ' for UserSettingsModel')
         self.field_name = field_name
         self.model_class = model_class
         self.model_ids = model_ids
@@ -99,7 +108,7 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
     """
 
     def __init__(
-            self, field_name, model_class, model_ids,
+            self, field_name, model_ids,
             system_user_ids_removed=False, pseudonymous_ids_removed=False):
         """Initializes the UserSettingsModelFetcherDetails domain object.
 
@@ -109,7 +118,6 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                 reference. For example: 'exp_ids': ExplorationModel, exp_ids
                 is the field name to identify the external model
                 ExplorationModel.
-            model_class: ClassObject. The external model class.
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
             system_user_ids_removed: bool. Whether to remove the system user IDs
@@ -127,7 +135,7 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                 if not utils.is_pseudonymous_id(i)
             ]
         self.field_name = field_name
-        self.model_class = model_class
+        self.model_class = user_models.UserSettingsModel
         self.model_ids = filtered_model_ids
 
 

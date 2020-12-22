@@ -85,9 +85,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         if user_services.is_user_id_valid(item.author_id):
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
-                    'author_ids',
-                    user_models.UserSettingsModel,
-                    [item.author_id],
+                    'author_ids', [item.author_id],
                     system_user_ids_removed=True,
                     pseudonymous_ids_removed=True
                 )
@@ -107,8 +105,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
             if item.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID:
                 field_name_to_external_model_references.append(
                     base_model_validators.UserSettingsModelFetcherDetails(
-                        'reviewer_ids', user_models.UserSettingsModel,
-                        [item.final_reviewer_id],
+                        'reviewer_ids', [item.final_reviewer_id],
                         system_user_ids_removed=True,
                         pseudonymous_ids_removed=True
                     ))
@@ -307,9 +304,7 @@ class GeneralVoiceoverApplicationModelValidator(
         if user_services.is_user_id_valid(item.author_id):
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
-                    'author_ids',
-                    user_models.UserSettingsModel,
-                    [item.author_id],
+                    'author_ids', [item.author_id],
                     pseudonymous_ids_removed=True
                 )
             )
@@ -325,8 +320,7 @@ class GeneralVoiceoverApplicationModelValidator(
         ):
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
-                    'final_reviewer_ids', user_models.UserSettingsModel,
-                    [item.final_reviewer_id],
+                    'final_reviewer_ids', [item.final_reviewer_id],
                     pseudonymous_ids_removed=True
                 ))
         return field_name_to_external_model_references

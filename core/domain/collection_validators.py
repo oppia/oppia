@@ -106,8 +106,7 @@ class CollectionSnapshotMetadataModelValidator(
                 'collection_ids', collection_models.CollectionModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id],
+                'committer_ids', [item.committer_id],
                 system_user_ids_removed=True,
                 pseudonymous_ids_removed=True
             )]
@@ -200,8 +199,7 @@ class CollectionRightsSnapshotMetadataModelValidator(
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids',
-                user_models.UserSettingsModel, [item.committer_id],
+                'committer_ids', [item.committer_id],
                 system_user_ids_removed=True,
                 pseudonymous_ids_removed=True
             )]
@@ -256,8 +254,7 @@ class CollectionCommitLogEntryModelValidator(
                 'collection_ids',
                 collection_models.CollectionModel, [item.collection_id]),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'user_id',
-                user_models.UserSettingsModel, [item.user_id],
+                'user_id', [item.user_id],
                 system_user_ids_removed=True,
                 pseudonymous_ids_removed=True
             )]
