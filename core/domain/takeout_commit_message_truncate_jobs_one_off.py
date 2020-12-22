@@ -81,6 +81,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         else:
             yield (key, values)
 
+
 class SnapshotMetadataCommitMsgShrinkOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that audits the commit_message field of the

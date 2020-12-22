@@ -38,6 +38,7 @@ from core.domain import suggestion_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
+from core.domain import takeout_commit_message_truncate_jobs_one_off
 import python_utils
 
 # List of all manager classes for one-off batch jobs for which to show controls
@@ -110,6 +111,12 @@ ONE_OFF_JOB_MANAGERS = [
     suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
     suggestion_jobs_one_off.SuggestionSvgFilenameValidationOneOffJob,
+    (
+        takeout_commit_message_truncate_jobs_one_off
+        .SnapshotMetadataCommitMsgAuditOneOffJob),
+    (
+        takeout_commit_message_truncate_jobs_one_off
+        .SnapshotMetadataCommitMsgShrinkOneOffJob),
     topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,

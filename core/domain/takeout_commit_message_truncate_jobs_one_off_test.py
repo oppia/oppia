@@ -22,10 +22,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 
 from core.domain import takeout_commit_message_truncate_jobs_one_off
+from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
-from core.domain import taskqueue_services
-
+import python_utils
 
 (base_models, config_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.config])
@@ -70,7 +70,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         num_models_per_category = 10
 
         model_class = config_models.ConfigPropertySnapshotMetadataModel
-        for i in range(num_models_per_category):
+        for i in python_utils.RANGE(num_models_per_category):
             model_class(
                 id='model_id-%d-%d' % (i, value_less_than_1000),
                 committer_id='committer_id',
@@ -96,6 +96,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
             ['BETWEEN_1000_AND_1500', 2 * num_models_per_category],
             ['LESS_OR_EQUAL_TO_1000', 2 * num_models_per_category + 1],
         ])
+
 
 class SnapshotMetadataCommitMsgShrinkOneOffJob(
         test_utils.GenericTestBase):
