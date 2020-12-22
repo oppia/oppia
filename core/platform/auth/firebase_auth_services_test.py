@@ -30,7 +30,7 @@ import firebase_admin
 from firebase_admin import exceptions as firebase_exceptions
 import webapp2
 
-(auth_models,) = models.Registry.import_models([models.NAMES.auth])
+auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 
 def mock_successful_firebase_initialization(test_method):

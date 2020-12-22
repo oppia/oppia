@@ -22,8 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import base_model_validators
 from core.platform import models
 
-(auth_models, user_models) = models.Registry.import_models(
-    [models.NAMES.auth, models.NAMES.user])
+auth_models, user_models = (
+    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
 
 
 class UserIdByFirebaseAuthIdModelValidator(
