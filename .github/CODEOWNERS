@@ -188,9 +188,8 @@
 /core/templates/components/button-directives/hint-and-solution-buttons.directive.html @kevintab95
 /core/templates/components/state-directives/ @kevintab95
 /core/templates/components/graph-services/ @kevintab95
-/core/templates/components/on-screen-keyboard/* @aks681
-/core/templates/components/version-diff-visualization/version-diff-visualization.directive.html @aks681
-/core/templates/components/version-diff-visualization/version-diff-visualization.directive.ts @aks681
+/core/templates/components/on-screen-keyboard/ @aks681
+/core/templates/components/version-diff-visualization/ @aks681
 /core/templates/domain/editor/ @kevintab95
 /core/templates/domain/exploration/ @kevintab95
 /core/templates/domain/recommendations/ @kevintab95
@@ -279,21 +278,20 @@
 
 # Interaction project.
 /core/domain/customization_args_util*.py @brianrodri
-/core/domain/expression_parser*.py @aks681
-/core/domain/interaction_registry*.py @aks681
-/core/domain/obj_services*.py @aks681
-/core/templates/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
-/core/templates/domain/objects/ @aks681
+/core/domain/expression_parser*.py @iamprayush
+/core/domain/interaction_registry*.py @iamprayush
+/core/domain/obj_services*.py @iamprayush
+/core/templates/domain/objects/ @iamprayush
 /core/templates/expressions/ @brianrodri
-/core/templates/services/code-normalizer.service*.ts @aks681
-/core/templates/services/guppy-configuration.service.ts @aks681
-/core/templates/services/guppy-initialization.service.ts @aks681
-/core/templates/services/math-interactions.service.ts @aks681
+/core/templates/services/code-normalizer.service*.ts @iamprayush
+/core/templates/services/guppy-configuration.service.ts @iamprayush
+/core/templates/services/guppy-initialization.service.ts @iamprayush
+/core/templates/services/math-interactions.service.ts @iamprayush
 /extensions/domain*.py @brianrodri
-/extensions/interactions/ @aks681 @vojtechjelinek
-/extensions/objects/ @aks681
+/extensions/interactions/ @iamprayush @vojtechjelinek
+/extensions/objects/ @iamprayush
 /extensions/value_generators/ @vojtechjelinek
-/extensions/__init__.py @aks681
+/extensions/__init__.py @iamprayush
 
 
 # Lesson Analytics team.
