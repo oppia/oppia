@@ -231,6 +231,7 @@ import { AudioTranslationManagerService } from 'pages/exploration-player-page/se
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ExplorationRecommendationsService } from 'pages/exploration-player-page/services/exploration-recommendations.service';
 import { ExtractImageFilenamesFromStateService } from 'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
+import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
 import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import { LearnerParamsService } from 'pages/exploration-player-page/services/learner-params.service';
 import { NumberAttemptsService } from 'pages/exploration-player-page/services/number-attempts.service';
@@ -278,7 +279,6 @@ import { ExplorationImprovementsTaskRegistryService } from 'services/exploration
 import { ExplorationStatsBackendApiService } from 'services/exploration-stats-backend-api.service';
 import { ExplorationStatsService } from 'services/exploration-stats.service';
 import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
-import { FatigueDetectionService } from 'core/templates/pages/exploration-player-page/services/fatigue-detection.service';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { GuppyConfigurationService } from 'services/guppy-configuration.service';
 import { GuppyInitializationService } from 'services/guppy-initialization.service';
