@@ -23,7 +23,7 @@ from core.platform import models
 from core.tests import test_utils
 
 auth_models, base_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.base]))
+    models.Registry.import_models([models.NAMES.auth, models.NAMES.base_model]))
 
 
 class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
