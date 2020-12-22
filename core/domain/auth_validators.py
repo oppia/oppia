@@ -42,11 +42,11 @@ class UserIdByFirebaseAuthIdModelValidator(
         Returns:
             str. A regex pattern to be followed by the model id.
         """
-        # Firebase _explicitly_ requires IDs to have at most 128 characters.
+        # Firebase *explicitly* requires IDs to have at most 128 characters:
         # https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
         #
         # After manually inspecting ~200 of them, however, we've also found that
-        # they only use alpha-numeric characters.
+        # they only use alpha-numeric characters, hence the tighter restriction.
         return '^[A-Za-z0-9]{1,128}$'
 
     @classmethod

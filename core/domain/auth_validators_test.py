@@ -43,7 +43,7 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
 
         self.signup(self.USER_EMAIL, self.USER_NAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        self.auth_id = 'user_auth_id'
+        self.auth_id = 'userauthid'
 
         new_model = auth_models.UserIdByFirebaseAuthIdModel(
             id=self.auth_id, user_id=self.user_id)
@@ -89,9 +89,9 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
         model_instance.update_timestamps()
         model_instance.put()
         expected_output = [
-            '[u\'failed validation check for model id check of '
-            'UserIdByFirebaseAuthIdModel\', [u\'Entity id %s: Firebase ID len '
-            'must be in range [1, 128)\']]' % (auth_id_that_is_too_long,),
+            u'[u\'failed validation check for model id check of '
+            'UserIdByFirebaseAuthIdModel\', [u\'Entity id %s: Entity id '
+            'does not match regex pattern\']]' % (auth_id_that_is_too_long,),
             '[u\'fully-validated UserIdByFirebaseAuthIdModel\', 1]',
         ]
         self.run_job_and_check_output(
