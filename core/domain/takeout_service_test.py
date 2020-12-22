@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import inspect
 import json
 
 from constants import constants
@@ -313,36 +312,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         {'cmd2': 'another_command'}
     ]
 
-    BASE_CLASSES = (
-        'BaseCommitLogEntryModel',
-        'BaseMapReduceBatchResultsModel',
-        'BaseModel',
-        'BaseSnapshotContentModel',
-        'BaseSnapshotMetadataModel',
-        'VersionedModel',
-    )
-
-    def _get_model_module_names(self):
-        """Get all module names in storage."""
-        # As models.NAMES is an enum, it cannot be iterated over. So we use the
-        # __dict__ property which can be iterated over.
-        for name in models.NAMES.__dict__:
-            if '__' not in name:
-                yield name
-
-    def _get_model_classes(self):
-        """Get all model classes in storage."""
-        for module_name in self._get_model_module_names():
-            (module,) = models.Registry.import_models([module_name])
-            for member_name, member_obj in inspect.getmembers(module):
-                if inspect.isclass(member_obj):
-                    clazz = getattr(module, member_name)
-                    all_base_classes = [
-                        base_class.__name__ for base_class in inspect.getmro(
-                            clazz)]
-                    if 'Model' in all_base_classes:
-                        yield clazz
-
     def set_up_non_trivial(self):
         """Set up all models for use in testing.
         1) Simulates the creation of a user, user_1, and their stats model.
@@ -505,8 +474,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # Setup for GeneralSuggestionModel.
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.EXPLORATION_IDS[0], 1,
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
@@ -962,8 +931,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in self._get_model_classes()
-            if not clazz.__name__ in self.BASE_CLASSES
+            for clazz in test_utils.get_storage_model_classes()
+            if (not clazz.__name__ in
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
 
         for model in all_models:
@@ -1026,8 +996,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in self._get_model_classes()
-            if not clazz.__name__ in self.BASE_CLASSES
+            for clazz in test_utils.get_storage_model_classes()
+            if (not clazz.__name__ in
+                test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
 
         # Iterate over models and test export policies.
@@ -1247,8 +1218,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
                 'status': suggestion_models.STATUS_IN_REVIEW,

@@ -152,7 +152,8 @@ def get_topic_from_model(topic_model):
         topic_model.language_code,
         topic_model.version, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
         topic_model.meta_tag_content, topic_model.practice_tab_is_displayed,
-        topic_model.created_on, topic_model.last_updated)
+        topic_model.page_title_fragment_for_web, topic_model.created_on,
+        topic_model.last_updated)
 
 
 def get_topic_by_id(topic_id, strict=True, version=None):

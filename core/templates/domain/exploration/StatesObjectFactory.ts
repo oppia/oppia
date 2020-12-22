@@ -26,7 +26,7 @@ import {
 } from 'domain/state/StateObjectFactory';
 import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 export interface StateObjectsDict {
   [state: string]: State;

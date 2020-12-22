@@ -796,6 +796,90 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v40_dict_to_v41_dict(cls, question_state_dict):
+        """Converts from version 40 to 41. Version 41 adds
+        TranslatableSetOfUnicodeString and TranslatableSetOfNormalizedString
+        objects to RuleSpec domain objects to allow for translations.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        class ContentIdCounter(python_utils.OBJECT):
+            """This helper class is used to keep track of
+            next_content_id_index and new_content_ids, and provides a
+            function to generate new content_ids.
+            """
+
+            def __init__(self, next_content_id_index):
+                """Initializes a ContentIdCounter object.
+
+                Args:
+                    next_content_id_index: int. The next content id index.
+                """
+                self.new_content_ids = []
+                self.next_content_id_index = next_content_id_index
+
+            def generate_content_id(self, content_id_prefix):
+                """Generate a new content_id from the prefix provided and
+                the next content id index.
+
+                Args:
+                    content_id_prefix: str. The prefix of the content_id.
+
+                Returns:
+                    str. The generated content_id.
+                """
+                content_id = '%s%i' % (
+                    content_id_prefix,
+                    self.next_content_id_index)
+                self.next_content_id_index += 1
+                self.new_content_ids.append(content_id)
+                return content_id
+
+        # As of Jan 2021, which is when this migration is to be run, only
+        # TextInput and SetInput have translatable rule inputs, and every rule
+        # for these interactions takes exactly one translatable input named x.
+        interaction_id = question_state_dict['interaction']['id']
+        if interaction_id not in ['TextInput', 'SetInput']:
+            return question_state_dict
+
+        content_id_counter = ContentIdCounter(
+            question_state_dict['next_content_id_index'])
+        answer_group_dicts = question_state_dict['interaction']['answer_groups']
+        for answer_group_dict in answer_group_dicts:
+            for rule_spec_dict in answer_group_dict['rule_specs']:
+                content_id = content_id_counter.generate_content_id(
+                    'rule_input_')
+                if interaction_id == 'TextInput':
+                    # Convert to TranslatableSetOfNormalizedString.
+                    rule_spec_dict['inputs']['x'] = {
+                        'contentId': content_id,
+                        'normalizedStrSet': rule_spec_dict['inputs']['x']
+                    }
+                elif interaction_id == 'SetInput':
+                    # Convert to TranslatableSetOfUnicodeString.
+                    rule_spec_dict['inputs']['x'] = {
+                        'contentId': content_id,
+                        'unicodeStrSet': rule_spec_dict['inputs']['x']
+                    }
+        question_state_dict['next_content_id_index'] = (
+            content_id_counter.next_content_id_index)
+        for new_content_id in content_id_counter.new_content_ids:
+            question_state_dict[
+                'written_translations'][
+                    'translations_mapping'][new_content_id] = {}
+            question_state_dict[
+                'recorded_voiceovers'][
+                    'voiceovers_mapping'][new_content_id] = {}
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
