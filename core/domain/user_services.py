@@ -770,20 +770,12 @@ def get_user_settings_by_gae_id(gae_id, strict=False):
     Raises:
         Exception. The value of strict is True and given gae_id does not exist.
     """
-    user_id = None
     user_identifiers_model = (
-        user_models.UserIdentifiersModel.get(gae_id, strict=False))
-    # If the UserIdentifiersModels are not yet generated use
-    # UserAuthDetailsModel as the backup for retrieving the user_id.
-    # TODO(#11140): Remove this after we run the migration job.
-    if user_identifiers_model is None:
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, gae_id))
-        if user_auth_details_model is not None:
-            user_id = user_auth_details_model.id
-    else:
-        user_id = user_identifiers_model.user_id
+        user_models.UserIdentifiersModel.get_by_gae_id(gae_id))
+    user_id = (
+        user_identifiers_model.user_id
+        if user_identifiers_model is not None else None
+    )
 
     if user_id is not None:
         user_settings = _get_user_settings_from_model(
@@ -2821,3 +2813,43 @@ def log_username_change(committer_id, old_username, new_username):
     audit_models.UsernameChangeAuditModel(
         id=model_id, committer_id=committer_id, old_username=old_username,
         new_username=new_username).put()
+
+
+def create_login_url(target_url):
+    """Creates a login url.
+
+    Args:
+        target_url: str. The URL to redirect to after login.
+
+    Returns:
+        str. The correct login URL that includes the page to redirect to.
+    """
+    return current_user_services.create_login_url(target_url)
+
+
+def is_current_user_super_admin():
+    """Checks whether the current logged user is super admin.
+
+    Returns:
+        bool. Whether the current logged user is super admin. When the user is
+        not logged in False is returned.
+    """
+    return current_user_services.is_current_user_super_admin()
+
+
+def get_current_gae_id():
+    """Gets the GAE ID of current user.
+
+    Returns:
+        str or None. GAE ID of the current user. None if user is not logged in.
+    """
+    return current_user_services.get_current_gae_id()
+
+
+def get_current_user_email():
+    """Get the email of current user.
+
+    Returns:
+        str or None. Email of the current user. None if user is not logged in.
+    """
+    return current_user_services.get_current_user_email()
