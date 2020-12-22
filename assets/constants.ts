@@ -17,7 +17,7 @@
  * @fileoverview Initializes constants for the Oppia codebase.
  */
 
-export = {
+export default {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
 
@@ -47,6 +47,9 @@ export = {
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
+
+  "ACTION_ACCEPT_SUGGESTION": "accept",
+  "ACTION_REJECT_SUGGESTION": "reject",
 
   "SKILL_STATUS_OPTIONS": {
     "ALL": "All",
