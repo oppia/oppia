@@ -41,15 +41,15 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
 
     var _getSkillOpportunities = function(cursor) {
       return ContributionOpportunitiesBackendApiService
-      .fetchSkillOpportunitiesAsync(
-        cursor).then(({ opportunities, nextCursor, more }) => {
-        skillOpportunitiesCursor = nextCursor;
-        moreSkillOpportunitiesAvailable = more;
-        return {
-          opportunities: opportunities,
-          more: more
-        };
-      });
+        .fetchSkillOpportunitiesAsync(
+          cursor).then(({ opportunities, nextCursor, more }) => {
+          skillOpportunitiesCursor = nextCursor;
+          moreSkillOpportunitiesAvailable = more;
+          return {
+            opportunities: opportunities,
+            more: more
+          };
+        });
     };
     var _getTranslationOpportunities = function(languageCode, cursor) {
       return ContributionOpportunitiesBackendApiService
