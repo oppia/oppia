@@ -579,12 +579,10 @@
     "I18N_TEACH_TESTIMONIAL_2":"“Oppia is more interesting and useful for students than what I expected; it provides them with all they need to know about specific topic in an enjoyable way”",
     "I18N_TEACH_TESTIMONIAL_3":"“Oppia is more interesting and useful for students than what I expected; it provides them with all they need to know about specific topic in an enjoyable way”",
     "I18N_TEACH_TESTIMONIAL_4":"“Oppia is more interesting and useful for students than what I expected; it provides them with all they need to know about specific topic in an enjoyable way”",
-
     "I18N_TEACH_STUDENT_DETAILS_1":"- Yamama, Facilitator, Palestine",
     "I18N_TEACH_STUDENT_DETAILS_2":"- Yamama, Facilitator, Palestine",
     "I18N_TEACH_STUDENT_DETAILS_3":"- Yamama, Facilitator, Palestine",
     "I18N_TEACH_STUDENT_DETAILS_4":"- Yamama, Facilitator, Palestine",
-
     "I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lesson} other{# lessons}}",
     "I18N_TOPIC_VIEWER_CHAPTER": "Chapter",
     "I18N_TOPIC_VIEWER_DESCRIPTION": "Description",
