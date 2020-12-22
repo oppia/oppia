@@ -22,8 +22,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 from core.tests import test_utils
 
-auth_models, user_models = (
-    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+auth_models, base_models = (
+    models.Registry.import_models([models.NAMES.auth, models.NAMES.base]))
 
 
 class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
