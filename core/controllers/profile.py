@@ -381,7 +381,7 @@ class ExportAccountHandler(base.BaseHandler):
 
         # Ensure that the exported data does not contain a user ID.
         user_data_json_string = json.dumps(user_data)
-        if python_utils.UNICODE(self.user_id) in user_data_json_string:
+        if re.search(feconf.USER_ID_REGEX, user_data_json_string):
             user_data_json_string = (
                 'There was an error while exporting ' +
                 'data. Please contact admin@oppia.org to export your data.')
