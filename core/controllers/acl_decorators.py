@@ -39,12 +39,8 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
-from core.platform import models
 import feconf
-
-current_user_services = models.Registry.import_current_user_services()
-
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+import utils
 
 
 def _redirect_based_on_return_type(
@@ -205,7 +201,7 @@ def can_view_skills(handler):
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
+        except utils.ValidationError:
             raise self.InvalidInputException
 
         try:
@@ -572,7 +568,7 @@ def can_access_admin_page(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not current_user_services.is_current_user_super_admin():
+        if not user_services.is_current_user_super_admin():
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application' % self.user_id)
         return handler(self, **kwargs)
@@ -609,9 +605,9 @@ def can_upload_exploration(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not current_user_services.is_current_user_super_admin():
+        if not user_services.is_current_user_super_admin():
             raise self.UnauthorizedUserException(
-                'You do not have credentials to upload exploration.')
+                'You do not have credentials to upload explorations.')
         return handler(self, **kwargs)
     test_can_upload.__wrapped__ = True
 
@@ -1614,7 +1610,7 @@ def can_edit_topic(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -1829,7 +1825,7 @@ def can_add_new_story_to_topic(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -2107,7 +2103,7 @@ def can_delete_topic(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
@@ -2240,7 +2236,7 @@ def can_view_any_topic_editor(handler):
             raise self.NotLoggedInException
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
@@ -2333,7 +2329,7 @@ def can_change_topic_publication_status(handler):
 
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
-        except Exception as e:
+        except utils.ValidationError as e:
             raise self.PageNotFoundException(e)
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
@@ -2693,13 +2689,13 @@ def get_decorator_for_accepting_suggestion(decorator):
                 return handler(self, target_id, suggestion_id, **kwargs)
 
             if suggestion.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                 if user_services.can_review_translation_suggestions(
                         self.user_id,
                         language_code=suggestion.change.language_code):
                     return handler(self, target_id, suggestion_id, **kwargs)
             elif suggestion.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION):
                 if user_services.can_review_question_suggestions(self.user_id):
                     return handler(self, target_id, suggestion_id, **kwargs)
 
@@ -2740,11 +2736,11 @@ def can_view_reviewable_suggestions(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
         if suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if user_services.can_review_translation_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
         elif suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
             if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
         else:

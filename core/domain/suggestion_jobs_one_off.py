@@ -20,7 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import logging
 
 from constants import constants
 from core import jobs
@@ -52,7 +51,7 @@ class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted or item.suggestion_type != (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                feconf.SUGGESTION_TYPE_ADD_QUESTION):
             return
 
         try:
@@ -121,10 +120,10 @@ class SuggestionSvgFilenameValidationOneOffJob(
 
     @staticmethod
     def map(item):
-        if item.target_type != suggestion_models.TARGET_TYPE_EXPLORATION:
+        if item.target_type != feconf.ENTITY_TYPE_EXPLORATION:
             return
         if item.suggestion_type != (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
             return
         suggestion = suggestion_services.get_suggestion_from_model(item)
         html_string_list = suggestion.get_all_html_content_strings()
@@ -170,128 +169,6 @@ class SuggestionSvgFilenameValidationOneOffJob(
             yield (key, values)
 
 
-class SuggestionMathMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """A one-time job that can be used to migrate the Math components in the
-    suggestions to the new Math Schema.
-    """
-
-    _ERROR_KEY_BEFORE_MIGRATION = 'validation_error'
-    _ERROR_KEY_AFTER_MIGRATION = 'validation_error_after_migration'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [suggestion_models.GeneralSuggestionModel]
-
-    @staticmethod
-    def map(item):
-        suggestion = suggestion_services.get_suggestion_by_id(item.id)
-        try:
-            suggestion.validate()
-        except Exception as e:
-            logging.error(
-                'Suggestion %s failed validation: %s' % (item.id, e))
-            yield (
-                SuggestionMathMigrationOneOffJob._ERROR_KEY_BEFORE_MIGRATION,
-                'Suggestion %s failed validation: %s' % (item.id, e))
-            return
-        html_string_list = suggestion.get_all_html_content_strings()
-        html_string = ''.join(html_string_list)
-        error_list = (
-            html_validation_service.
-            validate_math_tags_in_html_with_attribute_math_content(html_string))
-        # Migrate the suggestion only if the suggestions have math-tags with
-        # old schema.
-        if len(error_list) > 0:
-            suggestion.convert_html_in_suggestion_change(
-                html_validation_service.add_math_content_to_math_rte_components)
-            try:
-                suggestion.validate()
-            except Exception as e:
-                logging.error(
-                    'Suggestion %s failed validation after migration: %s' % (
-                        item.id, e))
-                yield (
-                    SuggestionMathMigrationOneOffJob._ERROR_KEY_AFTER_MIGRATION,
-                    'Suggestion %s failed validation: %s' % (
-                        item.id, e))
-                return
-            item.change_cmd = suggestion.change.to_dict()
-            item.update_timestamps(update_last_updated_time=False)
-            item.put()
-            yield ('suggestion_migrated', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key not in [
-                SuggestionMathMigrationOneOffJob._ERROR_KEY_AFTER_MIGRATION,
-                SuggestionMathMigrationOneOffJob._ERROR_KEY_BEFORE_MIGRATION]:
-            no_of_suggestions_migrated = (
-                sum(ast.literal_eval(v) for v in values))
-            yield (key, ['%d suggestions successfully migrated.' % (
-                no_of_suggestions_migrated)])
-        else:
-            yield (key, values)
-
-
-class PopulateSuggestionLanguageCodeMigrationOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """A reusable one-time job that may be used to add the language_code field
-    to suggestions that do not have that field yet. The language_code field
-    allows question and translation suggestions to be queried by language.
-    This job will load all existing suggestions from the data store, update
-    them, if needed, and immediately store them back into the data store.
-    """
-
-    _VALIDATION_ERROR_KEY = 'validation_error'
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [suggestion_models.GeneralSuggestionModel]
-
-    @staticmethod
-    def map(item):
-        # Exit early if the suggestion has been marked deleted, or if the
-        # suggestion has already set the language code property, or if the
-        # suggestion type is not queryable by language, since ndb automatically
-        # sets properties that aren't intialized to None.
-        if item.deleted or item.language_code or item.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT):
-            return
-
-        suggestion = suggestion_services.get_suggestion_from_model(item)
-        if suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-            # Set the language code to be the language of the question.
-            suggestion.change.question_dict['language_code'] = (
-                constants.DEFAULT_LANGUAGE_CODE)
-            suggestion.language_code = constants.DEFAULT_LANGUAGE_CODE
-        elif suggestion.suggestion_type == (
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
-            # Set the language code to be the language of the translation.
-            suggestion.language_code = suggestion.change.language_code
-        # Validate the suggestion before updating the storage model.
-        try:
-            suggestion.validate()
-        except Exception as e:
-            logging.error(
-                'Suggestion %s failed validation: %s' % (
-                    item.id, e))
-            yield (
-                PopulateSuggestionLanguageCodeMigrationOneOffJob
-                ._VALIDATION_ERROR_KEY,
-                'Suggestion %s failed validation: %s' % (
-                    item.id, e))
-            return
-        item.language_code = suggestion.language_code
-        item.update_timestamps()
-        item.put()
-        yield ('%s_suggestion_migrated' % item.suggestion_type, item.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
 class PopulateContributionStatsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to initialize, or regenerate,
@@ -322,7 +199,7 @@ class PopulateContributionStatsOneOffJob(
             # Contributor Dashboard or if the suggestion is not currently in
             # review.
             if item.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT) or (
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT) or (
                         item.status != suggestion_models.STATUS_IN_REVIEW):
                 return
             suggestion = suggestion_services.get_suggestion_from_model(item)
@@ -397,10 +274,10 @@ class PopulateContributionStatsOneOffJob(
             # Update the suggestion counts.
             else:
                 if item_category == (
-                        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                        feconf.SUGGESTION_TYPE_ADD_QUESTION):
                     stats_model.question_suggestion_count = count_value
                 elif item_category == (
-                        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                     (
                         stats_model
                         .translation_suggestion_counts_by_lang_code[
