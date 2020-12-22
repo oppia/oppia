@@ -6,7 +6,7 @@
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
     "skipLibCheck": true,
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true,
     "strict": true,
     "typeRoots": ["./node_modules/@types"],
@@ -15,6 +15,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
       "app.constants": ["core/templates/app.constants"],

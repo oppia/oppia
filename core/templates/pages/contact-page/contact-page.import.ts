@@ -16,6 +16,15 @@
  * @fileoverview File to import necessary scripts for contact page.
  */
 
+import 'core-js/es7/reflect';
+import 'zone.js';
+
+angular.module('oppia', [
+  require('angular-cookies'), 'headroom', 'ngAnimate',
+  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+  'toastr', 'ui.bootstrap'
+]);
+
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
 require('pages/contact-page/contact-page.module.ts');
