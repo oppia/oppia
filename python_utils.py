@@ -42,6 +42,9 @@ import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
+import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
 
 BASESTRING = past.builtins.basestring
 INPUT = builtins.input
@@ -290,8 +293,6 @@ def url_retrieve(source_url, filename=None):
     Returns:
         urlretrieve. The 'urlretrieve' object.
     """
-    import certifi
-    import ssl
     context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib
@@ -319,8 +320,6 @@ def url_open(source_url):
     Returns:
         urlopen. The 'urlopen' object.
     """
-    import certifi
-    import ssl
     context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib2
