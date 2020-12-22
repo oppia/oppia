@@ -1457,7 +1457,7 @@ class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(
             )
 
     def test_for_existing_exploration_ids(self):
-        # Generate a model with populated exploration IDs
+        # Generate a model with populated exploration IDs.
         origional_subscription_model = (
             user_models.UserSubscriptionsModel(
                 id='model_id',
