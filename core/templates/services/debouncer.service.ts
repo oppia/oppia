@@ -28,7 +28,7 @@ export class DebouncerService {
   // for `wait` milliseconds.
   debounce(func: () => void, millisecsToWait: number): () => void {
     let timeout: ReturnType<typeof setTimeout>|null;
-    let context: this|null = this;
+    let context: this | null = this;
     let timestamp: number;
     let result: void;
 
