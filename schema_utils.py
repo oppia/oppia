@@ -97,7 +97,7 @@ def normalize_against_schema(
             schema[SCHEMA_KEY_OBJ_TYPE])
         if not apply_custom_validators:
             normalized_obj = normalize_against_schema(
-                obj, obj_class.SCHEMA, apply_custom_validators=False)
+                obj, obj_class.get_schema(), apply_custom_validators=False)
         else:
             normalized_obj = obj_class.normalize(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:

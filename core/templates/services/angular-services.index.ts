@@ -144,6 +144,8 @@ import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
+import { PopulateRuleContentIdsService } from
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -515,6 +517,7 @@ export const angularServices: [string, unknown][] = [
   ['PlaythroughIssueObjectFactory', PlaythroughIssueObjectFactory],
   ['PlaythroughIssuesBackendApiService', PlaythroughIssuesBackendApiService],
   ['PlaythroughObjectFactory', PlaythroughObjectFactory],
+  ['PopulateRuleContentIdsService', PopulateRuleContentIdsService],
   ['PlaythroughService', PlaythroughService],
   ['PredictionAlgorithmRegistryService', PredictionAlgorithmRegistryService],
   ['PretestQuestionBackendApiService', PretestQuestionBackendApiService],

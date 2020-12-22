@@ -65,6 +65,13 @@ angular.module('oppia').factory('QuestionUpdateService', [
       allContentIdsSet.add(state.content.getContentId());
       state.interaction.answerGroups.forEach(function(answerGroup) {
         allContentIdsSet.add(answerGroup.outcome.feedback.getContentId());
+        answerGroup.rules.forEach(rule => {
+          Object.keys(rule.inputs).forEach(inputName => {
+            if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
+              allContentIdsSet.add(rule.inputs[inputName].contentId);
+            }
+          });
+        });
       });
       if (state.interaction.defaultOutcome) {
         allContentIdsSet.add(

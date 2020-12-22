@@ -169,7 +169,10 @@ describe('TrainingDataService', function() {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: 'Test'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['Test']
+              }}
             }],
             outcome: {
               dest: 'State',

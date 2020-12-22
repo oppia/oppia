@@ -358,7 +358,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': 'Test'
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Test']
+                        }
                     },
                     'rule_type': 'Contains'
                 }],

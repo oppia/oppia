@@ -142,6 +142,13 @@ angular.module('oppia').factory('ExplorationStatesService', [
         var contentIds = new Set();
         answerGroups.forEach(function(answerGroup) {
           contentIds.add(answerGroup.outcome.feedback.getContentId());
+          answerGroup.rules.forEach(rule => {
+            Object.keys(rule.inputs).forEach(inputName => {
+              if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
+                contentIds.add(rule.inputs[inputName].contentId);
+              }
+            });
+          });
         });
         return contentIds;
       },

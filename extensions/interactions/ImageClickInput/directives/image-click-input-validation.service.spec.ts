@@ -104,7 +104,7 @@ describe('ImageClickInputValidationService', () => {
         inputs: {
           x: 'SecondLabel'
         }
-      })],
+      }, 'ImageClickInput')],
       goodDefaultOutcome,
       null,
       null)];

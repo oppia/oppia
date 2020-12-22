@@ -84,21 +84,21 @@ describe('RatioExpressionInputValidationService', () => {
       inputs: {
         x: [1, 2, 3]
       }
-    });
+    }, 'RatioExpressionInput');
 
     equals = rof.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2, 3]
       }
-    });
+    }, 'RatioExpressionInput');
 
     hasNumberOfTermsEqualTo = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 3
       }
-    });
+    }, 'RatioExpressionInput');
 
     answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
@@ -135,7 +135,7 @@ describe('RatioExpressionInputValidationService', () => {
       inputs: {
         x: [2, 4, 6]
       }
-    });
+    }, 'RatioExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalent, isEquivalentNonSimplified];
@@ -154,7 +154,7 @@ describe('RatioExpressionInputValidationService', () => {
       inputs: {
         x: [1, 2, 3, 4]
       }
-    });
+    }, 'RatioExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [hasNumberOfTermsEqualTo, equals, equalFourTerms];
@@ -189,13 +189,13 @@ describe('RatioExpressionInputValidationService', () => {
       inputs: {
         x: [1, 2]
       }
-    });
+    }, 'RatioExpressionInput');
     let hasNumberOfTermsEqualToLength2 = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 2
       }
-    });
+    }, 'RatioExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [

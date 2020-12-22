@@ -718,7 +718,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': ['Test']
+                        'x': {
+                            'contentId': 'rule_input_3',
+                            'normalizedStrSet': ['Test']
+                        }
                     },
                     'rule_type': 'Contains'
                 }],
@@ -739,7 +742,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': ['Test']
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Test']
+                        }
                     },
                     'rule_type': 'Contains'
                 }],
@@ -760,7 +766,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': ['Test']
+                        'x': {
+                            'contentId': 'rule_input_5',
+                            'normalizedStrSet': ['Test']
+                        }
                     },
                     'rule_type': 'Contains'
                 }],
@@ -771,13 +780,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_state_data.written_translations.translations_mapping.update({
             'feedback_0': {},
             'feedback_1': {},
-            'feedback_2': {}
+            'feedback_2': {},
+            'rule_input_3': {},
+            'rule_input_4': {},
+            'rule_input_5': {}
         })
         question_state_data.recorded_voiceovers.voiceovers_mapping.update({
             'feedback_0': {},
             'feedback_1': {},
-            'feedback_2': {}
+            'feedback_2': {},
+            'rule_input_3': {},
+            'rule_input_4': {},
+            'rule_input_5': {}
         })
+        question_state_data.next_content_id_index = 5
         inapplicable_skill_misconception_ids = [
             'skillid12345-3',
             'skillid12345-4'
@@ -857,7 +873,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': ['Test']
+                        'x': {
+                            'contentId': 'rule_input_3',
+                            'normalizedStrSet': ['Test']
+                        }
                     },
                     'rule_type': 'Contains'
                 }],
@@ -878,7 +897,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': ['Test']
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Test']
+                        }
                     },
                     'rule_type': 'Contains'
                 }],
@@ -899,7 +921,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': ['Test']
+                        'x': {
+                            'contentId': 'rule_input_5',
+                            'normalizedStrSet': ['Test']
+                        }
                     },
                     'rule_type': 'Contains'
                 }],
@@ -910,13 +935,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_state_data.written_translations.translations_mapping.update({
             'feedback_0': {},
             'feedback_1': {},
-            'feedback_2': {}
+            'feedback_2': {},
+            'rule_input_3': {},
+            'rule_input_4': {},
+            'rule_input_5': {}
         })
         question_state_data.recorded_voiceovers.voiceovers_mapping.update({
             'feedback_0': {},
             'feedback_1': {},
-            'feedback_2': {}
+            'feedback_2': {},
+            'rule_input_3': {},
+            'rule_input_4': {},
+            'rule_input_5': {}
         })
+        question_state_data.next_content_id_index = 5
         inapplicable_skill_misconception_ids = [
             'skillid12345-3',
             'skillid12345-4'
@@ -1183,7 +1215,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
                             'needs_update': False,
-                            'duration_secs': 0.0}}}})
+                            'duration_secs': 0.0}},
+                    'rule_input_1': {}}})
 
     def test_migrate_question_state_from_v31_to_latest(self):
         answer_group = {
@@ -2305,7 +2338,10 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             migrated_rule_spec,
             {
-                'inputs': {'x': ['test']},
+                'inputs': {'x': {
+                    'contentId': 'rule_input_2',
+                    'normalizedStrSet': ['test']
+                }},
                 'rule_type': 'Equals'
             })
 
@@ -2483,3 +2519,194 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             cust_args['placeholder'].value.unicode_str,
             'Type an expression here, using only numbers.')
+
+    def test_migrate_question_state_from_v40_to_latest(self):
+        answer_group = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['Test']
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'placeholder': {
+                        'value': {
+                            'content_id': 'ca_placeholder_0',
+                            'unicode_str': ''
+                        }
+                    },
+                    'rows': {'value': 1}
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': 'TextInput'
+            },
+            'next_content_id_index': 4,
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+        question_model = question_models.QuestionModel(
+            id='question_id',
+            question_state_data=question_state_dict,
+            language_code='en',
+            version=0,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=40)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        answer_group = question.question_state_data.interaction.answer_groups[0]
+        rule_spec = answer_group.rule_specs[0]
+        self.assertEqual(
+            rule_spec.inputs['x'],
+            {
+                'contentId': 'rule_input_4',
+                'normalizedStrSet': ['Test']
+            })
+        self.assertEqual(question.question_state_data.next_content_id_index, 5)
+
+    def test_migrate_question_state_from_v41_to_latest(self):
+        answer_group = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': ['Test']
+                },
+                'rule_type': 'Equals'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {
+                    'buttonText': {
+                        'value': {
+                            'content_id': 'ca_buttonText_0',
+                            'unicode_str': ''
+                        }
+                    },
+                },
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [],
+                'solution': {},
+                'id': 'SetInput'
+            },
+            'next_content_id_index': 4,
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+        question_model = question_models.QuestionModel(
+            id='question_id',
+            question_state_data=question_state_dict,
+            language_code='en',
+            version=0,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=40)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        question = question_fetchers.get_question_from_model(question_model)
+        self.assertEqual(
+            question.question_state_data_schema_version,
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+
+        answer_group = question.question_state_data.interaction.answer_groups[0]
+        rule_spec = answer_group.rule_specs[0]
+        self.assertEqual(
+            rule_spec.inputs['x'],
+            {
+                'contentId': 'rule_input_4',
+                'unicodeStrSet': ['Test']
+            })
+        self.assertEqual(question.question_state_data.next_content_id_index, 5)

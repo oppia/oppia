@@ -521,7 +521,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -542,7 +545,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name], 'TextInput')
+            init_state, 'TextInput')
+        init_state.update_interaction_answer_groups(old_answer_groups)
+        answer_groups = interaction.answer_groups
+        answer_group = answer_groups[0]
         answer_group.outcome.dest = exploration.init_state_name
         exploration.validate()
 
@@ -560,18 +566,32 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_spec.rule_type = 'FakeRuleType'
         self._assert_validation_error(exploration, 'Unrecognized rule type')
 
-        rule_spec.inputs = {'x': 15}
+        rule_spec.inputs = {'x': {
+            'contentId': 'rule_input_Equals',
+            'normalizedStrSet': 15
+        }}
         rule_spec.rule_type = 'Contains'
         with self.assertRaisesRegexp(
-            Exception, 'Expected list, received 15'
+            Exception, 'Invalid unicode string set: 15'
             ):
             exploration.validate()
 
-        rule_spec.inputs = {'x': '{{ExampleParam}}'}
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name],
+            'PencilCodeEditor')
+        temp_rule = old_answer_groups[0]['rule_specs'][0]
+        old_answer_groups[0]['rule_specs'][0] = {
+            'rule_type': 'ErrorContains',
+            'inputs': {'x': '{{ExampleParam}}'}
+        }
+        init_state.update_interaction_answer_groups(old_answer_groups)
+        old_answer_groups[0]['rule_specs'][0] = temp_rule
+
         self._assert_validation_error(
             exploration,
-            'RuleSpec \'Contains\' has an input with name \'x\' which refers '
-            'to an unknown parameter within the exploration: ExampleParam')
+            'RuleSpec \'ErrorContains\' has an input with name \'x\' which '
+            'refers to an unknown parameter within the exploration: '
+            'ExampleParam')
 
         # Restore a valid exploration.
         exploration.param_specs['ExampleParam'] = param_domain.ParamSpec(
@@ -579,7 +599,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         # Validate Outcome.
-        outcome = answer_group.outcome
+        outcome = init_state.interaction.answer_groups[0].outcome
         destination = exploration.init_state_name
         outcome.dest = None
         self._assert_validation_error(
@@ -668,9 +688,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         interaction.id = 'SomeInteractionTypeThatDoesNotExist'
         self._assert_validation_error(exploration, 'Invalid interaction id')
+        interaction.id = 'PencilCodeEditor'
 
         self.set_interaction_for_state(init_state, 'TextInput')
+        init_state.update_interaction_answer_groups(old_answer_groups)
         valid_text_input_cust_args = init_state.interaction.customization_args
+        rule_spec.inputs = {'x': {
+            'contentId': 'rule_input_Equals',
+            'normalizedStrSet': ['Test']
+        }}
+        rule_spec.rule_type = 'Contains'
         exploration.validate()
 
         interaction.customization_args = []
@@ -702,7 +729,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected answer groups to be a list')
 
-        interaction.answer_groups = answer_groups
+        init_state.update_interaction_answer_groups(old_answer_groups)
         self.set_interaction_for_state(init_state, 'EndExploration')
         self._assert_validation_error(
             exploration,
@@ -715,13 +742,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Non-terminal interactions must have a default outcome.')
 
         self.set_interaction_for_state(init_state, 'EndExploration')
+        init_state.interaction.answer_groups = answer_groups
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.')
 
         # A terminal interaction without a default outcome or answer group is
         # valid. This resets the exploration back to a valid state.
-        init_state.update_interaction_answer_groups([])
+        init_state.interaction.answer_groups = []
         exploration.validate()
 
         # Restore a valid exploration.
@@ -767,7 +795,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -794,7 +825,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -1270,7 +1304,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_5',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -1647,7 +1684,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -6718,7 +6758,151 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V45
+    YAML_CONTENT_V46 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V46
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -7158,7 +7342,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 45
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -7179,7 +7363,9 @@ states:
         rule_specs:
         - inputs:
             x:
-            - InputString
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7203,7 +7389,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 3
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7211,6 +7397,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7218,6 +7405,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7282,7 +7470,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 40
+states_schema_version: 41
 tags: []
 title: Title
 """)
@@ -7315,7 +7503,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 45
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -7336,7 +7524,9 @@ states:
         rule_specs:
         - inputs:
             x:
-            - InputString
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7360,7 +7550,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 3
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7368,6 +7558,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7375,6 +7566,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7444,7 +7636,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 40
+states_schema_version: 41
 tags: []
 title: Title
 """)
@@ -7495,7 +7687,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 45
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -7516,7 +7708,9 @@ states:
         rule_specs:
         - inputs:
             x:
-            - InputString
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7540,7 +7734,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 3
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7548,6 +7742,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7555,6 +7750,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7631,7 +7827,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 40
+states_schema_version: 41
 tags: []
 title: Title
 """)
@@ -7664,7 +7860,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 45
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -7685,7 +7881,9 @@ states:
         rule_specs:
         - inputs:
             x:
-            - InputString
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7709,7 +7907,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 3
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7717,6 +7915,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7724,6 +7923,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7792,7 +7992,7 @@ states:
         ca_customPlaceholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 40
+states_schema_version: 41
 tags: []
 title: Title
 """)
@@ -7855,7 +8055,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 45
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -7876,7 +8076,9 @@ states:
         rule_specs:
         - inputs:
             x:
-            - InputString
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -7900,7 +8102,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 3
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -7908,6 +8110,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -7915,6 +8118,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -7976,7 +8180,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 40
+states_schema_version: 41
 tags: []
 title: Title
 """)
@@ -8152,7 +8356,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 45
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -8279,7 +8483,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 40
+states_schema_version: 41
 tags: []
 title: Title
 """)
@@ -8429,7 +8633,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 45
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -8450,7 +8654,9 @@ states:
         rule_specs:
         - inputs:
             x:
-            - InputString
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -8474,7 +8680,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 3
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -8482,6 +8688,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -8493,6 +8700,7 @@ states:
             translation: <p>Translation</p>
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -8557,13 +8765,220 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 40
+states_schema_version: 41
 tags: []
 title: Title
 """)
         exploration = exp_domain.Exploration.from_yaml(
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
+
+    def test_load_from_v45_with_set_input_interaction(self):
+        """Tests the migration of SetInput rule inputs."""
+        v45_exploration_with_set_input_yaml = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 45
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_2
+            unicode_str: ''
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: SetInput
+      solution: null
+    next_content_id_index: 3
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 40
+tags: []
+title: Title
+""")
+
+        latest_exploration_with_set_input_yaml = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              unicodeStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value:
+            content_id: ca_buttonText_2
+            unicode_str: ''
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: SetInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_buttonText_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_buttonText_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', v45_exploration_with_set_input_yaml)
+        self.assertEqual(
+            exploration.to_yaml(),
+            latest_exploration_with_set_input_yaml)
 
     def test_cannot_load_from_yaml_with_no_schema_version(self):
         sample_yaml_content = (
@@ -8993,7 +9408,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long, single-line-pragma
-    YAML_CONTENT_V45_IMAGE_DIMENSIONS = (
+    YAML_CONTENT_V46_IMAGE_DIMENSIONS = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -9004,7 +9419,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 45
+schema_version: 46
 states:
   Introduction:
     classifier_model_id: null
@@ -9257,7 +9672,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 40
+states_schema_version: 41
 tags: []
 title: title
 """)
@@ -9505,7 +9920,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V45_WITH_IMAGE_CAPTION = (
+    YAML_CONTENT_V46_WITH_IMAGE_CAPTION = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -9516,7 +9931,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 45
+schema_version: 46
 states:
   (untitled state):
     classifier_model_id: null
@@ -9541,7 +9956,9 @@ states:
         rule_specs:
         - inputs:
             x:
-            - InputString
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -9565,7 +9982,7 @@ states:
       hints: []
       id: TextInput
       solution: null
-    next_content_id_index: 3
+    next_content_id_index: 4
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -9573,6 +9990,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -9580,6 +9998,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -9644,7 +10063,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 40
+states_schema_version: 41
 tags: []
 title: Title
 """)
@@ -9660,7 +10079,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V45_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V46_IMAGE_DIMENSIONS)
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
@@ -9672,7 +10091,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V45_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V46_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):

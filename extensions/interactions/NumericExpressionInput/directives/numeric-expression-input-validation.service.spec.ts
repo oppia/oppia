@@ -82,14 +82,14 @@ describe('NumericExpressionInputValidationService', () => {
       inputs: {
         x: '3^2'
       }
-    });
+    }, 'NumericExpressionInput');
 
     matchesExactlyWith = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '3 * 3'
       }
-    });
+    }, 'NumericExpressionInput');
 
     answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
@@ -118,13 +118,13 @@ describe('NumericExpressionInputValidationService', () => {
       inputs: {
         x: '(4+5)^2'
       }
-    });
+    }, 'NumericExpressionInput');
     let isEquivalentTo2 = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: '81'
       }
-    });
+    }, 'NumericExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
@@ -143,13 +143,13 @@ describe('NumericExpressionInputValidationService', () => {
       inputs: {
         x: '3^2 - 1'
       }
-    });
+    }, 'NumericExpressionInput');
     let matchesExactlyWith2 = rof.createFromBackendDict({
       rule_type: 'MatchesExactlyWith',
       inputs: {
         x: '-1 + 3^2'
       }
-    });
+    }, 'NumericExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
@@ -175,13 +175,13 @@ describe('NumericExpressionInputValidationService', () => {
       inputs: {
         x: '2 * 3'
       }
-    });
+    }, 'NumericExpressionInput');
     isEquivalentTo = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
         x: '2 + 3'
       }
-    });
+    }, 'NumericExpressionInput');
 
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 

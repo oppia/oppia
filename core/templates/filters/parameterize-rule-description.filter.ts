@@ -156,6 +156,24 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
             replacementText += inputs[varName][i];
           }
           replacementText += ']';
+        } else if (varType === 'TranslatableSetOfNormalizedString') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].normalizedStrSet.length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName].normalizedStrSet[i];
+          }
+          replacementText += ']';
+        } else if (varType === 'TranslatableSetOfUnicodeString') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].unicodeStrSet.length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName].unicodeStrSet[i];
+          }
+          replacementText += ']';
         } else if (
           varType === 'Real' || varType === 'NonnegativeInt' ||
           varType === 'Int') {

@@ -121,7 +121,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
         interaction_answer_groups = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
-                'inputs': {'x': ['abc']},
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_4',
+                        'normalizedStrSet': ['abc']
+                    }
+                },
             }],
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
@@ -144,6 +149,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             'property_name': (
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
             'new_value': interaction_answer_groups
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
+            'new_value': 4
         })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):

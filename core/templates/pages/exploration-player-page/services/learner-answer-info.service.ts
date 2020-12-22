@@ -21,8 +21,10 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AppConstants } from 'app.constants';
 import { State } from 'domain/state/StateObjectFactory.ts';
-import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service.ts';
-import { AnswerClassificationService, InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service.ts';
+import { LearnerAnswerDetailsBackendApiService } from
+  'domain/statistics/learner-answer-details-backend-api.service.ts';
+import { AnswerClassificationService, InteractionRulesService } from
+  'pages/exploration-player-page/services/answer-classification.service.ts';
 
 @Injectable({
   providedIn: 'root'

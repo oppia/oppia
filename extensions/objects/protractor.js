@@ -205,7 +205,7 @@ var SanitizedUrlEditor = function(elem) {
   };
 };
 
-var SetOfNormalizedStringEditor = function(elem) {
+var TranslatableSetOfNormalizedStringEditor = function(elem) {
   return {
     setValue: async function(normalizedStrings) {
       // Clear all entries.
@@ -260,7 +260,7 @@ var OBJECT_EDITORS = {
   PositionOfTerms: ParameterNameEditor,
   RatioExpression: RatioExpressionEditor,
   SanitizedUrl: SanitizedUrlEditor,
-  SetOfNormalizedString: SetOfNormalizedStringEditor,
+  TranslatableSetOfNormalizedString: TranslatableSetOfNormalizedStringEditor,
   SkillSelector: SkillSelector,
   UnicodeString: UnicodeStringEditor
 };
