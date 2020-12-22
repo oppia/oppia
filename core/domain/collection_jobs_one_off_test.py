@@ -36,8 +36,6 @@ import feconf
 
 datastore_services = models.Registry.import_datastore_services()
 
-datastore_services = models.Registry.import_datastore_services()
-
 
 class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
@@ -139,45 +137,58 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         do not pass strict validation.
         """
         # Save a collection without an objective or explorations in version 1.
-        collection_title = 'A title'
-        collection_category = 'A category'
-        rights_manager.create_new_collection_rights(
-            self.COLLECTION_ID, self.albert_id)
-        model = collection_models.CollectionModel(
-            id=self.COLLECTION_ID,
-            category=collection_title,
-            title=collection_category,
-            objective='',
-            tags=[],
-            collection_contents={
-                'nodes': {}
-            },
-            schema_version=2,
-        )
-        model.commit(self.albert_id, 'Made a new collection!', [{
-            'cmd': collection_services.CMD_CREATE_NEW,
-            'title': collection_title,
-            'category': collection_category,
-        }])
+        with self.swap(
+            collection_models,
+            'CollectionModel',
+            MockCollectionModel):
+            collection_title = 'A title'
+            collection_category = 'A category'
+            # Create an exploration to put in the collection.
+            self.save_new_default_exploration(self.EXP_ID, self.albert_id)
+            rights_manager.create_new_collection_rights(
+                self.COLLECTION_ID, self.albert_id)
+            model = collection_models.CollectionModel(
+                id=self.COLLECTION_ID,
+                category=collection_title,
+                title=collection_category,
+                objective='',
+                tags=[],
+                nodes=[{
+                    'exploration_id': self.EXP_ID,
+                    'prerequisite_skills': [],
+                    'acquired_skills': []
+                }],
+                schema_version=2,
+            )
+            model.commit(self.albert_id, 'Made a new collection!', [{
+                'cmd': collection_services.CMD_CREATE_NEW,
+                'title': collection_title,
+                'category': collection_category,
+            }])
 
-        # Save a collection summary object for indexing. The explicit commit
-        # does not create a summary object, which is needed for the
-        # job to update the index after updating the collection.
-        collection_services.regenerate_collection_summary_with_new_contributor(
-            model.id, self.albert_id)
+            # Save a collection summary object for indexing. The explicit commit
+            # does not create a summary object, which is needed for the
+            # job to update the index after updating the collection.
+            (
+                collection_services
+                .regenerate_collection_summary_with_new_contributor(
+                    model.id, self.albert_id))
 
-        # Start migration job on sample collection.
-        job_id = (
-            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
-        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
+            # Start migration job on sample collection.
+            job_id = (
+                collection_jobs_one_off.CollectionMigrationOneOffJob
+                .create_new())
+            collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
 
-        # This running without errors indicates the collection is migrated.
-        self.process_and_flush_pending_mapreduce_tasks()
+            # This running without errors indicates the collection is migrated.
+            self.process_and_flush_pending_mapreduce_tasks()
 
-        # Check the version number of the new model.
-        new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
-        self.assertEqual(
-            new_model.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+            # Check the version number of the new model.
+            new_model = collection_models.CollectionModel.get(
+                self.COLLECTION_ID)
+            self.assertEqual(
+                new_model.schema_version,
+                feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
     def test_migration_job_skips_collection_failing_validation(self):
         """Tests that the collection migration job skips the collection
@@ -185,48 +196,64 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
         """
         # Create a collection directly using the model and with an
         # invalid language code.
-        collection_title = 'A title'
-        collection_category = 'A category'
-        collection_language_code = 'abc'
-        collection_schema_version = 2
-        rights_manager.create_new_collection_rights(
-            self.COLLECTION_ID, self.albert_id)
-        model = collection_models.CollectionModel(
-            id=self.COLLECTION_ID,
-            category=collection_title,
-            title=collection_category,
-            language_code=collection_language_code,
-            objective='An objective',
-            tags=[],
-            schema_version=collection_schema_version
-        )
-        model.commit(self.albert_id, 'Made a new collection!', [{
-            'cmd': collection_services.CMD_CREATE_NEW,
-            'title': collection_title,
-            'category': collection_category,
-        }])
+        with self.swap(
+            collection_models,
+            'CollectionModel',
+            MockCollectionModel):
+            collection_title = 'A title'
+            collection_category = 'A category'
+            collection_language_code = 'abc'
+            collection_schema_version = 2
 
-        # Start migration job on sample collection.
-        job_id = (
-            collection_jobs_one_off.CollectionMigrationOneOffJob.create_new())
-        collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
+            # Create an exploration to put in the collection.
+            self.save_new_default_exploration(self.EXP_ID, self.albert_id)
+            rights_manager.create_new_collection_rights(
+                self.COLLECTION_ID, self.albert_id)
+            model = collection_models.CollectionModel(
+                id=self.COLLECTION_ID,
+                category=collection_title,
+                title=collection_category,
+                language_code=collection_language_code,
+                objective='An objective',
+                tags=[],
+                nodes=[{
+                    'exploration_id': self.EXP_ID,
+                    'prerequisite_skills': [],
+                    'acquired_skills': []
+                }],
+                schema_version=collection_schema_version
+            )
+            model.commit(self.albert_id, 'Made a new collection!', [{
+                'cmd': collection_services.CMD_CREATE_NEW,
+                'title': collection_title,
+                'category': collection_category,
+            }])
 
-        # This running without errors indicates the collection failing
-        # validation is being ignored.
-        self.process_and_flush_pending_mapreduce_tasks()
+            # Start migration job on sample collection.
+            job_id = (
+                collection_jobs_one_off.CollectionMigrationOneOffJob
+                .create_new())
+            collection_jobs_one_off.CollectionMigrationOneOffJob.enqueue(job_id)
 
-        # Check that the version number of the new model is same as old model.
-        new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
-        self.assertEqual(new_model.schema_version, collection_schema_version)
+            # This running without errors indicates the collection failing
+            # validation is being ignored.
+            self.process_and_flush_pending_mapreduce_tasks()
 
-        output = (
-            collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(
-                job_id))
-        expected = [[u'validation_error',
-                     [u'Collection %s failed validation: Invalid '
-                      u'language code: %s'
-                      % (self.COLLECTION_ID, collection_language_code)]]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+            # Check that the version number of the new model is same as
+            # old model.
+            new_model = collection_models.CollectionModel.get(
+                self.COLLECTION_ID)
+            self.assertEqual(
+                new_model.schema_version, collection_schema_version)
+
+            output = (
+                collection_jobs_one_off.CollectionMigrationOneOffJob.get_output(
+                    job_id))
+            expected = [[u'validation_error',
+                         [u'Collection %s failed validation: Invalid '
+                          u'language code: %s'
+                          % (self.COLLECTION_ID, collection_language_code)]]]
+            self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_migrates_collection_nodes(self):
         """Tests that the collection migration job migrates content from
@@ -255,9 +282,6 @@ class CollectionMigrationOneOffJobTests(test_utils.GenericTestBase):
                 objective='An objective',
                 tags=[],
                 schema_version=2,
-                collection_contents={
-                    'nodes': {}
-                },
                 nodes=[{
                     'exploration_id': self.EXP_ID,
                     'prerequisite_skills': [],
