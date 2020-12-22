@@ -48,7 +48,8 @@ angular.module('oppia').directive('imageUploader', [
           e.preventDefault();
           scope.backgroundWhileUploading = false;
           // Since we are using JQlite for event handling
-          // we should trigger scope.$apply() Manually.
+          // which will run outside angular
+          // that's why we should trigger scope.$apply() Manually.
           scope.$apply();
         };
 
@@ -126,7 +127,8 @@ angular.module('oppia').directive('imageUploader', [
           e.preventDefault();
           scope.backgroundWhileUploading = true;
           // Since we are using JQlite for event handling
-          // we should trigger scope.$apply() Manually.
+          // which will run outside angular
+          // that's why we should trigger scope.$apply() Manually.
           scope.$apply();
         });
 
