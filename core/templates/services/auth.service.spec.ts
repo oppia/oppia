@@ -18,32 +18,30 @@
 
 import { TestBed } from '@angular/core/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { of } from 'rxjs';
+
 import { AuthService } from 'services/auth.service';
+import { MockAngularFireAuth } from 'tests/unit-test-utils';
 
 
-describe('Auth service', () => {
+fdescribe('Auth service', () => {
   let authService: AuthService;
-  let angularFireAuthSpy: jasmine.SpyObj<AngularFireAuth>;
+  let angularFireAuth: AngularFireAuth;
 
   beforeEach(() => {
-    angularFireAuthSpy = jasmine.createSpyObj<AngularFireAuth>(
-      'AngularFireAuth', ['signOut'], {idToken: of(null)});
-
+    var mockAngularFireAuth = new MockAngularFireAuth();
     TestBed.configureTestingModule({
       providers: [
         AuthService,
-        {provide: AngularFireAuth, useValue: angularFireAuthSpy},
-      ]
+        {provider: AngularFireAuth, useValue: mockAngularFireAuth},
+      ],
     });
 
     authService = TestBed.inject(AuthService);
-    angularFireAuthSpy = (
-      TestBed.inject(AngularFireAuth) as jasmine.SpyObj<AngularFireAuth>);
+    angularFireAuth = TestBed.inject(AngularFireAuth);
   });
 
   it('should sign out successfully', async() => {
-    angularFireAuthSpy.signOut.and.resolveTo();
+    spyOn(angularFireAuth, 'signOut').and.resolveTo();
 
     await expectAsync(authService.signOutAsync()).toBeResolvedTo();
   });

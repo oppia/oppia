@@ -20,18 +20,34 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, NgModule } from '@angular/core';
 import { NgZone, PlatformRef, Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 
 import { angularServices } from 'services/angular-services.index';
+import { Observable, of } from 'rxjs';
 
 declare var angular: ng.IAngularStatic;
 
+// AngularFireAuth is an Angular-only service (Angular, not AngularJS) that we
+// depend on to provide authentication services for Oppia.
+//
+// The library is not @Injectable, so we mock its interface and value during
+// unit tests to the minimal subset we need/want to use.
+export class MockAngularFireAuth {
+  idToken: Observable<string | null> = of(null);
+  signOut(): Promise<void> {
+    return Promise.resolve();
+  }
+}
+
 export const importAllAngularServices = (): void => {
+  const mockAngularFireAuth = new MockAngularFireAuth();
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
+      providers: [{provider: AngularFireAuth, useValue: mockAngularFireAuth}],
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -39,6 +55,7 @@ export const importAllAngularServices = (): void => {
       $provide.value(
         servicePair[0], TestBed.get(servicePair[1]));
     }
+    $provide.value('AngularFireAuth', mockAngularFireAuth);
   }));
 };
 
