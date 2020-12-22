@@ -58,5 +58,5 @@ class UserIdByFirebaseAuthIdModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'user_auth_details_ids',
                 user_models.UserAuthDetailsModel,
-                [item.user_id])
+                [item.user_id]),
         ]
