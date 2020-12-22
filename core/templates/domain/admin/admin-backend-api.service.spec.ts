@@ -226,7 +226,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
   afterEach(() => {
     httpTestingController.verify();
   });
-  it('should start the new job with respect to its jobType',
+  it('should start the new job',
     fakeAsync(() => {
       let jobType = 'ActivityContributorsSummaryOneOffJob';
       adminBackendApiService.startNewJob(jobType)
@@ -243,7 +243,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
     }
     ));
 
-  it('should cancel the job with respects to its jobType and jobId',
+  it('should cancel the job given its id and type',
     fakeAsync(() => {
       let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
       let jobType = 'AuditContributorsOneOffJob';
@@ -261,7 +261,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
     }
     ));
 
-  it('should start computation with respect to its computationType',
+  it('should start computation given the job name',
     fakeAsync(() => {
       let computationType = 'FeedbackAnalyticsAggregator';
       adminBackendApiService.startComputation(computationType)
@@ -278,7 +278,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
     }
     ));
 
-  it('should stop computation with respect to its computationType',
+  it('should stop computation given the job name',
     fakeAsync(() => {
       let computationType = 'FeedbackAnalyticsAggregator';
       adminBackendApiService.stopComputation(computationType)
@@ -295,7 +295,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
     }
     ));
 
-  it('should show the Output of valid Jobs',
+  it('should show the output of valid jobs',
     fakeAsync(() => {
       let adminJobOutputUrl =
         '/adminjoboutput?job_id=RemoveGaeUserIdOneOffJob-1608282829960-668';
