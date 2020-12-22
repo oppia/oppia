@@ -29,7 +29,7 @@ FLAKE_CHECK_AND_REPORT_URL = (
     '/check-flake-and-report')
 PASS_REPORT_URL = (
     'https://oppia-e2e-test-results-logger.herokuapp.com'
-    '/check-flake-and-report')
+    '/report-pass')
 REPORT_API_KEY = '7Ccp062JVjv9LUYwnLMqcm5Eu5gYqqhpl3zQmcO3cDQ'
 
 CI_INFO = {
@@ -46,9 +46,9 @@ CI_INFO = {
             'identifier': 'GITHUB_ACTIONS',
             'user_info': 'GITHUB_ACTOR',
             'build_url': None,
-            'build_id': 'GITHUB_ACTION'
+            'build_id': 'GITHUB_RUN_ID',
         },
-        'build_url_template': 'https://github.com/oppia/oppia/runs/%s'
+        'build_url_template': 'https://github.com/oppia/oppia/actions/runs/%s'
     }
 }
 
@@ -121,7 +121,10 @@ def report_pass(suite_name):
         _print_color_message((
             'Failed to contact E2E test logging server at %s.'
             'Please report to E2E team in case server is down.'
-            'Exception: %s') % (FLAKE_CHECK_AND_REPORT_URL, e))
+            'Exception: %s') % (PASS_REPORT_URL, e))
+    _print_color_message(
+        'Reported pass to E2E logging server at {}.'.format(
+            PASS_REPORT_URL))
 
 
 def is_test_output_flaky(output_lines, suite_name):
@@ -163,6 +166,8 @@ def is_test_output_flaky(output_lines, suite_name):
             'Logs from test result logging server:\n %s' % log_str)
 
     flaky = report['result'] if 'result' in report else False
+    _print_color_message(
+        'E2E logging server says test flaky: {}.'.format(flaky))
     if flaky:
         flake = report['flake']
         _print_color_message('Flake Detected:')
