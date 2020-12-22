@@ -28,19 +28,18 @@ describe('Auth service', () => {
 
   beforeEach(() => {
     angularFireAuthSpy = jasmine.createSpyObj<AngularFireAuth>(
-      'AngularFireAuth', ['signOut', 'signInWithPopup'], {idToken: of(null)});
-    angularFireAuthSpy.signInWithPopup.and.callFake(() => {
-      return Promise.resolve({credential: null, user: null});
-    });
+      'AngularFireAuth', ['signOut'], {idToken: of(null)});
 
     TestBed.configureTestingModule({
       providers: [
         AuthService,
-        {provide: AngularFireAuth, useValue: angularFireAuthSpy}
+        {provide: AngularFireAuth, useValue: angularFireAuthSpy},
       ]
     });
 
     authService = TestBed.inject(AuthService);
+    angularFireAuthSpy = (
+      TestBed.inject(AngularFireAuth) as jasmine.SpyObj<AngularFireAuth>);
   });
 
   it('should sign out successfully', async() => {
