@@ -16,14 +16,6 @@
  * @fileoverview Module for the donate page.
  */
 
-import 'core-js/es7/reflect';
-import 'zone.js';
-
-angular.module('oppia', [
-  require('angular-cookies'), 'headroom', 'ngSanitize', 'ngTouch',
-  'pascalprecht.translate', 'toastr', 'ui.bootstrap'
-]);
-
 import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
