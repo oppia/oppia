@@ -100,6 +100,9 @@ angular.module('oppia').component('teachPage', {
         ctrl.displayedTestimonialId = 0;
         ctrl.testimonialCount = 4;
         ctrl.testimonials = ctrl.getTestimonials();
+        $rootScope.$on('$translateChangeSucess',function(){
+          ctrl.testimonials = ctrl.getTestimonials();
+        });
         ctrl.classroomUrl = UrlInterpolationService.interpolateUrl(
           '/learn/<classroomUrlFragment>', {
             classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
@@ -108,8 +111,7 @@ angular.module('oppia').component('teachPage', {
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
+          // TODO(#8521)
           $rootScope.$applyAsync();
         });
       };
