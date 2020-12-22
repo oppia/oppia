@@ -3147,7 +3147,7 @@ class Exploration(python_utils.OBJECT):
             if interaction_id not in [
                     'DragAndDropSortInput', 'ItemSelectionInput']:
                 continue
-            
+
             solution = state_dict['interaction']['solution']
             choices = state_dict['interaction']['customization_args'][
                 'choices']['value']

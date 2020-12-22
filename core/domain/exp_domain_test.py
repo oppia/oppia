@@ -9121,8 +9121,8 @@ title: Title
         exploration = exp_domain.Exploration.from_yaml(
             'eid', v45_exploration_with_set_input_yaml)
         self.assertEqual(
-          exploration.to_yaml(),
-          latest_exploration_with_set_input_yaml)
+            exploration.to_yaml(),
+            latest_exploration_with_set_input_yaml)
 
     def test_load_from_v46_with_item_selection_input_interaction(self):
         """Tests the migration of ItemSelectionInput rule inputs."""
