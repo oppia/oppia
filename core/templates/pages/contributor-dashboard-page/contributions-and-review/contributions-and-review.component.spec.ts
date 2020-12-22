@@ -180,7 +180,7 @@ describe('Contributions and review component', function() {
     it('should initialize $scope properties after controller is' +
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('reviews');
-      expect(ctrl.activeSuggestionType).toBe('add_question');
+      expect(ctrl.activeSuggestionType).toBe('translate_content');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(2);
@@ -531,7 +531,8 @@ describe('Contributions and review component', function() {
         .and.returnValue(
           $q.resolve({
             can_review_translation_for_language_codes: [],
-            can_review_questions: false
+            can_review_questions: false,
+            can_suggest_questions: true
           }));
       spyOn(
         contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
@@ -687,7 +688,7 @@ describe('Contributions and review component', function() {
     it('should initialize $scope properties after controller is' +
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('contributions');
-      expect(ctrl.activeSuggestionType).toBe('add_question');
+      expect(ctrl.activeSuggestionType).toBe('translate_content');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(0);
@@ -710,38 +711,47 @@ describe('Contributions and review component', function() {
     it('should open show view question modal when clicking on' +
       ' question suggestion', function() {
       spyOn($uibModal, 'open').and.callThrough();
-      ctrl.onClickViewSuggestion('suggestion_1');
-      $scope.$apply();
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
+      ctrl.loadContributions().then(function() {
+        ctrl.onClickViewSuggestion('suggestion_1');
+        $scope.$apply();
 
-      expect($uibModal.open).toHaveBeenCalled();
+        expect($uibModal.open).toHaveBeenCalled();
+      });
     });
 
     it('should resolve suggestion to skill when closing show question' +
       ' suggestion modal', function() {
-      expect(Object.keys(ctrl.contributions).length).toBe(1);
-
       $httpBackend.expectPUT(
         '/suggestionactionhandler/skill/1/suggestion_1').respond(200);
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.resolve({})
       });
-      ctrl.onClickViewSuggestion('suggestion_1');
-      $scope.$apply();
-      $httpBackend.flush();
 
-      expect($uibModal.open).toHaveBeenCalled();
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
+      ctrl.loadContributions().then(function() {
+        expect(Object.keys(ctrl.contributions).length).toBe(1);
+        ctrl.onClickViewSuggestion('suggestion_1');
+        $scope.$apply();
+        $httpBackend.flush();
+
+        expect($uibModal.open).toHaveBeenCalled();
+      });
     });
 
     it('should not resolve suggestion to skill when dismissing show question' +
       ' suggestion modal', function() {
+      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
       spyOn(contributionAndReviewService, 'resolveSuggestiontoSkill');
       spyOn($uibModal, 'open').and.returnValue({
         result: $q.reject({})
       });
-      ctrl.onClickViewSuggestion('suggestion_1');
-      $scope.$apply();
+      ctrl.loadContributions().then(function() {
+        ctrl.onClickViewSuggestion('suggestion_1');
+        $scope.$apply();
 
-      expect($uibModal.open).toHaveBeenCalled();
+        expect($uibModal.open).toHaveBeenCalled();
+      });
     });
 
     it('should return correctly check the active tab', function() {
