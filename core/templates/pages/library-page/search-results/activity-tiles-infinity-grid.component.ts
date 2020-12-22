@@ -43,7 +43,7 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
                 data.activity_list));
             ctrl.endOfPageIsReached = endOfPageIsReached;
             ctrl.searchResultsAreLoading = false;
-            $rootScope.$apply();
+            $rootScope.$applyAsync();
           }, function(endOfPageIsReached) {
             ctrl.endOfPageIsReached = endOfPageIsReached;
             ctrl.searchResultsAreLoading = false;
