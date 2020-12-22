@@ -42,9 +42,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
         'SkillEditorRoutingService', 'SkillEditorStateService',
         'UndoRedoService',
         function(
-          $rootScope, $scope, $uibModal, AlertsService,
-          SkillEditorRoutingService, SkillEditorStateService,
-          UndoRedoService) {
+            $rootScope, $scope, $uibModal, AlertsService,
+            SkillEditorRoutingService, SkillEditorStateService,
+            UndoRedoService) {
           var ctrl = this;
           var ACTIVE_TAB_EDITOR = 'Editor';
           var ACTIVE_TAB_QUESTIONS = 'Questions';
