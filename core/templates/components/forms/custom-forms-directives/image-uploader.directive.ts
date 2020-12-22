@@ -127,9 +127,10 @@ angular.module('oppia').directive('imageUploader', [
         $(elt).bind('dragover', function(e) {
           e.preventDefault();
           scope.backgroundWhileUploading = true;
-          // Since we are using JQlite for event handling
-          // which will run outside angular
-          // that's why we should trigger scope.$apply() Manually.
+          // JQlite is used for event handling
+          // in this case and it runs outside angular.
+          // Due to this, scope.$apply() has to be triggered manually
+          // for the changes to be detected.
           scope.$apply();
         });
 
