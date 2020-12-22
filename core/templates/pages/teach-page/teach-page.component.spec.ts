@@ -13,182 +13,143 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the teach page.
+ * @fileoverview Unit tests for the splash page.
  */
 
-import { NO_ERRORS_SCHEMA, Pipe, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, async, fakeAsync, tick } from
-  '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 
-import { TeachPageComponent } from './teach-page.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { TranslateService } from 'services/translate.service';
+import { UserService } from 'services/user.service';
 
-@Pipe({name: 'translate'})
-class MockTranslatePipe {
-  transform(value: string, params: Object | undefined):string {
-    return value;
-  }
-}
-
-class MockTranslateService {
-  languageCode = 'es';
-  use(newLanguageCode: string): string {
-    this.languageCode = newLanguageCode;
-    return this.languageCode;
-  }
-}
-
-class MockI18nLanguageCodeService {
-  codeChangeEventEmiiter = new EventEmitter<string>();
-  getCurrentI18nLanguageCode() {
-    return 'en';
-  }
-
-  get onI18nLanguageCodeChange() {
-    return this.codeChangeEventEmiiter;
-  }
-}
-
-// Mocking window object here because changing location.href causes the
-// full page to reload. Page reloads raise an error in karma.
-class MockWindowRef {
-  _window = {
-    location: {
-      _hash: '',
-      _hashChange: null,
-      _href: '',
-      get hash() {
-        return this._hash;
-      },
-      set hash(val) {
-        this._hash = val;
-        if (this._hashChange === null) {
-          return;
-        }
-        this._hashChange();
-      },
-      get href() {
-        return this._href;
-      },
-      set href(val) {
-        this._href = val;
-      },
-      reload: (val) => val
-    },
-    get onhashchange() {
-      return this.location._hashChange;
-    },
-
-    set onhashchange(val) {
-      this.location._hashChange = val;
-    }
-  };
-  get nativeWindow() {
-    return this._window;
-  }
-}
-
-class MockSiteAnalyticsService {
-  registerApplyToTeachWithOppiaEvent(): void {
-    return;
-  }
-}
-
-let component: TeachPageComponent;
-let fixture: ComponentFixture<TeachPageComponent>;
+require('pages/teach-page/teach-page.component.ts');
 
 describe('Teach Page', function() {
-  let windowRef: MockWindowRef;
-  let siteAnalyticsService = null;
+  var $scope = null, ctrl = null;
+  var $timeout = null;
+  var $q = null;
+  var userService: UserService = null;
+  var LoaderService = null;
+  var loadingMessage = null;
+  var SiteAnalyticsService = null;
+  var subscriptions = [];
+  var WindowDimensionsService = null;
 
-  beforeEach(async(() => {
-    windowRef = new MockWindowRef();
-    TestBed.configureTestingModule({
-      declarations: [TeachPageComponent, MockTranslatePipe],
-      providers: [
-        {
-          provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        },
-        { provide: SiteAnalyticsService, useClass: MockSiteAnalyticsService },
-        { provide: TranslateService, useClass: MockTranslateService },
-        UrlInterpolationService,
-        { provide: WindowRef, useValue: windowRef }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-  }));
-
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
-    fixture = TestBed.createComponent(TeachPageComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
   });
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('UserService', TestBed.get(UserService));
+  }));
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $timeout = $injector.get('$timeout');
+    $q = $injector.get('$q');
+    userService = $injector.get('UserService');
+    LoaderService = $injector.get('LoaderService');
+    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
+    WindowDimensionsService = $injector.get('WindowDimensionsService');
+    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
+      (message: string) => loadingMessage = message
+    ));
+    loadingMessage = '';
+    var $rootScope = $injector.get('$rootScope');
+    $scope = $rootScope.$new();
 
-  it('should click on teach tab', () => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('teach');
-
-    component.onTabClick('teach');
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-    expect(component.activeTabName).toBe('teach');
-  });
-
-  it('should click on participation tab', (() => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('teach');
-
-    component.onTabClick('participation');
-    expect(windowRef.nativeWindow.location.hash).toBe('#participation');
-    expect(component.activeTabName).toBe('participation');
+    ctrl = $componentController('teachPage', {
+      $rootScope: $scope
+    });
   }));
 
-  it('should activate teach tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#teach';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#teach');
-    expect(component.activeTabName).toBe('teach');
+  afterEach(function() {
+    for (let subscription of subscriptions) {
+      subscription.unsubscribe();
+    }
   });
 
-  it('should activate participation tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#participation';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#participation');
-    expect(component.activeTabName).toBe('participation');
-  });
-
-  it('should get static image url', () => {
-    expect(component.getStaticImageUrl('/path/to/image')).toBe(
+  it('should get static image url', function() {
+    expect(ctrl.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
 
-  it('should apply to teach with oppia', fakeAsync(() => {
-    const applyToTeachWithOppiaEventSpy = spyOn(
-      siteAnalyticsService, 'registerApplyToTeachWithOppiaEvent')
+  it('should record analytics when Browse Lessons is clicked', function() {
+    var clickBrowseLibraryButtonEventSpy = spyOn(
+      SiteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
       .and.callThrough();
+    ctrl.onClickBrowseLessonsButton();
+    $timeout.flush(150);
 
-    component.ngOnInit();
-    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      location: {
-        href: ''
-      }
+    expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
+  });
+
+  it('should check if window is narrow', function() {
+    spyOn(
+      WindowDimensionsService, 'isWindowNarrow').and.returnValues(false, true);
+    expect(ctrl.isWindowNarrow()).toBe(false);
+    expect(ctrl.isWindowNarrow()).toBe(true);
+  });
+
+  it('should increment and decrement testimonial IDs correctly', function() {
+    ctrl.$onInit();
+    expect(ctrl.displayedTestimonialId).toBe(0);
+    ctrl.incrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(1);
+    ctrl.incrementDisplayedTestimonialId();
+    ctrl.incrementDisplayedTestimonialId();
+    ctrl.incrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(0);
+
+    ctrl.decrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(3);
+    ctrl.decrementDisplayedTestimonialId();
+    expect(ctrl.displayedTestimonialId).toBe(2);
+  });
+
+  it('should get testimonials correctly', function() {
+    ctrl.$onInit();
+    expect(ctrl.getTestimonials().length).toBe(ctrl.testimonialCount);
+  });
+
+  it('should evaluate if user is logged in', function() {
+    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve({
+        isLoggedIn: function() {
+          return true;
+        }
+      });
+      return deferred.promise;
     });
-    component.onApplyToTeachWithOppia();
-    tick(150);
-    fixture.detectChanges();
-    expect(windowRef.nativeWindow.location.href).toBe(
-      'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
-    expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
-  }));
+
+    ctrl.$onInit();
+    expect(ctrl.userIsLoggedIn).toBe(null);
+    expect(ctrl.classroomUrl).toBe('/learn/math');
+    expect(loadingMessage).toBe('Loading');
+
+    $scope.$digest();
+    expect(ctrl.userIsLoggedIn).toBe(true);
+    expect(loadingMessage).toBe('');
+  });
+
+  it('should evaluate if user is not logged in', function() {
+    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve({
+        isLoggedIn: function() {
+          return false;
+        }
+      });
+      return deferred.promise;
+    });
+
+    ctrl.$onInit();
+    expect(ctrl.userIsLoggedIn).toBe(null);
+    expect(loadingMessage).toBe('Loading');
+
+    $scope.$digest();
+    expect(ctrl.userIsLoggedIn).toBe(false);
+    expect(loadingMessage).toBe('');
+  });
 });
+

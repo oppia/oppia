@@ -8,21 +8,26 @@
     <oppia-root>
       <div ng-controller="Base">
         <base-content>
-          <navbar-breadcrumb>
-            <ul class="nav navbar-nav oppia-navbar-breadcrumb protractor-test-teach-page">
-              <li>
-                <span class="oppia-navbar-breadcrumb-separator"></span>
-                Teach with Oppia
-              </li>
-            </ul>
-          </navbar-breadcrumb>
-
           <content>
-            <teach-page></teach-page>
+            <teach-page class="protractor-test-splash-page"></teach-page>
           </content>
         </base-content>
       </div>
 
+      <style>
+        @media (min-width: 608px) {
+          .oppia-splash-overlapping-image-1 {
+            margin-top: -105px;
+          }
+        }
+
+        @media (max-width: 608px) {
+          .oppia-splash-overlapping-image-1 {
+            margin-top: -30px;
+          }
+        }
+      </style>
+      
     </oppia-root>
     @load('pages/footer_js_libs.html')
   </body>

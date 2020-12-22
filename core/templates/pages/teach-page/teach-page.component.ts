@@ -15,65 +15,106 @@
 /**
  * @fileoverview Component for the teach page.
  */
+require('base-components/base-content.directive.ts');
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/site-analytics.service.ts');
+require('services/user.service.ts');
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+import splashConstants from 'assets/constants';
 
-@Component({
-  selector: 'teach-page',
-  templateUrl: './teach-page.component.html',
-  styleUrls: []
-})
-export class TeachPageComponent implements OnInit {
-  TAB_ID_TEACH: string = 'teach';
-  TAB_ID_PARTICIPATION: string = 'participation';
-  TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
-  ALLOWED_TABS: string[] = [this.TAB_ID_TEACH, this.TAB_ID_PARTICIPATION];
-  activeTabName: string = this.TAB_ID_TEACH;
+angular.module('oppia').component('teachPage', {
+  template: require('./teach-page.component.html'),
+  controller: [
+    '$rootScope', '$translate', 'LoaderService', 'SiteAnalyticsService',
+    'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
+    function(
+        $rootScope, $translate, LoaderService, SiteAnalyticsService,
+        UrlInterpolationService, UserService, WindowDimensionsService) {
+      var ctrl = this;
+      ctrl.getStaticImageUrl = function(imagePath) {
+        if (imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        }
+      };
 
-  constructor(
-    private siteAnalyticsService: SiteAnalyticsService,
-    private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
-  ) {}
+      ctrl.onClickBrowseLessonsButton = function() {
+        SiteAnalyticsService.registerClickBrowseLessonsButtonEvent();
+        return false;
+      };
 
-  ngOnInit(): void {
-    const hash = this.windowRef.nativeWindow.location.hash.slice(1);
-    if (this.ALLOWED_TABS.includes(hash)) {
-      this.activeTabName = hash;
+      ctrl.isWindowNarrow = function() {
+        return WindowDimensionsService.isWindowNarrow();
+      };
+
+      // The 2 functions below are to cycle between values:
+      // 0 to (testimonialCount - 1) for displayedTestimonialId.
+      ctrl.incrementDisplayedTestimonialId = function() {
+        // This makes sure that incrementing from (testimonialCount - 1)
+        // returns 0 instead of testimonialCount,since we want the testimonials
+        // to cycle through.
+        ctrl.displayedTestimonialId = (
+          ctrl.displayedTestimonialId + 1) % ctrl.testimonialCount;
+      };
+
+      ctrl.decrementDisplayedTestimonialId = function() {
+        // This makes sure that decrementing from 0, returns
+        // (testimonialCount - 1) instead of -1, since we want the testimonials
+        // to cycle through.
+        ctrl.displayedTestimonialId = (
+          ctrl.displayedTestimonialId + ctrl.testimonialCount - 1) %
+          ctrl.testimonialCount;
+      };
+
+      ctrl.getTestimonials = function() {
+        return [{
+          quote: $translate.instant('I18N_TEACH_TESTIMONIAL_1'),
+          studentDetails: $translate.instant('I18N_TEACH_STUDENT_DETAILS_1'),
+          imageUrl: '/splash/mira.png',
+          imageUrlWebp: '/splash/mira.webp',
+          borderPresent: false
+        }, {
+          quote: $translate.instant('I18N_TEACH_TESTIMONIAL_2'),
+          studentDetails: $translate.instant('I18N_TEACH_STUDENT_DETAILS_2'),
+          imageUrl: '/splash/Dheeraj_3.png',
+          imageUrlWebp: '/splash/Dheeraj_3.webp',
+          borderPresent: true
+        }, {
+          quote: $translate.instant('I18N_TEACH_TESTIMONIAL_3'),
+          studentDetails: $translate.instant('I18N_TEACH_STUDENT_DETAILS_3'),
+          imageUrl: '/splash/sama.png',
+          imageUrlWebp: '/splash/sama.webp',
+          borderPresent: false
+        }, {
+          quote: $translate.instant('I18N_TEACH_TESTIMONIAL_4'),
+          studentDetails: $translate.instant('I18N_TEACH_STUDENT_DETAILS_4'),
+          imageUrl: '/splash/Gaurav_2.png',
+          imageUrlWebp: '/splash/Gaurav_2.webp',
+          borderPresent: true
+        }];
+      };
+
+      ctrl.$onInit = function() {
+        ctrl.userIsLoggedIn = null;
+        ctrl.displayedTestimonialId = 0;
+        ctrl.testimonialCount = 4;
+        ctrl.testimonials = ctrl.getTestimonials();
+        ctrl.classroomUrl = UrlInterpolationService.interpolateUrl(
+          '/learn/<classroomUrlFragment>', {
+            classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+          });
+        LoaderService.showLoadingScreen('Loading');
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+          LoaderService.hideLoadingScreen();
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
+        });
+      };
     }
-    this.windowRef.nativeWindow.onhashchange = () => {
-      const hashChange = this.windowRef.nativeWindow.location.hash.slice(1);
-      if (this.ALLOWED_TABS.includes(hashChange)) {
-        this.activeTabName = hashChange;
-      }
-    };
-  }
-
-  onTabClick(tabName: string): Window {
-    // Update URL hash.
-    this.windowRef.nativeWindow.location.hash = '#' + tabName;
-    this.activeTabName = tabName;
-    return this.windowRef.nativeWindow;
-  }
-
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  onApplyToTeachWithOppia(): boolean {
-    this.siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.TEACH_FORM_URL;
-    }, 150);
-    return false;
-  }
-}
-
-angular.module('oppia').directive('teachPage',
-  downgradeComponent({component: TeachPageComponent}));
+  ]
+});
+// angular.module('oppia').directive('teachPage',
+//   downgradeComponent({component: TeachPageComponent}));
