@@ -1274,7 +1274,6 @@ class ParameterName(BaseObject):
     @classmethod
     def get_schema(cls):
         """Returns the object schema.
-
         Returns:
             dict. The object schema.
         """
@@ -1370,7 +1369,6 @@ class NumberWithUnits(BaseObject):
     @classmethod
     def get_schema(cls):
         """Returns the object schema.
-
         Returns:
             dict. The object schema.
         """
