@@ -1383,41 +1383,104 @@ class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(
 
     def test_for_empty_activity_ids(self):
         # Generate empty activity_ids.
-        user_models.UserSubscriptionsModel(
-            id='model_id',
-            activity_ids=[]
-        ).put()
+        origional_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='model_id',
+                activity_ids=[]
+            )
+        )
+        origional_subscription_model.update_timestamps()
+        origional_subscription_model.put()
+
         output = self._run_one_off_job()
         self.assertEqual([[u'SUCCESS', 1]], output)
-        subscription_model = user_models.UserSubscriptionsModel.get('model_id')
+
+        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
+            'model_id')
         self.assertEqual(
-            subscription_model.exploration_ids, [])
+            migrated_subscription_model.exploration_ids, [])
+        self.assertEqual(
+            origional_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
 
     def test_for_non_empty_activity_ids(self):
         # Generate non-empty activity_ids.
-        user_models.UserSubscriptionsModel(
-            id='model_id',
-            activity_ids=['exp_1', 'exp_2', 'exp_3']
-        ).put()
+        origional_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='model_id',
+                activity_ids=['exp_1', 'exp_2', 'exp_3']
+            )
+        )
+        origional_subscription_model.update_timestamps()
+        origional_subscription_model.put()
+
         output = self._run_one_off_job()
         self.assertEqual([[u'SUCCESS', 1]], output)
-        subscription_model = user_models.UserSubscriptionsModel.get('model_id')
+
+        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
+            'model_id')
         self.assertEqual(
-            subscription_model.exploration_ids, ['exp_1', 'exp_2', 'exp_3'])
+            migrated_subscription_model.exploration_ids,
+            ['exp_1', 'exp_2', 'exp_3']
+        )
+        self.assertEqual(
+            origional_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
 
     def test_for_multiple_models(self):
         # Generate 3 models.
         for i in python_utils.RANGE(3):
-            user_models.UserSubscriptionsModel(
-                id='model_id_%s' % i,
-                activity_ids=['exp_%s' % i]
-            ).put()
+            origional_subscription_model = (
+                user_models.UserSubscriptionsModel(
+                    id='model_id_%s' % i,
+                    activity_ids=['exp_%s' % i]
+                )
+            )
+            origional_subscription_model.update_timestamps()
+            origional_subscription_model.put()
+
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS', 3]])
         for i in python_utils.RANGE(3):
-            subscription_model = (
+            migrated_subscription_model = (
                 user_models.UserSubscriptionsModel.get('model_id_%s' % i))
-            self.assertEqual(subscription_model.exploration_ids, ['exp_%s' % i])
+            self.assertEqual(
+                migrated_subscription_model.exploration_ids,
+                ['exp_%s' % i]
+            )
+            self.assertEqual(
+                origional_subscription_model.get(
+                    'model_id_%s' % i).last_updated,
+                migrated_subscription_model.last_updated
+            )
+
+    def test_for_existing_exploration_ids(self):
+        # Generate a model with populated exploration IDs
+        origional_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='model_id',
+                activity_ids=['exp_1', 'exp_2', 'exp_3'],
+                exploration_ids=['exp_4', 'exp_5']
+            )
+        )
+        origional_subscription_model.update_timestamps()
+        origional_subscription_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 1]])
+
+        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
+            'model_id')
+        self.assertEqual(
+            migrated_subscription_model.exploration_ids,
+            ['exp_1', 'exp_2', 'exp_3']
+        )
+        self.assertEqual(
+            origional_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
 
 
 class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
