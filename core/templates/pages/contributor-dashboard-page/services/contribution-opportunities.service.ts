@@ -40,7 +40,8 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     var moreVoiceoverOpportunitiesAvailable = true;
 
     var _getSkillOpportunities = function(cursor) {
-      return ContributionOpportunitiesBackendApiService.fetchSkillOpportunitiesAsync(
+      return ContributionOpportunitiesBackendApiService
+      .fetchSkillOpportunitiesAsync(
         cursor).then(({ opportunities, nextCursor, more }) => {
         skillOpportunitiesCursor = nextCursor;
         moreSkillOpportunitiesAvailable = more;
