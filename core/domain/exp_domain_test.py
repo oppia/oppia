@@ -8773,7 +8773,7 @@ title: Title
             'eid', sample_yaml_content)
         self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
-    def test_load_from_v45_with_set_input_interaction(self):
+    def test_load_from_v45_exploration_with_set_input_yaml(self):
         """Tests the migration of SetInput rule inputs."""
         sample_yaml_content = (
             """author_notes: ''
