@@ -104,7 +104,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             datetime, 'datetime', MockDatetime(self.example_date))
         post_swap = self.swap_with_checks(
             requests, 'post', mock_post, expected_args=[
-                (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
+                (flake_checker.PASS_REPORT_URL,)],
             expected_kwargs=[{
                 'json': expected_payload,
                 'allow_redirects': False,
@@ -122,7 +122,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             environment_vars = {
                 'GITHUB_ACTIONS': 1,
                 'GITHUB_ACTOR': 'user',
-                'GITHUB_ACTION': 1234,
+                'GITHUB_RUN_ID': 1234,
             }
             return environment_vars.get(variable)
 
@@ -133,7 +133,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             'suite': 'suiteName',
             'metadata': {
                 'username': 'user',
-                'build_url': 'https://github.com/oppia/oppia/runs/1234',
+                'build_url': 'https://github.com/oppia/oppia/actions/runs/1234',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
             }
         }
@@ -143,7 +143,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             datetime, 'datetime', MockDatetime(self.example_date))
         post_swap = self.swap_with_checks(
             requests, 'post', mock_post, expected_args=[
-                (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
+                (flake_checker.PASS_REPORT_URL,)],
             expected_kwargs=[{
                 'json': expected_payload,
                 'allow_redirects': False,
@@ -182,7 +182,7 @@ class ReportPassTests(test_utils.GenericTestBase):
             datetime, 'datetime', MockDatetime(self.example_date))
         post_swap = self.swap_with_checks(
             requests, 'post', mock_post, expected_args=[
-                (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
+                (flake_checker.PASS_REPORT_URL,)],
             expected_kwargs=[{
                 'json': expected_payload,
                 'allow_redirects': False,
@@ -293,7 +293,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             environment_vars = {
                 'GITHUB_ACTIONS': 1,
                 'GITHUB_ACTOR': 'user',
-                'GITHUB_ACTION': 1234,
+                'GITHUB_RUN_ID': 1234,
             }
             return environment_vars.get(variable)
 
@@ -314,7 +314,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             'output_lines': ['line1', 'line2'],
             'metadata': {
                 'username': 'user',
-                'build_url': 'https://github.com/oppia/oppia/runs/1234',
+                'build_url': 'https://github.com/oppia/oppia/actions/runs/1234',
                 'timestamp': '2020-01-01T00:00:00.000001+00:00',
             }
         }
