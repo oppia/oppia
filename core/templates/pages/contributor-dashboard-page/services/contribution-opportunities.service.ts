@@ -40,7 +40,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     var moreVoiceoverOpportunitiesAvailable = true;
 
     var _getSkillOpportunities = function(cursor) {
-      return ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
+      return ContributionOpportunitiesBackendApiService.fetchSkillOpportunitiesAsync(
         cursor).then(({ opportunities, nextCursor, more }) => {
         skillOpportunitiesCursor = nextCursor;
         moreSkillOpportunitiesAvailable = more;
@@ -52,7 +52,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     };
     var _getTranslationOpportunities = function(languageCode, cursor) {
       return ContributionOpportunitiesBackendApiService
-        .fetchTranslationOpportunities(
+        .fetchTranslationOpportunitiesAsync(
           languageCode, cursor).then(({ opportunities, nextCursor, more }) => {
           translationOpportunitiesCursor = nextCursor;
           moreTranslationOpportunitiesAvailable = more;
@@ -64,7 +64,7 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     };
     var _getVoiceoverOpportunities = function(languageCode, cursor) {
       return ContributionOpportunitiesBackendApiService
-        .fetchVoiceoverOpportunities(languageCode, cursor).then(
+        .fetchVoiceoverOpportunitiesAsync(languageCode, cursor).then(
           function({ opportunities, nextCursor, more }) {
             voiceoverOpportunitiesCursor = nextCursor;
             moreVoiceoverOpportunitiesAvailable = more;
