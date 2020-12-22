@@ -187,11 +187,16 @@ describe('Editable question backend API service', function() {
       var req = httpTestingController.expectOne(
         '/question_editor_handler/data/0');
       expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+      req.flush({
+        question_dict: sampleDataResults.questionDict,
+        associated_skill_dicts: sampleDataResults.associated_skill_dicts
+      });
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects.questionObject);
+      expect(successHandler).toHaveBeenCalledWith({
+        questionObject: sampleDataResultsObjects.questionObject,
+        associated_skill_dicts: sampleDataResults.associated_skill_dicts
+      });
       expect(failHandler).not.toHaveBeenCalled();
     }
     ));
@@ -224,12 +229,15 @@ describe('Editable question backend API service', function() {
       // Loading a question the first time should fetch it from the backend.
       editableQuestionBackendApiService.fetchQuestion('0').then(
         data => {
-          question = data.toBackendDict(false);
+          question = data.questionObject.toBackendDict(false);
         });
       var req = httpTestingController.expectOne(
         '/question_editor_handler/data/0');
       expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+      req.flush({
+        question_dict: sampleDataResults.questionDict,
+        associated_skill_dicts: sampleDataResults.associated_skill_dicts
+      });
       flushMicrotasks();
 
       question.question_state_data.content.html = 'New Question Content';
@@ -315,49 +323,5 @@ describe('Editable question backend API service', function() {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith('Error loading question 0.');
-  }));
-
-  it('should change difficulty from an existing question', fakeAsync(()=> {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    let questionId = '0';
-    let skillId = '1';
-    let difficulty = 1;
-
-    editableQuestionBackendApiService.changeDifficulty(
-      questionId, skillId, difficulty).then(
-      successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/manage_question_skill_link/' + questionId);
-    expect(req.request.method).toEqual('PUT');
-    req.flush({status: 200});
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should use the rejection handler when changing the difficulty of ' +
-    'an existing question fails', fakeAsync(()=> {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    let questionId = '0';
-    let skillId = '1';
-    let difficulty = 1;
-    editableQuestionBackendApiService.changeDifficulty(
-      questionId, skillId, difficulty).then(
-      successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/manage_question_skill_link/' + questionId);
-    expect(req.request.method).toEqual('PUT');
-    req.flush({
-      error: 'Error changing difficulty.'},
-    {status: 500, statusText: 'Internal Server Error'});
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error changing difficulty.');
   }));
 });

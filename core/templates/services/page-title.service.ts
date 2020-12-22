@@ -47,6 +47,14 @@ export class PageTitleService {
       name: 'description',
       content: content
     });
+    this.metaTagService.updateTag({
+      itemprop: 'description',
+      content: content
+    });
+    this.metaTagService.updateTag({
+      property: 'og:description',
+      content: content
+    });
   }
 
   setPageTitleForMobileView(title: string): void {
