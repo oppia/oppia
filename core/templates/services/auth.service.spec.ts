@@ -25,19 +25,18 @@ import { MockAngularFireAuth } from 'tests/unit-test-utils';
 
 fdescribe('Auth service', () => {
   let authService: AuthService;
-  let angularFireAuth: AngularFireAuth;
+  let angularFireAuth;
 
   beforeEach(() => {
-    var mockAngularFireAuth = new MockAngularFireAuth();
+    angularFireAuth = new MockAngularFireAuth();
     TestBed.configureTestingModule({
       providers: [
         AuthService,
-        {provider: AngularFireAuth, useValue: mockAngularFireAuth},
+        {provider: AngularFireAuth, useValue: angularFireAuth},
       ],
     });
 
     authService = TestBed.inject(AuthService);
-    angularFireAuth = TestBed.inject(AngularFireAuth);
   });
 
   it('should sign out successfully', async() => {

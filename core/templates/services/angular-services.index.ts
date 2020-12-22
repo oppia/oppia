@@ -320,7 +320,6 @@ import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
-import { of } from 'rxjs';
 
 export const angularServices: [string, unknown][] = [
   ['AdminBackendApiService', AdminBackendApiService],
