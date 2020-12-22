@@ -14,30 +14,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Service layer for handling user-authentication via Firebase.
+"""Service layer for handling user-authentication with Firebase.
 
 Oppia depends on OpenID Connect 1.0 to handle user authentication. We use
 [Firebase authentication](https://firebase.google.com/docs/auth) to do the
-heavy-lifting, especially for securely storing user credentials and associations
-to their identity providers. This helps us minimize our contact with these
-private details.
+heavy-lifting, especially for securely storing user credentials and associating
+users to their identity providers. This helps us minimize the contact we make
+with private information.
 
 Terminology:
     OpenID Connect 1.0 (OIDC):
         A simple identity layer on top of the OAuth 2.0 protocol. It is a
-        specification (i.e., a strict set of algorithms, data structures, and
-        rules) that defines how two parties must share data about a user
-        securely, on that user's behalf.
+        specification (i.e. a strict set of algorithms, data structures, and
+        rules) that defines how two parties must share data about a user in
+        a secure way on that user's behalf.
     OAuth 2.0 (OAuth):
         The industry-standard protocol for authorization. It enables a
         third-party application to obtain limited access to an HTTP service on
-        behalf of a resource owner.
+        behalf of a user.
     Claim:
         A piece of information about a user (name, address, phone number, etc.)
         that has been encrypted and digitally signed.
     JSON Web Token (JWT):
         A compact and URL-safe protocol primarily designed to send Claims
-        between two parties. Claims are organized into JSON objects mapping
+        between two parties. Claims are organized into JSON objects that map
         "Claim Names" to "Claim Values".
     Identity provider:
         An entity that creates, maintains, and manages identity information and
@@ -46,8 +46,9 @@ Terminology:
         Facebook, Email verification links, and Text message SMS codes.
     Subject Identifier:
         A Claim that can uniquely identify a user. It is locally unique and
-        never reassigned with respect to the provider who issued it.
-        For example: `24400320` or `AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4`.
+        never reassigned with respect to the provider who issued it. The Claim's
+        name is 'sub'.
+        Example values: `24400320` or `AItOawmwtWwcT0k51BayewNvutrJUqsvl6qs7A4`.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -90,16 +91,18 @@ def authenticate_request(request):
 
     The name "Bearer authentication" can be understood as: "give access to the
     bearer of this token." These tokens _must_ be sent in the `Authorization`
-    header of HTTP requests and _must_ have the format: `Bearer <token>`.
+    header of HTTP requests, and _must_ have the format: `Bearer <token>`.
 
-    Oppia specifically expects the token to have a Subject Identifier Claim for
-    the user (Claim Name: 'sub').
+    Oppia specifically expects the token to have a Subject Identifier for the
+    user (Claim Name: 'sub').
 
-    To learn more:
+    Learn more about:
         HTTP authentication schemes:
             https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication
         OAuth 2.0 Bearer authentication scheme:
             https://oauth.net/2/bearer-tokens/
+        OpenID Connect 1.0 ID Tokens:
+            https://openid.net/specs/openid-connect-core-1_0.html#IDToken
 
     Args:
         request: webapp2.Request. The HTTP request to inspect.
@@ -123,8 +126,8 @@ def authenticate_request(request):
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.error(e)
         return None
-
-    return claims.get('sub', None)
+    else:
+        return claims.get('sub', None)
 
 
 def get_user_id_from_auth_id(auth_id):
