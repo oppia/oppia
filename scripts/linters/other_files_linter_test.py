@@ -262,7 +262,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'SUCCESS  Sorted strict TS config check passed')
         with self.open_file_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE).check_strict_ts_config()
+                FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
             self.assertEqual(
                 error_messages.get_report()[0], expected_error_messages)
             self.assertEqual('Sorted strict TS config', error_messages.name)
@@ -275,7 +275,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_error_messages = 'FAILED  Sorted strict TS config check failed'
         with self.open_file_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE).check_strict_ts_config()
+                FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
             self.assertEqual(
                 error_messages.get_report()[1], expected_error_messages)
             self.assert_same_list_elements(

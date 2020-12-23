@@ -241,7 +241,7 @@ class CustomLintChecksManager(python_utils.OBJECT):
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages)
 
-    def check_strict_ts_config(self):
+    def check_filenames_in_tsconfig_strict_are_sorted(self):
         """Checks if the files in strict TS config are sorted
         alphabetically.
 
@@ -285,7 +285,8 @@ class CustomLintChecksManager(python_utils.OBJECT):
         linter_stdout.append(self.check_skip_files_in_app_dev_yaml())
         linter_stdout.append(self.check_third_party_libs_type_defs())
         linter_stdout.append(self.check_webpack_config_file())
-        linter_stdout.append(self.check_strict_ts_config())
+        linter_stdout.append(
+            self.check_filenames_in_tsconfig_strict_are_sorted())
 
         return linter_stdout
 
