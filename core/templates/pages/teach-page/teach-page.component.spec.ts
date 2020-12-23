@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the splash page.
+ * @fileoverview Unit tests for the teach page.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';

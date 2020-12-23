@@ -100,7 +100,7 @@ angular.module('oppia').component('teachPage', {
         ctrl.displayedTestimonialId = 0;
         ctrl.testimonialCount = 4;
         ctrl.testimonials = ctrl.getTestimonials();
-        $rootScope.$on('$translateChangeSucess',function(){
+        $rootScope.$on('$translateChangeSucess', function() {
           ctrl.testimonials = ctrl.getTestimonials();
         });
         ctrl.classroomUrl = UrlInterpolationService.interpolateUrl(
@@ -111,12 +111,10 @@ angular.module('oppia').component('teachPage', {
         UserService.getUserInfoAsync().then(function(userInfo) {
           ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           LoaderService.hideLoadingScreen();
-          // TODO(#8521)
+          // TODO(#8521):Remove the use of $rootScope.$apply()
           $rootScope.$applyAsync();
         });
       };
     }
   ]
 });
-// angular.module('oppia').directive('teachPage',
-//   downgradeComponent({component: TeachPageComponent}));
