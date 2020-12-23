@@ -36,11 +36,9 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
-    
     OppiaAngularRootComponent
   ],
   entryComponents: [
-   
     OppiaAngularRootComponent
   ],
   providers: [
