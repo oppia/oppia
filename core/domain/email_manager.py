@@ -32,6 +32,7 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
+import schema_utils
 import utils
 
 (email_models, suggestion_models) = models.Registry.import_models(
@@ -99,12 +100,12 @@ REMOVED_REVIEWER_EMAIL_DATA = {
     }
 }
 
-NOTIFICATION_EMAIL_LIST_SCHEMA = {
-    'type': 'list',
+NOTIFICATION_USER_IDS_LIST_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_LIST,
     'items': {
-        'type': 'unicode',
+        'type': schema_utils.SCHEMA_TYPE_UNICODE,
         'validators': [{
-            'id': 'is_valid_email',
+            'id': 'is_valid_user_id',
         }]
     },
     'validators': [{
@@ -116,18 +117,18 @@ NOTIFICATION_EMAIL_LIST_SCHEMA = {
 }
 
 EMAIL_HTML_BODY_SCHEMA = {
-    'type': 'unicode',
+    'type': schema_utils.SCHEMA_TYPE_UNICODE,
     'ui_config': {
         'rows': 20,
     }
 }
 
 EMAIL_CONTENT_SCHEMA = {
-    'type': 'dict',
+    'type': schema_utils.SCHEMA_TYPE_DICT,
     'properties': [{
         'name': 'subject',
         'schema': {
-            'type': 'unicode',
+            'type': schema_utils.SCHEMA_TYPE_UNICODE,
         },
     }, {
         'name': 'html_body',
@@ -203,10 +204,10 @@ UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = config_domain.ConfigProperty(
     'I\'m writing to inform you that I have unpublished the above '
     'exploration.')
 
-NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
-    'notification_emails_for_failed_tasks',
-    NOTIFICATION_EMAIL_LIST_SCHEMA,
-    'Email(s) to notify if an ML training task fails',
+NOTIFICATION_USER_IDS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
+    'notification_user_ids_for_failed_tasks',
+    NOTIFICATION_USER_IDS_LIST_SCHEMA,
+    'User IDs to notify if an ML training task fails',
     []
 )
 
@@ -235,22 +236,22 @@ HTML_FOR_SUGGESTION_DESCRIPTION = {
     # The templates below are for listing the information for each suggestion
     # type offered on the Contributor Dashboard.
     'suggestion_template': {
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
             '<li>The following %s translation suggestion was submitted for '
             'review %s ago:<br>%s</li><br>'),
-        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+        feconf.SUGGESTION_TYPE_ADD_QUESTION: (
             '<li>The following question suggestion was submitted for review '
             '%s ago:<br>%s</li><br>')
     },
     # Each suggestion type has a lambda function to retrieve the values needed
     # to populate the above suggestion template.
     'suggestion_template_values_getter_functions': {
-        suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+        feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
             lambda values_dict: (
                 values_dict['language'], values_dict['review_wait_time'],
                 values_dict['suggestion_content'])
         ),
-        suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: (
+        feconf.SUGGESTION_TYPE_ADD_QUESTION: (
             lambda values_dict: (
                 values_dict['review_wait_time'],
                 values_dict['suggestion_content'])
@@ -361,6 +362,8 @@ SENDER_VALIDATORS = {
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: user_services.is_admin,
+    feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_TEST: user_services.is_admin
 }
@@ -534,15 +537,16 @@ def send_job_failure_email(job_id):
         'please visit the admin page at:\n'
         'https://www.oppia.org/admin#/jobs') % job_id)
     send_mail_to_admin(mail_subject, mail_body)
-    other_recipients = (
-        NOTIFICATION_EMAILS_FOR_FAILED_TASKS.value)
-    system_name_email = '%s <%s>' % (
-        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
-    if other_recipients:
-        email_services.send_bulk_mail(
-            system_name_email, other_recipients,
-            mail_subject, mail_body,
-            mail_body.replace('\n', '<br/>'))
+    recipient_ids = (
+        NOTIFICATION_USER_IDS_FOR_FAILED_TASKS.value)
+    bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
+    if recipient_ids:
+        _send_bulk_mail(
+            recipient_ids, feconf.SYSTEM_COMMITTER_ID,
+            feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE, mail_subject, mail_body,
+            feconf.SYSTEM_EMAIL_ADDRESS, feconf.SYSTEM_EMAIL_NAME,
+            bulk_email_model_id
+        )
 
 
 def send_dummy_mail_to_admin(username):
@@ -1461,11 +1465,11 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
     # Create the html for the suggestion types that need more reviewers for the
     # email body html.
     suggestion_types_needing_reviewers_paragraphs = []
-    if suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
+    if feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
             suggestion_types_needing_reviewers):
         language_codes_that_need_reviewers = (
             suggestion_types_needing_reviewers[
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT])
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT])
         # There are different templates to handle whether multiple languages
         # need more reviewers or just one language.
         if len(language_codes_that_need_reviewers) == 1:
@@ -1493,7 +1497,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                         feconf.CONTRIBUTOR_DASHBOARD_URL,
                         html_for_languages_that_need_more_reviewers))
 
-    if suggestion_models.SUGGESTION_TYPE_ADD_QUESTION in (
+    if feconf.SUGGESTION_TYPE_ADD_QUESTION in (
             suggestion_types_needing_reviewers):
         suggestion_types_needing_reviewers_paragraphs.append(
             ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[

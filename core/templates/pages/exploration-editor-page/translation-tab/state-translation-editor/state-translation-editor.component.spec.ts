@@ -18,7 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -33,6 +32,8 @@ import { WrittenTranslationObjectFactory } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -152,6 +153,9 @@ describe('State Translation Editor Component', function() {
       StateRecordedVoiceoversService));
     $provide.value(
       'StateWrittenTranslationsService', stateWrittenTranslationsService);
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   describe('when has written translation', function() {

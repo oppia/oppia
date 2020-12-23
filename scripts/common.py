@@ -47,8 +47,7 @@ PYLINT_VERSION = '1.9.5'
 PYLINT_QUOTES_VERSION = '0.1.8'
 PYGITHUB_VERSION = '1.45'
 WEBTEST_VERSION = '2.0.35'
-PIP_TOOLS_VERSION = '5.3.1'
-SIMPLE_CRYPT_VERSION = '4.1.7'
+PIP_TOOLS_VERSION = '5.4.0'
 GRPCIO_VERSION = '1.0.0'
 ENUM_VERSION = '1.1.10'
 PROTOBUF_VERSION = '3.13.0'
@@ -62,6 +61,12 @@ YARN_VERSION = '1.22.10'
 
 # Versions of libraries used in backend.
 PILLOW_VERSION = '6.2.2'
+
+# Buf version.
+BUF_VERSION = '0.29.0'
+# Protoc is the compiler for protobuf files and the version must be same as
+# the version of protobuf library being used.
+PROTOC_VERSION = PROTOBUF_VERSION
 
 # We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
 # there is a `make test` bug in redis 6.0.6 where the solution has not been

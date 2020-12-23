@@ -84,21 +84,21 @@ describe('RatioExpressionInputValidationService', () => {
       inputs: {
         x: [1, 2, 3]
       }
-    });
+    }, 'RatioExpressionInput');
 
     equals = rof.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2, 3]
       }
-    });
+    }, 'RatioExpressionInput');
 
     hasNumberOfTermsEqualTo = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 3
       }
-    });
+    }, 'RatioExpressionInput');
 
     answerGroups = [agof.createNew([], goodDefaultOutcome, null, null)];
   });
@@ -109,9 +109,18 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([]);
   });
 
+  it('should be able to perform basic valid', () => {
+    // The second rule has a broader scope than first.
+    answerGroups[0].rules = [equals, isEquivalent];
+
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
   it('should catch redundancy of rules with matching inputs', () => {
     // The third rule will never get matched.
-    answerGroups[0].rules = [equals, isEquivalent];
+    answerGroups[0].rules = [equals, equals];
 
     warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
@@ -126,7 +135,7 @@ describe('RatioExpressionInputValidationService', () => {
       inputs: {
         x: [2, 4, 6]
       }
-    });
+    }, 'RatioExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalent, isEquivalentNonSimplified];
@@ -136,21 +145,16 @@ describe('RatioExpressionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched because' +
-      ' provided input is not in its simplest form.'
-    }, {
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched because' +
       ' it is preceded by a \'IsEquivalent\' rule with a matching' +
       ' input.'
-    }
-    ]);
+    }]);
 
     let equalFourTerms = rof.createFromBackendDict({
       rule_type: 'Equals',
       inputs: {
         x: [1, 2, 3, 4]
       }
-    });
+    }, 'RatioExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [hasNumberOfTermsEqualTo, equals, equalFourTerms];
@@ -185,13 +189,13 @@ describe('RatioExpressionInputValidationService', () => {
       inputs: {
         x: [1, 2]
       }
-    });
+    }, 'RatioExpressionInput');
     let hasNumberOfTermsEqualToLength2 = rof.createFromBackendDict({
       rule_type: 'HasNumberOfTermsEqualTo',
       inputs: {
         y: 2
       }
-    });
+    }, 'RatioExpressionInput');
 
     // The second rule will never get matched.
     answerGroups[0].rules = [

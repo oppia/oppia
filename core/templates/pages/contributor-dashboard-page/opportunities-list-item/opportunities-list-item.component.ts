@@ -24,12 +24,11 @@ require(
 
 angular.module('oppia').component('opportunitiesListItem', {
   bindings: {
-    getOpportunity: '&opportunity',
-    onClickActionButton: '=',
-    isLabelRequired: '&labelRequired',
-    isProgressBarRequired: '&progressBarRequired',
-    getOpportunityHeadingTruncationLength:
-      '&opportunityHeadingTruncationLength'
+    opportunity: '<',
+    onClickActionButton: '<',
+    labelRequired: '<',
+    progressBarRequired: '<',
+    opportunityHeadingTruncationLength: '<'
   },
   template: require('./opportunities-list-item.component.html'),
   controller: [
@@ -37,15 +36,13 @@ angular.module('oppia').component('opportunitiesListItem', {
       var ctrl = this;
       ctrl.$onInit = function() {
         ctrl.opportunityDataIsLoading = false;
-        ctrl.opportunity = ctrl.getOpportunity();
-        if (ctrl.opportunity && ctrl.isLabelRequired()) {
+        if (ctrl.opportunity && ctrl.labelRequired) {
           ctrl.labelText = ctrl.opportunity.labelText;
           ctrl.labelStyle = {
             'background-color': ctrl.opportunity.labelColor
           };
         }
-        ctrl.opportunityHeadingTruncationLength =
-          ctrl.getOpportunityHeadingTruncationLength();
+
         if (!ctrl.opportunityHeadingTruncationLength) {
           ctrl.opportunityHeadingTruncationLength = 35;
         }

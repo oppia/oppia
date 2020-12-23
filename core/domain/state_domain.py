@@ -32,6 +32,7 @@ from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
+from extensions.objects.models import objects
 import feconf
 import python_utils
 import schema_utils
@@ -97,7 +98,8 @@ class AnswerGroup(python_utils.OBJECT):
         """
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
-            [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
+            [RuleSpec.from_dict(rs)
+             for rs in answer_group_dict['rule_specs']],
             answer_group_dict['training_data'],
             answer_group_dict['tagged_skill_misconception_id']
         )
@@ -1711,23 +1713,6 @@ class WrittenTranslations(python_utils.OBJECT):
         else:
             self.translations_mapping.pop(content_id, None)
 
-    def get_translation_counts(self):
-        """Return a dict representing the number of translation available in a
-        languages in which there exist at least one translation in the
-        WrittenTranslation object.
-
-        Returns:
-            dict(str, int). A dict with language code as a key and number of
-            translation available in that language as the value.
-        """
-        translation_counts = collections.defaultdict(int)
-        for translations in self.translations_mapping.values():
-            for language, translation in translations.items():
-                if not translation.needs_update:
-                    translation_counts[language] += 1
-
-        return translation_counts
-
     def get_all_html_content_strings(self):
         """Gets all html content strings used in the WrittenTranslations.
 
@@ -2366,6 +2351,21 @@ class State(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % feedback_content_id)
             content_id_list.append(feedback_content_id)
+
+            for rule_spec in answer_group.rule_specs:
+                for param_name, value in rule_spec.inputs.items():
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).get_rule_param_type(rule_spec.rule_type, param_name))
+
+                    if issubclass(param_type, objects.BaseTranslatableObject):
+                        if value['contentId'] in content_id_list:
+                            raise utils.ValidationError(
+                                'Found a duplicate content '
+                                'id %s' % value['contentId'])
+                        content_id_list.append(value['contentId'])
+
         if self.interaction.default_outcome:
             default_outcome_content_id = (
                 self.interaction.default_outcome.feedback.content_id)
@@ -2547,11 +2547,22 @@ class State(python_utils.OBJECT):
         languages in which there exists at least one translation in the state
         object.
 
+        Note: This method only counts the translations which are translatable as
+        per _get_all_translatable_content method.
+
         Returns:
             dict(str, int). A dict with language code as a key and number of
             translations available in that language as the value.
         """
-        return self.written_translations.get_translation_counts()
+        translation_counts = collections.defaultdict(int)
+        translations_mapping = self.written_translations.translations_mapping
+
+        for content_id in self._get_all_translatable_content():
+            for language_code, translation in (
+                    translations_mapping[content_id].items()):
+                if not translation.needs_update:
+                    translation_counts[language_code] += 1
+        return translation_counts
 
     def get_translatable_content_count(self):
         """Returns the number of content fields available for translation in
@@ -2647,12 +2658,30 @@ class State(python_utils.OBJECT):
         Args:
             interaction_id: str. The new interaction id to set.
         """
-        self.interaction.id = interaction_id
+        if self.interaction.id:
+            old_content_id_list = [
+                answer_group.outcome.feedback.content_id for answer_group in (
+                    self.interaction.answer_groups)]
 
-        # TODO(sll): This should also clear interaction.answer_groups (except
-        # for the default rule). This is somewhat mitigated because the client
-        # updates interaction_answer_groups directly after this, but we should
-        # fix it.
+            for answer_group in self.interaction.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    for param_name, value in rule_spec.inputs.items():
+                        param_type = (
+                            interaction_registry.Registry.get_interaction_by_id(
+                                self.interaction.id
+                            ).get_rule_param_type(
+                                rule_spec.rule_type, param_name))
+
+                        if issubclass(
+                                param_type, objects.BaseTranslatableObject
+                        ):
+                            old_content_id_list.append(value['contentId'])
+
+            self._update_content_ids_in_assets(
+                old_content_id_list, [])
+
+        self.interaction.id = interaction_id
+        self.interaction.answer_groups = []
 
     def update_next_content_id_index(self, next_content_id_index):
         """Update the interaction next content id index attribute.
@@ -2707,9 +2736,22 @@ class State(python_utils.OBJECT):
                 % answer_groups_list)
 
         interaction_answer_groups = []
+        new_content_id_list = []
         old_content_id_list = [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
+
+        for answer_group in self.interaction.answer_groups:
+            for rule_spec in answer_group.rule_specs:
+                for param_name, value in rule_spec.inputs.items():
+                    param_type = (
+                        interaction_registry.Registry.get_interaction_by_id(
+                            self.interaction.id
+                        ).get_rule_param_type(rule_spec.rule_type, param_name))
+
+                    if issubclass(param_type, objects.BaseTranslatableObject):
+                        old_content_id_list.append(value['contentId'])
+
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
@@ -2746,18 +2788,25 @@ class State(python_utils.OBJECT):
                         # referred to exist and have the correct types.
                         normalized_param = value
                     else:
+                        if issubclass(
+                                param_type,
+                                objects.BaseTranslatableObject
+                        ):
+                            new_content_id_list.append(value['contentId'])
+
                         try:
                             normalized_param = param_type.normalize(value)
                         except Exception:
                             raise Exception(
                                 '%s has the wrong type. It should be a %s.' %
                                 (value, param_type.__name__))
+
                     rule_inputs[param_name] = normalized_param
 
                 answer_group.rule_specs.append(rule_spec)
         self.interaction.answer_groups = interaction_answer_groups
 
-        new_content_id_list = [
+        new_content_id_list += [
             answer_group.outcome.feedback.content_id for answer_group in (
                 self.interaction.answer_groups)]
         self._update_content_ids_in_assets(
@@ -2890,6 +2939,10 @@ class State(python_utils.OBJECT):
     def _get_all_translatable_content(self):
         """Returns all content which can be translated into different languages.
 
+        Note: Currently, we don't support interaction translation through
+        contributor dashboard, this method only returns content which are
+        translatable through the contributor dashboard.
+
         Returns:
             dict(str, str). Returns a dict with key as content id and content
             html as the value.
@@ -2938,7 +2991,12 @@ class State(python_utils.OBJECT):
             .get_content_ids_that_are_correctly_translated(language_code))
 
         for content_id in available_translation_content_ids:
-            del content_id_to_html[content_id]
+            # Interactions can be translated through editor pages but
+            # _get_all_translatable_content returns contents which are only
+            # translatable through the contributor dashboard page, we are
+            # ignoring the content ids related to interaction translation below
+            # if it doesn't exist in content_id_to_html.
+            content_id_to_html.pop(content_id, None)
 
         # TODO(#7571): Add functionality to return the list of
         # translations which needs update.

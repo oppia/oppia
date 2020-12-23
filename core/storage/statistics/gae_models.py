@@ -57,15 +57,7 @@ ALLOWED_ACTION_TYPES = [
     ACTION_TYPE_ANSWER_SUBMIT,
     ACTION_TYPE_EXPLORATION_QUIT
 ]
-# Mapping from issue type to issue keyname in the issue customization dict. This
-# mapping is useful to uniquely identify issues by the combination of their
-# issue type and other type-specific information (such as the list of states
-# involved).
-CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
-    'EarlyQuit': 'state_name',
-    'MultipleIncorrectSubmissions': 'state_name',
-    'CyclicStateTransitions': 'state_names'
-}
+
 # The entity types for which the LearnerAnswerDetailsModel instance
 # can be created.
 ALLOWED_ENTITY_TYPES = [
@@ -98,9 +90,7 @@ class StateCounterModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StateCounterModels is aggregated and anonymized, and cannot be tied
-        back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -127,7 +117,7 @@ class StateCounterModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user.."""
         return dict(super(cls, cls).get_export_policy(), **{
             'first_entry_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'subsequent_entries_count':
@@ -157,9 +147,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """AnswerSubmittedEventLogEntryModels are anonymized, and cannot be tied
-        back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -200,7 +188,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -232,9 +220,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationActualStartEventLogEntryModels are anonymized, and cannot
-        be tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -271,7 +257,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -299,9 +285,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """SolutionHitEventLogEntryModels are anonymized, and cannot be tied
-        back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -341,7 +325,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -396,9 +380,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StartExplorationEventLogEntryModels are anonymized, and cannot be
-        tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -466,7 +448,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -540,9 +522,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """MaybeLeaveExplorationEventLogEntryModels are anonymized, and cannot
-        be tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -607,7 +587,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -675,9 +655,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CompleteExplorationEventLogEntryModels are anonymized, and cannot be
-        tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -742,7 +720,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -782,9 +760,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """RateExplorationEventLogEntryModels are anonymized, and cannot be tied
-        back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -835,7 +811,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -887,9 +863,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StateHitEventLogEntryModels are anonymized, and cannot be tied back
-        to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -954,7 +928,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -985,9 +959,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StateCompleteEventLogEntryModels are anonymized, and cannot be tied
-        back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -1027,7 +999,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1059,9 +1031,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """LeaveForRefresherExplorationEventLogEntryModels are anonymized, and
-        cannot be tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -1102,7 +1072,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'refresher_exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1156,9 +1126,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationStatsModels are aggregated and anonymized, and cannot be
-        tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -1307,7 +1275,7 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1338,9 +1306,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationIssuesModels are aggregated and anonymized, and cannot be
-        tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -1407,7 +1373,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1439,9 +1405,7 @@ class PlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """PlaythroughModels are anonymized, and cannot be tied back to an
-        individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -1514,7 +1478,7 @@ class PlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(PlaythroughModel, cls).get_export_policy(), **{
             'exp_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exp_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1565,9 +1529,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """LearnerAnswerDetailsModels are aggregated and anonymized, and cannot
-        be tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -1687,7 +1649,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'state_reference': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1724,9 +1686,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationAnnotationsModels are aggregated and anonymized, and
-        cannot be tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -1792,7 +1752,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -1863,9 +1823,7 @@ class StateAnswersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StateAnswersModels are aggregated and anonymized, and cannot be tied
-        back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -2161,7 +2119,7 @@ class StateAnswersModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -2200,9 +2158,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StateAnswersCalcOutputModels are aggregated and anonymized, and
-        cannot be tied back to an individual user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -2301,7 +2257,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
