@@ -559,10 +559,10 @@
 
 
 # User Data Takeout.
-# TODO(#11477): Restore codeowners to @BenHenning after 2021-01-04.
-/core/domain/takeout_*.py @vojtechjelinek
-# TODO(#11477): Restore codeowners to @BenHenning after 2021-01-04.
-/core/domain/wipeout_*.py @vojtechjelinek
+# TODO(#11477): Replace @seanlip with @BenHenning after 2021-01-04.
+/core/domain/takeout_*.py @seanlip @vojtechjelinek
+# TODO(#11477): Replace @seanlip with @BenHenning after 2021-01-04.
+/core/domain/wipeout_*.py @seanlip @vojtechjelinek
 
 
 # User’s profile page.
