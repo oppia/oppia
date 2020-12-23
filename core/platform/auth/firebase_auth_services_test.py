@@ -38,7 +38,7 @@ def mock_successful_firebase_initialization(test_method):
     @functools.wraps(test_method)
     def decorated_test_method(test):
         """The decorated test method."""
-        with test.swap_to_always_return(firebase_admin, 'get_app'):
+        with test.swap_to_always_return(firebase_admin, 'initialize_app'):
             test_method(test)
     return decorated_test_method
 
@@ -62,50 +62,69 @@ class AuthenticateRequestTests(test_utils.TestBase):
         return request
 
     def test_returns_none_when_firebase_init_fails(self):
-        firebase_error = firebase_exceptions.UnknownError('bad things happened')
-        get_swap = self.swap_to_always_raise(
-            firebase_admin, 'get_app', error=firebase_error)
-        init_swap = self.swap_to_always_raise(
-            firebase_admin, 'initialize_app', error=firebase_error)
-        with get_swap, init_swap:
-            request = self.make_request(auth_header='DummyToken')
-            self.assertIsNone(auth_services.authenticate_request(request))
+        initialize_app_swap = self.swap_to_always_raise(
+            firebase_admin, 'initialize_app',
+            error=firebase_exceptions.UnknownError('could not init'))
+        request = self.make_request(auth_header='Bearer DUMMY_JWT')
+
+        with initialize_app_swap, self.capture_logging() as errors:
+            auth_id = auth_services.authenticate_request(request)
+
+        self.assertIsNone(auth_id)
+        self.assertEqual(len(errors), 1)
+        self.assertIn('could not init', errors[0])
 
     @mock_successful_firebase_initialization
     def test_returns_auth_id_from_valid_auth_token(self):
-        verify_swap = self.swap_to_always_return(
+        verify_id_token_swap = self.swap_to_always_return(
             firebase_admin.auth, 'verify_id_token', value={'sub': 'auth_id'})
-        with verify_swap:
-            request = self.make_request(auth_header='Bearer DUMMY_JWT')
-            self.assertEqual(
-                auth_services.authenticate_request(request), 'auth_id')
+        request = self.make_request(auth_header='Bearer DUMMY_JWT')
+
+        with verify_id_token_swap:
+            auth_id = auth_services.authenticate_request(request)
+
+        self.assertEqual(auth_id, 'auth_id')
 
     @mock_successful_firebase_initialization
     def test_returns_none_when_auth_header_is_missing(self):
         request = self.make_request()
-        self.assertIsNone(auth_services.authenticate_request(request))
+
+        auth_id = auth_services.authenticate_request(request)
+
+        self.assertIsNone(auth_id)
 
     @mock_successful_firebase_initialization
     def test_returns_none_when_auth_header_uses_wrong_scheme_type(self):
         request = self.make_request(auth_header='Basic password=123')
-        self.assertIsNone(auth_services.authenticate_request(request))
+
+        auth_id = auth_services.authenticate_request(request)
+
+        self.assertIsNone(auth_id)
 
     @mock_successful_firebase_initialization
     def test_returns_none_when_auth_token_is_invalid(self):
-        verify_swap = self.swap_to_always_raise(
+        verify_id_token_swap = self.swap_to_always_raise(
             firebase_admin.auth, 'verify_id_token',
-            error=firebase_exceptions.InvalidArgumentError('bad!'))
-        with verify_swap:
-            request = self.make_request(auth_header='Bearer DUMMY_JWT')
-            self.assertIsNone(auth_services.authenticate_request(request))
+            error=firebase_exceptions.InvalidArgumentError('invalid token'))
+        request = self.make_request(auth_header='Bearer DUMMY_JWT')
+
+        with verify_id_token_swap, self.capture_logging() as errors:
+            auth_id = auth_services.authenticate_request(request)
+
+        self.assertIsNone(auth_id)
+        self.assertEqual(len(errors), 1)
+        self.assertIn('invalid token', errors[0])
 
     @mock_successful_firebase_initialization
     def test_returns_none_when_auth_token_is_missing_subject_identifier(self):
-        mock_verify = self.swap_to_always_return(
+        verify_id_token_swap = self.swap_to_always_return(
             firebase_admin.auth, 'verify_id_token', value={})
-        with mock_verify:
-            request = self.make_request(auth_header='Bearer DUMMY_JWT')
-            self.assertIsNone(auth_services.authenticate_request(request))
+        request = self.make_request(auth_header='Bearer DUMMY_JWT')
+
+        with verify_id_token_swap:
+            auth_id = auth_services.authenticate_request(request)
+
+        self.assertIsNone(auth_id)
 
 
 class AuthIdUserIdAssociationOperationsTests(test_utils.GenericTestBase):
@@ -145,7 +164,7 @@ class AuthIdUserIdAssociationOperationsTests(test_utils.GenericTestBase):
                 ['sub1', 'sub2', 'sub3']),
             ['uid1', 'uid2', 'uid3'])
 
-    def test_get_multi_associations_that_do_not_exist(self):
+    def test_get_multi_associations_when_one_does_not_exist(self):
         self.put_association(
             auth_domain.AuthIdUserIdPair('sub1', 'uid1'))
         # Mapping from sub2 -> uid2 missing.

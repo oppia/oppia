@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
 import os
 
 from constants import constants
@@ -288,6 +289,18 @@ class TestUtilsTests(test_utils.GenericTestBase):
             Exception, 'Expected params to be a dict'):
             self.get_response_without_checking_for_errors(
                 'random_url', [200], params='invalid_params')
+
+    def test_capture_logging(self):
+        logging.info('0')
+        with self.capture_logging() as logs:
+            logging.info('1')
+            logging.debug('2')
+            logging.warn('3')
+            logging.error('4')
+            python_utils.PRINT('5')
+        logging.info('6')
+
+        self.assertEqual(logs, ['1', '2', '3', '4'])
 
     def test_swap_to_always_return_uses_none_by_default(self):
         class MockClass(python_utils.OBJECT):

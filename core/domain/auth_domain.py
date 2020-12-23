@@ -21,5 +21,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 
+# Auth ID refers to an identifier that links many Identity Providers to a single
+# user. For example, an individual user's Facebook, Google, and Apple profiles
+# would all map to a single Auth ID.
+#
+# Auth IDs are handled by the sub-modules in `core.platform.auth`.
+#
+# This domain object is simply a convenience for pairing Auth IDs to their
+# corresponding Oppia-generated IDs in our APIs.
 AuthIdUserIdPair = (
     collections.namedtuple('AuthIdUserIdPair', ['auth_id', 'user_id']))

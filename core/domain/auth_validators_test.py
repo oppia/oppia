@@ -80,7 +80,7 @@ class UserIdByFirebaseAuthIdModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-    def test_audit_with_invalid_id_fails(self):
+    def test_audit_with_id_that_is_too_long_fails(self):
         auth_id_that_is_too_long = 'i' * 129
         self.signup('email@test.com', 'testUser')
         user_id = self.get_user_id_from_email('email@test.com')

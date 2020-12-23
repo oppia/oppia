@@ -26,6 +26,7 @@ import copy
 import inspect
 import itertools
 import json
+import logging
 import os
 import unittest
 
@@ -429,6 +430,42 @@ class TestBase(unittest.TestCase):
         corresponding cache slug. asset_suffix should have a leading slash.
         """
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
+
+    @contextlib.contextmanager
+    def capture_logging(self):
+        """Context manager that captures logs into a list.
+
+        Strips whitespace from messages for convenience.
+
+        https://docs.python.org/3/howto/logging-cookbook.html#using-a-context-manager-for-selective-logging
+
+        Yields:
+            list(str). A live-feed of the logging messages captured so-far.
+        """
+        captured_logs = []
+
+        class ListStream(python_utils.OBJECT):
+            """Stream-like object that appends writes to the captured logs."""
+
+            def write(self, msg):
+                """Appends stripped messages to captured logs."""
+                captured_logs.append(msg.strip())
+
+            def flush(self):
+                """Does nothing."""
+                pass
+
+        list_stream_handler = logging.StreamHandler(stream=ListStream())
+
+        logger = logging.getLogger()
+        old_level = logger.level
+        logger.addHandler(list_stream_handler)
+        logger.setLevel(logging.NOTSET)
+        try:
+            yield captured_logs
+        finally:
+            logger.setLevel(old_level)
+            logger.removeHandler(list_stream_handler)
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
