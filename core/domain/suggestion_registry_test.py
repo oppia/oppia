@@ -132,8 +132,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            'target_type': feconf.ENTITY_TYPE_EXPLORATION,
             'target_id': 'exp1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -814,8 +814,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-            'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+            'target_type': feconf.ENTITY_TYPE_EXPLORATION,
             'target_id': 'exp1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -1426,8 +1426,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -2073,8 +2073,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -2130,8 +2130,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            'target_type': feconf.ENTITY_TYPE_SKILL,
             'target_id': 'skill1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
@@ -2988,7 +2988,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
     """Tests for the ReviewableSuggestionEmailInfo class."""
 
-    suggestion_type = suggestion_models.SUGGESTION_TYPE_ADD_QUESTION
+    suggestion_type = feconf.SUGGESTION_TYPE_ADD_QUESTION
     language_code = 'en'
     suggestion_content = 'sample question'
     submission_datetime = datetime.datetime.utcnow()
