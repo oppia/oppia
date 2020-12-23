@@ -23,25 +23,32 @@ import { AuthService } from 'services/auth.service';
 import { MockAngularFireAuth } from 'tests/unit-test-utils';
 
 
-fdescribe('Auth service', () => {
+describe('Auth service', () => {
   let authService: AuthService;
-  let angularFireAuth;
+  let angularFireAuth: MockAngularFireAuth;
 
   beforeEach(() => {
     angularFireAuth = new MockAngularFireAuth();
+
     TestBed.configureTestingModule({
       providers: [
         AuthService,
-        {provider: AngularFireAuth, useValue: angularFireAuth},
+        {provide: AngularFireAuth, useValue: angularFireAuth},
       ],
     });
 
     authService = TestBed.inject(AuthService);
   });
 
-  it('should sign out successfully', async() => {
+  it('should resolve when sign out succeeds', async() => {
     spyOn(angularFireAuth, 'signOut').and.resolveTo();
 
     await expectAsync(authService.signOutAsync()).toBeResolvedTo();
+  });
+
+  it('should reject when sign out fails', async() => {
+    spyOn(angularFireAuth, 'signOut').and.rejectWith(new Error('fail'));
+
+    await expectAsync(authService.signOutAsync()).toBeRejectedWithError('fail');
   });
 });

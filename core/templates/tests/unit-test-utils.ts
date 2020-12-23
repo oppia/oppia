@@ -36,7 +36,10 @@ declare var angular: ng.IAngularStatic;
 // The library is not @Injectable, so we mock its interface and value during
 // unit tests to the minimal subset we need/want to use.
 export class MockAngularFireAuth {
-  idToken: Observable<string | null> = of(null);
+  constructor(private mockIdToken: Observable<string | null> = of(null)) {}
+  get idToken(): Observable<string | null> {
+    return this.mockIdToken;
+  }
   signOut(): Promise<void> {
     return Promise.resolve();
   }
@@ -47,13 +50,12 @@ export const importAllAngularServices = (): void => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [{provider: AngularFireAuth, useValue: mockAngularFireAuth}],
+      providers: [{provide: AngularFireAuth, useValue: mockAngularFireAuth}],
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    for (let servicePair of angularServices) {
-      $provide.value(
-        servicePair[0], TestBed.get(servicePair[1]));
+    for (let [serviceName, serviceType] of angularServices) {
+      $provide.value(serviceName, TestBed.inject(serviceType));
     }
     $provide.value('AngularFireAuth', mockAngularFireAuth);
   }));

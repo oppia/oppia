@@ -38,7 +38,7 @@ export class AuthService implements OnDestroy {
     this.tokenSubscription.unsubscribe();
   }
 
-  get idToken(): Observable<string | null> {
+  get idToken$(): Observable<string | null> {
     return this.tokenCache;
   }
 
