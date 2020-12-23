@@ -75,7 +75,10 @@ describe('State Interaction Stats Service', () => {
           {
             rule_specs: [{
               rule_type: 'Equals',
-              inputs: {x: ['hola!']}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['hola!']
+              }}
             }],
             outcome: {
               dest: 'Me Llamo',
@@ -91,7 +94,10 @@ describe('State Interaction Stats Service', () => {
           {
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: ['hola']}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['hola']
+              }}
             }],
             outcome: {
               dest: 'Me Llamo',
@@ -107,7 +113,10 @@ describe('State Interaction Stats Service', () => {
           {
             rule_specs: [{
               rule_type: 'FuzzyEquals',
-              inputs: {x: ['hola']}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['hola']
+              }}
             }],
             outcome: {
               dest: 'Me Llamo',
