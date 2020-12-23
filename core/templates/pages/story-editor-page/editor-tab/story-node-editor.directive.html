@@ -163,7 +163,7 @@
                   </span>
                 </div>
               </div>
-              <button class="btn add-skill-btn protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()">+ ADD PREREQUISITE SKILL</button>
+              <button class="btn add-skill-btn protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()" ng-disabled="!skillInfoHasLoaded">+ ADD PREREQUISITE SKILL</button>
             </div>
           </div>
           <div class="acquired-skills">
@@ -179,7 +179,7 @@
                   </span>
                 </div>
               </div>
-              <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">+ ADD ACQUIRED SKILL</button>
+              <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()" ng-disabled="!skillInfoHasLoaded">+ ADD ACQUIRED SKILL</button>
             </div>
           </div>
         </div>
@@ -216,7 +216,7 @@
                     </span>
                   </div>
                 </div>
-                <button class="btn add-skill-btn protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()">+ ADD PREREQUISITE SKILL</button>
+                <button class="btn add-skill-btn protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()" ng-disabled="!skillInfoHasLoaded">+ ADD PREREQUISITE SKILL</button>
               </div>
             </div>
           </div>
@@ -252,7 +252,7 @@
                     </span>
                   </div>
                 </div>
-                <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">+ ADD ACQUIRED SKILL</button>
+                <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()" ng-disabled="!skillInfoHasLoaded">+ ADD ACQUIRED SKILL</button>
               </div>
             </div>
           </div>

@@ -105,7 +105,7 @@ describe('Responses Service', () => {
             param_changes: [],
           },
           rule_specs: [],
-          training_data: '',
+          training_data: [],
           tagged_skill_misconception_id: '',
         },
       ],
@@ -157,14 +157,14 @@ describe('Responses Service', () => {
           },
           rule_specs: [
             {
-              rule_type: '',
+              rule_type: 'Equals',
               inputs: {
                 x: ['c', 'd', 'e'],
                 y: ['a', 'b', 'c'],
               },
             },
           ],
-          training_data: '',
+          training_data: [],
           tagged_skill_misconception_id: '',
         },
       ],
@@ -269,8 +269,12 @@ describe('Responses Service', () => {
         {
           type: 'Contains',
           inputs: {
-            x: 'correct',
+            x: {
+              contentId: 'rule_input_Contains',
+              normalizedStrSet: ['correct']
+            },
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -286,7 +290,7 @@ describe('Responses Service', () => {
         hasNonemptyFeedback: jasmine.createSpy('hasNonemptyFeedback'),
         isConfusing: jasmine.createSpy('isConfusing'),
       },
-      trainingData: 'This is training data text',
+      trainingData: ['This is training data text'],
       taggedSkillMisconceptionId: '',
       toBackendDict: jasmine.createSpy('toBackendDict'),
     };
@@ -324,6 +328,7 @@ describe('Responses Service', () => {
           inputs: {
             x: 'correct',
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -345,7 +350,7 @@ describe('Responses Service', () => {
       refresherExplorationId: 'test',
       missingPrerequisiteSkillId: 'test_skill_id',
       labelledAsCorrect: true,
-      trainingData: 'This is training data text',
+      trainingData: ['This is training data text'],
       toBackendDict: jasmine.createSpy('toBackendDict'),
     };
     const callbackSpy = jasmine.createSpy('callback');
@@ -390,6 +395,7 @@ describe('Responses Service', () => {
           inputs: {
             x: 'correct',
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -411,7 +417,7 @@ describe('Responses Service', () => {
       refresherExplorationId: '',
       missingPrerequisiteSkillId: '',
       labelledAsCorrect: true,
-      trainingData: 'This is training data text',
+      trainingData: ['This is training data text'],
       toBackendDict: jasmine.createSpy('toBackendDict'),
     };
     const callbackSpy = jasmine.createSpy('callback');
@@ -881,7 +887,7 @@ describe('Responses Service', () => {
       answerGroupObjectFactory.createNew(
         [],
         outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
-        'Training data text',
+        ['Training data text'],
         '0'
       ),
     ];
@@ -924,7 +930,7 @@ describe('Responses Service', () => {
       answerGroupObjectFactory.createNew(
         [],
         outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
-        'Training data text',
+        ['Training data text'],
         '0'
       ),
     ];

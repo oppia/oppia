@@ -128,10 +128,12 @@ describe('TrainingDataEditorPanelServiceModalController', function() {
             },
           },
           rule_specs: [{
-            rule_type: '',
+            rule_type: 'Equals',
             inputs: {
-              x: ['c', 'd', 'e'],
-              y: ['a', 'b', 'c']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['c', 'd', 'e']
+              }
             }
           }],
           training_data: ['Answer1', 'Answer2']
