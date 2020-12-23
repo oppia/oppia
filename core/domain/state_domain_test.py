@@ -19,8 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import functools
-import json
 import logging
 import os
 import re
@@ -30,6 +30,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import interaction_registry
+from core.domain import rules_registry
 from core.domain import state_domain
 from core.tests import test_utils
 import feconf
@@ -121,10 +122,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': [
-                '<p>state customization arg html 1</p>',
-                '<p>state customization arg html 2</p>',
-                '<p>state customization arg html 3</p>',
-                '<p>state customization arg html 4</p>'
+                'ca_choices_0',
+                'ca_choices_1',
+                'ca_choices_2',
+                'ca_choices_3'
             ],
             'explanation': {
                 'content_id': 'solution',
@@ -295,10 +296,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': [
-                ['<p>state customization arg html 1</p>'],
-                ['<p>state customization arg html 2</p>'],
-                ['<p>state customization arg html 3</p>'],
-                ['<p>state customization arg html 4</p>']
+                ['ca_choices_0'],
+                ['ca_choices_1'],
+                ['ca_choices_2'],
+                ['ca_choices_3']
             ],
             'explanation': {
                 'content_id': 'solution',
@@ -351,10 +352,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
-                '<p>state customization arg html 1</p>',
-                '<p>state customization arg html 2</p>',
-                '<p>state customization arg html 3</p>',
-                '<p>state customization arg html 4</p>',
                 '<p>state customization arg html 1</p>',
                 '<p>state customization arg html 2</p>',
                 '<p>state customization arg html 3</p>',
@@ -537,10 +534,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': [
-                '<p>state customization arg html 1</p>',
-                '<p>state customization arg html 2</p>',
-                '<p>state customization arg html 3</p>',
-                '<p>state customization arg html 4</p>'
+                'ca_choices_0',
+                'ca_choices_1',
+                'ca_choices_2',
+                'ca_choices_3'
             ],
             'explanation': {
                 'content_id': 'solution',
@@ -581,10 +578,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
-                '<p>state customization arg html 1</p>',
-                '<p>state customization arg html 2</p>',
-                '<p>state customization arg html 3</p>',
-                '<p>state customization arg html 4</p>',
                 '<p>init_state customization arg html 1</p>',
                 '<p>init_state customization arg html 2</p>',
                 '<p>init_state customization arg html 3</p>',
@@ -703,11 +696,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             interaction_registry.Registry.get_interaction_by_id(
                 'DragAndDropSortInput'))
         interaction.answer_type = 'DragAndDropHtmlString'
-        with self.assertRaisesRegexp(
-            Exception,
-            'The solution does not have a valid '
-            'correct_answer type.'):
-            state.get_all_html_content_strings()
+
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        def mock_get_html_field_types_to_rule_specs(cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        with self.swap(
+                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+                classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
+            with self.assertRaisesRegexp(
+                Exception,
+                'The solution does not have a valid '
+                'correct_answer type.'):
+                state.get_all_html_content_strings()
 
     def test_get_all_html_when_interaction_is_none(self):
         """Test the method for extracting all the HTML from a state
@@ -1936,7 +1941,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components),
+                add_math_content_to_math_rte_components,
+                state_uses_old_rule_template_schema=True),
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_item_selection_interaction(self):
@@ -2171,7 +2177,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components),
+                add_math_content_to_math_rte_components,
+                state_uses_old_rule_template_schema=True),
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_text_input_interaction(self):
@@ -2436,24 +2443,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             html_type_dict['format'] = 'invalid format'
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(cls,
+                state_schema_version=None):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+                classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'The rule spec does not belong to a valid format.'):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
                     html_validation_service.
-                    add_math_content_to_math_rte_components)
+                    add_math_content_to_math_rte_components,
+                    state_uses_old_rule_template_schema=True)
 
     def test_convert_html_fields_in_rule_spec_with_invalid_input_variable(self):
         """Test the method for converting the HTML in a state
@@ -2539,19 +2551,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             if html_type_dict['interactionId'] == 'ItemSelectionInput':
                 html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
                     ['y'])
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(cls,
+                state_schema_version=None):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+                classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'Rule spec should have at least one valid input variable with '
@@ -2626,16 +2642,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         mock_html_field_types_to_rule_specs_dict['NormalizedString'] = (
             mock_html_field_types_to_rule_specs_dict.pop('SetOfHtmlString'))
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(cls,
+                state_schema_version=None):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+                classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'The solution does not have a valid '

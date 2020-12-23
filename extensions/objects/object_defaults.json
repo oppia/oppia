@@ -26,6 +26,7 @@
     "SetOfAlgebraicIdentifier": [],
     "SetOfTranslatableHtmlContentId": [],
     "SetOfUnicodeString": [],
+    "TranslatableHtmlContentId": "",
     "TranslatableSetOfNormalizedString": {
       "contentId": null,
       "normalizedStrSet": []

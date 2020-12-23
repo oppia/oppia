@@ -8359,7 +8359,7 @@ title: Title
     def test_load_from_v40_special_cases(self):
         """Test to cover some special cases that occurs in the migration from
         v40 to v41 exploration schema. This includes modifying existing written
-        translations, converting hmtl to SubtitledHtml, and filling in empty
+        translations, converting html to SubtitledHtml, and filling in empty
         SubtitledHtml list customization arguments with a default value.
         """
         sample_yaml_content = (
@@ -8417,7 +8417,6 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -8427,7 +8426,6 @@ states:
                 needs_update: false
         default_outcome: {}
         feedback_1: {}
-        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -8546,7 +8544,7 @@ states:
       hints: []
       id: MultipleChoiceInput
       solution: null
-    next_content_id_index: 4
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -8554,7 +8552,6 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -8566,7 +8563,6 @@ states:
             translation: <p>Translation</p>
         default_outcome: {}
         feedback_1: {}
-        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -8698,7 +8694,6 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -8708,7 +8703,6 @@ states:
                 needs_update: false
         default_outcome: {}
         feedback_1: {}
-        rule_input_3: {}
   END:
     classifier_model_id: null
     content:
@@ -8936,7 +8930,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 45
 states:
   (untitled state):
     classifier_model_id: null
@@ -8957,9 +8951,7 @@ states:
         rule_specs:
         - inputs:
             x:
-              contentId: rule_input_3
-              normalizedStrSet:
-              - InputString
+            - InputString
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -8981,7 +8973,7 @@ states:
       hints: []
       id: SetInput
       solution: null
-    next_content_id_index: 4
+    next_content_id_index: 3
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
@@ -8989,7 +8981,6 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_3: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -8997,7 +8988,6 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-        rule_input_3: {}
   END:
     classifier_model_id: null
     content:

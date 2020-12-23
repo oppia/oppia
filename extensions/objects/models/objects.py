@@ -1736,6 +1736,8 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
 class TranslatableHtmlContentId(BaseObject):
     """A TranslatableHtml content id."""
 
+    default_value = ''
+
     @classmethod
     def get_schema(cls):
         """Returns the object schema.

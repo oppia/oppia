@@ -839,7 +839,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.get_schema())
                     count += 1
 
-        self.assertEqual(count, 55)
+        self.assertEqual(count, 52)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
@@ -910,9 +910,9 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
             if isinstance(member(), objects.BaseTranslatableObject):
                 if name == 'BaseTranslatableObject':
                     continue
-                self.assertEqual(name.index('Translatable'), 0)
-            else:
-                self.assertNotEqual(name.index('Translatable'), 0)
+                self.assertEqual(name.find('Translatable'), 0)
+            elif 'ContentId' not in name:
+                self.assertNotEqual(name.find('Translatable'), 0)
 
     def test_abstract_base_class_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
