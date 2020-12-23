@@ -265,6 +265,7 @@ export class ResponsesService {
   ): void {
     if (this.answerGroupsCacheService.contains(newInteractionId)) {
       this._answerGroups = this.answerGroupsCacheService.get(newInteractionId);
+      console.log('retrieved cache', this._answerGroups);
     } else {
       this._answerGroups = [];
     }

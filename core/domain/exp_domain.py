@@ -2214,7 +2214,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.convert_to_textangular,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
         return states_dict
 
     @classmethod
@@ -2234,7 +2235,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_caption_attr_to_image,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
         return states_dict
 
     @classmethod
@@ -2254,7 +2256,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.convert_to_ckeditor,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
         return states_dict
 
     @classmethod
@@ -2278,7 +2281,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
             if state_dict['interaction']['id'] == 'ImageClickInput':
                 filename = state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath']
@@ -2545,7 +2549,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_math_content_to_math_rte_components,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
 
         return states_dict
 
