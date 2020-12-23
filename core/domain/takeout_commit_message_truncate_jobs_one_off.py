@@ -78,7 +78,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         if key == 'LESS_OR_EQUAL_TO_1000':
             yield (key, len(values))
         elif key == 'BETWEEN_1000_AND_1500':
-            yield (key, len(values))
+            yield (key, values)
         else:
             yield (key, values)
 
