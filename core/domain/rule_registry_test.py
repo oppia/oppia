@@ -30,7 +30,7 @@ import python_utils
 class RulesRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the rules registry."""
 
-    def test_get_html_field_types_to_rule_specs_for_current_state_schema_version(self):
+    def test_get_html_field_types_to_rule_specs_for_current_state_schema_version(self): # pylint: disable=line-too-long
         html_field_types_to_rule_specs = (
             rules_registry.Registry.get_html_field_types_to_rule_specs())
 
@@ -43,9 +43,10 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
             html_field_types_to_rule_specs,
             specs_from_json)
 
-    def test_get_html_field_types_to_rule_specs_for_previous_state_schema_version(self):
+    def test_get_html_field_types_to_rule_specs_for_previous_state_schema_version(self): # pylint: disable=line-too-long
         html_field_types_to_rule_specs_v41 = (
-            rules_registry.Registry.get_html_field_types_to_rule_specs(41))
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
 
         spec_file_v41 = os.path.join(
             'extensions', 'interactions',
@@ -58,12 +59,12 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
             html_field_types_to_rule_specs_v41,
             specs_from_json_v41)
 
-    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version(self):
+    def test_get_html_field_types_to_rule_specs_for_unsaved_state_schema_version(self): # pylint: disable=line-too-long
         with self.assertRaisesRegexp(
             Exception,
             'No specs json file found for state schema'
         ):
             (
                 rules_registry.Registry
-                .get_html_field_types_to_rule_specs(10)
+                .get_html_field_types_to_rule_specs(state_schema_version=10)
             )

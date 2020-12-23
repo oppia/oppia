@@ -51,10 +51,11 @@ class Registry(python_utils.OBJECT):
             Exception. No html_field_types_to_rule_specs json file found for the
                 given state schema version.
         """
-        cached = (state_schema_version in
+        cached = (
+            state_schema_version in
             cls._state_schema_version_to_html_field_types_to_rule_specs)
 
-        if not cached and state_schema_version == None:
+        if not cached and state_schema_version is None:
             cls._state_schema_version_to_html_field_types_to_rule_specs[
                 state_schema_version] = json.loads(
                     utils.get_file_contents(

@@ -2759,7 +2759,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.Solution.convert_html_in_solution(
                 None, solution_dict,
                 html_validation_service.
-                add_math_content_to_math_rte_components), solution_dict)
+                add_math_content_to_math_rte_components,
+                rules_registry.Registry.get_html_field_types_to_rule_specs()
+            ), solution_dict)
 
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""

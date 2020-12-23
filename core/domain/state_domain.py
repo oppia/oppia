@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import itertools
-import json
 import logging
 import re
 
@@ -3109,7 +3108,8 @@ class State(python_utils.OBJECT):
             # html_field_types_to_rule_specs to properly convert html, since
             # past state schema v41, some html fields where removed.
             html_field_types_to_rule_specs = (
-                rules_registry.Registry.get_html_field_types_to_rule_specs(41))
+                rules_registry.Registry.get_html_field_types_to_rule_specs(
+                    state_schema_version=41))
         else:
             html_field_types_to_rule_specs = (
                 rules_registry.Registry.get_html_field_types_to_rule_specs())
