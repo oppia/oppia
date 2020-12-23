@@ -33,6 +33,7 @@
 # files/folders are created in the following directories, these codeowners would
 # be superseded by the relevant codeowners mentioned elsewhere in this file.
 # (Reference: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners)
+* @oppia/owners
 /core/controllers/ @aks681
 /core/domain/ @DubeySandeep
 /core/templates/components/ @srijanreddy98
@@ -72,13 +73,13 @@
 
 
 # Answer classification team.
-/core/controllers/classifier*.py @prasanna08
-/core/domain/classifier*.py @prasanna08
-/proto/ @prasanna08
-/core/templates/domain/classifier/ @prasanna08
-/extensions/classifiers/ @prasanna08
-/buf.yaml @prasanna08
-/buf.gen.yaml @prasanna08
+/core/controllers/classifier*.py @oppia/ml
+/core/domain/classifier*.py @oppia/ml
+/proto/ @oppia/ml
+/core/templates/domain/classifier/ @oppia/ml
+/extensions/classifiers/ @oppia/ml
+/buf.yaml @oppia/ml
+/buf.gen.yaml @oppia/ml
 
 
 # Audio and Translation team.
