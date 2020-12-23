@@ -36,13 +36,14 @@ from core.platform import models
 class SnapshotMetadataCommitMsgAuditOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that audits the commit_message field of the
-    BaseSnapshotMetadataModels to determine frequency of string sizes.
+    BaseSnapshotMetadataModels to determine frequency of string sizes. This job
+    is temporary and only used once.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
         super(SnapshotMetadataCommitMsgAuditOneOffJob, cls).enqueue(
-            job_id, shard_count=4)
+            job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -66,7 +67,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         model_id = item.id
         identifier_message = '%s with id %s' % (model_name, model_id)
         if len(item.commit_message) <= 1000:
-            yield ('LESS_OR_EQUAL_TO_1000', identifier_message)
+            yield ('LESS_OR_EQUAL_TO_1000', 1)
         elif len(item.commit_message) <= 1500:
             yield ('BETWEEN_1000_AND_1500', identifier_message)
         else:
@@ -85,7 +86,8 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
 class SnapshotMetadataCommitMsgShrinkOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that audits the commit_message field of the
-    BaseSnapshotMetadataModels to determine frequency of string sizes.
+    BaseSnapshotMetadataModels to determine frequency of string sizes. This job
+    is temporary and only used once.
     """
 
     @classmethod
@@ -120,7 +122,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
             item.put()
             yield ('TRUNCATED', identifier_message)
         else:
-            yield ('NOT_TRUNCATED', identifier_message)
+            yield ('NOT_TRUNCATED', 1)
 
     @staticmethod
     def reduce(key, values):
