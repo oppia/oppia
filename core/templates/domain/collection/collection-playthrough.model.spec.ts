@@ -19,7 +19,6 @@ import { CollectionPlaythrough } from './collection-playthrough.model';
  */
 
 describe('Collection playthrough model', () => {
-
   it('should create a new CollectionPlaythrough instance', () => {
     let collectionPlaythroughObject = new CollectionPlaythrough(
       'exp_id0', ['exp_id1']);
@@ -56,8 +55,7 @@ describe('Collection playthrough model', () => {
     };
     let collectionPlaythroughObject = CollectionPlaythrough
       .createFromBackendObject(collectionPlaythroughBackendDict);
-    expect(collectionPlaythroughObject
-      .getNextRecommendedCollectionNodeCount()).toEqual(1);
+    expect(collectionPlaythroughObject.getNextRecommendedCollectionNodeCount()).toEqual(1);
   });
 
   it('should get the completed exploration ids', () => {
