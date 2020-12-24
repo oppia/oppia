@@ -137,7 +137,7 @@ describe('DragAndDropSortInputValidationService', () => {
     equalsListWithEmptyListRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['a'], [], ['c', 'b', 'd']]
+        x: [['ca_0'], [], ['ca_2', 'ca_1', 'ca_3']]
       }
     }, 'DragAndDropSortInput');
 
@@ -213,7 +213,7 @@ describe('DragAndDropSortInputValidationService', () => {
   });
 
   it('should expect all lists to be nonempty', () => {
-    // Add rule containing empty lists.
+    // Add rule containing empty items.
     answerGroups[0].rules = [equalsListWithEmptyListRule];
 
     var warnings = validatorService.getAllWarnings(
@@ -221,6 +221,10 @@ describe('DragAndDropSortInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Please ensure the list is nonempty.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 1 from answer group 1 options do not match ' +
+        'customization argument choices.'
     }]);
   });
 

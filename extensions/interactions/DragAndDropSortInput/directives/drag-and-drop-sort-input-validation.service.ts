@@ -92,6 +92,7 @@ export class DragAndDropSortInputValidationService {
     var warningsList = [];
     var seenItems = [];
     var ranges = [];
+    var areAnyItemsEmpty = false;
     var areAnyItemsDuplicated = false;
 
     warningsList = warningsList.concat(
@@ -196,6 +197,9 @@ export class DragAndDropSortInputValidationService {
             var xInputs = <string[][]>inputs.x;
             for (var k = 0; k < xInputs.length; k++) {
               for (var l = 0; l < xInputs[k].length; l++) {
+                if (inputs.x[k].length === 0) {
+                  areAnyItemsEmpty = true;
+                }
                 const itemContentId = xInputs[k][l];
                 const item = choiceContentIdToHtml[itemContentId];
                 if (seenItems.indexOf(item) !== -1) {
@@ -205,7 +209,7 @@ export class DragAndDropSortInputValidationService {
               }
             }
 
-            if (xInputs.length === 0) {
+            if (areAnyItemsEmpty || xInputs.length === 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
                 message: 'Please ensure the list is nonempty.'
@@ -233,8 +237,8 @@ export class DragAndDropSortInputValidationService {
             }
             var sortedCustomArgsChoices = choiceValues.sort();
             var flattenedAndSortedXInputs = (
-              xInputs.reduce((acc, val) => acc.concat(val), []).sort()
-            ).map(contentId => choiceContentIdToHtml[contentId]);
+              xInputs.reduce((acc, val) => acc.concat(val), [])
+            ).map(contentId => choiceContentIdToHtml[contentId]).sort();
             if (
               !angular.equals(
                 sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
