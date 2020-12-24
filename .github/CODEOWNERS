@@ -33,7 +33,6 @@
 # files/folders are created in the following directories, these codeowners would
 # be superseded by the relevant codeowners mentioned elsewhere in this file.
 # (Reference: https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners)
-* @oppia/owners
 /core/controllers/ @aks681
 /core/domain/ @DubeySandeep
 /core/templates/components/ @srijanreddy98
