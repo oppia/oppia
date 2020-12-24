@@ -332,11 +332,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             rules_registry.Registry.get_html_field_types_to_rule_specs(
                 state_schema_version=41))
 
-        def mock_get_html_field_types_to_rule_specs(cls):
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
             return mock_html_field_types_to_rule_specs_dict
 
         def mock_get_interaction_by_id(cls, interaction_id):
-            interaction = copy.deepcopy(cls._interactions[interaction_id])
+            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
             interaction.answer_type = 'ListOfSetsOfHtmlStrings'
             return interaction
 
@@ -736,13 +736,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             rules_registry.Registry.get_html_field_types_to_rule_specs(
                 state_schema_version=41))
 
-        def mock_get_html_field_types_to_rule_specs(cls):
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
-                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                classmethod(mock_get_html_field_types_to_rule_specs)
-        ):
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)):
             with self.assertRaisesRegexp(
                 Exception,
                 'The solution does not have a valid '
@@ -2483,14 +2482,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 mock_html_field_types_to_rule_specs_dict.values()):
             html_type_dict['format'] = 'invalid format'
 
-        def mock_get_html_field_types_to_rule_specs(cls,
-                state_schema_version=None):
+        def mock_get_html_field_types_to_rule_specs(
+                unused_cls, unused_state_schema_version=None):
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
-                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                classmethod(mock_get_html_field_types_to_rule_specs)
-        ):
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)):
             with self.assertRaisesRegexp(
                 Exception,
                 'The rule spec does not belong to a valid format.'):
@@ -2593,13 +2591,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
                     ['y'])
 
-        def mock_get_html_field_types_to_rule_specs(cls,
-                state_schema_version=None):
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
-                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                classmethod(mock_get_html_field_types_to_rule_specs)
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
         ):
             with self.assertRaisesRegexp(
                 Exception,
@@ -2681,13 +2678,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         mock_html_field_types_to_rule_specs_dict['NormalizedString'] = (
             mock_html_field_types_to_rule_specs_dict.pop('SetOfHtmlString'))
 
-        def mock_get_html_field_types_to_rule_specs(cls,
-                state_schema_version=None):
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
-                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                classmethod(mock_get_html_field_types_to_rule_specs)
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
         ):
             with self.assertRaisesRegexp(
                 Exception,
