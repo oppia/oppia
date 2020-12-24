@@ -13,48 +13,32 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ConfirmOrCancelModalController.
+ * @fileoverview Unit tests for TakeBreakModalComponent.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, async, tick} from
+import { TestBed } from
   '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { TakeBreakModalComponent } from
   './take-break-modal.component';
 
-describe('TakeBreakModalComponent', () => {
-  var $scope = null;
-  var $uibModalInstance = null;
 
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
-
-    $scope = $rootScope.$new();
-    $controller('ConfirmOrCancelModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-    });
-  }));
-
-  it('should close modal with the correct value', function() {
-    var message = 'closing';
-    $scope.confirm(message);
-    expect($uibModalInstance.close).toHaveBeenCalledWith(message);
+describe('TakeBreakModalComponent', function() {
+  let takebreakmodal: TakeBreakModalComponent;
+  let ngbActiveModal: NgbActiveModal;
+  beforeEach(() => {
+    takebreakmodal = TestBed.get(TakeBreakModalComponent);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
   });
 
-  it('should dismiss modal', function() {
-    $scope.cancel();
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
+  it('should close modal', () => {
+    takebreakmodal.confirm();
+    expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
-  it('should dismiss modal with the correct value', function() {
-    var message = 'canceling';
-    $scope.cancel(message);
-    expect($uibModalInstance.dismiss).toHaveBeenCalledWith(message);
+  it('should dismiss modal', () => {
+    takebreakmodal.cancel();
+    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
 });

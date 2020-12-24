@@ -17,7 +17,6 @@
  */
 
 import { Component } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 
@@ -42,7 +41,3 @@ export class TakeBreakModalComponent {
     this.activeModal.close();
   }
 }
-
-angular.module('oppia').factory(
-  'TakeBreakModalComponent',
-  downgradeInjectable(TakeBreakModalComponent));
