@@ -141,7 +141,7 @@ export class AdminBackendApiService {
     });
   }
 
-  startNewJob(jobType:string):Promise<void> {
+  async startNewJobAsync(jobType: string): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'start_new_job',
@@ -150,7 +150,7 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  cancelJob(jobId:string, jobType:string):Promise<void> {
+  async cancelJobAsync(jobId: string, jobType: string): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'cancel_job',
@@ -160,7 +160,7 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  startComputation(computationType:string):Promise<void> {
+  async startComputationAsync(computationType: string): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'start_computation',
@@ -169,7 +169,7 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  stopComputation(computationType:string):Promise<void> {
+  async stopComputationAsync(computationType: string): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'stop_computation',
@@ -178,8 +178,8 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  showJobOutput(adminJobOutputUrl:string):Promise<ArrayBuffer> {
-    return this.http.get<ArrayBuffer>(adminJobOutputUrl)
+  async showJobOutputAsync(adminJobOutputUrl: string): Promise<Object> {
+    return this.http.get<Object>(adminJobOutputUrl)
       .toPromise();
   }
 }

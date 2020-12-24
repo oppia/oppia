@@ -46,7 +46,7 @@ angular.module('oppia').directive('adminJobsTab', [
             ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
               jobId: jobId
             });
-          AdminBackendApiService.showJobOutput(adminJobOutputUrl)
+          AdminBackendApiService.showJobOutputAsync(adminJobOutputUrl)
             .then(function(response) {
               ctrl.showingJobOutput = true;
               ctrl.jobOutput = response.output || [];
@@ -60,7 +60,7 @@ angular.module('oppia').directive('adminJobsTab', [
         ctrl.startNewJob = function(jobType) {
           ctrl.setStatusMessage('Starting new job...');
 
-          AdminBackendApiService.startNewJob(jobType)
+          AdminBackendApiService.startNewJobAsync(jobType)
             .then(function() {
               ctrl.setStatusMessage('Job started successfully.');
               window.location.reload();
@@ -73,7 +73,7 @@ angular.module('oppia').directive('adminJobsTab', [
         ctrl.cancelJob = function(jobId, jobType) {
           ctrl.setStatusMessage('Cancelling job...');
 
-          AdminBackendApiService.cancelJob(jobId, jobType)
+          AdminBackendApiService.cancelJobAsync(jobId, jobType)
             .then(function() {
               ctrl.setStatusMessage('Abort signal sent to job.');
               window.location.reload();
@@ -86,7 +86,7 @@ angular.module('oppia').directive('adminJobsTab', [
         ctrl.startComputation = function(computationType) {
           ctrl.setStatusMessage('Starting computation...');
 
-          AdminBackendApiService.startComputation(computationType)
+          AdminBackendApiService.startComputationAsync(computationType)
             .then(function() {
               ctrl.setStatusMessage('Computation started successfully.');
               window.location.reload();
@@ -99,7 +99,7 @@ angular.module('oppia').directive('adminJobsTab', [
         ctrl.stopComputation = function(computationType) {
           ctrl.setStatusMessage('Stopping computation...');
 
-          AdminBackendApiService.stopComputation(computationType)
+          AdminBackendApiService.stopComputationAsync(computationType)
             .then(function() {
               ctrl.setStatusMessage('Abort signal sent to computation.');
               window.location.reload();

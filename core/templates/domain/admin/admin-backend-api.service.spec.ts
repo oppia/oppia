@@ -229,7 +229,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
   it('should start the new job',
     fakeAsync(() => {
       let jobType = 'ActivityContributorsSummaryOneOffJob';
-      adminBackendApiService.startNewJob(jobType)
+      adminBackendApiService.startNewJobAsync(jobType)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -247,7 +247,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
     fakeAsync(() => {
       let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
       let jobType = 'AuditContributorsOneOffJob';
-      adminBackendApiService.cancelJob(jobId, jobType)
+      adminBackendApiService.cancelJobAsync(jobId, jobType)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -264,7 +264,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
   it('should start computation given the job name',
     fakeAsync(() => {
       let computationType = 'FeedbackAnalyticsAggregator';
-      adminBackendApiService.startComputation(computationType)
+      adminBackendApiService.startComputationAsync(computationType)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -281,7 +281,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
   it('should stop computation given the job name',
     fakeAsync(() => {
       let computationType = 'FeedbackAnalyticsAggregator';
-      adminBackendApiService.stopComputation(computationType)
+      adminBackendApiService.stopComputationAsync(computationType)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -299,7 +299,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
     fakeAsync(() => {
       let adminJobOutputUrl =
         '/adminjoboutput?job_id=RemoveGaeUserIdOneOffJob-1608282829960-668';
-      adminBackendApiService.showJobOutput(adminJobOutputUrl)
+      adminBackendApiService.showJobOutputAsync(adminJobOutputUrl)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(adminJobOutputUrl);
