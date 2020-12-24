@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for authentication-related services.
+ * @fileoverview Service for managing the authorization of the currently
+ * logged-in user.
  */
 
 import { Injectable, OnDestroy } from '@angular/core';
