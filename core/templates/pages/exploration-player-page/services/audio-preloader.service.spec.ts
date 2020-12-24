@@ -240,7 +240,10 @@ describe('Audio preloader service', () => {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: '1'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['1']
+              }}
             }],
             outcome: {
               dest: 'State 1',
@@ -258,7 +261,10 @@ describe('Audio preloader service', () => {
           }, {
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: '2'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['2']
+              }}
             }],
             outcome: {
               dest: 'State 2',
