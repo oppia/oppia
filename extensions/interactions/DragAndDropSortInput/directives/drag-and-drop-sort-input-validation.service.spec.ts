@@ -221,10 +221,6 @@ describe('DragAndDropSortInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Please ensure the list is nonempty.'
-    }, {
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 options do not match ' +
-        'customization argument choices.'
     }]);
   });
 

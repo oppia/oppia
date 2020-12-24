@@ -141,6 +141,7 @@ export class DragAndDropSortInputValidationService {
           ruleIndex: j
         };
         seenItems = [];
+        areAnyItemsEmpty = false;
         areAnyItemsDuplicated = false;
 
         let choiceValues = (
@@ -196,10 +197,10 @@ export class DragAndDropSortInputValidationService {
           case 'IsEqualToOrderingWithOneItemAtIncorrectPosition':
             var xInputs = <string[][]>inputs.x;
             for (var k = 0; k < xInputs.length; k++) {
+              if (xInputs[k].length === 0) {
+                areAnyItemsEmpty = true;
+              }
               for (var l = 0; l < xInputs[k].length; l++) {
-                if (inputs.x[k].length === 0) {
-                  areAnyItemsEmpty = true;
-                }
                 const itemContentId = xInputs[k][l];
                 const item = choiceContentIdToHtml[itemContentId];
                 if (seenItems.indexOf(item) !== -1) {
