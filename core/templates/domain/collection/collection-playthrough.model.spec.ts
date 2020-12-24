@@ -68,8 +68,8 @@ describe('Collection playthrough model', () => {
     let collectionPlaythroughObject = CollectionPlaythrough
       .createFromBackendObject(collectionPlaythroughBackendDict);
     expect(
-      collectionPlaythroughObject._completedExplorationIds).toEqual(['exp_id1']
-    );
+      collectionPlaythroughObject._completedExplorationIds
+    ).toEqual(['exp_id1']);
   });
 
   it('should get the completed exploration node count', () => {
