@@ -76,7 +76,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'collection-node-editor.directive.ts',
     'collection-node.model.ts',
     'collection-player-page.directive.ts',
-    'collection-playthrough.model.ts',
     'collection-summary-tile.directive.ts',
     'collection-update.service.ts',
     'collection.model.ts',
