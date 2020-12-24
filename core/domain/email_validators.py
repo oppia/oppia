@@ -45,11 +45,12 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'recipient_id',
-                user_models.UserSettingsModel, [item.recipient_id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'sender_id', user_models.UserSettingsModel, [item.sender_id])]
+                [item.recipient_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'sender_id', [item.sender_id],
+                system_user_ids_removed=True)]
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -127,11 +128,11 @@ class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
+            base_model_validators.UserSettingsModelFetcherDetails(
                 'recipient_id',
-                user_models.UserSettingsModel, item.recipient_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'sender_id', user_models.UserSettingsModel, [item.sender_id])]
+                item.recipient_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'sender_id', [item.sender_id])]
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -219,9 +220,8 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'item.id.user_id',
-                user_models.UserSettingsModel, [
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'item.id.user_id', [
                     item.id[:item.id.find('.')]]),
             base_model_validators.ExternalModelFetcherDetails(
                 'item.id.thread_id',
