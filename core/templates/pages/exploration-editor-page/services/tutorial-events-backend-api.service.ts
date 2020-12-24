@@ -30,14 +30,15 @@ export class TutorialEventsBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  recordStartedEditorTutorialEvent(expId: string): Promise<Object> {
+  async recordStartedEditorTutorialEventAsync(expId: string): Promise<Object> {
     return this.http.post(
       this.urlInterpolationService.interpolateUrl(
         '/createhandler/started_tutorial_event/<expId>', { expId: expId }), {}
     ).toPromise();
   }
 
-  recordStartedTranslationTutorialEvent(expId: string): Promise<Object> {
+  async recordStartedTranslationTutorialEventAsync(
+      expId: string): Promise<Object> {
     return this.http.post(this.urlInterpolationService.interpolateUrl(
       '/createhandler/started_translation_tutorial_event/<expId>',
       { expId: expId }), {}).toPromise();

@@ -51,12 +51,12 @@ export class StateTutorialFirstTimeService {
     if (this._currentlyInEditorFirstVisit) {
       this.enterEditorForTheFirstTimeEventEmitter.emit();
       this.editorFirstTimeEventsService.initRegisterEvents(expId);
-      this.tutorialEventsBackendApiService.recordStartedEditorTutorialEvent(
-        expId).then(null, () => {
-        console.error(
-          'Warning: could not record editor tutorial start event.'
-        );
-      });
+      this.tutorialEventsBackendApiService
+        .recordStartedEditorTutorialEventAsync(expId).then(null, () => {
+          console.error(
+            'Warning: could not record editor tutorial start event.'
+          );
+        });
     }
   }
 
@@ -84,7 +84,7 @@ export class StateTutorialFirstTimeService {
       this.enterTranslationForTheFirstTimeEventEmitter.emit();
       this.editorFirstTimeEventsService.initRegisterEvents(expId);
       this.tutorialEventsBackendApiService
-        .recordStartedTranslationTutorialEvent(expId).then(null, () => {
+        .recordStartedTranslationTutorialEventAsync(expId).then(null, () => {
           console.error(
             'Warning: could not record translation tutorial start event.');
         });

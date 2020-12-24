@@ -30,9 +30,9 @@ describe('Tutorial events backend service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    tutorialEventsBackendApiService = TestBed.get(
+    tutorialEventsBackendApiService = TestBed.inject(
       TutorialEventsBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
@@ -45,7 +45,7 @@ describe('Tutorial events backend service', () => {
 
     let expId = 'abc';
 
-    tutorialEventsBackendApiService.recordStartedEditorTutorialEvent(expId)
+    tutorialEventsBackendApiService.recordStartedEditorTutorialEventAsync(expId)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -66,8 +66,8 @@ describe('Tutorial events backend service', () => {
 
       let expId = 'abc';
 
-      tutorialEventsBackendApiService.recordStartedEditorTutorialEvent(expId)
-        .then(successHandler, failHandler);
+      tutorialEventsBackendApiService.recordStartedEditorTutorialEventAsync(
+        expId).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         '/createhandler/started_tutorial_event/' + expId);
@@ -88,7 +88,7 @@ describe('Tutorial events backend service', () => {
 
     let expId = 'abc';
 
-    tutorialEventsBackendApiService.recordStartedTranslationTutorialEvent(
+    tutorialEventsBackendApiService.recordStartedTranslationTutorialEventAsync(
       expId).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -109,8 +109,9 @@ describe('Tutorial events backend service', () => {
 
       let expId = 'abc';
 
-      tutorialEventsBackendApiService.recordStartedTranslationTutorialEvent(
-        expId).then(successHandler, failHandler);
+      tutorialEventsBackendApiService
+        .recordStartedTranslationTutorialEventAsync(expId)
+        .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         '/createhandler/started_translation_tutorial_event/' + expId);
