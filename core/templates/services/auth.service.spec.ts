@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for authentication-related services.
+ * @fileoverview Unit tests for AuthService.
  */
 
 import { TestBed } from '@angular/core/testing';
@@ -23,7 +23,6 @@ import { marbles } from 'rxjs-marbles';
 
 import { AuthService } from 'services/auth.service';
 import { MockAngularFireAuth } from 'tests/unit-test-utils';
-
 
 
 describe('Auth service', () => {

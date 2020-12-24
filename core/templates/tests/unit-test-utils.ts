@@ -17,28 +17,26 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Component, NgModule } from '@angular/core';
-import { NgZone, PlatformRef, Type } from '@angular/core';
+import { Component, NgModule, NgZone, PlatformRef, Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { BrowserModule } from '@angular/platform-browser';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 
-import { angularServices } from 'services/angular-services.index';
 import { Observable, of } from 'rxjs';
+import { angularServices } from 'services/angular-services.index';
+
 
 declare var angular: ng.IAngularStatic;
 
-// AngularFireAuth is an Angular-only service (Angular, not AngularJS) that we
-// depend on to provide authentication services for Oppia.
+// AngularFireAuth is an Angular-only service (i.e., _not_ AngularJS) that Oppia
+// depends on to provide authentication services.
 //
-// The library is not @Injectable, so we mock its interface and value during
-// unit tests to the minimal subset we need/want to use.
+// Since the library is not @Injectable, we mock an interface and value during
+// unit tests to satisfy dependents.
 export class MockAngularFireAuth {
-  constructor(private mockIdToken: Observable<string | null> = of(null)) {}
-  get idToken(): Observable<string | null> {
-    return this.mockIdToken;
+  constructor(public idToken: Observable<string> = of(null)) {
   }
   signOut(): Promise<void> {
     return Promise.resolve();

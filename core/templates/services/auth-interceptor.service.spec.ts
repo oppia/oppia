@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for authentication-related services.
+ * @fileoverview Unit tests for AuthInterceptor.
  */
 
 import { HttpClient, HttpRequest, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -21,6 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed } from '@angular/core/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { of } from 'rxjs';
+
 import { AuthInterceptor } from 'services/auth-interceptor.service';
 import { AuthService } from 'services/auth.service';
 import { MockAngularFireAuth } from 'tests/unit-test-utils';
