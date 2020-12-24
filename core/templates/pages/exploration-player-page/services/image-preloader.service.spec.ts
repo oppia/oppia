@@ -46,6 +46,7 @@ describe('Image preloader service', () => {
 
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
+    auto_tts_enabled: true,
     language_code: 'en',
     title: 'My Title',
     init_state_name: initStateName,
@@ -338,6 +339,31 @@ describe('Image preloader service', () => {
     },
     param_specs: {},
     param_changes: [],
+    category: '',
+    correctness_feedback_enabled: true,
+    draft_change_list_id: 0,
+    draft_changes: [],
+    show_state_editor_tutorial_on_load: true,
+    show_state_translation_tutorial_on_load: true,
+    is_version_of_draft_valid: true,
+    tags: [],
+    email_preferences: {
+      'mute_feedback_notifications': true,
+      'mute_suggestion_notifications': true
+      },
+    exploration_id: '0',
+    objective: '',
+    rights: {
+      'cloned_from': true,
+      'status': '',
+      'community_owned': true,
+      'owner_names': [],
+      'editor_names': [],
+      'voice_artist_names': [],
+      'viewer_names': [],
+      'viewable_if_private': true
+    },
+    version: ''
   };
   const filename1 = 'sIMChoice1_height_32_width_42.png';
   const filename2 = 'sIMChoice2_height_30_width_40.png';

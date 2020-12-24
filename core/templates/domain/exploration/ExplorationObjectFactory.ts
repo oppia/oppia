@@ -50,12 +50,46 @@ import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 export interface ExplorationBackendDict {
+  'auto_tts_enabled': boolean;
+  'category': string;
+  'correctness_feedback_enabled': boolean;
+  'draft_change_list_id': number;
+  'draft_changes': DraftChangeList[];
+  'email_preferences': UserExplorationPrefsBackendDict;
+  'exploration_id': string;
   'init_state_name': string;
+  'is_version_of_draft_valid': boolean;
+  'language_code': string;
+  'objective': string;
   'param_changes': ParamChangeBackendDict[];
   'param_specs': ParamSpecsBackendDict;
+  'rights': ActivityRightBackendDict;
+  'show_state_editor_tutorial_on_load': boolean;
+  'show_state_translation_tutorial_on_load': boolean;
   'states': StateObjectsBackendDict;
+  'tags': string[];
   'title': string;
-  'language_code': string;
+  'version': string;
+}
+interface ActivityRightBackendDict {
+  'cloned_from': boolean;
+  'status': string;
+  'community_owned': boolean;
+  'owner_names': string[];
+  'editor_names': string[];
+  'voice_artist_names': string[];
+  'viewer_names': string[];
+  'viewable_if_private': boolean;
+}
+interface UserExplorationPrefsBackendDict {
+  'mute_feedback_notifications': boolean;
+  'mute_suggestion_notifications': boolean;
+}
+export interface DraftChangeList {
+  'cmd': 'edit_exploration_property';
+  'property_name': string;
+  'old_value': Object;
+  'new_value': Object;
 }
 
 export class Exploration {

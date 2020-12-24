@@ -1,7 +1,4 @@
-/* eslint-disable oppia/no-multiline-disable */
-/* eslint-disable max-len */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,23 +29,23 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { UrlService } from 'services/contextual/url.service';
 import { ExplorationChangeList } from 'domain/exploration/exploration-draft.model';
-import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
+import { ExplorationBackendDict, DraftChangeList } from 'domain/exploration/ExplorationObjectFactory';
 import { ExplorationDataBackendApiService } from 'pages/exploration-editor-page/services/exploration-data-backend-api.service';
 
 export interface ExplorationAutosaveChangeListResponse{
   'draft_change_list_id': number
 }
-export interface DraftExplorationResponse{
-  'draft_change_list_id': number,
-  'version': number,
-  'exploration': ExplorationBackendDict
-}
+
 export interface ResolveAnswerResponse{
   'resolved_answers': string[]
 }
 export interface ExplorationAutosaveChangeListRequest{
-    'change_list': ExplorationChangeList[],
-    'version': number
+    'change_list': ExplorationChangeList[];
+    'version': string;
+}
+interface ExplorationDataBackendDict{
+  explorationId: string;
+  data: ExplorationBackendDict;
 }
 
 @Injectable({
@@ -56,11 +53,11 @@ export interface ExplorationAutosaveChangeListRequest{
 })
 export class ExplorationDataService {
   resolvedAnswersUrlPrefix: string = null;
-  explorationDraftAutosaveUrl: string= null;
+  explorationDraftAutosaveUrl: string = null;
   private draftChangeListId: number = null;
   private pathname: string;
   private pathnameArray: string[];
-  private explorationData;
+  private explorationData: ExplorationDataBackendDict;
   private explorationId: string = null;
 
   constructor(
@@ -87,7 +84,8 @@ export class ExplorationDataService {
 
     if (!this.explorationId) {
       this.loggerService.error(
-        'Unexpected call to ExplorationDataService for pathname ' + this.pathname);
+        'Unexpected call to ExplorationDataService for pathname ' +
+        this.pathname);
       // Note: if we do not return anything, Karma unit tests fail.
     }
 
@@ -106,9 +104,11 @@ export class ExplorationDataService {
   autosaveChangeList(
       changeList: ExplorationChangeList[],
       successCallback: Function,
-      errorCallback = () => {}) {
-    // First save locally to be retrieved later if save is unsuccessful.
-    if (this.localStorageService && this.localStorageService.saveExplorationDraft) {
+      errorCallback = () => Object): void {
+    // First save locally to be retrieved later
+    // if save is unsuccessful.
+    if (this.localStorageService &&
+        this.localStorageService.saveExplorationDraft) {
       this.localStorageService.saveExplorationDraft(
         this.explorationId, changeList, this.draftChangeListId);
     }
@@ -153,7 +153,7 @@ export class ExplorationDataService {
 
   // Returns a promise that supplies the data for the current exploration.
   getData(errorCallback: (reason?: string) => void)
-  : Promise<DraftExplorationResponse> {
+  : Promise<ExplorationBackendDict> {
     if (!this.explorationId) {
       throw new Error('explorationDataService.getData is not a function');
     }
@@ -169,7 +169,7 @@ export class ExplorationDataService {
       // (which is cached here) will be reused.
         return (
           this.editableExplorationBackendApiService.fetchApplyDraftExploration(
-            this.explorationId).then((response: DraftExplorationResponse) => {
+            this.explorationId).then((response: ExplorationBackendDict) => {
             this.loggerService.info('Retrieved exploration data : ' + response);
             this.draftChangeListId = response.draft_change_list_id;
             this.explorationData.data = response;
@@ -211,9 +211,9 @@ export class ExplorationDataService {
   resolveAnswers(
       stateName: string,
       resolvedAnswersList: string[],
-      successCallback: (value?: {}) => void,
+      successCallback: (value?: Object) => void,
       errorCallback: (reason?: string) => void)
-    : Promise<{}> {
+    : Promise<Object> {
     return new Promise((resolve, reject) => {
       this.alertsService.clearWarnings();
       let resolveAnswerUrl =
@@ -242,7 +242,7 @@ export class ExplorationDataService {
    *   this save operation.
    */
   save(
-      changeList: string[],
+      changeList: DraftChangeList[],
       commitMessage: string,
       successCallback: (value: ExplorationBackendDict) => void,
       errorCallback: (reason?: string) => void)

@@ -155,7 +155,7 @@ describe('Exploration data Backend Api Service', function() {
     let autosaveChangeListRequest: ExplorationAutosaveChangeListRequest =
     {
       change_list: [],
-      version: 0
+      version: '0'
     };
     explorationDataBackendApiService.setAutoSaveChangeList(
       autosaveChangeUrl, autosaveChangeListRequest).then(response => {
@@ -176,7 +176,7 @@ describe('Exploration data Backend Api Service', function() {
     let autosaveChangeListRequest: ExplorationAutosaveChangeListRequest =
     {
       change_list: [],
-      version: 0
+      version: '0'
     };
 
     explorationDataBackendApiService.setAutoSaveChangeList(

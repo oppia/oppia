@@ -24,8 +24,7 @@ import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
-import { DraftExplorationResponse } from 'pages/exploration-editor-page/services/exploration-data.service';
+import { ExplorationBackendDict, DraftChangeList } from 'domain/exploration/ExplorationObjectFactory';
 import { AppConstants } from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -61,13 +60,13 @@ export class EditableExplorationBackendApiService {
       explorationId: string,
       applyDraft: boolean,
       successCallback:
-      (value: ExplorationBackendDict | DraftExplorationResponse) => void,
+      (value: ExplorationBackendDict) => void,
       errorCallback: (reason?: string) => void)
-      : Promise<ExplorationBackendDict | DraftExplorationResponse> {
+      : Promise<ExplorationBackendDict> {
     return new Promise((resolve, reject) => {
       let editableExplorationDataUrl = this._getExplorationUrl(
         explorationId, applyDraft);
-      this.httpClient.get<ExplorationBackendDict | DraftExplorationResponse>(
+      this.httpClient.get<ExplorationBackendDict>(
         editableExplorationDataUrl).toPromise().then((response) => {
         let exploration = cloneDeep(response);
         successCallback(exploration);
@@ -81,7 +80,7 @@ export class EditableExplorationBackendApiService {
       explorationId: string,
       explorationVersion: string,
       commitMessage: string,
-      changeList: string[],
+      changeList: DraftChangeList[],
       successCallback: (value: ExplorationBackendDict) => void,
       errorCallback: (reason?: string) => void)
       : Promise<ExplorationBackendDict> {
@@ -98,7 +97,7 @@ export class EditableExplorationBackendApiService {
         editableExplorationDataUrl, putData)
         .toPromise()
         .then((response) => {
-        // The returned data is an updated exploration dict.
+          // The returned data is an updated exploration dict.
           let exploration: ExplorationBackendDict = cloneDeep(response);
 
           // Delete from the ReadOnlyExplorationBackendApiService's cache
@@ -115,7 +114,7 @@ export class EditableExplorationBackendApiService {
 
   private _deleteExploration(
       explorationId: string,
-      successCallback: (value: {}) => void,
+      successCallback: (value: Object) => void,
       errorCallback: (reason?: string) => void): Promise<{}> {
     return new Promise((resolve, reject) => {
       let editableExplorationDataUrl = this._getExplorationUrl(
@@ -135,14 +134,14 @@ export class EditableExplorationBackendApiService {
   }
 
   fetchExploration(explorationId: string)
-  : Promise<ExplorationBackendDict | DraftExplorationResponse> {
+  : Promise<ExplorationBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchExploration(explorationId, null, resolve, reject);
     });
   }
 
   fetchApplyDraftExploration(explorationId: string)
-  : Promise<ExplorationBackendDict | DraftExplorationResponse> {
+  : Promise<ExplorationBackendDict> {
     return new Promise((resolve, reject) => {
       this._fetchExploration(explorationId, true, resolve, reject);
     });
@@ -167,7 +166,7 @@ export class EditableExplorationBackendApiService {
       explorationId: string,
       explorationVersion: string,
       commitMessage: string,
-      changeList: string[]): Promise<ExplorationBackendDict> {
+      changeList: DraftChangeList[]): Promise<ExplorationBackendDict> {
     return new Promise((resolve, reject) => {
       this._updateExploration(
         explorationId, explorationVersion, commitMessage, changeList,

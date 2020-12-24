@@ -20,6 +20,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
+import { NonExistentActivities } from 'domain/learner_dashboard/non-existent-activities.model';
 import { AudioPreloaderService } from 'pages/exploration-player-page/services/audio-preloader.service';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { ContextService } from 'services/context.service';
@@ -44,6 +45,7 @@ describe('Audio preloader service', () => {
   const audioBlob = new Blob(['audio data'], {type: 'audiotype'});
 
   let explorationDict: ExplorationBackendDict = {
+    auto_tts_enabled: true,
     language_code: 'en',
     title: 'My Title',
     init_state_name: 'Introduction',
@@ -288,6 +290,31 @@ describe('Audio preloader service', () => {
     },
     param_specs: {},
     param_changes: [],
+    category: '',
+    correctness_feedback_enabled: true,
+    draft_change_list_id: 0,
+    draft_changes: [],
+    show_state_editor_tutorial_on_load: true,
+    show_state_translation_tutorial_on_load: true,
+    is_version_of_draft_valid: true,
+    tags: [],
+    email_preferences: {
+      'mute_feedback_notifications': true,
+      'mute_suggestion_notifications': true
+      },
+    exploration_id: '0',
+    objective: '',
+    rights: {
+      'cloned_from': true,
+      'status': '',
+      'community_owned': true,
+      'owner_names': [],
+      'editor_names': [],
+      'voice_artist_names': [],
+      'viewer_names': [],
+      'viewable_if_private': true
+    },
+    version: ''
   };
   let requestUrl1 = '/assetsdevhandler/exploration/1/assets/audio/en-1.mp3';
   let requestUrl2 = '/assetsdevhandler/exploration/1/assets/audio/en-2.mp3';

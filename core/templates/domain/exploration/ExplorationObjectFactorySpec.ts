@@ -148,6 +148,7 @@ describe('Exploration object factory', () => {
     };
 
     const explorationDict = {
+      auto_tts_enabled: true,
       id: 1,
       title: 'My Title',
       category: 'Art',
@@ -163,7 +164,28 @@ describe('Exploration object factory', () => {
         'second state': secondState},
       param_specs: {},
       param_changes: [],
-      version: 1
+      version: '1',
+      correctness_feedback_enabled: true,
+      draft_change_list_id: 0,
+      draft_changes: [],
+      email_preferences: {
+        'mute_feedback_notifications': true,
+        'mute_suggestion_notifications': true
+        },
+      exploration_id: '0',
+      rights: {
+        'cloned_from': true,
+        'status': '',
+        'community_owned': true,
+        'owner_names': [],
+        'editor_names': [],
+        'voice_artist_names': [],
+        'viewer_names': [],
+        'viewable_if_private': true
+      },
+      is_version_of_draft_valid: true,
+      show_state_editor_tutorial_on_load: true,
+      show_state_translation_tutorial_on_load: true,
     };
 
     exploration = eof.createFromBackendDict(explorationDict);
