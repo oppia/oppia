@@ -92,7 +92,6 @@ export class DragAndDropSortInputValidationService {
     var warningsList = [];
     var seenItems = [];
     var ranges = [];
-    var areAnyItemsEmpty = false;
     var areAnyItemsDuplicated = false;
 
     warningsList = warningsList.concat(
@@ -141,7 +140,6 @@ export class DragAndDropSortInputValidationService {
           ruleIndex: j
         };
         seenItems = [];
-        areAnyItemsEmpty = false;
         areAnyItemsDuplicated = false;
 
         let choiceValues = (
@@ -210,7 +208,7 @@ export class DragAndDropSortInputValidationService {
             if (xInputs.length === 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: `Please ensure the list is nonempty.`
+                message: 'Please ensure the list is nonempty.'
               });
             }
 
