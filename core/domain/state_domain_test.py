@@ -114,7 +114,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
                 'inputs': {
                     'x': [[(
-                        '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition r'	
+                        '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition r'
                         'ule_spec htmls</p>')]]
                 }
             }],
@@ -373,12 +373,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>state written_translation ca_choices_3-hi</p>',
                 '<p>state written_translation ca_choices_3-en</p>',
                 '<p>State Feedback</p>',
-                '<p>IsEqualToOrdering rule_spec htmls</p>',	
-                '<p>HasElementXAtPositionY rule_spec html</p>',	
-                '<p>y input for HasElementXAtPositionY rule_spec </p>',	
-                '<p>x input for HasElementXAtPositionY rule_spec </p>',	
-                (	
-                    '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'	
+                '<p>IsEqualToOrdering rule_spec htmls</p>',
+                '<p>HasElementXAtPositionY rule_spec html</p>',
+                '<p>y input for HasElementXAtPositionY rule_spec </p>',
+                '<p>x input for HasElementXAtPositionY rule_spec </p>',
+                (
+                    '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'
                     'pec htmls</p>'),
                 '',
                 '<p>Hello, this is html1 for hint 1</p>',
@@ -387,9 +387,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>state customization arg html 2</p>',
                 '<p>state customization arg html 3</p>',
                 '<p>state customization arg html 4</p>',
-                '<p>state customization arg html 1</p>',	
-                '<p>state customization arg html 2</p>',	
-                '<p>state customization arg html 3</p>',	
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
                 '<p>state customization arg html 4</p>',
                 '<p>state content html</p>'])
 
