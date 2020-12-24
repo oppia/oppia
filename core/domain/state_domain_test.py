@@ -2484,6 +2484,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         def mock_get_html_field_types_to_rule_specs(
                 unused_cls, state_schema_version=None):
+            # The linter raises an unused variable error for
+            # state_schema_version, but renaming state_schema_version to
+            # unused_state_schema_version will result in an unexpected keyword
+            # argument error. To get around this, we arbitrarily use the
+            # variable state_schema_version.
+            mock_html_field_types_to_rule_specs_dict[
+                'dummy'] = state_schema_version
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
