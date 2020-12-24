@@ -15,19 +15,13 @@
 /**
  * @fileoverview Module for the shared components.
  */
-
 import 'core-js/es7/reflect';
 import 'zone.js';
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AngularFireModule } from '@angular/fire';
-import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
-import { BrowserModule } from '@angular/platform-browser';
-import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
 import { BackgroundBannerComponent } from
   './common-layout-directives/common-elements/background-banner.component';
 import { AttributionGuideComponent } from
@@ -62,15 +56,7 @@ import { ProfileLinkTextComponent } from
 
 
 @NgModule({
-  imports: [
-    CommonModule,
-    MaterialModule,
-    NgbModalModule,
-    BrowserModule,
-    FormsModule,
-    AngularFireModule.initializeApp(AppConstants.FIREBASE_ENVIRONMENT.config),
-    AngularFireAuthModule,
-  ],
+  imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
 
   declarations: [
     AttributionGuideComponent,
@@ -118,6 +104,3 @@ import { ProfileLinkTextComponent } from
 })
 
 export class SharedComponentsModule { }
-
-angular.module('oppia').factory(
-  'AngularFireAuth', downgradeInjectable(AngularFireAuth));

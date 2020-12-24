@@ -5332,18 +5332,6 @@ export default {
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
 
-  "FIREBASE_ENVIRONMENT": {
-    "production": false,
-    "config": {
-      "apiKey": "",
-      "authDomain": "",
-      "projectId": "",
-      "storageBucket": "",
-      "messagingSenderId": "",
-      "appId": ""
-    }
-  },
-
   "ALLOW_YAML_FILE_UPLOAD": false,
 
   // A regular expression for tags.

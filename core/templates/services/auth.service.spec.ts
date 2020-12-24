@@ -74,9 +74,9 @@ describe('Auth service', () => {
     // Subscribing to the service's idToken$ emits null for the early observer
     // because the source hasn't produced anything yet. The subscription ends
     // before 'a' is emitted, so null is the first and last value observed.
-    const sourceIdTokens = m.hot('--^----a-|');
-    const expectedObservations = '--N---    ';
-    const givenSubscription = '   --^--!    ';
+    const sourceIdTokens = m.hot('-----a-|');
+    const expectedObservations = '-N--    ';
+    const givenSubscription = '   -^-!    ';
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
 
@@ -102,8 +102,8 @@ describe('Auth service', () => {
   }));
 
   it('should emit null and complete after source errors', marbles(m => {
-    // Subscriber joins in time to observe a and then completes with a final
-    // null value rather than propogating an error.
+    // Subscriber joins in time to observe 'a' and then completes after emitting
+    // a final null value, rather than throwing the error from source.
     const sourceIdTokens = m.hot('a---#   ');
     const expectedObservations = '--a-(N|)';
     const givenSubscription = '   --^--   ';
