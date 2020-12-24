@@ -51,9 +51,9 @@ describe('Auth service', () => {
   it('should reject when sign out fails', async() => {
     const [angularFireAuth, authService] = setUpSystemUnderTest();
 
-    spyOn(angularFireAuth, 'signOut').and.resolveTo();
+    spyOn(angularFireAuth, 'signOut').and.rejectWith(new Error('fail'));
 
-    await expectAsync(authService.signOutAsync()).toBeResolvedTo();
+    await expectAsync(authService.signOutAsync()).toBeRejectedWithError('fail');
   });
 
   it('should unsubscribe from source after calling ngOnDestroy', marbles(m => {
