@@ -31,7 +31,7 @@ interface Answer {
 }
 
 describe('Logic Proof rules service', () => {
-  let lprs: LogicProofRulesService = null;
+  let lprs: LogicProofRulesService;
   beforeEach(() => {
     lprs = new LogicProofRulesService();
   });

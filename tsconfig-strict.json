@@ -32,6 +32,8 @@
     }
   },
   "files": [
+    "core/templates/domain/classifier/classifier.model.ts",
+    "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.spec.ts",
     "core/templates/domain/email-dashboard/email-dashboard-query.model.ts",
@@ -105,11 +107,8 @@
     "extensions/interactions/Continue/directives/continue-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
-    "extensions/interactions/EndExploration/directives/end-exploration-rules.service.ts",
-    "extensions/interactions/ImageClickInput/directives/image-click-input-rules.service.ts",
-    "extensions/interactions/ImageClickInput/directives/image-click-input-rules.service.spec.ts",
-    "core/templates/domain/classifier/classifier.model.ts",
-    "core/templates/domain/classifier/classifier.model.spec.ts"
+    "extensions/interactions/LogicProof/directives/logic-proof-rules.service.ts",
+    "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts",
   ],
   "include": ["typings/*.ts"]
 }
