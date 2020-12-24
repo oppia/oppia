@@ -2483,7 +2483,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             html_type_dict['format'] = 'invalid format'
 
         def mock_get_html_field_types_to_rule_specs(
-                unused_cls, unused_state_schema_version=None):
+                unused_cls, state_schema_version=None):
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
