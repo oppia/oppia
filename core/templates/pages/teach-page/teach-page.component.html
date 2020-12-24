@@ -7,7 +7,7 @@
       </div>
       <div class="oppia-teach-button-container">
         <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" ng-click="$ctrl.onClickBrowseLessonsButton()"
+          <button type="submit" ng-click="$ctrl.onClickStartLearningButton()"
                   class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_ACTION_START_LEARNING">
           </button>
@@ -36,7 +36,7 @@
       <h3 ng-if="!$ctrl.isWindowNarrow()" translate="I18N_SPLASH_BENEFITS_TITLE"></h3>
       <div class="teach-benefits-section">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet1.svg')]>" alt="">
-        <h2 translate="I18N_SPLASH_BENEFITS_ONE" class="splash-benefits"></h2>
+        <h2 translate="I18N_SPLASH_BENEFITS_ONE" class="teach-benefits"></h2>
       </div>
       <div class="teach-benefits-section">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet2.svg')]>" alt="">
@@ -44,7 +44,7 @@
       </div>
       <div class="teach-benefits-section">
         <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet3.svg')]>" alt="">
-        <h2 translate="I18N_SPLASH_BENEFITS_THREE" class="splash-benefits"></h2>
+        <h2 translate="I18N_SPLASH_BENEFITS_THREE" class="teach-benefits"></h2>
       </div>
     </div>
   </div>
@@ -55,7 +55,7 @@
       <p translate="I18N_TEACH_PAGE_CLASSROOM_CONTENT"></p>
       <div class="oppia-teach-button-container">
         <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit"
+          <button type="submit" ng-click="$ctrl.onClickVisitClassroomButton()"
                   class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_CLASSROOM_BUTTON">
           </button>
@@ -75,8 +75,8 @@
       <h2 translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
       <p translate="I18N_TEACH_PAGE_LIBRARY_CONTENT"></p>
       <div class="oppia-teach-button-container">
-        <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit"
+        <form action="/community-library">
+          <button type="submit" ng-click="$ctrl.onClickBrowseLibraryButton()"
                   class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_LIBRARY_BUTTON">
           </button>
@@ -126,7 +126,7 @@
     <h2 translate="I18N_TEACH_PAGE_SIX_TITLE"></h2>
     <div class="oppia-teach-button-container-button-one">
       <form action="https://www.oppiafoundation.org/volunteer">
-        <button type="submit"
+        <button type="submit" ng-click="$ctrl.onClickGuideParentsButton()"
                 class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_GUIDE_FOR_TEACHERS">
         </button>
@@ -134,15 +134,15 @@
     </div>
     <div class="oppia-teach-button-container-button-one">
       <form action="https://www.oppiafoundation.org/volunteer">
-        <button type="submit"
+        <button type="submit" ng-click="$ctrl.onClickTipforParentsButton()"
                 class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_TIPS_FOR_PARENTS">
         </button>
       </form>
     </div>
     <div class="oppia-teach-button-container-button-one">
-      <form action="https://www.oppiafoundation.org/volunteer">
-        <button type="submit"
+      <form action="<[$ctrl.classroomUrl]>">
+        <button type="submit" ng-click="$ctrl.onClickExploreLessonsButton()"
                 class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_EXPLORE_LESSONS">
         </button>

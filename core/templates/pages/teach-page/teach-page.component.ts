@@ -39,8 +39,18 @@ angular.module('oppia').component('teachPage', {
         }
       };
 
-      ctrl.onClickBrowseLessonsButton = function() {
-        SiteAnalyticsService.registerClickBrowseLessonsButtonEvent();
+      ctrl.onClickStartLearningButton = function() {
+        SiteAnalyticsService.registerClickStartLearningButtonEvent();
+        return false;
+      };
+
+      ctrl.onClickVisitClassroomButton = function() {
+        SiteAnalyticsService.registerClickVisitClassroomButtonEvent();
+        return false;
+      };
+
+      ctrl.onClickBrowseLibraryButton = function() {
+        SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
         return false;
       };
 
@@ -93,6 +103,21 @@ angular.module('oppia').component('teachPage', {
           imageUrlWebp: '/splash/Gaurav_2.webp',
           borderPresent: true
         }];
+      };
+
+      ctrl.onClickGuideParentsButton = function() {
+        SiteAnalyticsService.registerClickGuideParentsButtonEvent();
+        return false;
+      };
+
+      ctrl.onClickTipforParentsButton = function() {
+        SiteAnalyticsService.registerClickTipforParentsButtonEvent();
+        return false;
+      };
+
+      ctrl.onClickExploreLessonsButton = function() {
+        SiteAnalyticsService.registerClickExploreLessonsButtonEvent();
+        return false;
       };
 
       ctrl.$onInit = function() {

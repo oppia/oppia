@@ -73,14 +73,64 @@ describe('Teach Page', function() {
       '/assets/images/path/to/image');
   });
 
-  it('should record analytics when Browse Lessons is clicked', function() {
-    var clickBrowseLibraryButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickBrowseLessonsButtonEvent')
+  it('should record analytics when Start Learning Button is clicked', function() {
+    var clickStartLearningButtonEventSpy = spyOn(
+      SiteAnalyticsService, 'registerClickStartLearningButtonEvent')
       .and.callThrough();
-    ctrl.onClickBrowseLessonsButton();
+    ctrl.onClickStartLearningButton();
+    $timeout.flush(150);
+
+    expect(clickStartLearningButtonEventSpy).toHaveBeenCalled();
+  });
+
+  it('should record analytics when Visit Classroom Button is clicked', function() {
+    var clickVisitClassroomButtonEventSpy = spyOn(
+      SiteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
+      .and.callThrough();
+    ctrl.onClickVisitClassroomButton();
+    $timeout.flush(150);
+
+    expect(clickVisitClassroomButtonEventSpy).toHaveBeenCalled();
+  });
+
+  it('should record analytics when Browse Library Button is clicked', function() {
+    var clickBrowseLibraryButtonEventSpy = spyOn(
+      SiteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
+      .and.callThrough();
+    ctrl.onClickBrowseLibraryButton();
     $timeout.flush(150);
 
     expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
+  });
+
+  it('should record analytics when Guide For Parents Button is clicked', function() {
+    var clickGuideParentsButtonEventSpy = spyOn(
+      SiteAnalyticsService, 'registerClickGuideParentsButtonEvent')
+      .and.callThrough();
+    ctrl.onClickGuideParentsButton();
+    $timeout.flush(150);
+
+    expect(clickGuideParentsButtonEventSpy).toHaveBeenCalled();
+  });
+
+  it('should record analytics when Tips For Parents Button is clicked', function() {
+    var clickTipforParentsButtonEventSpy = spyOn(
+      SiteAnalyticsService, 'registerClickTipforParentsButtonEvent')
+      .and.callThrough();
+    ctrl.onClickTipforParentsButton();
+    $timeout.flush(150);
+
+    expect(clickTipforParentsButtonEventSpy).toHaveBeenCalled();
+  });
+
+  it('should record analytics when Explore Lessons Button is clicked', function() {
+    var clickExploreLessonsButtonEventSpy = spyOn(
+      SiteAnalyticsService, 'registerClickExploreLessonsButtonEvent')
+      .and.callThrough();
+    ctrl.onClickExploreLessonsButton();
+    $timeout.flush(150);
+
+    expect(clickExploreLessonsButtonEventSpy).toHaveBeenCalled();
   });
 
   it('should check if window is narrow', function() {
