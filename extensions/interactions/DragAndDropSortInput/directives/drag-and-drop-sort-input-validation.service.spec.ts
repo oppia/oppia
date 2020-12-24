@@ -39,7 +39,7 @@ describe('DragAndDropSortInputValidationService', () => {
   let currentState: string;
   let answerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
   let customOutcome: Outcome;
-  let equalsListWithEmptyValuesRule: Rule, equalsListWithDuplicatesRule: Rule,
+  let equalsListWithDuplicatesRule: Rule,
     equalsListWithAllowedValuesRule: Rule, equalsListWithValuesRule: Rule,
     goodRule1: Rule, goodRule2: Rule, hasXBeforeYRule: Rule,
     hasElementXAtPositionYRule: Rule;
@@ -134,16 +134,6 @@ describe('DragAndDropSortInputValidationService', () => {
       }
     }, 'DragAndDropSortInput');
 
-    equalsListWithEmptyValuesRule = rof.createFromBackendDict({
-      rule_type: 'IsEqualToOrdering',
-      inputs: {
-        x: [
-          ['ca_0', 'ca_4'],
-          [], ['ca_2', 'ca_1', 'ca_3']
-        ]
-      }
-    }, 'DragAndDropSortInput');
-
     equalsListWithDuplicatesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
@@ -213,22 +203,6 @@ describe('DragAndDropSortInputValidationService', () => {
       message: 'Multiple items in a single position are not allowed.'
     }]);
     customizationArgs.allowMultipleItemsInSamePosition.value = true;
-  });
-
-  it('should expect all items to be nonempty', () => {
-    // Add rule containing empty items.
-    answerGroups[0].rules = [equalsListWithEmptyValuesRule];
-
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Please ensure the items are nonempty.'
-    }, {
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 1 from answer group 1 options do not match ' +
-        'customization argument choices.'
-    }]);
   });
 
   it('should expect all items to be unique', () => {
