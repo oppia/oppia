@@ -54,32 +54,34 @@ describe('Auth token interceptor', () => {
   ];
 
   for (const method of methods) {
-    it(`should not authorize ${method} requests when token is null`, () => {
-      spyOnProperty(authService, 'idToken$', 'get')
-        .and.returnValue(of(null));
+    it('should not authorize ' + method + ' requests when token is null',
+      () => {
+        spyOnProperty(authService, 'idToken$', 'get')
+          .and.returnValue(of(null));
 
-      httpClient.request(new HttpRequest(method, '/abc', null)).subscribe(
-        response => expect(response).toBeTruthy(),
-        error => expect(error).toBeFalsy());
+        httpClient.request(new HttpRequest(method, '/abc', null)).subscribe(
+          response => expect(response).toBeTruthy(),
+          error => expect(error).toBeFalsy());
 
-      const testRequest = httpTestingController.expectOne('/abc');
+        const testRequest = httpTestingController.expectOne('/abc');
 
-      expect(testRequest.request.headers.has('Authorization')).toBeFalse();
-    });
+        expect(testRequest.request.headers.has('Authorization')).toBeFalse();
+      });
 
-    it(`should authorize ${method} requests when token is not null`, () => {
-      spyOnProperty(authService, 'idToken$', 'get')
-        .and.returnValue(of('VALID_JWT'));
+    it('should authorize ' + method + ' requests when token is not null',
+      () => {
+        spyOnProperty(authService, 'idToken$', 'get')
+          .and.returnValue(of('VALID_JWT'));
 
-      httpClient.request(new HttpRequest(method, '/abc', null)).subscribe(
-        response => expect(response).toBeTruthy(),
-        error => expect(error).toBeFalsy());
+        httpClient.request(new HttpRequest(method, '/abc', null)).subscribe(
+          response => expect(response).toBeTruthy(),
+          error => expect(error).toBeFalsy());
 
-      const testRequest = httpTestingController.expectOne('/abc');
+        const testRequest = httpTestingController.expectOne('/abc');
 
-      expect(testRequest.request.headers.has('Authorization')).toBeTrue();
-      expect(testRequest.request.headers.get('Authorization'))
-        .toEqual('Bearer VALID_JWT');
-    });
+        expect(testRequest.request.headers.has('Authorization')).toBeTrue();
+        expect(testRequest.request.headers.get('Authorization'))
+          .toEqual('Bearer VALID_JWT');
+      });
   }
 });
