@@ -84,7 +84,7 @@ angular.module('oppia').directive('adminRolesTab', [
 
           AdminTaskManagerService.startTask();
           ctrl.result = {};
-          AdminBackendApiService.viewUsersRole(
+          AdminBackendApiService.viewUsersRoleAsync(
             formResponse.filterCriterion, formResponse.role,
             formResponse.username
           ).then(function(response) {
@@ -107,7 +107,7 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Updating User Role');
           AdminTaskManagerService.startTask();
-          AdminBackendApiService.updateUserRole(
+          AdminBackendApiService.updateUserRoleAsync(
             formResponse.newRole, formResponse.username,
             formResponse.topicId
           ).then(function(response) {
@@ -125,7 +125,7 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Adding new reviewer...');
           AdminTaskManagerService.startTask();
-          AdminBackendApiService.addContributionReviewer(
+          AdminBackendApiService.addContributionReviewerAsync(
             formResponse.category, formResponse.username,
             formResponse.languageCode
           ).then(function(response) {
@@ -144,7 +144,7 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
           if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-            AdminBackendApiService.viewContributionReviewers(
+            AdminBackendApiService.viewContributionReviewersAsync(
               formResponse.category, formResponse.languageCode
             ).then(function(response) {
               ctrl.result.usernames = response.usernames;
@@ -154,7 +154,7 @@ angular.module('oppia').directive('adminRolesTab', [
           } else {
             var translationLanguages = [];
             var voiceoverLanguages = [];
-            AdminBackendApiService.contributionReviewerRights(
+            AdminBackendApiService.contributionReviewerRightsAsync(
               formResponse.username
             ).then(function(response) {
               translationLanguages = getLanguageDescriptions(
@@ -179,7 +179,7 @@ angular.module('oppia').directive('adminRolesTab', [
           }
           ctrl.setStatusMessage('Processing query...');
           AdminTaskManagerService.startTask();
-          AdminBackendApiService.removeContributionReviewer(
+          AdminBackendApiService.removeContributionReviewerAsync(
             formResponse.username, formResponse.method,
             formResponse.category, formResponse.languageCode
           ).then(function(response) {

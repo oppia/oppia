@@ -234,7 +234,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let result = {
         validUser: 'ADMIN'
       };
-      adminBackendApiService.viewUsersRole(filterCriterion, role, username)
+      adminBackendApiService.viewUsersRoleAsync(filterCriterion, role, username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -259,7 +259,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let result = {
         validUser: 'ADMIN'
       };
-      adminBackendApiService.viewUsersRole(filterCriterion, role, username)
+      adminBackendApiService.viewUsersRoleAsync(filterCriterion, role, username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -281,7 +281,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let filterCriterion = 'username';
       let role = null;
       let username = 'InvalidUser';
-      adminBackendApiService.viewUsersRole(filterCriterion, role, username)
+      adminBackendApiService.viewUsersRoleAsync(filterCriterion, role, username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -303,7 +303,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let topicId = null;
       let newRole = 'ADMIN';
       let username = 'validUser';
-      adminBackendApiService.updateUserRole(newRole, username, topicId)
+      adminBackendApiService.updateUserRoleAsync(newRole, username, topicId)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/adminrolehandler');
@@ -322,7 +322,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let topicId = null;
       let newRole = 'ADMIN';
       let username = 'InvalidUser';
-      adminBackendApiService.updateUserRole(newRole, username, topicId)
+      adminBackendApiService.updateUserRoleAsync(newRole, username, topicId)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/adminrolehandler');
@@ -342,7 +342,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let category = 'voiceover';
       let languageCode = 'en';
       let username = 'validUser';
-      adminBackendApiService.addContributionReviewer(
+      adminBackendApiService.addContributionReviewerAsync(
         category, username, languageCode
       ).then(successHandler, failHandler);
 
@@ -363,7 +363,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let category = 'voiceover';
       let languageCode = 'en';
       let username = 'InvalidUser';
-      adminBackendApiService.addContributionReviewer(
+      adminBackendApiService.addContributionReviewerAsync(
         category, username, languageCode
       ).then(successHandler, failHandler);
 
@@ -385,7 +385,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let category = 'voiceover';
       let languageCode = 'en';
       let result = ['validUsername'];
-      adminBackendApiService.viewContributionReviewers(
+      adminBackendApiService.viewContributionReviewersAsync(
         category, languageCode
       ).then(successHandler, failHandler);
 
@@ -406,7 +406,7 @@ describe('Admin Backend API service for Roles Tab', () => {
   it('should get the data of ContributionReviewer regarding username',
     fakeAsync(() => {
       let username = 'validUsername';
-      adminBackendApiService.contributionReviewerRights(username)
+      adminBackendApiService.contributionReviewerRightsAsync(username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -425,7 +425,7 @@ describe('Admin Backend API service for Roles Tab', () => {
   it('should fail to get the data of ContributionReviewer',
     fakeAsync(() => {
       let username = 'InvalidUsername';
-      adminBackendApiService.contributionReviewerRights(username)
+      adminBackendApiService.contributionReviewerRightsAsync(username)
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
@@ -448,7 +448,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let languageCode = null;
       let username = 'validUser';
       let method = 'all';
-      adminBackendApiService.removeContributionReviewer(
+      adminBackendApiService.removeContributionReviewerAsync(
         username, method, category, languageCode
       ).then(successHandler, failHandler);
 
@@ -470,7 +470,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let languageCode = 'en';
       let username = 'validUser';
       let method = 'specific';
-      adminBackendApiService.removeContributionReviewer(
+      adminBackendApiService.removeContributionReviewerAsync(
         username, method, category, languageCode
       ).then(successHandler, failHandler);
 
@@ -492,7 +492,7 @@ describe('Admin Backend API service for Roles Tab', () => {
       let languageCode = null;
       let username = 'validUser';
       let method = 'all';
-      adminBackendApiService.removeContributionReviewer(
+      adminBackendApiService.removeContributionReviewerAsync(
         username, method, category, languageCode
       ).then(successHandler, failHandler);
 

@@ -31,6 +31,7 @@ export const AdminPageConstants = {
     '/getcontributionreviewershandler',
   ADMIN_JOB_REMOVE_CONTRIBUTION_REVIEWER:
     '/removecontributionreviewerhandler',
+
   ADMIN_TAB_URLS: {
     ACTIVITIES: '#activities',
     JOBS: '#jobs',

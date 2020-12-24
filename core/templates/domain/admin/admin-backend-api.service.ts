@@ -141,10 +141,10 @@ export class AdminBackendApiService {
     });
   }
 
-  viewUsersRole(
-      filterCriterion:string, role:string, username:string
-  ):Promise<ArrayBuffer> {
-    return this.http.get<ArrayBuffer>(
+  async viewUsersRoleAsync(
+      filterCriterion: string, role: string, username: string
+  ): Promise<Object> {
+    return this.http.get<Object>(
       AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
         params: {
           filter_criterion: filterCriterion,
@@ -155,9 +155,9 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  updateUserRole(
-      newRole:string, username:string, topicId:string
-  ):Promise<void> {
+  async updateUserRoleAsync(
+      newRole: string, username: string, topicId: string
+  ): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
         role: newRole,
@@ -167,8 +167,8 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  addContributionReviewer(
-      category:string, username:string, languageCode:string
+  async addContributionReviewerAsync(
+      category: string, username: string, languageCode: string
   ):Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_JOB_ADD_CONTRIBUTION_REVIEWER_HANDLER, {
@@ -179,10 +179,10 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  viewContributionReviewers(
-      category:string, languageCode:string,
-  ):Promise<ArrayBuffer> {
-    return this.http.get<ArrayBuffer>(
+  async viewContributionReviewersAsync(
+      category: string, languageCode: string
+  ): Promise<Object> {
+    return this.http.get<Object>(
       AdminPageConstants.ADMIN_JOB_GET_CONTRIBUTION_REVIEWERS, {
         params: {
           review_category: category,
@@ -192,8 +192,8 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  contributionReviewerRights(username:string):Promise<ArrayBuffer> {
-    return this.http.get<ArrayBuffer>(
+  async contributionReviewerRightsAsync(username: string): Promise<Object> {
+    return this.http.get<Object>(
       AdminPageConstants.ADMIN_JOB_CONTRIBUTION_REVIEWER_RIGHTS_HANDLER, {
         params: {
           username: username
@@ -202,10 +202,10 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  removeContributionReviewer(
-      username:string, method:string,
-      category:string, languageCode:string
-  ):Promise<void> {
+  async removeContributionReviewerAsync(
+      username: string, method: string,
+      category: string, languageCode: string
+  ): Promise<void> {
     return this.http.put<void>(
       AdminPageConstants.ADMIN_JOB_REMOVE_CONTRIBUTION_REVIEWER, {
         username: username,
