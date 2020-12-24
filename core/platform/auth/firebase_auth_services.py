@@ -157,6 +157,7 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
     ]
 
 
+@transaction_services.run_in_transaction_wrapper
 def associate_auth_id_to_user_id(pair):
     """Commits the association between auth ID and user ID.
 
@@ -168,29 +169,24 @@ def associate_auth_id_to_user_id(pair):
     """
     auth_id, user_id = pair
 
-    def _associate_auth_id_to_user_id_transactionally():
-        """Verifies and commits the association within a transaction."""
-        claimed_user_id = get_user_id_from_auth_id(auth_id)
-        if claimed_user_id is not None:
-            raise Exception(
-                'auth_id=%r is already mapped to user_id=%r' % (
-                    auth_id, claimed_user_id))
+    claimed_user_id = get_user_id_from_auth_id(auth_id)
+    if claimed_user_id is not None:
+        raise Exception(
+            'auth_id=%r is already mapped to user_id=%r' % (
+                auth_id, claimed_user_id))
 
-        mapping = auth_models.UserIdByFirebaseAuthIdModel(
-            id=auth_id, user_id=user_id)
-        mapping.update_timestamps()
-        mapping.put()
-
-    transaction_services.run_in_transaction(
-        _associate_auth_id_to_user_id_transactionally)
+    mapping = (
+        auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id))
+    mapping.update_timestamps()
+    mapping.put()
 
 
+@transaction_services.run_in_transaction_wrapper
 def associate_multi_auth_ids_to_user_ids(pairs):
     """Commits the associations between auth IDs and user IDs.
 
     Args:
-        pairs: list(auth_domain.AuthIdUserIdPair). The associations to
-            commit.
+        pairs: list(auth_domain.AuthIdUserIdPair). The associations to commit.
 
     Raises:
         Exception. One or more auth ID associations already exist.
@@ -198,25 +194,18 @@ def associate_multi_auth_ids_to_user_ids(pairs):
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
     auth_ids, user_ids = python_utils.ZIP(*pairs)
 
-    def _associate_multi_auth_ids_to_user_ids_transactionally():
-        """Verifies and commits the associations within a transaction."""
-        claimed_user_ids = get_multi_user_ids_from_auth_ids(auth_ids)
-        if any(user_id is not None for user_id in claimed_user_ids):
-            existing_associations = sorted(
-                'auth_id=%r, user_id=%r' % (auth_id, user_id)
-                for auth_id, user_id in python_utils.ZIP(
-                    auth_ids, claimed_user_ids)
-                if user_id is not None)
-            raise Exception(
-                'associations already exist for: %r' % (existing_associations,))
+    claimed_user_ids = get_multi_user_ids_from_auth_ids(auth_ids)
+    if any(user_id is not None for user_id in claimed_user_ids):
+        existing_associations = sorted(
+            'auth_id=%r, user_id=%r' % (auth_id, user_id)
+            for auth_id, user_id in python_utils.ZIP(auth_ids, claimed_user_ids)
+            if user_id is not None)
+        raise Exception(
+            'associations already exist for: %r' % (existing_associations,))
 
-        mappings = [
-            auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
-            for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
-        ]
-        auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(
-            mappings)
-        auth_models.UserIdByFirebaseAuthIdModel.put_multi(mappings)
-
-    transaction_services.run_in_transaction(
-        _associate_multi_auth_ids_to_user_ids_transactionally)
+    mappings = [
+        auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
+        for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
+    ]
+    auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(mappings)
+    auth_models.UserIdByFirebaseAuthIdModel.put_multi(mappings)
