@@ -95,8 +95,8 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
         """
         if model_class == user_models.UserSettingsModel:
             raise Exception(
-                'Please use the UserSettingsModelFetcherDetails' +
-                ' for UserSettingsModel')
+                'Please use the UserSettingsModelFetcherDetails ' +
+                'for UserSettingsModel')
         self.field_name = field_name
         self.model_class = model_class
         self.model_ids = model_ids
