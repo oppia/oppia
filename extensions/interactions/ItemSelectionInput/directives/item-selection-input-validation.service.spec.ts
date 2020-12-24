@@ -93,7 +93,7 @@ describe('ItemSelectionInputValidationService', () => {
         inputs: {
           x: ['Selection 1', 'Selection 2']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)
@@ -104,7 +104,7 @@ describe('ItemSelectionInputValidationService', () => {
         inputs: {
           x: ['Selection 1', 'Selection 2', 'Selection 3']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)
@@ -115,7 +115,7 @@ describe('ItemSelectionInputValidationService', () => {
         inputs: {
           x: ['Selection 1']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)
@@ -126,7 +126,7 @@ describe('ItemSelectionInputValidationService', () => {
         inputs: {
           x: []
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)
@@ -137,7 +137,7 @@ describe('ItemSelectionInputValidationService', () => {
         inputs: {
           x: ['Selection 1']
         }
-      })],
+      }, 'ItemSelectionInput')],
       goodDefaultOutcome,
       null,
       null)

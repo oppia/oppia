@@ -20,7 +20,7 @@ import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 
 describe('Answer Stats Object Factory', () => {
-  let asof;
+  let asof: AnswerStatsObjectFactory;
 
   beforeEach(() => {
     asof = new AnswerStatsObjectFactory();
