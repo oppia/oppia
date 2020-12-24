@@ -157,7 +157,7 @@ describe('Responses Service', () => {
           },
           rule_specs: [
             {
-              rule_type: '',
+              rule_type: 'Equals',
               inputs: {
                 x: ['c', 'd', 'e'],
                 y: ['a', 'b', 'c'],
@@ -269,8 +269,12 @@ describe('Responses Service', () => {
         {
           type: 'Contains',
           inputs: {
-            x: 'correct',
+            x: {
+              contentId: 'rule_input_Contains',
+              normalizedStrSet: ['correct']
+            },
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -324,6 +328,7 @@ describe('Responses Service', () => {
           inputs: {
             x: 'correct',
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -390,6 +395,7 @@ describe('Responses Service', () => {
           inputs: {
             x: 'correct',
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
