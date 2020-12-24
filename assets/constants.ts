@@ -4736,6 +4736,12 @@ export default {
     "Welcome": "#992a2b"
   },
 
+  "RTL_LANGUAGES": [
+    "ar",
+    "he",
+    "fa"
+  ],
+
   // List of supported content languages in which we can create explorations or
   // other entities. Each description has a parenthetical part that may be
   // stripped out to give a shorter description.
