@@ -169,19 +169,19 @@ describe('Exploration object factory', () => {
       draft_change_list_id: 0,
       draft_changes: [],
       email_preferences: {
-        'mute_feedback_notifications': true,
-        'mute_suggestion_notifications': true
-        },
+        mute_feedback_notifications: true,
+        mute_suggestion_notifications: true
+      },
       exploration_id: '0',
       rights: {
-        'cloned_from': true,
-        'status': '',
-        'community_owned': true,
-        'owner_names': [],
-        'editor_names': [],
-        'voice_artist_names': [],
-        'viewer_names': [],
-        'viewable_if_private': true
+        cloned_from: true,
+        status: '',
+        community_owned: true,
+        owner_names: [],
+        editor_names: [],
+        voice_artist_names: [],
+        viewer_names: [],
+        viewable_if_private: true
       },
       is_version_of_draft_valid: true,
       show_state_editor_tutorial_on_load: true,

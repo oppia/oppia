@@ -354,20 +354,20 @@ describe('Image preloader service', () => {
     is_version_of_draft_valid: true,
     tags: [],
     email_preferences: {
-      'mute_feedback_notifications': true,
-      'mute_suggestion_notifications': true
-      },
+      mute_feedback_notifications: true,
+      mute_suggestion_notifications: true
+    },
     exploration_id: '0',
     objective: '',
     rights: {
-      'cloned_from': true,
-      'status': '',
-      'community_owned': true,
-      'owner_names': [],
-      'editor_names': [],
-      'voice_artist_names': [],
-      'viewer_names': [],
-      'viewable_if_private': true
+      cloned_from: true,
+      status: '',
+      community_owned: true,
+      owner_names: [],
+      editor_names: [],
+      voice_artist_names: [],
+      viewer_names: [],
+      viewable_if_private: true
     },
     version: ''
   };
