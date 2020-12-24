@@ -2168,10 +2168,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'hints': []
             }
         }
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'ItemSelectionInput'))
-        interaction.can_have_solution = True
+        interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            41)['ItemSelectionInput']['can_have_solution'] = True
 
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
@@ -2780,7 +2778,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 None, solution_dict,
                 html_validation_service.
                 add_math_content_to_math_rte_components,
-                rules_registry.Registry.get_html_field_types_to_rule_specs()
+                rules_registry.Registry.get_html_field_types_to_rule_specs(),
+                {}
             ), solution_dict)
 
     def test_subtitled_html_validation_with_invalid_html_type(self):
