@@ -140,19 +140,21 @@ export class AdminBackendApiService {
       });
     });
   }
-  flushCache():Promise<void> {
+
+  async flushCacheAsync(): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL, {}
     ).toPromise();
   }
 
-  clearSearchIndex():Promise<void> {
+  async clearSearchIndexAsync(): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {}
     ).toPromise();
   }
 
-  regenerateTopicRelatedOpportunities(topicId:string):Promise<void> {
+  async regenerateTopicRelatedOpportunitiesAsync(
+      topicId: string): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'regenerate_topic_related_opportunities',
@@ -161,7 +163,7 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  uploadTopicSimilarities(data:string | ArrayBuffer):Promise<void> {
+  async uploadTopicSimilaritiesAsync(data: string): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_HANDLER_URL, {
         action: 'upload_topic_similarities',
@@ -170,26 +172,20 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  sendDummyMail():Promise<void> {
+  async sendDummyMailAsync(): Promise<void> {
     return this.http.post<void>(
       AdminPageConstants.ADMIN_SEND_DUMMY_MAIL_HANDLER_URL, {}
     ).toPromise();
   }
 
-  getMemoryCacheProfile():Promise<void> {
-    let memoryCacheProfile = null;
-    return new Promise((resolve, reject) => {
-      this.http.get<void>(
-        AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL, {}
-      ).toPromise()
-        .then(responce =>{
-          memoryCacheProfile = responce;
-          resolve(memoryCacheProfile);
-        }, errorResponse => reject(errorResponse));
-    }
-    );
+  async fetchMemoryCacheProfileAsync(): Promise<Object> {
+    return this.http.get<Object>(
+      AdminPageConstants.ADMIN_MEMORY_CACHE_HANDLER_URL, {}
+    ).toPromise();
   }
-  updateUserName(oldUsername:string, newUsername:string):Promise<void> {
+
+  async updateUserNameAsync(
+      oldUsername: string, newUsername: string): Promise<void> {
     return this.http.put<void>(
       AdminPageConstants.ADMIN_UPDATE_USERNAME_HANDLER_URL, {
         old_username: oldUsername,
@@ -198,12 +194,13 @@ export class AdminBackendApiService {
     ).toPromise();
   }
 
-  numberOfPendingDeletionRequest():Promise<void> {
-    return this.http.get<void>(
-      AdminPageConstants.ADMIN_NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {}
+  async numberOfPendingDeletionRequestAsync(): Promise<Object> {
+    return this.http.get<Object>(
+      AdminPageConstants.ADMIN_DELETION_REQUEST_HANDLER_URL, {}
     ).toPromise();
   }
 }
+
 angular.module('oppia').factory(
   'AdminBackendApiService',
   downgradeInjectable(AdminBackendApiService));
