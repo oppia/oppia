@@ -26,6 +26,7 @@ import copy
 import inspect
 import itertools
 import json
+import logging
 import os
 import unittest
 
@@ -431,6 +432,42 @@ class TestBase(unittest.TestCase):
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
+    def capture_logging(self):
+        """Context manager that captures logs into a list.
+
+        Strips whitespace from messages for convenience.
+
+        https://docs.python.org/3/howto/logging-cookbook.html#using-a-context-manager-for-selective-logging
+
+        Yields:
+            list(str). A live-feed of the logging messages captured so-far.
+        """
+        captured_logs = []
+
+        class ListStream(python_utils.OBJECT):
+            """Stream-like object that appends writes to the captured logs."""
+
+            def write(self, msg):
+                """Appends stripped messages to captured logs."""
+                captured_logs.append(msg.strip())
+
+            def flush(self):
+                """Does nothing."""
+                pass
+
+        list_stream_handler = logging.StreamHandler(stream=ListStream())
+
+        logger = logging.getLogger()
+        old_level = logger.level
+        logger.addHandler(list_stream_handler)
+        logger.setLevel(logging.NOTSET)
+        try:
+            yield captured_logs
+        finally:
+            logger.setLevel(old_level)
+            logger.removeHandler(list_stream_handler)
+
+    @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a 'with'
         statement. The object can be anything that supports getattr and setattr,
@@ -463,6 +500,24 @@ class TestBase(unittest.TestCase):
             yield
         finally:
             setattr(obj, attr, original)
+
+    @contextlib.contextmanager
+    def swap_to_always_return(self, obj, attr, value=None):
+        """Swap obj.attr with a function that always returns the given value."""
+        def function_that_always_returns(*unused_args, **unused_kwargs):
+            """Returns the input value."""
+            return value
+        with self.swap(obj, attr, function_that_always_returns):
+            yield
+
+    @contextlib.contextmanager
+    def swap_to_always_raise(self, obj, attr, error=Exception):
+        """Swap obj.attr with a function that always raises the given error."""
+        def function_that_always_raises(*unused_args, **unused_kwargs):
+            """Raises the input exception."""
+            raise error
+        with self.swap(obj, attr, function_that_always_raises):
+            yield
 
     @contextlib.contextmanager
     def swap_with_checks(

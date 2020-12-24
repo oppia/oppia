@@ -260,6 +260,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserContributionProficiencyModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserEmailPreferencesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserIdByFirebaseAuthIdModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob,
     prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserRecentChangesBatchModelAuditOneOffJob,
