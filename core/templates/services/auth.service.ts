@@ -18,7 +18,8 @@
 
 import { Injectable, OnDestroy } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 
 @Injectable({
@@ -30,8 +31,8 @@ export class AuthService implements OnDestroy {
 
   constructor(private angularFireAuth: AngularFireAuth) {
     this.tokenCache = new BehaviorSubject(null);
-    this.tokenSubscription = (
-      this.angularFireAuth.idToken.subscribe(this.tokenCache));
+    this.tokenSubscription = this.angularFireAuth.idToken.pipe(
+      catchError(_ => of(null))).subscribe(this.tokenCache);
   }
 
   ngOnDestroy(): void {
@@ -39,10 +40,10 @@ export class AuthService implements OnDestroy {
   }
 
   get idToken$(): Observable<string | null> {
-    return this.tokenCache;
+    return this.tokenCache.asObservable();
   }
 
   async signOutAsync(): Promise<void> {
-    await this.angularFireAuth.signOut();
+    return this.angularFireAuth.signOut();
   }
 }

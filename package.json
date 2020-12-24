@@ -87,6 +87,7 @@
     "puppeteer": "^5.0.0",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.4.0",
+    "rxjs-marbles": "^6.0.1",
     "sourcemapped-stacktrace": "^1.1.11",
     "style-loader": "^2.0.0",
     "stylelint": "^13.3.2",
