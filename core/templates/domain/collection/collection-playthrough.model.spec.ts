@@ -55,7 +55,9 @@ describe('Collection playthrough model', () => {
     };
     let collectionPlaythroughObject = CollectionPlaythrough
       .createFromBackendObject(collectionPlaythroughBackendDict);
-    expect(collectionPlaythroughObject.getNextRecommendedCollectionNodeCount()).toEqual(1);
+    expect(
+      collectionPlaythroughObject.getNextRecommendedCollectionNodeCount()
+    ).toEqual(1);
   });
 
   it('should get the completed exploration ids', () => {
@@ -65,8 +67,9 @@ describe('Collection playthrough model', () => {
     };
     let collectionPlaythroughObject = CollectionPlaythrough
       .createFromBackendObject(collectionPlaythroughBackendDict);
-    expect(collectionPlaythroughObject
-      ._completedExplorationIds).toEqual(['exp_id1']);
+    expect(
+      collectionPlaythroughObject._completedExplorationIds).toEqual(['exp_id1']
+    );
   });
 
   it('should get the completed exploration node count', () => {
@@ -82,7 +85,7 @@ describe('Collection playthrough model', () => {
 
   it('should get whether the collection is started when no exploration is' +
     'completed',
-    () => {
+  () => {
     var collectionPlaythroughBackendDict = {
       next_exploration_id: 'exp_id0',
       completed_exploration_ids: []
@@ -91,11 +94,11 @@ describe('Collection playthrough model', () => {
       .createFromBackendObject(collectionPlaythroughBackendDict);
     expect(collectionPlaythroughObject.hasStartedCollection())
       .toEqual(false);
-    }
+  }
   );
 
   it(
-      'should get whether the collection is started when any exploration is' +
+    'should get whether the collection is started when any exploration is' +
       'completed',
     () => {
       var collectionPlaythroughBackendDict = {
@@ -106,10 +109,10 @@ describe('Collection playthrough model', () => {
         .createFromBackendObject(collectionPlaythroughBackendDict);
       expect(collectionPlaythroughObject.hasStartedCollection())
         .toEqual(true);
-  });
+    });
 
   it(
-      'should get whether the collection is finished when a next' + 
+    'should get whether the collection is finished when a next' +
       'exploration is available', () => {
       var collectionPlaythroughBackendDict = {
         next_exploration_id: 'exp_id0',
@@ -119,18 +122,18 @@ describe('Collection playthrough model', () => {
         .createFromBackendObject(collectionPlaythroughBackendDict);
       expect(collectionPlaythroughObject.hasFinishedCollection())
         .toEqual(false);
-  });
+    });
 
   it(
-    'should get whether the collection is finished when a next' + 
+    'should get whether the collection is finished when a next' +
     'exploration is not available', () => {
-    var collectionPlaythroughBackendDict = {
-      next_exploration_id: null,
-      completed_exploration_ids: ['exp_id1']
-    };
-    let collectionPlaythroughObject = CollectionPlaythrough
-      .createFromBackendObject(collectionPlaythroughBackendDict);
-    expect(collectionPlaythroughObject.hasFinishedCollection())
-      .toEqual(true);
-  });
-})
+      var collectionPlaythroughBackendDict = {
+        next_exploration_id: null,
+        completed_exploration_ids: ['exp_id1']
+      };
+      let collectionPlaythroughObject = CollectionPlaythrough
+        .createFromBackendObject(collectionPlaythroughBackendDict);
+      expect(collectionPlaythroughObject.hasFinishedCollection())
+        .toEqual(true);
+    });
+});
