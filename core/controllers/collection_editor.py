@@ -27,10 +27,7 @@ from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import summary_services
-from core.platform import models
 import feconf
-
-current_user_services = models.Registry.import_current_user_services()
 
 
 def _require_valid_version(version_from_payload, collection_version):
