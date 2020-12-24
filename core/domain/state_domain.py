@@ -404,7 +404,7 @@ class Solution(python_utils.OBJECT):
     @staticmethod
     def convert_html_in_solution(
             interaction_id, solution_dict, conversion_fn,
-            html_field_types_to_rule_specs):
+            html_field_types_to_rule_specs, interaction_spec):
         """Checks for HTML fields in a solution and convert it according
         to the conversion function.
 
@@ -415,6 +415,7 @@ class Solution(python_utils.OBJECT):
                 HTML.
             html_field_types_to_rule_specs: dict. A dictionary defining
                 the locations of html fields in rule specs.
+            interaction_spec: dict. The specification for the interaction.
 
         Returns:
             dict. The converted Solution dict.
@@ -422,17 +423,13 @@ class Solution(python_utils.OBJECT):
         if interaction_id is None:
             return solution_dict
 
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                interaction_id))
-
         solution_dict['explanation']['html'] = (
             conversion_fn(solution_dict['explanation']['html']))
 
-        if interaction.can_have_solution:
+        if interaction_spec['can_have_solution']:
             if solution_dict['correct_answer']:
                 for html_type in html_field_types_to_rule_specs.keys():
-                    if html_type == interaction.answer_type:
+                    if html_type == interaction_spec['answer_type']:
 
                         if (
                                 html_type ==
@@ -3136,12 +3133,24 @@ class State(python_utils.OBJECT):
             return state_dict
 
         if state_dict['interaction']['solution']:
+            if state_uses_old_rule_template_schema:
+                interaction_spec = (
+                    interaction_registry.Registry
+                    .get_all_specs_for_state_schema_version(41)[
+                        interaction_id]
+                )
+            else:
+                interaction_spec = (
+                    interaction_registry.Registry
+                    .get_all_specs()[interaction_id]
+                )
             state_dict['interaction']['solution'] = (
                 Solution.convert_html_in_solution(
                     state_dict['interaction']['id'],
                     state_dict['interaction']['solution'],
                     conversion_fn,
-                    html_field_types_to_rule_specs))
+                    html_field_types_to_rule_specs,
+                    interaction_spec))
 
         if state_uses_old_interaction_cust_args_schema:
             # We need to retrieve an older version of interaction_specs to
