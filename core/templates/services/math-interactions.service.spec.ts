@@ -95,6 +95,11 @@ describe('MathInteractionsService', () => {
       'Your answer seems to be missing a variable/number after the "+".');
 
     expect(mathInteractionsService.validateAlgebraicExpression(
+      '(+)', [])).toBeFalse();
+    expect(mathInteractionsService.getWarningText()).toBe(
+      'Your answer seems to be missing a variable/number after the "+".');
+
+    expect(mathInteractionsService.validateAlgebraicExpression(
       'a/', ['a'])).toBeFalse();
     expect(mathInteractionsService.getWarningText()).toBe(
       'Your answer seems to be missing a variable/number after the "/".');
