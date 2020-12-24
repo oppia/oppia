@@ -22,7 +22,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 describe('Debouncer service', () => {
   let ds: DebouncerService;
   let ls: LoggerService;
-  let loggerServiceSpy: ReturnType<typeof spyOn>;
+  let loggerServiceSpy: jasmine.Spy<(msg: string) => void>;
 
   beforeEach(() => {
     ds = TestBed.get(DebouncerService);
