@@ -73,7 +73,7 @@ describe('Teach Page', function() {
       '/assets/images/path/to/image');
   });
 
-  it('should record analytics when Start Learning Button is clicked', function() {
+  it('should record analytics when Start Learning is clicked', function() {
     var clickStartLearningButtonEventSpy = spyOn(
       SiteAnalyticsService, 'registerClickStartLearningButtonEvent')
       .and.callThrough();
@@ -83,7 +83,7 @@ describe('Teach Page', function() {
     expect(clickStartLearningButtonEventSpy).toHaveBeenCalled();
   });
 
-  it('should record analytics when Visit Classroom Button is clicked', function() {
+  it('should record analytics when Visit Classroom is clicked', function() {
     var clickVisitClassroomButtonEventSpy = spyOn(
       SiteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
@@ -93,7 +93,7 @@ describe('Teach Page', function() {
     expect(clickVisitClassroomButtonEventSpy).toHaveBeenCalled();
   });
 
-  it('should record analytics when Browse Library Button is clicked', function() {
+  it('should record analytics when Browse Library is clicked', function() {
     var clickBrowseLibraryButtonEventSpy = spyOn(
       SiteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
       .and.callThrough();
@@ -103,7 +103,7 @@ describe('Teach Page', function() {
     expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
   });
 
-  it('should record analytics when Guide For Parents Button is clicked', function() {
+  it('should record analytics when Guide For Parents is clicked', function() {
     var clickGuideParentsButtonEventSpy = spyOn(
       SiteAnalyticsService, 'registerClickGuideParentsButtonEvent')
       .and.callThrough();
@@ -113,7 +113,7 @@ describe('Teach Page', function() {
     expect(clickGuideParentsButtonEventSpy).toHaveBeenCalled();
   });
 
-  it('should record analytics when Tips For Parents Button is clicked', function() {
+  it('should record analytics when Tips For Parents is clicked', function() {
     var clickTipforParentsButtonEventSpy = spyOn(
       SiteAnalyticsService, 'registerClickTipforParentsButtonEvent')
       .and.callThrough();
@@ -123,7 +123,7 @@ describe('Teach Page', function() {
     expect(clickTipforParentsButtonEventSpy).toHaveBeenCalled();
   });
 
-  it('should record analytics when Explore Lessons Button is clicked', function() {
+  it('should record analytics when Explore Lessons is clicked', function() {
     var clickExploreLessonsButtonEventSpy = spyOn(
       SiteAnalyticsService, 'registerClickExploreLessonsButtonEvent')
       .and.callThrough();
