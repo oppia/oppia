@@ -152,4 +152,3 @@ describe('Teach Page', function() {
     expect(loadingMessage).toBe('');
   });
 });
-
