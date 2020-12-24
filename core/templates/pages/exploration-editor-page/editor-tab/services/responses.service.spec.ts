@@ -825,7 +825,7 @@ describe('Responses Service', () => {
     responsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
 
     expect(callbackSpy).toHaveBeenCalledWith(
-      interactionData.answerGroups,
+      [],
       interactionData.defaultOutcome
     );
   });
