@@ -27,7 +27,7 @@ import { AuthService } from 'services/auth.service';
 import { MockAngularFireAuth } from 'tests/unit-test-utils';
 
 
-describe('Auth token interceptor', () => {
+describe('Auth interceptor', () => {
   let httpClient: HttpClient;
   let httpTestingController: HttpTestingController;
   let authService: AuthService;
