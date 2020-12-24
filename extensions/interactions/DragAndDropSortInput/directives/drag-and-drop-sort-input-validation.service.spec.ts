@@ -87,10 +87,10 @@ describe('DragAndDropSortInputValidationService', () => {
     customizationArgs = {
       choices: {
         value: [
-          new SubtitledHtml('a', ''),
-          new SubtitledHtml('b', ''),
-          new SubtitledHtml('c', ''),
-          new SubtitledHtml('d', '')
+          new SubtitledHtml('a', 'ca_0'),
+          new SubtitledHtml('b', 'ca_1'),
+          new SubtitledHtml('c', 'ca_2'),
+          new SubtitledHtml('d', 'ca_3')
         ]
       },
       allowMultipleItemsInSamePosition: {
@@ -101,57 +101,71 @@ describe('DragAndDropSortInputValidationService', () => {
     goodRule1 = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['a'], ['b'], ['c'], ['d']]
+        x: [
+          ['ca_0'], ['ca_1'], ['ca_2'], ['ca_3']
+        ]
       }
     }, 'DragAndDropSortInput');
 
     goodRule2 = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['d'], ['c'], ['b'], ['a']]
+        x: [
+          ['ca_3'], ['ca_2'], ['ca_1'], ['ca_0']
+        ]
       }
     }, 'DragAndDropSortInput');
 
     equalsListWithAllowedValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['a', 'b'], ['d'], ['c']]
+        x: [
+          ['ca_0', 'ca_1'], ['ca_3'], ['ca_2']
+        ]
       }
     }, 'DragAndDropSortInput');
 
     equalsListWithValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
-        x: [['a'], ['d'], ['c'], ['b']]
+        x: [
+          ['ca_0'], ['ca_3'], ['ca_2'], ['ca_1']
+        ]
       }
     }, 'DragAndDropSortInput');
 
     equalsListWithEmptyValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['a', ''], [], ['c', 'b', 'd']]
+        x: [
+          ['ca_0', 'ca_4'],
+          [], ['ca_2', 'ca_1', 'ca_3']
+        ]
       }
     }, 'DragAndDropSortInput');
 
     equalsListWithDuplicatesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
-        x: [['a', 'b'], ['b'], ['c', 'a', 'd']]
+        x: [
+          ['ca_0', 'ca_1'], ['ca_1'],
+          ['ca_2', 'ca_0', 'ca_3']
+        ]
       }
     }, 'DragAndDropSortInput');
 
     hasXBeforeYRule = rof.createFromBackendDict({
       rule_type: 'HasElementXBeforeElementY',
       inputs: {
-        x: 'b',
-        y: 'b'
+        x: 'ca_1',
+        y: 'ca_1'
       }
     }, 'DragAndDropSortInput');
 
     hasElementXAtPositionYRule = rof.createFromBackendDict({
       rule_type: 'HasElementXAtPositionY',
       inputs: {
-        x: 'x',
+        x: 'ca_5',
         y: '5'
       }
     }, 'DragAndDropSortInput');
@@ -182,7 +196,7 @@ describe('DragAndDropSortInputValidationService', () => {
     var rules = [rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
-        x: [['a', 'b'], ['c', 'd']]
+        x: [['ca_0', 'ca_1'], ['ca_2', 'ca_3']]
       }
     }, 'DragAndDropSortInput')];
     answerGroups = [

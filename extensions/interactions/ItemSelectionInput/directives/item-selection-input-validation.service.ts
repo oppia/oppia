@@ -136,7 +136,7 @@ export class ItemSelectionInputValidationService {
     if (maxAllowedCount === 1) {
       var answerChoiceToIndex = {};
       seenChoices.forEach((seenChoice, choiceIndex) => {
-        answerChoiceToIndex[seenChoice.getHtml()] = choiceIndex;
+        answerChoiceToIndex[seenChoice.getContentId()] = choiceIndex;
       });
 
       answerGroups.forEach((answerGroup, answerIndex) => {

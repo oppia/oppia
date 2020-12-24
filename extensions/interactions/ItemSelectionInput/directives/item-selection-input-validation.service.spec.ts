@@ -75,9 +75,9 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments = {
       choices: {
         value: [
-          new SubtitledHtml('Selection 1', ''),
-          new SubtitledHtml('Selection 2', ''),
-          new SubtitledHtml('Selection 3', '')
+          new SubtitledHtml('Selection 1', 'ca_0'),
+          new SubtitledHtml('Selection 2', 'ca_1'),
+          new SubtitledHtml('Selection 3', 'ca_2')
         ]
       },
       maxAllowableSelectionCount: {
@@ -91,7 +91,7 @@ describe('ItemSelectionInputValidationService', () => {
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
-          x: ['Selection 1', 'Selection 2']
+          x: ['ca_0', 'ca_1']
         }
       }, 'ItemSelectionInput')],
       goodDefaultOutcome,
@@ -102,7 +102,7 @@ describe('ItemSelectionInputValidationService', () => {
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
-          x: ['Selection 1', 'Selection 2', 'Selection 3']
+          x: ['ca_0', 'ca_1', 'ca_2']
         }
       }, 'ItemSelectionInput')],
       goodDefaultOutcome,
@@ -113,7 +113,7 @@ describe('ItemSelectionInputValidationService', () => {
       [rof.createFromBackendDict({
         rule_type: 'Equals',
         inputs: {
-          x: ['Selection 1']
+          x: ['ca_0']
         }
       }, 'ItemSelectionInput')],
       goodDefaultOutcome,
@@ -135,7 +135,7 @@ describe('ItemSelectionInputValidationService', () => {
       [rof.createFromBackendDict({
         rule_type: 'IsProperSubsetOf',
         inputs: {
-          x: ['Selection 1']
+          x: ['ca_0']
         }
       }, 'ItemSelectionInput')],
       goodDefaultOutcome,
@@ -237,7 +237,7 @@ describe('ItemSelectionInputValidationService', () => {
   it('should expect all choices to be unique', () => {
     // Repeat the last choice.
     customizationArguments.choices.value.push(
-      new SubtitledHtml('Selection 3', ''));
+      new SubtitledHtml('Selection 3', 'ca_4'));
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArguments, goodAnswerGroups,

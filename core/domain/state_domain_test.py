@@ -95,25 +95,27 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [['ca_choices_0']]
+                    'x': [['<p>IsEqualToOrdering rule_spec htmls</p>']]
                 },
                 'rule_type': 'IsEqualToOrdering'
             }, {
                 'rule_type': 'HasElementXAtPositionY',
                 'inputs': {
-                    'x': 'ca_choices_1',
+                    'x': '<p>HasElementXAtPositionY rule_spec html</p>',
                     'y': 2
                 }
             }, {
                 'rule_type': 'HasElementXBeforeElementY',
                 'inputs': {
-                    'x': 'ca_choices_2',
-                    'y': 'ca_choices_3'
+                    'x': '<p>x input for HasElementXAtPositionY rule_spec </p>',
+                    'y': '<p>y input for HasElementXAtPositionY rule_spec </p>'
                 }
             }, {
                 'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
                 'inputs': {
-                    'x': [['ca_choices_0']]
+                    'x': [[(
+                        '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition r'	
+                        'ule_spec htmls</p>')]]
                 }
             }],
             'training_data': [],
@@ -122,10 +124,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': [
-                'ca_choices_0',
-                'ca_choices_1',
-                'ca_choices_2',
-                'ca_choices_3'
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>'
             ],
             'explanation': {
                 'content_id': 'solution',
@@ -296,10 +298,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': [
-                ['ca_choices_0'],
-                ['ca_choices_1'],
-                ['ca_choices_2'],
-                ['ca_choices_3']
+                ['<p>state customization arg html 1</p>'],
+                ['<p>state customization arg html 2</p>'],
+                ['<p>state customization arg html 3</p>'],
+                ['<p>state customization arg html 4</p>']
             ],
             'explanation': {
                 'content_id': 'solution',
@@ -326,7 +328,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        html_list = state.get_all_html_content_strings()
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        def mock_get_html_field_types_to_rule_specs(cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        def mock_get_interaction_by_id(cls, interaction_id):
+            interaction = copy.deepcopy(cls._interactions[interaction_id])
+            interaction.answer_type = 'ListOfSetsOfHtmlStrings'
+            return interaction
+
+        rules_registry_swap = self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs))
+
+        interaction_registry_swap = self.swap(
+            interaction_registry.Registry, 'get_interaction_by_id',
+            classmethod(mock_get_interaction_by_id))
+
+        with rules_registry_swap, interaction_registry_swap:
+            html_list = state.get_all_html_content_strings()
+
         self.assertEqual(
             html_list,
             [
@@ -349,12 +373,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 '<p>state written_translation ca_choices_3-hi</p>',
                 '<p>state written_translation ca_choices_3-en</p>',
                 '<p>State Feedback</p>',
+                '<p>IsEqualToOrdering rule_spec htmls</p>',	
+                '<p>HasElementXAtPositionY rule_spec html</p>',	
+                '<p>y input for HasElementXAtPositionY rule_spec </p>',	
+                '<p>x input for HasElementXAtPositionY rule_spec </p>',	
+                (	
+                    '<p>IsEqualToOrderingWithOneItemAtIncorrectPosition rule_s'	
+                    'pec htmls</p>'),
                 '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
                 '<p>state customization arg html 1</p>',
                 '<p>state customization arg html 2</p>',
                 '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>',
+                '<p>state customization arg html 1</p>',	
+                '<p>state customization arg html 2</p>',	
+                '<p>state customization arg html 3</p>',	
                 '<p>state customization arg html 4</p>',
                 '<p>state content html</p>'])
 

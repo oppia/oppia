@@ -75,8 +75,13 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
             const contentIds = choices.map(choice => choice.val);
 
             for (var i = 0; i < key.length; i++) {
-              replacementText += $filter('formatRtePreview')(
-                choices[contentIds.indexOf(key[i])].label);
+              const choiceIndex = contentIds.indexOf(key[i]);
+              if (choiceIndex === -1) {
+                replacementText += 'INVALID';
+              } else {
+                replacementText += $filter('formatRtePreview')(
+                  choices[choiceIndex].label);
+              }
               if (i < key.length - 1) {
                 replacementText += ',';
               }
@@ -90,8 +95,13 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
             for (var i = 0; i < key.length; i++) {
               replacementText += '[';
               for (var j = 0; j < key[i].length; j++) {
-                replacementText += $filter('formatRtePreview')(
-                  choices[contentIds.indexOf(key[i][j])].label);
+                const choiceIndex = contentIds.indexOf(key[i][j]);
+                if (choiceIndex === -1) {
+                  replacementText += 'INVALID';
+                } else {
+                  replacementText += $filter('formatRtePreview')(
+                    choices[choiceIndex].label);
+                }
                 if (j < key[i].length - 1) {
                   replacementText += ',';
                 }

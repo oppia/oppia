@@ -145,7 +145,7 @@ export class DragAndDropSortInputValidationService {
         areAnyItemsDuplicated = false;
 
         let choiceValues = (
-          customizationArgs.choices.value.map(x => x.getHtml()));
+          customizationArgs.choices.value.map(x => x.getContentId()));
         switch (rule.type) {
           case 'HasElementXAtPositionY':
             if (!choiceValues.includes(<string>inputs.x)) {
