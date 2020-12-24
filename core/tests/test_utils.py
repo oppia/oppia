@@ -288,8 +288,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
 
         for f in filters:
             for k, v in f['match'].items():
-                values = v.split(' ')
-                result_docs = [doc for doc in result_docs if doc[k] in values]
+                result_docs = [doc for doc in result_docs if doc[k] in v]
 
         if terms:
             filtered_docs = []
@@ -1824,6 +1823,44 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
 
         return self._parse_json_response(json_response, expect_errors)
+
+    def create_search_query(self, terms, categories, languages=['en']):
+        """Returns the search query derived from terms and categories.
+
+        Args:
+            terms: list(str). A list of search terms.
+            categories: list(str). A list of values for the category field.
+            languages: list(str). A list of values for the language_code field.
+
+        Returns:
+            str. A JSON-encoded query string.
+        """
+
+        query = {
+            'query': {
+                'bool': {
+                    'must': [],
+                    'filter': [],
+                }
+            }
+        }
+        if terms:
+            term_string = ' '.join([term for term in terms])
+            query['query']['bool']['must'].append(
+                {'multi_match': {'query': term_string}}
+            )
+        if categories:
+            category_string = ' '.join([category for category in categories])
+            query['query']['bool']['filter'].append(
+                {'match': {'category': category_string}}
+            )
+        if languages:
+            language_string = ' '.join([language for language in languages])
+            query['query']['bool']['filter'].append(
+                {'match': {'language_code': language_string}}
+            )
+
+        return json.dumps(query)
 
     def get_new_csrf_token(self):
         """Generates CSRF token for test."""

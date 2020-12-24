@@ -414,6 +414,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
 
     return displayable_exp_summaries
 
+
 # TODO(#11314): Change this to ElasticSearch query string.
 def _generate_query(categories, language_codes):
     """Generates query based on the categories and language codes.
@@ -434,6 +435,7 @@ def _generate_query(categories, language_codes):
     # This assumes that 'categories' is non-empty.
     return 'category=("%s")%s' % (
         '" OR "'.join(categories), language_codes_suffix)
+
 
 def _get_displayable_collection_summary_dicts(collection_summaries):
     """Gets a summary of collections in human readable form.

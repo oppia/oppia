@@ -647,37 +647,6 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
             self.COL_ID_4])
 
-    def _create_search_query(self, terms, categories):
-        """Returns the search query derived from terms and categories.
-
-        Args:
-            terms: list. A list of search terms.
-            categories: list(str). A list of values for the category field.
-
-        Returns:
-            str. A JSON-encoded query string.
-        """
-
-        query = {
-            'query': {
-                'bool': {
-                    'must': [],
-                    'filter': [],
-                }
-            }
-        }
-        if terms:
-            term_string = ' '.join(['"%s"' % term for term in terms])
-            query['query']['bool']['must'].append(
-                {'multi_match': {'query': term_string}}
-            )
-        if categories:
-            category_string = ' '.join(['"%s"' % cat for cat in categories])
-            query['query']['bool']['filter'].append(
-                {'match': {'category': category_string}}
-            )
-        return json.dumps(query)
-
     def test_get_collection_summaries_matching_ids(self):
         summaries = collection_services.get_collection_summaries_matching_ids([
             self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, 'nonexistent'])
@@ -747,32 +716,32 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         # Search within the 'Architecture' category.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_search_query([], ['Architecture'])))[0]
+                self.create_search_query([], ['Architecture'])))[0]
         self.assertEqual(col_ids, [self.COL_ID_0])
 
         # Search for collections containing 'Oppia'.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_search_query(['Oppia'], [])))[0]
+                self.create_search_query(['Oppia'], [])))[0]
         self.assertEqual(sorted(col_ids), [self.COL_ID_1, self.COL_ID_2])
 
         # Search for collections containing 'Oppia' and 'Introduce'.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_search_query(
+                self.create_search_query(
                     ['Oppia', 'Introduce'], [])))[0]
         self.assertEqual(sorted(col_ids), [self.COL_ID_1, self.COL_ID_2])
 
         # Search for collections containing 'England'.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_search_query(['England'], [])))[0]
+                self.create_search_query(['England'], [])))[0]
         self.assertEqual(col_ids, [self.COL_ID_0])
 
         # Search for collections containing 'in'.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_search_query(['in'], [])))[0]
+                self.create_search_query(['in'], [])))[0]
         self.assertEqual(
             sorted(col_ids), [self.COL_ID_0, self.COL_ID_2, self.COL_ID_4])
 
@@ -780,7 +749,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         # 'Welcome' categories.
         col_ids = (
             collection_services.get_collection_ids_matching_query(
-                self._create_search_query(
+                self.create_search_query(
                     ['in'], ['Architecture', 'Welcome'])))[0]
         self.assertEqual(sorted(col_ids), [self.COL_ID_0, self.COL_ID_2])
 

@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import json
 import logging
 import os
+import re
 
 from constants import constants
 from core.domain import activity_domain
@@ -31,11 +32,15 @@ from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+
+gae_search_services = models.Registry.import_search_services()
 
 CAN_EDIT_STR = 'can_edit'
 
@@ -236,11 +241,39 @@ class LibraryPageTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(exp_id, self.admin_id)
         self.publish_exploration(self.admin_id, exp_id)
         exp_services.index_explorations_given_ids([exp_id])
-        response_dict = self.get_json(
-            feconf.LIBRARY_SEARCH_DATA_URL, params={
-                'category': 'A category',
-                'language_code': 'en'
-            })
+
+        def _parse_query_string_and_search(
+                query_string, index_name, remaining_to_fetch, cursor):
+            """Parses query string and calls search_services.search()"""
+            regex_parsed_query = re.search(
+                'category=(.*) language_code=(.*)', query_string)
+            category = regex_parsed_query.group(1)
+            language_code = regex_parsed_query.group(2)
+            query = self.create_search_query([], [category], [language_code])
+            return gae_search_services.search(
+                query, index_name, cursor=cursor,
+                size=remaining_to_fetch, ids_only=True)
+
+        def _mock_search_collections(query_string, remaining_to_fetch, cursor):
+            """Mocks search_services.search_collections()."""
+            return _parse_query_string_and_search(
+                query_string, 'collections', remaining_to_fetch, cursor)
+
+        def _mock_search_explorations(query_string, remaining_to_fetch, cursor):
+            """Mocks search_services.search_collections()."""
+            return _parse_query_string_and_search(
+                query_string, 'explorations', remaining_to_fetch, cursor)
+
+        search_collections_swap = self.swap(
+            search_services, 'search_collections', _mock_search_collections)
+        search_explorations_swap = self.swap(
+            search_services, 'search_explorations', _mock_search_explorations)
+        with search_collections_swap, search_explorations_swap:
+            response_dict = self.get_json(
+                feconf.LIBRARY_SEARCH_DATA_URL, params={
+                    'category': 'A category',
+                    'language_code': 'en'
+                })
         activity_list = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [exp_id]))
