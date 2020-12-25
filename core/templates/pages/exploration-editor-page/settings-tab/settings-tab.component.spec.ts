@@ -648,12 +648,16 @@ describe('Settings Tab Component', function() {
       ctrl.toggleCards('settings');
       expect(ctrl.basicSettingIsShown).toEqual(true);
     });
-    it('should display Unpublish button and canReleaseOwnership ' +
-      'should be updated', function() {
+    it('should display Unpublish button', function() {
       ctrl.showUnpublishButton();
       expect(ctrl.canUnpublish).toBe(true);
-      expect(ctrl.canReleaseOwnership).toBe(true);
       expect(ctrl.showUnpublishButton()).toEqual(true);
     });
+
+    it('should display Transfer ownership button', function() {
+    ctrl.showUnpublishButton();
+    expect(ctrl.canReleaseOwnership).toBe(true);
+    expect(ctrl.showReleaseOwnershipButton()).toEqual(true);
+  });
   });
 });

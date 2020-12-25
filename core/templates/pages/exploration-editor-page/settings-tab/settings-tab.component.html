@@ -479,7 +479,7 @@
       </i>
     </div>
     <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.controlsCardIsShown">
-      <p ng-if="$ctrl.canReleaseOwnership" class="oppia-exploration-ctrl" ng-hide="$ctrl.ExplorationRightsService.isCommunityOwned()">
+      <p ng-if="$ctrl.showReleaseOwnershipButton()" class="oppia-exploration-ctrl" ng-hide="$ctrl.ExplorationRightsService.isCommunityOwned()">
         <button type="button" class="btn btn-secondary" ng-click="$ctrl.showTransferExplorationOwnershipModal()" ng-disabled="$ctrl.isExplorationLockedForEditing()">
           Transfer ownership to the community
         </button>

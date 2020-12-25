@@ -469,11 +469,20 @@ angular.module('oppia').component('settingsTab', {
         UserExplorationPermissionsService.getPermissionsAsync()
           .then(function(permissions) {
             ctrl.canUnpublish = permissions.canUnpublish;
-            ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
             $rootScope.$applyAsync();
           });
         return ctrl.canUnpublish;
       };
+
+      ctrl.showReleaseOwnershipButton = function() {
+        UserExplorationPermissionsService.getPermissionsAsync()
+          .then(function(permissions) {
+            ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
+            $rootScope.$applyAsync();
+          });
+        return ctrl.canReleaseOwnership;
+      };
+
       ctrl.$onDestroy = function() {
         ctrl.directiveSubscriptions.unsubscribe();
       };
