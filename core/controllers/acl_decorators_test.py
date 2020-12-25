@@ -1276,7 +1276,7 @@ class UploadExplorationTests(test_utils.GenericTestBase):
                 '/mock_upload_exploration/', expected_status_int=401)
         self.assertEqual(
             response['error'],
-            'You do not have credentials to upload exploration.')
+            'You do not have credentials to upload explorations.')
         self.logout()
 
     def test_guest_cannot_upload_explorations(self):

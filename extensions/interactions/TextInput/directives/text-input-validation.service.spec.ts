@@ -145,15 +145,21 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          }),
+          }, 'TextInput'),
           rof.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
-              x: ['xyza']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyza']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -174,9 +180,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -184,9 +193,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
-              x: ['xyza']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyza']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -205,9 +217,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
-              x: ['']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -215,9 +230,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
-              x: ['abc']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['abc']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -236,9 +254,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -246,9 +267,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -269,9 +293,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -279,9 +306,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
-              x: ['xyza']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyza']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -300,9 +330,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
-              x: ['']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -310,9 +343,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
-              x: ['abc']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['abc']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -331,9 +367,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Contains',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -341,9 +380,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'StartsWith',
             inputs: {
-              x: ['xyzy']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyzy']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -364,9 +406,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input_4',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -374,9 +419,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -395,9 +443,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -405,9 +456,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'Equals',
             inputs: {
-              x: ['xya']
+              x: {
+                contentId: 'rule_input_4',
+                normalizedStrSet: ['xya']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -428,9 +482,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -438,9 +495,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
@@ -459,9 +519,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
-              x: ['xyz']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xyz']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       ),
       createAnswerGroupByRules(
@@ -469,9 +532,12 @@ describe('TextInputValidationService', () => {
           rof.createFromBackendDict({
             rule_type: 'FuzzyEquals',
             inputs: {
-              x: ['xya']
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['xya']
+              }
             }
-          })
+          }, 'TextInput')
         ]
       )];
 
