@@ -49,6 +49,14 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             expected_audit_models,
             self.registry_instance.import_models([models.NAMES.audit]))
 
+    def test_import_models_auth_model(self):
+        """Tests import_models function with auth option."""
+        from core.storage.auth import gae_models as auth_models
+        expected_auth_models = (auth_models,)
+        self.assertEqual(
+            expected_auth_models,
+            self.registry_instance.import_models([models.NAMES.auth]))
+
     def test_import_models_base_model(self):
         """Tests import_models function with base model option."""
         from core.storage.base_model import gae_models as base_models
@@ -234,6 +242,13 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.registry_instance.import_transaction_services(),
             gae_transaction_services)
+
+    def test_import_auth_services(self):
+        """Tests import auth services function."""
+        from core.platform.auth import firebase_auth_services
+        self.assertIs(
+            self.registry_instance.import_auth_services(),
+            firebase_auth_services)
 
     def test_import_app_identity_services(self):
         """Tests import app identity services function."""
