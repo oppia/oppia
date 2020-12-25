@@ -16,16 +16,26 @@
  * @fileoverview Unit tests for TakeBreakModalComponent.
  */
 
-import { async, TestBed } from
+import { async, ComponentFixture, TestBed } from
   '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { TakeBreakModalComponent } from
   './take-break-modal.component';
 
+class MockActiveModal {
+  dismiss(): void {
+    return;
+  }
+
+  close(): void {
+    return;
+  }
+}
 
 describe('TakeBreakModalComponent', function() {
-  let takebreakmodal: TakeBreakModalComponent;
+  let component: TakeBreakModalComponent;
+  let fixture: ComponentFixture<TakeBreakModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(async(() => {
@@ -33,24 +43,28 @@ describe('TakeBreakModalComponent', function() {
       declarations: [TakeBreakModalComponent],
       providers: [
         {
-          provide: NgbActiveModal
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
         }
       ]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    takebreakmodal = TestBed.get(TakeBreakModalComponent);
+    fixture = TestBed.createComponent(TakeBreakModalComponent);
+    component = fixture.componentInstance;
     ngbActiveModal = TestBed.get(NgbActiveModal);
   });
 
   it('should close modal', () => {
-    takebreakmodal.confirm();
-    expect(ngbActiveModal.close).toHaveBeenCalled();
+    const dismissSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+    component.confirm();
+    expect(dismissSpy).toHaveBeenCalled();
   });
 
   it('should dismiss modal', () => {
-    takebreakmodal.cancel();
-    expect(ngbActiveModal.dismiss).toHaveBeenCalled();
+    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+    component.cancel();
+    expect(dismissSpy).toHaveBeenCalled();
   });
 });
