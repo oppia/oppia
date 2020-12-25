@@ -50,6 +50,8 @@ angular.module('oppia').controller('TranslationModalController', [
       ENTITY_TYPE.EXPLORATION, opportunity.id);
 
     ContextService.setImageSaveDestinationToLocalStorage();
+    $scope.targetLocaleDirection =
+      TranslationLanguageService.getActiveLanguageDirection();
     $scope.uploadingTranslation = false;
     $scope.activeWrittenTranslation = {};
     $scope.activeWrittenTranslation.html = '';
