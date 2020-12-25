@@ -259,8 +259,9 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 'code': 'en', 'description': 'English'}]):
             self.run_job_and_check_output(
                 expected_output, sort=True, literal_eval=False)
-
-    def test_missing_topic_model_failure(self):
+     def test_missing_topic_model_failure(self):
+        
+        
         topic_models.TopicModel.get_by_id('0').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
 
@@ -273,7 +274,9 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
                 'doesn\'t exist"]]'),
                 self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
-            def test_missing_snapshot_metadata_model_failure(self):
+     def test_missing_snapshot_metadata_model_failure(self):
+            
+       
         subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
             '0-1-1').delete()
         expected_output = [
