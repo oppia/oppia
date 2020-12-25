@@ -148,9 +148,13 @@ export class LanguageUtilService {
     return language ? language.description : null;
   }
   getLanguageDirection(languageCode: string): string {
-    const languageIndex = this.SUPPORTED_CONTENT_LANGUAGES.findIndex(
-      (lang: ContentLanguage) => lang.code === languageCode);
-    return this.SUPPORTED_CONTENT_LANGUAGES[languageIndex].dir;
+    let languageDirection = 'ltr';
+    this.SUPPORTED_CONTENT_LANGUAGES.forEach((lang: ContentLanguage) => {
+      if (lang.code === languageCode) {
+        languageDirection = lang.dir;
+      }
+    });
+    return languageDirection;
   }
   // Given a list of audio language codes, returns the complement list, i.e.
   // the list of audio language codes not in the input list.
