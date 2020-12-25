@@ -28,6 +28,7 @@ import itertools
 import json
 import logging
 import os
+import types
 import unittest
 
 from constants import constants
@@ -1280,9 +1281,12 @@ tags: []
         memory_cache_services_stub.flush_cache()
 
         with contextlib2.ExitStack() as stack:
+            # Using types.MethodType is necessary because this is a classmethod
+            # (see the documentation for self.swap()).
             stack.enter_context(self.swap(
                 models.Registry, 'import_search_services',
-                self._search_services_stub))
+                types.MethodType(
+                    lambda _: self._search_services_stub, models.Registry)))
 
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
