@@ -62,8 +62,8 @@ describe('Auth service', () => {
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
     // Calls ngOnDestroy() after 2 frames have elapsed in the marble diagram.
-    // Frame 0 begins at the ^ character, so we check for an unsubscription (by
-    // using the ! character) 2 frames after it.
+    // Frame 0 begins at the ^ character, so we check for an unsubscribe
+    // (represented by the ! character) 2 frames after it.
     m.scheduler.schedule(() => authService.ngOnDestroy(), 2);
 
     m.expect(sourceIdTokens).toHaveSubscriptions(authServiceSubscription);
@@ -101,9 +101,12 @@ describe('Auth service', () => {
   }));
 
   it('should emit null when the source errors', marbles(m => {
-    const sourceIdTokens = m.hot('a---#');
-    const expectedObservations = '--a-N';
-    const givenSubscription = '   --^--';
+    // Even though the source emits an error (represented with the # character),
+    // the subscriber just observes a null value and continues, rather than
+    // ending abruptly from the same error.
+    const sourceIdTokens = m.hot('a---#  ');
+    const expectedObservations = '--a-N--';
+    const givenSubscription = '   --^----';
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
 
@@ -111,32 +114,13 @@ describe('Auth service', () => {
       .toBeObservable(expectedObservations, {a: 'a', N: null});
   }));
 
-  it('should still emit null after source closes from errors', marbles(m => {
-    const sourceIdTokens = m.hot('-#  ');
-    const expectedObservations = '---N';
-    const givenSubscription = '   ---^';
-
-    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
-
-    m.expect(authService.idToken$, givenSubscription)
-      .toBeObservable(expectedObservations, {N: null});
-  }));
-
-  it('should emit null when the source complete', marbles(m => {
-    const sourceIdTokens = m.hot('a---#');
-    const expectedObservations = '--a-N';
-    const givenSubscription = '   --^--';
-
-    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
-
-    m.expect(authService.idToken$, givenSubscription)
-      .toBeObservable(expectedObservations, {a: 'a', N: null});
-  }));
-
-  it('should still emit null after source closes from errors', marbles(m => {
-    const sourceIdTokens = m.hot('-#  ');
-    const expectedObservations = '---N';
-    const givenSubscription = '   ---^';
+  it('should continue to emit null after the source errors', marbles(m => {
+    // The source has closed due to an error, but new subscribers can still
+    // register themselves and observe a single null value without ending the
+    // stream.
+    const sourceIdTokens = m.hot('-#    ');
+    const expectedObservations = '---N--';
+    const givenSubscription = '   ---^--';
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
 
