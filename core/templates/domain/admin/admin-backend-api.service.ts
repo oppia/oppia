@@ -62,6 +62,10 @@ interface ConfigProperties {
   [property: string]: Object;
 }
 
+interface JobOutput {
+  output: string;
+}
+
 export interface AdminPageDataBackendDict {
   'demo_explorations': string[][];
   'demo_collections': string[][];
@@ -141,46 +145,53 @@ export class AdminBackendApiService {
     });
   }
 
-  async startNewJobAsync(jobType: string): Promise<void> {
+  private _postAdminActionAsync(action:string, payload:Object): Promise<void> {
     return this.http.post<void>(
-      AdminPageConstants.ADMIN_HANDLER_URL, {
-        action: 'start_new_job',
-        job_type: jobType
-      }
-    ).toPromise();
+      AdminPageConstants.ADMIN_HANDLER_URL, { action, ...payload }).toPromise();
+  }
+
+  async startNewJobAsync(jobType: string): Promise<void> {
+    let action = 'start_new_job';
+    let payload = {
+      job_type: jobType
+    };
+    this._postAdminActionAsync(action, payload);
   }
 
   async cancelJobAsync(jobId: string, jobType: string): Promise<void> {
-    return this.http.post<void>(
-      AdminPageConstants.ADMIN_HANDLER_URL, {
-        action: 'cancel_job',
-        job_id: jobId,
-        job_type: jobType
-      }
-    ).toPromise();
+    let action = 'cancel_job';
+    let payload = {
+      job_id: jobId,
+      job_type: jobType
+    };
+    this._postAdminActionAsync(action, payload);
   }
 
   async startComputationAsync(computationType: string): Promise<void> {
-    return this.http.post<void>(
-      AdminPageConstants.ADMIN_HANDLER_URL, {
-        action: 'start_computation',
-        computation_type: computationType
-      }
-    ).toPromise();
+    let action = 'start_computation';
+    let payload = {
+      computation_type: computationType
+    };
+    this._postAdminActionAsync(action, payload);
   }
 
   async stopComputationAsync(computationType: string): Promise<void> {
-    return this.http.post<void>(
-      AdminPageConstants.ADMIN_HANDLER_URL, {
-        action: 'stop_computation',
-        computation_type: computationType
-      }
-    ).toPromise();
+    let action = 'stop_computation';
+    let payload = {
+      computation_type: computationType
+    };
+    this._postAdminActionAsync(action, payload);
   }
 
-  async showJobOutputAsync(adminJobOutputUrl: string): Promise<Object> {
-    return this.http.get<Object>(adminJobOutputUrl)
-      .toPromise();
+  async showJobOutputAsync(adminJobOutputUrl: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.http.get<JobOutput>(
+        adminJobOutputUrl).toPromise().then(response => {
+        resolve(response.output);
+      }, errorResponse =>{
+        reject(errorResponse);
+      });
+    });
   }
 }
 

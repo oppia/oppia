@@ -226,15 +226,20 @@ describe('Admin Backend API service for Jobs Tab', () => {
   afterEach(() => {
     httpTestingController.verify();
   });
-  it('should start the new job',
+
+  it('should request to start a new job when calling startNewJobAsync',
     fakeAsync(() => {
       let jobType = 'ActivityContributorsSummaryOneOffJob';
+      let payload = {
+        action: 'start_new_job',
+        job_type: jobType
+      };
       adminBackendApiService.startNewJobAsync(jobType)
         .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/adminhandler');
+      let req = httpTestingController.expectOne('/adminhandler');
       expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
       req.flush(200);
       flushMicrotasks();
 
@@ -243,72 +248,86 @@ describe('Admin Backend API service for Jobs Tab', () => {
     }
     ));
 
-  it('should cancel the job given its id and type',
-    fakeAsync(() => {
-      let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
-      let jobType = 'AuditContributorsOneOffJob';
-      adminBackendApiService.cancelJobAsync(jobId, jobType)
-        .then(successHandler, failHandler);
+  it('should request to cancel the job given its id' +
+    'and type when calling cancelJobAsync', fakeAsync(() => {
+    let jobId = 'AuditContributorsOneOffJob-1608291840709-843';
+    let jobType = 'AuditContributorsOneOffJob';
+    let payload = {
+      action: 'cancel_job',
+      job_id: jobId,
+      job_type: jobType
+    };
+    adminBackendApiService.cancelJobAsync(jobId, jobType)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/adminhandler');
-      expect(req.request.method).toEqual('POST');
-      req.flush(200);
-      flushMicrotasks();
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should start computation given the job name',
-    fakeAsync(() => {
-      let computationType = 'FeedbackAnalyticsAggregator';
-      adminBackendApiService.startComputationAsync(computationType)
-        .then(successHandler, failHandler);
+  it('should request to start computation given the job' +
+    'name when calling startComputationAsync', fakeAsync(() => {
+    let computationType = 'FeedbackAnalyticsAggregator';
+    let payload = {
+      action: 'start_computation',
+      computation_type: computationType
+    };
+    adminBackendApiService.startComputationAsync(computationType)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/adminhandler');
-      expect(req.request.method).toEqual('POST');
-      req.flush(200);
-      flushMicrotasks();
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should stop computation given the job name',
-    fakeAsync(() => {
-      let computationType = 'FeedbackAnalyticsAggregator';
-      adminBackendApiService.stopComputationAsync(computationType)
-        .then(successHandler, failHandler);
+  it('should request to stop computation given the job' +
+    'name when calling stopComputationAsync', fakeAsync(() => {
+    let computationType = 'FeedbackAnalyticsAggregator';
+    let payload = {
+      action: 'stop_computation',
+      computation_type: computationType
+    };
+    adminBackendApiService.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/adminhandler');
-      expect(req.request.method).toEqual('POST');
-      req.flush(200);
-      flushMicrotasks();
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush(200);
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 
-  it('should show the output of valid jobs',
-    fakeAsync(() => {
-      let adminJobOutputUrl =
-        '/adminjoboutput?job_id=RemoveGaeUserIdOneOffJob-1608282829960-668';
-      adminBackendApiService.showJobOutputAsync(adminJobOutputUrl)
-        .then(successHandler, failHandler);
+  it('should request to show the output of valid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let adminJobOutputUrl =
+      '/adminjoboutput?job_id=RemoveGaeUserIdOneOffJob-1608282829960-668';
+    adminBackendApiService.showJobOutputAsync(adminJobOutputUrl)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(adminJobOutputUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush(200);
-      flushMicrotasks();
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    expect(req.request.urlWithParams).toEqual(adminJobOutputUrl);
+    req.flush(200);
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
 });

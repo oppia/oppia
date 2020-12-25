@@ -49,11 +49,14 @@ angular.module('oppia').directive('adminJobsTab', [
           AdminBackendApiService.showJobOutputAsync(adminJobOutputUrl)
             .then(function(response) {
               ctrl.showingJobOutput = true;
-              ctrl.jobOutput = response.output || [];
+              ctrl.jobOutput = response || [];
               ctrl.jobOutput.sort();
               $timeout(function() {
                 document.querySelector('#job-output').scrollIntoView();
               });
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.error.error);
             });
         };
 
