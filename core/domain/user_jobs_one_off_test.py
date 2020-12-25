@@ -1888,7 +1888,7 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         # UserAuthDetails model was created before UserSettingsModel, but the
         # time difference is less than the time_delta required, hence created_on
         # will not be updated.
-        self.assertLessThan(
+        self.assertLess(
             user_auth_details_model.created_on, user_settings_model.created_on)
         actual_output = self._run_one_off_job()
         expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 1]]
