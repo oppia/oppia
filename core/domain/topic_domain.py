@@ -614,7 +614,7 @@ class Topic(python_utils.OBJECT):
 
     @classmethod
     def from_dict(
-            cls, topic_dict, topic_version=feconf.INIT_VERSION,
+            cls, topic_dict, topic_version=feconf.INITIAL_VERSION,
             topic_created_on=None, topic_last_updated=None):
         """Returns a Topic domain object from a dictionary.
 
@@ -1134,7 +1134,7 @@ class Topic(python_utils.OBJECT):
             topic_id, name, name, url_fragment, None, None,
             description, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
-            constants.DEFAULT_LANGUAGE_CODE, feconf.INIT_VERSION,
+            constants.DEFAULT_LANGUAGE_CODE, feconf.INITIAL_VERSION,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '', False, '')
 
     @classmethod

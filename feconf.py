@@ -257,9 +257,9 @@ CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 # schema changes.
 CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION = 1
 
-# This value is used to initialize the version number for the versioned
-# entities.
-INIT_VERSION = 0
+# Version number that should be used when initializing versioned entities when
+# no specific version is known.
+INITIAL_VERSION = 0
 
 # The default number of exploration tiles to load at a time in the search
 # results page.

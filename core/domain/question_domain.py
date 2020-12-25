@@ -973,7 +973,8 @@ class Question(python_utils.OBJECT):
         return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, feconf.INIT_VERSION, skill_ids, [])
+            constants.DEFAULT_LANGUAGE_CODE, feconf.INITIAL_VERSION, skill_ids,
+            [])
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
