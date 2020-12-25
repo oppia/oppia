@@ -353,8 +353,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         elif not cursor and not offset:
             offset = 0
 
-        # A JSON-encoded string representation of the dictionary search
-        # definition that uses Query DSL. See
+        # The search query dict, formatted using Query DSL. See
         # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
         # for more details about Query DSL.
         query = {
