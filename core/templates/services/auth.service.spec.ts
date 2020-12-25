@@ -25,7 +25,7 @@ import { AuthService } from 'services/auth.service';
 import { MockAngularFireAuth } from 'tests/unit-test-utils';
 
 
-fdescribe('Auth service', () => {
+describe('Auth service', () => {
   const setUpSystemUnderTest = (
       idTokenSource$ = of(null)): [AngularFireAuth, AuthService] => {
     const mockAngularFireAuth = new MockAngularFireAuth(idTokenSource$);
