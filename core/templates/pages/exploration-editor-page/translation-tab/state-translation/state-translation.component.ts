@@ -64,6 +64,7 @@ import { WRITTEN_TRANSLATION_TYPE_HTML, WRITTEN_TRANSLATION_TYPE_UNICODE } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
+import { Rule } from 'domain/exploration/RuleObjectFactory';
 
 angular.module('oppia').component('stateTranslation', {
   bindings: {
@@ -80,6 +81,7 @@ angular.module('oppia').component('stateTranslation', {
     'TranslationTabActiveModeService', 'COMPONENT_NAME_CONTENT',
     'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
     'COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS',
+    'COMPONENT_NAME_RULE_INPUT',
     'COMPONENT_NAME_SOLUTION', 'INTERACTION_SPECS',
     'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
     function(
@@ -92,6 +94,7 @@ angular.module('oppia').component('stateTranslation', {
         TranslationTabActiveModeService, COMPONENT_NAME_CONTENT,
         COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
         COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS,
+        COMPONENT_NAME_RULE_INPUT,
         COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
         RULE_SUMMARY_WRAP_CHARACTER_COUNT
     ) {
@@ -191,7 +194,13 @@ angular.module('oppia').component('stateTranslation', {
           if (activeContent instanceof SubtitledUnicode) {
             activeDataFormat = WRITTEN_TRANSLATION_TYPE_UNICODE;
           }
+        } else if (tabId === $scope.TAB_ID_RULE_INPUTS) {
+          const {
+            rule, inputName
+          } = $scope.interactionRuleTranslatableContents[0];
+          activeContentId = rule.inputs[inputName].contentId;
         }
+        console.log(activeContentId);
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId,
           activeDataFormat);
@@ -297,6 +306,8 @@ angular.module('oppia').component('stateTranslation', {
         } else if (tabId === $scope.TAB_ID_CUSTOMIZATION_ARGS) {
           return (
             $scope.interactionCustomizationArgTranslatableContent.length === 0);
+        } else if (tabId === $scope.TAB_ID_RULE_INPUTS) {
+          return $scope.interactionRuleTranslatableContents.length === 0;
         }
       };
 
@@ -392,6 +403,27 @@ angular.module('oppia').component('stateTranslation', {
         }
       };
 
+      const getInteractionRuleTranslatableContents = (): {
+        rule: Rule, inputName: string
+      }[] => {
+        const allRules = $scope.stateAnswerGroups.map(
+          answerGroup => answerGroup.rules).flat();
+
+        const interactionRuleTranslatableContent = [];
+        allRules.forEach(rule => {
+          Object.keys(rule.inputs).forEach(
+            inputName => {
+              if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
+                interactionRuleTranslatableContent.push({
+                  rule, inputName
+                });
+              }
+            });
+        });
+
+        return interactionRuleTranslatableContent;
+      };
+
       $scope.getInteractionCustomizationArgTranslatableContents = function(
           customizationArgs: InteractionCustomizationArgs
       ): {name: string, content: SubtitledUnicode|SubtitledHtml}[] {
@@ -473,6 +505,8 @@ angular.module('oppia').component('stateTranslation', {
           $scope.getInteractionCustomizationArgTranslatableContents(
             $scope.stateInteractionCustomizationArgs)
         );
+        $scope.interactionRuleTranslatableContents = (
+          getInteractionRuleTranslatableContents());
 
         if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
           $scope.needsUpdateTooltipMessage = 'Audio needs update to ' +
@@ -488,6 +522,7 @@ angular.module('oppia').component('stateTranslation', {
         $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
         $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
         $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
+        $scope.TAB_ID_RULE_INPUTS = COMPONENT_NAME_RULE_INPUT;
         $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
         $scope.TAB_ID_CUSTOMIZATION_ARGS = (
           COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
