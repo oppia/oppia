@@ -24,8 +24,7 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.platform import models
 subtopic_models = models.Registry.import_models([models.NAMES.subtopic])
-class SubtopicPageModelValidator(
-    base_model_validators.BaseModelValidator):
+class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SubtopicPageModel."""
 
     @classmethod
@@ -64,8 +63,7 @@ class SubtopicPageModelValidator(
         return []
 
 
-class SubtopicPageSnapshotMetadataModelValidator(
-    base_model_validators.BaseSnapshotMetadataModelValidator):
+class SubtopicPageSnapshotMetadataModelValidator(base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'subtopic page'
