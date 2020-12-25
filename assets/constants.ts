@@ -4736,141 +4736,177 @@ export default {
     "Welcome": "#992a2b"
   },
 
-  "RTL_LANGUAGES": [
-    "ar",
-    "he",
-    "fa"
-  ],
-
   // List of supported content languages in which we can create explorations or
   // other entities. Each description has a parenthetical part that may be
   // stripped out to give a shorter description.
   "SUPPORTED_CONTENT_LANGUAGES": [{
     "code": "en",
-    "description": "English"
+    "description": "English",
+    "dir": "ltr"
   }, {
     "code": "ar",
-    "description": "العربية (Arabic)"
+    "description": "العربية (Arabic)",
+    "dir": "rtl"
   }, {
     "code": "sq",
-    "description": "shqip (Albanian)"
+    "description": "shqip (Albanian)",
+    "dir": "ltr"
   }, {
     "code": "bg",
-    "description": "български (Bulgarian)"
+    "description": "български (Bulgarian)",
+    "dir": "ltr"
   }, {
     "code": "bn",
-    "description": "বাংলা (Bangla)"
+    "description": "বাংলা (Bangla)",
+    "dir": "ltr"
   }, {
     "code": "ca",
-    "description": "català (Catalan)"
+    "description": "català (Catalan)",
+    "dir": "ltr"
   }, {
     "code": "zh",
-    "description": "中文 (Chinese)"
+    "description": "中文 (Chinese)",
+    "dir": "ltr"
   }, {
     "code": "hr",
-    "description": "hrvatski (Croatian)"
+    "description": "hrvatski (Croatian)",
+    "dir": "ltr"
   }, {
     "code": "cs",
-    "description": "čeština (Czech)"
+    "description": "čeština (Czech)",
+    "dir": "ltr"
   }, {
     "code": "da",
-    "description": "dansk (Danish)"
+    "description": "dansk (Danish)",
+    "dir": "ltr"
   }, {
     "code": "prs",
-    "description": "دری (Dari)"
+    "description": "دری (Dari)",
+    "dir": "ltr"
   }, {
     "code": "nl",
-    "description": "Nederlands (Dutch)"
+    "description": "Nederlands (Dutch)",
+    "dir": "ltr"
   }, {
     "code": "tl",
-    "description": "Filipino (Filipino)"
+    "description": "Filipino (Filipino)",
+    "dir": "ltr"
   }, {
     "code": "fi",
-    "description": "suomi (Finnish)"
+    "description": "suomi (Finnish)",
+    "dir": "ltr"
   }, {
     "code": "fr",
-    "description": "français (French)"
+    "description": "français (French)",
+    "dir": "ltr"
   }, {
     "code": "de",
-    "description": "Deutsch (German)"
+    "description": "Deutsch (German)",
+    "dir": "ltr"
   }, {
     "code": "el",
-    "description": "ελληνικά (Greek)"
+    "description": "ελληνικά (Greek)",
+    "dir": "ltr"
   }, {
     "code": "he",
-    "description": "עברית (Hebrew)"
+    "description": "עברית (Hebrew)",
+    "dir": "rtl"
   }, {
     "code": "hi",
-    "description": "हिन्दी (Hindi)"
+    "description": "हिन्दी (Hindi)",
+    "dir": "ltr"
   }, {
     "code": "hu",
-    "description": "magyar (Hungarian)"
+    "description": "magyar (Hungarian)",
+    "dir": "ltr"
   }, {
     "code": "id",
-    "description": "Bahasa Indonesia (Indonesian)"
+    "description": "Bahasa Indonesia (Indonesian)",
+    "dir": "ltr"
   }, {
     "code": "it",
-    "description": "italiano (Italian)"
+    "description": "italiano (Italian)",
+    "dir": "ltr"
   }, {
     "code": "ja",
-    "description": "日本語 (Japanese)"
+    "description": "日本語 (Japanese)",
+    "dir": "ltr"
   }, {
     "code": "kab",
-    "description": "Taqbaylit (Kabyle)"
+    "description": "Taqbaylit (Kabyle)",
+    "dir": "ltr"
   }, {
     "code": "ko",
-    "description": "한국어 (Korean)"
+    "description": "한국어 (Korean)",
+    "dir": "ltr"
   }, {
     "code": "lv",
-    "description": "latviešu (Latvian)"
+    "description": "latviešu (Latvian)",
+    "dir": "ltr"
   }, {
     "code": "lt",
-    "description": "lietuvių (Lithuanian)"
+    "description": "lietuvių (Lithuanian)",
+    "dir": "ltr"
   }, {
     "code": "no",
-    "description": "Norsk (Norwegian)"
+    "description": "Norsk (Norwegian)",
+    "dir": "ltr"
   }, {
     "code": "fa",
-    "description": "فارسی (Persian)"
+    "description": "فارسی (Persian)",
+    "dir": "rtl"
   }, {
     "code": "pl",
-    "description": "polszczyzna (Polish)"
+    "description": "polszczyzna (Polish)",
+    "dir": "ltr"
   }, {
     "code": "pt",
-    "description": "português (Portuguese)"
+    "description": "português (Portuguese)",
+    "dir": "ltr"
   }, {
     "code": "ro",
-    "description": "română (Romanian)"
+    "description": "română (Romanian)",
+    "dir": "ltr"
   }, {
     "code": "ru",
-    "description": "pусский (Russian)"
+    "description": "pусский (Russian)",
+    "dir": "ltr"
   }, {
     "code": "sr",
-    "description": "cрпски (Serbian)"
+    "description": "cрпски (Serbian)",
+    "dir": "ltr"
   }, {
     "code": "sk",
-    "description": "slovenčina (Slovak)"
+    "description": "slovenčina (Slovak)",
+    "dir": "ltr"
   }, {
     "code": "sl",
-    "description": "slovenščina (Slovenian)"
+    "description": "slovenščina (Slovenian)",
+    "dir": "ltr"
   }, {
     "code": "es",
-    "description": "español (Spanish)"
+    "description": "español (Spanish)",
+    "dir": "ltr"
   }, {
     "code": "sv",
-    "description": "svenska (Swedish)"
+    "description": "svenska (Swedish)",
+    "dir": "ltr"
   }, {
     "code": "th",
-    "description": "ภาษาไทย (Thai)"
+    "description": "ภาษาไทย (Thai)",
+    "dir": "ltr"
   }, {
     "code": "tr",
-    "description": "Türkçe (Turkish)"
+    "description": "Türkçe (Turkish)",
+    "dir": "ltr"
   }, {
     "code": "uk",
-    "description": "yкраїнська (Ukrainian)"
+    "description": "yкраїнська (Ukrainian)",
+    "dir": "ltr"
   }, {
     "code": "vi",
-    "description": "Tiếng Việt (Vietnamese)"
+    "description": "Tiếng Việt (Vietnamese)",
+    "dir": "ltr"
   }],
 
   // NOTE TO DEVELOPERS: While adding another language, please ensure that the

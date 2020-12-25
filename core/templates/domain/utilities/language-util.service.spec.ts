@@ -75,6 +75,15 @@ describe('Language util service', function() {
     }
   );
 
+  it('should get the correct language direction given a content language code',
+    () => {
+      expect(lus.getLanguageDirection('en')).toEqual('ltr');
+      expect(lus.getLanguageDirection('ar')).toEqual('rtl');
+      expect(lus.getLanguageDirection('he')).toEqual('rtl');
+      expect(lus.getLanguageDirection('fa')).toEqual('rtl');
+    }
+  );
+
   it('should correctly compute the complement languages', () => {
     expect(lus.getComplementAudioLanguageCodes([]))
       .toEqual(['en', 'hi-en', 'es']);

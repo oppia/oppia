@@ -22,7 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import constants from 'assets/constants';
 
 
 @Injectable({
@@ -43,13 +42,8 @@ export class TranslationLanguageService {
   }
 
   getActiveLanguageDirection(): string {
-    let languageDirection = 'ltr';
-    constants.RTL_LANGUAGES.forEach((langCode) => {
-      if (langCode === this.getActiveLanguageCode()) {
-        languageDirection = 'rtl';
-      }
-    });
-    return languageDirection;
+    return this.languageUtilService.getLanguageDirection(
+      this.getActiveLanguageCode());
   }
 
   setActiveLanguageCode(newActiveLanguageCode: string): void {

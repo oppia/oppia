@@ -42,6 +42,7 @@ interface SupportedAudioLanguageBackendDict {
 interface SupportedContentLanguageBackendDict {
   'code': string;
   'description': string;
+  'dir': string;
 }
 
 interface LanguageIdAndText {
@@ -52,6 +53,7 @@ interface LanguageIdAndText {
 interface ContentLanguage {
   code: string;
   description: string;
+  dir: string;
 }
 
 @Injectable({
@@ -144,6 +146,11 @@ export class LanguageUtilService {
   getAudioLanguageDescription(audioLanguageCode: string): string {
     const language = this.getSupportedAudioLanguages()[audioLanguageCode];
     return language ? language.description : null;
+  }
+  getLanguageDirection(languageCode: string): string {
+    const languageIndex = this.SUPPORTED_CONTENT_LANGUAGES.findIndex(
+      (lang: ContentLanguage) => lang.code === languageCode);
+    return this.SUPPORTED_CONTENT_LANGUAGES[languageIndex].dir;
   }
   // Given a list of audio language codes, returns the complement list, i.e.
   // the list of audio language codes not in the input list.
