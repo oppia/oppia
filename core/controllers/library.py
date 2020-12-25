@@ -33,9 +33,10 @@ import python_utils
 import utils
 
 
-def get_matching_activity_dicts(query_string, search_cursor):
-    """Given a query string and a search cursor, returns a list of activity
-    dicts that satisfy the search query.
+def get_matching_activity_dicts(
+        query_string, categories, language_codes, search_cursor):
+    """Given the details of a query and a search cursor, returns a list of
+    activity dicts that satisfy the query.
     """
     # We only populate collections in the initial load, since the current
     # frontend search infrastructure is set up to only deal with one search
@@ -45,16 +46,14 @@ def get_matching_activity_dicts(query_string, search_cursor):
     if not search_cursor:
         collection_ids, _ = (
             collection_services.get_collection_ids_matching_query(
-                query_string))
+                query_string, categories, language_codes))
 
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
-            query_string, cursor=search_cursor))
-    activity_list = []
+            query_string, categories, language_codes, cursor=search_cursor))
     activity_list = (
         summary_services.get_displayable_collection_summary_dicts_matching_ids(
-            collection_ids))
-    activity_list += (
+            collection_ids) +
         summary_services.get_displayable_exp_summary_dicts_matching_ids(
             exp_ids))
 
@@ -215,15 +214,24 @@ class SearchHandler(base.BaseHandler):
             (ord(char), None) for char in string.punctuation)
         query_string = query_string.translate(remove_punctuation_map)
 
-        if self.request.get('category'):
-            query_string += ' category=%s' % self.request.get('category')
-        if self.request.get('language_code'):
-            query_string += ' language_code=%s' % self.request.get(
-                'language_code')
+        # If there is a category parameter, it will be in the following form:
+        #     category=("Algebra" OR "Math")
+        category_string = self.request.get('category', '')
+        categories = (
+            category_string[2:-2].split('" OR "') if category_string else [])
+
+        # If there is a language code parameter, it will be in the following
+        # form:
+        #     language_code=("en" OR "hi")
+        language_code_string = self.request.get('language_code', '')
+        language_codes = (
+            language_code_string[2:-2].split('" OR "')
+            if language_code_string else [])
+
         search_cursor = self.request.get('cursor', None)
 
         activity_list, new_search_cursor = get_matching_activity_dicts(
-            query_string, search_cursor)
+            query_string, categories, language_codes, search_cursor)
 
         self.values.update({
             'activity_list': activity_list,

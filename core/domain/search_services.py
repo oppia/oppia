@@ -164,11 +164,13 @@ def _should_index_collection(collection):
     return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
-def search_explorations(query, limit, cursor=None):
+def search_explorations(query, categories, language_codes, limit, cursor=None):
     """Searches through the available explorations.
 
     Args:
         query: str or None. The query string to search for.
+        categories: list(str). The list of categories to query for.
+        language_codes: list(str). The list of language codes to query for.
         limit: int. The maximum number of results to return.
         cursor: str or None. A cursor, used to get the next page of results. If
             there are more documents that match the query than 'limit', this
@@ -185,8 +187,8 @@ def search_explorations(query, limit, cursor=None):
     # instead once the underlying search service is migrated over to
     # elasticsearch.
     return search_services.search(
-        query, SEARCH_INDEX_EXPLORATIONS, cursor=cursor,
-        size=limit, ids_only=True)
+        query, SEARCH_INDEX_EXPLORATIONS, categories, language_codes,
+        cursor=cursor, size=limit, ids_only=True)
 
 
 def delete_explorations_from_search_index(exploration_ids):
@@ -208,11 +210,13 @@ def clear_exploration_search_index():
     search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
 
 
-def search_collections(query, limit, cursor=None):
+def search_collections(query, categories, language_codes, limit, cursor=None):
     """Searches through the available collections.
 
     Args:
         query: str or None. The query string to search for.
+        categories: list(str). The list of categories to query for.
+        language_codes: list(str). The list of language codes to query for.
         limit: int. The maximum number of results to return.
         cursor: str or None. A cursor, used to get the next page of results.
             If there are more documents that match the query than 'limit', this
@@ -229,8 +233,8 @@ def search_collections(query, limit, cursor=None):
     # instead once the underlying search service is migrated over to
     # elasticsearch.
     return search_services.search(
-        query, SEARCH_INDEX_COLLECTIONS, cursor=cursor,
-        size=limit, ids_only=True)
+        query, SEARCH_INDEX_COLLECTIONS, categories, language_codes,
+        cursor=cursor, size=limit, ids_only=True)
 
 
 def delete_collections_from_search_index(collection_ids):

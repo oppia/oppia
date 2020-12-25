@@ -238,8 +238,8 @@ class LibraryPageTests(test_utils.GenericTestBase):
         exp_services.index_explorations_given_ids([exp_id])
         response_dict = self.get_json(
             feconf.LIBRARY_SEARCH_DATA_URL, params={
-                'category': 'A category',
-                'language_code': 'en'
+                'category': '("A category")',
+                'language_code': '("en")'
             })
         activity_list = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
