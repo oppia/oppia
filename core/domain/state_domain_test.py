@@ -534,22 +534,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'rule_specs': [{
                 'rule_type': 'Equals',
                 'inputs': {
-                    'x': ['ca_choices_0']
+                    'x': ['<p>Equals rule_spec html</p>']
                 }
             }, {
                 'rule_type': 'ContainsAtLeastOneOf',
                 'inputs': {
-                    'x': ['ca_choices_1']
+                    'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
                 }
             }, {
                 'rule_type': 'IsProperSubsetOf',
                 'inputs': {
-                    'x': ['ca_choices_2']
+                    'x': ['<p>IsProperSubsetOf rule_spec html</p>']
                 }
             }, {
                 'rule_type': 'DoesNotContainAtLeastOneOf',
                 'inputs': {
-                    'x': ['ca_choices_3']
+                    'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
                 }
             }],
             'outcome': {
@@ -569,10 +569,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_solution_dict = {
             'answer_is_exclusive': True,
             'correct_answer': [
-                'ca_choices_0',
-                'ca_choices_1',
-                'ca_choices_2',
-                'ca_choices_3'
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>'
             ],
             'explanation': {
                 'content_id': 'solution',
@@ -601,23 +601,117 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_solution(solution)
         exp_services.save_new_exploration('owner_id', exploration)
 
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'ItemSelectionInput'))
-        interaction.can_have_solution = True
-        html_list = state.get_all_html_content_strings()
+        mock_html_field_types_to_rule_specs_dict = (
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        def mock_get_interaction_by_id(cls, interaction_id):
+            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
+            interaction.answer_type = 'SetOfHtmlString'
+            interaction.can_have_solution = True
+            return interaction
+
+        rules_registry_swap = self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs))
+
+        interaction_registry_swap = self.swap(
+            interaction_registry.Registry, 'get_interaction_by_id',
+            classmethod(mock_get_interaction_by_id))
+
+        with rules_registry_swap, interaction_registry_swap:
+            html_list = state.get_all_html_content_strings()
+
         self.assertEqual(
             html_list,
             [
                 '<p>state outcome html</p>',
-                '',
+                '<p>Equals rule_spec html</p>',
+                '<p>ContainsAtLeastOneOf rule_spec html</p>',
+                '<p>IsProperSubsetOf rule_spec html</p>',
+                '<p>DoesNotContainAtLeastOneOf rule_spec html</p>', '',
                 '<p>Hello, this is html1 for hint 1</p>',
                 '<p>This is solution for state1</p>',
+                '<p>state customization arg html 1</p>',
+                '<p>state customization arg html 2</p>',
+                '<p>state customization arg html 3</p>',
+                '<p>state customization arg html 4</p>',
                 '<p>init_state customization arg html 1</p>',
                 '<p>init_state customization arg html 2</p>',
                 '<p>init_state customization arg html 3</p>',
                 '<p>init_state customization arg html 4</p>',
                 '<p>state content html</p>'])
+
+    def test_rule_spec_with_invalid_html_format(self):
+        """Test the method for extracting all the HTML from a state
+        when the rule_spec has invalid html format.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_answer_groups = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': ['<p>Equals rule_spec html</p>']
+                }
+            }, {
+                'rule_type': 'ContainsAtLeastOneOf',
+                'inputs': {
+                    'x': ['<p>ContainsAtLeastOneOf rule_spec html</p>']
+                }
+            }, {
+                'rule_type': 'IsProperSubsetOf',
+                'inputs': {
+                    'x': ['<p>IsProperSubsetOf rule_spec html</p>']
+                }
+            }, {
+                'rule_type': 'DoesNotContainAtLeastOneOf',
+                'inputs': {
+                    'x': ['<p>DoesNotContainAtLeastOneOf rule_spec html</p>']
+                }
+            }],
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>state outcome html</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        state.update_interaction_id('ItemSelectionInput')
+        state.update_interaction_answer_groups(state_answer_groups)
+
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+        for html_type_dict in (
+                mock_html_field_types_to_rule_specs_dict.values()):
+            html_type_dict['format'] = 'invalid format'
+
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        with self.swap(
+                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+                classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
+            with self.assertRaisesRegexp(
+                Exception,
+                'The rule spec does not belong to a valid format.'):
+                state.get_all_html_content_strings()
 
     def test_update_customization_args_with_invalid_content_id(self):
         """Test the method for updating interaction customization arguments
@@ -655,6 +749,89 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ):
             state.update_interaction_customization_args(
                 state_customization_args_dict)
+
+    def test_rule_spec_with_html_having_invalid_input_variable(self):
+        """Test the method for extracting all the HTML from a state
+        when the rule_spec has html but the input variable is invalid.
+        """
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id')
+        exploration.add_states(['State1'])
+        state = exploration.states['State1']
+        state_answer_groups = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {
+                    'x': ['<p>init_state customization arg html 1</p>']
+                }
+            }],
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback',
+                    'html': '<p>state outcome html</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+        state_customization_args_dict = {
+            'maxAllowableSelectionCount': {
+                'value': 1
+            },
+            'minAllowableSelectionCount': {
+                'value': 1
+            },
+            'choices': {
+                'value': [
+                    {
+                        'content_id': 'ca_choices_0',
+                        'html': '<p>init_state customization arg html 1</p>'
+                    }, {
+                        'content_id': 'ca_choices_1',
+                        'html': '<p>init_state customization arg html 2</p>'
+                    }, {
+                        'content_id': 'ca_choices_2',
+                        'html': '<p>init_state customization arg html 3</p>'
+                    }, {
+                        'content_id': 'ca_choices_3',
+                        'html': '<p>init_state customization arg html 4</p>'
+                    }
+                ]
+            }
+        }
+
+        state.update_interaction_id('ItemSelectionInput')
+        state.update_interaction_customization_args(
+            state_customization_args_dict)
+        state.update_interaction_answer_groups(state_answer_groups)
+
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+        for html_type_dict in (
+                mock_html_field_types_to_rule_specs_dict.values()):
+            if html_type_dict['interactionId'] == 'ItemSelectionInput':
+                html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
+                    ['y'])
+
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        with self.swap(
+                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+                classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
+            with self.assertRaisesRegexp(
+                Exception,
+                'Rule spec should have at least one valid input variable with '
+                'Html in it.'):
+                state.get_all_html_content_strings()
 
     def test_get_all_html_when_solution_has_invalid_answer_type(self):
         """Test the method for extracting all the HTML from a state
