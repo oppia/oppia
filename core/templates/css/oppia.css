@@ -3850,7 +3850,8 @@ oppia-noninteractive-link {
 }
 
 .oppia-about-otter-speech-bubble h3 {
-  color: #000;
+  color: #333;
+  font-weight: 700;
   margin: 20px 0 20px 0;
 }
 
