@@ -18,7 +18,7 @@
 
 import { Injectable, OnDestroy } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 
@@ -30,9 +30,24 @@ export class AuthService implements OnDestroy {
   private tokenSubscription: Subscription;
 
   constructor(private angularFireAuth: AngularFireAuth) {
+    // An Observable (i.e. stream of values) Subject (i.e. producer of values).
+    // BehaviorSubjects are "cold" observables (i.e. lazy streams that only emit
+    // values when prompted by a subscriber), and emits the value it last
+    // produced to new subscribers (or null, the initial value we've given it).
     this.tokenCache = new BehaviorSubject(null);
-    this.tokenSubscription = this.angularFireAuth.idToken.pipe(
-      catchError(_ => of(null))).subscribe(this.tokenCache);
+    // Object used to control the lifetime of a subscription. After the
+    // subscription becomes obsolete, we should call ".unsubscribe()" on it to
+    // prevent a memory leak.
+    this.tokenSubscription = (
+      // Given an untrusted source of ID Tokens, prepare to apply a sequence of
+      // transformations on the values it emits using a "pipe".
+      this.angularFireAuth.idToken.pipe(
+        // Catch errors thrown by the untrusted source and change them into a
+        // "cold" Observable that eternally emits "null".
+        catchError(_ => new BehaviorSubject(null)))
+        // Subscribe to the results, forwarding every token (or null) it emits
+        // into our BehaviorSubject.
+        .subscribe(this.tokenCache));
   }
 
   ngOnDestroy(): void {

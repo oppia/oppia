@@ -25,7 +25,7 @@ import { AuthService } from 'services/auth.service';
 import { MockAngularFireAuth } from 'tests/unit-test-utils';
 
 
-describe('Auth service', () => {
+fdescribe('Auth service', () => {
   const setUpSystemUnderTest = (
       idTokenSource$ = of(null)): [AngularFireAuth, AuthService] => {
     const mockAngularFireAuth = new MockAngularFireAuth(idTokenSource$);
@@ -70,12 +70,12 @@ describe('Auth service', () => {
   }));
 
   it('should emit null when subscription is too early', marbles(m => {
-    // Subscribing to the service's idToken$ emits null for the early observer
+    // Subscribing to the service's idToken$ emits null for early observers
     // because the source hasn't produced anything yet. The subscription ends
     // before 'a' is emitted, so null is the first and last value observed.
-    const sourceIdTokens = m.hot('-----a-|');
-    const expectedObservations = '-N--    ';
-    const givenSubscription = '   -^-!    ';
+    const sourceIdTokens = m.hot('-----a-');
+    const expectedObservations = '-N--   ';
+    const givenSubscription = '   -^-!   ';
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
 
@@ -84,13 +84,13 @@ describe('Auth service', () => {
   }));
 
   it('should emit most recent value after subscribing', marbles(m => {
-    const sourceIdTokens = m.hot('-a---b---|');
+    const sourceIdTokens = m.hot('-a---b---');
     // The early observer will see 'a' and stick around to see 'b' as well.
-    const earlyObservations = '   ---a-b----';
-    const earlySubscription = '   ---^-----!';
+    const earlyObservations = '   ---a-b---';
+    const earlySubscription = '   ---^-----';
     // The late observer will only see 'b'.
-    const lateObservations = '    -------b--';
-    const lateSubscription = '    -------^-!';
+    const lateObservations = '    -------b-';
+    const lateSubscription = '    -------^-';
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
 
@@ -100,16 +100,47 @@ describe('Auth service', () => {
       .toBeObservable(lateObservations);
   }));
 
-  it('should emit null and complete after source errors', marbles(m => {
-    // Subscriber joins in time to observe 'a' and then completes after emitting
-    // a final null value, rather than throwing the error from source.
-    const sourceIdTokens = m.hot('a---#   ');
-    const expectedObservations = '--a-(N|)';
-    const givenSubscription = '   --^--   ';
+  it('should emit null when the source errors', marbles(m => {
+    const sourceIdTokens = m.hot('a---#');
+    const expectedObservations = '--a-N';
+    const givenSubscription = '   --^--';
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
 
     m.expect(authService.idToken$, givenSubscription)
       .toBeObservable(expectedObservations, {a: 'a', N: null});
+  }));
+
+  it('should still emit null after source closes from errors', marbles(m => {
+    const sourceIdTokens = m.hot('-#  ');
+    const expectedObservations = '---N';
+    const givenSubscription = '   ---^';
+
+    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
+
+    m.expect(authService.idToken$, givenSubscription)
+      .toBeObservable(expectedObservations, {N: null});
+  }));
+
+  it('should emit null when the source complete', marbles(m => {
+    const sourceIdTokens = m.hot('a---#');
+    const expectedObservations = '--a-N';
+    const givenSubscription = '   --^--';
+
+    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
+
+    m.expect(authService.idToken$, givenSubscription)
+      .toBeObservable(expectedObservations, {a: 'a', N: null});
+  }));
+
+  it('should still emit null after source closes from errors', marbles(m => {
+    const sourceIdTokens = m.hot('-#  ');
+    const expectedObservations = '---N';
+    const givenSubscription = '   ---^';
+
+    const [, authService] = setUpSystemUnderTest(sourceIdTokens);
+
+    m.expect(authService.idToken$, givenSubscription)
+      .toBeObservable(expectedObservations, {N: null});
   }));
 });

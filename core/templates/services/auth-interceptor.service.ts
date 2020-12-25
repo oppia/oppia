@@ -19,7 +19,7 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { mergeMap, take } from 'rxjs/operators';
+import { map, switchMap, take } from 'rxjs/operators';
 
 import { AuthService } from 'services/auth.service';
 
@@ -30,12 +30,25 @@ import { AuthService } from 'services/auth.service';
 export class AuthInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) {}
 
+  /**
+   * Given an HTTP request, adds a new Authorization header (if and only if a
+   * user is currently signed in) and passes it along to the next handler of
+   * HTTP requests.
+   */
   intercept<T>(
       request: HttpRequest<T>, next: HttpHandler): Observable<HttpEvent<T>> {
-    return this.authService.idToken$.pipe(take(1), mergeMap(
-      idToken => next.handle(
-        idToken === null ?
-          request :
-          request.clone({setHeaders: {Authorization: `Bearer ${idToken}`}}))));
+    // From AuthService's `Observable` stream of ID Tokens, prepare to apply a
+    // sequence of transformations with a pipe.
+    return this.authService.idToken$.pipe(
+      // Take the first token emitted.
+      take(1),
+      // Map the token to the passed-in HTTP request, modifying it to include an
+      // Authorization header if and only if the token is not null.
+      map(token => token === null ? request : request.clone({
+        setHeaders: {Authorization: `Bearer ${token}`}
+      })),
+      // Finally, map the request onto the next HttpHandler and switch the type
+      // of Observable stream returned to emit the events it fires.
+      switchMap(request => next.handle(request)));
   }
 }
