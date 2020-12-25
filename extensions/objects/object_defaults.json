@@ -26,8 +26,15 @@
     "Real": 0.0,
     "SetOfAlgebraicIdentifier": [],
     "SetOfHtmlString": [],
-    "SetOfNormalizedString": [],
     "SetOfUnicodeString": [],
+    "TranslatableSetOfNormalizedString": {
+      "contentId": null,
+      "normalizedStrSet": []
+    },
+    "TranslatableSetOfUnicodeString": {
+      "contentId": null,
+      "unicodeStrSet": []
+    },
     "UnicodeString": "",
     "Fraction": {
       "isNegative": false,
