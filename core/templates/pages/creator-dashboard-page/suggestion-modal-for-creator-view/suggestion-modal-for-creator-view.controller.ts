@@ -16,16 +16,17 @@
  * @fileoverview Controller for suggestion modal in creator view.
  */
 
+
 angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
   '$scope', '$uibModalInstance', 'SuggestionModalService',
   'canReviewActiveThread', 'description', 'newContent', 'oldContent',
   'stateName', 'suggestionIsHandled', 'suggestionStatus',
-  'suggestionType',
+  'suggestionType', 'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
       $scope, $uibModalInstance, SuggestionModalService,
       canReviewActiveThread, description, newContent, oldContent,
       stateName, suggestionIsHandled, suggestionStatus,
-      suggestionType
+      suggestionType, ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION
   ) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canReject = $scope.isNotHandled;
@@ -63,7 +64,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
       SuggestionModalService.acceptSuggestion(
         $uibModalInstance,
         {
-          action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+          action: ACTION_ACCEPT_SUGGESTION,
           commitMessage: $scope.commitMessage,
           reviewMessage: $scope.reviewMessage,
         });
@@ -73,7 +74,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
       SuggestionModalService.rejectSuggestion(
         $uibModalInstance,
         {
-          action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+          action: ACTION_REJECT_SUGGESTION,
           commitMessage: null,
           reviewMessage: $scope.reviewMessage
         });
