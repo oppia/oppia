@@ -468,6 +468,40 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
+class RemoveFeedbackThreadIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes the feedback_thread_ids from the UserSubscriptionsModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSubscriptionsModel]
+
+    @staticmethod
+    def map(user_subscriptions_model):
+        # This is the only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'feedback_thread_ids' in user_subscriptions_model._properties:  # pylint: disable=protected-access
+            del user_subscriptions_model._properties['feedback_thread_ids']  # pylint: disable=protected-access
+            if 'feedback_thread_ids' in user_subscriptions_model._values:  # pylint: disable=protected-access
+                del user_subscriptions_model._values['feedback_thread_ids']  # pylint: disable=protected-access
+            user_subscriptions_model.update_timestamps(
+                update_last_updated_time=False)
+            user_subscriptions_model.put()
+            yield (
+                'SUCCESS_REMOVED - UserSubscriptionsModel',
+                user_subscriptions_model.id)
+        else:
+            yield (
+                'SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel',
+                user_subscriptions_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
+
+
 class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that cleans up UserSubscribersModel by removing user id if it is
     present in subscriber ids.

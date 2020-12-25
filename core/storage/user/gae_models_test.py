@@ -874,7 +874,6 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
             activity_ids=self.ACTIVITY_IDS,
-            feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATETIME
         ).put()
@@ -936,7 +935,6 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'creator_usernames': [],
             'collection_ids': [],
             'activity_ids': [],
-            'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked_msec': None
         }
@@ -950,7 +948,6 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
             'activity_ids': self.ACTIVITY_IDS,
-            'feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'last_checked_msec':
                 utils.get_time_in_millisecs(self.GENERIC_DATETIME)
