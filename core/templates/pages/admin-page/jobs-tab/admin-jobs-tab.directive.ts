@@ -25,11 +25,9 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 angular.module('oppia').directive('adminJobsTab', [
   '$rootScope', '$timeout', 'AdminBackendApiService',
   'AdminDataService', 'UrlInterpolationService',
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
   function(
       $rootScope, $timeout, AdminBackendApiService,
-      AdminDataService, UrlInterpolationService,
-      ADMIN_JOB_OUTPUT_URL_TEMPLATE) {
+      AdminDataService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -42,11 +40,7 @@ angular.module('oppia').directive('adminJobsTab', [
       controller: [function() {
         var ctrl = this;
         ctrl.showJobOutput = function(jobId) {
-          var adminJobOutputUrl = UrlInterpolationService.interpolateUrl(
-            ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
-              jobId: jobId
-            });
-          AdminBackendApiService.showJobOutputAsync(adminJobOutputUrl)
+          AdminBackendApiService.showJobOutputAsync(jobId)
             .then(function(response) {
               ctrl.showingJobOutput = true;
               ctrl.jobOutput = response || [];

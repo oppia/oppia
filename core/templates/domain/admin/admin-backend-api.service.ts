@@ -42,6 +42,8 @@ import {
   PlatformParameter,
   PlatformParameterBackendDict
 } from 'domain/platform_feature/platform-parameter.model';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 
 interface UserRoles {
@@ -107,7 +109,8 @@ export interface AdminPageData {
 })
 export class AdminBackendApiService {
   constructor(
-    private http: HttpClient) {}
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService) {}
 
   async getDataAsync(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
@@ -183,7 +186,11 @@ export class AdminBackendApiService {
     this._postAdminActionAsync(action, payload);
   }
 
-  async showJobOutputAsync(adminJobOutputUrl: string): Promise<string> {
+  async showJobOutputAsync(jobId: string): Promise<string> {
+    let adminJobOutputUrl = this.urlInterpolationService.interpolateUrl(
+      AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
+        jobId: jobId
+      });
     return new Promise((resolve, reject) => {
       this.http.get<JobOutput>(
         adminJobOutputUrl).toPromise().then(response => {

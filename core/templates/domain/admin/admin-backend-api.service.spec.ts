@@ -315,14 +315,14 @@ describe('Admin Backend API service for Jobs Tab', () => {
 
   it('should request to show the output of valid' +
     'jobs when calling showJobOutputAsync', fakeAsync(() => {
-    let adminJobOutputUrl =
-      '/adminjoboutput?job_id=RemoveGaeUserIdOneOffJob-1608282829960-668';
-    adminBackendApiService.showJobOutputAsync(adminJobOutputUrl)
+    let jobId = 'FeedbackAnalyticsMRJobManager-1608932124519-748';
+    let adminJobOutputUrl = 'adminjoboutput?job_id=FeedbackAnalytics' +
+      'MRJobManager-1608932124519-748';
+    adminBackendApiService.showJobOutputAsync(jobId)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(adminJobOutputUrl);
     expect(req.request.method).toEqual('GET');
-    expect(req.request.urlWithParams).toEqual(adminJobOutputUrl);
     req.flush(200);
     flushMicrotasks();
 
