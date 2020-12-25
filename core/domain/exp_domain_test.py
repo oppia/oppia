@@ -9160,6 +9160,7 @@ states:
             x:
             - <p>Choice 1</p>
             - <p>Choice 2</p>
+            - <p>Choice Invalid</p>
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -9275,6 +9276,7 @@ states:
             x:
             - ca_choices_2
             - ca_choices_3
+            - invalid_content_id
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
