@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import copy
+import datetime
 import imghdr
 
 from core import jobs
@@ -28,6 +29,7 @@ from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import feconf
 import python_utils
 import utils
 
@@ -469,11 +471,8 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that fixes the invalid values of created_on attribute in the
-    UserSettingsModel.
-
-    This is a one-off job and can be removed from the codebase
-    after we resolve this issue by running the job once.
+    """Job that audits timestamp attributes of user models to fix the invalid
+    values of created_on attribute in the UserSettingsModel.
     """
 
     @classmethod
@@ -489,56 +488,39 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_settings_model):
         user_id = user_settings_model.id
         user_dates_list = [
-            ('UserSettingsModel', user_settings_model.created_on),
-            ('UserSettingsModel', user_settings_model.last_updated),
-            ('UserSettingsModel', user_settings_model.last_agreed_to_terms),
-            ('UserSettingsModel', user_settings_model.last_logged_in),
-            ('UserSettingsModel', user_settings_model.first_contribution_msec),
             (
-                'UserSettingsModel',
+                'UserSettingsModel_last_updated',
+                user_settings_model.last_updated
+            ),
+            (
+                'UserSettingsModel_last_agreed_to_terms',
+                user_settings_model.last_agreed_to_terms
+            ),
+            (
+                'UserSettingsModel_last_started_state_editor_tutorial',
                 user_settings_model.last_started_state_editor_tutorial
             ),
             (
-                'UserSettingsModel',
+                'UserSettingsModel_last_started_state_translation_tutorial',
                 user_settings_model.last_started_state_translation_tutorial
             ),
             (
-                'UserSettingsModel',
+                'UserSettingsModel_last_logged_in',
+                user_settings_model.last_logged_in
+            ),
+            (
+                'UserSettingsModel_last_edited_an_exploration',
                 user_settings_model.last_edited_an_exploration
             ),
             (
-                'UserSettingsModel',
+                'UserSettingsModel_last_created_an_exploration',
                 user_settings_model.last_created_an_exploration
             ),
+            (
+                'UserSettingsModel_first_contribution_msec',
+                user_settings_model.first_contribution_msec
+            ),
         ]
-
-        # Models in user storage module keyed by user_id.
-        completed_activities_model = (
-            user_models.CompletedActivitiesModel.get_by_id(user_id))
-        incomplete_activities_model = (
-            user_models.IncompleteActivitiesModel.get_by_id(user_id))
-        learner_playlist_model = (
-            user_models.LearnerPlaylistModel.get_by_id(user_id))
-        pending_deletion_request_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(user_id))
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel.get_by_id(user_id))
-        user_bulk_emails_model = (
-            user_models.UserBulkEmailsModel.get_by_id(user_id))
-        user_contributions_model = (
-            user_models.UserContributionsModel.get_by_id(user_id))
-        user_contribution_rights_model = (
-            user_models.UserContributionRightsModel.get_by_id(user_id))
-        user_email_preferences_model = (
-            user_models.UserEmailPreferencesModel.get_by_id(user_id))
-        user_recent_changes_batch_model = (
-            user_models.UserRecentChangesBatchModel.get_by_id(user_id))
-        user_stats_model = (
-            user_models.UserStatsModel.get_by_id(user_id))
-        user_subscribers_model = (
-            user_models.UserSubscribersModel.get_by_id(user_id))
-        user_subscriptions_model = (
-            user_models.UserSubscriptionsModel.get_by_id(user_id))
 
         # Models in user storage module having user_id as an attribute.
         collection_progress_model = (
@@ -572,20 +554,7 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 user_models.ExplorationUserDataModel.user_id == user_id).get()
         )
 
-        models_linked_with_user_settings_model = [
-            ('CompletedActivitiesModel', completed_activities_model),
-            ('IncompleteActivitiesModel', incomplete_activities_model),
-            ('LearnerPlaylistModel', learner_playlist_model),
-            ('PendingDeletionRequestModel', pending_deletion_request_model),
-            ('UserAuthDetailsModel', user_auth_details_model),
-            ('UserBulkEmailsModel', user_bulk_emails_model),
-            ('UserContributionsModel', user_contributions_model),
-            ('UserContributionRightsModel', user_contribution_rights_model),
-            ('UserEmailPreferencesModel', user_email_preferences_model),
-            ('UserRecentChangesBatchModel', user_recent_changes_batch_model),
-            ('UserStatsModel', user_stats_model),
-            ('UserSubscribersModel', user_subscribers_model),
-            ('UserSubscriptionsModel', user_subscriptions_model),
+        all_models_linked_with_user_settings_model = [
             ('CollectionProgressModel', collection_progress_model),
             ('ExpUserLastPlaythroughModel', exp_user_last_playthrough_model),
             ('StoryProgressModel', story_progress_model),
@@ -596,47 +565,85 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             ('ExplorationUserDataModel', exploration_user_data_model)
         ]
 
-        for model_name, model in models_linked_with_user_settings_model:
+        # Models in user storage module keyed by user_id itself.
+        model_names_and_ids_to_be_fetched_in_batch = [
+            ('CompletedActivitiesModel', [user_id]),
+            ('IncompleteActivitiesModel', [user_id]),
+            ('LearnerPlaylistModel', [user_id]),
+            ('PendingDeletionRequestModel', [user_id]),
+            ('UserAuthDetailsModel', [user_id]),
+            ('UserBulkEmailsModel', [user_id]),
+            ('UserContributionsModel', [user_id]),
+            ('UserContributionRightsModel', [user_id]),
+            ('UserEmailPreferencesModel', [user_id]),
+            ('UserRecentChangesBatchModel', [user_id]),
+            ('UserStatsModel', [user_id]),
+            ('UserSubscribersModel', [user_id]),
+            ('UserSubscriptionsModel', [user_id]),
+        ]
+        fetched_batch_models = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                model_names_and_ids_to_be_fetched_in_batch)
+        )
+
+        for model_name_tuple, model_list in python_utils.ZIP(
+                model_names_and_ids_to_be_fetched_in_batch,
+                fetched_batch_models
+            ):
+            model_name = model_name_tuple[0]
+            actual_model = model_list[0]
+            all_models_linked_with_user_settings_model.append(
+                (model_name, actual_model)
+            )
+
+        for model_name, model in all_models_linked_with_user_settings_model:
             if model is not None:
-                user_dates_list.append((model_name, model.last_updated))
-                user_dates_list.append((model_name, model.created_on))
-
-        # Following models had some additional date/time fields.
-        if user_subscriptions_model is not None:
-            user_dates_list.append(
-                (
-                    'UserSubscriptionsModel',
-                    user_subscriptions_model.last_checked
+                user_dates_list.append(
+                    (
+                        model_name + python_utils.UNICODE('_last_updated'),
+                        model.last_updated
+                    )
                 )
-            )
-
-        if exploration_user_data_model is not None:
-            user_dates_list.append(
-                (
-                    'ExplorationUserDataModel',
-                    exploration_user_data_model.rated_on
+                user_dates_list.append(
+                    (
+                        model_name + python_utils.UNICODE('_created_on'),
+                        model.created_on
+                    )
                 )
-            )
-            user_dates_list.append(
-                (
-                    'ExplorationUserDataModel',
-                    exploration_user_data_model.draft_change_list_last_updated
-                )
-            )
+                if model_name == 'UserSubscriptionsModel':
+                    user_dates_list.append(
+                        (
+                            'UserSubscriptionsModel_last_checked',
+                            model.last_checked
+                        )
+                    )
+                if model_name == 'ExplorationUserDataModel':
+                    user_dates_list.append(
+                        (
+                            'ExplorationUserDataModel_rated_on',
+                            model.rated_on
+                        )
+                    )
+                    user_dates_list.append(
+                        (
+                            'ExplorationUserDataModel_draft_change_list_last_'
+                            'updated',
+                            model.draft_change_list_last_updated
+                        )
+                    )
 
         filtered_user_dates_list = [
-            (model_name, date) for model_name, date in user_dates_list
+            (attribute_name, date) for attribute_name, date in user_dates_list
             if date is not None
         ]
 
-        model_name, min_date = min(filtered_user_dates_list, key=lambda x: x[1])
-        if min_date < user_settings_model.created_on:
-            user_settings_model.created_on = min_date
-            user_settings_model.update_timestamps(
-                update_last_updated_time=False)
-            user_settings_model.put()
+        attribute_name, min_date = min(
+            filtered_user_dates_list, key=lambda x: x[1])
+        time_delta = datetime.timedelta(
+            minutes=feconf.CREATED_ON_TIME_DELTA_MINUTES)
+        if user_settings_model.created_on - min_date > time_delta:
             yield (
-                'SUCCESS_UPDATED_USING_' + python_utils.UNICODE(model_name), 1)
+                'UPDATE_USING_' + python_utils.UNICODE(attribute_name), 1)
         else:
             yield ('SUCCESS_ALREADY_UP_TO_DATE', 1)
 

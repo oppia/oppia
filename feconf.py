@@ -1253,3 +1253,7 @@ MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 # to go unrecorded.
 # https://cloud.google.com/appengine/docs/standard/python/outbound-requests#request_timeouts
 DEFAULT_TASKQUEUE_TIMEOUT_SECONDS = 30
+
+# Minimum timestamp difference required between UserSettingsModel's created_on
+# and some other attribute to use it for updating the created_on attribute.
+CREATED_ON_TIME_DELTA_MINUTES = 5
