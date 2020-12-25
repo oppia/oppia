@@ -19,14 +19,8 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 ## Proof that changes are correct
 
 <!--
-Add videos/screenshots of the user-facing interface to demonstrate that the changes made in this PR works correctly.
+Add videos/screenshots of the user-facing interface to demonstrate that the changes made in this PR work correctly.
 -->
-Steps followed to test the changes:
- 1. Go to '...'
- 2. Click on '....'
- 3. Scroll down to '....'
-
-
 
 ## PR Pointers
 
