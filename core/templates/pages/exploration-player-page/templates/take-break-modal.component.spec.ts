@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for TakeBreakModalComponent.
  */
 
-import { TestBed } from
+import { async, TestBed } from
   '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -27,6 +27,18 @@ import { TakeBreakModalComponent } from
 describe('TakeBreakModalComponent', function() {
   let takebreakmodal: TakeBreakModalComponent;
   let ngbActiveModal: NgbActiveModal;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [TakeBreakModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal
+        }
+      ]
+    }).compileComponents();
+  }));
+
   beforeEach(() => {
     takebreakmodal = TestBed.get(TakeBreakModalComponent);
     ngbActiveModal = TestBed.get(NgbActiveModal);

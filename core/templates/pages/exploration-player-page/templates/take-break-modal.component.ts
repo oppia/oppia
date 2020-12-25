@@ -17,12 +17,13 @@
  */
 
 import { Component } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
   selector: 'take-break-modal',
-  templateUrl: './take-break-modal.template.html',
+  templateUrl: './take-break-modal.component.html',
   styleUrls: []
 })
 export class TakeBreakModalComponent {
@@ -41,3 +42,8 @@ export class TakeBreakModalComponent {
     this.activeModal.close();
   }
 }
+
+angular.module('oppia').factory(
+  'TakeBreakModalComponent',
+  downgradeComponent(
+    {component: TakeBreakModalComponent}));

@@ -103,6 +103,7 @@ import { TakeBreakModalComponent } from
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    TakeBreakModalComponent,
     TranslatePipe
   ],
 })
