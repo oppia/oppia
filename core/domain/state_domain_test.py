@@ -705,8 +705,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
-                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                classmethod(mock_get_html_field_types_to_rule_specs)
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
         ):
             with self.assertRaisesRegexp(
                 Exception,
@@ -824,8 +824,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             return mock_html_field_types_to_rule_specs_dict
 
         with self.swap(
-                rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-                classmethod(mock_get_html_field_types_to_rule_specs)
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
         ):
             with self.assertRaisesRegexp(
                 Exception,
