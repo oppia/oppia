@@ -655,9 +655,9 @@ describe('Settings Tab Component', function() {
     });
 
     it('should display Transfer ownership button', function() {
-    ctrl.showUnpublishButton();
-    expect(ctrl.canReleaseOwnership).toBe(true);
-    expect(ctrl.showReleaseOwnershipButton()).toEqual(true);
-  });
+      ctrl.showUnpublishButton();
+      expect(ctrl.canReleaseOwnership).toBe(true);
+      expect(ctrl.showReleaseOwnershipButton()).toEqual(true);
+    });
   });
 });
