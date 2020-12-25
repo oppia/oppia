@@ -47,8 +47,13 @@ export class AuthInterceptor implements HttpInterceptor {
       map(token => token === null ? request : request.clone({
         setHeaders: {Authorization: `Bearer ${token}`}
       })),
-      // Finally, map the request onto the next HttpHandler and switch the type
-      // of Observable stream returned to emit the events it fires.
+      // Finally, forward the request to the next HttpHandler, switching the
+      // type of Observable we return into the stream of events emitted by the
+      // next handler.
+      //
+      // Note the different signatures between map and switchMap:
+      //    Observable<T> | map(T => U)                   => Observable<U>
+      //    Observable<T> | switchMap(T => Observable<U>) => Observable<U>
       switchMap(request => next.handle(request)));
   }
 }
