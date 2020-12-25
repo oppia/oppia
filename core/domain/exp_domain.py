@@ -3129,6 +3129,10 @@ class Exploration(python_utils.OBJECT):
                 for subtitled_html_dict in choices:
                     if subtitled_html_dict['html'] == html:
                         return subtitled_html_dict['content_id']
+                # If there is no match, we discard the rule input. The frontend
+                # will handle invalid content ids similar to how it handled
+                # non-matching html.
+                return 'invalid_content_id'
 
             if new_type == 'TranslatableHtmlContentId':
                 return extract_content_id_from_choices(value)

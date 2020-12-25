@@ -204,7 +204,7 @@ describe('ItemSelectionInputValidationService', () => {
     'should expect minAllowableSelectionCount to be less than the total ' +
     'number of selections',
     () => {
-    // Remove the last choice.
+      // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
       customizationArguments.minAllowableSelectionCount.value = 3;
@@ -217,6 +217,11 @@ describe('ItemSelectionInputValidationService', () => {
         type: WARNING_TYPES.CRITICAL,
         message: (
           'Please ensure that you have enough choices to reach the min count.')
+      }, {
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule 1 from answer group 1 options do not match ' +
+          'customization argument choices.')
       }]);
     });
 
@@ -231,6 +236,11 @@ describe('ItemSelectionInputValidationService', () => {
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
       message: 'Please ensure the choices are nonempty.'
+    }, {
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule 1 from answer group 1 options do not match ' +
+        'customization argument choices.')
     }]);
   });
 
@@ -296,4 +306,17 @@ describe('ItemSelectionInputValidationService', () => {
           'should have at least one option.')
       }]);
     });
+
+  it('should expect all rule inputs to match choices', () => {
+    goodAnswerGroups[0].rules[0].inputs.x[0] = 'invalid_content_id';
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule 1 from answer group 1 options do not match ' +
+        'customization argument choices.')
+    }]);
+  });
 });
