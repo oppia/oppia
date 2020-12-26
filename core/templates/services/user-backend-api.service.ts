@@ -59,55 +59,55 @@ export interface UserContributionRightsDataBackendDict {
 export class UserBackendApiService {
   constructor(private http: HttpClient) {}
 
-    private USER_INFO_URL = '/userinfohandler';
-    private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
-    private PREFERENCES_DATA_URL = '/preferenceshandler/data';
-    private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
-      '/usercontributionrightsdatahandler');
+  private USER_INFO_URL = '/userinfohandler';
+  private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
+  private PREFERENCES_DATA_URL = '/preferenceshandler/data';
+  private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
+    '/usercontributionrightsdatahandler');
 
-    getUserInfoAsync(): Promise<UserInfo> {
-      return this.http.get<UserInfoBackendDict>(
-        this.USER_INFO_URL).toPromise().then(
-        (backendDict) => {
-          return backendDict.user_is_logged_in ? UserInfo.createFromBackendDict(
-            backendDict) : UserInfo.createDefault();
-        });
-    }
+  async getUserInfoAsync(): Promise<UserInfo> {
+    return this.http.get<UserInfoBackendDict>(
+      this.USER_INFO_URL).toPromise().then(
+      (backendDict) => {
+        return backendDict.user_is_logged_in ? UserInfo.createFromBackendDict(
+          backendDict) : UserInfo.createDefault();
+      });
+  }
 
-    getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
-      return this.http.get<PreferencesBackendDict>(
-        this.PROFILE_PICTURE_URL).toPromise().then(
-        (backendDict) => {
-          return backendDict.profile_picture_data_url || defaultUrl;
-        });
-    }
+  async getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
+    return this.http.get<PreferencesBackendDict>(
+      this.PROFILE_PICTURE_URL).toPromise().then(
+      (backendDict) => {
+        return backendDict.profile_picture_data_url || defaultUrl;
+      });
+  }
 
-    setProfileImageDataUrlAsync(
-        newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
-      const profileImageUpdateUrlData = {
-        update_type: 'profile_picture_data_url',
-        data: newProfileImageDataUrl
-      };
-      return this.http.put<PreferencesBackendDict>(
-        this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();
-    }
+  async setProfileImageDataUrlAsync(
+      newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
+    const profileImageUpdateUrlData = {
+      update_type: 'profile_picture_data_url',
+      data: newProfileImageDataUrl
+    };
+    return this.http.put<PreferencesBackendDict>(
+      this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();
+  }
 
-    getLoginUrlAsync(currentUrl: string): Promise<string> {
-      const urlParameters = {
-        current_url: currentUrl
-      };
-      return this.http.get<LoginUrlResponseDict>(
-        '/url_handler', { params: urlParameters }).toPromise().then(
-        (backendDict) => {
-          return backendDict.login_url;
-        });
-    }
+  async getLoginUrlAsync(currentUrl: string): Promise<string> {
+    const urlParameters = {
+      current_url: currentUrl
+    };
+    return this.http.get<LoginUrlResponseDict>(
+      '/url_handler', { params: urlParameters }).toPromise().then(
+      (backendDict) => {
+        return backendDict.login_url;
+      });
+  }
 
-    getUserContributionRightsData():
-      Promise<UserContributionRightsDataBackendDict> {
-      return this.http.get<UserContributionRightsDataBackendDict>(
-        this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
-    }
+  async getUserContributionRightsDataAsync():
+    Promise<UserContributionRightsDataBackendDict> {
+    return this.http.get<UserContributionRightsDataBackendDict>(
+      this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
+  }
 }
 
 angular.module('oppia').factory(

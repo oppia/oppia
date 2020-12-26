@@ -23,7 +23,7 @@ require('domain/utilities/url-interpolation.service.ts');
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-const subtopicConstants2 = require('constants.ts');
+import subtopicConstants2 from 'assets/constants';
 
 require('domain/question/question-backend-api.service.ts');
 require('domain/topic/topic-update.service.ts');

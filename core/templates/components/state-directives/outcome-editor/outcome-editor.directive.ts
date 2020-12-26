@@ -30,6 +30,9 @@ require(
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/external-save.service.ts');

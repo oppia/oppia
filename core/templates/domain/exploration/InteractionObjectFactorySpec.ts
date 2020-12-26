@@ -33,7 +33,7 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory.ts';
 import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
 
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 describe('Interaction object factory', () => {
   let iof = null;
@@ -485,8 +485,8 @@ describe('Interaction object factory', () => {
       },
       training_data: ['training_data'],
       tagged_skill_misconception_id: 'skill_id-1'
-    })]);
-    newAnswerGroup = agof.createFromBackendDict(newAnswerGroup);
+    }, 'TextInput')]);
+    newAnswerGroup = agof.createFromBackendDict(newAnswerGroup, 'TextInput');
     testInteraction.setAnswerGroups([newAnswerGroup]);
     expect(testInteraction.answerGroups).toEqual([newAnswerGroup]);
   });

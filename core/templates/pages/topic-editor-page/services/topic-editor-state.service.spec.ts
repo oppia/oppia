@@ -36,6 +36,8 @@ import { TopicRights } from 'domain/topic/topic-rights.model';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils';
+import { TestBed } from '@angular/core/testing';
+import { TopicUpdateService } from 'domain/topic/topic-update.service';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
@@ -49,7 +51,7 @@ describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var subtopicPageObjectFactory = null;
-  var TopicUpdateService = null;
+  var topicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
   var fakeTopicRightsBackendApiService = null;
   var secondSubtopicPageObject = null;
@@ -194,7 +196,7 @@ describe('Topic editor state service', function() {
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    TopicUpdateService = $injector.get('TopicUpdateService');
+    topicUpdateService = TestBed.get(TopicUpdateService);
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
 
@@ -646,7 +648,7 @@ describe('Topic editor state service', function() {
       'updateTopic').and.callThrough();
 
     TopicEditorStateService.loadTopic(0);
-    TopicUpdateService.setTopicName(
+    topicUpdateService.setTopicName(
       TopicEditorStateService.getTopic(), 'New name');
     $rootScope.$apply();
 
@@ -665,7 +667,7 @@ describe('Topic editor state service', function() {
 
   it('should fire an update event after saving the topic', function() {
     TopicEditorStateService.loadTopic(5);
-    TopicUpdateService.setTopicName(
+    topicUpdateService.setTopicName(
       TopicEditorStateService.getTopic(), 'New name');
     $rootScope.$apply();
 
@@ -677,7 +679,7 @@ describe('Topic editor state service', function() {
 
   it('should track whether it is currently saving the topic', function() {
     TopicEditorStateService.loadTopic(5);
-    TopicUpdateService.setTopicName(
+    topicUpdateService.setTopicName(
       TopicEditorStateService.getTopic(), 'New name');
     $rootScope.$apply();
 
@@ -692,7 +694,7 @@ describe('Topic editor state service', function() {
   it('should indicate a topic is no longer saving after an error',
     function() {
       TopicEditorStateService.loadTopic(5);
-      TopicUpdateService.setTopicName(
+      topicUpdateService.setTopicName(
         TopicEditorStateService.getTopic(), 'New name');
       $rootScope.$apply();
 

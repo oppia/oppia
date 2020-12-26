@@ -20,6 +20,11 @@ require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require(
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
@@ -29,6 +34,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
 
 var DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 // This directive controls an editor for selecting the type and input parameters
@@ -51,11 +59,13 @@ angular.module('oppia').directive('ruleEditor', [
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'ResponsesService', 'StateEditorService',
-        'StateInteractionIdService', 'INTERACTION_SPECS',
+        '$scope', '$timeout', 'PopulateRuleContentIdsService',
+        'ResponsesService', 'StateEditorService', 'StateInteractionIdService',
+        'INTERACTION_SPECS',
         function(
-            $scope, $timeout, ResponsesService, StateEditorService,
-            StateInteractionIdService, INTERACTION_SPECS) {
+            $scope, $timeout, PopulateRuleContentIdsService,
+            ResponsesService, StateEditorService, StateInteractionIdService,
+            INTERACTION_SPECS) {
           var ctrl = this;
           // This returns the rule description string.
           var computeRuleDescriptionFragments = function() {
@@ -229,7 +239,8 @@ angular.module('oppia').directive('ruleEditor', [
                 ctrl.rule.inputs[varName] = angular.copy(
                   answerChoices[0].val);
               } else {
-                ctrl.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
+                ctrl.rule.inputs[varName] = angular.copy(
+                  DEFAULT_OBJECT_VALUES[varType]);
               }
 
               tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
@@ -248,6 +259,7 @@ angular.module('oppia').directive('ruleEditor', [
           };
 
           ctrl.saveThisRule = function() {
+            PopulateRuleContentIdsService.populateNullRuleContentIds(ctrl.rule);
             ctrl.onSaveRule();
           };
 

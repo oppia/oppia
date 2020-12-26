@@ -398,7 +398,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Equals'
             }],
@@ -1081,7 +1084,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -1243,7 +1249,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -1286,6 +1295,118 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'default_outcome': {},
                 'solution': {},
                 'feedback_1': {}
+            }
+        }
+        written_translations = state_domain.WrittenTranslations.from_dict(
+            written_translations_dict)
+
+        init_state.update_written_translations(written_translations)
+
+        self.assertEqual(
+            init_state.get_content_id_mapping_needing_translations('hi'), {
+                'hint_1': '<p>hint one</p>',
+                'solution': '<p>hello_world is a string</p>',
+                'feedback_1': '<p>Feedback</p>',
+                'default_outcome': '<p>The default outcome.</p>'
+            })
+
+    def test_get_content_id_mapping_needing_translations_with_interaction_translations(self): # pylint: disable=line-too-long
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_content(
+            state_domain.SubtitledHtml.from_dict({
+                'content_id': 'content',
+                'html': '<p>This is content</p>'
+            }))
+        init_state.update_interaction_id('TextInput')
+        state_interaction_cust_args = {
+            'placeholder': {
+                'value': {
+                    'content_id': 'ca_placeholder_0',
+                    'unicode_str': 'Placeholder'
+                }
+            },
+            'rows': {'value': 1}
+        }
+        init_state.update_interaction_customization_args(
+            state_interaction_cust_args)
+
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
+
+        init_state.update_interaction_default_outcome(default_outcome)
+
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_4',
+                        'normalizedStrSet': ['Test']
+                    }
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
+            )
+        ]
+        init_state.update_interaction_hints(hints_list)
+
+        solution_dict = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': '<p>hello_world is a string</p>'
+            },
+        }
+
+        solution = state_domain.Solution.from_dict(
+            init_state.interaction.id, solution_dict)
+        init_state.update_interaction_solution(solution)
+
+        written_translations_dict = {
+            'translations_mapping': {
+                'content': {
+                    'hi': {
+                        'data_format': 'html',
+                        'translation': '<p>hello!</p>',
+                        'needs_update': False
+                    }
+                },
+                'hint_1': {},
+                'default_outcome': {},
+                'solution': {},
+                'feedback_1': {},
+                'ca_placeholder_0': {
+                    'hi': {
+                        'data_format': 'unicode',
+                        'translation': 'Placeholder translation',
+                        'needs_update': False
+                    }
+                },
+                'rule_input_4': {}
             }
         }
         written_translations = state_domain.WrittenTranslations.from_dict(
@@ -3180,7 +3301,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected state param_changes to be a list, received 0'):
             exploration.init_state.validate(None, True)
 
-    def test_validate_duplicate_content_id_with_answer_groups(self):
+    def test_validate_duplicate_content_id_with_answer_group_feedback(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         answer_group_dict = {
             'outcome': {
@@ -3196,7 +3317,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -3214,6 +3338,48 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'Found a duplicate content id feedback_1'):
+            exploration.init_state.validate(None, True)
+
+    def test_validate_duplicate_content_id_with_answer_group_rules(self):
+        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
+        answer_group_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test']
+                    }
+                },
+                'rule_type': 'Contains'
+            }, {
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_Contains',
+                        'normalizedStrSet': ['Test1']
+                    }
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+
+        exploration.init_state.update_interaction_answer_groups(
+            [answer_group_dict])
+
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id rule_input_Contains'):
             exploration.init_state.validate(None, True)
 
     def test_validate_duplicate_content_id_with_default_outcome(self):
@@ -3612,7 +3778,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected rule_inputs to be a dict'):
+            Exception,
+            re.escape('Expected rule_inputs to be a dict, received []')
+        ):
             exploration.init_state.update_interaction_answer_groups(
                 answer_groups_list)
 
@@ -3656,7 +3824,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[]]
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': [[]]
+                    }
                 },
                 'rule_type': 'Contains'
             }],
@@ -3667,7 +3838,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             re.escape(
-                '[[]] has the wrong type. It should be a SetOfNormalizedString.'
+                '{u\'normalizedStrSet\': [[]], u\'contentId\': u\'rule_input_'
+                'Equals\'} has the wrong type. It should be a TranslatableSetOf'
+                'NormalizedString.'
             )
         ):
             exploration.init_state.update_interaction_answer_groups(
@@ -3697,7 +3870,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': ['Test']
+                    'x': {
+                        'contentId': 'rule_input_Equals',
+                        'normalizedStrSet': ['Test']
+                    }
                 },
                 'rule_type': 'Contains'
             }],

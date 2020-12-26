@@ -23,12 +23,16 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
 class ContributorDashboardPageTest(test_utils.GenericTestBase):
@@ -220,7 +224,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             isinstance(response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_skill_opportunity_data_pagination(self):
-        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={})
@@ -247,7 +251,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data_pagination(self):
-        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi'})
@@ -273,7 +277,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                     next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_voiceover_opportunity_data_pagination(self):
-        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'en'})
@@ -298,33 +302,33 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_with_invalid_language_code(self):
-        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
     def test_get_translation_opportunity_without_language_code(self):
-        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_voiceover_opportunity_with_invalid_language_code(self):
-        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
                 expected_status_int=400)
 
     def test_get_voiceover_opportunity_without_language_code(self):
-        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/voiceover' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
     def test_get_opportunity_for_invalid_opportunity_type(self):
-        with self.swap(feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
                 '%s/invalid_opportunity_type' % (
                     feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),
@@ -451,6 +455,35 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             }
         }
 
+        self.assertEqual(output, expected_output)
+
+    def test_handler_does_not_return_in_review_content(self):
+        change_dict = {
+            'cmd': 'add_translation',
+            'state_name': 'Introduction',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '',
+            'translation_html': '<p>Translation for content.</p>'
+        }
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0', 1, self.owner_id, change_dict, 'description')
+
+        output = self.get_json('/gettranslatabletexthandler', params={
+            'language_code': 'hi',
+            'exp_id': '0'
+        })
+
+        expected_output = {
+            'version': 1,
+            'state_names_to_content_id_mapping': {
+                'End State': {
+                    'content': ''
+                }
+            }
+        }
         self.assertEqual(output, expected_output)
 
 
