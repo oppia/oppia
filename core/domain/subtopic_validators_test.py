@@ -20,8 +20,19 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import datetime
+import random
+
 from constants import constants
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import subtopic_page_domain
+from core.domain import topic_domain
+from core.domain import topic_services
+from core.domain import user_services
+from core.platform import models
+from core.tests import test_utils
+import feconf
+import python_utils
 import utils
 datastore_services = models.Registry.import_datastore_services()
 
