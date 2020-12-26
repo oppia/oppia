@@ -880,7 +880,8 @@ class InteractionCustomizationArgsValidationOneOffJobTests(
             .InteractionCustomizationArgsValidationOneOffJob)
 
 
-class RuleInputToCustomizationArgsMappingOneOffJobTests(test_utils.GenericTestBase):
+class RuleInputToCustomizationArgsMappingOneOffJobTests(
+        test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -983,8 +984,8 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(test_utils.GenericTestBa
         job_id = (
             interaction_jobs_one_off
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
-        (interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
-            .enqueue(job_id))
+        interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
+            .enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
@@ -1061,8 +1062,8 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(test_utils.GenericTestBa
         job_id = (
             interaction_jobs_one_off
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
-        (interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
-            .enqueue(job_id))
+        interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
+            .enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
@@ -1160,8 +1161,8 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(test_utils.GenericTestBa
         job_id = (
             interaction_jobs_one_off
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
-        (interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
-            .enqueue(job_id))
+        interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
+            .enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
@@ -1241,8 +1242,8 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(test_utils.GenericTestBa
         job_id = (
             interaction_jobs_one_off
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
-        (interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
-            .enqueue(job_id))
+        interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
+            .enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
@@ -1267,8 +1268,8 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(test_utils.GenericTestBa
         job_id = (
             interaction_jobs_one_off
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
-        (interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
-            .enqueue(job_id))
+        interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
+            .enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             interaction_jobs_one_off
@@ -1336,6 +1337,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(test_utils.GenericTestBa
 
         run_job_for_deleted_exp(
             self,
-            (interaction_jobs_one_off
+            (
+                interaction_jobs_one_off
                 .RuleInputToCustomizationArgsMappingOneOffJob)
         )

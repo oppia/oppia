@@ -252,19 +252,19 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                     invalid_values.extend(
                         get_invalid_values(
                             'DragAndDropHtmlString', html, choices))
-            
+
             if value_type == 'ListOfSetsOfHtmlStrings':
                 for html_set in value:
                     invalid_values.extend(
                         get_invalid_values(
-                            'SetOfHtmlString', html_set, choices)) 
+                            'SetOfHtmlString', html_set, choices))
 
             return invalid_values
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.items():            
+        for state_name, state in exploration.states.items():   
             if state.interaction.id not in [
-                'DragAndDropSortInput', 'ItemSelectionInput']:
+                    'DragAndDropSortInput', 'ItemSelectionInput']:
                 continue
 
             choices = [
@@ -283,10 +283,11 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                     if invalid_values:
                         yield (
                             exploration.id,
-                            ('<ItemSelectionInput Answer> '
-                             'State: %s, Invalid Values: %s' % (
-                                state_name, invalid_values
-                            )).encode('utf-8')
+                            (
+                                '<ItemSelectionInput Answer> '
+                                'State: %s, Invalid Values: %s' % (
+                                    state_name, invalid_values)
+                            ).encode('utf-8')
                         )
                 
                 if state.interaction.id == 'DragAndDropSortInput':
@@ -297,10 +298,11 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                     if invalid_values:
                         yield (
                             exploration.id,
-                            ('<DragAndDropSortInput Answer> '
-                             'State: %s, Invalid Values: %s' % (
-                                state_name, invalid_values
-                            )).encode('utf-8')
+                            (
+                                '<DragAndDropSortInput Answer> '
+                                'State: %s, Invalid Values: %s' % (
+                                    state_name, invalid_values)
+                            ).encode('utf-8')
                         )
 
             for group_i, group in enumerate(state.interaction.answer_groups):
@@ -315,11 +317,12 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                         if invalid_values:
                             yield (
                                 exploration.id,
-                                ('<ItemSelectionInput Rule> State: %s, '
-                                 'Answer Group Index: %i, '
-                                 'Invalid Values: %s' % (
-                                    state_name, group_i, invalid_values
-                                )).encode('utf-8')
+                                (
+                                    '<ItemSelectionInput Rule> State: %s, '
+                                    'Answer Group Index: %i, '
+                                    'Invalid Values: %s' % (
+                                        state_name, group_i, invalid_values)
+                                ).encode('utf-8')
                             )
                     if state.interaction.id == 'DragAndDropSortInput':
                         if rule_type in [
@@ -336,11 +339,12 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                             if invalid_values:
                                 yield (
                                     exploration.id,
-                                    ('<DragAndDropSortInput Rule> State: %s, '
-                                     'Answer Group Index: %i, '
-                                     'Invalid Values: %s' % (
-                                        state_name, group_i, invalid_values
-                                    )).encode('utf-8')
+                                    (
+                                        '<DragAndDropSortInput Rule> State: %s, '
+                                        'Answer Group Index: %i, '
+                                        'Invalid Values: %s' % (
+                                            state_name, group_i, invalid_values)
+                                    ).encode('utf-8')
                                 )
                         elif rule_type == 'HasElementXAtPositionY':
                             # For rule type HasElementXAtPositionY,
@@ -354,11 +358,13 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                             if invalid_values:
                                 yield (
                                     exploration.id,
-                                    ('<DragAndDropSortInput Rule> State: %s, '
-                                     'Answer Group Index: %i, '
-                                     'Invalid Values: %s' % (
-                                        state_name, group_i, invalid_values
-                                    )).encode('utf-8')
+                                    (
+                                        '<DragAndDropSortInput Rule> '
+                                        'State: %s, '
+                                        'Answer Group Index: %i, '
+                                        'Invalid Values: %s' % (
+                                            state_name, group_i, invalid_values)
+                                    ).encode('utf-8')
                                 )
                         elif rule_type == 'HasElementXBeforeElementY':
                             # For rule type HasElementXBeforeElementY,
@@ -372,11 +378,14 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                                 if invalid_values:
                                     yield (
                                         exploration.id,
-                                        ('<DragAndDropSortInput Rule> '
-                                         'State: %s, Answer Group Index: %i, '
-                                         'Invalid Values: %s' % (
-                                            state_name, group_i, invalid_values
-                                        )).encode('utf-8')
+                                        (
+                                            '<DragAndDropSortInput Rule> '
+                                            'State: %s, '
+                                            'Answer Group Index: %i, '
+                                            'Invalid Values: %s' % (
+                                                state_name, group_i,
+                                                invalid_values)
+                                        ).encode('utf-8')
                                     )
                                                     
     @staticmethod
