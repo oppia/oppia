@@ -262,7 +262,7 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
             return invalid_values
 
         exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.items():   
+        for state_name, state in exploration.states.items():
             if state.interaction.id not in [
                     'DragAndDropSortInput', 'ItemSelectionInput']:
                 continue
@@ -289,7 +289,7 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                                     state_name, invalid_values)
                             ).encode('utf-8')
                         )
-                
+
                 if state.interaction.id == 'DragAndDropSortInput':
                     invalid_values = get_invalid_values(
                         'ListOfSetsOfHtmlStrings',
@@ -326,8 +326,8 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                             )
                     if state.interaction.id == 'DragAndDropSortInput':
                         if rule_type in [
-                            'IsEqualToOrdering',
-                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                                'IsEqualToOrdering',
+                                'IsEqualToOrderingWithOneItemAtIncorrectPosition' # pylint: disable=line-too-long
                         ]:
                             # For rule type IsEqualToOrdering and
                             # IsEqualToOrderingWithOneItemAtIncorrectPosition,
@@ -340,7 +340,8 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                                 yield (
                                     exploration.id,
                                     (
-                                        '<DragAndDropSortInput Rule> State: %s, '
+                                        '<DragAndDropSortInput Rule> '
+                                        'State: %s, '
                                         'Answer Group Index: %i, '
                                         'Invalid Values: %s' % (
                                             state_name, group_i, invalid_values)
@@ -387,7 +388,7 @@ class RuleInputToCustomizationArgsMappingOneOffJob(
                                                 invalid_values)
                                         ).encode('utf-8')
                                     )
-                                                    
+
     @staticmethod
     def reduce(key, values):
         yield (key, values)
