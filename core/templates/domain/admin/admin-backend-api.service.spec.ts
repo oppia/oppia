@@ -32,6 +32,9 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;
   let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService = null;
+  let successHandler = null;
+  let failHandler = null;
   let adminBackendResponse = {
     unfinished_job_data: [],
     role_graph_data: {
@@ -128,6 +131,9 @@ describe('Admin backend api service', () => {
 
     abas = TestBed.get(AdminBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.get(CsrfTokenService);
+    successHandler = jasmine.createSpy('success');
+    failHandler = jasmine.createSpy('fail');
     adminDataObject = {
       demoExplorations: adminBackendResponse.demo_explorations,
       demoCollections: adminBackendResponse.demo_collections,
@@ -157,6 +163,10 @@ describe('Admin backend api service', () => {
         dict => PlatformParameter.createFromBackendDict(dict)
       )
     };
+
+    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
+      return Promise.resolve('sample-csrf-token');
+    });
   });
 
   afterEach(() => {
@@ -178,9 +188,6 @@ describe('Admin backend api service', () => {
 
   it('should use the rejection handler if the backend request failed.',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
       abas.getDataAsync().then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
@@ -198,34 +205,6 @@ describe('Admin backend api service', () => {
       expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
     })
   );
-});
-
-describe('Admin Backend API service for Jobs Tab', () => {
-  let adminBackendApiService: AdminBackendApiService;
-  let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
-  let successHandler = null;
-  let failHandler = null;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [AdminBackendApiService]
-    });
-    httpTestingController = TestBed.get(HttpTestingController);
-    adminBackendApiService = TestBed.get(AdminBackendApiService);
-    csrfService = TestBed.get(CsrfTokenService);
-    successHandler = jasmine.createSpy('success');
-    failHandler = jasmine.createSpy('fail');
-
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-      return Promise.resolve('sample-csrf-token');
-    });
-  });
-
-  afterEach(() => {
-    httpTestingController.verify();
-  });
 
   it('should request to start a new job when calling startNewJobAsync',
     fakeAsync(() => {
@@ -234,8 +213,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
         action: 'start_new_job',
         job_type: jobType
       };
-      adminBackendApiService.startNewJobAsync(jobType)
-        .then(successHandler, failHandler);
+      abas.startNewJobAsync(jobType).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/adminhandler');
       expect(req.request.method).toEqual('POST');
@@ -257,8 +235,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
       job_id: jobId,
       job_type: jobType
     };
-    adminBackendApiService.cancelJobAsync(jobId, jobType)
-      .then(successHandler, failHandler);
+    abas.cancelJobAsync(jobId, jobType).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('POST');
@@ -278,7 +255,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
       action: 'start_computation',
       computation_type: computationType
     };
-    adminBackendApiService.startComputationAsync(computationType)
+    abas.startComputationAsync(computationType)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
@@ -299,7 +276,7 @@ describe('Admin Backend API service for Jobs Tab', () => {
       action: 'stop_computation',
       computation_type: computationType
     };
-    adminBackendApiService.stopComputationAsync(computationType)
+    abas.stopComputationAsync(computationType)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne('/adminhandler');
@@ -316,10 +293,9 @@ describe('Admin Backend API service for Jobs Tab', () => {
   it('should request to show the output of valid' +
     'jobs when calling showJobOutputAsync', fakeAsync(() => {
     let jobId = 'FeedbackAnalyticsMRJobManager-1608932124519-748';
-    let adminJobOutputUrl = 'adminjoboutput?job_id=FeedbackAnalytics' +
+    let adminJobOutputUrl = '/adminjoboutput?job_id=FeedbackAnalytics' +
       'MRJobManager-1608932124519-748';
-    adminBackendApiService.showJobOutputAsync(jobId)
-      .then(successHandler, failHandler);
+    abas.showJobOutputAsync(jobId).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(adminJobOutputUrl);
     expect(req.request.method).toEqual('GET');
