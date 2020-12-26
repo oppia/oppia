@@ -1482,6 +1482,12 @@ class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(
             migrated_subscription_model.last_updated
         )
 
+    def test_rerun(self):
+        self.test_for_empty_activity_ids
+        self.test_for_non_empty_activity_ids
+        self.test_for_multiple_models
+        self.test_for_existing_exploration_ids
+
 
 class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
 
