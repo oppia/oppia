@@ -42,7 +42,7 @@ interface SupportedAudioLanguageBackendDict {
 interface SupportedContentLanguageBackendDict {
   'code': string;
   'description': string;
-  'dir': string;
+  'direction': string;
 }
 
 interface LanguageIdAndText {
@@ -53,7 +53,7 @@ interface LanguageIdAndText {
 interface ContentLanguage {
   code: string;
   description: string;
-  dir: string;
+  direction: string;
 }
 
 @Injectable({
@@ -151,7 +151,7 @@ export class LanguageUtilService {
     let languageDirection = 'ltr';
     this.SUPPORTED_CONTENT_LANGUAGES.forEach((lang: ContentLanguage) => {
       if (lang.code === languageCode) {
-        languageDirection = lang.dir;
+        languageDirection = lang.direction;
       }
     });
     return languageDirection;
