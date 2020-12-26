@@ -315,3 +315,47 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     size=size, ids_only=False))
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
+
+    def test_search_constructs_query_with_categories_and_languages(self):
+        correct_index_name = 'index1'
+
+        def mock_search(body, index, params):
+            self.assertEqual(body, {
+                'query': {
+                    'bool': {
+                        'filter': [{
+                            'match': {
+                                'category': '"my_category"',
+                            }
+                        }, {
+                            'match': {
+                                'language_code': '"en" "es"'
+                            }
+                        }],
+                        'must': [{
+                            'multi_match': {
+                                'query': ''
+                            }
+                        }]
+                    }
+                }
+            })
+            self.assertEqual(index, correct_index_name)
+            self.assertEqual(params, {
+                'from': 0,
+                'size': 20
+            })
+            return {
+                'hits': {
+                    'hits': []
+                }
+            }
+
+        swap_search = self.swap(
+            elastic_search_services.ES, 'search', mock_search)
+        with swap_search:
+            result, new_offset = (
+                elastic_search_services.search(
+                    '', correct_index_name, ['my_category'], ['en', 'es']))
+        self.assertEqual(new_offset, None)
+        self.assertEqual(result, [])
