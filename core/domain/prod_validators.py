@@ -46,9 +46,9 @@ import utils
 
 (
     base_models, collection_models,
-    email_models, exp_models, feedback_models, 
-    job_models, question_models, 
-    skill_models, story_models, subtopic_models, 
+    email_models, exp_models, feedback_models,
+    job_models, question_models,
+    skill_models, story_models, subtopic_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection,
@@ -68,7 +68,6 @@ IMAGE_PATH_REGEX = (
 AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
-USER_ID_REGEX = 'uid_[a-z]{32}'
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'DashboardRecentUpdatesAggregator',
     'ExplorationRecommendationsAggregator',

@@ -31,6 +31,12 @@ import python_utils
     models.NAMES.suggestion, models.NAMES.user
 ])
 
+USER_ID_REGEX = 'uid_[a-z]{32}'
+TARGET_TYPE_TO_TARGET_MODEL = {
+    suggestion_models.TARGET_TYPE_EXPLORATION: (
+        exp_models.ExplorationModel)
+}
+
 
 class GeneralFeedbackThreadModelValidator(
         base_model_validators.BaseModelValidator):

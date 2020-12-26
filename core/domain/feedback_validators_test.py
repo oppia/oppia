@@ -38,7 +38,7 @@ datastore_services = models.Registry.import_datastore_services()
 ) = models.Registry.import_models([
     models.NAMES.exploration,
     models.NAMES.feedback,
-    models.NAMES.suggestion, 
+    models.NAMES.suggestion,
     models.NAMES.user
 ])
 
