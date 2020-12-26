@@ -986,7 +986,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
         (
             interaction_jobs_one_off
-                .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
@@ -1065,7 +1065,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
         (
             interaction_jobs_one_off
-                .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
@@ -1083,7 +1083,8 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
 
         self.assertEqual(actual_output, expected_output)
 
-    def test_exp_state_pairs_are_produced_for_drag_and_drop_sort_interactions(self):
+    def test_exp_state_pairs_are_produced_for_drag_and_drop_sort_interactions(
+            self):
         """Checks (exp, state) pairs are produced correctly for DragAndDropSort
         interactions.
         """
@@ -1165,7 +1166,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
         (
             interaction_jobs_one_off
-                .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
@@ -1247,7 +1248,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
         (
             interaction_jobs_one_off
-                .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
 
         actual_output = (
