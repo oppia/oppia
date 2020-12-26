@@ -158,7 +158,7 @@ export class AdminBackendApiService {
     let payload = {
       job_type: jobType
     };
-    this._postAdminActionAsync(action, payload);
+    return this._postAdminActionAsync(action, payload);
   }
 
   async cancelJobAsync(jobId: string, jobType: string): Promise<void> {
@@ -167,7 +167,7 @@ export class AdminBackendApiService {
       job_id: jobId,
       job_type: jobType
     };
-    this._postAdminActionAsync(action, payload);
+    return this._postAdminActionAsync(action, payload);
   }
 
   async startComputationAsync(computationType: string): Promise<void> {
@@ -175,7 +175,7 @@ export class AdminBackendApiService {
     let payload = {
       computation_type: computationType
     };
-    this._postAdminActionAsync(action, payload);
+    return this._postAdminActionAsync(action, payload);
   }
 
   async stopComputationAsync(computationType: string): Promise<void> {
@@ -183,7 +183,7 @@ export class AdminBackendApiService {
     let payload = {
       computation_type: computationType
     };
-    this._postAdminActionAsync(action, payload);
+    return this._postAdminActionAsync(action, payload);
   }
 
   async showJobOutputAsync(jobId: string): Promise<string> {
