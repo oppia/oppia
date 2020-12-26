@@ -208,7 +208,8 @@ class InteractionCustomizationArgsValidationOneOffJob(
         yield (key, values)
 
 
-class RuleInputToCustomizationArgsMappingOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class RuleInputToCustomizationArgsMappingOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """Job that produces a list of (exploration, state) pairs that use the item
     selection or drag and drop sort interaction and that have rules that do not
     match the answer choices.
