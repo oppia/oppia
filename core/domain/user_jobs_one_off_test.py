@@ -545,8 +545,6 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
         self.assertEqual(
             user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
-        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_two_explorations(self):
@@ -661,8 +659,6 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self.EXP_ID_1, self.EXP_ID_FOR_COLLECTION_1])
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
-        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_two_collections(self):
@@ -1612,7 +1608,7 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
                        stringified_item in stringified_output]
         return eval_output
 
-    def test_one_setting_model_with_feedback_thread_ids(self):
+    def test_one_subscription_model_with_feedback_thread_ids(self):
         with self.swap(
             user_models, 'UserSubscriptionsModel',
             MockUserSubscriptionsModelWithFeedbackThreadIDs):
@@ -1645,7 +1641,7 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
                 original_setting_model.last_updated,
                 migrated_setting_model.last_updated)
 
-    def test_one_setting_model_without_feedback_thread_ids(self):
+    def test_one_subscription_model_without_feedback_thread_ids(self):
         original_setting_model = (
             user_models.UserSubscriptionsModel(
                 id='id'

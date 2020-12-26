@@ -797,7 +797,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'activity_ids': [],
             'collection_ids': [],
             'creator_usernames': [],
-            'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked_msec': None
         }
