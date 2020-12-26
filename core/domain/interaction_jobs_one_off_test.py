@@ -1272,8 +1272,9 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         job_id = (
             interaction_jobs_one_off
             .RuleInputToCustomizationArgsMappingOneOffJob.create_new())
-        interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob
-            .enqueue(job_id)
+        (
+            interaction_jobs_one_off
+            .RuleInputToCustomizationArgsMappingOneOffJob.enqueue(job_id))
         self.process_and_flush_pending_mapreduce_tasks()
         actual_output = (
             interaction_jobs_one_off
