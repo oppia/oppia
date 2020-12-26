@@ -306,4 +306,23 @@ describe('Admin backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }
   ));
+
+  it('should fail to show the output of valid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'Invalid jobId';
+    let adminJobOutputUrl = '/adminjoboutput?job_id=Invalid%20jobId';
+    abas.showJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush('Internal Server Error', {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }
+  ));
 });
