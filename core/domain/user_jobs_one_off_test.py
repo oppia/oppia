@@ -1642,7 +1642,7 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model.update_timestamps()
         original_created_on_timestamp = user_settings_model.created_on
         correction_cutoff_timestamp = datetime.datetime.strptime(
-            feconf.CREATED_ON_CORRECTION_CUTOFF_DATE, '%b %d %Y')
+            'Jul 1 2020', '%b %d %Y')
         final_created_on_timestamp = (
             correction_cutoff_timestamp - datetime.timedelta(days=10))
         user_settings_model.last_updated = final_created_on_timestamp

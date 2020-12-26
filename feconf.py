@@ -1293,7 +1293,3 @@ SUGGESTION_TYPE_CHOICES = [
 # Minimum timestamp difference required between UserSettingsModel's created_on
 # and some other attribute to use it for updating the created_on attribute.
 CREATED_ON_TIME_DELTA_MINUTES = 5
-
-# Date after which UserSettingModel's created_on attribute is supposed to have
-# its correct value.
-CREATED_ON_CORRECTION_CUTOFF_DATE = 'Jul 1 2020'

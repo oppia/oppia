@@ -642,7 +642,7 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         time_delta = datetime.timedelta(
             minutes=feconf.CREATED_ON_TIME_DELTA_MINUTES)
         correction_cutoff_timestamp = datetime.datetime.strptime(
-            feconf.CREATED_ON_CORRECTION_CUTOFF_DATE, '%b %d %Y')
+            'Jul 1 2020', '%b %d %Y')
         if user_settings_model.created_on - min_date > time_delta:
             yield (
                 'UPDATE_USING_' + python_utils.UNICODE(attribute_name), 1)
