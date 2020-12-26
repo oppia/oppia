@@ -25,24 +25,15 @@ import { State, StateBackendDict, StateObjectFactory } from
   'domain/state/StateObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { AnswerClassificationService } from
+import { AnswerClassificationService, InteractionRulesService } from
   'pages/exploration-player-page/services/answer-classification.service';
 import { LearnerAnswerInfoService } from
   'pages/exploration-player-page/services/learner-answer-info.service.ts';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-
-interface MockInteractionRulesService {
-  [ruleName: string]: (
-    answer: InteractionAnswer,
-    ruleInputs: MockInteractionRuleInputs) => boolean;
-}
-
-interface MockInteractionRuleInputs {
-  x: number
-}
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Learner answer info service', () =>{
   let sof: StateObjectFactory;
@@ -51,8 +42,8 @@ describe('Learner answer info service', () =>{
   let firstState: State;
   let secondState: State;
   let thirdState: State;
+  let tirs: InteractionRulesService;
   let mockAnswer: string;
-  let mockInteractionRulesService: MockInteractionRulesService;
   let ladbas: LearnerAnswerDetailsBackendApiService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
   let answerClassificationService: AnswerClassificationService;
@@ -75,7 +66,16 @@ describe('Learner answer info service', () =>{
         }
       },
       interaction: {
-        id: null,
+        id: 'TextInput',
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: ''
+            }
+          },
+          rows: { value: 1 }
+        },
         answer_groups: [{
           outcome: {
             dest: 'outcome 1',
@@ -90,7 +90,12 @@ describe('Learner answer info service', () =>{
           },
           rule_specs: [{
             rule_type: 'Equals',
-            inputs: {x: 10}
+            inputs: {
+              x: {
+                contentId: 'rule_input_0',
+                normalizedStrSet: ['10']
+              }
+            }
           }],
           training_data: [],
           tagged_skill_misconception_id: ''
@@ -108,13 +113,28 @@ describe('Learner answer info service', () =>{
           },
           rule_specs: [{
             rule_type: 'Equals',
-            inputs: { x: 5 }
+            inputs: {
+              x: {
+                contentId: 'rule_input_1',
+                normalizedStrSet: ['5']
+              }
+            }
           }, {
             rule_type: 'Equals',
-            inputs: { x: 6 }
+            inputs: {
+              x: {
+                contentId: 'rule_input_2',
+                normalizedStrSet: ['6']
+              }
+            }
           }, {
-            rule_type: 'NotEquals',
-            inputs: { x: 7 }
+            rule_type: 'FuzzyEquals',
+            inputs: {
+              x: {
+                contentId: 'rule_input_3',
+                normalizedStrSet: ['7']
+              }
+            }
           }],
           training_data: [],
           tagged_skill_misconception_id: ''
@@ -132,7 +152,6 @@ describe('Learner answer info service', () =>{
         },
         hints: [],
         confirmed_unclassified_answers: [],
-        customization_args: '',
         solution: null
       },
       param_changes: [],
@@ -160,6 +179,7 @@ describe('Learner answer info service', () =>{
     firstState = sof.createFromBackendDict('new state', stateDict);
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
+    tirs = TestBed.get(TextInputRulesService);
 
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(new AnswerClassificationResult(
@@ -167,14 +187,6 @@ describe('Learner answer info service', () =>{
         DEFAULT_OUTCOME_CLASSIFICATION));
 
     mockAnswer = 'This is my answer';
-    mockInteractionRulesService = {
-      Equals: function(answer, inputs): boolean {
-        return inputs.x === answer;
-      },
-      NotEquals: function(answer, inputs): boolean {
-        return inputs.x !== answer;
-      }
-    };
     // Spying the random function to return 0, so that
     // getRandomProbabilityIndex() returns 0, which is a private function in
     // LearnerAnswerInfoService. This will help to mark the
@@ -186,7 +198,7 @@ describe('Learner answer info service', () =>{
   describe('.initLearnerAnswerInfo', () => {
     beforeEach(function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', firstState, mockAnswer, mockInteractionRulesService, false);
+        '10', firstState, mockAnswer, tirs, false);
     });
 
     it('should return can ask learner for answer info true', () => {
@@ -202,14 +214,14 @@ describe('Learner answer info service', () =>{
     it('should return current interaction rules service', () => {
       expect(
         learnerAnswerInfoService.getCurrentInteractionRulesService()).toEqual(
-        mockInteractionRulesService);
+        tirs);
     });
   });
 
   describe('learner answer info service', () => {
     beforeEach(function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', firstState, mockAnswer, mockInteractionRulesService, false);
+        '10', firstState, mockAnswer, tirs, false);
     });
 
     it('should not ask for answer details for same state', () => {
@@ -219,7 +231,7 @@ describe('Learner answer info service', () =>{
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false);
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', firstState, mockAnswer, mockInteractionRulesService, false);
+        '10', firstState, mockAnswer, tirs, false);
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false);
     });
@@ -231,7 +243,7 @@ describe('Learner answer info service', () =>{
       beforeEach(function() {
         firstState.interaction.id = 'EndExploration';
         learnerAnswerInfoService.initLearnerAnswerInfoService(
-          '10', firstState, mockAnswer, mockInteractionRulesService, false);
+          '10', firstState, mockAnswer, tirs, false);
       });
 
       it('should return can ask learner for answer info false', () => {
@@ -246,7 +258,7 @@ describe('Learner answer info service', () =>{
       beforeEach(function() {
         firstState.solicitAnswerDetails = false;
         learnerAnswerInfoService.initLearnerAnswerInfoService(
-          '10', firstState, mockAnswer, mockInteractionRulesService, false);
+          '10', firstState, mockAnswer, tirs, false);
       });
       it('should return can ask learner for answer info false', () => {
         expect(
@@ -259,7 +271,7 @@ describe('Learner answer info service', () =>{
   describe('.recordLearnerAnswerInfo', () => {
     beforeEach(function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', firstState, mockAnswer, mockInteractionRulesService, false);
+        '10', firstState, mockAnswer, tirs, false);
     });
 
     it('should record learner answer details', (() => {
@@ -267,23 +279,23 @@ describe('Learner answer info service', () =>{
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details');
       expect(
         ladbas.recordLearnerAnswerDetailsAsync).toHaveBeenCalledWith(
-        '10', 'new state', null, 'This is my answer', 'My details');
+        '10', 'new state', 'TextInput', 'This is my answer', 'My details');
     }));
   });
 
   describe('learner answer info service', () => {
     beforeEach(function() {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', firstState, mockAnswer, mockInteractionRulesService, false);
+        '10', firstState, mockAnswer, tirs, false);
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', secondState, mockAnswer, mockInteractionRulesService, false);
+        '10', secondState, mockAnswer, tirs, false);
       learnerAnswerInfoService.recordLearnerAnswerInfo('My details 1');
     });
 
     it('should not record answer details more than two times', () => {
       learnerAnswerInfoService.initLearnerAnswerInfoService(
-        '10', thirdState, mockAnswer, mockInteractionRulesService, false);
+        '10', thirdState, mockAnswer, tirs, false);
       expect(learnerAnswerInfoService.getCanAskLearnerForAnswerInfo()).toEqual(
         false);
     });
