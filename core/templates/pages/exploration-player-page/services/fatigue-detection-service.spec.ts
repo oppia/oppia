@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
@@ -16,98 +16,89 @@
  * @fileoverview Unit tests for the Fatigue Detection service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-require('pages/exploration-player-page/services/fatigue-detection.service.ts');
 
-describe('Fatigue detection service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+import { TestBed } from '@angular/core/testing';
+import { FatigueDetectionService } from 'pages/exploration-player-page/services/fatigue-detection.service';
 
-  var FatigueDetectionService = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    FatigueDetectionService = $injector.get('FatigueDetectionService');
-  }));
 
-  beforeEach(function() {
+describe('Fatigue detection service', () => {
+  let fatigueDetectionService: FatigueDetectionService;
+  beforeEach(() => {
+    fatigueDetectionService = TestBed.get(FatigueDetectionService);
+  });
+
+  beforeEach(() => {
     jasmine.clock().uninstall();
     jasmine.clock().install();
     jasmine.clock().mockDate();
   });
 
-  afterEach(function() {
+  afterEach(() => {
     jasmine.clock().uninstall();
   });
 
-  describe('isSubmittingTooFast', function() {
+  describe('isSubmittingTooFast', () => {
     it('should return true for 4 or more submissions in under 10 seconds',
-      function() {
-        FatigueDetectionService.recordSubmissionTimestamp();
+      () => {
+        fatigueDetectionService.recordSubmissionTimestamp();
         jasmine.clock().tick(100);
-        FatigueDetectionService.recordSubmissionTimestamp();
+        fatigueDetectionService.recordSubmissionTimestamp();
         jasmine.clock().tick(100);
-        FatigueDetectionService.recordSubmissionTimestamp();
+        fatigueDetectionService.recordSubmissionTimestamp();
         jasmine.clock().tick(100);
-        FatigueDetectionService.recordSubmissionTimestamp();
-        expect(FatigueDetectionService.isSubmittingTooFast()).toBe(true);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
 
         jasmine.clock().tick(100);
-        FatigueDetectionService.recordSubmissionTimestamp();
-        expect(FatigueDetectionService.isSubmittingTooFast()).toBe(true);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
       });
 
     it('should return false for 4 or more submissions in over 10 seconds',
-      function() {
-        FatigueDetectionService.recordSubmissionTimestamp();
+      () => {
+        fatigueDetectionService.recordSubmissionTimestamp();
         jasmine.clock().tick(100);
-        FatigueDetectionService.recordSubmissionTimestamp();
+        fatigueDetectionService.recordSubmissionTimestamp();
         jasmine.clock().tick(100);
-        FatigueDetectionService.recordSubmissionTimestamp();
+        fatigueDetectionService.recordSubmissionTimestamp();
         jasmine.clock().tick(10000);
-        FatigueDetectionService.recordSubmissionTimestamp();
-        expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
 
         jasmine.clock().tick(100);
-        FatigueDetectionService.recordSubmissionTimestamp();
-        expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
+        fatigueDetectionService.recordSubmissionTimestamp();
+        expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
       });
 
-    it('should return false for less than 4 submissions', function() {
-      FatigueDetectionService.recordSubmissionTimestamp();
-      expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
+    it('should return false for less than 4 submissions', () => {
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
 
       jasmine.clock().tick(1000);
-      FatigueDetectionService.recordSubmissionTimestamp();
-      expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
 
       jasmine.clock().tick(1000);
-      FatigueDetectionService.recordSubmissionTimestamp();
-      expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
     });
   });
 
-  describe('reset', function() {
-    it('should properly reset submissions', function() {
-      FatigueDetectionService.recordSubmissionTimestamp();
+  describe('reset', () => {
+    it('should properly reset submissions', () => {
+      fatigueDetectionService.recordSubmissionTimestamp();
       jasmine.clock().tick(1000);
-      FatigueDetectionService.recordSubmissionTimestamp();
+      fatigueDetectionService.recordSubmissionTimestamp();
       jasmine.clock().tick(1000);
-      FatigueDetectionService.recordSubmissionTimestamp();
+      fatigueDetectionService.recordSubmissionTimestamp();
       jasmine.clock().tick(1000);
-      FatigueDetectionService.recordSubmissionTimestamp();
-      expect(FatigueDetectionService.isSubmittingTooFast()).toBe(true);
+      fatigueDetectionService.recordSubmissionTimestamp();
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(true);
 
-      FatigueDetectionService.reset();
+      fatigueDetectionService.reset();
 
-      expect(FatigueDetectionService.isSubmittingTooFast()).toBe(false);
+      expect(fatigueDetectionService.isSubmittingTooFast()).toBe(false);
     });
   });
 });
