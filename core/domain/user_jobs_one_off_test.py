@@ -1612,60 +1612,64 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
         with self.swap(
             user_models, 'UserSubscriptionsModel',
             MockUserSubscriptionsModelWithFeedbackThreadIDs):
-            original_setting_model = (
+            original_subscription_model = (
                 user_models.UserSubscriptionsModel(
                     id='id',
-                    feedback_thread_ids=[]
+                    feedback_thread_ids=['some_id']
                 )
             )
-            original_setting_model.update_timestamps()
-            original_setting_model.put()
+            original_subscription_model.update_timestamps()
+            original_subscription_model.put()
 
-            self.assertIsNotNone(original_setting_model.feedback_thread_ids)
-            self.assertIn('feedback_thread_ids', original_setting_model._values)  # pylint: disable=protected-access
+            self.assertIsNotNone(
+                original_subscription_model.feedback_thread_ids)
             self.assertIn(
-                'feedback_thread_ids', original_setting_model._properties)  # pylint: disable=protected-access
+                'feedback_thread_ids', original_subscription_model._values)  # pylint: disable=protected-access
+            self.assertIn(
+                'feedback_thread_ids', original_subscription_model._properties)  # pylint: disable=protected-access
 
             output = self._run_one_off_job()
             self.assertItemsEqual(
                 [['SUCCESS_REMOVED - UserSubscriptionsModel', 1]], output)
 
-            migrated_setting_model = (
+            migrated_subscription_model = (
                 user_models.UserSubscriptionsModel.get_by_id('id'))
 
             self.assertNotIn(
-                'feedback_thread_ids', migrated_setting_model._values)  # pylint: disable=protected-access
+                'feedback_thread_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
             self.assertNotIn(
-                'feedback_thread_ids', migrated_setting_model._properties)  # pylint: disable=protected-access
+                'feedback_thread_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
             self.assertEqual(
-                original_setting_model.last_updated,
-                migrated_setting_model.last_updated)
+                original_subscription_model.last_updated,
+                migrated_subscription_model.last_updated)
 
     def test_one_subscription_model_without_feedback_thread_ids(self):
-        original_setting_model = (
+        original_subscription_model = (
             user_models.UserSubscriptionsModel(
                 id='id'
             )
         )
-        original_setting_model.update_timestamps()
-        original_setting_model.put()
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
 
-        self.assertNotIn('feedback_thread_ids', original_setting_model._values)  # pylint: disable=protected-access
         self.assertNotIn(
-            'feedback_thread_ids', original_setting_model._properties)  # pylint: disable=protected-access
+            'feedback_thread_ids', original_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'feedback_thread_ids', original_subscription_model._properties)  # pylint: disable=protected-access
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
             [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
 
-        migrated_setting_model = user_models.UserSubscriptionsModel.get_by_id(
-            'id')
-        self.assertNotIn('feedback_thread_ids', migrated_setting_model._values)  # pylint: disable=protected-access
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
         self.assertNotIn(
-            'feedback_thread_ids', migrated_setting_model._properties)  # pylint: disable=protected-access
+            'feedback_thread_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'feedback_thread_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
         self.assertEqual(
-            original_setting_model.last_updated,
-            migrated_setting_model.last_updated)
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
 
 
 class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
