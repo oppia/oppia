@@ -641,16 +641,27 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             filtered_user_dates_list, key=lambda x: x[1])
         time_delta = datetime.timedelta(
             minutes=feconf.CREATED_ON_TIME_DELTA_MINUTES)
+        correction_cutoff_timestamp = datetime.datetime.strptime(
+            feconf.CREATED_ON_CORRECTION_CUTOFF_DATE, '%b %d %Y')
         if user_settings_model.created_on - min_date > time_delta:
             yield (
                 'UPDATE_USING_' + python_utils.UNICODE(attribute_name), 1)
+
+            # Yield an additional error key for user_models created after
+            # feconf.CREATED_ON_CORRECTION_CUTOFF_DATE having a discrepancy in
+            # their created_on.
+            if min_date >= correction_cutoff_timestamp:
+                yield ('ERROR_NOT_UP_TO_DATE_USER', user_id)
         else:
             yield ('SUCCESS_ALREADY_UP_TO_DATE', 1)
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        yield (key, len(values))
+        if key == 'ERROR_NOT_UP_TO_DATE_USER':
+            yield (key, values)
+        else:
+            yield (key, len(values))
 
 
 class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):

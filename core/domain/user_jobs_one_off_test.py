@@ -1625,9 +1625,41 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
             .get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
-        return eval_output
+        sorted_eval_output = []
+        for key, values in eval_output:
+            if key == 'ERROR_NOT_UP_TO_DATE_USER':
+                values.sort()
+            sorted_eval_output.append([key, values])
+        return sorted_eval_output
 
-    def test_update_using_last_updated_of_user_settings_model(self):
+    def test_update_for_user_model_created_before_cutoff_date(self):
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        original_created_on_timestamp = user_settings_model.created_on
+        correction_cutoff_timestamp = datetime.datetime.strptime(
+            feconf.CREATED_ON_CORRECTION_CUTOFF_DATE, '%b %d %Y')
+        final_created_on_timestamp = (
+            correction_cutoff_timestamp - datetime.timedelta(days=10))
+        user_settings_model.last_updated = final_created_on_timestamp
+        user_settings_model.created_on = (
+            final_created_on_timestamp + datetime.timedelta(hours=10))
+        user_settings_model.put()
+
+        self.assertNotEqual(
+            user_settings_model.created_on, original_created_on_timestamp)
+        self.assertNotEqual(
+            user_settings_model.created_on, final_created_on_timestamp)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['UPDATE_USING_UserSettingsModel_last_updated', 1]], output)
+
+    def test_update_for_user_model_created_after_cutoff_date(self):
         user_settings_model = (
             user_models.UserSettingsModel(
                 id=self.USER_ID_1,
@@ -1650,7 +1682,12 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
-            [['UPDATE_USING_UserSettingsModel_last_updated', 1]], output)
+            [
+                ['UPDATE_USING_UserSettingsModel_last_updated', 1],
+                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+            ],
+            output
+        )
 
     def test_update_using_other_attributes_of_user_settings_model(self):
         user_settings_model = (
@@ -1681,7 +1718,12 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
-            [['UPDATE_USING_UserSettingsModel_last_logged_in', 1]], output)
+            [
+                ['UPDATE_USING_UserSettingsModel_last_logged_in', 1],
+                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+            ],
+            output
+        )
 
     def test_update_using_created_on_and_last_updated_of_other_models(self):
         user_settings_model = (
@@ -1737,7 +1779,12 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
-            [['UPDATE_USING_UserAuthDetailsModel_created_on', 1]], output)
+            [
+                ['UPDATE_USING_UserAuthDetailsModel_created_on', 1],
+                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+            ],
+            output
+        )
 
     def test_update_using_other_datetime_attributes_of_other_models(self):
         user_settings_model = (
@@ -1789,7 +1836,40 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
-            [['UPDATE_USING_UserSubscriptionsModel_last_checked', 1]], output)
+            [
+                ['UPDATE_USING_UserSubscriptionsModel_last_checked', 1],
+                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+            ],
+            output
+        )
+
+    def test_time_difference_less_than_time_delta_does_not_update(self):
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel(
+                id=self.USER_ID_1,
+                gae_id='gae_id'
+            )
+        )
+        user_auth_details_model.update_timestamps()
+        user_auth_details_model.put()
+
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+
+        # UserAuthDetails model was created before UserSettingsModel, but the
+        # time difference is less than the time_delta required, hence created_on
+        # will not be updated.
+        self.assertLess(
+            user_auth_details_model.created_on, user_settings_model.created_on)
+        actual_output = self._run_one_off_job()
+        expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 1]]
+        self.assertItemsEqual(expected_output, actual_output)
 
     def test_update_for_multiple_users_works_correctly(self):
         user_settings_model_1 = (
@@ -1834,65 +1914,11 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             [
                 ['UPDATE_USING_UserSettingsModel_last_updated', 1],
-                ['UPDATE_USING_UserSettingsModel_last_logged_in', 1]
+                ['UPDATE_USING_UserSettingsModel_last_logged_in', 1],
+                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1, self.USER_ID_2]]
             ],
             output
         )
-
-    def test_multiple_runs_of_one_off_job_raises_no_error(self):
-        user_settings_model = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model.update_timestamps()
-        original_created_on_timestamp = user_settings_model.created_on
-        user_settings_model.created_on += datetime.timedelta(hours=10)
-        user_settings_model.put()
-
-        # We did not modify last_updated earlier, and hence it becomes the
-        # minimal timestamp value now.
-        final_created_on_timestamp = user_settings_model.last_updated
-
-        self.assertNotEqual(
-            user_settings_model.created_on, original_created_on_timestamp)
-        self.assertNotEqual(
-            user_settings_model.created_on, final_created_on_timestamp)
-
-        actual_output = self._run_one_off_job()
-        expected_output = [['UPDATE_USING_UserSettingsModel_last_updated', 1]]
-        self.assertItemsEqual(expected_output, actual_output)
-        actual_output = self._run_one_off_job()
-        self.assertItemsEqual(expected_output, actual_output)
-
-    def test_time_difference_less_than_time_delta_does_not_update(self):
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel(
-                id=self.USER_ID_1,
-                gae_id='gae_id'
-            )
-        )
-        user_auth_details_model.update_timestamps()
-        user_auth_details_model.put()
-
-        user_settings_model = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
-
-        # UserAuthDetails model was created before UserSettingsModel, but the
-        # time difference is less than the time_delta required, hence created_on
-        # will not be updated.
-        self.assertLess(
-            user_auth_details_model.created_on, user_settings_model.created_on)
-        actual_output = self._run_one_off_job()
-        expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 1]]
-        self.assertItemsEqual(expected_output, actual_output)
 
 
 class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
