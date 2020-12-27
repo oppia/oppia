@@ -16,7 +16,7 @@
     </div>
     <div class="oppia-teach-section-one-right">
       <picture class="oppia-teach-main-image image-desktop">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>">
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.webp')]>">
         <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>" alt="">
       </picture>
@@ -63,7 +63,8 @@
       </div>
     </div>
     <div class="oppia-teach-section-three-right" ng-if="!$ctrl.isWindowNarrow()">
-      <picture class="teach-student-desk-image">
+      <picture class="teach-with-oppia-image">
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 (1).webp')]>">
         <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>" alt="">
       </picture>
@@ -84,7 +85,8 @@
       </div>
     </div>
     <div class="oppia-teach-section-four-right" ng-if="!$ctrl.isWindowNarrow()">
-      <picture class="teach-student-desk-image">
+      <picture class="teach-with-oppia-image">
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia1.webp')]>">
         <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia1.png')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia1.png')]>" alt="">
       </picture>
@@ -385,7 +387,7 @@
     margin-top: 7.5vh;
   }
 
-  .teach-page .teach-student-desk-image img {
+  .teach-page .teach-with-oppia-image img {
     border-radius: 10px;
     max-width: 500px;
     width: 100%;
