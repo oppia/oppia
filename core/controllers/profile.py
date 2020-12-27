@@ -34,6 +34,7 @@ from core.domain import user_services
 from core.domain import wipeout_service
 from core.platform import models
 import feconf
+import logging
 import python_utils
 import utils
 
@@ -382,6 +383,9 @@ class ExportAccountHandler(base.BaseHandler):
         # Ensure that the exported data does not contain a user ID.
         user_data_json_string = json.dumps(user_data)
         if re.search(feconf.USER_ID_REGEX, user_data_json_string):
+            logging.error(
+                '[TAKEOUT] User ID found in the JSON generated for user %s'
+                % self.user_id)
             user_data_json_string = (
                 'There was an error while exporting ' +
                 'data. Please contact admin@oppia.org to export your data.')
