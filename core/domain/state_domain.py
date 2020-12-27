@@ -1433,9 +1433,13 @@ class WrittenTranslation(python_utils.OBJECT):
         """Initializes a WrittenTranslation domain object.
 
         Args:
-            data_format: str. 'unicode' or 'html'. Indicates if translation
-                field is html or unicode.
-            translation: str. A piece of user-submitted HTML or unicode. If
+            data_format: str. 'unicode', 'html', or a custom object that
+                subclasses BaseTranslatableObject (exm.
+                'TranslatableSetOfUnicodeString'). If the data format is a
+                BaseTranslatableObject, the translation field will conform to
+                the schema defined by the get_value_schema() method which is
+                required for the BaseTranslatableObject interface.
+            translation: *. A piece of user-submitted translation. If
                 html, this is cleaned in such a way as to contain a restricted
                 set of HTML tags.
             needs_update: bool. Whether translation is marked as needing
@@ -1447,6 +1451,10 @@ class WrittenTranslation(python_utils.OBJECT):
 
         if data_format == self.DATA_FORMAT_HTML:
             self.translation = html_cleaner.clean(self.translation)
+
+        if data_format not in [self.DATA_FORMAT_HTML, self.DATA_FORMAT_UNICODE]
+            obj = getattr(objects, self.data_format)
+            obj.normalize_value(self.translation)
 
     def to_dict(self):
         """Returns a dict representing this WrittenTranslation domain object.
@@ -1490,10 +1498,12 @@ class WrittenTranslation(python_utils.OBJECT):
 
         if not (self.data_format == self.DATA_FORMAT_UNICODE or
                 self.data_format == self.DATA_FORMAT_HTML):
-            raise utils.ValidationError(
-                'Invalid data_format: %s' % self.data_format)
+            obj = getattr(objects, self.data_format)
+            if not issubclass(obj, objects.BaseTranslatableObject):
+                raise utils.ValidationError(
+                    'Invalid data_format: %s' % self.data_format)
 
-        if not isinstance(self.translation, python_utils.BASESTRING):
+        if  not isinstance(self.translation, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Invalid translation: %s' % self.translation)
 

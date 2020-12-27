@@ -68,11 +68,11 @@ class BaseTranslatableObject(BaseObject):
     This is a superclass for objects that are translatable and thus require a
     content id. This class enforces that the object is a dictionary with a
     content id field. The schema of the actual value is determined by the
-    _get_value_schema() method.
+    get_value_schema() method.
     """
 
     @staticmethod
-    def _get_value_schema():
+    def get_value_schema():
         """Returns a list of properties that store the object value.
 
         Returns:
@@ -80,10 +80,10 @@ class BaseTranslatableObject(BaseObject):
         """
         raise NotImplementedError(
             'Subclasses of BaseTranslatableObject should implement '
-            '_get_value_schema().')
+            'get_value_schema().')
 
     @staticmethod
-    def _normalize_value(raw):
+    def normalize_value(raw):
         """Returns a method that normalizes the values of the object.
 
         Args:
@@ -96,7 +96,7 @@ class BaseTranslatableObject(BaseObject):
         """
         raise NotImplementedError(
             'Subclasses of BaseTranslatableObject should implement '
-            '_normalize_value().')
+            'normalize_value().')
 
     @classmethod
     def get_schema(cls):
@@ -113,7 +113,7 @@ class BaseTranslatableObject(BaseObject):
                 # populated before being saved. The normalize() method has
                 # validation checks for this.
                 'schema': {'type': 'unicode_or_none'}
-            }] + cls._get_value_schema()
+            }] + cls.get_value_schema()
         }
 
     @classmethod
@@ -136,7 +136,7 @@ class BaseTranslatableObject(BaseObject):
                 raw['contentId'])
 
         return schema_utils.normalize_against_schema(
-            cls._normalize_value(raw),
+            cls.normalize_value(raw),
             cls.get_schema())
 
 
@@ -1698,7 +1698,7 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
     }
 
     @staticmethod
-    def _get_value_schema():
+    def get_value_schema():
         """Returns a list of properties that store the object value.
 
         Returns:
@@ -1710,7 +1710,7 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
         }]
 
     @staticmethod
-    def _normalize_value(raw):
+    def normalize_value(raw):
         """Validates and normalizes the value fields of the translatable object.
 
         Args:
@@ -1751,7 +1751,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     }
 
     @staticmethod
-    def _get_value_schema():
+    def get_value_schema():
         """Returns a list of properties that store the object value.
 
         Returns:
@@ -1763,7 +1763,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
         }]
 
     @staticmethod
-    def _normalize_value(raw):
+    def normalize_value(raw):
         """Validates and normalizes the value fields of the translatable object.
 
         Args:
