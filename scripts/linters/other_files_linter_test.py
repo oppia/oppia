@@ -34,6 +34,8 @@ PROCESSES = multiprocessing.Manager().dict()
 NAME_SPACE.files = pre_commit_linter.FileCache()
 FILE_CACHE = NAME_SPACE.files
 
+LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
+
 
 class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     """Tests for CustomLintChecksManager."""
@@ -53,16 +55,11 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'midi-defs-0.4.d.ts',
             'nerdamer-defs-0.6.d.ts'
         ]
-        self.strict_ts_config = python_utils.string_io(
-            buffer_value='{\"files\": [\"some-file.ts\",'
-            '\"some-file.spec.ts\"]}')
         def mock_open_file(path, unused_permissions):
             if path == other_files_linter.MANIFEST_JSON_FILE_PATH:
                 return self.manifest_file
             elif path == other_files_linter.PACKAGE_JSON_FILE_PATH:
                 return self.package_file
-            elif path == other_files_linter.STRICT_TS_CONFIG_FILEPATH:
-                return self.strict_ts_config
         def mock_listdir(unused_path):
             return self.files_in_typings_dir
         self.open_file_swap = self.swap(
@@ -258,9 +255,13 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertTrue(error_messages.failed)
 
     def test_check_valid_strict_checks(self):
+        strict_ts_config_path_swap = self.swap(
+            other_files_linter,
+            'STRICT_TS_CONFIG_FILEPATH',
+            os.path.join(LINTER_TESTS_DIR, 'valid_strict_ts_config.json'))
         expected_error_messages = (
             'SUCCESS  Sorted strict TS config check passed')
-        with self.open_file_swap, self.print_swap:
+        with strict_ts_config_path_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
             self.assertEqual(
@@ -269,11 +270,12 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertFalse(error_messages.failed)
 
     def test_check_invalid_strict_checks(self):
-        self.strict_ts_config = python_utils.string_io(
-            buffer_value='{\"files\": [\"some-file.spec.ts\",'
-            '\"some-file.ts\"]}')
+        strict_ts_config_path_swap = self.swap(
+            other_files_linter,
+            'STRICT_TS_CONFIG_FILEPATH',
+            os.path.join(LINTER_TESTS_DIR, 'invalid_strict_ts_config.json'))
         expected_error_messages = 'FAILED  Sorted strict TS config check failed'
-        with self.open_file_swap, self.print_swap:
+        with strict_ts_config_path_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
             self.assertEqual(
