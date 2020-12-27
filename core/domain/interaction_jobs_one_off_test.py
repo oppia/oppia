@@ -23,7 +23,6 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_jobs_one_off
 from core.domain import rights_manager
-from core.domain import state_domain
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
