@@ -730,6 +730,8 @@ def managed_process(args, shell=False, **kwargs):
     Yields:
         psutil.Process. The process managed by the context manager.
     """
+    if PSUTIL_DIR not in sys.path:
+        sys.path.insert(1, PSUTIL_DIR)
     import psutil
 
     str_args = (python_utils.UNICODE(arg).strip() for arg in args)

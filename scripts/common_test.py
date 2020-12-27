@@ -916,6 +916,14 @@ class ManagedProcessTests(test_utils.TestBase):
         with self.swap(psutil, 'Popen', popen_mock):
             yield popen_calls
 
+    def test_managed_process_when_psutil_not_in_path(self):
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self.swap(sys, 'path', []))
+            stack.enter_context(self._swap_popen())
+
+            # Entering the context should not raise.
+            stack.enter_context(common.managed_process(['a']))
+
     def test_concats_command_args_when_shell_is_true(self):
         with contextlib2.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
