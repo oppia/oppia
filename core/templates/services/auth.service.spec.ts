@@ -66,8 +66,8 @@ describe('Auth service', () => {
     // Given that ngOnDestroy() is supposed to call .unsubscribe() on the source
     // observable, that means the subscription should end (represented by the !
     // character) two frames after the subscription starts.
-    const sourceIdTokens = m.hot('   ^---');
-    const authServiceSubscription = '^-! ';
+    const sourceIdTokens = m.hot('   --^---');
+    const authServiceSubscription = '  ^-! ';
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
     m.scheduler.schedule(() => authService.ngOnDestroy(), 2);
