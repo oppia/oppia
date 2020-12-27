@@ -730,8 +730,6 @@ def managed_process(args, shell=False, **kwargs):
     Yields:
         psutil.Process. The process managed by the context manager.
     """
-    if PSUTIL_DIR not in sys.path:
-        sys.path.insert(1, PSUTIL_DIR)
     import psutil
 
     str_args = (python_utils.UNICODE(arg).strip() for arg in args)
@@ -746,22 +744,19 @@ def managed_process(args, shell=False, **kwargs):
         if parent_proc.is_running():
             # Terminate the child processes first, because terminating a parent
             # process does not guarantee its children will be terminated too.
-            # https://stackoverflow.com/a/27034438/4859885.
             child_procs = parent_proc.children(recursive=True)
             for proc in child_procs:
                 proc.terminate()
 
-            gone, still_alive = psutil.wait_procs(child_procs, timeout=5)
-            for proc in still_alive:
+            _, procs_still_running = psutil.wait_procs(child_procs, timeout=10)
+
+            for proc in procs_still_running:
                 proc.kill()
                 logging.warn('Process killed (pid=%d)' % proc.pid)
-            for proc in gone:
-                logging.info('Process terminated (pid=%d)' % proc.pid)
 
             parent_proc.terminate()
             try:
-                parent_proc.wait(timeout=5)
-                logging.info('Process terminated (pid=%d)' % parent_proc.pid)
+                parent_proc.wait(timeout=10)
             except psutil.TimeoutExpired:
                 parent_proc.kill()
                 logging.warn('Process killed (pid=%d)' % parent_proc.pid)

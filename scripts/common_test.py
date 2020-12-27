@@ -31,6 +31,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 
 import constants
@@ -861,16 +862,16 @@ class ManagedProcessTests(test_utils.TestBase):
 
     @contextlib.contextmanager
     def _swap_popen(
-            self, make_processes_unresponsive=False, make_grandchild=False):
+            self, make_processes_unresponsive=False, num_children=0):
         """Returns values for inspecting and mocking calls to psutil.Popen.
 
         Args:
             make_processes_unresponsive: bool. Whether the processes created by
                 the mock will stall when asked to terminate. Processes will
                 always terminate within ~1 minute regardless of this choice.
-            make_grandchild: bool. Whether the process created by the mock
-                should create its _own_ child-process. The grandchild will
-                inherit the same termination behavior.
+            num_children: int. The number of child processes the process created
+                by the mock should create. Children inherit the same termination
+                behavior.
 
         Returns:
             Context manager. A context manager in which calls to psutil.Popen
@@ -902,8 +903,9 @@ class ManagedProcessTests(test_utils.TestBase):
                 time.sleep(1) # Give child a chance to start running.
                 return psutil.Process(pid=child_pid)
 
-            if make_grandchild:
-                os.fork()
+            for _ in python_utils.RANGE(num_children):
+                if os.fork() == 0:
+                    break
 
             if make_processes_unresponsive:
                 # Register an unresponsive function as the SIGTERM handler.
@@ -923,7 +925,7 @@ class ManagedProcessTests(test_utils.TestBase):
             pid = stack.enter_context(
                 common.managed_process(['a', 1], shell=True)).pid
 
-        self.assertEqual(logs, ['Process terminated (pid=%d)' % pid])
+        self.assertEqual(logs, [])
         self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
 
     def test_passes_command_args_as_list_of_strings_when_shell_is_false(self):
@@ -934,7 +936,7 @@ class ManagedProcessTests(test_utils.TestBase):
             pid = stack.enter_context(
                 common.managed_process(['a', 1], shell=False)).pid
 
-        self.assertEqual(logs, ['Process terminated (pid=%d)' % pid])
+        self.assertEqual(logs, [])
         self.assertEqual(
             popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
@@ -946,7 +948,7 @@ class ManagedProcessTests(test_utils.TestBase):
             pid = stack.enter_context(
                 common.managed_process(['', 'a', '', 1], shell=True)).pid
 
-        self.assertEqual(logs, ['Process terminated (pid=%d)' % pid])
+        self.assertEqual(logs, [])
         self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
 
     def test_filters_empty_strings_from_command_args_when_shell_is_false(self):
@@ -957,7 +959,7 @@ class ManagedProcessTests(test_utils.TestBase):
             pid = stack.enter_context(
                 common.managed_process(['', 'a', '', 1], shell=False)).pid
 
-        self.assertEqual(logs, ['Process terminated (pid=%d)' % pid])
+        self.assertEqual(logs, [])
         self.assertEqual(
             popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
@@ -975,14 +977,16 @@ class ManagedProcessTests(test_utils.TestBase):
         with contextlib2.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             stack.enter_context(self._swap_popen(
-                make_processes_unresponsive=True, make_grandchild=True))
+                make_processes_unresponsive=True, num_children=3))
 
             parent_proc = stack.enter_context(common.managed_process(['a']))
-            # NOTE: Children pids come *before* parent pid in this list.
-            pids = [c.pid for c in parent_proc.children()] + [parent_proc.pid]
+            child_pids = [c.pid for c in parent_proc.children()]
+            proc_pid = parent_proc.pid
 
-        self.assertEqual(len(logs), 2)
-        self.assertEqual(logs, ['Process killed (pid=%d)' % p for p in pids])
+        self.assertEqual(len(logs), 4)
+        self.assertEqual(logs[-1], 'Process killed (pid=%d)' % proc_pid)
+        self.assertItemsEqual(
+            logs[:-1], ['Process killed (pid=%d)' % p for p in child_pids])
 
     def test_managed_dev_appserver(self):
         with contextlib2.ExitStack() as stack:
