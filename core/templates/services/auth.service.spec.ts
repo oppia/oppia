@@ -66,6 +66,10 @@ describe('Auth service', () => {
     // Given that ngOnDestroy() is supposed to call .unsubscribe() on the source
     // observable, that means the subscription should end (represented by the !
     // character) two frames after the subscription starts.
+    //
+    // Note that the lifetime of the source tokens are not bounded by the
+    // subscription. AuthService simply subscribes, listens for a few frames,
+    // and then unsubscribes.
     const sourceIdTokens = m.hot('   --^---');
     const authServiceSubscription = '  ^-! ';
 
