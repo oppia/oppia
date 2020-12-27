@@ -828,8 +828,8 @@ def managed_firebase_emulator():
         psutil.Process. The Firebase emulator process.
     """
     emulator_args = [
-        FIREBASE_JS_PATH, 'emulators:start',
-        '--only', 'auth', '--project', feconf.OPPIA_PROJECT_ID,
+        FIREBASE_JS_PATH, 'emulators:start', '--only', 'auth',
+        '--project', feconf.OPPIA_PROJECT_ID
     ]
     with managed_process(emulator_args, shell=True) as proc:
         yield proc
