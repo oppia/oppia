@@ -711,7 +711,7 @@ var FORM_EDITORS = {
   List: ListEditor,
   Real: RealEditor,
   RichText: RichTextEditor,
-  SetOfTranslatableHtmlContentId: SetOfTranslatableHtmlContentIdEditor,
+  SetOfTranslatableHtmlContentIds: SetOfTranslatableHtmlContentIdEditor,
   Unicode: UnicodeEditor
 };
 

@@ -240,8 +240,11 @@ class AnswerGroup(python_utils.OBJECT):
             answer_group_dict: dict. The answer group dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
-            html_field_types_to_rule_specs: dict. A dictionary defining
-                the locations of html fields in rule specs.
+            html_field_types_to_rule_specs: dict. A dictionary that specifies
+                the locations of html fields in rule specs. It is defined as a
+                mapping of rule input types to a dictionary containing
+                interaction id, format, and rule types. See
+                html_field_types_to_rule_specs_state_v41.json for an example.   
 
         Returns:
             dict. The converted answer group dict.
@@ -413,8 +416,11 @@ class Solution(python_utils.OBJECT):
             solution_dict: dict. The Solution dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
-            html_field_types_to_rule_specs: dict. A dictionary defining
-                the locations of html fields in rule specs.
+            html_field_types_to_rule_specs: dict. A dictionary that specifies
+                the locations of html fields in rule specs. It is defined as a
+                mapping of rule input types to a dictionary containing
+                interaction id, format, and rule types. See
+                html_field_types_to_rule_specs_state_v41.json for an example. 
             interaction_spec: dict. The specification for the interaction.
 
         Returns:
@@ -2040,8 +2046,11 @@ class RuleSpec(python_utils.OBJECT):
             rule_spec_dict: dict. The Rule Spec dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
-            html_field_types_to_rule_specs: dict. A dictionary defining
-                the locations of html fields in rule specs.
+            html_field_types_to_rule_specs: dict. A dictionary that specifies
+                the locations of html fields in rule specs. It is defined as a
+                mapping of rule input types to a dictionary containing
+                interaction id, format, and rule types. See
+                html_field_types_to_rule_specs_state_v41.json for an example. 
 
         Returns:
             dict. The converted Rule Spec dict.
@@ -3103,7 +3112,7 @@ class State(python_utils.OBJECT):
         if state_uses_old_rule_template_schema:
             # We need to retrieve an older version of
             # html_field_types_to_rule_specs to properly convert html, since
-            # past state schema v41, some html fields where removed.
+            # after state schema v41, some html fields were removed.
             html_field_types_to_rule_specs = (
                 rules_registry.Registry.get_html_field_types_to_rule_specs(
                     state_schema_version=41))

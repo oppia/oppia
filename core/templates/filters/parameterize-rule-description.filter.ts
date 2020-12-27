@@ -69,7 +69,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
         // Special case for MultipleChoiceInput, ImageClickInput, and
         // ItemSelectionInput.
         if (choices) {
-          if (varType === 'SetOfTranslatableHtmlContentId') {
+          if (varType === 'SetOfTranslatableHtmlContentIds') {
             replacementText = '[';
             const key = inputs[varName];
             const contentIds = choices.map(choice => choice.val);
@@ -87,7 +87,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
               }
             }
             replacementText += ']';
-          } else if (varType === 'ListOfSetsOfTranslatableHtmlContentId') {
+          } else if (varType === 'ListOfSetsOfTranslatableHtmlContentIds') {
             replacementText = '[';
             const key = inputs[varName];
             const contentIds = choices.map(choice => choice.val);

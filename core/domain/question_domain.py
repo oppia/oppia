@@ -899,8 +899,8 @@ class Question(python_utils.OBJECT):
         """
 
         def migrate_rule_inputs_and_answers(new_type, value, choices):
-            """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentId,
-            ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentId,
+            """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
+            ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
             migrations are necessary to have rules work easily for multiple
             languages; instead of comparing html for equality, we compare
@@ -929,21 +929,23 @@ class Question(python_utils.OBJECT):
                 for subtitled_html_dict in choices:
                     if subtitled_html_dict['html'] == html:
                         return subtitled_html_dict['content_id']
+                # If there is no match, we discard the rule input. The frontend
+                # will handle invalid content ids similar to how it handled
+                # non-matching html.
+                return feconf.INVALID_CONTENT_ID
 
             if new_type == 'TranslatableHtmlContentId':
                 return extract_content_id_from_choices(value)
-
-            if new_type == 'SetOfTranslatableHtmlContentId':
+            elif new_type == 'SetOfTranslatableHtmlContentIds':
                 return [
                     migrate_rule_inputs_and_answers(
                         'TranslatableHtmlContentId', html, choices
                     ) for html in value
                 ]
-
-            if new_type == 'ListOfSetsOfTranslatableHtmlContentId':
+            elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
                 return [
                     migrate_rule_inputs_and_answers(
-                        'SetOfTranslatableHtmlContentId', html_set, choices
+                        'SetOfTranslatableHtmlContentIds', html_set, choices
                     ) for html_set in value
                 ]
 
@@ -958,21 +960,21 @@ class Question(python_utils.OBJECT):
 
         if interaction_id == 'ItemSelectionInput':
             # The solution type will be migrated from SetOfHtmlString to
-            # SetOfTranslatableHtmlContentId.
+            # SetOfTranslatableHtmlContentIds.
             if solution is not None:
                 solution['correct_answer'] = (
                     migrate_rule_inputs_and_answers(
-                        'SetOfTranslatableHtmlContentId',
+                        'SetOfTranslatableHtmlContentIds',
                         solution['correct_answer'],
                         choices)
                 )
         if interaction_id == 'DragAndDropSortInput':
             # The solution type will be migrated from ListOfSetsOfHtmlString
-            # to ListOfSetsOfTranslatableHtmlContentId.
+            # to ListOfSetsOfTranslatableHtmlContentIds.
             if solution is not None:
                 solution['correct_answer'] = (
                     migrate_rule_inputs_and_answers(
-                        'ListOfSetsOfTranslatableHtmlContentId',
+                        'ListOfSetsOfTranslatableHtmlContentIds',
                         solution['correct_answer'],
                         choices)
                 )
@@ -986,9 +988,9 @@ class Question(python_utils.OBJECT):
                 if interaction_id == 'ItemSelectionInput':
                     # All rule inputs for ItemSelectionInput will be
                     # migrated from SetOfHtmlString to
-                    # SetOfTranslatableHtmlContentId.
+                    # SetOfTranslatableHtmlContentIds.
                     rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                        'SetOfTranslatableHtmlContentId',
+                        'SetOfTranslatableHtmlContentIds',
                         rule_inputs['x'],
                         choices)
                 if interaction_id == 'DragAndDropSortInput':
@@ -1001,9 +1003,9 @@ class Question(python_utils.OBJECT):
                         # IsEqualToOrderingWithOneItemAtIncorrectPosition,
                         # the x input will be migrated from
                         # ListOfSetsOfHtmlStrings to
-                        # ListOfSetsOfTranslatableHtmlContentId.
+                        # ListOfSetsOfTranslatableHtmlContentIds.
                         rule_inputs['x'] = migrate_rule_inputs_and_answers(
-                            'ListOfSetsOfTranslatableHtmlContentId',
+                            'ListOfSetsOfTranslatableHtmlContentIds',
                             rule_inputs['x'],
                             choices)
                     elif rule_type == 'HasElementXAtPositionY':

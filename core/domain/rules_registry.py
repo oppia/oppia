@@ -62,7 +62,7 @@ class Registry(python_utils.OBJECT):
                         feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH)
                 )
         elif not cached:
-            file_name = 'html_field_types_to_rule_specs_stateV%i.json' % (
+            file_name = 'html_field_types_to_rule_specs_state_v%i.json' % (
                 state_schema_version)
             spec_file = os.path.join(
                 feconf.LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH_FILE_DIR,

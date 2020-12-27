@@ -911,8 +911,10 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
                 if name == 'BaseTranslatableObject':
                     continue
                 self.assertEqual(name.find('Translatable'), 0)
-            elif 'ContentId' not in name:
+            elif 'ContentId' in name:
                 self.assertNotEqual(name.find('Translatable'), 0)
+            else:
+                self.assertNotIn('Translatable', name)
 
     def test_abstract_base_class_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(

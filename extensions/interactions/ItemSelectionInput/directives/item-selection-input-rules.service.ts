@@ -30,19 +30,19 @@ export class ItemSelectionInputRulesService {
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
     return answer.length === inputs.x.length &&
-    answer.every(val => inputs.x.indexOf(val) !== -1);
+    answer.every(val => inputs.x.includes(val));
   }
   ContainsAtLeastOneOf(
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
-    return answer.some(val => inputs.x.indexOf(val) !== -1);
+    return answer.some(val => inputs.x.includes(val));
   }
   // TODO(wxy): migrate the name of this rule to OmitsAtLeastOneOf, keeping
   // in sync with the backend migration of the same rule.
   DoesNotContainAtLeastOneOf(
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
-    return inputs.x.some(val => answer.indexOf(val) === -1);
+    return inputs.x.some(val => answer.includes(val));
   }
   // This function checks if the answer
   // given by the user is a subset of the correct answers.
@@ -50,7 +50,7 @@ export class ItemSelectionInputRulesService {
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
     return answer.length < inputs.x.length &&
-    answer.every(val => inputs.x.indexOf(val) !== -1);
+    answer.every(val => inputs.x.includes(val));
   }
 }
 

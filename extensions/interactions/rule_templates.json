@@ -42,10 +42,10 @@
   "Continue": {},
   "DragAndDropSortInput": {
     "IsEqualToOrdering": {
-      "description": "is equal to ordering {{x|ListOfSetsOfTranslatableHtmlContentId}}"
+      "description": "is equal to ordering {{x|ListOfSetsOfTranslatableHtmlContentIds}}"
     },
     "IsEqualToOrderingWithOneItemAtIncorrectPosition": {
-      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfTranslatableHtmlContentId}}"
+      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfTranslatableHtmlContentIds}}"
     },
     "HasElementXAtPositionY": {
       "description": "has element {{x|TranslatableHtmlContentId}} at position {{y|DragAndDropPositiveInt}}"
@@ -107,16 +107,16 @@
   },
   "ItemSelectionInput": {
     "Equals": {
-      "description": "is equal to {{x|SetOfTranslatableHtmlContentId}}"
+      "description": "is equal to {{x|SetOfTranslatableHtmlContentIds}}"
     },
     "ContainsAtLeastOneOf": {
-      "description": "contains at least one of {{x|SetOfTranslatableHtmlContentId}}"
+      "description": "contains at least one of {{x|SetOfTranslatableHtmlContentIds}}"
     },
     "DoesNotContainAtLeastOneOf": {
-      "description": "omits at least one of {{x|SetOfTranslatableHtmlContentId}}"
+      "description": "omits at least one of {{x|SetOfTranslatableHtmlContentIds}}"
     },
     "IsProperSubsetOf": {
-      "description": "is a proper subset of {{x|SetOfTranslatableHtmlContentId}}"
+      "description": "is a proper subset of {{x|SetOfTranslatableHtmlContentIds}}"
     }
   },
   "LogicProof": {

@@ -62,7 +62,7 @@ ISSUES_DIR = (
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
 INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
-    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs'))
+    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs_by_state_version'))
 INTERACTIONS_SPECS_FILE_PATH = (
     os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
@@ -97,7 +97,7 @@ HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
     'html_field_types_to_rule_specs.json')
 LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH_FILE_DIR = os.path.join(
     os.getcwd(), 'extensions', 'interactions',
-    'legacy_html_field_types_to_rule_specs')
+    'legacy_html_field_types_to_rule_specs_by_state_version')
 
 # A mapping of interaction ids to classifier properties.
 # TODO(#10217): As of now we support only one algorithm per interaction.
@@ -295,6 +295,9 @@ DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
+# Content id assigned to rule inputs that do not match any interaction
+# customization argument choices.
+INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
 DEFAULT_RECORDED_VOICEOVERS = {
     'voiceovers_mapping': {

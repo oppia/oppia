@@ -58,7 +58,7 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
 
           ctrl.submitAnswer = function() {
             // Converting list of dicts to list of lists to make it consistent
-            // with the ListOfSetsOfTranslatableHtmlContentId object.
+            // with the ListOfSetsOfTranslatableHtmlContentIds object.
             answers = [];
             for (var i = 0; i < ctrl.list.length; i++) {
               answers.push([getContentIdOfHtml(ctrl.list[i].title)]);

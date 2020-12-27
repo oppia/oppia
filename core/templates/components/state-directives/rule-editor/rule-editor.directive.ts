@@ -102,7 +102,7 @@ angular.module('oppia').directive('ruleEditor', [
                 // selection interaction.
                 // TODO(sll): Remove the need for this special case.
                 if (answerChoices.length > 0) {
-                  if (finalInputArray[2] === 'SetOfTranslatableHtmlContentId') {
+                  if (finalInputArray[2] === 'SetOfTranslatableHtmlContentIds') {
                     ctrl.ruleDescriptionChoices = answerChoices.map(
                       choice => ({
                         id: choice.label,
@@ -115,7 +115,7 @@ angular.module('oppia').directive('ruleEditor', [
                     });
                   } else if (
                     finalInputArray[2] ===
-                    'ListOfSetsOfTranslatableHtmlContentId'
+                    'ListOfSetsOfTranslatableHtmlContentIds'
                   ) {
                     ctrl.ruleDescriptionChoices = answerChoices.map(
                       choice => ({

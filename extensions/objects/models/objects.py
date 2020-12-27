@@ -1748,7 +1748,7 @@ class TranslatableHtmlContentId(BaseObject):
         return UnicodeString.get_schema()
 
 
-class SetOfTranslatableHtmlContentId(BaseObject):
+class SetOfTranslatableHtmlContentIds(BaseObject):
     """A Set of TranslatableHtml content ids."""
 
     default_value = []
@@ -1769,7 +1769,7 @@ class SetOfTranslatableHtmlContentId(BaseObject):
         }
 
 
-class ListOfSetsOfTranslatableHtmlContentId(BaseObject):
+class ListOfSetsOfTranslatableHtmlContentIds(BaseObject):
     """List of sets of TranslatableHtml content ids."""
 
     default_value = []
@@ -1783,5 +1783,5 @@ class ListOfSetsOfTranslatableHtmlContentId(BaseObject):
         """
         return {
             'type': 'list',
-            'items': SetOfTranslatableHtmlContentId.get_schema()
+            'items': SetOfTranslatableHtmlContentIds.get_schema()
         }
