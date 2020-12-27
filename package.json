@@ -136,6 +136,7 @@
     "dayjs": "^1.8.35",
     "default-passive-events": "^2.0.0",
     "fabric": "^4.1.0",
+    "firebase-tools": "^9.1.0",
     "gif-frames": "^1.0.1",
     "gifshot": "^0.4.5",
     "hammerjs": "^2.0.8",
