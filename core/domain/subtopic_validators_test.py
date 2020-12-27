@@ -18,22 +18,22 @@
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
-import ast
+
 import datetime
-import random
+
 
 from constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
+
+
 from core.domain import subtopic_page_domain
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import user_services
+
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
+
 datastore_services = models.Registry.import_datastore_services()
 
 USER_EMAIL = 'useremail@example.com'
@@ -65,33 +65,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        skills = [
-            skill_domain.Skill.create_default_skill(
-                '%s' % i, 'skill%s' % i, rubrics)
-            for i in python_utils.RANGE(9)]
-
-        for skill in skills:
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d',
-            'description %d' % i,
-            '%s' % (python_utils.divide(i, 2)),
-            'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(6)]
-
-        for story in stories:
-            story_services.save_new_story(self.owner_id, story)
-
-        language_codes = ['ar', 'en', 'en']
+        
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
@@ -124,8 +98,8 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_2 = (
             subtopic_models.SubtopicPageModel.get_by_id('2-1'))
 
-        self.job_class = (
-            prod_validation_jobs_one_off.SubtopicPageModelAuditOneOffJob)
+        
+            
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -294,33 +268,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        skills = [
-            skill_domain.Skill.create_default_skill(
-                '%s' % i, 'skill%s' % i, rubrics)
-            for i in python_utils.RANGE(9)]
-
-        for skill in skills:
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d',
-            'description %d' % i,
-            '%s' % (python_utils.divide(i, 2)),
-            'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(6)]
-
-        for story in stories:
-            story_services.save_new_story(self.owner_id, story)
-
-        language_codes = ['ar', 'en', 'en']
+        
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
@@ -360,9 +308,9 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '2-1-1'))
 
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .SubtopicPageSnapshotMetadataModelAuditOneOffJob)
+        
+            
+            
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -512,33 +460,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        skills = [
-            skill_domain.Skill.create_default_skill(
-                '%s' % i, 'skill%s' % i, rubrics)
-            for i in python_utils.RANGE(9)]
-
-        for skill in skills:
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d',
-            'description %d' % i,
-            '%s' % (python_utils.divide(i, 2)),
-            'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(6)]
-
-        for story in stories:
-            story_services.save_new_story(self.owner_id, story)
-
-        language_codes = ['ar', 'en', 'en']
+      
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
@@ -755,9 +677,9 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
             subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-2-1-1'))
 
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .SubtopicPageCommitLogEntryModelAuditOneOffJob)
+       
+           
+           
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
