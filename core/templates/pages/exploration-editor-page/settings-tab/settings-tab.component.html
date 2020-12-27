@@ -184,7 +184,7 @@
     </div>
 
     <div ng-if="$ctrl.advancedFeaturesIsShown" class="oppia-mobile-collapsible-card-content">
-      <div role="form" class="form-horizontal">
+      <div role="form" class="form-horizontal" ng-if="$ctrl.areParametersEnabled()">
         <div class="oppia-features-header">
           <label for="$ctrl.enableParameters">
             Parameters
