@@ -69,7 +69,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
         AlertsService.clearWarnings();
 
         $uibModal.open({
-          backdrop: true,
+          backdrop: 'static',
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/creator-dashboard-page/modal-templates/' +
             'upload-activity-modal.directive.html'),

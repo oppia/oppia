@@ -36,7 +36,7 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
           '/pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
           'suggestion-modal-for-creator-view.directive.html'
         ),
-        backdrop: true,
+        backdrop: 'static',
         size: 'lg',
         resolve: {
           suggestionIsHandled: function() {

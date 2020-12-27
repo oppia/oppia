@@ -177,7 +177,7 @@ angular.module('oppia').directive('topicEditorTab', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                   'rearrange-skills-in-subtopics-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               windowClass: 'rearrange-skills-modal',
               controller: 'RearrangeSkillsInSubtopicsModalController',
               controllerAs: '$ctrl',
@@ -415,7 +415,7 @@ angular.module('oppia').directive('topicEditorTab', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                       'change-subtopic-assignment-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 subtopics: () => $scope.subtopics
               },

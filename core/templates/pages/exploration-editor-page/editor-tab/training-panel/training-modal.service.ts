@@ -68,7 +68,7 @@ angular.module('oppia').factory('TrainingModalService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/training-unresolved-answer-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           resolve: {
             unhandledAnswer: function() {
               return unhandledAnswer;

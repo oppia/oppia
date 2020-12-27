@@ -163,7 +163,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story-editor-page/modal-templates/' +
                 'story-editor-save-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
               StoryEditorStateService.saveStory(commitMessage);

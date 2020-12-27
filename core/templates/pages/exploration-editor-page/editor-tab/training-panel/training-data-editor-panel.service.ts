@@ -68,7 +68,7 @@ angular.module('oppia').factory('TrainingDataEditorPanelService', [
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/editor-tab/templates/' +
             'training-data-editor.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'TrainingDataEditorPanelServiceModalController'
         });
         // Save the modified training data externally in state content.

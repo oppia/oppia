@@ -65,7 +65,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topic-editor-page/modal-templates/' +
             'tag-misconception-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'TagMisconceptionModalController',
           resolve: {
             taggedSkillMisconceptionId: taggedSkillMisconceptionId

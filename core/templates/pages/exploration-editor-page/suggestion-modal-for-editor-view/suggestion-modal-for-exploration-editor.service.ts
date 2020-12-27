@@ -50,7 +50,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
           'exploration-editor-suggestion-modal.template.html'),
-        backdrop: true,
+        backdrop: 'static',
         size: 'lg',
         resolve: {
           currentContent: () => {

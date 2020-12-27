@@ -85,7 +85,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/modal-templates/' +
                 'skill-editor-save-modal.directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage, () => {

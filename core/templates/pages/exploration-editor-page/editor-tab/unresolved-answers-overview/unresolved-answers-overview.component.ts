@@ -101,7 +101,7 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/editor-tab/templates/' +
             'modal-templates/teach-oppia-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'TeachOppiaModalController'
         }).result.then(function() {}, function() {
           // Note to developers:
