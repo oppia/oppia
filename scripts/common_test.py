@@ -856,7 +856,8 @@ class CommonTests(test_utils.GenericTestBase):
 class ManagedProcessTests(test_utils.TestBase):
 
     # Helper class for improving the readability of tests.
-    _CALL = collections.namedtuple('_CALL', ['args', 'kwargs'])
+    POPEN_CALL = (
+        collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs']))
 
     @contextlib.contextmanager
     def _swap_popen(
@@ -872,28 +873,28 @@ class ManagedProcessTests(test_utils.TestBase):
                 inherit the same termination behavior.
 
         Yields:
-            list(_CALL). A list with the most up-to-date (*args, **kwargs) calls
-            made to psutil.Popen while under the context.
+            list(POPEN_CALL). A list with the most up-to-date arguments passed
+            to psutil.Popen within the context returned.
         """
         popen_calls = []
 
-        def popen_mock(*args, **kwargs):
+        def popen_mock(program_args, **kwargs):
             """Mock of psutil.Popen that creates processes using os.fork().
 
-            Processes created by this function will always terminate after ~25s.
+            The processes created will always terminate within ~1 minute.
 
             Args:
-                *args: list(*). Unused but added to the list of calls for later
-                    inspection.
-                **kwargs: dict(str: *). Unused but added to the list of calls
-                    for later inspection.
+                program_args: list(*). Unused program arguments that would
+                    otherwise be used by psutil.Popen.
+                **kwargs: dict(str: *). Unused keyword arguments that would
+                    otherwise be used by psutil.Popen.
 
             Returns:
                 psutil.Process. Handle for the parent of the new process tree.
             """
             child_pid = os.fork()
             if child_pid != 0:
-                popen_calls.append(self._CALL(args=args, kwargs=kwargs))
+                popen_calls.append(self.POPEN_CALL(program_args, kwargs))
                 time.sleep(1) # Give child a chance to start running.
                 return psutil.Process(pid=child_pid)
 
@@ -919,9 +920,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 common.managed_process(['a', 1], shell=True)).pid
 
         self.assertEqual(logs, ['Process terminated (pid=%d)' % pid])
-        self.assertEqual(popen_calls, [
-            self._CALL(args=('a 1',), kwargs={'shell': True})
-        ])
+        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
 
     def test_passes_command_args_as_list_of_strings_when_shell_is_false(self):
         with contextlib2.ExitStack() as stack:
@@ -932,9 +931,8 @@ class ManagedProcessTests(test_utils.TestBase):
                 common.managed_process(['a', 1], shell=False)).pid
 
         self.assertEqual(logs, ['Process terminated (pid=%d)' % pid])
-        self.assertEqual(popen_calls, [
-            self._CALL(args=(['a', '1'],), kwargs={'shell': False})
-        ])
+        self.assertEqual(
+            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
     def test_filters_empty_strings_from_command_args_when_shell_is_true(self):
         with contextlib2.ExitStack() as stack:
@@ -945,9 +943,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 common.managed_process(['', 'a', '', 1], shell=True)).pid
 
         self.assertEqual(logs, ['Process terminated (pid=%d)' % pid])
-        self.assertEqual(popen_calls, [
-            self._CALL(args=('a 1',), kwargs={'shell': True})
-        ])
+        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
 
     def test_filters_empty_strings_from_command_args_when_shell_is_false(self):
         with contextlib2.ExitStack() as stack:
@@ -958,9 +954,8 @@ class ManagedProcessTests(test_utils.TestBase):
                 common.managed_process(['', 'a', '', 1], shell=False)).pid
 
         self.assertEqual(logs, ['Process terminated (pid=%d)' % pid])
-        self.assertEqual(popen_calls, [
-            self._CALL(args=(['a', '1'],), kwargs={'shell': False})
-        ])
+        self.assertEqual(
+            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
     def test_reports_killed_processes_as_warnings(self):
         with contextlib2.ExitStack() as stack:
@@ -990,10 +985,8 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(
-                common.managed_dev_appserver('app.yaml', env={'a': 1}))
+                common.managed_dev_appserver('app.yaml', env=None))
 
         self.assertEqual(len(popen_calls), 1)
-        args, kwargs = popen_calls[0]
-        self.assertEqual(len(args), 1)
-        self.assertIn('dev_appserver.py', args[0])
-        self.assertEqual(kwargs, {'shell': True, 'env': {'a': 1}})
+        self.assertIn('dev_appserver.py', popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'env': None})
