@@ -32,13 +32,10 @@ from core.domain import summary_services
 from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
-from core.platform import models
 import feconf
 import logging
 import python_utils
 import utils
-
-current_user_services = models.Registry.import_current_user_services()
 
 
 class ProfilePage(base.BaseHandler):
@@ -398,8 +395,10 @@ class ExportAccountHandler(base.BaseHandler):
             zfile.writestr('oppia_takeout_data.json', user_data_json_string)
             for image in user_images:
                 b64_png_no_header = image.b64_image_data.split(',')[1]
-                decoded_png = base64.b64decode(
-                    python_utils.url_unquote_plus(b64_png_no_header))
+                b64_png_no_header = python_utils.url_unquote_plus(
+                    b64_png_no_header)
+                b64_png_no_header = re.sub(r'\s', b'+', b64_png_no_header)
+                decoded_png = base64.b64decode(b64_png_no_header)
                 zfile.writestr('images/' + image.image_export_path, decoded_png)
 
         # Render file for download.
@@ -474,7 +473,7 @@ class UserInfoHandler(base.BaseHandler):
                     user_services.is_at_least_moderator(self.user_id)),
                 'is_admin': user_services.is_admin(self.user_id),
                 'is_super_admin': (
-                    current_user_services.is_current_user_super_admin()),
+                    user_services.is_current_user_super_admin()),
                 'is_topic_manager': (
                     user_services.is_topic_manager(self.user_id)),
                 'can_create_collections': bool(
@@ -498,14 +497,12 @@ class UrlHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        login_url = None
         if self.user_id:
             self.render_json({'login_url': None})
         else:
             if self.request and self.request.get('current_url'):
                 target_url = self.request.get('current_url')
-                login_url = (
-                    current_user_services.create_login_url(target_url))
+                login_url = user_services.create_login_url(target_url)
                 self.render_json({'login_url': login_url})
             else:
                 raise self.InvalidInputException(

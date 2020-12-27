@@ -474,8 +474,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # Setup for GeneralSuggestionModel.
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.EXPLORATION_IDS[0], 1,
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
@@ -1218,8 +1218,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
                 'status': suggestion_models.STATUS_IN_REVIEW,

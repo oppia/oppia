@@ -133,8 +133,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     target_id, self.target_version_at_submission,
                     self.author_id, self.change, 'test description')
 
@@ -175,8 +175,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         expected_suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread_1',
             'suggestion_type': (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            'target_type': feconf.ENTITY_TYPE_EXPLORATION,
             'target_id': self.target_id,
             'target_version_at_submission': self.target_version_at_submission,
             'status': suggestion_models.STATUS_IN_REVIEW,
@@ -205,7 +205,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Invalid suggestion type'):
             suggestion_services.create_suggestion(
                 'invalid_suggestion_type',
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, self.change, 'test description')
 
@@ -213,8 +213,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected author_id to be in a valid user ID format'):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 'invalid author ID', self.change, 'test description')
 
@@ -232,15 +232,15 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'The given content_html does not match the content of the '
             'exploration.'):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 self.author_id, add_translation_change_dict, 'test description')
 
     def test_get_all_stale_suggestion_ids(self):
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             self.author_id, self.change, 'test description')
 
@@ -265,8 +265,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_reject_suggestion_with_empty_review_message(self):
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             self.author_id, self.change, 'test description')
 
@@ -303,8 +303,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         }
 
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             self.author_id, change_dict, 'test description')
 
@@ -472,8 +472,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 exp_fetchers, 'get_exploration_by_id',
                 self.mock_get_exploration_by_id):
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id, self.target_version_at_submission,
                     self.author_id, change_dict, 'test description')
         self.assert_suggestion_status(
@@ -844,8 +844,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id_1, suggestion_change, 'test description'
         )
 
@@ -868,8 +868,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 exp_domain.Exploration, 'get_content_html',
                 self.MockExploration.get_content_html):
                 translation_suggestion = suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id_1, 1, self.author_id_1,
                     add_translation_change_dict, 'test description')
 
@@ -893,32 +893,32 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             self.mock_get_exploration_by_id):
 
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, self.change, 'test description')
 
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, self.change, 'test description')
 
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_1, self.change, 'test description')
 
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_1, self.target_version_at_submission,
                 self.author_id_2, self.change, 'test description')
 
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.target_id_2, self.target_version_at_submission,
                 self.author_id_2, self.change, 'test description')
 
@@ -930,12 +930,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_by_target_id(self):
         queries = [
-            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_type', feconf.ENTITY_TYPE_EXPLORATION),
             ('target_id', self.target_id_1)
         ]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 4)
         queries = [
-            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_type', feconf.ENTITY_TYPE_EXPLORATION),
             ('target_id', self.target_id_2)
         ]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
@@ -947,19 +947,19 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     def test_get_by_type(self):
         queries = [(
             'suggestion_type',
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 5)
 
     def test_query_suggestions(self):
         queries = [
-            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_type', feconf.ENTITY_TYPE_EXPLORATION),
             ('target_id', self.target_id_1),
             ('author_id', self.author_id_2)
         ]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
 
         queries = [
-            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_type', feconf.ENTITY_TYPE_EXPLORATION),
             ('target_id', self.target_id_1),
             ('author_id', self.author_id_1),
             ('status', suggestion_models.STATUS_IN_REVIEW)
@@ -967,7 +967,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 3)
 
         queries = [
-            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_type', feconf.ENTITY_TYPE_EXPLORATION),
             ('target_id', self.target_id_1),
             ('invalid_field', 'value')
         ]
@@ -985,8 +985,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 exp_domain.Exploration, 'get_content_html',
                 self.MockExploration.get_content_html):
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id_1, 1, self.author_id_1,
                     self.add_translation_change_dict, 'test description')
 
@@ -1009,8 +1009,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 exp_domain.Exploration, 'get_content_html',
                 self.MockExploration.get_content_html):
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id_2, 1, self.author_id_1,
                     self.add_translation_change_dict, 'test description')
         # Create the translation suggestion associated with exploration id
@@ -1022,8 +1022,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 exp_domain.Exploration, 'get_content_html',
                 self.MockExploration.get_content_html):
                 suggestion_services.create_suggestion(
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    feconf.ENTITY_TYPE_EXPLORATION,
                     self.target_id_3, 1, self.author_id_1,
                     self.add_translation_change_dict, 'test description')
 
@@ -1067,14 +1067,14 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(suggestions[0].target_id, self.target_id_1)
         self.assertEqual(
             suggestions[0].suggestion_type,
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
         self.assertEqual(
             suggestions[0].status,
             suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(suggestions[1].target_id, self.target_id_1)
         self.assertEqual(
             suggestions[1].suggestion_type,
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
         self.assertEqual(
             suggestions[1].status,
             suggestion_models.STATUS_IN_REVIEW)
@@ -1215,34 +1215,34 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'user2', 'category3', 5)
 
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             'exp1', 1, suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change, 'category1',
             'exploration.exp1.thread_1', None)
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change, 'category2',
             'exploration.exp1.thread_2', None)
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change, 'category3',
             'exploration.exp1.thread_3', None)
         # This suggestion does not count as a suggestion that can be reviewed
         # by a user because it has already been rejected.
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_REJECTED, 'author_3',
             'reviewer_2', self.change, 'category1',
             'exploration.exp1.thread_4', None)
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, 'exp1', 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp1', 1,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_2', self.change, 'category2',
             'exploration.exp1.thread_5', None)
@@ -1389,8 +1389,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         }
 
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             exp_id, 1, author_id, add_translation_change_dict,
             'test description')
 
@@ -1409,8 +1409,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
                 self.author_id, self.change, 'test description')
 
@@ -1433,8 +1433,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
                 self.author_id, self.change, 'test description')
 
@@ -1460,8 +1460,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id', self.mock_generate_new_thread_id):
             suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
                 self.author_id, self.change, 'test description')
 
@@ -1504,8 +1504,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
         self.assert_created_suggestion_is_valid(skill_id, self.author_id)
 
@@ -1696,8 +1696,8 @@ class ReviewableSuggestionEmailInfoUnitTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description'
@@ -1728,8 +1728,8 @@ class ReviewableSuggestionEmailInfoUnitTests(
             }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
@@ -1753,8 +1753,8 @@ class ReviewableSuggestionEmailInfoUnitTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, edit_state_content_change_dict,
             'test description')
@@ -1806,7 +1806,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 Exception,
                 'Expected suggestion type to be offered on the Contributor '
                 'Dashboard, received: %s.' % (
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)):
                 (
                     suggestion_services
                     .create_reviewable_suggestion_email_info_from_suggestion(
@@ -2338,8 +2338,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             author_id, add_translation_change_dict,
             'test description'
@@ -2364,8 +2364,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             author_id, add_question_change_dict,
             'test description'
@@ -2939,8 +2939,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description'
@@ -2964,8 +2964,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
@@ -2989,8 +2989,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, edit_state_content_change_dict,
             'test description'
@@ -3448,8 +3448,8 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description'
@@ -3473,8 +3473,8 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
@@ -3553,7 +3553,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         # This mocked list cannot be empty because then the storage query in the
         # get_suggestions_waiting_too_long_for_review method will fail.
         mocked_contributor_dashboard_suggestion_types = [
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION]
+            feconf.SUGGESTION_TYPE_ADD_QUESTION]
 
         with self.swap(
             suggestion_models, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
@@ -3725,8 +3725,8 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description'
@@ -3750,8 +3750,8 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
@@ -3888,7 +3888,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
 
     def test_get_returns_reviewers_needed_if_translation_for_a_lang_no_reviewer(
             self):
@@ -3908,7 +3908,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 self.sample_language_code}})
 
     def test_get_returns_reviewers_needed_if_translation_for_langs_no_reviewers(
@@ -3929,7 +3929,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'}})
+            {feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {'en', 'fr'}})
 
     def test_get_returns_reviewers_needed_if_multi_suggestion_types_no_reviewer(
             self):
@@ -3951,7 +3951,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
             {
-                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                     'en', 'fr'},
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
+                feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
             })
