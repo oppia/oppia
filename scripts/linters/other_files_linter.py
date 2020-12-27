@@ -254,8 +254,8 @@ class CustomLintChecksManager(python_utils.OBJECT):
         failed = False
         error_messages = []
 
-        strict_ts_config = json.load(
-            python_utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r'))
+        with python_utils.open_file(STRICT_TS_CONFIG_FILEPATH, 'r') as f:
+            strict_ts_config = json.load(f)
 
         # Remove .ts extension from filepath for sorting to ensure that
         # spec files are always below the main files.
