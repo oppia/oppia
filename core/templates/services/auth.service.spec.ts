@@ -57,13 +57,19 @@ describe('Auth service', () => {
   });
 
   it('should unsubscribe from source after calling ngOnDestroy', marbles(m => {
+    // AuthService calls .subscribe() on the source ID tokens at "frame 0" of
+    // the marble diagrams (represented by the ^ character).
+    //
+    // We schedule ngOnDestroy() to be called two frames _after_ that (each
+    // non-whitespace character of the marble diagram is "1 frame").
+    //
+    // Given that ngOnDestroy() is supposed to call .unsubscribe() on the source
+    // observable, that means the subscription should end (represented by the !
+    // character) two frames after the subscription starts.
     const sourceIdTokens = m.hot('   ^---');
     const authServiceSubscription = '^-! ';
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
-    // Calls ngOnDestroy() after 2 frames have elapsed in the marble diagram.
-    // Frame 0 begins at the ^ character, so we check for an unsubscribe
-    // (represented by the ! character) 2 frames after it.
     m.scheduler.schedule(() => authService.ngOnDestroy(), 2);
 
     m.expect(sourceIdTokens).toHaveSubscriptions(authServiceSubscription);
