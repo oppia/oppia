@@ -263,7 +263,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
@@ -301,7 +301,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
