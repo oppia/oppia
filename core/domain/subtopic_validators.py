@@ -18,11 +18,13 @@
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
-from core.domain import base_model_validators
+
 
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.platform import models
+from core.tests import test_utils
+import python_utils
 subtopic_models = models.Registry.import_models([models.NAMES.subtopic])
 class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SubtopicPageModel."""
@@ -54,9 +56,9 @@ class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 subtopic_models.SubtopicPageSnapshotContentModel,
-                snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'topic_ids', topic_models.TopicModel, [item.topic_id])]
+                snapshot_model_ids)]
+           
+                
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -68,9 +70,9 @@ class SubtopicPageSnapshotMetadataModelValidator(base_model_validators.BaseSnaps
 
     EXTERNAL_MODEL_NAME = 'subtopic page'
 
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9]{1,%s}-\\d*-\\d*$' % base_models.ID_LENGTH
+    
+   
+        
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -81,8 +83,8 @@ class SubtopicPageSnapshotMetadataModelValidator(base_model_validators.BaseSnaps
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_ids',
-                subtopic_models.SubtopicPageModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
+                subtopic_models.SubtopicPageModel
+                ),
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
@@ -94,17 +96,17 @@ class SubtopicPageSnapshotContentModelValidator(
 
     EXTERNAL_MODEL_NAME = 'subtopic page'
 
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9]{1,%s}-\\d*-\\d*$' % base_models.ID_LENGTH
+   
+    
+        
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_ids',
-                subtopic_models.SubtopicPageModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
+                subtopic_models.SubtopicPageModel
+                )]
 
 
 class SubtopicPageCommitLogEntryModelValidator(
@@ -139,6 +141,4 @@ class SubtopicPageCommitLogEntryModelValidator(
                 'subtopic_page_ids',
                 subtopic_models.SubtopicPageModel,
                 [item.subtopic_page_id])]
-
-
 
