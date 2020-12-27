@@ -31,7 +31,6 @@ import stat
 import subprocess
 import sys
 import tempfile
-import threading
 import time
 
 import constants
@@ -922,8 +921,7 @@ class ManagedProcessTests(test_utils.TestBase):
             logs = stack.enter_context(self.capture_logging())
             popen_calls = stack.enter_context(self._swap_popen())
 
-            pid = stack.enter_context(
-                common.managed_process(['a', 1], shell=True)).pid
+            stack.enter_context(common.managed_process(['a', 1], shell=True))
 
         self.assertEqual(logs, [])
         self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
@@ -933,8 +931,7 @@ class ManagedProcessTests(test_utils.TestBase):
             logs = stack.enter_context(self.capture_logging())
             popen_calls = stack.enter_context(self._swap_popen())
 
-            pid = stack.enter_context(
-                common.managed_process(['a', 1], shell=False)).pid
+            stack.enter_context(common.managed_process(['a', 1], shell=False))
 
         self.assertEqual(logs, [])
         self.assertEqual(
@@ -945,8 +942,8 @@ class ManagedProcessTests(test_utils.TestBase):
             logs = stack.enter_context(self.capture_logging())
             popen_calls = stack.enter_context(self._swap_popen())
 
-            pid = stack.enter_context(
-                common.managed_process(['', 'a', '', 1], shell=True)).pid
+            stack.enter_context(
+                common.managed_process(['', 'a', '', 1], shell=True))
 
         self.assertEqual(logs, [])
         self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
@@ -956,8 +953,8 @@ class ManagedProcessTests(test_utils.TestBase):
             logs = stack.enter_context(self.capture_logging())
             popen_calls = stack.enter_context(self._swap_popen())
 
-            pid = stack.enter_context(
-                common.managed_process(['', 'a', '', 1], shell=False)).pid
+            stack.enter_context(
+                common.managed_process(['', 'a', '', 1], shell=False))
 
         self.assertEqual(logs, [])
         self.assertEqual(
