@@ -1483,10 +1483,40 @@ class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(
         )
 
     def test_rerun(self):
-        self.test_for_empty_activity_ids()
-        self.test_for_non_empty_activity_ids()
-        self.test_for_multiple_models()
-        self.test_for_existing_exploration_ids()
+        origional_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='model_id',
+                activity_ids=[]
+            )
+        )
+        origional_subscription_model.update_timestamps()
+        origional_subscription_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual([[u'SUCCESS', 1]], output)
+
+        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
+            'model_id')
+        self.assertEqual(
+            migrated_subscription_model.exploration_ids,
+            []
+        )
+        self.assertEqual(
+            origional_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
+
+        output = self._run_one_off_job()
+        self.assertEqual([[u'SUCCESS', 1]], output)
+
+        self.assertEqual(
+            migrated_subscription_model.exploration_ids,
+            []
+        )
+        self.assertEqual(
+            origional_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
 
 
 class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):

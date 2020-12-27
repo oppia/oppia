@@ -912,7 +912,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # IDs of activities (e.g., explorations) that this user subscribes to.
     # IDs of explorations that this user subscribes to.
     exploration_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
