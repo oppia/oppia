@@ -42,7 +42,7 @@ export class ItemSelectionInputRulesService {
   DoesNotContainAtLeastOneOf(
       answer: ItemSelectionAnswer,
       inputs: ItemSelectionRuleInputs): boolean {
-    return inputs.x.some(val => answer.includes(val));
+    return inputs.x.some(val => !answer.includes(val));
   }
   // This function checks if the answer
   // given by the user is a subset of the correct answers.
