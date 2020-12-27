@@ -1452,7 +1452,7 @@ class WrittenTranslation(python_utils.OBJECT):
         if data_format == self.DATA_FORMAT_HTML:
             self.translation = html_cleaner.clean(self.translation)
 
-        if data_format not in [self.DATA_FORMAT_HTML, self.DATA_FORMAT_UNICODE]
+        if data_format not in [self.DATA_FORMAT_HTML, self.DATA_FORMAT_UNICODE]:
             obj = getattr(objects, self.data_format)
             obj.normalize_value(self.translation)
 
@@ -1498,14 +1498,28 @@ class WrittenTranslation(python_utils.OBJECT):
 
         if not (self.data_format == self.DATA_FORMAT_UNICODE or
                 self.data_format == self.DATA_FORMAT_HTML):
-            obj = getattr(objects, self.data_format)
+            try:
+                obj = getattr(objects, self.data_format)
+            except AttributeError:
+                raise utils.ValidationError(
+                    'Invalid data_format: %s' % self.data_format)
+
             if not issubclass(obj, objects.BaseTranslatableObject):
                 raise utils.ValidationError(
                     'Invalid data_format: %s' % self.data_format)
 
-        if  not isinstance(self.translation, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Invalid translation: %s' % self.translation)
+        if (self.data_format == self.DATA_FORMAT_UNICODE or
+            self.data_format == self.DATA_FORMAT_HTML):
+            if not isinstance(self.translation, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Invalid translation: %s' % self.translation)
+        else:
+            try:
+                obj = getattr(objects, self.data_format)
+                obj.normalize_value(self.translation)
+            except TypeError:
+                raise utils.ValidationError(
+                    'Invalid translation: %s' % self.translation)
 
         if not isinstance(self.needs_update, bool):
             raise utils.ValidationError(

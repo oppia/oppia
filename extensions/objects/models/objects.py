@@ -68,11 +68,11 @@ class BaseTranslatableObject(BaseObject):
     This is a superclass for objects that are translatable and thus require a
     content id. This class enforces that the object is a dictionary with a
     content id field. The schema of the actual value is determined by the
-    get_value_schema() method.
+    _get_value_schema() method.
     """
 
     @staticmethod
-    def get_value_schema():
+    def _get_value_schema():
         """Returns a list of properties that store the object value.
 
         Returns:
@@ -80,10 +80,10 @@ class BaseTranslatableObject(BaseObject):
         """
         raise NotImplementedError(
             'Subclasses of BaseTranslatableObject should implement '
-            'get_value_schema().')
+            '_get_value_schema().')
 
     @staticmethod
-    def normalize_value(raw):
+    def _normalize_value(raw):
         """Returns a method that normalizes the values of the object.
 
         Args:
@@ -96,7 +96,7 @@ class BaseTranslatableObject(BaseObject):
         """
         raise NotImplementedError(
             'Subclasses of BaseTranslatableObject should implement '
-            'normalize_value().')
+            '_normalize_value().')
 
     @classmethod
     def get_schema(cls):
@@ -113,7 +113,7 @@ class BaseTranslatableObject(BaseObject):
                 # populated before being saved. The normalize() method has
                 # validation checks for this.
                 'schema': {'type': 'unicode_or_none'}
-            }] + cls.get_value_schema()
+            }] + cls._get_value_schema()
         }
 
     @classmethod
@@ -136,9 +136,28 @@ class BaseTranslatableObject(BaseObject):
                 raw['contentId'])
 
         return schema_utils.normalize_against_schema(
-            cls.normalize_value(raw),
+            cls._normalize_value(raw),
             cls.get_schema())
 
+    @classmethod
+    def normalize_value(cls, raw):
+        """Validates and normalizes the values in the raw Python object. This
+        method is used in the WrittenTranslation domain object to validate the
+        stored translations.
+
+        Args:
+            raw: dict. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            dict. The normalized object.
+
+        Raises:
+            TypeError. Error while normalizing.
+        """
+        return schema_utils.normalize_against_schema(
+            cls._normalize_value(raw),
+            {'type': 'dict', 'properties': cls._get_value_schema()})
 
 class Boolean(BaseObject):
     """Class for booleans."""
@@ -1698,7 +1717,7 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
     }
 
     @staticmethod
-    def get_value_schema():
+    def _get_value_schema():
         """Returns a list of properties that store the object value.
 
         Returns:
@@ -1710,7 +1729,7 @@ class TranslatableSetOfNormalizedString(BaseTranslatableObject):
         }]
 
     @staticmethod
-    def normalize_value(raw):
+    def _normalize_value(raw):
         """Validates and normalizes the value fields of the translatable object.
 
         Args:
@@ -1751,7 +1770,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
     }
 
     @staticmethod
-    def get_value_schema():
+    def _get_value_schema():
         """Returns a list of properties that store the object value.
 
         Returns:
@@ -1763,7 +1782,7 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
         }]
 
     @staticmethod
-    def normalize_value(raw):
+    def _normalize_value(raw):
         """Validates and normalizes the value fields of the translatable object.
 
         Args:

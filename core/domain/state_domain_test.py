@@ -3049,6 +3049,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid data_format'
             ):
+            with self.swap(written_translation, 'data_format', 'Boolean'):
+                written_translation.validate()
+
+        data_format_swap = self.swap(
+            written_translation, 'data_format',
+            'TranslatableSetOfNormalizedString')
+        translation_swap = self.swap(
+            written_translation, 'translation', [1, 2, 3])
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid translation'
+            ):
+            with data_format_swap, translation_swap:
+                written_translation.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid data_format'
+            ):
             with self.swap(written_translation, 'data_format', 2):
                 written_translation.validate()
 
@@ -3993,7 +4010,7 @@ class SubtitledUnicodeDomainUnitTests(test_utils.GenericTestBase):
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
 
-    def test_from_and_to_dict_wroks_correctly(self):
+    def test_from_and_to_dict_works_correctly(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content1': {
@@ -4006,6 +4023,13 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                         'data_format': 'html',
                         'translation': 'Hey!',
                         'needs_update': False
+                    },
+                    'fr': {
+                        'data_format': 'TranslatableSetOfNormalizedString',
+                        'translation': {
+                            'normalizedStrSet': ['test1', 'test2']
+                        },
+                        'needs_update': False
                     }
                 },
                 'feedback_1': {
@@ -4017,6 +4041,13 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
                     'en': {
                         'data_format': 'html',
                         'translation': 'hello!',
+                        'needs_update': False
+                    },
+                    'fr': {
+                        'data_format': 'TranslatableSetOfNormalizedString',
+                        'translation': {
+                            'normalizedStrSet': ['test1', 'test2']
+                        },
                         'needs_update': False
                     }
                 }
