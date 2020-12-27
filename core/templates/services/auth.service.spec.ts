@@ -69,7 +69,7 @@ describe('Auth service', () => {
     //
     // Note that the lifetime of the source tokens are not bounded by the
     // subscription. AuthService simply subscribes, listens for a few frames,
-    // and then unsubscribes.
+    // and then unsubscribes (because it was destroyed with `.ngOnDestroy()`).
     const sourceIdTokens = m.hot('   --^---');
     const authServiceSubscription = '  ^-! ';
 
