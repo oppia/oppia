@@ -32,13 +32,13 @@ from core.domain import prod_validators
 from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import skill_domain
-from core.domain import skill_services
+
+
 from core.domain import story_domain
 from core.domain import story_services
-from core.domain import subtopic_page_domain
+
 from core.domain import taskqueue_services
-from core.domain import topic_domain
+
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
