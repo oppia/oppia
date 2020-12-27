@@ -37,6 +37,26 @@ def get_matching_activity_dicts(
         query_string, categories, language_codes, search_cursor):
     """Given the details of a query and a search cursor, returns a list of
     activity dicts that satisfy the query.
+
+    Args:
+        query_string: str. The search query string (this is what the user
+            enters).
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
+        search_cursor: str or None. Cursor indicating where, in the list of
+            search results, to start the search from.
+
+    Returns:
+        tuple. A tuple consisting of two elements:
+            - list(dict). Each element in this list is a collection or
+                exploration summary dict, representing a search result.
+            - str. The cursor from which to start the next search.
     """
     # We only populate collections in the initial load, since the current
     # frontend search infrastructure is set up to only deal with one search
@@ -214,16 +234,28 @@ class SearchHandler(base.BaseHandler):
             (ord(char), None) for char in string.punctuation)
         query_string = query_string.translate(remove_punctuation_map)
 
-        # If there is a category parameter, it will be in the following form:
+        # If there is a category parameter, it should be in the following form:
         #     category=("Algebra" OR "Math")
         category_string = self.request.get('category', '')
+        if category_string and (
+                not category_string.startswith('("') or
+                not category_string.endswith('")')):
+            raise self.InvalidInputException('Invalid search query.')
+        # The 2 and -2 account for the '("" and '")' characters at the
+        # beginning and end.
         categories = (
             category_string[2:-2].split('" OR "') if category_string else [])
 
-        # If there is a language code parameter, it will be in the following
+        # If there is a language code parameter, it should be in the following
         # form:
         #     language_code=("en" OR "hi")
         language_code_string = self.request.get('language_code', '')
+        if language_code_string and (
+                not language_code_string.startswith('("') or
+                not language_code_string.endswith('")')):
+            raise self.InvalidInputException('Invalid search query.')
+        # The 2 and -2 account for the '("" and '")' characters at the
+        # beginning and end.
         language_codes = (
             language_code_string[2:-2].split('" OR "')
             if language_code_string else [])
