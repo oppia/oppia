@@ -951,17 +951,10 @@ class ContinuousComputationModelValidator(
     @classmethod
     def _get_custom_validation_functions(cls):
         return [cls._validate_time_fields]
-
-
-
-
-
     @classmethod
     def _get_custom_validation_functions(cls):
         return []
-
-
-
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return '^[A-Za-z0-9]{1,%s}-\\d*-\\d*$' % base_models.ID_LENGTH
+
