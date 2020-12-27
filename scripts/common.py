@@ -720,13 +720,16 @@ class CD(python_utils.OBJECT):
 
 
 @contextlib.contextmanager
-def managed_process(args, shell=False, **kwargs):
+def managed_process(args, shell=False, timeout=60, **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
         args: list(*). A sequence of program arguments, where the program to
             execute is the first item. All items are converted to strings first.
         shell: bool. Whether the command should be run inside of its own shell.
+        timeout: int. The time allotted for the managed process and its
+            descendants to terminate themselves, in seconds. After the timeout,
+            any remaining processes will be killed abruptly.
         **kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
@@ -736,9 +739,9 @@ def managed_process(args, shell=False, **kwargs):
         sys.path.insert(1, PSUTIL_DIR)
     import psutil
 
-    str_args = (python_utils.UNICODE(arg).strip() for arg in args)
-    truthy_args = (arg for arg in str_args if arg)
-    popen_args = ' '.join(truthy_args) if shell else list(truthy_args)
+    stripped_args = (python_utils.UNICODE(arg).strip() for arg in args)
+    non_empty_args = (arg for arg in stripped_args if arg)
+    popen_args = ' '.join(non_empty_args) if shell else list(non_empty_args)
 
     root_proc = psutil.Popen(popen_args, shell=shell, **kwargs)
 
@@ -750,7 +753,7 @@ def managed_process(args, shell=False, **kwargs):
             for proc in procs:
                 proc.terminate()
 
-            _, procs_still_running = psutil.wait_procs(procs, timeout=10)
+            _, procs_still_running = psutil.wait_procs(procs, timeout=timeout)
             for proc in procs_still_running:
                 proc.kill()
                 logging.warn('Process killed (pid=%d)' % proc.pid)
@@ -792,15 +795,19 @@ def managed_dev_appserver(
         psutil.Process. The dev_appserver process.
     """
     dev_appserver_args = [
-        CURRENT_PYTHON_BIN, DEV_APPSERVER_PATH,
-        '--host', host, '--port', port,
-        '--admin_host', admin_host, '--admin_port', admin_port,
+        CURRENT_PYTHON_BIN,
+        DEV_APPSERVER_PATH,
+        '--host', host,
+        '--port', port,
+        '--admin_host', admin_host,
+        '--admin_port', admin_port,
         '--clear_datastore', 'true' if clear_datastore else 'false',
         '--enable_console', 'true' if enable_console else 'false',
         '--enable_host_checking', 'true' if enable_host_checking else 'false',
         '--automatic_restart', 'true' if automatic_restart else 'false',
         '--skip_sdk_update_check', 'true' if skip_sdk_update_check else 'false',
-        '--log_level', log_level, '--dev_appserver_log_level', log_level,
+        '--log_level', log_level,
+        '--dev_appserver_log_level', log_level,
         app_yaml_path
     ]
     with managed_process(dev_appserver_args, shell=True, env=env) as proc:

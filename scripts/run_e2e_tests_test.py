@@ -811,88 +811,76 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_report_pass(unused_suite_name):
             return
 
-        get_chrome_driver_version_swap = self.swap(
-            run_e2e_tests, 'get_chrome_driver_version',
-            mock_get_chrome_driver_version)
-
-        check_swap = self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running',
-            mock_is_oppia_server_already_running)
-
-        setup_and_install_swap = self.swap_with_checks(
-            run_e2e_tests, 'setup_and_install_dependencies',
-            mock_setup_and_install_dependencies, expected_args=[(False,)])
-
-        register_swap = self.swap_with_checks(
-            atexit, 'register', mock_register, expected_args=[
-                (run_e2e_tests.cleanup_portserver, mock_process),
-                (mock_cleanup,),
-            ])
-
-        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
-        build_swap = self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', mock_build_js_files,
-            expected_args=[(True,)])
-        start_webdriver_swap = self.swap_with_checks(
-            run_e2e_tests, 'start_webdriver_manager',
-            mock_start_webdriver_manager,
-            expected_args=[(CHROME_DRIVER_VERSION,)])
-        firebase_emulator_swap = self.swap_to_always_return(
-            common, 'managed_firebase_emulator',
-            value=contextlib2.nullcontext())
-        dev_appserver_swap = self.swap_to_always_return(
-            common, 'managed_dev_appserver', value=contextlib2.nullcontext())
-        wait_swap = self.swap_with_checks(
-            common, 'wait_for_port_to_be_open',
-            mock_wait_for_port_to_be_open,
-            expected_args=[
-                (feconf.REDISPORT,),
-                (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        get_parameters_swap = self.swap_with_checks(
-            run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
-        popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=[
-                ([
-                    'python', '-m',
-                    'scripts.run_portserver',
-                    '--portserver_unix_socket_address',
-                    run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
-                ],),
-                ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
-                    '--daemonize', 'yes'
-                ],),
-                ([
-                    common.NODE_BIN_PATH,
-                    '--unhandled-rejections=strict',
-                    run_e2e_tests.PROTRACTOR_BIN_PATH,
-                    'commands',
-                ],),
-            ],
-        )
-        report_flake_swap = self.swap_with_checks(
-            flake_checker, 'report_pass', mock_report_pass,
-            expected_args=[('full',)])
-        exit_swap = self.swap_with_checks(
-            sys, 'exit', mock_exit, expected_args=[(0,)])
+        swap_contexts = [
+            self.swap(
+                run_e2e_tests, 'get_chrome_driver_version',
+                mock_get_chrome_driver_version),
+            self.swap_with_checks(
+                run_e2e_tests, 'is_oppia_server_already_running',
+                mock_is_oppia_server_already_running),
+            self.swap_with_checks(
+                run_e2e_tests, 'setup_and_install_dependencies',
+                mock_setup_and_install_dependencies, expected_args=[(False,)]),
+            self.swap_with_checks(
+                atexit, 'register', mock_register, expected_args=[
+                    (run_e2e_tests.cleanup_portserver, mock_process),
+                    (mock_cleanup,),
+                ]),
+            self.swap(run_e2e_tests, 'cleanup', mock_cleanup),
+            self.swap_with_checks(
+                run_e2e_tests, 'build_js_files', mock_build_js_files,
+                expected_args=[(True,)]),
+            self.swap_with_checks(
+                run_e2e_tests, 'start_webdriver_manager',
+                mock_start_webdriver_manager,
+                expected_args=[(CHROME_DRIVER_VERSION,)]),
+            self.swap_to_always_return(
+                common, 'managed_firebase_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_dev_appserver',
+                value=contextlib2.nullcontext()),
+            self.swap_with_checks(
+                common, 'wait_for_port_to_be_open',
+                mock_wait_for_port_to_be_open,
+                expected_args=[
+                    (feconf.REDISPORT,),
+                    (run_e2e_tests.WEB_DRIVER_PORT,),
+                    (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                ]),
+            self.swap_with_checks(
+                run_e2e_tests, 'get_e2e_test_parameters',
+                mock_get_e2e_test_parameters,
+                expected_args=[(3, 'full', True)]),
+            self.swap_with_checks(
+                subprocess, 'Popen', mock_popen, expected_args=[
+                    ([
+                        'python', '-m',
+                        'scripts.run_portserver',
+                        '--portserver_unix_socket_address',
+                        run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                    ],),
+                    ([
+                        common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                        '--daemonize', 'yes'
+                    ],),
+                    ([
+                        common.NODE_BIN_PATH,
+                        '--unhandled-rejections=strict',
+                        run_e2e_tests.PROTRACTOR_BIN_PATH,
+                        'commands',
+                    ],),
+                ]),
+            self.swap_with_checks(
+                flake_checker, 'report_pass', mock_report_pass,
+                expected_args=[('full',)]),
+            self.swap_with_checks(
+                sys, 'exit', mock_exit, expected_args=[(0,)]),
+        ]
 
         with contextlib2.ExitStack() as stack:
-            stack.enter_context(check_swap)
-            stack.enter_context(setup_and_install_swap)
-            stack.enter_context(register_swap)
-            stack.enter_context(cleanup_swap)
-            stack.enter_context(build_swap)
-            stack.enter_context(start_webdriver_swap)
-            stack.enter_context(firebase_emulator_swap)
-            stack.enter_context(dev_appserver_swap)
-            stack.enter_context(wait_swap)
-            stack.enter_context(report_flake_swap)
-            stack.enter_context(get_parameters_swap)
-            stack.enter_context(popen_swap)
-            stack.enter_context(exit_swap)
-            stack.enter_context(get_chrome_driver_version_swap)
+            for context in swap_contexts:
+                stack.enter_context(context)
 
             run_e2e_tests.main(args=[])
 
@@ -939,75 +927,65 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_get_chrome_driver_version():
             return CHROME_DRIVER_VERSION
 
-        get_chrome_driver_version_swap = self.swap(
-            run_e2e_tests, 'get_chrome_driver_version',
-            mock_get_chrome_driver_version)
-
-        check_swap = self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running',
-            mock_is_oppia_server_already_running)
-
-        setup_and_install_swap = self.swap_with_checks(
-            run_e2e_tests, 'setup_and_install_dependencies',
-            mock_setup_and_install_dependencies, expected_args=[(False,)])
-
-        register_swap = self.swap_with_checks(
-            atexit, 'register', mock_register, expected_args=[
-                (mock_cleanup,),
-            ])
-
-        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
-        build_swap = self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', mock_build_js_files,
-            expected_args=[(True,)])
-        start_webdriver_swap = self.swap_with_checks(
-            run_e2e_tests, 'start_webdriver_manager',
-            mock_start_webdriver_manager,
-            expected_args=[(CHROME_DRIVER_VERSION,)])
-        firebase_emulator_swap = self.swap_to_always_return(
-            common, 'managed_firebase_emulator',
-            value=contextlib2.nullcontext())
-        dev_appserver_swap = self.swap_to_always_return(
-            common, 'managed_dev_appserver', value=contextlib2.nullcontext())
-        wait_swap = self.swap_with_checks(
-            common, 'wait_for_port_to_be_open',
-            mock_wait_for_port_to_be_open,
-            expected_args=[
-                (feconf.REDISPORT,),
-                (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        get_parameters_swap = self.swap_with_checks(
-            run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
-        popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=[
-                ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
-                    '--daemonize', 'yes'
-                ],),
-                ([
-                    common.NODE_BIN_PATH,
-                    '--unhandled-rejections=strict',
-                    run_e2e_tests.PROTRACTOR_BIN_PATH,
-                    'commands',
-                ],),
-            ],
-        )
+        swap_contexts = [
+            self.swap(
+                run_e2e_tests, 'get_chrome_driver_version',
+                mock_get_chrome_driver_version),
+            self.swap_with_checks(
+                run_e2e_tests, 'is_oppia_server_already_running',
+                mock_is_oppia_server_already_running),
+            self.swap_with_checks(
+                run_e2e_tests, 'setup_and_install_dependencies',
+                mock_setup_and_install_dependencies, expected_args=[(False,)]),
+            self.swap_with_checks(
+                atexit, 'register', mock_register, expected_args=[
+                    (mock_cleanup,),
+                ]),
+            self.swap(run_e2e_tests, 'cleanup', mock_cleanup),
+            self.swap_with_checks(
+                run_e2e_tests, 'build_js_files', mock_build_js_files,
+                expected_args=[(True,)]),
+            self.swap_with_checks(
+                run_e2e_tests, 'start_webdriver_manager',
+                mock_start_webdriver_manager,
+                expected_args=[(CHROME_DRIVER_VERSION,)]),
+            self.swap_to_always_return(
+                common, 'managed_firebase_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_dev_appserver',
+                value=contextlib2.nullcontext()),
+            self.swap_with_checks(
+                common, 'wait_for_port_to_be_open',
+                mock_wait_for_port_to_be_open,
+                expected_args=[
+                    (feconf.REDISPORT,),
+                    (run_e2e_tests.WEB_DRIVER_PORT,),
+                    (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
+            self.swap_with_checks(
+                run_e2e_tests, 'get_e2e_test_parameters',
+                mock_get_e2e_test_parameters,
+                expected_args=[(3, 'full', True)]),
+            self.swap_with_checks(
+                subprocess, 'Popen', mock_popen, expected_args=[
+                    ([
+                        common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                        '--daemonize', 'yes'
+                    ],),
+                    ([
+                        common.NODE_BIN_PATH,
+                        '--unhandled-rejections=strict',
+                        run_e2e_tests.PROTRACTOR_BIN_PATH,
+                        'commands',
+                    ],),
+                ],
+            ),
+        ]
         args = run_e2e_tests._PARSER.parse_args(args=[])  # pylint: disable=protected-access
 
         with contextlib2.ExitStack() as stack:
-            stack.enter_context(check_swap)
-            stack.enter_context(setup_and_install_swap)
-            stack.enter_context(register_swap)
-            stack.enter_context(cleanup_swap)
-            stack.enter_context(build_swap)
-            stack.enter_context(start_webdriver_swap)
-            stack.enter_context(firebase_emulator_swap)
-            stack.enter_context(dev_appserver_swap)
-            stack.enter_context(wait_swap)
-            stack.enter_context(get_parameters_swap)
-            stack.enter_context(popen_swap)
-            stack.enter_context(get_chrome_driver_version_swap)
+            for context in swap_contexts:
+                stack.enter_context(context)
 
             lines, _ = run_e2e_tests.run_tests(args)
 
@@ -1292,85 +1270,77 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_report_pass(unused_suite_name):
             return
 
-        get_chrome_driver_version_swap = self.swap(
-            run_e2e_tests, 'get_chrome_driver_version',
-            mock_get_chrome_driver_version)
-
-        check_swap = self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running',
-            mock_is_oppia_server_already_running)
-        setup_and_install_swap = self.swap_with_checks(
-            run_e2e_tests, 'setup_and_install_dependencies',
-            mock_setup_and_install_dependencies, expected_args=[(True,)])
-        register_swap = self.swap_with_checks(
-            atexit, 'register', mock_register, expected_args=[
-                (run_e2e_tests.cleanup_portserver, mock_process),
-                (mock_cleanup,),
-            ])
-        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
-        modify_constants_swap = self.swap_with_checks(
-            build, 'modify_constants', mock_modify_constants,
-            expected_kwargs=[{'prod_env': False}])
-        start_webdriver_swap = self.swap_with_checks(
-            run_e2e_tests, 'start_webdriver_manager',
-            mock_start_webdriver_manager,
-            expected_args=[(CHROME_DRIVER_VERSION,)])
-        firebase_emulator_swap = self.swap_to_always_return(
-            common, 'managed_firebase_emulator',
-            value=contextlib2.nullcontext())
-        dev_appserver_swap = self.swap_to_always_return(
-            common, 'managed_dev_appserver', value=contextlib2.nullcontext())
-        wait_swap = self.swap_with_checks(
-            common, 'wait_for_port_to_be_open',
-            mock_wait_for_port_to_be_open,
-            expected_args=[
-                (feconf.REDISPORT,),
-                (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        get_parameters_swap = self.swap_with_checks(
-            run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
-        popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=[
-                ([
-                    'python', '-m',
-                    'scripts.run_portserver',
-                    '--portserver_unix_socket_address',
-                    run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
-                ],),
-                ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
-                    '--daemonize', 'yes'
-                ],),
-                ([
-                    common.NODE_BIN_PATH,
-                    '--unhandled-rejections=strict',
-                    run_e2e_tests.PROTRACTOR_BIN_PATH,
-                    'commands'
-                ],),
-            ],
-        )
-        report_flake_swap = self.swap_with_checks(
-            flake_checker, 'report_pass', mock_report_pass,
-            expected_args=[('full',)])
-        exit_swap = self.swap_with_checks(
-            sys, 'exit', mock_exit, expected_args=[(0,)])
+        swap_contexts = [
+            self.swap(
+                run_e2e_tests, 'get_chrome_driver_version',
+                mock_get_chrome_driver_version),
+            self.swap_with_checks(
+                run_e2e_tests, 'is_oppia_server_already_running',
+                mock_is_oppia_server_already_running),
+            self.swap_with_checks(
+                run_e2e_tests, 'setup_and_install_dependencies',
+                mock_setup_and_install_dependencies, expected_args=[(True,)]),
+            self.swap_with_checks(
+                atexit, 'register', mock_register, expected_args=[
+                    (run_e2e_tests.cleanup_portserver, mock_process),
+                    (mock_cleanup,),
+                ]),
+            self.swap(run_e2e_tests, 'cleanup', mock_cleanup),
+            self.swap_with_checks(
+                build, 'modify_constants', mock_modify_constants,
+                expected_kwargs=[{'prod_env': False}]),
+            self.swap_with_checks(
+                run_e2e_tests, 'start_webdriver_manager',
+                mock_start_webdriver_manager,
+                expected_args=[(CHROME_DRIVER_VERSION,)]),
+            self.swap_to_always_return(
+                common, 'managed_firebase_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_dev_appserver',
+                value=contextlib2.nullcontext()),
+            self.swap_with_checks(
+                common, 'wait_for_port_to_be_open',
+                mock_wait_for_port_to_be_open,
+                expected_args=[
+                    (feconf.REDISPORT,),
+                    (run_e2e_tests.WEB_DRIVER_PORT,),
+                    (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                ]),
+            self.swap_with_checks(
+                run_e2e_tests, 'get_e2e_test_parameters',
+                mock_get_e2e_test_parameters,
+                expected_args=[(3, 'full', True)]),
+            self.swap_with_checks(
+                subprocess, 'Popen', mock_popen, expected_args=[
+                    ([
+                        'python', '-m',
+                        'scripts.run_portserver',
+                        '--portserver_unix_socket_address',
+                        run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                    ],),
+                    ([
+                        common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                        '--daemonize', 'yes'
+                    ],),
+                    ([
+                        common.NODE_BIN_PATH,
+                        '--unhandled-rejections=strict',
+                        run_e2e_tests.PROTRACTOR_BIN_PATH,
+                        'commands'
+                    ],),
+                ],
+            ),
+            self.swap_with_checks(
+                flake_checker, 'report_pass', mock_report_pass,
+                expected_args=[('full',)]),
+            self.swap_with_checks(
+                sys, 'exit', mock_exit, expected_args=[(0,)]),
+        ]
 
         with contextlib2.ExitStack() as stack:
-            stack.enter_context(check_swap)
-            stack.enter_context(setup_and_install_swap)
-            stack.enter_context(register_swap)
-            stack.enter_context(cleanup_swap)
-            stack.enter_context(modify_constants_swap)
-            stack.enter_context(start_webdriver_swap)
-            stack.enter_context(firebase_emulator_swap)
-            stack.enter_context(dev_appserver_swap)
-            stack.enter_context(wait_swap)
-            stack.enter_context(report_flake_swap)
-            stack.enter_context(get_parameters_swap)
-            stack.enter_context(popen_swap)
-            stack.enter_context(exit_swap)
-            stack.enter_context(get_chrome_driver_version_swap)
+            for context in swap_contexts:
+                stack.enter_context(context)
 
             run_e2e_tests.main(args=['--skip-install', '--skip-build'])
 
@@ -1470,88 +1440,77 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_report_pass(unused_suite_name):
             return
 
-        get_chrome_driver_version_swap = self.swap(
-            run_e2e_tests, 'get_chrome_driver_version',
-            mock_get_chrome_driver_version)
+        swap_contexts = [
+            self.swap(
+                run_e2e_tests, 'get_chrome_driver_version',
+                mock_get_chrome_driver_version),
+            self.swap_with_checks(
+                run_e2e_tests, 'is_oppia_server_already_running',
+                mock_is_oppia_server_already_running),
+            self.swap_with_checks(
+                run_e2e_tests, 'setup_and_install_dependencies',
+                mock_setup_and_install_dependencies, expected_args=[(False,)]),
+            self.swap_with_checks(
+                atexit, 'register', mock_register, expected_args=[
+                    (run_e2e_tests.cleanup_portserver, mock_process),
+                    (mock_cleanup,),
+                ]),
+            self.swap(run_e2e_tests, 'cleanup', mock_cleanup),
+            self.swap_with_checks(
+                run_e2e_tests, 'build_js_files', mock_build_js_files,
+                expected_args=[(True,)]),
+            self.swap_with_checks(
+                run_e2e_tests, 'start_webdriver_manager',
+                mock_start_webdriver_manager,
+                expected_args=[(CHROME_DRIVER_VERSION,)]),
+            self.swap_to_always_return(
+                common, 'managed_firebase_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_dev_appserver',
+                value=contextlib2.nullcontext()),
+            self.swap_with_checks(
+                common, 'wait_for_port_to_be_open',
+                mock_wait_for_port_to_be_open,
+                expected_args=[
+                    (feconf.REDISPORT,),
+                    (run_e2e_tests.WEB_DRIVER_PORT,),
+                    (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
+            self.swap_with_checks(
+                run_e2e_tests, 'get_e2e_test_parameters',
+                mock_get_e2e_test_parameters,
+                expected_args=[(3, 'full', True)]),
+            self.swap_with_checks(
+                subprocess, 'Popen', mock_popen, expected_args=[
+                    ([
+                        'python', '-m',
+                        'scripts.run_portserver',
+                        '--portserver_unix_socket_address',
+                        run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                    ],),
+                    ([
+                        common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                        '--daemonize', 'yes'
+                    ],),
+                    ([
+                        common.NODE_BIN_PATH,
+                        '--inspect-brk',
+                        '--unhandled-rejections=strict',
+                        run_e2e_tests.PROTRACTOR_BIN_PATH,
+                        'commands',
+                    ],),
+                ],
+            ),
+            self.swap_with_checks(
+                flake_checker, 'report_pass', mock_report_pass,
+                expected_args=[('full',)]),
+            self.swap_with_checks(
+                sys, 'exit', mock_exit, expected_args=[(0,)]),
+        ]
 
-        check_swap = self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running',
-            mock_is_oppia_server_already_running)
-
-        setup_and_install_swap = self.swap_with_checks(
-            run_e2e_tests, 'setup_and_install_dependencies',
-            mock_setup_and_install_dependencies, expected_args=[(False,)])
-
-        register_swap = self.swap_with_checks(
-            atexit, 'register', mock_register, expected_args=[
-                (run_e2e_tests.cleanup_portserver, mock_process),
-                (mock_cleanup,),
-            ])
-
-        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
-        build_swap = self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', mock_build_js_files,
-            expected_args=[(True,)])
-        start_webdriver_swap = self.swap_with_checks(
-            run_e2e_tests, 'start_webdriver_manager',
-            mock_start_webdriver_manager,
-            expected_args=[(CHROME_DRIVER_VERSION,)])
-        firebase_emulator_swap = self.swap_to_always_return(
-            common, 'managed_firebase_emulator',
-            value=contextlib2.nullcontext())
-        dev_appserver_swap = self.swap_to_always_return(
-            common, 'managed_dev_appserver', value=contextlib2.nullcontext())
-        wait_swap = self.swap_with_checks(
-            common, 'wait_for_port_to_be_open',
-            mock_wait_for_port_to_be_open,
-            expected_args=[
-                (feconf.REDISPORT,),
-                (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        get_parameters_swap = self.swap_with_checks(
-            run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
-        popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=[
-                ([
-                    'python', '-m',
-                    'scripts.run_portserver',
-                    '--portserver_unix_socket_address',
-                    run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
-                ],),
-                ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
-                    '--daemonize', 'yes'
-                ],),
-                ([
-                    common.NODE_BIN_PATH,
-                    '--inspect-brk',
-                    '--unhandled-rejections=strict',
-                    run_e2e_tests.PROTRACTOR_BIN_PATH,
-                    'commands',
-                ],),
-            ],
-        )
-        report_flake_swap = self.swap_with_checks(
-            flake_checker, 'report_pass', mock_report_pass,
-            expected_args=[('full',)])
-        exit_swap = self.swap_with_checks(
-            sys, 'exit', mock_exit, expected_args=[(0,)])
         with contextlib2.ExitStack() as stack:
-            stack.enter_context(check_swap)
-            stack.enter_context(setup_and_install_swap)
-            stack.enter_context(register_swap)
-            stack.enter_context(cleanup_swap)
-            stack.enter_context(build_swap)
-            stack.enter_context(start_webdriver_swap)
-            stack.enter_context(firebase_emulator_swap)
-            stack.enter_context(dev_appserver_swap)
-            stack.enter_context(wait_swap)
-            stack.enter_context(report_flake_swap)
-            stack.enter_context(get_parameters_swap)
-            stack.enter_context(popen_swap)
-            stack.enter_context(exit_swap)
-            stack.enter_context(get_chrome_driver_version_swap)
+            for context in swap_contexts:
+                stack.enter_context(context)
 
             run_e2e_tests.main(args=['--debug_mode'])
 
@@ -1602,88 +1561,76 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_report_pass(unused_suite_name):
             return
 
-        get_chrome_driver_version_swap = self.swap(
-            run_e2e_tests, 'get_chrome_driver_version',
-            mock_get_chrome_driver_version)
-
-        check_swap = self.swap_with_checks(
-            run_e2e_tests, 'is_oppia_server_already_running',
-            mock_is_oppia_server_already_running)
-
-        setup_and_install_swap = self.swap_with_checks(
-            run_e2e_tests, 'setup_and_install_dependencies',
-            mock_setup_and_install_dependencies, expected_args=[(False,)])
-
-        register_swap = self.swap_with_checks(
-            atexit, 'register', mock_register, expected_args=[
-                (run_e2e_tests.cleanup_portserver, mock_process),
-                (mock_cleanup,),
-            ])
-
-        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
-        build_swap = self.swap_with_checks(
-            run_e2e_tests, 'build_js_files', mock_build_js_files,
-            expected_args=[(True,)])
-        start_webdriver_swap = self.swap_with_checks(
-            run_e2e_tests, 'start_webdriver_manager',
-            mock_start_webdriver_manager,
-            expected_args=[(CHROME_DRIVER_VERSION,)])
-        firebase_emulator_swap = self.swap_to_always_return(
-            common, 'managed_firebase_emulator',
-            value=contextlib2.nullcontext())
-        dev_appserver_swap = self.swap_to_always_return(
-            common, 'managed_dev_appserver', value=contextlib2.nullcontext())
-        wait_swap = self.swap_with_checks(
-            common, 'wait_for_port_to_be_open',
-            mock_wait_for_port_to_be_open,
-            expected_args=[
-                (feconf.REDISPORT,),
-                (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        get_parameters_swap = self.swap_with_checks(
-            run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
-        popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=[
-                ([
-                    'python', '-m',
-                    'scripts.run_portserver',
-                    '--portserver_unix_socket_address',
-                    run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
-                ],),
-                ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
-                    '--daemonize', 'yes'
-                ],),
-                ([
-                    common.NODE_BIN_PATH,
-                    '--unhandled-rejections=strict',
-                    run_e2e_tests.PROTRACTOR_BIN_PATH,
-                    'commands',
-                ],),
-            ],
-        )
-        report_flake_swap = self.swap_with_checks(
-            flake_checker, 'report_pass', mock_report_pass,
-            expected_args=[('full',)])
-        exit_swap = self.swap_with_checks(
-            sys, 'exit', mock_exit, expected_args=[(0,)])
+        swap_contexts = [
+            self.swap(
+                run_e2e_tests, 'get_chrome_driver_version',
+                mock_get_chrome_driver_version),
+            self.swap_with_checks(
+                run_e2e_tests, 'is_oppia_server_already_running',
+                mock_is_oppia_server_already_running),
+            self.swap_with_checks(
+                run_e2e_tests, 'setup_and_install_dependencies',
+                mock_setup_and_install_dependencies, expected_args=[(False,)]),
+            self.swap_with_checks(
+                atexit, 'register', mock_register, expected_args=[
+                    (run_e2e_tests.cleanup_portserver, mock_process),
+                    (mock_cleanup,),
+                ]),
+            self.swap(run_e2e_tests, 'cleanup', mock_cleanup),
+            self.swap_with_checks(
+                run_e2e_tests, 'build_js_files', mock_build_js_files,
+                expected_args=[(True,)]),
+            self.swap_with_checks(
+                run_e2e_tests, 'start_webdriver_manager',
+                mock_start_webdriver_manager,
+                expected_args=[(CHROME_DRIVER_VERSION,)]),
+            self.swap_to_always_return(
+                common, 'managed_firebase_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_dev_appserver',
+                value=contextlib2.nullcontext()),
+            self.swap_with_checks(
+                common, 'wait_for_port_to_be_open',
+                mock_wait_for_port_to_be_open,
+                expected_args=[
+                    (feconf.REDISPORT,),
+                    (run_e2e_tests.WEB_DRIVER_PORT,),
+                    (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
+            self.swap_with_checks(
+                run_e2e_tests, 'get_e2e_test_parameters',
+                mock_get_e2e_test_parameters,
+                expected_args=[(3, 'full', True)]),
+            self.swap_with_checks(
+                subprocess, 'Popen', mock_popen, expected_args=[
+                    ([
+                        'python', '-m',
+                        'scripts.run_portserver',
+                        '--portserver_unix_socket_address',
+                        run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
+                    ],),
+                    ([
+                        common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                        '--daemonize', 'yes'
+                    ],),
+                    ([
+                        common.NODE_BIN_PATH,
+                        '--unhandled-rejections=strict',
+                        run_e2e_tests.PROTRACTOR_BIN_PATH,
+                        'commands',
+                    ],),
+                ],
+            ),
+            self.swap_with_checks(
+                flake_checker, 'report_pass', mock_report_pass,
+                expected_args=[('full',)]),
+            self.swap_with_checks(
+                sys, 'exit', mock_exit, expected_args=[(0,)]),
+        ]
 
         with contextlib2.ExitStack() as stack:
-            stack.enter_context(check_swap)
-            stack.enter_context(setup_and_install_swap)
-            stack.enter_context(register_swap)
-            stack.enter_context(cleanup_swap)
-            stack.enter_context(build_swap)
-            stack.enter_context(start_webdriver_swap)
-            stack.enter_context(firebase_emulator_swap)
-            stack.enter_context(dev_appserver_swap)
-            stack.enter_context(wait_swap)
-            stack.enter_context(report_flake_swap)
-            stack.enter_context(get_parameters_swap)
-            stack.enter_context(popen_swap)
-            stack.enter_context(exit_swap)
-            stack.enter_context(get_chrome_driver_version_swap)
+            for context in swap_contexts:
+                stack.enter_context(context)
 
             run_e2e_tests.main(
                 args=['--chrome_driver_version', CHROME_DRIVER_VERSION])
