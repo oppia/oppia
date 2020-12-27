@@ -205,10 +205,13 @@ def main(args=None):
     import contextlib2
 
     with contextlib2.ExitStack() as stack:
+        stack.enter_context(common.managed_firebase_emulator())
+
         stack.enter_context(common.managed_dev_appserver(
             APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
             clear_datastore=True, log_level='critical',
             skip_sdk_update_check=True))
+
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
         run_lighthouse_puppeteer_script()
         run_lighthouse_checks(lighthouse_mode)

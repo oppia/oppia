@@ -523,6 +523,8 @@ def run_tests(args):
     import contextlib2
 
     with contextlib2.ExitStack() as stack:
+        stack.enter_context(common.managed_firebase_emulator())
+
         stack.enter_context(common.managed_dev_appserver(
             'app.yaml' if args.prod_env else 'app_dev.yaml',
             port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
