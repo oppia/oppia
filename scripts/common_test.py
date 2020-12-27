@@ -916,6 +916,14 @@ class ManagedProcessTests(test_utils.TestBase):
         with self.swap(psutil, 'Popen', popen_mock):
             yield popen_calls
 
+    def test_managed_process_when_psutil_not_in_path(self):
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self.swap(sys, 'path', []))
+            stack.enter_context(self._swap_popen())
+
+            # Entering the context should not raise.
+            stack.enter_context(common.managed_process(['a']))
+
     def test_concats_command_args_when_shell_is_true(self):
         with contextlib2.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
@@ -970,20 +978,18 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(logs, ['Process killed (pid=%d)' % pid])
 
-    def test_kills_child_process_before_parent_process(self):
+    def test_kills_child_processes(self):
         with contextlib2.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             stack.enter_context(self._swap_popen(
                 make_processes_unresponsive=True, num_children=3))
 
-            parent_proc = stack.enter_context(common.managed_process(['a']))
-            child_pids = [c.pid for c in parent_proc.children()]
-            proc_pid = parent_proc.pid
+            proc = stack.enter_context(common.managed_process(['a']))
+            pids = [c.pid for c in proc.children()] + [proc.pid]
 
-        self.assertEqual(len(logs), 4)
-        self.assertEqual(logs[-1], 'Process killed (pid=%d)' % proc_pid)
+        self.assertEqual(len(pids), 4)
         self.assertItemsEqual(
-            logs[:-1], ['Process killed (pid=%d)' % p for p in child_pids])
+            logs, ['Process killed (pid=%d)' % p for p in pids])
 
     def test_managed_dev_appserver(self):
         with contextlib2.ExitStack() as stack:

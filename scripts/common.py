@@ -732,36 +732,28 @@ def managed_process(args, shell=False, **kwargs):
     Yields:
         psutil.Process. The process managed by the context manager.
     """
+    if PSUTIL_DIR not in sys.path:
+        sys.path.insert(1, PSUTIL_DIR)
     import psutil
 
     str_args = (python_utils.UNICODE(arg).strip() for arg in args)
     truthy_args = (arg for arg in str_args if arg)
     popen_args = ' '.join(truthy_args) if shell else list(truthy_args)
 
-    parent_proc = psutil.Popen(popen_args, shell=shell, **kwargs)
+    root_proc = psutil.Popen(popen_args, shell=shell, **kwargs)
 
     try:
-        yield parent_proc
+        yield root_proc
     finally:
-        if parent_proc.is_running():
-            # Terminate the child processes first, because terminating a parent
-            # process does not guarantee its children will be terminated too.
-            child_procs = parent_proc.children(recursive=True)
-            for proc in child_procs:
+        if root_proc.is_running():
+            procs = root_proc.children(recursive=True) + [root_proc]
+            for proc in procs:
                 proc.terminate()
 
-            _, procs_still_running = psutil.wait_procs(child_procs, timeout=10)
-
+            _, procs_still_running = psutil.wait_procs(procs, timeout=10)
             for proc in procs_still_running:
                 proc.kill()
                 logging.warn('Process killed (pid=%d)' % proc.pid)
-
-            parent_proc.terminate()
-            try:
-                parent_proc.wait(timeout=10)
-            except psutil.TimeoutExpired:
-                parent_proc.kill()
-                logging.warn('Process killed (pid=%d)' % parent_proc.pid)
 
 
 @contextlib.contextmanager
