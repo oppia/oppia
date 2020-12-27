@@ -39,7 +39,7 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/fire@^6.0.4":
+"@angular/fire@^6.1.0":
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/@angular/fire/-/fire-6.1.4.tgz#d3923a68336d7177abbb2676731d0aef566b9739"
   integrity sha512-5u305XnBC041JMrAtczLa0bdprxw7RkXy4kgcRCisPI8maGuiN4XzlwNYX+plCHZCo4R0motxQom//tPTA2edQ==
@@ -4975,7 +4975,7 @@ fined@^1.0.1:
     object.pick "^1.2.0"
     parse-filepath "^1.0.1"
 
-firebase@^8.0.1:
+firebase@^8.0.0:
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/firebase/-/firebase-8.2.1.tgz#fd8eb523a4ca424030d8eb21c2795aa3c1d1031d"
   integrity sha512-u2dvRIbyHZ2g0dziHKwXvMBubTSf+fgJcijXyy7fXcFFPd3wbDaGlHz7Sc6saOnlJtzZAYmvZUXaIxnStKOOXg==
@@ -4995,7 +4995,7 @@ firebase@^8.0.1:
     "@firebase/storage" "0.4.2"
     "@firebase/util" "0.3.4"
 
-firebaseui-angular@^5.1.0:
+firebaseui-angular@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/firebaseui-angular/-/firebaseui-angular-5.1.1.tgz#1fad945fc7ca36458063e862375171e6a9470c6b"
   integrity sha512-MbCiENFE3PixE7sFOzrgVl4dH5z6PGQbB33bT/h4QDPvpohFYv5xfrY7R2l63uZ5+hkG6HDhAzq5RlKfoCUYTA==
