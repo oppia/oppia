@@ -129,7 +129,7 @@ angular.module('oppia').factory('QuestionCreationService', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/topic-editor-page/modal-templates/' +
             'select-skill-and-difficulty-modal.template.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {
           allSkillSummaries: () => allSkillSummaries,
           countOfSkillsToPrioritize: () => countOfSkillsToPrioritize,
