@@ -103,42 +103,42 @@ describe('DragAndDropSortInputValidationService', () => {
       inputs: {
         x: [['a'], ['b'], ['c'], ['d']]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     goodRule2 = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['d'], ['c'], ['b'], ['a']]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     equalsListWithAllowedValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['a', 'b'], ['d'], ['c']]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     equalsListWithValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
         x: [['a'], ['d'], ['c'], ['b']]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     equalsListWithEmptyValuesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['a', ''], [], ['c', 'b', 'd']]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     equalsListWithDuplicatesRule = rof.createFromBackendDict({
       rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
       inputs: {
         x: [['a', 'b'], ['b'], ['c', 'a', 'd']]
       }
-    });
+    }, 'DragAndDropSortInput');
 
     hasXBeforeYRule = rof.createFromBackendDict({
       rule_type: 'HasElementXBeforeElementY',
@@ -146,7 +146,7 @@ describe('DragAndDropSortInputValidationService', () => {
         x: 'b',
         y: 'b'
       }
-    });
+    }, 'DragAndDropSortInput');
 
     hasElementXAtPositionYRule = rof.createFromBackendDict({
       rule_type: 'HasElementXAtPositionY',
@@ -154,7 +154,7 @@ describe('DragAndDropSortInputValidationService', () => {
         x: 'x',
         y: '5'
       }
-    });
+    }, 'DragAndDropSortInput');
 
     answerGroups = [
       agof.createNew(
@@ -184,7 +184,7 @@ describe('DragAndDropSortInputValidationService', () => {
       inputs: {
         x: [['a', 'b'], ['c', 'd']]
       }
-    })];
+    }, 'DragAndDropSortInput')];
     answerGroups = [
       agof.createNew(rules, customOutcome, null, null),
       agof.createNew(rules, customOutcome, null, null)

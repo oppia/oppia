@@ -38,11 +38,13 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'SkillEditorRoutingService',
-        'SkillEditorStateService', 'UndoRedoService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'SkillEditorRoutingService', 'SkillEditorStateService',
+        'UndoRedoService',
         function(
-            $scope, $uibModal, AlertsService, SkillEditorRoutingService,
-            SkillEditorStateService, UndoRedoService) {
+            $rootScope, $scope, $uibModal, AlertsService,
+            SkillEditorRoutingService, SkillEditorStateService,
+            UndoRedoService) {
           var ctrl = this;
           var ACTIVE_TAB_EDITOR = 'Editor';
           var ACTIVE_TAB_QUESTIONS = 'Questions';
@@ -88,6 +90,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
             }).result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage, () => {
                 AlertsService.addSuccessMessage('Changes Saved.');
+                $rootScope.$applyAsync();
               });
             }, function() {
               // Note to developers:
