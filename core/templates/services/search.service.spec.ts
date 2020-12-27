@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests that average ratings are being computed correctly.
+ * @fileoverview Tests that search service gets correct collections.
  */
 
 import { EventEmitter } from '@angular/core';
