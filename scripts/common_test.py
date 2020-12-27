@@ -991,6 +991,16 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertItemsEqual(
             logs, ['Process killed (pid=%d)' % p for p in pids])
 
+    def test_managed_firebase_emulator(self):
+        with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(common.managed_firebase_emulator())
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn('firebase', popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+
     def test_managed_dev_appserver(self):
         with contextlib2.ExitStack() as stack:
             popen_calls = stack.enter_context(self._swap_popen())

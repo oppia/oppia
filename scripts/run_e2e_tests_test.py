@@ -837,6 +837,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
             expected_args=[(CHROME_DRIVER_VERSION,)])
+        firebase_emulator_swap = self.swap_to_always_return(
+            common, 'managed_firebase_emulator',
+            value=contextlib2.nullcontext())
         dev_appserver_swap = self.swap_to_always_return(
             common, 'managed_dev_appserver', value=contextlib2.nullcontext())
         wait_swap = self.swap_with_checks(
@@ -882,6 +885,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             stack.enter_context(cleanup_swap)
             stack.enter_context(build_swap)
             stack.enter_context(start_webdriver_swap)
+            stack.enter_context(firebase_emulator_swap)
             stack.enter_context(dev_appserver_swap)
             stack.enter_context(wait_swap)
             stack.enter_context(report_flake_swap)
@@ -960,6 +964,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
             expected_args=[(CHROME_DRIVER_VERSION,)])
+        firebase_emulator_swap = self.swap_to_always_return(
+            common, 'managed_firebase_emulator',
+            value=contextlib2.nullcontext())
         dev_appserver_swap = self.swap_to_always_return(
             common, 'managed_dev_appserver', value=contextlib2.nullcontext())
         wait_swap = self.swap_with_checks(
@@ -995,6 +1002,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             stack.enter_context(cleanup_swap)
             stack.enter_context(build_swap)
             stack.enter_context(start_webdriver_swap)
+            stack.enter_context(firebase_emulator_swap)
             stack.enter_context(dev_appserver_swap)
             stack.enter_context(wait_swap)
             stack.enter_context(get_parameters_swap)
@@ -1307,6 +1315,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
             expected_args=[(CHROME_DRIVER_VERSION,)])
+        firebase_emulator_swap = self.swap_to_always_return(
+            common, 'managed_firebase_emulator',
+            value=contextlib2.nullcontext())
         dev_appserver_swap = self.swap_to_always_return(
             common, 'managed_dev_appserver', value=contextlib2.nullcontext())
         wait_swap = self.swap_with_checks(
@@ -1352,6 +1363,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             stack.enter_context(cleanup_swap)
             stack.enter_context(modify_constants_swap)
             stack.enter_context(start_webdriver_swap)
+            stack.enter_context(firebase_emulator_swap)
             stack.enter_context(dev_appserver_swap)
             stack.enter_context(wait_swap)
             stack.enter_context(report_flake_swap)
@@ -1484,6 +1496,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
             expected_args=[(CHROME_DRIVER_VERSION,)])
+        firebase_emulator_swap = self.swap_to_always_return(
+            common, 'managed_firebase_emulator',
+            value=contextlib2.nullcontext())
         dev_appserver_swap = self.swap_to_always_return(
             common, 'managed_dev_appserver', value=contextlib2.nullcontext())
         wait_swap = self.swap_with_checks(
@@ -1529,6 +1544,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             stack.enter_context(cleanup_swap)
             stack.enter_context(build_swap)
             stack.enter_context(start_webdriver_swap)
+            stack.enter_context(firebase_emulator_swap)
             stack.enter_context(dev_appserver_swap)
             stack.enter_context(wait_swap)
             stack.enter_context(report_flake_swap)
@@ -1612,6 +1628,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager,
             expected_args=[(CHROME_DRIVER_VERSION,)])
+        firebase_emulator_swap = self.swap_to_always_return(
+            common, 'managed_firebase_emulator',
+            value=contextlib2.nullcontext())
         dev_appserver_swap = self.swap_to_always_return(
             common, 'managed_dev_appserver', value=contextlib2.nullcontext())
         wait_swap = self.swap_with_checks(
@@ -1657,6 +1676,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             stack.enter_context(cleanup_swap)
             stack.enter_context(build_swap)
             stack.enter_context(start_webdriver_swap)
+            stack.enter_context(firebase_emulator_swap)
             stack.enter_context(dev_appserver_swap)
             stack.enter_context(wait_swap)
             stack.enter_context(report_flake_swap)
