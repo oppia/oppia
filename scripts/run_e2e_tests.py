@@ -521,9 +521,9 @@ def run_tests(args):
     start_webdriver_manager(version)
 
     managed_dev_appserver = common.managed_dev_appserver(
-        'app_dev.yaml' if dev_mode else 'app.yaml',
+        'app.yaml' if args.prod_env else 'app_dev.yaml',
         port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
-        skip_sdk_update_check=True,
+        clear_datastore=True, skip_sdk_update_check=True,
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
 
     with managed_dev_appserver:

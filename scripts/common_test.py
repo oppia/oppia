@@ -859,20 +859,21 @@ class ManagedProcessTests(test_utils.TestBase):
     _CALL = collections.namedtuple('_CALL', ['args', 'kwargs'])
 
     @contextlib.contextmanager
-    def _swap_popen(self, make_procs_unresponsive=False, make_grandchild=False):
+    def _swap_popen(
+            self, make_processes_unresponsive=False, make_grandchild=False):
         """Returns values for inspecting and mocking calls to psutil.Popen.
 
         Args:
-            make_procs_unresponsive: bool. Whether processes created by the mock
-                will stall while terminating. Regardless of the choice, the
-                processes will terminate after ~15 seconds.
+            make_processes_unresponsive: bool. Whether the processes created by
+                the mock will stall when asked to terminate. Processes will
+                always terminate within ~1 minute regardless of this choice.
             make_grandchild: bool. Whether the process created by the mock
-                should create a child-process with the same termination-
-                behavior.
+                should create its _own_ child-process. The grandchild will
+                inherit the same termination behavior.
 
         Yields:
-            list(tuple). A list with the most up-to-date (*args, **kwargs) calls
-            made to psutil.Popen while within context.
+            list(_CALL). A list with the most up-to-date (*args, **kwargs) calls
+            made to psutil.Popen while under the context.
         """
         popen_calls = []
 
@@ -891,7 +892,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 psutil.Process. Handle for the parent of the new process tree.
             """
             child_pid = os.fork()
-            if child_pid:
+            if child_pid != 0:
                 popen_calls.append(self._CALL(args=args, kwargs=kwargs))
                 time.sleep(1) # Give child a chance to start running.
                 return psutil.Process(pid=child_pid)
@@ -899,8 +900,8 @@ class ManagedProcessTests(test_utils.TestBase):
             if make_grandchild:
                 os.fork()
 
-            if make_procs_unresponsive:
-                # Registers an unresponsive function as the SIGTERM handler.
+            if make_processes_unresponsive:
+                # Register an unresponsive function as the SIGTERM handler.
                 signal.signal(signal.SIGTERM, lambda *_: time.sleep(30))
 
             time.sleep(30)
@@ -964,7 +965,8 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_reports_killed_processes_as_warnings(self):
         with contextlib2.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
-            stack.enter_context(self._swap_popen(make_procs_unresponsive=True))
+            stack.enter_context(self._swap_popen(
+                make_processes_unresponsive=True))
 
             pid = stack.enter_context(common.managed_process(['a'])).pid
 
@@ -974,7 +976,7 @@ class ManagedProcessTests(test_utils.TestBase):
         with contextlib2.ExitStack() as stack:
             logs = stack.enter_context(self.capture_logging())
             stack.enter_context(self._swap_popen(
-                make_procs_unresponsive=True, make_grandchild=True))
+                make_processes_unresponsive=True, make_grandchild=True))
 
             parent_proc = stack.enter_context(common.managed_process(['a']))
             # NOTE: Children pids come *before* parent pid in this list.

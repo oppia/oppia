@@ -151,7 +151,7 @@ def main(args=None):
         enable_console=parsed_args.enable_console,
         enable_host_checking=not parsed_args.disable_host_checking,
         automatic_restart=not parsed_args.no_auto_restart,
-        port=PORT_NUMBER_FOR_GAE_SERVER)
+        skip_sdk_update_check=True, port=PORT_NUMBER_FOR_GAE_SERVER)
 
     python_utils.PRINT('Starting GAE development server')
     with managed_dev_appserver:
