@@ -244,7 +244,7 @@ class AnswerGroup(python_utils.OBJECT):
                 the locations of html fields in rule specs. It is defined as a
                 mapping of rule input types to a dictionary containing
                 interaction id, format, and rule types. See
-                html_field_types_to_rule_specs_state_v41.json for an example.   
+                html_field_types_to_rule_specs_state_v41.json for an example.
 
         Returns:
             dict. The converted answer group dict.
@@ -420,7 +420,7 @@ class Solution(python_utils.OBJECT):
                 the locations of html fields in rule specs. It is defined as a
                 mapping of rule input types to a dictionary containing
                 interaction id, format, and rule types. See
-                html_field_types_to_rule_specs_state_v41.json for an example. 
+                html_field_types_to_rule_specs_state_v41.json for an example.
             interaction_spec: dict. The specification for the interaction.
 
         Returns:
@@ -2050,7 +2050,7 @@ class RuleSpec(python_utils.OBJECT):
                 the locations of html fields in rule specs. It is defined as a
                 mapping of rule input types to a dictionary containing
                 interaction id, format, and rule types. See
-                html_field_types_to_rule_specs_state_v41.json for an example. 
+                html_field_types_to_rule_specs_state_v41.json for an example.
 
         Returns:
             dict. The converted Rule Spec dict.
