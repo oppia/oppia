@@ -872,9 +872,13 @@ class ManagedProcessTests(test_utils.TestBase):
                 should create its _own_ child-process. The grandchild will
                 inherit the same termination behavior.
 
+        Returns:
+            Context manager. A context manager in which calls to psutil.Popen
+            create a simple program that simply waits and then exits.
+
         Yields:
             list(POPEN_CALL). A list with the most up-to-date arguments passed
-            to psutil.Popen within the context returned.
+            to psutil.Popen from within the context manager returned.
         """
         popen_calls = []
 
