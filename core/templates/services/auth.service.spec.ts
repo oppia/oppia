@@ -71,12 +71,13 @@ describe('Auth service', () => {
     // subscription. AuthService simply subscribes, listens for a few frames,
     // and then unsubscribes (because it was destroyed with `.ngOnDestroy()`).
     const sourceIdTokens = m.hot('   --^---');
-    const authServiceSubscription = '  ^-! ';
+    const expectedAuthServiceSubscription = '  ^-! ';
 
     const [, authService] = setUpSystemUnderTest(sourceIdTokens);
     m.scheduler.schedule(() => authService.ngOnDestroy(), 2);
 
-    m.expect(sourceIdTokens).toHaveSubscriptions(authServiceSubscription);
+    m.expect(sourceIdTokens)
+      .toHaveSubscriptions(expectedAuthServiceSubscription);
   }));
 
   it('should emit null when subscription is too early', marbles(m => {
