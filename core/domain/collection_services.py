@@ -573,8 +573,14 @@ def get_collection_ids_matching_query(
 
     Args:
         query_string: str. The search query string.
-        categories: list(str). The list of categories to query for.
-        language_codes: list(str). The list of language codes to query for.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         cursor: str or None. Cursor indicating where, in the list of
             collections, to start the search from.
 

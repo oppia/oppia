@@ -169,8 +169,14 @@ def search_explorations(query, categories, language_codes, limit, cursor=None):
 
     Args:
         query: str or None. The query string to search for.
-        categories: list(str). The list of categories to query for.
-        language_codes: list(str). The list of language codes to query for.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         limit: int. The maximum number of results to return.
         cursor: str or None. A cursor, used to get the next page of results. If
             there are more documents that match the query than 'limit', this
@@ -215,8 +221,14 @@ def search_collections(query, categories, language_codes, limit, cursor=None):
 
     Args:
         query: str or None. The query string to search for.
-        categories: list(str). The list of categories to query for.
-        language_codes: list(str). The list of language codes to query for.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         limit: int. The maximum number of results to return.
         cursor: str or None. A cursor, used to get the next page of results.
             If there are more documents that match the query than 'limit', this

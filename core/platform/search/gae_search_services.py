@@ -241,8 +241,14 @@ def search(
     Args:
         query_string: str. The search query.
         index_name: str. The name of the index to search.
-        categories: list(str). The list of categories to query for.
-        language_codes: list(str). The list of language codes to query for.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         cursor: str. A cursor string, as returned by this function. Pass this in
             to get the next 'page' of results. Leave as None to start at the
             beginning.

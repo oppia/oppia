@@ -50,13 +50,16 @@ def get_matching_activity_dicts(
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
         search_cursor: str or None. Cursor indicating where, in the list of
-            search results, to start the search from.
+            exploration search results, to start the search from. If None,
+            collection search results are returned first before the
+            explorations.
 
     Returns:
         tuple. A tuple consisting of two elements:
             - list(dict). Each element in this list is a collection or
                 exploration summary dict, representing a search result.
-            - str. The cursor from which to start the next search.
+            - str. The exploration index cursor from which to start the
+                next search.
     """
     # We only populate collections in the initial load, since the current
     # frontend search infrastructure is set up to only deal with one search

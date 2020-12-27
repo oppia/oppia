@@ -138,8 +138,14 @@ def get_exploration_ids_matching_query(
 
     Args:
         query_string: str. A search query string.
-        categories: list(str). The list of categories to query for.
-        language_codes: list(str). The list of language codes to query for.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         cursor: str or None. Optional cursor from which to start the search
             query. If no cursor is supplied, the first N results matching
             the query are returned.
