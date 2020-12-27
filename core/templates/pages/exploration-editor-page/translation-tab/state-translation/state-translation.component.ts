@@ -196,11 +196,12 @@ angular.module('oppia').component('stateTranslation', {
           }
         } else if (tabId === $scope.TAB_ID_RULE_INPUTS) {
           const {
-            rule, inputName
+            rule, inputName, contentId
           } = $scope.interactionRuleTranslatableContents[0];
-          activeContentId = rule.inputs[inputName].contentId;
+          activeContentId = contentId;
+          activeDataFormat = rule.inputTypes[inputName];
+          $scope.activeRuleContentIndex = 0;
         }
-        console.log(activeContentId);
         TranslationTabActiveContentIdService.setActiveContent(
           activeContentId,
           activeDataFormat);
@@ -326,6 +327,24 @@ angular.module('oppia').component('stateTranslation', {
           activeContentId, WRITTEN_TRANSLATION_TYPE_HTML);
       };
 
+      $scope.changeActiveRuleContentIndex = function(newIndex) {
+        if (ctrl.isTranslationTabBusy) {
+          StateEditorService.onShowTranslationTabBusyModal.emit();
+          return;
+        }
+        if ($scope.activeRuleContentIndex === newIndex) {
+          return;
+        }
+        const {
+          rule, inputName, contentId
+        } = $scope.interactionRuleTranslatableContents[newIndex];
+        const activeContentId = contentId;
+        const activeDataFormat = rule.inputTypes[inputName];
+        TranslationTabActiveContentIdService.setActiveContent(
+          activeContentId, activeDataFormat);
+        $scope.activeRuleContentIndex = newIndex;
+      };
+
       $scope.changeActiveCustomizationArgContentIndex = function(newIndex) {
         if (ctrl.isTranslationTabBusy) {
           StateEditorService.onShowTranslationTabBusyModal.emit();
@@ -404,7 +423,7 @@ angular.module('oppia').component('stateTranslation', {
       };
 
       const getInteractionRuleTranslatableContents = (): {
-        rule: Rule, inputName: string
+        rule: Rule, inputName: string, contentId: string
       }[] => {
         const allRules = $scope.stateAnswerGroups.map(
           answerGroup => answerGroup.rules).flat();
@@ -414,8 +433,9 @@ angular.module('oppia').component('stateTranslation', {
           Object.keys(rule.inputs).forEach(
             inputName => {
               if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
+                const contentId = rule.inputs[inputName].contentId;
                 interactionRuleTranslatableContent.push({
-                  rule, inputName
+                  rule, inputName, contentId
                 });
               }
             });
@@ -537,6 +557,7 @@ angular.module('oppia').component('stateTranslation', {
         $scope.activeHintIndex = null;
         $scope.activeAnswerGroupIndex = null;
         $scope.activeCustomizationArgContentIndex = null;
+        $scope.activeRuleContentIndex = null;
         $scope.stateContent = null;
         $scope.stateInteractionId = null;
         $scope.stateAnswerGroups = [];

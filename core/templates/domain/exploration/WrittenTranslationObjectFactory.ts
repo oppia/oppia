@@ -23,19 +23,15 @@ import { Injectable } from '@angular/core';
 export const WRITTEN_TRANSLATION_TYPE_HTML = 'html';
 export const WRITTEN_TRANSLATION_TYPE_UNICODE = 'unicode';
 
-export type WrittenTranslationDataFormat = (
-  typeof WRITTEN_TRANSLATION_TYPE_UNICODE |
-  typeof WRITTEN_TRANSLATION_TYPE_HTML);
-
 export interface TranslationBackendDict {
-  'data_format': WrittenTranslationDataFormat;
+  'data_format': string;
   'translation': string;
   'needs_update': boolean;
 }
 
 export class WrittenTranslation {
   constructor(
-      public dataFormat: WrittenTranslationDataFormat,
+      public dataFormat: string,
       public translation: string,
       public needsUpdate: boolean
   ) {}
@@ -91,7 +87,7 @@ export class WrittenTranslation {
 })
 export class WrittenTranslationObjectFactory {
   createNew(
-      type: WrittenTranslationDataFormat,
+      type: string,
       html: string
   ): WrittenTranslation {
     return new WrittenTranslation(type, html, false);

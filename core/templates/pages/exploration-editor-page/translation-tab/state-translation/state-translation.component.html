@@ -110,6 +110,33 @@
         </li>
       </ul>
     </div>
+
+    <div ng-if="isActive(TAB_ID_RULE_INPUTS)" class="translation-state-content">
+      <div>
+        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
+          <li class="oppia-rule-block oppia-prevent-selection protractor-test-translation-feedback mt-0"
+              ng-repeat="ruleContent in interactionRuleTranslatableContents track by $index"
+              ng-class="{'active': activeRuleContentIndex === $index}">
+            <a class="oppia-rule-tab protractor-test-feedback-<[$index]>"
+               ng-click="changeActiveRuleContentIndex($index)"
+               ng-class="{'oppia-rule-tab-active': activeRuleContentIndex === $index}"
+               ng-style="contentIdStatusColorStyle(ruleContent.contentId)">
+               <[ruleContent.rule | parameterizeRuleDescription:stateInteractionId:answerChoices]>
+            </a>
+            <div ng-if="activeRuleContentIndex === $index">
+              <div class="oppia-editor-card-section">
+                <div class="oppia-rule-body-container">
+                  <span>
+                    <[(ruleContent.rule | parameterizeRuleDescription:stateInteractionId:answerChoices:true)[ruleContent.inputName]]>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
     <div ng-if="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">

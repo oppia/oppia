@@ -30,7 +30,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
   function(
       $filter, INTERACTION_SPECS, FractionObjectFactory,
       NumberWithUnitsObjectFactory, POSITION_OF_TERMS_MAPPING) {
-    return function(rule, interactionId, choices) {
+    return function(rule, interactionId, choices, ruleInputValuesOnly = false) {
       if (!rule) {
         return '';
       }
@@ -50,6 +50,7 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
 
       var inputs = rule.inputs;
       var finalDescription = description;
+      const ruleInputValues = {};
 
       var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
       var iter = 0;
@@ -212,8 +213,10 @@ angular.module('oppia').filter('parameterizeRuleDescription', [
 
         description = description.replace(PATTERN, ' ');
         finalDescription = finalDescription.replace(PATTERN, replacementText);
+        ruleInputValues[varName] = replacementText;
       }
-      return finalDescription;
+
+      return ruleInputValuesOnly ? ruleInputValues : finalDescription;
     };
   }
 ]);
