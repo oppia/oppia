@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import base64
 import json
+import logging
 import re
 import zipfile
 
@@ -33,7 +34,6 @@ from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
 import feconf
-import logging
 import python_utils
 import utils
 
