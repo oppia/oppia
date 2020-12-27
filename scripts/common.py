@@ -793,7 +793,8 @@ def managed_dev_appserver(
         psutil.Process. The dev_appserver process.
     """
     dev_appserver_args = [
-        CURRENT_PYTHON_BIN, DEV_APPSERVER_PATH,
+        CURRENT_PYTHON_BIN,
+        DEV_APPSERVER_PATH,
         '--host', host,
         '--port', port,
         '--admin_host', admin_host,
