@@ -62,7 +62,7 @@ def compile_and_check_typescript(config_path):
         config_path: str. The config that should be used to run the typescript
             checks.
     """
-    node_path = common.NODE_PATH
+    node_path = common_constants.NODE_PATH
     os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
     validate_compiled_js_dir()

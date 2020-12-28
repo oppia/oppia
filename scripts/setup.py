@@ -81,9 +81,9 @@ def download_and_install_package(url_to_retrieve, filename):
     """
     python_utils.url_retrieve(url_to_retrieve, filename=filename)
     tar = tarfile.open(name=filename)
-    tar.extractall(path=common.OPPIA_TOOLS_DIR)
+    tar.extractall(path=common_constants.OPPIA_TOOLS_DIR)
     tar.close()
-    rename_yarn_folder(filename, common.OPPIA_TOOLS_DIR)
+    rename_yarn_folder(filename, common_constants.OPPIA_TOOLS_DIR)
     os.remove(filename)
 
 
@@ -112,32 +112,32 @@ def download_and_install_node():
 
         extension = '.zip'
         node_file_name = 'node-v%s-win-%s' % (
-            common.NODE_VERSION, architecture)
+            common_constants.NODE_VERSION, architecture)
         url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
-            common.NODE_VERSION, node_file_name, extension)
+            common_constants.NODE_VERSION, node_file_name, extension)
         python_utils.url_retrieve(url_to_retrieve, filename=outfile_name)
         subprocess.check_call(
             ['powershell.exe', '-c', 'expand-archive',
              outfile_name, '-DestinationPath',
-             common.OPPIA_TOOLS_DIR])
+             common_constants.OPPIA_TOOLS_DIR])
     else:
         extension = '.tar.gz'
         if common.is_x64_architecture():
             if common.is_mac_os():
-                node_file_name = 'node-v%s-darwin-x64' % (common.NODE_VERSION)
+                node_file_name = 'node-v%s-darwin-x64' % (common_constants.NODE_VERSION)
             elif common.is_linux_os():
-                node_file_name = 'node-v%s-linux-x64' % (common.NODE_VERSION)
+                node_file_name = 'node-v%s-linux-x64' % (common_constants.NODE_VERSION)
         else:
-            node_file_name = 'node-v%s' % common.NODE_VERSION
+            node_file_name = 'node-v%s' % common_constants.NODE_VERSION
         download_and_install_package(
             'https://nodejs.org/dist/v%s/%s%s' % (
-                common.NODE_VERSION, node_file_name, extension),
+                common_constants.NODE_VERSION, node_file_name, extension),
             outfile_name)
     os.rename(
-        os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
-        common.NODE_PATH)
-    if node_file_name == 'node-v%s' % common.NODE_VERSION:
-        with common.CD(common.NODE_PATH):
+        os.path.join(common_constants.OPPIA_TOOLS_DIR, node_file_name),
+        common_constants.NODE_PATH)
+    if node_file_name == 'node-v%s' % common_constants.NODE_VERSION:
+        with common_constants.CD(common_constants.NODE_PATH):
             subprocess.check_call(['./configure'])
             subprocess.check_call(['make'])
 
@@ -161,36 +161,36 @@ def main(args=None):
     # is necessary becaue COMMON_DIR (or subsequent variables which refer to it)
     # may use it in a situation where relative paths won't work as expected(such
     # as $PYTHONPATH).
-    create_directory(common.OPPIA_TOOLS_DIR)
-    create_directory(common.THIRD_PARTY_DIR)
+    create_directory(common_constants.OPPIA_TOOLS_DIR)
+    create_directory(common_constants.THIRD_PARTY_DIR)
     common.create_readme(
-        common.THIRD_PARTY_DIR,
+        common_constants.THIRD_PARTY_DIR,
         'This folder contains third party libraries used in Oppia codebase.\n'
         'You can regenerate this folder by deleting it and then running '
         'the start.py script.\n')
-    create_directory(common.NODE_MODULES_PATH)
+    create_directory(common_constants.NODE_MODULES_PATH)
     common.create_readme(
-        common.NODE_MODULES_PATH,
+        common_constants.NODE_MODULES_PATH,
         'This folder contains node utilities used in Oppia codebase.\n'
         'You can regenerate this folder by deleting it and then running '
         'the start.py script.\n')
 
     # Download and install node.js.
     python_utils.PRINT(
-        'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
-    if not os.path.exists(common.NODE_PATH):
+        'Checking if node.js is installed in %s' % common_constants.OPPIA_TOOLS_DIR)
+    if not os.path.exists(common_constants.NODE_PATH):
         python_utils.PRINT('Installing Node.js')
         download_and_install_node()
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
     if not common.is_windows_os():
-        common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
-        common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
+        common.recursive_chown(common_constants.NODE_MODULES_PATH, os.getuid(), -1)
+        common.recursive_chmod(common_constants.NODE_MODULES_PATH, 0o744)
 
     # Download and install yarn.
     python_utils.PRINT(
-        'Checking if yarn is installed in %s' % common.OPPIA_TOOLS_DIR)
-    if not os.path.exists(common.YARN_PATH):
+        'Checking if yarn is installed in %s' % common_constants.OPPIA_TOOLS_DIR)
+    if not os.path.exists(common_constants.YARN_PATH):
         python_utils.PRINT('Removing package-lock.json')
         clean.delete_file('package-lock.json')
         common.print_each_string_after_two_new_lines([
@@ -200,10 +200,10 @@ def main(args=None):
             'visit https://yarnpkg.com/en/docs/usage.'])
 
         # NB: Update .yarnrc if the yarn version below is changed.
-        yarn_file_name = 'yarn-v%s.tar.gz' % common.YARN_VERSION
+        yarn_file_name = 'yarn-v%s.tar.gz' % common_constants.YARN_VERSION
         download_and_install_package(
             'https://github.com/yarnpkg/yarn/releases/download/v%s/%s'
-            % (common.YARN_VERSION, yarn_file_name), yarn_file_name)
+            % (common_constants.YARN_VERSION, yarn_file_name), yarn_file_name)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.

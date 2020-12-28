@@ -35,7 +35,7 @@ CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 
 ESPRIMA_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
+    OPPIA_TOOLS_DIR, 'esprima-%s' % common_constants.ESPRIMA_VERSION)
 
 sys.path.insert(1, ESPRIMA_PATH)
 

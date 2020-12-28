@@ -36,7 +36,7 @@ from . import setup
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNTAR_PATH = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.tar.gz')
 TEST_DATA_DIR = os.path.join('core', 'tests', 'data', '')
-MOCK_YARN_PATH = os.path.join(TEST_DATA_DIR, 'yarn-v' + common.YARN_VERSION)
+MOCK_YARN_PATH = os.path.join(TEST_DATA_DIR, 'yarn-v' + common_constants.YARN_VERSION)
 
 
 class MockCD(python_utils.OBJECT):
@@ -233,9 +233,9 @@ class SetupTests(test_utils.GenericTestBase):
         # Creates a dummy yarn folder and then checks if `v` was removed
         # upon function call.
         os.mkdir(MOCK_YARN_PATH)
-        setup.rename_yarn_folder('yarn-v' + common.YARN_VERSION, TEST_DATA_DIR)
+        setup.rename_yarn_folder('yarn-v' + common_constants.YARN_VERSION, TEST_DATA_DIR)
         target = os.path.join(
-            TEST_DATA_DIR, 'yarn-' + common.YARN_VERSION)
+            TEST_DATA_DIR, 'yarn-' + common_constants.YARN_VERSION)
         self.assertTrue(os.path.exists(target))
         os.rmdir(target)
 
@@ -278,10 +278,10 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.urls, [
                 'https://nodejs.org/dist/v%s/node-v%s-darwin-x64.tar.gz' % (
-                    common.NODE_VERSION, common.NODE_VERSION),
+                    common_constants.NODE_VERSION, common_constants.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v%s/yarn-v%s.tar.gz' % (
-                    common.YARN_VERSION, common.YARN_VERSION)])
+                    common_constants.YARN_VERSION, common_constants.YARN_VERSION)])
 
     def test_package_install_with_darwin_x86(self):
         def mock_exists(unused_path):
@@ -307,10 +307,10 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.urls, [
                 'https://nodejs.org/dist/v%s/node-v%s.tar.gz' % (
-                    common.NODE_VERSION, common.NODE_VERSION),
+                    common_constants.NODE_VERSION, common_constants.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v%s/yarn-v%s.tar.gz' % (
-                    common.YARN_VERSION, common.YARN_VERSION)])
+                    common_constants.YARN_VERSION, common_constants.YARN_VERSION)])
         self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
     def test_package_install_with_linux_x64(self):
@@ -333,11 +333,11 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.urls, [
                 'https://nodejs.org/dist/v%s/node-v%s' % (
-                    common.NODE_VERSION, common.NODE_VERSION) +
+                    common_constants.NODE_VERSION, common_constants.NODE_VERSION) +
                 '-linux-x64.tar.gz',
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v%s/yarn-v%s.tar.gz' % (
-                    common.YARN_VERSION, common.YARN_VERSION)])
+                    common_constants.YARN_VERSION, common_constants.YARN_VERSION)])
 
     def test_package_install_with_linux_x86(self):
         def mock_exists(unused_path):
@@ -363,10 +363,10 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.urls, [
                 'https://nodejs.org/dist/v%s/node-v%s.tar.gz' % (
-                    common.NODE_VERSION, common.NODE_VERSION),
+                    common_constants.NODE_VERSION, common_constants.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v%s/yarn-v%s.tar.gz' % (
-                    common.YARN_VERSION, common.YARN_VERSION)])
+                    common_constants.YARN_VERSION, common_constants.YARN_VERSION)])
         self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
     def test_package_install_with_windows_x86(self):
@@ -403,14 +403,14 @@ class SetupTests(test_utils.GenericTestBase):
             mock_check_call.commands,
             ['powershell.exe', '-c', 'expand-archive',
              'node-download', '-DestinationPath',
-             common.OPPIA_TOOLS_DIR])
+             common_constants.OPPIA_TOOLS_DIR])
         self.assertEqual(
             self.urls, [
                 'https://nodejs.org/dist/v%s/node-v%s-win-x86.zip' % (
-                    common.NODE_VERSION, common.NODE_VERSION),
+                    common_constants.NODE_VERSION, common_constants.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v%s/yarn-v%s.tar.gz' % (
-                    common.YARN_VERSION, common.YARN_VERSION)])
+                    common_constants.YARN_VERSION, common_constants.YARN_VERSION)])
 
     def test_package_install_with_windows_x64(self):
         def mock_exists(unused_path):
@@ -447,14 +447,14 @@ class SetupTests(test_utils.GenericTestBase):
             mock_check_call.commands,
             ['powershell.exe', '-c', 'expand-archive',
              'node-download', '-DestinationPath',
-             common.OPPIA_TOOLS_DIR])
+             common_constants.OPPIA_TOOLS_DIR])
         self.assertEqual(
             self.urls, [
                 'https://nodejs.org/dist/v%s/node-v%s-win-x64.zip' % (
-                    common.NODE_VERSION, common.NODE_VERSION),
+                    common_constants.NODE_VERSION, common_constants.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v%s/yarn-v%s.tar.gz' % (
-                    common.YARN_VERSION, common.YARN_VERSION)])
+                    common_constants.YARN_VERSION, common_constants.YARN_VERSION)])
 
     def test_chrome_bin_setup_with_google_chrome(self):
         def mock_isfile(path):

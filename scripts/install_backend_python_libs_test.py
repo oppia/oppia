@@ -36,7 +36,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     """Tests for installing backend python libraries."""
 
     THIRD_PARTY_DATA_DIRECTORY_FILE_PATH = os.path.join(
-        common.CURR_DIR, 'core', 'tests', 'data', 'third_party')
+        common_constants.CURR_DIR, 'core', 'tests', 'data', 'third_party')
 
     TEST_REQUIREMENTS_TXT_FILE_PATH = os.path.join(
         THIRD_PARTY_DATA_DIRECTORY_FILE_PATH, 'requirements_test.txt')
@@ -181,7 +181,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             removed_dirs,
             [
-                common.THIRD_PARTY_PYTHON_LIBS_DIR
+                common_constants.THIRD_PARTY_PYTHON_LIBS_DIR
             ]
         )
 
@@ -191,9 +191,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 ['scripts.regenerate_requirements'],
                 [
                     'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies',
-                    '-r', common.COMPILED_REQUIREMENTS_FILE_PATH,
+                    '-r', common_constants.COMPILED_REQUIREMENTS_FILE_PATH,
                     '--upgrade'
                 ]
             ]
@@ -229,17 +229,17 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 ['scripts.regenerate_requirements'],
                 [
                     'pip', 'install', '%s==%s' % ('flask', '1.1.0.1'),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--target', common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
                     'pip', 'install', '%s==%s' % ('six', '1.15.0'),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--target', common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
                     'pip', 'install', '%s==%s' % ('protobuf', '2.0.1.3'),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--target', common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ]
             ]
@@ -277,7 +277,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             removed_dirs,
             [
-                common.THIRD_PARTY_PYTHON_LIBS_DIR
+                common_constants.THIRD_PARTY_PYTHON_LIBS_DIR
             ]
         )
 
@@ -287,9 +287,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 ['scripts.regenerate_requirements'],
                 [
                     'pip', 'install', '--target',
-                    common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies', '-r',
-                    common.COMPILED_REQUIREMENTS_FILE_PATH,
+                    common_constants.COMPILED_REQUIREMENTS_FILE_PATH,
                     '--upgrade'
                 ]
             ]
@@ -416,7 +416,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         paths_to_delete = []
         def mock_rm(path):
             paths_to_delete.append(
-                path[len(common.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
+                path[len(common_constants.THIRD_PARTY_PYTHON_LIBS_DIR) + 1:])
 
         def mock_is_dir(path): # pylint: disable=unused-argument
             return True
@@ -451,23 +451,23 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 ['scripts.regenerate_requirements'],
                 [
                     'pip', 'install', '%s==%s' % ('flask', '1.1.1'),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--target', common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
                     'pip', 'install', '%s==%s' % ('webencodings', '1.1.1'),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--target', common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
                     'pip', 'install', '%s==%s' % ('six', '1.15.0'),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--target', common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
                     'pip', 'install',
                     '%s==%s' % ('google-cloud-datastore', '1.15.0'),
-                    '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
+                    '--target', common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ]
             ]
@@ -544,7 +544,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         # the outside brackets.
         library_name_pattern = re.compile(r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$')
         with python_utils.open_file(
-            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+            common_constants.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -624,7 +624,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_uniqueness_of_normalized_lib_names_in_requirements_file(self):
         normalized_library_names = set()
-        with python_utils.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
+        with python_utils.open_file(common_constants.REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -643,7 +643,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self):
         normalized_library_names = set()
         with python_utils.open_file(
-            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+            common_constants.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()

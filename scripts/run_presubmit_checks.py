@@ -87,13 +87,13 @@ def main(args=None):
     all_changed_files = subprocess.check_output([
         'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', branch])
 
-    if common.FRONTEND_DIR in all_changed_files:
+    if common_constants.FRONTEND_DIR in all_changed_files:
         # Run frontend unit tests.
         python_utils.PRINT('Running frontend unit tests')
         run_frontend_tests.main(args=['--run_minified_tests'])
         python_utils.PRINT('Frontend tests passed.')
     else:
-        # If files in common.FRONTEND_DIR were not changed, skip the tests.
+        # If files in common_constants.FRONTEND_DIR were not changed, skip the tests.
         common.print_each_string_after_two_new_lines([
             'No frontend files were changed.',
             'Skipped frontend tests'])

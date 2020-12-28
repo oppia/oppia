@@ -424,7 +424,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
             # The first subprocess.call() in install_redis_cli needs to throw an
             # exception so that the script can execute the installation pathway.
-            if unused_cmd_tokens == [common.REDIS_SERVER_PATH, '--version']:
+            if unused_cmd_tokens == [common_constants.REDIS_SERVER_PATH, '--version']:
                 raise OSError('redis-server: command not found')
             else:
                 return Ret()

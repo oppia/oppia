@@ -354,7 +354,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             check_function_calls['tweak_yarn_executable_is_called'] = True
 
         correct_google_path = os.path.join(
-            common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+            common_constants.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         def mock_is_dir(path):
             directories_that_do_not_exist = {
                 os.path.join(correct_google_path, 'appengine'),
@@ -376,15 +376,15 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         correct_copied_src_dst_tuples = [
             (
                 os.path.join(
-                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+                    common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
                 os.path.join(correct_google_path, 'appengine')),
             (
                 os.path.join(
-                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
+                    common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
                 os.path.join(correct_google_path, 'net')),
             (
                 os.path.join(
-                    common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+                    common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
                 os.path.join(correct_google_path, 'pyglib'))
         ]
 

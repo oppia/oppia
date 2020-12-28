@@ -32,7 +32,7 @@ import sys
 from scripts import common
 
 PIP_TOOLS_PATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION)
+    common_constants.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common_constants.PIP_TOOLS_VERSION)
 sys.path.insert(0, PIP_TOOLS_PATH)
 from piptools.scripts import compile  # isort:skip pylint: disable=redefined-builtin, wrong-import-position, wrong-import-order
 
@@ -57,7 +57,7 @@ def main():
     # libraries correctly.
     sys.argv[0] = re.sub(
         r'(-script\.pyw|\.exe)?$', '',
-        common.REQUIREMENTS_FILE_PATH)
+        common_constants.REQUIREMENTS_FILE_PATH)
     compile.cli() # pylint: disable=no-value-for-parameter
 
 

@@ -39,17 +39,17 @@ WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
 PROTRACTOR_BIN_PATH = os.path.join(
-    common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
+    common_constants.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
 # Path relative to current working directory where portserver socket
 # file will be created.
 PORTSERVER_SOCKET_FILEPATH = os.path.join(
     os.getcwd(), 'portserver.socket')
 KILL_TIMEOUT_SECS = 10
 
-CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
+CONSTANT_FILE_PATH = os.path.join(common_constants.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
 WEBDRIVER_HOME_PATH = os.path.join(
-    common.NODE_MODULES_PATH, 'webdriver-manager')
+    common_constants.NODE_MODULES_PATH, 'webdriver-manager')
 WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
     WEBDRIVER_HOME_PATH, 'bin', 'webdriver-manager')
 
@@ -69,7 +69,7 @@ GECKO_PROVIDER_BAK_FILE_PATH = os.path.join(
     WEBDRIVER_PROVIDER_PATH, 'geckodriver.js.bak')
 
 WEBPACK_BIN_PATH = os.path.join(
-    common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
+    common_constants.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
 PATTERN_FOR_REPLACE_WEBDRIVER_CODE = r'this\.osArch = os\.arch\(\);'
 PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor.conf.js')
@@ -176,7 +176,7 @@ def cleanup():
     """Kill the running subprocesses and server fired in this program, set
     constants back to default values.
     """
-    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
+    google_app_engine_path = '%s/' % common_constants.GOOGLE_APP_ENGINE_SDK_HOME
     webdriver_download_path = '%s/selenium' % WEBDRIVER_HOME_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
@@ -224,7 +224,7 @@ def run_webpack_compilation(source_maps=False):
                 build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if source_maps
                 else build.WEBPACK_DEV_CONFIG)
             subprocess.check_call([
-                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                common_constants.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
                 webpack_config_file])
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
@@ -245,7 +245,7 @@ def run_webdriver_manager(parameters):
         parameters: list(str). A list of parameters to pass to webdriver
             manager.
     """
-    web_driver_command = [common.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
+    web_driver_command = [common_constants.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
     web_driver_command.extend(parameters)
     p = subprocess.Popen(web_driver_command)
     p.communicate()
@@ -424,7 +424,7 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=%s '
         '--log_level=%s --skip_sdk_update_check=true %s' % (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
+            common_constants.CURRENT_PYTHON_BIN, common_constants.GOOGLE_APP_ENGINE_SDK_HOME,
             GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
         shell=True)
@@ -549,7 +549,7 @@ def run_tests(args):
         'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
         'core/tests/protractor.conf.js, you can view screenshots'
         'of the failed tests in ../protractor-screenshots/')
-    commands = [common.NODE_BIN_PATH]
+    commands = [common_constants.NODE_BIN_PATH]
     if args.debug_mode:
         commands.append('--inspect-brk')
     # This flag ensures tests fail if waitFor calls time out.

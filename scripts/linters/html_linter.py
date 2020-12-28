@@ -336,7 +336,7 @@ class ThirdPartyHTMLLintChecksManager(python_utils.OBJECT):
             TaskResult. A TaskResult object representing the result of the lint
             check.
         """
-        node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
+        node_path = os.path.join(common_constants.NODE_PATH, 'bin', 'node')
         htmllint_path = os.path.join(
             'node_modules', 'htmllint-cli', 'bin', 'cli.js')
 

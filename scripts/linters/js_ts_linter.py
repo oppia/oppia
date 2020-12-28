@@ -37,7 +37,7 @@ CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 
 ESPRIMA_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
+    OPPIA_TOOLS_DIR, 'esprima-%s' % common_constants.ESPRIMA_VERSION)
 
 sys.path.insert(1, ESPRIMA_PATH)
 
@@ -160,7 +160,7 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             file_cache: object(FileCache). Provides thread-safe access to cached
                 file content.
         """
-        os.environ['PATH'] = '%s/bin:' % common.NODE_PATH + os.environ['PATH']
+        os.environ['PATH'] = '%s/bin:' % common_constants.NODE_PATH + os.environ['PATH']
 
         self.js_files = js_files
         self.ts_files = ts_files
@@ -1140,7 +1140,7 @@ class ThirdPartyJsTsLintChecksManager(python_utils.OBJECT):
             TaskResult. A TaskResult object representing the result of the lint
             check.
         """
-        node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
+        node_path = os.path.join(common_constants.NODE_PATH, 'bin', 'node')
         eslint_path = os.path.join(
             'node_modules', 'eslint', 'bin', 'eslint.js')
         if not os.path.exists(eslint_path):

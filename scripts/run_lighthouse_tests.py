@@ -30,7 +30,7 @@ from scripts import build
 from scripts import common
 
 WEBPACK_BIN_PATH = os.path.join(
-    common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
+    common_constants.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
 LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
 SERVER_MODE_PROD = 'dev'
@@ -64,11 +64,11 @@ def cleanup():
     """Deactivates webpages and deletes html lighthouse reports."""
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
-    common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
+    common.inplace_replace_file(common_constants.CONSTANTS_FILE_PATH, pattern, replace)
 
     build.set_constants_to_default()
 
-    google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
+    google_app_engine_path = '%s/' % common_constants.GOOGLE_APP_ENGINE_SDK_HOME
     processes_to_kill = [
         '.*%s.*' % re.escape(google_app_engine_path),
     ]
@@ -85,7 +85,7 @@ def run_lighthouse_puppeteer_script():
     """Runs puppeteer script to collect dynamic urls."""
     puppeteer_path = os.path.join(
         'core', 'tests', 'puppeteer', 'lighthouse_setup.js')
-    bash_command = [common.NODE_BIN_PATH, puppeteer_path]
+    bash_command = [common_constants.NODE_BIN_PATH, puppeteer_path]
 
     try:
         script_output = subprocess.check_output(bash_command).split('\n')
@@ -109,7 +109,7 @@ def run_webpack_compilation():
         try:
             webpack_config_file = build.WEBPACK_DEV_CONFIG
             subprocess.check_call([
-                common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                common_constants.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
                 webpack_config_file])
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
@@ -149,7 +149,7 @@ def run_lighthouse_checks(lighthouse_mode):
     """
     lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
     bash_command = [
-        common.NODE_BIN_PATH, lhci_path, 'autorun',
+        common_constants.NODE_BIN_PATH, lhci_path, 'autorun',
         '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode]]
 
     try:
@@ -165,7 +165,7 @@ def enable_webpages():
     """Enables deactivated webpages for testing."""
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": true,'
-    common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
+    common.inplace_replace_file(common_constants.CONSTANTS_FILE_PATH, pattern, replace)
 
 
 def start_google_app_engine_server(server_mode):
@@ -181,7 +181,7 @@ def start_google_app_engine_server(server_mode):
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
+            common_constants.CURRENT_PYTHON_BIN, common_constants.GOOGLE_APP_ENGINE_SDK_HOME,
             GOOGLE_APP_ENGINE_PORT, app_yaml_filepath
         ), shell=True)
     SUBPROCESSES.append(p)

@@ -281,7 +281,7 @@ def execute_branch_cut(target_version, hotfix_number):
         'Please confirm: are Actions checks passing on %s? (y/n) ' % (
             branch_to_check))
     answer = python_utils.INPUT().lower()
-    if answer not in common.AFFIRMATIVE_CONFIRMATIONS:
+    if answer not in common_constants.AFFIRMATIVE_CONFIRMATIONS:
         raise Exception(
             'Tests should pass on %s before this script is run.' % (
                 branch_to_check))

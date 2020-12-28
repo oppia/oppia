@@ -30,7 +30,7 @@ from scripts import common
 
 def main():
     """Run the tests."""
-    node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
+    node_path = os.path.join(common_constants.NODE_PATH, 'bin', 'node')
     nyc_path = os.path.join('node_modules', 'nyc', 'bin', 'nyc.js')
     mocha_path = os.path.join('node_modules', 'mocha', 'bin', 'mocha')
     filepath = 'scripts/linters/custom_eslint_checks/rules/'

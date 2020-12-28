@@ -146,9 +146,9 @@ def main(args=None):
             build.WEBPACK_DEV_SOURCE_MAPS_CONFIG if parsed_args.source_maps
             else build.WEBPACK_DEV_CONFIG)
         background_processes.append(subprocess.Popen([
-            common.NODE_BIN_PATH,
+            common_constants.NODE_BIN_PATH,
             os.path.join(
-                common.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
+                common_constants.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
             '--config', webpack_config_file, '--watch']))
 
         # Give webpack few seconds to do the initial compilation.
@@ -161,7 +161,7 @@ def main(args=None):
         'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
         '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
         'true %s' % (
-            common.GOOGLE_APP_ENGINE_SDK_HOME, clear_datastore_arg,
+            common_constants.GOOGLE_APP_ENGINE_SDK_HOME, clear_datastore_arg,
             enable_console_arg, disable_host_checking_arg, no_auto_restart,
             python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
             app_yaml_filepath), shell=True))

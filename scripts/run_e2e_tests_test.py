@@ -192,7 +192,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
         google_app_engine_path = '%s/' % (
-            common.GOOGLE_APP_ENGINE_SDK_HOME)
+            common_constants.GOOGLE_APP_ENGINE_SDK_HOME)
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
@@ -245,7 +245,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
-        google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
+        google_app_engine_path = '%s/' % common_constants.GOOGLE_APP_ENGINE_SDK_HOME
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
@@ -341,7 +341,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common.wait_for_port_to_be_open(1)
         self.assertEqual(
             mock_sleep.sleep_time,
-            common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
+            common_constants.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
     def test_run_webpack_compilation_success(self):
         def mock_isdir(unused_dirname):
@@ -415,7 +415,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_run_webdriver_manager(self):
         expected_commands = [
-            common.NODE_BIN_PATH, run_e2e_tests.WEBDRIVER_MANAGER_BIN_PATH,
+            common_constants.NODE_BIN_PATH, run_e2e_tests.WEBDRIVER_MANAGER_BIN_PATH,
             'start', '--detach']
 
         def mock_popen(unused_command):
@@ -752,7 +752,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=error '
             '--log_level=error --skip_sdk_update_check=true %s' % (
-                common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
+                common_constants.CURRENT_PYTHON_BIN, common_constants.GOOGLE_APP_ENGINE_SDK_HOME,
                 run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
                 'app_dev.yaml'))
         popen_swap = self.popen_swap(
@@ -773,7 +773,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=error '
             '--log_level=error --skip_sdk_update_check=true %s' % (
-                common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
+                common_constants.CURRENT_PYTHON_BIN, common_constants.GOOGLE_APP_ENGINE_SDK_HOME,
                 run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
                 'app.yaml'))
         popen_swap = self.popen_swap(
@@ -903,11 +903,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 ],),
                 ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    common_constants.REDIS_SERVER_PATH, common_constants.REDIS_CONF_PATH,
                     '--daemonize', 'yes'
                 ],),
                 ([
-                    common.NODE_BIN_PATH,
+                    common_constants.NODE_BIN_PATH,
                     '--unhandled-rejections=strict',
                     run_e2e_tests.PROTRACTOR_BIN_PATH,
                     'commands',
@@ -1015,11 +1015,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[
                 ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    common_constants.REDIS_SERVER_PATH, common_constants.REDIS_CONF_PATH,
                     '--daemonize', 'yes'
                 ],),
                 ([
-                    common.NODE_BIN_PATH,
+                    common_constants.NODE_BIN_PATH,
                     '--unhandled-rejections=strict',
                     run_e2e_tests.PROTRACTOR_BIN_PATH,
                     'commands',
@@ -1363,11 +1363,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 ],),
                 ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    common_constants.REDIS_SERVER_PATH, common_constants.REDIS_CONF_PATH,
                     '--daemonize', 'yes'
                 ],),
                 ([
-                    common.NODE_BIN_PATH,
+                    common_constants.NODE_BIN_PATH,
                     '--unhandled-rejections=strict',
                     run_e2e_tests.PROTRACTOR_BIN_PATH,
                     'commands'
@@ -1538,11 +1538,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 ],),
                 ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    common_constants.REDIS_SERVER_PATH, common_constants.REDIS_CONF_PATH,
                     '--daemonize', 'yes'
                 ],),
                 ([
-                    common.NODE_BIN_PATH,
+                    common_constants.NODE_BIN_PATH,
                     '--inspect-brk',
                     '--unhandled-rejections=strict',
                     run_e2e_tests.PROTRACTOR_BIN_PATH,
@@ -1663,11 +1663,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     run_e2e_tests.PORTSERVER_SOCKET_FILEPATH,
                 ],),
                 ([
-                    common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH,
+                    common_constants.REDIS_SERVER_PATH, common_constants.REDIS_CONF_PATH,
                     '--daemonize', 'yes'
                 ],),
                 ([
-                    common.NODE_BIN_PATH,
+                    common_constants.NODE_BIN_PATH,
                     '--unhandled-rejections=strict',
                     run_e2e_tests.PROTRACTOR_BIN_PATH,
                     'commands',

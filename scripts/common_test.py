@@ -40,7 +40,7 @@ from . import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common_constants.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
 import github # isort:skip  pylint: disable=wrong-import-position
@@ -171,7 +171,7 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(
                 check_function_calls, expected_check_function_calls)
         finally:
-            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
+            common_constants.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_open_new_tab_in_browser_if_possible_with_url_opening_correctly(
             self):
@@ -200,7 +200,7 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(
                 check_function_calls, expected_check_function_calls)
         finally:
-            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
+            common_constants.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_open_new_tab_in_browser_if_possible_with_url_not_opening_correctly(
             self):
@@ -229,7 +229,7 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(
                 check_function_calls, expected_check_function_calls)
         finally:
-            common.USER_PREFERENCES['open_new_tab_in_browser'] = None
+            common_constants.USER_PREFERENCES['open_new_tab_in_browser'] = None
 
     def test_get_remote_alias_with_correct_alias(self):
         def mock_check_output(unused_cmd_tokens):

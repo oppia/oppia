@@ -128,10 +128,10 @@ class RedisCacheServicesUnitTests(test_utils.TestBase):
         the same port definition.
         """
         self.assertTrue(os.path.exists(
-            os.path.join(common.CURR_DIR, 'redis.conf')))
+            os.path.join(common_constants.CURR_DIR, 'redis.conf')))
 
         with python_utils.open_file(
-            os.path.join(common.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
+            os.path.join(common_constants.CURR_DIR, 'redis.conf'), 'r') as redis_conf:
             lines = redis_conf.readlines()
             elements = lines[0].split()
             self.assertEqual(len(elements), 2)

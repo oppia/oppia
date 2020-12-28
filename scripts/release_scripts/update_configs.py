@@ -34,7 +34,7 @@ from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
+    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common_constants.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
 import github  # isort:skip pylint: disable=wrong-import-position
@@ -123,7 +123,7 @@ def check_updates_to_terms_of_service(
         terms_of_service_are_changed = python_utils.INPUT().lower()
 
     if terms_of_service_are_changed in (
-            common.AFFIRMATIVE_CONFIRMATIONS):
+            common_constants.AFFIRMATIVE_CONFIRMATIONS):
         python_utils.PRINT(
             'Enter sha of the commit which changed the terms of service.')
         commit_sha = python_utils.INPUT().lstrip().rstrip()
@@ -216,9 +216,9 @@ def main(
     constants_config_path = os.path.join(
         deploy_data_path, 'constants_updates.config')
 
-    release_feconf_path = os.path.join(release_dir_path, common.FECONF_PATH)
+    release_feconf_path = os.path.join(release_dir_path, common_constants.FECONF_PATH)
     release_constants_path = os.path.join(
-        release_dir_path, common.CONSTANTS_FILE_PATH)
+        release_dir_path, common_constants.CONSTANTS_FILE_PATH)
 
     if prompt_for_mailgun_and_terms_update:
         try:

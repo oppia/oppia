@@ -363,7 +363,7 @@ def install_redis_cli():
     """
     try:
         subprocess.call(
-            [common.REDIS_SERVER_PATH, '--version'],
+            [common_constants.REDIS_SERVER_PATH, '--version'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
@@ -375,17 +375,17 @@ def install_redis_cli():
 
         download_and_untar_files(
             ('https://download.redis.io/releases/redis-%s.tar.gz') %
-            common.REDIS_CLI_VERSION,
+            common_constants.REDIS_CLI_VERSION,
             TARGET_DOWNLOAD_DIRS['oppiaTools'],
-            'redis-%s' % common.REDIS_CLI_VERSION,
-            'redis-cli-%s' % common.REDIS_CLI_VERSION)
+            'redis-%s' % common_constants.REDIS_CLI_VERSION,
+            'redis-cli-%s' % common_constants.REDIS_CLI_VERSION)
 
         # Temporarily change the working directory to redis-cli-6.0.6 so we can
         # build the source code.
-        with common.CD(
+        with common_constants.CD(
             os.path.join(
                 TARGET_DOWNLOAD_DIRS['oppiaTools'],
-                'redis-cli-%s' % common.REDIS_CLI_VERSION)):
+                'redis-cli-%s' % common_constants.REDIS_CLI_VERSION)):
             # Build the scripts necessary to start the redis server.
             # The make command only builds the C++ files in the src/ folder
             # without modifying anything outside of the oppia root directory.
@@ -396,9 +396,9 @@ def install_redis_cli():
 
         # Make the scripts executable.
         subprocess.call([
-            'chmod', '+x', common.REDIS_SERVER_PATH])
+            'chmod', '+x', common_constants.REDIS_SERVER_PATH])
         subprocess.call([
-            'chmod', '+x', common.REDIS_CLI_PATH])
+            'chmod', '+x', common_constants.REDIS_CLI_PATH])
 
         python_utils.PRINT('Redis-cli installed successfully.')
 

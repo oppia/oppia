@@ -63,10 +63,10 @@ Installation script for Oppia third-party libraries.
 """)
 
 PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION,
+    common_constants.OPPIA_TOOLS_DIR, 'pylint-%s' % common_constants.PYLINT_VERSION,
     'configparser.py')
 PQ_CONFIGPARSER_FILEPATH = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common.PYLINT_QUOTES_VERSION,
+    common_constants.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common_constants.PYLINT_QUOTES_VERSION,
     'configparser.py')
 
 # Download locations for buf binary.
@@ -83,17 +83,17 @@ BUF_DARWIN_FILES = [
 # Download URL of protoc compiler.
 PROTOC_URL = (
     'https://github.com/protocolbuffers/protobuf/releases/download/v%s' %
-    common.PROTOC_VERSION)
-PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common.PROTOC_VERSION)
-PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common.PROTOC_VERSION)
+    common_constants.PROTOC_VERSION)
+PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common_constants.PROTOC_VERSION)
+PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common_constants.PROTOC_VERSION)
 
 # Path of the buf executable.
 BUF_DIR = os.path.join(
-    common.OPPIA_TOOLS_DIR, 'buf-%s' % common.BUF_VERSION)
+    common_constants.OPPIA_TOOLS_DIR, 'buf-%s' % common_constants.BUF_VERSION)
 PROTOC_DIR = os.path.join(BUF_DIR, 'protoc')
 # Path of files which needs to be compiled by protobuf.
 PROTO_FILES_PATHS = [
-    os.path.join(common.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
+    os.path.join(common_constants.THIRD_PARTY_DIR, 'oppia-ml-proto-0.0.0')]
 
 
 def tweak_yarn_executable():
@@ -103,9 +103,9 @@ def tweak_yarn_executable():
     (while preserving the behavior on other systems), we rename it to yarn.sh
     here.
     """
-    origin_file_path = os.path.join(common.YARN_PATH, 'bin', 'yarn')
+    origin_file_path = os.path.join(common_constants.YARN_PATH, 'bin', 'yarn')
     if os.path.isfile(origin_file_path):
-        renamed_file_path = os.path.join(common.YARN_PATH, 'bin', 'yarn.sh')
+        renamed_file_path = os.path.join(common_constants.YARN_PATH, 'bin', 'yarn.sh')
         os.rename(origin_file_path, renamed_file_path)
 
 
@@ -211,23 +211,23 @@ def main():
     # looks for them in the default system paths when it is run. Therefore, we
     # must install these libraries to the developer's computer.
     system_pip_dependencies = [
-        ('enum34', common.ENUM_VERSION),
-        ('protobuf', common.PROTOBUF_VERSION)
+        ('enum34', common_constants.ENUM_VERSION),
+        ('protobuf', common_constants.PROTOBUF_VERSION)
     ]
     local_pip_dependencies = [
-        ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
-        ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', common.PYLINT_QUOTES_VERSION, common.OPPIA_TOOLS_DIR),
-        ('webtest', common.WEBTEST_VERSION, common.OPPIA_TOOLS_DIR),
-        ('isort', common.ISORT_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
-        ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
-        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
-        ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
+        ('coverage', common_constants.COVERAGE_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('pylint', common_constants.PYLINT_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('Pillow', common_constants.PILLOW_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('pylint-quotes', common_constants.PYLINT_QUOTES_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('webtest', common_constants.WEBTEST_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('isort', common_constants.ISORT_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('pycodestyle', common_constants.PYCODESTYLE_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('esprima', common_constants.ESPRIMA_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('PyGithub', common_constants.PYGITHUB_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('protobuf', common_constants.PROTOBUF_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('psutil', common_constants.PSUTIL_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('pip-tools', common_constants.PIP_TOOLS_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        ('setuptools', common_constants.SETUPTOOLS_VERSION, common_constants.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in local_pip_dependencies:
@@ -278,26 +278,26 @@ def main():
     python_utils.PRINT(
         'Copying Google Cloud SDK modules to third_party/python_libs...')
     correct_google_path = os.path.join(
-        common.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        common_constants.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
     if not os.path.isdir(correct_google_path):
         os.mkdir(correct_google_path)
 
     if not os.path.isdir(os.path.join(correct_google_path, 'appengine')):
         shutil.copytree(
             os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+                common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
             os.path.join(correct_google_path, 'appengine'))
 
     if not os.path.isdir(os.path.join(correct_google_path, 'net')):
         shutil.copytree(
             os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
+                common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
             os.path.join(correct_google_path, 'net'))
 
     if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
         shutil.copytree(
             os.path.join(
-                common.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+                common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
             os.path.join(correct_google_path, 'pyglib'))
 
     # The following for loop populates all of the google modules with

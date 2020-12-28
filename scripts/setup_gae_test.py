@@ -104,7 +104,7 @@ class SetupGaeTests(test_utils.GenericTestBase):
         self.expected_check_function_calls['extractall_is_called'] = True
         self.expected_check_function_calls['close_is_called'] = True
         def mock_exists(path):
-            if path == common.GOOGLE_CLOUD_SDK_HOME:
+            if path == common_constants.GOOGLE_CLOUD_SDK_HOME:
                 return False
             return True
         temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
@@ -135,7 +135,7 @@ class SetupGaeTests(test_utils.GenericTestBase):
         self.expected_check_function_calls['remove_is_called'] = False
         self.raise_error = True
         def mock_exists(path):
-            if path == common.GOOGLE_CLOUD_SDK_HOME:
+            if path == common_constants.GOOGLE_CLOUD_SDK_HOME:
                 return False
             return True
         exists_swap = self.swap(os.path, 'exists', mock_exists)

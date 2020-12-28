@@ -83,7 +83,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             TaskResult. A TaskResult object representing the result of the lint
             check.
         """
-        node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
+        node_path = os.path.join(common_constants.NODE_PATH, 'bin', 'node')
         stylelint_path = os.path.join(
             'node_modules', 'stylelint', 'bin', 'stylelint.js')
         if not os.path.exists(stylelint_path):

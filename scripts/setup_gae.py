@@ -39,12 +39,12 @@ def main(args=None):
     """Runs the script to setup GAE."""
     unused_parsed_args = _PARSER.parse_args(args=args)
     coverage_home = os.path.join(
-        common.OPPIA_TOOLS_DIR, 'coverage-%s' % common.COVERAGE_VERSION)
+        common_constants.OPPIA_TOOLS_DIR, 'coverage-%s' % common_constants.COVERAGE_VERSION)
 
     sys.path.append('.')
     sys.path.append(coverage_home)
-    sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
+    sys.path.append(common_constants.GOOGLE_APP_ENGINE_SDK_HOME)
+    sys.path.append(os.path.join(common_constants.OPPIA_TOOLS_DIR, 'webtest-2.0.33'))
 
     # Delete old *.pyc files.
     for directory, _, files in os.walk('.'):
@@ -55,11 +55,11 @@ def main(args=None):
 
     python_utils.PRINT(
         'Checking whether google-cloud-sdk is installed in %s'
-        % common.GOOGLE_CLOUD_SDK_HOME)
-    if not os.path.exists(common.GOOGLE_CLOUD_SDK_HOME):
+        % common_constants.GOOGLE_CLOUD_SDK_HOME)
+    if not os.path.exists(common_constants.GOOGLE_CLOUD_SDK_HOME):
         python_utils.PRINT(
             'Downloading Google Cloud SDK (this may take a little while)...')
-        os.makedirs(common.GOOGLE_CLOUD_SDK_HOME)
+        os.makedirs(common_constants.GOOGLE_CLOUD_SDK_HOME)
         try:
             python_utils.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
@@ -72,7 +72,7 @@ def main(args=None):
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
+                common_constants.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))
         tar.close()
 
         # This command installs specific google cloud components for the google
@@ -82,7 +82,7 @@ def main(args=None):
         # prompts with default values. In this case, that means accepting all
         # installations of gcloud packages.
         subprocess.call([
-            common.GCLOUD_PATH,
+            common_constants.GCLOUD_PATH,
             'components', 'install', 'cloud-datastore-emulator',
             'app-engine-python', 'app-engine-python-extras', '--quiet'])
 

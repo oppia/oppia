@@ -222,12 +222,12 @@ def modify_constants(prod_env=False, maintenance_mode=False):
     dev_mode_variable = (
         '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
     common.inplace_replace_file(
-        common.CONSTANTS_FILE_PATH, r'"DEV_MODE": .*', dev_mode_variable)
+        common_constants.CONSTANTS_FILE_PATH, r'"DEV_MODE": .*', dev_mode_variable)
 
     enable_maintenance_mode_variable = (
         'ENABLE_MAINTENANCE_MODE = %s' % python_utils.UNICODE(maintenance_mode))
     common.inplace_replace_file(
-        common.FECONF_PATH,
+        common_constants.FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = .*',
         enable_maintenance_mode_variable)
 
@@ -296,7 +296,7 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
     python_utils.PRINT('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
+        common_constants.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     subprocess.check_call(cmd, shell=True)
 
@@ -646,7 +646,7 @@ def build_using_webpack(config_path):
     python_utils.PRINT('Building webpack')
 
     cmd = '%s %s --config %s' % (
-        common.NODE_BIN_PATH, WEBPACK_FILE, config_path)
+        common_constants.NODE_BIN_PATH, WEBPACK_FILE, config_path)
     subprocess.check_call(cmd, shell=True)
 
 

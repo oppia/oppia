@@ -32,9 +32,9 @@ from .. import common
 from .. import concurrent_task_utils
 
 _PATHS_TO_INSERT = [
-    common.PYLINT_PATH,
-    common.PYCODESTYLE_PATH,
-    common.PYLINT_QUOTES_PATH
+    common_constants.PYLINT_PATH,
+    common_constants.PYCODESTYLE_PATH,
+    common_constants.PYLINT_QUOTES_PATH
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(1, path)

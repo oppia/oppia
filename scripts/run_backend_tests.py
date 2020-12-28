@@ -66,28 +66,28 @@ from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-
 from . import concurrent_task_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DIRS_TO_ADD_TO_SYS_PATH = [
-    os.path.join(common.OPPIA_TOOLS_DIR, 'pylint-%s' % common.PYLINT_VERSION),
+    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'pylint-%s' % common_constants.PYLINT_VERSION),
 
-    os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-%s' % common.WEBTEST_VERSION),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-%s' % common.PILLOW_VERSION),
+    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'webtest-%s' % common_constants.WEBTEST_VERSION),
+    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'Pillow-%s' % common_constants.PILLOW_VERSION),
     os.path.join(
-        common.OPPIA_TOOLS_DIR, 'protobuf-%s' % common.PROTOBUF_VERSION),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'grpcio-%s' % common.GRPCIO_VERSION),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
+        common_constants.OPPIA_TOOLS_DIR, 'protobuf-%s' % common_constants.PROTOBUF_VERSION),
+    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'psutil-%s' % common_constants.PSUTIL_VERSION),
+    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'grpcio-%s' % common_constants.GRPCIO_VERSION),
+    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(
-        common.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common.PYGITHUB_VERSION),
+        common_constants.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common_constants.PYGITHUB_VERSION),
     os.path.join(
-        common.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
-    common.CURR_DIR
+        common_constants.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common_constants.PIP_TOOLS_VERSION),
+    common_constants.CURR_DIR
 ]
 
 COVERAGE_DIR = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools',
-    'coverage-%s' % common.COVERAGE_VERSION)
+    'coverage-%s' % common_constants.COVERAGE_VERSION)
 COVERAGE_MODULE_PATH = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools',
-    'coverage-%s' % common.COVERAGE_VERSION, 'coverage')
+    'coverage-%s' % common_constants.COVERAGE_VERSION, 'coverage')
 
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
@@ -247,11 +247,11 @@ def main(args=None):
     if parsed_args.generate_coverage_report:
         python_utils.PRINT(
             'Checking whether coverage is installed in %s'
-            % common.OPPIA_TOOLS_DIR)
+            % common_constants.OPPIA_TOOLS_DIR)
         if not os.path.exists(
                 os.path.join(
-                    common.OPPIA_TOOLS_DIR,
-                    'coverage-%s' % common.COVERAGE_VERSION)):
+                    common_constants.OPPIA_TOOLS_DIR,
+                    'coverage-%s' % common_constants.COVERAGE_VERSION)):
             raise Exception(
                 'Coverage is not installed, please run the start script.')
 
@@ -413,7 +413,7 @@ def main(args=None):
         process = subprocess.Popen(
             [sys.executable, COVERAGE_MODULE_PATH, 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
-             % common.OPPIA_TOOLS_DIR, '--show-missing'],
+             % common_constants.OPPIA_TOOLS_DIR, '--show-missing'],
             stdout=subprocess.PIPE)
 
         report_stdout, _ = process.communicate()
