@@ -335,14 +335,14 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.reviewTabs = [];
         ctrl.contributionTabs = [
           {
-            suggestionType: SUGGESTION_TYPE_TRANSLATE,
-            text: 'Translations',
-            enabled: true
-          },
-          {
             suggestionType: SUGGESTION_TYPE_QUESTION,
             text: 'Questions',
             enabled: false
+          },
+          {
+            suggestionType: SUGGESTION_TYPE_TRANSLATE,
+            text: 'Translations',
+            enabled: true
           }
         ];
 
@@ -357,6 +357,7 @@ angular.module('oppia').component('contributionsAndReview', {
                     .can_review_translation_for_language_codes);
                 var userCanReviewQuestionSuggestions = (
                   userContributionRights.can_review_questions);
+                var userReviewableSuggestionTypes = [];
                 var userCanSuggestQuestions = (
                   userContributionRights.can_suggest_questions);
                 for (var index in ctrl.contributionTabs) {
@@ -366,6 +367,13 @@ angular.module('oppia').component('contributionsAndReview', {
                       userCanSuggestQuestions);
                   }
                 }
+                if (userCanReviewQuestionSuggestions) {
+                  ctrl.reviewTabs.push({
+                    suggestionType: SUGGESTION_TYPE_QUESTION,
+                    text: 'Review Questions'
+                  });
+                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_QUESTION);
+                }
                 if (
                   userCanReviewTranslationSuggestionsInLanguages
                     .length > 0) {
@@ -373,16 +381,14 @@ angular.module('oppia').component('contributionsAndReview', {
                     suggestionType: SUGGESTION_TYPE_TRANSLATE,
                     text: 'Review Translations'
                   });
+                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_TRANSLATE);
                 }
-                if (userCanReviewQuestionSuggestions) {
-                  ctrl.reviewTabs.push({
-                    suggestionType: SUGGESTION_TYPE_QUESTION,
-                    text: 'Review Questions'
-                  });
-                }
-                if (ctrl.reviewTabs.length > 0) {
+                if (userReviewableSuggestionTypes.length > 0) {
                   ctrl.switchToTab(
-                    ctrl.TAB_TYPE_REVIEWS, ctrl.reviewTabs[0].suggestionType);
+                    ctrl.TAB_TYPE_REVIEWS, userReviewableSuggestionTypes[0]);
+                } else if (userCanSuggestQuestions) {
+                  ctrl.switchToTab(
+                    ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_QUESTION);
                 } else {
                   ctrl.switchToTab(
                     ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_TRANSLATE);

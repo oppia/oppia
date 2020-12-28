@@ -180,7 +180,7 @@ describe('Contributions and review component', function() {
     it('should initialize $scope properties after controller is' +
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('reviews');
-      expect(ctrl.activeSuggestionType).toBe('translate_content');
+      expect(ctrl.activeSuggestionType).toBe('add_question');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(2);
@@ -688,7 +688,7 @@ describe('Contributions and review component', function() {
     it('should initialize $scope properties after controller is' +
       ' initialized', function() {
       expect(ctrl.activeTabType).toBe('contributions');
-      expect(ctrl.activeSuggestionType).toBe('translate_content');
+      expect(ctrl.activeSuggestionType).toBe('add_question');
       expect(ctrl.userIsLoggedIn).toBe(true);
       expect(ctrl.userDetailsLoading).toBe(false);
       expect(ctrl.reviewTabs.length).toEqual(0);
