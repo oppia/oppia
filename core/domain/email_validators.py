@@ -213,7 +213,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
             '^%s\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
             '[A-Za-z0-9=+/]{1,}') % (
                 feconf.USER_ID_REGEX,
-                ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
+                ('|').join(feconf.SUGGESTION_TARGET_TYPE_CHOICES),
                 base_models.ID_LENGTH)
 
     @classmethod

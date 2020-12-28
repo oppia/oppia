@@ -385,7 +385,8 @@ class ExportAccountHandler(base.BaseHandler):
                 % self.user_id)
             user_data_json_string = (
                 'There was an error while exporting ' +
-                'data. Please contact admin@oppia.org to export your data.')
+                'data. Please contact %s to export your data.'
+                % feconf.ADMIN_EMAIL_ADDRESS)
             user_images = []
 
         # Create zip file.
