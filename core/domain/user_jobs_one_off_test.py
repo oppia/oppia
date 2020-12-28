@@ -509,8 +509,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_c_id)
 
-        self.assertEqual(user_b_subscriptions_model.activity_ids, [])
-        self.assertEqual(user_c_subscriptions_model.activity_ids, [])
+        self.assertEqual(user_b_subscriptions_model.exploration_ids, [])
+        self.assertEqual(user_c_subscriptions_model.exploration_ids, [])
         self.assertEqual(
             user_b_subscriptions_model.general_feedback_thread_ids, [thread_id])
         self.assertEqual(
@@ -542,9 +542,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_c_id, strict=False)
 
         self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+            user_a_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
+            user_b_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_c_subscriptions_model, None)
@@ -565,7 +565,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_a_id)
 
         self.assertEqual(
-            sorted(user_a_subscriptions_model.activity_ids),
+            sorted(user_a_subscriptions_model.exploration_ids),
             sorted([self.EXP_ID_1, self.EXP_ID_2]))
 
     def test_community_owned_exploration(self):
@@ -597,9 +597,9 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             self.user_c_id, strict=False)
 
         self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+            user_a_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [self.EXP_ID_1])
+            user_b_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_deleted_exploration(self):
@@ -657,7 +657,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         # User A is also subscribed to the exploration within the collection
         # because they created both.
         self.assertEqual(
-            sorted(user_a_subscriptions_model.activity_ids), [
+            sorted(user_a_subscriptions_model.exploration_ids), [
                 self.EXP_ID_1, self.EXP_ID_FOR_COLLECTION_1])
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
@@ -756,11 +756,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         # User B should be subscribed to the collection and user A to the
         # exploration.
         self.assertEqual(
-            user_a_subscriptions_model.activity_ids, [self.EXP_ID_1])
+            user_a_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(
             user_a_subscriptions_model.collection_ids, [])
         self.assertEqual(
-            user_b_subscriptions_model.activity_ids, [])
+            user_b_subscriptions_model.exploration_ids, [])
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
 
@@ -1354,6 +1354,171 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(owner_settings.last_edited_an_exploration)
 
 
+class FillExplorationIdsInUserSubscriptionsModelOneOffJobTests(
+        test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off
+            .FillExplorationIdsInUserSubscriptionsModelOneOffJob
+            .create_new()
+        )
+        (
+            user_jobs_one_off
+            .FillExplorationIdsInUserSubscriptionsModelOneOffJob.enqueue(
+                job_id))
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off
+            .FillExplorationIdsInUserSubscriptionsModelOneOffJob
+            .get_output(job_id)
+        )
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def test_for_empty_activity_ids(self):
+        # Generate empty activity_ids.
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='model_id',
+                activity_ids=[]
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual([[u'SUCCESS', 1]], output)
+
+        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
+            'model_id')
+        self.assertEqual(
+            migrated_subscription_model.exploration_ids, [])
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
+
+    def test_for_non_empty_activity_ids(self):
+        # Generate non-empty activity_ids.
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='model_id',
+                activity_ids=['exp_1', 'exp_2', 'exp_3']
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual([[u'SUCCESS', 1]], output)
+
+        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
+            'model_id')
+        self.assertEqual(
+            migrated_subscription_model.exploration_ids,
+            ['exp_1', 'exp_2', 'exp_3']
+        )
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
+
+    def test_for_multiple_models(self):
+        # Generate 3 models.
+        for i in python_utils.RANGE(3):
+            original_subscription_model = (
+                user_models.UserSubscriptionsModel(
+                    id='model_id_%s' % i,
+                    activity_ids=['exp_%s' % i]
+                )
+            )
+            original_subscription_model.update_timestamps()
+            original_subscription_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 3]])
+        for i in python_utils.RANGE(3):
+            migrated_subscription_model = (
+                user_models.UserSubscriptionsModel.get('model_id_%s' % i))
+            self.assertEqual(
+                migrated_subscription_model.exploration_ids,
+                ['exp_%s' % i]
+            )
+            self.assertEqual(
+                original_subscription_model.get(
+                    'model_id_%s' % i).last_updated,
+                migrated_subscription_model.last_updated
+            )
+
+    def test_for_existing_exploration_ids(self):
+        # Generate a model with populated exploration IDs.
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='model_id',
+                activity_ids=['exp_1', 'exp_2', 'exp_3'],
+                exploration_ids=['exp_4', 'exp_5']
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS', 1]])
+
+        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
+            'model_id')
+        self.assertEqual(
+            migrated_subscription_model.exploration_ids,
+            ['exp_1', 'exp_2', 'exp_3']
+        )
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
+
+    def test_rerun(self):
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='model_id',
+                activity_ids=[]
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual([[u'SUCCESS', 1]], output)
+
+        migrated_subscription_model = user_models.UserSubscriptionsModel.get(
+            'model_id')
+        self.assertEqual(
+            migrated_subscription_model.exploration_ids,
+            []
+        )
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
+
+        output = self._run_one_off_job()
+        self.assertEqual([[u'SUCCESS', 1]], output)
+
+        self.assertEqual(
+            migrated_subscription_model.exploration_ids,
+            []
+        )
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated
+        )
+
+
 class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -1387,13 +1552,16 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
 
         owner_subscription_model = user_models.UserSubscriptionsModel.get(
             self.owner_id)
-        self.assertEqual(len(owner_subscription_model.activity_ids), 3)
+        self.assertEqual(len(owner_subscription_model.exploration_ids), 3)
 
         user_subscription_model = user_models.UserSubscriptionsModel.get(
             self.user_id)
-        self.assertEqual(len(user_subscription_model.activity_ids), 3)
+        self.assertEqual(len(user_subscription_model.exploration_ids), 3)
 
-        job = user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
+        job = (
+            user_jobs_one_off
+            .CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob
+        )
         job_id = job.create_new()
         job.enqueue(job_id)
         self.assertEqual(
@@ -1403,11 +1571,11 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
 
         owner_subscription_model = user_models.UserSubscriptionsModel.get(
             self.owner_id)
-        self.assertEqual(len(owner_subscription_model.activity_ids), 0)
+        self.assertEqual(len(owner_subscription_model.exploration_ids), 0)
 
         user_subscription_model = user_models.UserSubscriptionsModel.get(
             self.user_id)
-        self.assertEqual(len(user_subscription_model.activity_ids), 0)
+        self.assertEqual(len(user_subscription_model.exploration_ids), 0)
         actual_output = job.get_output(job_id)
         expected_output = [
             u'[u\'Successfully cleaned up UserSubscriptionsModel %s and '
