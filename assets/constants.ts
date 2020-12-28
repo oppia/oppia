@@ -4770,9 +4770,6 @@ export default {
     "code": "da",
     "description": "dansk (Danish)"
   }, {
-    "code": "prs",
-    "description": "دری (Dari)"
-  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)"
   }, {
@@ -4964,6 +4961,10 @@ export default {
     "description": "Danish",
     "relatedLanguages": ["da"]
   }, {
+    "id": "prs",
+    "description": "Dari",
+    "relatedLanguages": ["prs"]
+  }, {
     "id": "nl",
     "description": "Dutch",
     "relatedLanguages": ["nl"]
@@ -5083,6 +5084,10 @@ export default {
     "id": "sv",
     "description": "Swedish",
     "relatedLanguages": ["sw"]
+  }, {
+    "id": "te",
+    "description": "Telugu",
+    "relatedLanguages": ["te"]
   }, {
     "id": "th",
     "description": "Thai",
