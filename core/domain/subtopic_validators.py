@@ -19,26 +19,15 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-import itertools
-
-
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import rights_domain
-from core.domain import rights_manager
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import user_services
 from core.platform import models
 from core.domain import base_model_validators
-import feconf
+
 import python_utils
-import utils
 
 (
-    base_models,exp_models,subtopic_models,user_models
+    base_models, exp_models, subtopic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model,models.NAMES.subtopic, models.NAMES.user
 ])
@@ -74,9 +63,7 @@ class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
                 'snapshot_content_ids',
                 subtopic_models.SubtopicPageSnapshotContentModel,
                 snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'topic_ids', topic_models.TopicModel, [item.topic_id])]
-
+            
     @classmethod
     def _get_custom_validation_functions(cls):
         return []
