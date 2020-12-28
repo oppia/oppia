@@ -64,6 +64,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
+    exp_jobs_one_off.RemoveDeprecatedExplorationModelFieldsOneOffJob,
     exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     exp_jobs_one_off.XmlnsAttributeInExplorationMathSvgImagesAuditJob,
     exp_jobs_one_off.RegenerateMissingExpCommitLogModels,
