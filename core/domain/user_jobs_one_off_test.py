@@ -1702,10 +1702,18 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         user_settings_model.last_updated += datetime.timedelta(hours=10)
         user_settings_model.last_started_state_editor_tutorial = (
             original_created_on_timestamp + datetime.timedelta(hours=11))
-        user_settings_model.last_created_an_exploration = (
-            original_created_on_timestamp + datetime.timedelta(hours=12))
+        user_settings_model.last_started_state_translation_tutorial = (
+            original_created_on_timestamp + datetime.timedelta(hours=13))
         user_settings_model.last_logged_in = (
             original_created_on_timestamp + datetime.timedelta(hours=1))
+        user_settings_model.last_edited_an_exploration = (
+            original_created_on_timestamp + datetime.timedelta(hours=13))
+        user_settings_model.last_created_an_exploration = (
+            original_created_on_timestamp + datetime.timedelta(hours=12))
+        user_settings_model.first_contribution_msec = (
+            utils.get_time_in_millisecs(
+                original_created_on_timestamp + datetime.timedelta(hours=11))
+        )
         user_settings_model.put()
 
         # We had set the lowest timestamp for last_logged_in.

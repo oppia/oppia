@@ -516,11 +516,18 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'UserSettingsModel_last_created_an_exploration',
                 user_settings_model.last_created_an_exploration
             ),
-            (
-                'UserSettingsModel_first_contribution_msec',
-                user_settings_model.first_contribution_msec
-            ),
         ]
+
+        if user_settings_model.first_contribution_msec is not None:
+            user_dates_list.append(
+                (
+                    'UserSettingsModel_first_contribution_msec',
+                    datetime.datetime.fromtimestamp(
+                        python_utils.divide(
+                            user_settings_model.first_contribution_msec, 1000.0)
+                    )
+                )
+            )
 
         # Models in user storage module having user_id as an attribute.
         collection_progress_model = (
