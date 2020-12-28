@@ -80,7 +80,7 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
