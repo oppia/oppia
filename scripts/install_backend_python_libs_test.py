@@ -626,7 +626,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_uniqueness_of_normalized_lib_names_in_requirements_file(self):
         normalized_library_names = set()
         with python_utils.open_file(
-                    common_constants.REQUIREMENTS_FILE_PATH, 'r') as f:
+            common_constants.REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
