@@ -196,8 +196,9 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_external_model_fetcher_with_user_settings(self):
         with self.assertRaisesRegexp(
             Exception,
-            'Please use the UserSettingsModelFetcherDetails' +
-            ' for UserSettingsModel'):
+            'When fetching instances of UserSettingsModel, please use ' +
+            'UserSettingsModelFetcherDetails instead of ' +
+            'ExternalModelFetcherDetails'):
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [
@@ -211,7 +212,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids',
                 [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
-                system_user_ids_removed=True
+                system_user_ids_omitted=True
             ))
 
         self.assertItemsEqual(
@@ -222,7 +223,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids',
                 [feconf.MIGRATION_BOT_USER_ID, 'User-1', self.PSEUDONYMOUS_ID],
-                pseudonymous_ids_removed=True
+                pseudonymous_ids_omitted=True
             ))
 
         self.assertItemsEqual(

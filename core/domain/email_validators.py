@@ -50,7 +50,7 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
                 [item.recipient_id]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'sender_id', [item.sender_id],
-                system_user_ids_removed=True)]
+                system_user_ids_omitted=True)]
 
     @classmethod
     def _validate_sent_datetime(cls, item):

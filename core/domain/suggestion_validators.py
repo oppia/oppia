@@ -86,8 +86,8 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', [item.author_id],
-                    system_user_ids_removed=True,
-                    pseudonymous_ids_removed=True
+                    system_user_ids_omitted=True,
+                    pseudonymous_ids_omitted=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -106,8 +106,8 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                 field_name_to_external_model_references.append(
                     base_model_validators.UserSettingsModelFetcherDetails(
                         'reviewer_ids', [item.final_reviewer_id],
-                        system_user_ids_removed=True,
-                        pseudonymous_ids_removed=True
+                        system_user_ids_omitted=True,
+                        pseudonymous_ids_omitted=True
                     ))
         return field_name_to_external_model_references
 
@@ -305,7 +305,7 @@ class GeneralVoiceoverApplicationModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', [item.author_id],
-                    pseudonymous_ids_removed=True
+                    pseudonymous_ids_omitted=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -321,7 +321,7 @@ class GeneralVoiceoverApplicationModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'final_reviewer_ids', [item.final_reviewer_id],
-                    pseudonymous_ids_removed=True
+                    pseudonymous_ids_omitted=True
                 ))
         return field_name_to_external_model_references
 

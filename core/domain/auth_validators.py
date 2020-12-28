@@ -51,10 +51,8 @@ class UserIdByFirebaseAuthIdModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids',
-                user_models.UserSettingsModel,
-                [item.user_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_settings_ids', [item.user_id]),
             base_model_validators.ExternalModelFetcherDetails(
                 'user_auth_details_ids',
                 user_models.UserAuthDetailsModel,

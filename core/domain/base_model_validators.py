@@ -72,7 +72,8 @@ VALIDATION_MODE_NON_STRICT = 'non-strict'
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
     """Value object providing the class and ids to fetch an external model.
-    Note: For the UserSettingsModel use the UserSettingsModelFetcherDetails.
+    NOTE TO DEVELOPERS: For UserSettingsModel, use the
+    UserSettingsModelFetcherDetails class instead of this one.
     """
 
     def __init__(
@@ -90,49 +91,50 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
                 external models.
 
         Raises:
-            Exception. This class was used instead of using the
+            Exception. This class was used instead of
                 UserSettingsModelFetcherDetails for the UserSettingsModel.
         """
         if model_class == user_models.UserSettingsModel:
             raise Exception(
-                'Please use the UserSettingsModelFetcherDetails ' +
-                'for UserSettingsModel')
+                'When fetching instances of UserSettingsModel, please use ' +
+                'UserSettingsModelFetcherDetails instead of ' +
+                'ExternalModelFetcherDetails')
         self.field_name = field_name
         self.model_class = model_class
         self.model_ids = model_ids
 
 
 class UserSettingsModelFetcherDetails(python_utils.OBJECT):
-    """Value object providing the class and ids to fetch the
-    user settings model.
-    """
+    """Value object providing ids to fetch the user settings model."""
 
     def __init__(
             self, field_name, model_ids,
-            system_user_ids_removed=False, pseudonymous_ids_removed=False):
+            system_user_ids_omitted=False, pseudonymous_ids_omitted=False):
         """Initializes the UserSettingsModelFetcherDetails domain object.
 
         Args:
             field_name: str. A specific name used as an identifier by the
-                storage model which is used to identify the external model
-                reference. For example: 'exp_ids': ExplorationModel, exp_ids
-                is the field name to identify the external model
-                ExplorationModel.
-            model_ids: list(str). The list of external model ids to fetch the
-                external models.
-            system_user_ids_removed: bool. Whether to remove the system user IDs
-                from the model_ids.
-            pseudonymous_ids_removed: bool. Whether to remove pseudonymous user
-                IDs from the model_ids.
+                storage model which is used to identify the user settings model
+                reference. For example: 'committer_id': UserSettingsModel,
+                committer_id is the field name to identify the external model
+                UserSettingsModel.
+            model_ids: list(str). The list of user settings model ids to fetch
+                the UserSettingsModels.
+            system_user_ids_omitted: bool. Whether to omit the system user IDs
+                from the model_ids before attempting to fetch the corresponding
+                models.
+            pseudonymous_ids_omitted: bool. Whether to omit pseudonymous user
+                IDs from the model_ids before attempting to fetch the
+                corresponding models.
         """
         filtered_model_ids = model_ids
-        if system_user_ids_removed:
+        if system_user_ids_omitted:
             filtered_model_ids = list(
                 set(filtered_model_ids) - set(feconf.SYSTEM_USERS.values()))
-        if pseudonymous_ids_removed:
+        if pseudonymous_ids_omitted:
             filtered_model_ids = [
-                i for i in filtered_model_ids
-                if not utils.is_pseudonymous_id(i)
+                model_id for model_id in filtered_model_ids
+                if not utils.is_pseudonymous_id(model_id)
             ]
         self.field_name = field_name
         self.model_class = user_models.UserSettingsModel
