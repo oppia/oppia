@@ -432,6 +432,16 @@ describe('State Translation Editor Component', function() {
         writtenTranslationObjectFactory.createNew('html', ''));
     });
 
+    it('should open translation editor when it is editable and with a ' +
+       'Translatable object as data format', function() {
+      $scope.dataFormat = 'TranslatableSetOfUnicodeString';
+      $scope.openTranslationEditor();
+      expect($scope.translationEditorIsOpen).toBe(true);
+      expect($scope.activeWrittenTranslation).toEqual(
+        writtenTranslationObjectFactory.createNew(
+          'TranslatableSetOfUnicodeString', {unicodeStrSet: []}));
+    });
+
     it('should add written translation html when clicking on save' +
       ' translation button', function() {
       $scope.openTranslationEditor();

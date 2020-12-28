@@ -36,14 +36,14 @@ const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
-    '$filter', '$scope', '$uibModal', 'EditabilityService',
+    '$scope', '$uibModal', 'EditabilityService',
     'ExplorationStatesService', 'ExternalSaveService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
     'WrittenTranslationObjectFactory',
     function(
-        $filter, $scope, $uibModal, EditabilityService,
+        $scope, $uibModal, EditabilityService,
         ExplorationStatesService, ExternalSaveService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
@@ -180,12 +180,6 @@ angular.module('oppia').component('stateTranslationEditor', {
       $scope.cancelEdit = function() {
         StateWrittenTranslationsService.restoreFromMemento();
         initEditor();
-      };
-
-      $scope.getTranslatableContentPreview = () => {
-        return $filter('formatBaseTranslatableObjectValues')(
-          $scope.activeWrittenTranslation.translation,
-          $scope.dataFormat);
       };
 
       ctrl.$onInit = function() {
