@@ -126,7 +126,8 @@ def get_exploration_titles_and_categories(exp_ids):
     return result
 
 
-def get_exploration_ids_matching_query(query_string, cursor=None):
+def get_exploration_ids_matching_query(
+        query_string, categories, language_codes, cursor=None):
     """Returns a list with all exploration ids matching the given search query
     string, as well as a search cursor for future fetches.
 
@@ -137,6 +138,14 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
 
     Args:
         query_string: str. A search query string.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         cursor: str or None. Optional cursor from which to start the search
             query. If no cursor is supplied, the first N results matching
             the query are returned.
@@ -152,7 +161,8 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
             returned_exploration_ids)
 
         exp_ids, search_cursor = search_services.search_explorations(
-            query_string, remaining_to_fetch, cursor=search_cursor)
+            query_string, categories, language_codes, remaining_to_fetch,
+            cursor=search_cursor)
 
         invalid_exp_ids = []
         for ind, model in enumerate(
