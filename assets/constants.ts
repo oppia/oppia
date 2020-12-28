@@ -4960,187 +4960,233 @@ export default {
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
     "description": "English",
-    "relatedLanguages": ["en"]
+    "relatedLanguages": ["en"],
+    "direction": "ltr"
   }, {
     "id": "ak",
     "description": "Akan",
-    "relatedLanguages": ["ak"]
+    "relatedLanguages": ["ak"],
+    "direction": "ltr"
   }, {
     "id": "sq",
     "description": "Albanian",
-    "relatedLanguages": ["sq"]
+    "relatedLanguages": ["sq"],
+    "direction": "ltr"
   }, {
     "id": "ar",
     "description": "Arabic",
-    "relatedLanguages": ["ar"]
+    "relatedLanguages": ["ar"],
+    "direction": "rtl"
   }, {
     "id": "bg",
     "description": "Bulgarian",
-    "relatedLanguages": ["bg"]
+    "relatedLanguages": ["bg"],
+    "direction": "ltr"
   }, {
     "id": "bn",
     "description": "Bangla",
-    "relatedLanguages": ["bn"]
+    "relatedLanguages": ["bn"],
+    "direction": "ltr"
   }, {
     "id": "ms",
     "description": "Bahasa Melayu",
-    "relatedLanguages": ["ms"]
+    "relatedLanguages": ["ms"],
+    "direction": "ltr"
   }, {
     "id": "ca",
     "description": "Catalan",
-    "relatedLanguages": ["ca"]
+    "relatedLanguages": ["ca"],
+    "direction": "ltr"
   }, {
     "id": "zh",
     "description": "Chinese",
-    "relatedLanguages": ["zh"]
+    "relatedLanguages": ["zh"],
+    "direction": "ltr"
   }, {
     "id": "hr",
     "description": "Croatian",
-    "relatedLanguages": ["hr"]
+    "relatedLanguages": ["hr"],
+    "direction": "ltr"
   }, {
     "id": "cs",
     "description": "Czech",
-    "relatedLanguages": ["cs"]
+    "relatedLanguages": ["cs"],
+    "direction": "ltr"
   }, {
     "id": "da",
     "description": "Danish",
-    "relatedLanguages": ["da"]
+    "relatedLanguages": ["da"],
+    "direction": "ltr"
   }, {
     "id": "nl",
     "description": "Dutch",
-    "relatedLanguages": ["nl"]
+    "relatedLanguages": ["nl"],
+    "direction": "ltr"
   }, {
     "id": "ee",
     "description": "Ewe",
-    "relatedLanguages": ["ee"]
+    "relatedLanguages": ["ee"],
+    "direction": "ltr"
   }, {
     "id": "tl",
     "description": "Filipino",
-    "relatedLanguages": ["tl"]
+    "relatedLanguages": ["tl"],
+    "direction": "ltr"
   }, {
     "id": "fi",
     "description": "Finnish",
-    "relatedLanguages": ["fi"]
+    "relatedLanguages": ["fi"],
+    "direction": "ltr"
   }, {
     "id": "fr",
     "description": "French",
-    "relatedLanguages": ["fr"]
+    "relatedLanguages": ["fr"],
+    "direction": "ltr"
   }, {
     "id": "de",
     "description": "German",
-    "relatedLanguages": ["de"]
+    "relatedLanguages": ["de"],
+    "direction": "ltr"
   }, {
     "id": "el",
     "description": "Greek",
-    "relatedLanguages": ["el"]
+    "relatedLanguages": ["el"],
+    "direction": "ltr"
   }, {
     "id": "gaa",
     "description": "Ga",
-    "relatedLanguages": ["gaa"]
+    "relatedLanguages": ["gaa"],
+    "direction": "ltr"
   }, {
     "id": "he",
     "description": "Hebrew",
-    "relatedLanguages": ["he"]
+    "relatedLanguages": ["he"],
+    "direction": "rtl"
   }, {
     "id": "hi",
     "description": "Hindi",
-    "relatedLanguages": ["hi"]
+    "relatedLanguages": ["hi"],
+    "direction": "ltr"
   }, {
     "id": "hi-en",
     "description": "Hinglish",
-    "relatedLanguages": ["hi", "en"]
+    "relatedLanguages": ["hi", "en"],
+    "direction": "ltr"
   }, {
     "id": "hu",
     "description": "Hungarian",
-    "relatedLanguages": ["hu"]
+    "relatedLanguages": ["hu"],
+    "direction": "ltr"
   }, {
     "id": "id",
     "description": "Indonesian",
-    "relatedLanguages": ["id"]
+    "relatedLanguages": ["id"],
+    "direction": "ltr"
   }, {
     "id": "it",
     "description": "Italian",
-    "relatedLanguages": ["it"]
+    "relatedLanguages": ["it"],
+    "direction": "ltr"
   }, {
     "id": "ja",
     "description": "Japanese",
-    "relatedLanguages": ["ja"]
+    "relatedLanguages": ["ja"],
+    "direction": "ltr"
   }, {
     "id": "kab",
     "description": "Kabyle",
-    "relatedLanguages": ["kab"]
+    "relatedLanguages": ["kab"],
+    "direction": "ltr"
   }, {
     "id": "ko",
     "description": "Korean",
-    "relatedLanguages": ["ko"]
+    "relatedLanguages": ["ko"],
+    "direction": "ltr"
   }, {
     "id": "lv",
     "description": "Latvian",
-    "relatedLanguages": ["lv"]
+    "relatedLanguages": ["lv"],
+    "direction": "ltr"
   }, {
     "id": "lt",
     "description": "Lithuanian",
-    "relatedLanguages": ["lt"]
+    "relatedLanguages": ["lt"],
+    "direction": "ltr"
   }, {
     "id": "no",
     "description": "Norwegian",
-    "relatedLanguages": ["no"]
+    "relatedLanguages": ["no"],
+    "direction": "ltr"
   }, {
     "id": "fa",
     "description": "Persian",
-    "relatedLanguages": ["fa"]
+    "relatedLanguages": ["fa"],
+    "direction": "rtl"
   }, {
     "id": "pl",
     "description": "Polish",
-    "relatedLanguages": ["pl"]
+    "relatedLanguages": ["pl"],
+    "direction": "ltr"
   }, {
     "id": "pt",
     "description": "Portuguese",
-    "relatedLanguages": ["pt"]
+    "relatedLanguages": ["pt"],
+    "direction": "ltr"
   }, {
     "id": "ro",
     "description": "Romanian",
-    "relatedLanguages": ["ro"]
+    "relatedLanguages": ["ro"],
+    "direction": "ltr"
   }, {
     "id": "ru",
     "description": "Russian",
-    "relatedLanguages": ["ru"]
+    "relatedLanguages": ["ru"],
+    "direction": "ltr"
   }, {
     "id": "sr",
     "description": "Serbian",
-    "relatedLanguages": ["sr"]
+    "relatedLanguages": ["sr"],
+    "direction": "ltr"
   }, {
     "id": "sk",
     "description": "Slovak",
-    "relatedLanguages": ["sk"]
+    "relatedLanguages": ["sk"],
+    "direction": "ltr"
   }, {
     "id": "sl",
     "description": "Slovenian",
-    "relatedLanguages": ["sl"]
+    "relatedLanguages": ["sl"],
+    "direction": "ltr"
   }, {
     "id": "es",
     "description": "Spanish",
-    "relatedLanguages": ["es"]
+    "relatedLanguages": ["es"],
+    "direction": "ltr"
   }, {
     "id": "sv",
     "description": "Swedish",
-    "relatedLanguages": ["sw"]
+    "relatedLanguages": ["sw"],
+    "direction": "ltr"
   }, {
     "id": "th",
     "description": "Thai",
-    "relatedLanguages": ["th"]
+    "relatedLanguages": ["th"],
+    "direction": "ltr"
   }, {
     "id": "tr",
     "description": "Turkish",
-    "relatedLanguages": ["tr"]
+    "relatedLanguages": ["tr"],
+    "direction": "ltr"
   }, {
     "id": "uk",
     "description": "Ukrainian",
-    "relatedLanguages": ["uk"]
+    "relatedLanguages": ["uk"],
+    "direction": "ltr"
   }, {
     "id": "vi",
     "description": "Vietnamese",
-    "relatedLanguages": ["vi"]
+    "relatedLanguages": ["vi"],
+    "direction": "ltr"
   }],
 
   "AUTOGENERATED_AUDIO_LANGUAGES": [{
