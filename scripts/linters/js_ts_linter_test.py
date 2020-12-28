@@ -29,7 +29,6 @@ from core.tests import test_utils
 
 from . import js_ts_linter
 from . import pre_commit_linter
-from .. import common
 from .. import common_constants
 
 CURR_DIR = os.path.abspath(os.getcwd())

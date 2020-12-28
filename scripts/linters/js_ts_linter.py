@@ -30,7 +30,6 @@ import sys
 import python_utils
 
 from .. import build
-from .. import common
 from .. import common_constants
 from .. import concurrent_task_utils
 

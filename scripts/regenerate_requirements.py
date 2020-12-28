@@ -29,7 +29,6 @@ import os
 import re
 import sys
 
-from scripts import common
 from scripts import common_constants
 
 PIP_TOOLS_PATH = os.path.join(

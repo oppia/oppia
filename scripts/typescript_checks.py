@@ -25,7 +25,6 @@ import subprocess
 import sys
 
 import python_utils
-from . import common
 from . import common_constants
 
 _PARSER = argparse.ArgumentParser(

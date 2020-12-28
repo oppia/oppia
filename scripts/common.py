@@ -20,7 +20,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import contextlib
 import getpass
 import os
-import platform
 import re
 import shutil
 import socket
@@ -320,7 +319,7 @@ def install_npm_library(library_name, version, path):
     python_utils.PRINT(
         'Checking whether %s is installed in %s' % (library_name, path))
     if not os.path.exists(
-        os.path.join(common_constants.NODE_MODULES_PATH, library_name)):
+            os.path.join(common_constants.NODE_MODULES_PATH, library_name)):
         python_utils.PRINT('Installing %s' % library_name)
         subprocess.check_call([
             'yarn', 'add', '%s@%s' % (library_name, version)])

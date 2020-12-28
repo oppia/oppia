@@ -26,7 +26,6 @@ import python_utils
 
 from . import js_ts_linter
 from . import warranted_angular_security_bypasses
-from .. import common
 from .. import common_constants
 from .. import concurrent_task_utils
 

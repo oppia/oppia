@@ -66,7 +66,7 @@ def cleanup():
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
     common.inplace_replace_file(
-            common_constants.CONSTANTS_FILE_PATH, pattern, replace)
+        common_constants.CONSTANTS_FILE_PATH, pattern, replace)
 
     build.set_constants_to_default()
 
@@ -168,7 +168,7 @@ def enable_webpages():
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": true,'
     common.inplace_replace_file(
-            common_constants.CONSTANTS_FILE_PATH, pattern, replace)
+        common_constants.CONSTANTS_FILE_PATH, pattern, replace)
 
 
 def start_google_app_engine_server(server_mode):
