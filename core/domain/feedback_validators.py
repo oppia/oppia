@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import base_model_validators
 from core.domain import user_services
 from core.platform import models
+import feconf
 import python_utils
 
 (

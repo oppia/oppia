@@ -30,7 +30,6 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
