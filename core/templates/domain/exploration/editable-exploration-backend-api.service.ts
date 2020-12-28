@@ -78,7 +78,7 @@ export class EditableExplorationBackendApiService {
 
   private _updateExploration(
       explorationId: string,
-      explorationVersion: string,
+      explorationVersion: number,
       commitMessage: string,
       changeList: DraftChangeList[],
       successCallback: (value: ExplorationBackendDict) => void,
@@ -164,7 +164,7 @@ export class EditableExplorationBackendApiService {
    */
   updateExploration(
       explorationId: string,
-      explorationVersion: string,
+      explorationVersion: number,
       commitMessage: string,
       changeList: DraftChangeList[]): Promise<ExplorationBackendDict> {
     return new Promise((resolve, reject) => {

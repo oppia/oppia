@@ -69,7 +69,7 @@ export interface ExplorationBackendDict {
   'states': StateObjectsBackendDict;
   'tags': string[];
   'title': string;
-  'version': string;
+  'version': number;
 }
 interface ActivityRightBackendDict {
   'cloned_from': boolean;

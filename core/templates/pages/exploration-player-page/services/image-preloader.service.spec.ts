@@ -369,7 +369,7 @@ describe('Image preloader service', () => {
       viewer_names: [],
       viewable_if_private: true
     },
-    version: ''
+    version: 0
   };
   const filename1 = 'sIMChoice1_height_32_width_42.png';
   const filename2 = 'sIMChoice2_height_30_width_40.png';

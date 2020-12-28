@@ -65,7 +65,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
           '/createhandler/rights/' + ExplorationDataService.explorationId);
 
         return $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
+          version: ExplorationDataService.explorationData.data.version,
           make_community_owned: true
         }).then(function(response) {
           var data = response.data;
@@ -83,7 +83,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
           '/createhandler/rights/' + ExplorationDataService.explorationId);
 
         return $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
+          version: ExplorationDataService.explorationData.data.version,
           viewable_if_private: viewableIfPrivate
         }).then(function(response) {
           var data = response.data;
@@ -101,7 +101,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
           '/createhandler/rights/' + ExplorationDataService.explorationId);
 
         return $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
+          version: ExplorationDataService.explorationData.data.version,
           new_member_role: newMemberRole,
           new_member_username: newMemberUsername
         }).then(function(response) {
@@ -139,7 +139,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
 
         $http.put(explorationModeratorRightsUrl, {
           email_body: emailBody,
-          version: ExplorationDataService.data.version
+          version: ExplorationDataService.explorationData.data.version
         }).then(function(response) {
           var data = response.data;
           AlertsService.clearWarnings();

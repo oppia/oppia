@@ -76,7 +76,8 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
               let suggestion = activeThread.getSuggestion();
               let stateName = suggestion.stateName;
-              let stateDict = ExplorationDataService.data.states[stateName];
+              let stateDict =
+                ExplorationDataService.explorationData.data.states[stateName];
               let state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
               state.content.setHtml(
@@ -85,7 +86,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
                 state.recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
                   state.content.getContentId());
               }
-              ExplorationDataService.data.version += 1;
+              ExplorationDataService.explorationData.data.version += 1;
               ExplorationStatesService.setState(stateName, state);
               RouterService.onRefreshVersionHistory.emit({
                 forceRefresh: true

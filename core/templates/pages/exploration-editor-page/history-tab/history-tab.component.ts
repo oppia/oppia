@@ -235,7 +235,8 @@ angular.module('oppia').component('historyTab', {
           controller: 'RevertExplorationModalController'
         }).result.then(function(version) {
           $http.post(ctrl.revertExplorationUrl, {
-            current_version: ExplorationDataService.data.version,
+            current_version:
+              ExplorationDataService.explorationData.data.version,
             revert_to_version: version
           }).then(function() {
             WindowRef.nativeWindow.location.reload();

@@ -319,7 +319,7 @@ describe('Audio preloader service', () => {
       viewer_names: [],
       viewable_if_private: true
     },
-    version: ''
+    version: 0
   };
   let requestUrl1 = '/assetsdevhandler/exploration/1/assets/audio/en-1.mp3';
   let requestUrl2 = '/assetsdevhandler/exploration/1/assets/audio/en-2.mp3';

@@ -164,7 +164,7 @@ describe('Exploration object factory', () => {
         'second state': secondState},
       param_specs: {},
       param_changes: [],
-      version: '1',
+      version: 1,
       correctness_feedback_enabled: true,
       draft_change_list_id: 0,
       draft_changes: [],

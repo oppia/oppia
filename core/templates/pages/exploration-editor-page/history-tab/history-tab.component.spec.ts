@@ -132,8 +132,10 @@ describe('History tab component', function() {
       TestBed.get(WrittenTranslationsObjectFactory));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,
-      data: {
-        version: 2
+      explorationData: {
+        data: {
+          version: 2
+        }
       },
       getData: () => $q.resolve({
         version: 2,

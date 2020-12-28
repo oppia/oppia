@@ -47,8 +47,10 @@ describe('Exploration rights service', function() {
     $provide.value(
       'ExplorationDataService', {
         explorationId: '12345',
-        data: {
-          version: 1
+        explorationData: {
+          data: {
+            version: 1
+          }
         }
       });
   }));

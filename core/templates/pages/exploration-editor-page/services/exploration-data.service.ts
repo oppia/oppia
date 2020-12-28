@@ -41,7 +41,7 @@ export interface ResolveAnswerResponse{
 }
 export interface ExplorationAutosaveChangeListRequest{
     'change_list': ExplorationChangeList[];
-    'version': string;
+    'version': number;
 }
 interface ExplorationDataBackendDict{
   explorationId: string;
@@ -170,7 +170,8 @@ export class ExplorationDataService {
         return (
           this.editableExplorationBackendApiService.fetchApplyDraftExploration(
             this.explorationId).then((response: ExplorationBackendDict) => {
-            this.loggerService.info('Retrieved exploration data : ' + response);
+            this.loggerService.info(
+              'Retrieved exploration data : ' + JSON.stringify(response));
             this.draftChangeListId = response.draft_change_list_id;
             this.explorationData.data = response;
             let draft = this.localStorageService.getExplorationDraft(
@@ -250,7 +251,7 @@ export class ExplorationDataService {
     return new Promise((resolve, reject) => {
       this.editableExplorationBackendApiService.updateExploration(
         this.explorationId,
-        this.explorationData.data ? this.explorationData.data.version : null,
+        this.explorationData.data ? this.explorationData.data.version : 0,
         commitMessage, changeList).then(
         response => {
           this.alertsService.clearWarnings();
