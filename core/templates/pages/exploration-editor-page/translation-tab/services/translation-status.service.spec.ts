@@ -69,7 +69,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-written-translations.service.ts');
 
-fdescribe('Translation status service', function() {
+describe('Translation status service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
@@ -124,6 +124,10 @@ fdescribe('Translation status service', function() {
       EndExploration: {
         is_linear: true,
         is_terminal: true
+      },
+      TextInput: {
+        is_linear: false,
+        is_terminal: false
       }
     });
   }));
@@ -226,37 +230,24 @@ fdescribe('Translation status service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 0}
-              }],
-              training_data: []
-            },
-            {
-              tagged_skill_misconception_id: null,
-              outcome: {
-                refresher_exploration_id: null,
-                param_changes: [],
-                labelled_as_correct: false,
-                feedback: {
-                  html: '<p>This is feedback2</p>',
-                  content_id: 'feedback_2'
-                },
-                missing_prerequisite_skill_id: null,
-                dest: 'First'
-              },
-              rule_specs: [{
-                rule_type: 'Equals',
-                inputs: {x: 1}
+                inputs: {x: {
+                  normalizedStrSet: [],
+                  contentId: 'rule_input_4'
+                }}
               }],
               training_data: []
             }],
             solution: null,
             hints: [],
-            id: 'MultipleChoiceInput',
+            id: 'TextInput',
             customization_args: {
-              choices: {
-                value: ['<p>1</p>', '<p>2</p>']
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder',
+                  unicode_str: 'Enter here'
+                }
               },
-              showChoicesInShuffledOrder: {value: false}
+              rows: {value: 2}
             },
             default_outcome: {
               refresher_exploration_id: null,
@@ -430,15 +421,11 @@ fdescribe('Translation status service', function() {
     it('should return a correct count of audio and translations required in ' +
       'an exploration', function() {
       ttams.activateVoiceoverMode();
-      var explorationAudioRequiredCount = (
-        tss.getExplorationContentRequiredCount());
-      expect(explorationAudioRequiredCount).toBe(8);
+      expect(tss.getExplorationContentRequiredCount()).toBe(8);
 
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
-      expect(tss.getExplorationTranslationContentRequiredCount()).toBe(9);
-      expect(tss.getExploration()).toBe(9);
-
+      expect(tss.getExplorationContentRequiredCount()).toBe(9);
 
       // To test changes after adding a new state.
       ess.addState('Fourth');
@@ -448,50 +435,38 @@ fdescribe('Translation status service', function() {
 
       ttams.activateVoiceoverMode();
       tls.setActiveLanguageCode('en');
-      var explorationAudioRequiredCount = (
-        tss.getExplorationContentRequiredCount());
-      expect(explorationAudioRequiredCount).toBe(9);
+      expect(tss.getExplorationContentRequiredCount()).toBe(9);
 
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
-      var explorationTranslationsRequiredCount = (
-        tss.getExplorationContentRequiredCount());
-      expect(explorationTranslationsRequiredCount).toBe(9);
+      expect(tss.getExplorationContentRequiredCount()).toBe(10);
     });
 
     it('should return a correct count of audio not available in an exploration',
       function() {
         ttams.activateVoiceoverMode();
-        var explorationAudioNotAvailableCount = tss
-          .getExplorationContentNotAvailableCount();
-        expect(explorationAudioNotAvailableCount).toBe(6);
+        expect(tss.getExplorationContentNotAvailableCount()).toBe(6);
 
         ess.addState('Fourth');
         ess.saveInteractionId('Third', 'MultipleChoiceInput');
         ess.saveInteractionId('Fourth', 'EndExploration');
         tss.refresh();
 
-        explorationAudioNotAvailableCount = (
-          tss.getExplorationContentNotAvailableCount());
-        expect(explorationAudioNotAvailableCount).toBe(7);
+        expect(tss.getExplorationContentNotAvailableCount()).toBe(7);
       });
 
     it('should return a correct count of translations not available in an ' +
       'exploration', function() {
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
-      var explorationTranslationNotAvailableCount = (
-        tss.getExplorationContentNotAvailableCount());
-      expect(explorationTranslationNotAvailableCount).toBe(6);
+      expect(tss.getExplorationContentNotAvailableCount()).toBe(7);
 
       ess.addState('Fourth');
       ess.saveInteractionId('Third', 'MultipleChoiceInput');
       ess.saveInteractionId('Fourth', 'EndExploration');
       tss.refresh();
 
-      explorationTranslationNotAvailableCount = (
-        tss.getExplorationContentNotAvailableCount());
-      expect(explorationTranslationNotAvailableCount).toBe(7);
+      expect(tss.getExplorationContentNotAvailableCount()).toBe(8);
     });
 
     it('should correctly return an object containing status colors of audio ' +

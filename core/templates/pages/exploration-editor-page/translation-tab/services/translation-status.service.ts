@@ -315,10 +315,10 @@ angular.module('oppia').factory('TranslationStatusService', [
         return stateNeedsUpdateWarnings;
       },
       getExplorationContentRequiredCount: function() {
-        return _getExplorationContentRequiredCount;
+        return _getExplorationContentRequiredCount();
       },
       getExplorationContentNotAvailableCount: function() {
-        return _getExplorationContentNotAvailableCount;
+        return _getExplorationContentNotAvailableCount();
       },
       getAllStateStatusColors: function() {
         return stateWiseStatusColor;
