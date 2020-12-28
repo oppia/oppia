@@ -157,7 +157,7 @@ export class LanguageUtilService {
     };
     this.SUPPORTED_CONTENT_LANGUAGES.forEach(languageSearchCallback);
     // Also search through supported audio languages since this constant is used
-    // for supported translation languages
+    // for supported translation languages.
     this.SUPPORTED_AUDIO_LANGUAGES.forEach(
       (audioLang: SupportedAudioLanguageBackendDict) => {
         languageSearchCallback({
