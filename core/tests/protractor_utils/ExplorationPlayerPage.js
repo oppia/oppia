@@ -22,6 +22,7 @@ var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var action = require('./action.js');
+const { browser } = require('protractor');
 
 var ExplorationPlayerPage = function() {
   var conversationInput = element(
@@ -217,9 +218,11 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickOnCloseSuggestionModalButton = async function() {
+    await browser.waitForAngularEnabled(false);
     await action.click(
       'Close Suggestion Modal Button', closeSuggestionModalButton);
     await waitFor.pageToFullyLoad();
+    await browser.waitForAngularEnabled(true);
   };
 
   // This verifies the question just asked, including formatting and
@@ -228,6 +231,7 @@ var ExplorationPlayerPage = function() {
   //   handler.readItalicText('slanted');
   // can then be sent.
   this.expectContentToMatch = async function(richTextInstructions) {
+    await browser.waitForAngularEnabled(false);
     await waitFor.visibilityOf(
       await conversationContent.first(), 'Conversation not visible');
     await waitFor.visibilityOf(
@@ -235,6 +239,7 @@ var ExplorationPlayerPage = function() {
     await forms.expectRichText(
       await conversationContent.last()
     ).toMatch(richTextInstructions);
+    await browser.waitForAngularEnabled(true);
   };
 
   this.expectExplorationToBeOver = async function() {
@@ -316,14 +321,17 @@ var ExplorationPlayerPage = function() {
   };
 
   this.submitFeedback = async function(feedback) {
+    await browser.waitForAngularEnabled(false);
     await action.click('Feedback Popup Link', feedbackPopupLink);
     await action.sendKeys('Feedback Text Area', feedbackTextArea, feedback);
     await action.click('Feedback Submit Button', feedbackSubmitButton);
     await waitFor.invisibilityOf(
       feedbackSubmitButton, 'Feedback popup takes too long to disappear');
+    await browser.waitForAngularEnabled(true);
   };
 
   this.submitSuggestion = async function(suggestion, description) {
+    await browser.waitForAngularEnabled(false);
     await action.click('Suggestion Popup Link', suggestionPopupLink);
     var editor = await forms.RichTextEditor(explorationSuggestionModal);
     await editor.setPlainText(suggestion);
@@ -332,6 +340,7 @@ var ExplorationPlayerPage = function() {
     await action.click('Suggestion Submit Button', suggestionSubmitButton);
     await waitFor.invisibilityOf(
       suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
+    await browser.waitForAngularEnabled(true);
   };
 
   this.expectCorrectFeedback = async function() {

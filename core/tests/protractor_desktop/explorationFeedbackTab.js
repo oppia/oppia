@@ -29,6 +29,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+const { browser } = require('protractor');
 
 describe('ExplorationFeedback', function() {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
@@ -283,7 +284,6 @@ describe('Suggestions on Explorations', function() {
       var suggestionDescription1 = 'Uppercased the first letter';
       var suggestion2 = 'New exploration';
       var suggestionDescription2 = 'Changed';
-
       await explorationPlayerPage.submitSuggestion(
         suggestion1, suggestionDescription1);
       await explorationPlayerPage.clickOnCloseSuggestionModalButton();
