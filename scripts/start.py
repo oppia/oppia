@@ -191,7 +191,7 @@ def main(args=None):
             time.sleep(5)
             background_processes.append(
                 subprocess.Popen([
-                    'open', 'http://localhost:%s/'
+                    'xdg-open', 'http://localhost:%s/'
                     % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
         else:
             common.print_each_string_after_two_new_lines([
