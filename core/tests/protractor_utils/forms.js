@@ -24,6 +24,7 @@ var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
 var waitFor = require('./waitFor.js');
+const { browser } = require('protractor');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -178,6 +179,7 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
+  await waitFor.elementToBeClickable(elem.all(by.css('.oppia-rte')).first());
   await (await elem.all(by.css('.oppia-rte')).first()).click();
 
   var _appendContentText = async function(text) {
