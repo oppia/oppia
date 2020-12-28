@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for searching for collections
+ * @fileoverview Service for searching for explorations.
  */
 
 import { HttpClient } from '@angular/common/http';
