@@ -151,11 +151,11 @@ var StoryEditorPage = function() {
   };
 
   this.publishStory = async function() {
-    await publishStoryButton.click();
+    await action.click('Publish Story Button', publishStoryButton);
   };
 
   this.unpublishStory = async function() {
-    await unpublishStoryButton.click();
+    await action.click('Unpublish Story Button', unpublishStoryButton);
   };
 
   this.deleteChapterWithIndex = async function(index) {
@@ -164,7 +164,9 @@ var StoryEditorPage = function() {
       'Chapter list taking too long to appear.');
     await action.click('Chapter edit options', chapterEditOptions.get(index));
     await action.click('Delete chapter button', deleteChapterButton);
-    await confirmDeleteChapterButton.click();
+    await action.click(
+      'Confirm Delete Chapter Button',
+      confirmDeleteChapterButton);
   };
 
   this.createNewChapter = async function(title, explorationId, imgPath) {
@@ -273,44 +275,54 @@ var StoryEditorPage = function() {
   };
 
   this.changeStoryTitle = async function(storyTitle) {
-    await storyTitleField.clear();
-    await storyTitleField.sendKeys(storyTitle);
+    await action.clear('Story title Field', storyTitleField);
+    await action.sendKeys('Story Title Field',
+      storyTitleField, storyTitle);
   };
 
   this.returnToTopic = async function() {
     await general.scrollToTop();
-    await returnToTopicButton.click();
+    await action.click('Return To Topic Button',
+      returnToTopicButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.changeStoryDescription = async function(storyDescription) {
-    await storyDescriptionField.clear();
-    await storyDescriptionField.sendKeys(storyDescription);
+    await action.clear(
+      'Story Description Field', storyDescriptionField);
+    await action.sendKeys(
+      'Story Description Field',
+      storyDescriptionField, storyDescription);
   };
 
   this.changeStoryNotes = async function(richTextInstructions) {
-    await openStoryNotesEditorButton.click();
+    await action.click(
+      'Open Story Notes Editor Button', openStoryNotesEditorButton);
     var storyNotesEditor = await forms.RichTextEditor(
       notesEditor);
-    await storyNotesEditor.clear();
+    await action.clear('Story Notes Editor', storyNotesEditor);
     await richTextInstructions(storyNotesEditor);
-    await saveStoryNotesEditorButton.click();
+    await action.click(
+      'Save Story Notes Editor Button', saveStoryNotesEditorButton);
   };
 
   this.saveStory = async function(commitMessage) {
     await waitFor.elementToBeClickable(
       saveStoryButton,
       'Save story button takes too long to be clickable');
-    await saveStoryButton.click();
+    await action.click('Save Story Button', saveStoryButton);
     await waitFor.visibilityOf(
       commitMessageField,
       'Commit message modal takes too long to appear.');
-    await commitMessageField.sendKeys(commitMessage);
+    await action.sendKeys(
+      'Commit Message Field',
+      commitMessageField, commitMessage);
 
-    await waitFor.elementToBeClickable(
-      closeSaveModalButton,
-      'Close save modal button takes too long to be clickable');
-    await closeSaveModalButton.click();
+      await waitFor.elementToBeClickable(
+        closeSaveModalButton,
+        'Close save modal button takes too long to be clickable'); 
+    await action.click(
+      'Close Save Modal Button', closeSaveModalButton);
     await waitFor.invisibilityOf(
       closeSaveModalButton,
       'Commit message modal takes too long to disappear.');
@@ -328,12 +340,13 @@ var StoryEditorPage = function() {
       'ExplorationIdInput takes too long to be visible'
     );
 
-    await explorationIdInput.sendKeys(explorationId);
-    await waitFor.elementToBeClickable(
-      explorationIdSaveButton,
-      'ExplorationIdSaveButton takes too long to be clickable'
-    );
-    await explorationIdSaveButton.click();
+    await action.sendKeys(
+      'Exploration Id Input', explorationIdInput, explorationId);
+      await waitFor.elementToBeClickable(
+        explorationIdSaveButton,
+        'ExplorationIdSaveButton takes too long to be clickable'
+      );
+    await action.click('Exploration Id Save Button', explorationIdSaveButton);
   };
 
   this.changeNodeDescription = async function(nodeDescription) {
@@ -344,8 +357,14 @@ var StoryEditorPage = function() {
       nodeDescriptionInputField,
       'NodeDescriptionInputField takes too long to be visible'
     );
-    await nodeDescriptionInputField.clear();
-    await nodeDescriptionInputField.sendKeys(nodeDescription);
+    await action.clear(
+      'Node Description Field', nodeDescriptionInputField
+    );
+    await action.sendKeys(
+      'Node Description Input Field',
+      nodeDescriptionInputField,
+      nodeDescription
+    );
   };
 
   this.expectNodeDescription = async function(nodeDescription) {
@@ -364,10 +383,11 @@ var StoryEditorPage = function() {
   this.changeNodeOutline = async function(richTextInstructions) {
     var editor = await forms.RichTextEditor(
       nodeOutlineEditor);
-    await editor.clear();
+    await action.clear('Editor', editor);
     await richTextInstructions(editor);
     await action.click('Chapter node editor', nodeOutlineEditor);
-    await nodeOutlineSaveButton.click();
+    await action.click('Node Outline Save Button',
+      nodeOutlineSaveButton);
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };
 
@@ -376,7 +396,7 @@ var StoryEditorPage = function() {
     // by the navbar.
     await general.scrollToTop();
     var chapterTitleButton = await chapterTitles.get(index);
-    await chapterTitleButton.click();
+    await action.click('Chapter Title Button', chapterTitleButton);
   };
 
   this.expectNodeOutlineToMatch = function(nodeOutline) {
@@ -400,7 +420,11 @@ var StoryEditorPage = function() {
         await waitFor.visibilityOf(
           skillNameInputField,
           'skillNameInputField takes too long to be visible');
-        await skillNameInputField.sendKeys(name);
+        await action.sendKeys(
+          'Skill Name Input Field',
+          skillNameInputField,
+          name 
+        );
       },
 
       _selectSkillBasedOnIndex: async function(index) {
@@ -409,7 +433,9 @@ var StoryEditorPage = function() {
           selectedSkill,
           'selectedSkill takes too long to be clickable.'
         );
-        await selectedSkill.click();
+        await action.click(
+          'Selected Skill', selectedSkill
+        )
       },
 
       selectSkill: async function(name) {
@@ -418,7 +444,9 @@ var StoryEditorPage = function() {
         await waitFor.elementToBeClickable(
           skillSaveButton,
           'doneButton takes too long to be clickable');
-        await skillSaveButton.click();
+        await action.click(
+          'Skill Save Button', skillSaveButton
+        );
       },
     };
   };
@@ -430,7 +458,9 @@ var StoryEditorPage = function() {
     await waitFor.elementToBeClickable(
       addAcquiredSkillButton,
       'addAcquiredSkillButton takes too long to be clickable');
-    await addAcquiredSkillButton.click();
+    await action.click(
+      'Add Acquired Skill Button', addAcquiredSkillButton
+    );
     var selectSkillModal = await this.getSelectSkillModal();
     await selectSkillModal.selectSkill(skillName);
   };
@@ -442,17 +472,24 @@ var StoryEditorPage = function() {
     await waitFor.elementToBeClickable(
       addPrerequisiteSkillButton,
       'addPrerequisitesSkillButton takes too long to be clickable');
-    await addPrerequisiteSkillButton.click();
+    await action.click(
+      'Add Prerequisite Skill Button', addPrerequisiteSkillButton);
     var selectSkillModal = await this.getSelectSkillModal();
     await selectSkillModal.selectSkill(skillName);
   };
 
   this.deleteAcquiredSkillByIndex = async function(index) {
-    await deleteAcquiredSkillButton.get(index).click();
+    await action.click(
+      'Delete Acquired Skill Button',
+      deleteAcquiredSkillButton.get(index)
+    );
   };
 
   this.deletePrerequisiteSkillByIndex = async function(index) {
-    await deletePrerequisiteSkillButton.get(index).click();
+    await action.click(
+      'Delete PrerequisiteSkill Button',
+      deletePrerequisiteSkillButton.get(index)
+    );
   };
 
   this.updateMetaTagContent = async function(newMetaTagContent) {
