@@ -977,7 +977,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 make_processes_unresponsive=True))
 
             proc = stack.enter_context(
-                    common.managed_process(['a'], timeout_secs=10))
+                common.managed_process(['a'], timeout_secs=10))
             pid = proc.pid
 
         self.assertEqual(logs, ['Process killed (pid=%d)' % pid])
