@@ -527,8 +527,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'new_value': new_content
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1,
             self.user_id, change_cmd, 'sample description')
 
         response = self.get_json(
@@ -551,8 +551,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))
         expected_suggestion_dict = {
             'suggestion_type': (
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            'target_type': feconf.ENTITY_TYPE_EXPLORATION,
             'target_id': self.EXP_ID,
             'status': suggestion_models.STATUS_IN_REVIEW,
             'author_name': self.USER_USERNAME
@@ -596,8 +596,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'new_value': new_content
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 1,
             self.owner_id_1, change, 'sample description')
 
         thread_id = suggestion_services.query_suggestions(

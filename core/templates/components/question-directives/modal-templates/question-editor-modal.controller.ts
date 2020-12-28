@@ -37,7 +37,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
   'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
-  'rubrics', 'skillNames', 'untriagedSkillSummaries',
+  'rubric', 'skillName', 'untriagedSkillSummaries',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
       ImageLocalStorageService, QuestionUndoRedoService,
@@ -45,7 +45,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData,
-      rubrics, skillNames, untriagedSkillSummaries) {
+      rubric, skillName, untriagedSkillSummaries) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
       commitMessage: ''
@@ -58,8 +58,8 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.misconceptionsBySkill = misconceptionsBySkill;
     $scope.canEditQuestion = canEditQuestion;
     $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
-    $scope.skillNames = skillNames;
-    $scope.rubrics = rubrics;
+    $scope.skillName = skillName;
+    $scope.rubric = rubric;
 
     $scope.getSkillEditorUrl = function(skillId) {
       return '/skill_editor/' + skillId;
@@ -100,7 +100,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/skill-selector/' +
             'select-skill-modal.template.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {
           skillsInSameTopicCount: () => skillsInSameTopicCount,
           sortedSkillSummaries: () => sortedSkillSummaries,
@@ -154,7 +154,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
                    '/components/question-directives' +
                    '/modal-templates/' +
                    'question-editor-save-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function(commitMessage) {
           returnModalObject.commitMessage = commitMessage;
