@@ -21,7 +21,7 @@ var action = require('./action.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var SkillEditorPage = function() {
+var SkillEditorPage = function () {
   var EDITOR_URL_PREFIX = '/skill_editor/';
   var confirmSkillDifficultyButton = element(
     by.css('.protractor-test-confirm-skill-difficulty-button'));
@@ -35,7 +35,7 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-add-worked-example'));
   var saveWorkedExampleButton = element(
     by.css('.protractor-test-save-worked-example-button'));
-  var workedExampleSummary = function(index) {
+  var workedExampleSummary = function (index) {
     return element(by.css('.protractor-test-worked-example-' + index));
   };
   var workedExampleQuestion = element(
@@ -48,7 +48,7 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-worked-example-question-field'));
   var workedExampleExplanationField = element(
     by.css('.protractor-test-worked-example-explanation-field'));
-  var deleteWorkedExampleButton = function(index) {
+  var deleteWorkedExampleButton = function (index) {
     return element(
       by.css('.protractor-test-worked-example-' + index))
       .element(by.css('.oppia-delete-example-button'));
@@ -71,7 +71,7 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-misconception-list-item'));
   var misconceptionListContainer = element(
     by.css('.protractor-test-misconception-list-container'));
-  var deleteMisconceptionButton = function(index) {
+  var deleteMisconceptionButton = function (index) {
     return element(
       by.css('.protractor-test-misconception-' + index))
       .element(by.css('.oppia-delete-example-button'));
@@ -107,12 +107,12 @@ var SkillEditorPage = function() {
   var selectRubricDifficulty = element(
     by.css('.protractor-test-select-rubric-difficulty'));
 
-  this.get = async function(skillId) {
+  this.get = async function (skillId) {
     await browser.get(EDITOR_URL_PREFIX + skillId);
     await waitFor.pageToFullyLoad();
   };
 
-  this.selectDifficultyForRubric = async function(difficulty) {
+  this.selectDifficultyForRubric = async function (difficulty) {
     await waitFor.visibilityOf(
       selectRubricDifficulty, 'Select Rubric takes too long to appear.');
     await action.click(
@@ -121,8 +121,8 @@ var SkillEditorPage = function() {
         by.cssContainingText('option', difficulty)));
   };
 
-  this.addRubricExplanationForDifficulty = async function(
-      difficulty, explanation) {
+  this.addRubricExplanationForDifficulty = async function (
+    difficulty, explanation) {
     await this.selectDifficultyForRubric(difficulty);
     var addRubricExplanationButton = element(
       by.css('.protractor-test-add-explanation-button-' + difficulty));
@@ -144,8 +144,8 @@ var SkillEditorPage = function() {
       'Save Rubric Explanation editor takes too long to close.');
   };
 
-  this.deleteRubricExplanationWithIndex = async function(
-      difficulty, explIndex) {
+  this.deleteRubricExplanationWithIndex = async function (
+    difficulty, explIndex) {
     // The edit explanation buttons for all explanations of a difficulty have
     // the same class name and each explanation in it are identified by its
     // index.
@@ -163,8 +163,8 @@ var SkillEditorPage = function() {
     await deleteRubricExplanationButton.click();
   };
 
-  this.editRubricExplanationWithIndex = async function(
-      difficulty, explIndex, explanation) {
+  this.editRubricExplanationWithIndex = async function (
+    difficulty, explIndex, explanation) {
     // The edit explanation buttons for all explanations of a difficulty have
     // the same class name and each explanation in it are identified by its
     // index.
@@ -186,8 +186,8 @@ var SkillEditorPage = function() {
     await saveRubricExplanationButton.click();
   };
 
-  this.expectRubricExplanationsToMatch = async function(
-      difficulty, explanations) {
+  this.expectRubricExplanationsToMatch = async function (
+    difficulty, explanations) {
     await this.selectDifficultyForRubric(difficulty);
     var rubricExplanationsForDifficulty = element.all(
       by.css('.protractor-test-rubric-explanation-' + difficulty));
@@ -198,45 +198,45 @@ var SkillEditorPage = function() {
     }
   };
 
-  this.expectNumberOfQuestionsToBe = async function(count) {
+  this.expectNumberOfQuestionsToBe = async function (count) {
     await waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
     expect(await questionItems.count()).toEqual(count);
   };
 
-  this.saveQuestion = async function() {
+  this.saveQuestion = async function () {
     await general.scrollToTop();
     await action.click('Save Question Button', saveQuestionButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.moveToQuestionsTab = async function() {
+  this.moveToQuestionsTab = async function () {
     await action.click('Questions tab button', questionsTab);
   };
 
-  this.clickCreateQuestionButton = async function() {
+  this.clickCreateQuestionButton = async function () {
     await action.click('Create Question Button', createQuestionButton);
     await action.click('Easy difficulty for skill', easyRubricDifficulty);
   };
 
-  this.confirmSkillDifficulty = async function() {
+  this.confirmSkillDifficulty = async function () {
     await action.click(
       'Confirm skill difficulty button', confirmSkillDifficultyButton);
   };
 
-  this.changeSkillDescription = async function(description) {
+  this.changeSkillDescription = async function (description) {
     await action.clear('Skill description', skillDescriptionField);
     await action.sendKeys(
       'Skill description', skillDescriptionField, description);
   };
 
-  this.expectSkillDescriptionToBe = async function(description) {
+  this.expectSkillDescriptionToBe = async function (description) {
     await waitFor.visibilityOf(skillDescriptionField, 'Skill description');
     var description = await skillDescriptionField.getAttribute('value');
     expect(description).toEqual(description);
   };
 
-  this.saveOrPublishSkill = async function(commitMessage) {
+  this.saveOrPublishSkill = async function (commitMessage) {
     await action.click(
       'Save or Publish Skill button', saveOrPublishSkillButton);
     await action.sendKeys('Commit message', commitMessageField, commitMessage);
@@ -249,7 +249,7 @@ var SkillEditorPage = function() {
     expect(await saveOrPublishSkillButton.isEnabled()).toEqual(false);
   };
 
-  this.editConceptCard = async function(explanation) {
+  this.editConceptCard = async function (explanation) {
     await action.click(
       'Edit concept card explanation', editConceptCardExplanationButton);
 
@@ -267,12 +267,12 @@ var SkillEditorPage = function() {
       editor, 'Explanation Editor takes too long to close');
   };
 
-  this.expectConceptCardExplanationToMatch = async function(explanation) {
+  this.expectConceptCardExplanationToMatch = async function (explanation) {
     var text = await conceptCardExplanationText.getText();
     expect(text).toMatch(explanation);
   };
 
-  this.addWorkedExample = async function(question, explanation) {
+  this.addWorkedExample = async function (question, explanation) {
     await action.click('Add worked example', addWorkedExampleButton);
 
     var addWorkedExampleModal = (
@@ -294,7 +294,7 @@ var SkillEditorPage = function() {
       'Add Worked Example Modal takes too long to close');
   };
 
-  this.deleteWorkedExampleWithIndex = async function(index) {
+  this.deleteWorkedExampleWithIndex = async function (index) {
     await action.click(
       'Delete Worked Example button', deleteWorkedExampleButton(index));
 
@@ -312,8 +312,8 @@ var SkillEditorPage = function() {
       'Delete Worked Example Modal takes too long to close');
   };
 
-  this.expectWorkedExampleSummariesToMatch = async function(
-      questions, explanations) {
+  this.expectWorkedExampleSummariesToMatch = async function (
+    questions, explanations) {
     // This is declared separately since the expect() statements are in an async
     // callback and so 'index' gets incremented before the check is done. So, we
     // need another variable to track the correct index to check.
@@ -339,7 +339,7 @@ var SkillEditorPage = function() {
     }
   };
 
-  this.addMisconception = async function(name, notes, feedback) {
+  this.addMisconception = async function (name, notes, feedback) {
     await action.click('Add misconception', addMisconceptionButton);
 
     var addMisconceptionModal = (
@@ -364,14 +364,14 @@ var SkillEditorPage = function() {
       'Add Misconception Modal takes too long to close');
   };
 
-  this.expectNumberOfMisconceptionsToBe = async function(number) {
+  this.expectNumberOfMisconceptionsToBe = async function (number) {
     await waitFor.visibilityOf(
       misconceptionListContainer,
       'Misconception list container takes too long to appear.');
     expect(await misconceptionListItems.count()).toBe(number);
   };
 
-  this.deleteMisconception = async function(index) {
+  this.deleteMisconception = async function (index) {
     await action.click(
       'Delete misconception button', deleteMisconceptionButton(index));
 
