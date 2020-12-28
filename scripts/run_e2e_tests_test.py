@@ -168,7 +168,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self.mock_node_bin_path = 'node'
         self.node_bin_path_swap = self.swap(
-            common, 'NODE_BIN_PATH', self.mock_node_bin_path)
+            common_constants, 'NODE_BIN_PATH', self.mock_node_bin_path)
 
         self.mock_webpack_bin_path = 'webpack'
         self.webpack_bin_path_swap = self.swap(
@@ -1391,7 +1391,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                                         '--skip-build'])
 
     def test_linux_chrome_version_command_not_found_failure(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Linux')
 
         def mock_popen(unused_commands, stdout):
             self.assertEqual(stdout, -1)
@@ -1413,7 +1413,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.get_chrome_driver_version()
 
     def test_mac_chrome_version_command_not_found_failure(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Darwin')
 
         def mock_popen(unused_commands, stdout):
             self.assertEqual(stdout, -1)

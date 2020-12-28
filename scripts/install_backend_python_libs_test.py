@@ -111,7 +111,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_multiple_discrepancies_returns_correct_mismatches(self):
         swap_requirements = self.swap(
-            common, 'COMPILED_REQUIREMENTS_FILE_PATH',
+            common_constants, 'COMPILED_REQUIREMENTS_FILE_PATH',
             self.TEST_REQUIREMENTS_TXT_FILE_PATH)
 
         def mock_find_distributions(paths): # pylint: disable=unused-argument
@@ -573,7 +573,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertTrue('Error installing package' in context.exception)
 
     def test_pip_install_with_import_error_and_darwin_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Darwin')
 
         import pip
         try:
@@ -590,7 +590,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'OS%29' in self.print_arr)
 
     def test_pip_install_with_import_error_and_linux_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Linux')
 
         import pip
         try:
@@ -607,7 +607,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             '%29' in self.print_arr)
 
     def test_pip_install_with_import_error_and_windows_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Windows')
         import pip
         try:
             sys.modules['pip'] = None

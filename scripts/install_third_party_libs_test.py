@@ -104,19 +104,19 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(mock_rename.called)
 
     def test_get_yarn_command_on_windows(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Windows')
         with os_name_swap:
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn.cmd')
 
     def test_get_yarn_command_on_linux(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Linux')
         with os_name_swap:
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn')
 
     def test_get_yarn_command_on_mac(self):
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Darwin')
         with os_name_swap:
             command = install_third_party_libs.get_yarn_command()
             self.assertEqual(command, 'yarn')
@@ -156,7 +156,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             python_utils, 'url_retrieve', mock_url_retrieve)
         recursive_chmod_swap = self.swap(
             common, 'recursive_chmod', mock_recursive_chmod)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Linux')
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
         remove_swap = self.swap(os, 'remove', mock_remove)
@@ -205,7 +205,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             python_utils, 'url_retrieve', mock_url_retrieve)
         recursive_chmod_swap = self.swap(
             common, 'recursive_chmod', mock_recursive_chmod)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Darwin')
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
         remove_swap = self.swap(os, 'remove', mock_remove)
@@ -272,7 +272,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         url_retrieve_swap = self.swap(
             python_utils, 'url_retrieve', mock_url_retrieve)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Linux')
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)
 
@@ -504,7 +504,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         tweak_yarn_executable_swap = self.swap(
             install_third_party_libs, 'tweak_yarn_executable',
             mock_tweak_yarn_executable)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        os_name_swap = self.swap(common_constants, 'OS_NAME', 'Windows')
 
         py_actual_text = (
             'ConverterMapping,\nLine ending with '
