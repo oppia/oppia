@@ -54,6 +54,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   entryComponents: [
     OppiaAngularRootComponent,
     CollectionFooterComponent,
+    CollectionLocalNavComponent,
     CollectionNodeListComponent,
     CollectionNavbarComponent
   ],
