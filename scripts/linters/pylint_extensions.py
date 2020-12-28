@@ -1348,7 +1348,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
             args=(', '.join(sorted(missing_excs)),),
             node=node)
 
-
 class ImportOnlyModulesChecker(checkers.BaseChecker):
     """Checker for import-from statements. It checks that
     modules are only imported.
