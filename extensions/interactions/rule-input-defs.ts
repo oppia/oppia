@@ -265,6 +265,3 @@ export type InteractionRuleInputs = (
   RatioInputRuleInputs|
   SetInputRuleInputs |
   TextInputRuleInputs);
-
-  type X = TextInputRuleInputs[keyof TextInputRuleInputs];
-  let x: X;

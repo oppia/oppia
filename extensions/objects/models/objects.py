@@ -159,6 +159,7 @@ class BaseTranslatableObject(BaseObject):
             cls._normalize_value(raw),
             {'type': 'dict', 'properties': cls._get_value_schema()})
 
+
 class Boolean(BaseObject):
     """Class for booleans."""
 
