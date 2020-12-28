@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
-fdescribe('Language util service', function() {
+describe('Language util service', function() {
   var lus: LanguageUtilService = null;
   const mockSupportedContentLanguages = [{
     code: 'en',
@@ -86,6 +86,7 @@ fdescribe('Language util service', function() {
     }
   );
 
+  // eslint-disable-next-line max-len
   it('should get "auto" language direction when given an invalid content language code',
     () => {
       expect(lus.getLanguageDirection('invalid code')).toEqual('auto');
