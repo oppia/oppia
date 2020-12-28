@@ -1,14 +1,24 @@
 <div class="teach-page">
   <div class="oppia-teach-section-one" dir="auto">
     <div class="oppia-teach-section-one-left">
-      <h1 class="oppia-teach-h1" translate="I18N_TEACH_PAGE_HEADING"></h1>
+      <h1 ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-h1" translate="I18N_TEACH_PAGE_HEADING"></h1>
+      <h1 ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-h1 mobile-heading" translate="I18N_TEACH_PAGE_HEADING"></h1>
       <div class="oppia-teach-h2-container">
-        <h2 class="oppia-teach-h2 oppia-teach-h2-text" translate="I18N_TEACH_PAGE_CONTENT"></h2>
+        <h2 ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-h2 oppia-teach-h2-text" translate="I18N_TEACH_PAGE_CONTENT"></h2>
       </div>
-      <div class="oppia-teach-button-container">
+      <h2 ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-h2 oppia-teach-h2-text mobile-h2" translate="I18N_TEACH_PAGE_CONTENT"></h2>
+      <div ng-if="!$ctrl.isWindowNarrow()"class="oppia-teach-button-container">
         <form action="<[$ctrl.classroomUrl]>">
           <button type="submit" ng-click="$ctrl.onClickStartLearningButton()"
-                  class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                  class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                  translate="I18N_TEACH_PAGE_ACTION_START_LEARNING">
+          </button>
+        </form>
+      </div>
+      <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-button-container mobile-button">
+        <form action="<[$ctrl.classroomUrl]>">
+          <button type="submit" ng-click="$ctrl.onClickStartLearningButton()"
+                  class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_ACTION_START_LEARNING">
           </button>
         </form>
@@ -19,6 +29,11 @@
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.webp')]>">
         <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>" alt="">
+      </picture>
+      <picture ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-main-image image-mobile">
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.webp')]>">
+          <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>">
+          <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>" alt="">
       </picture>
     </div>
   </div>
@@ -73,7 +88,8 @@
 
   <div class="oppia-teach-section-four">
     <div class="oppia-teach-section-four-left">
-      <h2 translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
+      <h2 ng-if="!$ctrl.isWindowNarrow()" translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
+      <h2 ng-if="$ctrl.isWindowNarrow()" class="mobile-h2" translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
       <p translate="I18N_TEACH_PAGE_LIBRARY_CONTENT"></p>
       <div class="oppia-teach-button-container">
         <form action="/community-library">
@@ -155,9 +171,36 @@
 </div>
 
 <style>
+  .teach-page .image-mobile {
+    display: none;
+  }
+  .teach-page .image-mobile {
+    display: inherit;
+  }
+
+  .teach-page .mobile-button {
+    margin-top: 5vh;
+  }
+
+  .teach-page .oppia-teach-h1.mobile-heading {
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+  }
+
+  .teach-page .oppia-teach-h2-text.mobile-h2 {
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+  }
+  
+  .teach-page .oppia-teach-section-four-left .mobile-h2 {
+  width:fit-content
+  }
+
   .teach-page .oppia-teach-button-container-button-one {
     margin-bottom: 5vh;
-    margin-left: 20vw;
+    margin-left: auto;
     margin-right: auto;
     margin-top: 6vh;
     max-width: 800px;
@@ -186,11 +229,12 @@
     display: block;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     margin-left: 0;
+    margin-bottom: 0;
   }
 
   .teach-page .oppia-teach-h1 {
     font-size: 2.5em;
-    line-height: 56px;
+    line-height: 1.3em;
     margin-left: 10vw;
     max-width: 500px;
     width: 37.5vw;
@@ -226,6 +270,18 @@
     text-transform: uppercase;
   }
 
+  .teach-page .oppia-teach-button-one {
+    background-color: #015c53;
+    border-radius: 0;
+    color: #ffffff;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 16px;
+    margin-top: -20px;
+    margin-bottom: 1vw;
+    min-width: 250px;
+    padding: 10px;
+    text-transform: uppercase;
+  }
   .teach-page .oppia-teach-bottom-button {
     background-color: #015c53;
     border-radius: 0;
@@ -513,7 +569,7 @@
 
   .teach-page .oppia-teach-main-image img,
   .teach-page .oppia-teach-main-image source {
-    max-width: 800px;
+    max-width: 600px;
     width: 100%;
   }
 
@@ -528,10 +584,10 @@
   .teach-page .oppia-teach-h2-text {
     color: #4c4c4c;
     font-family: "Roboto", Arial, sans-serif;
-    font-size: 1.5em;
+    font-size: 1.3em;
     font-weight: 400;
-    max-width: 700px;
-    padding-bottom: 30px;
+    max-width: 400px;
+    padding-bottom: 2vw;
     padding-top: 0;
   }
 
@@ -590,9 +646,11 @@
     }
 
     .teach-page .oppia-teach-section-one-left {
+      height: fit-content;
       margin-left: auto;
       margin-right: auto;
       margin-top: 7.5vh;
+      padding-bottom: 3vh;
       text-align: center;
       width: 75vw;
     }
