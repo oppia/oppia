@@ -436,9 +436,9 @@ fdescribe('Translation status service', function() {
 
       ttams.activateTranslationMode();
       tls.setActiveLanguageCode('hi');
-      var explorationTranslationsRequiredCount = (
-        tss.getExplorationContentRequiredCount());
-      expect(explorationTranslationsRequiredCount).toBe(9);
+      expect(tss.getExplorationTranslationContentRequiredCount()).toBe(9);
+      expect(tss.getExploration()).toBe(9);
+
 
       // To test changes after adding a new state.
       ess.addState('Fourth');
