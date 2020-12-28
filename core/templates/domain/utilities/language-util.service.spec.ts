@@ -45,15 +45,18 @@ describe('Language util service', function() {
   const mockSupportedAudioLanguages = [{
     id: 'en',
     description: 'English',
-    relatedLanguages: ['en']
+    relatedLanguages: ['en'],
+    direction: 'ltr'
   }, {
     id: 'hi-en',
     description: 'Hinglish',
-    relatedLanguages: ['hi', 'en']
+    relatedLanguages: ['hi', 'en'],
+    direction: 'ltr'
   }, {
     id: 'es',
     description: 'Spanish',
-    relatedLanguages: ['es']
+    relatedLanguages: ['es'],
+    direction: 'ltr'
   }];
 
   beforeEach(() => {
@@ -83,6 +86,7 @@ describe('Language util service', function() {
       expect(lus.getLanguageDirection('en')).toEqual('ltr');
       expect(lus.getLanguageDirection('ar')).toEqual('rtl');
       expect(lus.getLanguageDirection('bg')).toEqual('ltr');
+      expect(lus.getLanguageDirection('hi-en')).toEqual('ltr');
     }
   );
 
