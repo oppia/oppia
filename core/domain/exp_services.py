@@ -797,7 +797,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):
-    """Remove explorations from all subscribers' activity_ids.
+    """Remove explorations from all subscribers' exploration_ids.
 
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
@@ -805,14 +805,12 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     if not exploration_ids:
         return
 
-    # TODO(#10727): activity_ids in UserSubscriptionsModel should be renamed
-    # to explorations_id.
     subscription_models = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
+        user_models.UserSubscriptionsModel.exploration_ids.IN(exploration_ids)
     ).fetch()
     for model in subscription_models:
-        model.activity_ids = [
-            id_ for id_ in model.activity_ids if id_ not in exploration_ids]
+        model.exploration_ids = [
+            id_ for id_ in model.exploration_ids if id_ not in exploration_ids]
     user_models.UserSubscriptionsModel.update_timestamps_multi(
         subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
