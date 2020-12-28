@@ -65,7 +65,7 @@ interface ConfigProperties {
 }
 
 interface JobOutput {
-  output: string;
+  output: string[];
 }
 
 export interface AdminPageDataBackendDict {
@@ -150,7 +150,12 @@ export class AdminBackendApiService {
 
   private _postAdminActionAsync(action:string, payload:Object): Promise<void> {
     return this.http.post<void>(
-      AdminPageConstants.ADMIN_HANDLER_URL, { action, ...payload }).toPromise();
+      AdminPageConstants.ADMIN_HANDLER_URL, { action, ...payload }).toPromise()
+      .then(response => {
+        return response;
+      }, errorResonse => {
+        return errorResonse.error.error;
+      });
   }
 
   async startNewJobAsync(jobType: string): Promise<void> {
@@ -186,7 +191,7 @@ export class AdminBackendApiService {
     return this._postAdminActionAsync(action, payload);
   }
 
-  async showJobOutputAsync(jobId: string): Promise<string> {
+  async fetchJobOutputAsync(jobId: string): Promise<string[]> {
     let adminJobOutputUrl = this.urlInterpolationService.interpolateUrl(
       AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
         jobId: jobId
@@ -194,9 +199,9 @@ export class AdminBackendApiService {
     return new Promise((resolve, reject) => {
       this.http.get<JobOutput>(
         adminJobOutputUrl).toPromise().then(response => {
-        resolve(response.output);
-      }, errorResponse =>{
-        reject(errorResponse);
+        resolve(response.output || []);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
       });
     });
   }

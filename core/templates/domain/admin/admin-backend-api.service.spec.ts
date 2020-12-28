@@ -290,19 +290,44 @@ describe('Admin backend api service', () => {
   }
   ));
 
-  it('should request to show the output of valid' +
-    'jobs when calling showJobOutputAsync', fakeAsync(() => {
-    let jobId = 'FeedbackAnalyticsMRJobManager-1608932124519-748';
-    let adminJobOutputUrl = '/adminjoboutput?job_id=FeedbackAnalytics' +
-      'MRJobManager-1608932124519-748';
-    abas.showJobOutputAsync(jobId).then(successHandler, failHandler);
+  it('should fail to stop computation given the job' +
+    'name when calling stopComputationAsync', fakeAsync(() => {
+    let computationType = 'InvalidComputaionType';
+    let payload = {
+      action: 'stop_computation',
+      computation_type: computationType
+    };
+    abas.stopComputationAsync(computationType)
+      .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(adminJobOutputUrl);
-    expect(req.request.method).toEqual('GET');
-    req.flush(200);
+    let req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+    req.flush('Internal Server Error', {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
+  it('should request to show the output of valid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let adminJobOutputUrl = '/adminjoboutput?job_id=' +
+      'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let jobOutput = {output: "[u'fully-validated UserSettingsModel', 1]"};
+    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output);
     expect(failHandler).not.toHaveBeenCalled();
   }
   ));
@@ -311,7 +336,7 @@ describe('Admin backend api service', () => {
     'jobs when calling showJobOutputAsync', fakeAsync(() => {
     let jobId = 'Invalid jobId';
     let adminJobOutputUrl = '/adminjoboutput?job_id=Invalid%20jobId';
-    abas.showJobOutputAsync(jobId).then(successHandler, failHandler);
+    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(adminJobOutputUrl);
     expect(req.request.method).toEqual('GET');

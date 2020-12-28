@@ -40,17 +40,16 @@ angular.module('oppia').directive('adminJobsTab', [
       controller: [function() {
         var ctrl = this;
         ctrl.showJobOutput = function(jobId) {
-          AdminBackendApiService.showJobOutputAsync(jobId)
-            .then(function(response) {
+          AdminBackendApiService.fetchJobOutputAsync(jobId)
+            .then(function(jobOutput) {
               ctrl.showingJobOutput = true;
-              ctrl.jobOutput = response || [];
-              ctrl.jobOutput.sort();
+              ctrl.jobOutput = jobOutput.sort();
               $timeout(function() {
                 document.querySelector('#job-output').scrollIntoView();
               });
-            }, function(errorResponse) {
+            }, function(errorMessage) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
+                'Server error: ' + errorMessage);
             });
         };
 
@@ -61,9 +60,9 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Job started successfully.');
               window.location.reload();
-            }, function(errorResponse) {
+            }, function(errorMessage) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
+                'Server error: ' + errorMessage);
             });
         };
 
@@ -74,9 +73,9 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Abort signal sent to job.');
               window.location.reload();
-            }, function(errorResponse) {
+            }, function(errorMessage) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
+                'Server error: ' + errorMessage);
             });
         };
 
@@ -87,9 +86,9 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Computation started successfully.');
               window.location.reload();
-            }, function(errorResponse) {
+            }, function(errorMessage) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
+                'Server error: ' + errorMessage);
             });
         };
 
@@ -100,9 +99,9 @@ angular.module('oppia').directive('adminJobsTab', [
             .then(function() {
               ctrl.setStatusMessage('Abort signal sent to computation.');
               window.location.reload();
-            }, function(errorResponse) {
+            }, function(errorMessage) {
               ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.error.error);
+                'Server error: ' + errorMessage);
             });
         };
         ctrl.$onInit = function() {
