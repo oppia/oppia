@@ -100,13 +100,12 @@ var ExplorationEditorHistoryTab = function() {
         await waitFor.elementToBeClickable(
           closeStateHistoryButton,
           'Close State History button is not clickable');
-        expect(await closeStateHistoryButton.isDisplayed()).toBe(true);
         await action.click(
           'Close State History button', closeStateHistoryButton);
         await waitFor.invisibilityOf(
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
-      },
+      };
       deselectVersion: async function() {
         await action.click('Reset graph button', resetGraphButton);
       },
