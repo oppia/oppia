@@ -28,19 +28,16 @@ import sys
 import time
 import traceback
 
-import backports.functools_lru_cache
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
-from core.platform import models
 import feconf
 import python_utils
 import utils
 
+import backports.functools_lru_cache
 import webapp2
 
-current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -169,17 +166,18 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
         self.iframed = False
 
-        self.is_super_admin = (
-            current_user_services.is_current_user_super_admin())
+        self.is_super_admin = user_services.is_current_user_super_admin()
         if feconf.ENABLE_MAINTENANCE_MODE and not self.is_super_admin:
             return
 
-        self.gae_id = current_user_services.get_current_gae_id()
+        self.gae_id = user_services.get_current_gae_id()
         self.user_id = None
         self.username = None
         self.partially_logged_in = False
         self.user_is_scheduled_for_deletion = False
 
+        # TODO(#11462): This part should be moved to the service layer when we
+        # migrate to Firebase.
         if self.gae_id:
             user_settings = user_services.get_user_settings_by_gae_id(
                 self.gae_id, strict=False)
@@ -187,7 +185,7 @@ class BaseHandler(webapp2.RequestHandler):
                 # If the user settings are not yet created and the request leads
                 # to signup page create a new user settings. Otherwise logout
                 # the not-fully registered user.
-                email = current_user_services.get_current_user_email()
+                email = user_services.get_current_user_email()
                 if 'signup?' in self.request.uri:
                     user_settings = user_services.create_new_user(
                         self.gae_id, email)
@@ -471,8 +469,7 @@ class BaseHandler(webapp2.RequestHandler):
                         'error': (
                             'You must be logged in to access this resource.')})
             else:
-                self.redirect(
-                    current_user_services.create_login_url(self.request.uri))
+                self.redirect(user_services.create_login_url(self.request.uri))
             return
 
         logging.error(b''.join(traceback.format_exception(*sys.exc_info())))

@@ -181,7 +181,7 @@ angular.module('oppia').component('contributionsAndReview', {
 
         $uibModal.open({
           templateUrl: _templateUrl,
-          backdrop: true,
+          backdrop: 'static',
           size: 'lg',
           resolve: {
             authorName: function() {
@@ -229,7 +229,7 @@ angular.module('oppia').component('contributionsAndReview', {
 
         $uibModal.open({
           templateUrl: _templateUrl,
-          backdrop: true,
+          backdrop: 'static',
           size: 'lg',
           resolve: {
             suggestionIdToSuggestion: function() {
