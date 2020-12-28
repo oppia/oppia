@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
-
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
@@ -178,11 +176,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         self.assertEqual(response, document)
 
     def test_search_returns_ids_only(self):
-        query = {
-            'match_all': {}
-        }
         correct_index_name = 'index1'
-        json_str = json.dumps(query)
         offset = 30
         size = 50
         documents = [
@@ -202,7 +196,18 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             }
         ]
         def mock_search(body, index, params):
-            self.assertEqual(body, query)
+            self.assertEqual(body, {
+                'query': {
+                    'bool': {
+                        'filter': [],
+                        'must': [{
+                            'multi_match': {
+                                'query': ''
+                            }
+                        }]
+                    }
+                }
+            })
             self.assertEqual(index, correct_index_name)
             self.assertEqual(params['size'], size)
             self.assertEqual(params['from'], offset)
@@ -217,17 +222,13 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_search:
             result, new_offset = (
                 elastic_search_services.search(
-                    json_str, correct_index_name, offset=offset,
+                    '', correct_index_name, [], [], offset=offset,
                     size=size, ids_only=True))
         self.assertEqual(new_offset, size + offset)
         self.assertEqual(result, [1, 12])
 
     def test_search_returns_full_response(self):
-        query = {
-            'match_all': {}
-        }
         correct_index_name = 'index1'
-        json_str = json.dumps(query)
         offset = 30
         size = 50
         documents = [
@@ -247,7 +248,18 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             }
         ]
         def mock_search(body, index, params):
-            self.assertEqual(body, query)
+            self.assertEqual(body, {
+                'query': {
+                    'bool': {
+                        'filter': [],
+                        'must': [{
+                            'multi_match': {
+                                'query': ''
+                            }
+                        }]
+                    }
+                }
+            })
             self.assertEqual(index, correct_index_name)
             self.assertEqual(params['size'], size)
             self.assertEqual(params['from'], offset)
@@ -262,22 +274,29 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_search:
             result, new_offset = (
                 elastic_search_services.search(
-                    json_str, correct_index_name, offset=offset,
+                    '', correct_index_name, [], [], offset=offset,
                     size=size, ids_only=False))
         self.assertEqual(new_offset, offset + size)
         self.assertEqual(
             result, [document['_source'] for document in documents])
 
     def test_search_returns_none_when_response_is_empty(self):
-        query = {
-            'match_all': {}
-        }
         correct_index_name = 'index1'
-        json_str = json.dumps(query)
         offset = 30
         size = 50
         def mock_search(body, index, params):
-            self.assertEqual(body, query)
+            self.assertEqual(body, {
+                'query': {
+                    'bool': {
+                        'filter': [],
+                        'must': [{
+                            'multi_match': {
+                                'query': ''
+                            }
+                        }]
+                    }
+                }
+            })
             self.assertEqual(index, correct_index_name)
             self.assertEqual(params['size'], size)
             self.assertEqual(params['from'], offset)
@@ -292,7 +311,51 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_search:
             result, new_offset = (
                 elastic_search_services.search(
-                    json_str, correct_index_name, offset=offset,
+                    '', correct_index_name, [], [], offset=offset,
                     size=size, ids_only=False))
+        self.assertEqual(new_offset, None)
+        self.assertEqual(result, [])
+
+    def test_search_constructs_query_with_categories_and_languages(self):
+        correct_index_name = 'index1'
+
+        def mock_search(body, index, params):
+            self.assertEqual(body, {
+                'query': {
+                    'bool': {
+                        'filter': [{
+                            'match': {
+                                'category': '"my_category"',
+                            }
+                        }, {
+                            'match': {
+                                'language_code': '"en" "es"'
+                            }
+                        }],
+                        'must': [{
+                            'multi_match': {
+                                'query': ''
+                            }
+                        }]
+                    }
+                }
+            })
+            self.assertEqual(index, correct_index_name)
+            self.assertEqual(params, {
+                'from': 0,
+                'size': 20
+            })
+            return {
+                'hits': {
+                    'hits': []
+                }
+            }
+
+        swap_search = self.swap(
+            elastic_search_services.ES, 'search', mock_search)
+        with swap_search:
+            result, new_offset = (
+                elastic_search_services.search(
+                    '', correct_index_name, ['my_category'], ['en', 'es']))
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])

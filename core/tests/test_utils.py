@@ -28,6 +28,7 @@ import itertools
 import json
 import logging
 import os
+import types
 import unittest
 
 from constants import constants
@@ -86,6 +87,7 @@ current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
+platform_search_services = models.Registry.import_search_services()
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 # Prefix to append to all lines printed by tests to the console.
@@ -195,6 +197,212 @@ def get_storage_model_classes():
                         clazz)]
                 if 'Model' in all_base_classes:
                     yield clazz
+
+
+class ElasticSearchServicesStub(python_utils.OBJECT):
+    """The stub class that mocks the API functionality offered by the platform
+    layer, namely the platform.search elastic search services API.
+    """
+
+    _DB = {}
+
+    def add_documents_to_index(self, documents, index_name):
+        """Adds documents in a list of documents to a given index in the mock
+        database.
+
+        Args:
+            documents: list(dict). Each document should be a dictionary. Every
+                key in the document is a field name, and the corresponding
+                value will be the field's value. There MUST be a key named
+                'id', its value will be used as the document's id.
+            index_name: str. The name of the index to insert the document into.
+
+        Raises:
+            Exception. A document cannot be added to the index.
+        """
+        for document in documents:
+            assert 'id' in document
+            if index_name not in self._DB:
+                self._DB[index_name] = []
+            self._DB[index_name] = [
+                d for d in self._DB[index_name] if d['id'] != document['id']]
+            self._DB[index_name].append(document)
+
+    def delete_documents_from_index(self, doc_ids, index_name):
+        """Deletes documents from an index in the mock database.
+
+        Args:
+            doc_ids: list(str). A list of document ids of documents to be
+                deleted from the index.
+            index_name: str. The name of the index to delete the document from.
+
+        Raises:
+            Exception. Document id does not exist.
+        """
+        assert isinstance(index_name, python_utils.BASESTRING)
+        if index_name in self._DB:
+            for doc_id in doc_ids:
+                assert isinstance(doc_id, python_utils.BASESTRING)
+                docs = [d for d in self._DB[index_name] if d['id'] != doc_id]
+                if len(self._DB[index_name]) != len(docs):
+                    self._DB[index_name] = docs
+                else:
+                    raise Exception('Document id does not exist: %s' % doc_id)
+
+    def clear_index(self, index_name):
+        """Clears an index on the mock elastic search instance.
+
+        Args:
+            index_name: str. The name of the index to clear.
+        """
+        assert isinstance(index_name, python_utils.BASESTRING)
+        del self._DB[index_name][:]
+
+    def get_document_from_index(self, doc_id, index_name):
+        """Get the document with the given ID from the given index.
+
+        Args:
+            doc_id: str. The document id.
+            index_name: str. The name of the index to get the document from.
+
+        Returns:
+            dict or None. The document in a dict format or None if not found.
+        """
+        assert isinstance(index_name, python_utils.BASESTRING)
+        for document in self._DB[index_name]:
+            if document['id'] == doc_id:
+                return document
+
+    def _filter_search(self, query, result_docs):
+        """Helper method that returns filtered search results.
+
+        Args:
+            query: dict. A dictionary search definition that uses Query DSL.
+            result_docs: list(dict). A list of documents represented as dicts.
+
+        Returns:
+            list(dict). A list of documents represented as dicts.
+        """
+        filters = query['query']['bool']['filter']
+        terms = query['query']['bool']['must']
+
+        for f in filters:
+            for k, v in f['match'].items():
+                result_docs = [doc for doc in result_docs if doc[k] in v]
+
+        if terms:
+            filtered_docs = []
+            for term in terms:
+                for _, v in term.items():
+                    values = v['query'].split(' ')
+                    for doc in result_docs:
+                        strs = [val for val in doc.values() if isinstance(
+                            val, python_utils.BASESTRING)]
+                        words = []
+                        for s in strs:
+                            words += s.split(' ')
+                        if all([value in words for value in values]):
+                            filtered_docs.append(doc)
+            result_docs = filtered_docs
+        return result_docs
+
+    def reset(self):
+        """Helper method that clears the mock database."""
+
+        self._DB.clear()
+
+    def search(
+            self, query_string, index_name, categories, language_codes,
+            cursor=None, offset=0, size=feconf.SEARCH_RESULTS_PAGE_SIZE,
+            ids_only=False):
+        """Returns search results from mock db object.
+
+        Args:
+            query_string: str. The search query.
+            index_name: str. The name of the index. Use '_all' or empty
+                string to perform the operation on all indices.
+            categories: list(str). The list of categories to query for. If it
+                is empty, no category filter is applied to the results. If it
+                is not empty, then a result is considered valid if it matches
+                at least one of these categories.
+            language_codes: list(str). The list of language codes to query for.
+                If it is empty, no language code filter is applied to the
+                results. If it is not empty, then a result is considered valid
+                if it matches at least one of these language codes.
+            cursor: str|None. Not used in this implementation.
+            offset: int. The offset into the index. Pass this in to start at
+                the 'offset' when searching through a list of results of max
+                length 'size'. Leave as None to start at the beginning.
+            size: int. The maximum number of documents to return.
+            ids_only: bool. Whether to only return document ids.
+
+        Returns:
+            2-tuple of (result_docs, resulting_offset). Where:
+                result_docs: list(dict)|list(str). Represents search documents.
+                    If'ids_only' is True, this will be a list of strings
+                    corresponding to the search document ids. If 'ids_only' is
+                    False, the full dictionaries representing each document
+                    retrieved from the elastic search instance will be returned.
+                resulting_offset: int. The resulting offset to start at for the
+                    next section of the results. Returns None if there are no
+                    more results.
+        """
+
+        result_docs = []
+        result_doc_ids = set()
+        resulting_offset = None
+
+        # TODO(#11314): This block will make tests pass when the caller
+        # passes in a cursor instead of an offset.
+        # Remove once migration to ElasticSearch is complete.
+        if cursor and not offset:
+            offset = cursor
+        elif not cursor and not offset:
+            offset = 0
+
+        # The search query dict, formatted using Query DSL. See
+        # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
+        # for more details about Query DSL.
+        query = {
+            'query': {
+                'bool': {
+                    'must': [{
+                        'multi_match': {
+                            'query': query_string,
+                        }
+                    }],
+                    'filter': [],
+                }
+            }
+        }
+        if categories:
+            category_string = ' '.join(['"%s"' % cat for cat in categories])
+            query['query']['bool']['filter'].append({
+                'match': {'category': category_string}
+            })
+        if language_codes:
+            language_string = ' '.join(['"%s"' % lc for lc in language_codes])
+            query['query']['bool']['filter'].append({
+                'match': {'language_code': language_string}
+            })
+
+        for db_index_name, docs in self._DB.items():
+            if index_name == db_index_name or index_name == '_all':
+                for doc in docs:
+                    if not doc['id'] in result_doc_ids:
+                        result_docs.append(doc)
+                        result_doc_ids.add(doc['id'])
+
+        result_docs = self._filter_search(query, result_docs)
+
+        if offset + size < len(result_docs):
+            resulting_offset = offset + size
+        if ids_only:
+            result_docs = [d['id'] for d in result_docs]
+        if resulting_offset:
+            return result_docs[offset:resulting_offset], resulting_offset
+        else:
+            return result_docs[offset:], resulting_offset
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -1059,6 +1267,7 @@ tags: []
         # while minimizing the swap's scope. We accomplish this by using a
         # context manager over run().
         self._taskqueue_services_stub = TaskqueueServicesStub(self)
+        self._search_services_stub = ElasticSearchServicesStub()
 
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
@@ -1078,9 +1287,17 @@ tags: []
         memory_cache_services_stub.flush_cache()
 
         with contextlib2.ExitStack() as stack:
+            # Using types.MethodType is necessary because this is a classmethod
+            # (see the documentation for self.swap()).
+            stack.enter_context(self.swap(
+                models.Registry, 'import_search_services',
+                types.MethodType(
+                    lambda _: self._search_services_stub, models.Registry)))
+
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self._taskqueue_services_stub.create_http_task))
+
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
                 memory_cache_services_stub.flush_cache))
@@ -1133,6 +1350,7 @@ tags: []
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
         self.signup_superadmin_user()
+        self._search_services_stub.reset()
 
     def tearDown(self):
         datastore_services.delete_multi(

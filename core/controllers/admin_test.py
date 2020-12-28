@@ -1406,10 +1406,11 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
     def test_clear_search_index(self):
         exp_services.load_demo('0')
         result_explorations = search_services.search_explorations(
-            'Welcome', 2)[0]
+            'Welcome', [], [], 2)[0]
         self.assertEqual(result_explorations, ['0'])
         collection_services.load_demo('0')
-        result_collections = search_services.search_collections('Welcome', 2)[0]
+        result_collections = search_services.search_collections(
+            'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, ['0'])
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1421,9 +1422,10 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
             csrf_token=csrf_token)
         self.assertEqual(generated_exps_response, {})
         result_explorations = search_services.search_explorations(
-            'Welcome', 2)[0]
+            'Welcome', [], [], 2)[0]
         self.assertEqual(result_explorations, [])
-        result_collections = search_services.search_collections('Welcome', 2)[0]
+        result_collections = search_services.search_collections(
+            'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, [])
 
 

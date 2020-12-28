@@ -234,15 +234,21 @@ def clear_index(index_name):
 
 
 def search(
-        query_string, index_name, cursor=None, offset=None,
-        size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
+        query_string, index_name, categories, language_codes, cursor=None,
+        offset=None, size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents in an index.
 
     Args:
         query_string: str. The search query.
-            The syntax used is described here:
-            https://developers.google.com/appengine/docs/python/search/query_strings
         index_name: str. The name of the index to search.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         cursor: str. A cursor string, as returned by this function. Pass this in
             to get the next 'page' of results. Leave as None to start at the
             beginning.
@@ -270,12 +276,23 @@ def search(
         cursor=gae_cursor,
         ids_only=ids_only)
 
+    # Convert the query to a query_string accepted by GAE. The syntax used is
+    # described here:
+    #   https://developers.google.com/appengine/docs/python/search/query_strings
+    category_suffix = (
+        ' category=("' + '" OR "'.join(categories) + '")'
+        if categories else '')
+    language_code_suffix = (
+        ' language_code=("' + '" OR "'.join(language_codes) + '")'
+        if language_codes else '')
+    gae_query_string = query_string + category_suffix + language_code_suffix
+
     try:
-        query = gae_search.Query(query_string, options=options)
+        query = gae_search.Query(gae_query_string, options=options)
     except gae_search.QueryError as e:
         # This can happen for query strings like "NOT" or a string that
         # contains backslashes.
-        logging.exception('Could not parse query string %s' % query_string)
+        logging.exception('Could not parse query string %s' % gae_query_string)
         return [], None
 
     index = gae_search.Index(index_name)

@@ -33,7 +33,6 @@ from core.tests import test_utils
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
-search_services = models.Registry.import_search_services()
 
 
 # This mock should be used only in InteractionCustomizationArgsValidationJob.

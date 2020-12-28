@@ -21,8 +21,6 @@ API.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import json
-
 import feconf
 import python_utils
 
@@ -107,8 +105,8 @@ def clear_index(index_name):
 
 
 def search(
-        query_string, index_name, cursor=None, offset=0,
-        size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
+        query_string, index_name, categories, language_codes, cursor=None,
+        offset=0, size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 results from a search by
     paginating using size and offset. If the number of items to search through
@@ -118,12 +116,17 @@ def search(
     on gae_search_services.py is removed from the codebase.
 
     Args:
-        query_string: str. A JSON-encoded string representation of the
-            dictionary search definition that uses Query DSL. See
-            elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
-            for more details about Query DSL.
+        query_string: str. The terms that the user is searching for.
         index_name: str. The name of the index. Use '_all' or empty string to
             perform the operation on all indices.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         cursor: str|None. Not used in this implementation.
         offset: int. The offset into the index. Pass this in to start at the
             'offset' when searching through a list of results of max length
@@ -145,9 +148,35 @@ def search(
     """
     assert cursor is None
     assert offset + size < MAXIMUM_NUMBER_OF_RESULTS
-    query_definiton = json.loads(query_string)
+
+    # Convert the query into a Query DSL object. See
+    # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
+    # for more details about Query DSL.
+    query_definition = {
+        'query': {
+            'bool': {
+                'must': [{
+                    'multi_match': {
+                        'query': query_string,
+                    }
+                }],
+                'filter': [],
+            }
+        }
+    }
+    if categories:
+        category_string = ' '.join(['"%s"' % cat for cat in categories])
+        query_definition['query']['bool']['filter'].append(
+            {'match': {'category': category_string}}
+        )
+    if language_codes:
+        language_code_string = ' '.join(['"%s"' % lc for lc in language_codes])
+        query_definition['query']['bool']['filter'].append(
+            {'match': {'language_code': language_code_string}}
+        )
+
     response = ES.search(
-        body=query_definiton, index=index_name,
+        body=query_definition, index=index_name,
         params={
             'size': size,
             'from': offset
