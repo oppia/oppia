@@ -1516,8 +1516,8 @@ class AugmentedSkillSummary(python_utils.OBJECT):
 
     def __init__(
             self, skill_id, description, language_code, version,
-            misconception_count, worked_examples_count, topic_name,
-            classroom_name, skill_model_created_on, skill_model_last_updated):
+            misconception_count, worked_examples_count, topic_names,
+            classroom_names, skill_model_created_on, skill_model_last_updated):
         """Constructs an AugmentedSkillSummary domain object.
 
         Args:
@@ -1529,9 +1529,9 @@ class AugmentedSkillSummary(python_utils.OBJECT):
                 with the skill.
             worked_examples_count: int. The number of worked examples in the
                 skill.
-            topic_name: str. The name of the topic to which the skill
+            topic_names: list(str). The name of the topic to which the skill
                 is assigned.
-            classroom_name: str. The name of the classroom to which the
+            classroom_names: list(str). The name of the classroom to which the
                 skill is assigned.
             skill_model_created_on: datetime.datetime. Date and time when
                 the skill model is created.
@@ -1546,8 +1546,8 @@ class AugmentedSkillSummary(python_utils.OBJECT):
         self.worked_examples_count = worked_examples_count
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
-        self.topic_name = topic_name
-        self.classroom_name = classroom_name
+        self.topic_names = topic_names
+        self.classroom_names = classroom_names
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -1562,8 +1562,8 @@ class AugmentedSkillSummary(python_utils.OBJECT):
             'version': self.version,
             'misconception_count': self.misconception_count,
             'worked_examples_count': self.worked_examples_count,
-            'topic_name': self.topic_name,
-            'classroom_name': self.classroom_name,
+            'topic_names': self.topic_names,
+            'classroom_names': self.classroom_names,
             'skill_model_created_on': utils.get_time_in_millisecs(
                 self.skill_model_created_on),
             'skill_model_last_updated': utils.get_time_in_millisecs(

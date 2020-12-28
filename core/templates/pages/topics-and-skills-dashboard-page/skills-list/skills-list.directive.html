@@ -28,12 +28,12 @@
         <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>" class="list-summary">
           <div class="skill-description protractor-test-skill-description"><[skill.description]></div>
           <div class="skill-topic">
-            <span ng-if="!skill.topicName">
+            <span ng-if="!skill.topicNames.length">
               Unassigned
               <i class="fa fa-exclamation-triangle"></i>
             </span>
-            <span ng-if="skill.topicName">
-              <[skill.topicName]>
+            <span ng-if="skill.topicNames.length">
+              <[skill.topicNames.join(', ')]>
             </span>
           </div>
         </a>
