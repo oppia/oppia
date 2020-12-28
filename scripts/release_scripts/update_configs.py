@@ -35,7 +35,8 @@ from scripts import common_constants
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common_constants.PYGITHUB_VERSION)
+    _PARENT_DIR, 'oppia_tools',
+    'PyGithub-%s' % common_constants.PYGITHUB_VERSION)
 sys.path.insert(0, _PY_GITHUB_PATH)
 
 import github  # isort:skip pylint: disable=wrong-import-position
@@ -217,7 +218,8 @@ def main(
     constants_config_path = os.path.join(
         deploy_data_path, 'constants_updates.config')
 
-    release_feconf_path = os.path.join(release_dir_path, common_constants.FECONF_PATH)
+    release_feconf_path = (
+        os.path.join(release_dir_path, common_constants.FECONF_PATH))
     release_constants_path = os.path.join(
         release_dir_path, common_constants.CONSTANTS_FILE_PATH)
 

@@ -202,7 +202,8 @@ def _remove_metadata(library_name, version_string):
         # convention: <library_name>-<library-version>.
         if normalized_directory_name in possible_normalized_directory_names:
             path_to_delete = os.path.join(
-                common_constants.THIRD_PARTY_PYTHON_LIBS_DIR, normalized_directory_name)
+                common_constants.THIRD_PARTY_PYTHON_LIBS_DIR,
+                normalized_directory_name)
             shutil.rmtree(path_to_delete)
 
 
@@ -534,7 +535,8 @@ def validate_metadata_directories():
             normalize_directory_name(name)
             for name in os.listdir(common_constants.THIRD_PARTY_PYTHON_LIBS_DIR)
             if os.path.isdir(
-                os.path.join(common_constants.THIRD_PARTY_PYTHON_LIBS_DIR, name))
+                os.path.join(
+                    common_constants.THIRD_PARTY_PYTHON_LIBS_DIR, name))
         ])
     for normalized_library_name, version_string in directory_contents.items():
         # Possible names of the metadata directory installed when <library_name>

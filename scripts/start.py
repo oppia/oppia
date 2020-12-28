@@ -149,7 +149,8 @@ def main(args=None):
         background_processes.append(subprocess.Popen([
             common_constants.NODE_BIN_PATH,
             os.path.join(
-                common_constants.NODE_MODULES_PATH, 'webpack', 'bin', 'webpack.js'),
+                common_constants.NODE_MODULES_PATH, 'webpack', 'bin',
+                'webpack.js'),
             '--config', webpack_config_file, '--watch']))
 
         # Give webpack few seconds to do the initial compilation.

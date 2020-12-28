@@ -47,7 +47,8 @@ PORTSERVER_SOCKET_FILEPATH = os.path.join(
     os.getcwd(), 'portserver.socket')
 KILL_TIMEOUT_SECS = 10
 
-CONSTANT_FILE_PATH = os.path.join(common_constants.CURR_DIR, 'assets', 'constants.ts')
+CONSTANT_FILE_PATH = os.path.join(
+    common_constants.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
 WEBDRIVER_HOME_PATH = os.path.join(
     common_constants.NODE_MODULES_PATH, 'webdriver-manager')
@@ -246,7 +247,8 @@ def run_webdriver_manager(parameters):
         parameters: list(str). A list of parameters to pass to webdriver
             manager.
     """
-    web_driver_command = [common_constants.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
+    web_driver_command = [
+        common_constants.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
     web_driver_command.extend(parameters)
     p = subprocess.Popen(web_driver_command)
     p.communicate()
@@ -425,7 +427,8 @@ def start_google_app_engine_server(dev_mode_setting, log_level):
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=%s '
         '--log_level=%s --skip_sdk_update_check=true %s' % (
-            common_constants.CURRENT_PYTHON_BIN, common_constants.GOOGLE_APP_ENGINE_SDK_HOME,
+            common_constants.CURRENT_PYTHON_BIN,
+            common_constants.GOOGLE_APP_ENGINE_SDK_HOME,
             GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
         shell=True)

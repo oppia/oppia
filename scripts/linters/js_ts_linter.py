@@ -161,7 +161,8 @@ class JsTsLintChecksManager(python_utils.OBJECT):
             file_cache: object(FileCache). Provides thread-safe access to cached
                 file content.
         """
-        os.environ['PATH'] = '%s/bin:' % common_constants.NODE_PATH + os.environ['PATH']
+        os.environ['PATH'] = (
+            '%s/bin:' % common_constants.NODE_PATH + os.environ['PATH'])
 
         self.js_files = js_files
         self.ts_files = ts_files

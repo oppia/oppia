@@ -778,7 +778,8 @@ class BuildTests(test_utils.GenericTestBase):
         mock_feconf_path = 'mock_app.yaml'
         constants_path_swap = self.swap(
             common_constants, 'CONSTANTS_FILE_PATH', mock_constants_path)
-        feconf_path_swap = self.swap(common_constants, 'FECONF_PATH', mock_feconf_path)
+        feconf_path_swap = self.swap(
+            common_constants, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path
@@ -825,7 +826,8 @@ class BuildTests(test_utils.GenericTestBase):
         mock_feconf_path = 'mock_app.yaml'
         constants_path_swap = self.swap(
             common_constants, 'CONSTANTS_FILE_PATH', mock_constants_path)
-        feconf_path_swap = self.swap(common_constants, 'FECONF_PATH', mock_feconf_path)
+        feconf_path_swap = self.swap(
+            common_constants, 'FECONF_PATH', mock_feconf_path)
 
         constants_temp_file = tempfile.NamedTemporaryFile()
         constants_temp_file.name = mock_constants_path

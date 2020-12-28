@@ -125,9 +125,11 @@ def download_and_install_node():
         extension = '.tar.gz'
         if common.is_x64_architecture():
             if common.is_mac_os():
-                node_file_name = 'node-v%s-darwin-x64' % (common_constants.NODE_VERSION)
+                node_file_name = 'node-v%s-darwin-x64' % (
+                    common_constants.NODE_VERSION)
             elif common.is_linux_os():
-                node_file_name = 'node-v%s-linux-x64' % (common_constants.NODE_VERSION)
+                node_file_name = 'node-v%s-linux-x64' % (
+                    common_constants.NODE_VERSION)
         else:
             node_file_name = 'node-v%s' % common_constants.NODE_VERSION
         download_and_install_package(
@@ -178,19 +180,22 @@ def main(args=None):
 
     # Download and install node.js.
     python_utils.PRINT(
-        'Checking if node.js is installed in %s' % common_constants.OPPIA_TOOLS_DIR)
+        'Checking if node.js is installed in %s' % (
+            common_constants.OPPIA_TOOLS_DIR))
     if not os.path.exists(common_constants.NODE_PATH):
         python_utils.PRINT('Installing Node.js')
         download_and_install_node()
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
     if not common.is_windows_os():
-        common.recursive_chown(common_constants.NODE_MODULES_PATH, os.getuid(), -1)
+        common.recursive_chown(
+            common_constants.NODE_MODULES_PATH, os.getuid(), -1)
         common.recursive_chmod(common_constants.NODE_MODULES_PATH, 0o744)
 
     # Download and install yarn.
     python_utils.PRINT(
-        'Checking if yarn is installed in %s' % common_constants.OPPIA_TOOLS_DIR)
+        'Checking if yarn is installed in %s' % (
+            common_constants.OPPIA_TOOLS_DIR))
     if not os.path.exists(common_constants.YARN_PATH):
         python_utils.PRINT('Removing package-lock.json')
         clean.delete_file('package-lock.json')

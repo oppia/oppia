@@ -377,15 +377,18 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         correct_copied_src_dst_tuples = [
             (
                 os.path.join(
-                    common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+                    common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google',
+                    'appengine'),
                 os.path.join(correct_google_path, 'appengine')),
             (
                 os.path.join(
-                    common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'net'),
+                    common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google',
+                    'net'),
                 os.path.join(correct_google_path, 'net')),
             (
                 os.path.join(
-                    common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+                    common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google',
+                    'pyglib'),
                 os.path.join(correct_google_path, 'pyglib'))
         ]
 

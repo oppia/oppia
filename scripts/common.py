@@ -108,8 +108,10 @@ def open_new_tab_in_browser_if_possible(url):
         python_utils.PRINT(
             '\nDo you want the url to be opened in the browser? '
             'Confirm by entering y/ye/yes.')
-        common_constants.USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
-    if common_constants.USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
+        common_constants.USER_PREFERENCES['open_new_tab_in_browser'] = (
+            python_utils.INPUT())
+    if common_constants.USER_PREFERENCES['open_new_tab_in_browser'] not in [
+            'y', 'ye', 'yes']:
         python_utils.PRINT(
             'Please open the following link in browser: %s' % url)
         return
@@ -187,7 +189,8 @@ def get_current_release_version_number(release_branch_name):
     Returns:
         str. The version of release.
     """
-    release_match = re.match(common_constants.RELEASE_BRANCH_REGEX, release_branch_name)
+    release_match = re.match(
+        common_constants.RELEASE_BRANCH_REGEX, release_branch_name)
     release_maintenance_match = re.match(
         common_constants.RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name)
     hotfix_match = re.match(
@@ -220,9 +223,12 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    release_match = bool(re.match(common_constants.RELEASE_BRANCH_REGEX, current_branch_name))
+    release_match = bool(
+        re.match(common_constants.RELEASE_BRANCH_REGEX, current_branch_name))
     release_maintenance_match = bool(
-        re.match(common_constants.RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
+        re.match(
+            common_constants.RELEASE_MAINTENANCE_BRANCH_REGEX,
+            current_branch_name))
     hotfix_match = bool(
         re.match(common_constants.HOTFIX_BRANCH_REGEX, current_branch_name))
     return release_match or release_maintenance_match or hotfix_match
@@ -235,7 +241,8 @@ def is_current_branch_a_test_branch():
         bool. Whether the current branch is a test branch for deployment.
     """
     current_branch_name = get_current_branch_name()
-    return bool(re.match(common_constants.TEST_BRANCH_REGEX, current_branch_name))
+    return bool(
+        re.match(common_constants.TEST_BRANCH_REGEX, current_branch_name))
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -312,7 +319,8 @@ def install_npm_library(library_name, version, path):
     """
     python_utils.PRINT(
         'Checking whether %s is installed in %s' % (library_name, path))
-    if not os.path.exists(os.path.join(common_constants.NODE_MODULES_PATH, library_name)):
+    if not os.path.exists(
+        os.path.join(common_constants.NODE_MODULES_PATH, library_name)):
         python_utils.PRINT('Installing %s' % library_name)
         subprocess.check_call([
             'yarn', 'add', '%s@%s' % (library_name, version)])
@@ -503,7 +511,8 @@ def wait_for_port_to_be_open(port_number):
     """
     waited_seconds = 0
     while (not is_port_open(port_number)
-           and waited_seconds < common_constants.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+           and waited_seconds <
+           common_constants.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1
     if (waited_seconds == common_constants.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
@@ -580,7 +589,8 @@ def fix_third_party_imports():
     # imports from the 'third_party/python_libs' folder so that the imports are
     # correct.
     if 'google' in sys.modules:
-        google_path = os.path.join(common_constants.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        google_path = os.path.join(
+            common_constants.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         google_module = sys.modules['google']
         google_module.__path__ = [google_path]
         google_module.__file__ = os.path.join(google_path, '__init__.py')

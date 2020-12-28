@@ -109,20 +109,26 @@ _PATHS_TO_INSERT = [
     os.path.join(
         common_constants.GOOGLE_APP_ENGINE_SDK_HOME),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'webtest-%s' % common_constants.WEBTEST_VERSION),
+        _PARENT_DIR, 'oppia_tools',
+        'webtest-%s' % common_constants.WEBTEST_VERSION),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common_constants.PYGITHUB_VERSION),
+        _PARENT_DIR, 'oppia_tools',
+        'PyGithub-%s' % common_constants.PYGITHUB_VERSION),
     os.path.join(
         _PARENT_DIR, 'oppia_tools',
         'setuptools-%s' % common_constants.SETUPTOOLS_VERSION),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common_constants.PILLOW_VERSION),
+        _PARENT_DIR, 'oppia_tools',
+        'Pillow-%s' % common_constants.PILLOW_VERSION),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'protobuf-%s' % common_constants.PROTOBUF_VERSION),
+        _PARENT_DIR, 'oppia_tools',
+        'protobuf-%s' % common_constants.PROTOBUF_VERSION),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common_constants.PSUTIL_VERSION),
+        _PARENT_DIR, 'oppia_tools',
+        'psutil-%s' % common_constants.PSUTIL_VERSION),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common_constants.PIP_TOOLS_VERSION),
+        _PARENT_DIR, 'oppia_tools',
+        'pip-tools-%s' % common_constants.PIP_TOOLS_VERSION),
     common_constants.THIRD_PARTY_PYTHON_LIBS_DIR
 ]
 

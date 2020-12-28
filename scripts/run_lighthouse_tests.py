@@ -65,7 +65,8 @@ def cleanup():
     """Deactivates webpages and deletes html lighthouse reports."""
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": false,'
-    common.inplace_replace_file(common_constants.CONSTANTS_FILE_PATH, pattern, replace)
+    common.inplace_replace_file(
+            common_constants.CONSTANTS_FILE_PATH, pattern, replace)
 
     build.set_constants_to_default()
 
@@ -166,7 +167,8 @@ def enable_webpages():
     """Enables deactivated webpages for testing."""
     pattern = '"ENABLE_ACCOUNT_DELETION": .*'
     replace = '"ENABLE_ACCOUNT_DELETION": true,'
-    common.inplace_replace_file(common_constants.CONSTANTS_FILE_PATH, pattern, replace)
+    common.inplace_replace_file(
+            common_constants.CONSTANTS_FILE_PATH, pattern, replace)
 
 
 def start_google_app_engine_server(server_mode):
@@ -182,7 +184,8 @@ def start_google_app_engine_server(server_mode):
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' %
         (
-            common_constants.CURRENT_PYTHON_BIN, common_constants.GOOGLE_APP_ENGINE_SDK_HOME,
+            common_constants.CURRENT_PYTHON_BIN,
+            common_constants.GOOGLE_APP_ENGINE_SDK_HOME,
             GOOGLE_APP_ENGINE_PORT, app_yaml_filepath
         ), shell=True)
     SUBPROCESSES.append(p)

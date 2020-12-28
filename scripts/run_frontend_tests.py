@@ -115,14 +115,16 @@ def main(args=None):
         build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
         cmd = [
-            os.path.join(common_constants.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            os.path.join(
+                common_constants.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
             '--prodEnv']
     else:
         build.main(args=[])
 
         cmd = [
-            os.path.join(common_constants.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            os.path.join(
+                common_constants.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
 
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)

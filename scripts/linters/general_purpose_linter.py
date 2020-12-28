@@ -701,7 +701,8 @@ class GeneralPurposeLinter(python_utils.OBJECT):
         # The path for node is set explicitly, since otherwise the lint
         # tests fail on CircleCI due to the TypeScript files not being
         # compilable.
-        os.environ['PATH'] = '%s/bin:' % common_constants.NODE_PATH + os.environ['PATH']
+        os.environ['PATH'] = (
+            '%s/bin:' % common_constants.NODE_PATH + os.environ['PATH'])
 
         self.files_to_lint = files_to_lint
         self.file_cache = file_cache

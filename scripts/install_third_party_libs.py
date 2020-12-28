@@ -64,10 +64,12 @@ Installation script for Oppia third-party libraries.
 """)
 
 PYLINT_CONFIGPARSER_FILEPATH = os.path.join(
-    common_constants.OPPIA_TOOLS_DIR, 'pylint-%s' % common_constants.PYLINT_VERSION,
+    common_constants.OPPIA_TOOLS_DIR,
+    'pylint-%s' % common_constants.PYLINT_VERSION,
     'configparser.py')
 PQ_CONFIGPARSER_FILEPATH = os.path.join(
-    common_constants.OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % common_constants.PYLINT_QUOTES_VERSION,
+    common_constants.OPPIA_TOOLS_DIR,
+    'pylint-quotes-%s' % common_constants.PYLINT_QUOTES_VERSION,
     'configparser.py')
 
 # Download locations for buf binary.
@@ -85,8 +87,10 @@ BUF_DARWIN_FILES = [
 PROTOC_URL = (
     'https://github.com/protocolbuffers/protobuf/releases/download/v%s' %
     common_constants.PROTOC_VERSION)
-PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (common_constants.PROTOC_VERSION)
-PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (common_constants.PROTOC_VERSION)
+PROTOC_LINUX_FILE = 'protoc-%s-linux-x86_64.zip' % (
+    common_constants.PROTOC_VERSION)
+PROTOC_DARWIN_FILE = 'protoc-%s-osx-x86_64.zip' % (
+    common_constants.PROTOC_VERSION)
 
 # Path of the buf executable.
 BUF_DIR = os.path.join(
@@ -106,7 +110,8 @@ def tweak_yarn_executable():
     """
     origin_file_path = os.path.join(common_constants.YARN_PATH, 'bin', 'yarn')
     if os.path.isfile(origin_file_path):
-        renamed_file_path = os.path.join(common_constants.YARN_PATH, 'bin', 'yarn.sh')
+        renamed_file_path = os.path.join(
+            common_constants.YARN_PATH, 'bin', 'yarn.sh')
         os.rename(origin_file_path, renamed_file_path)
 
 
@@ -216,19 +221,45 @@ def main():
         ('protobuf', common_constants.PROTOBUF_VERSION)
     ]
     local_pip_dependencies = [
-        ('coverage', common_constants.COVERAGE_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('pylint', common_constants.PYLINT_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('Pillow', common_constants.PILLOW_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('pylint-quotes', common_constants.PYLINT_QUOTES_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('webtest', common_constants.WEBTEST_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('isort', common_constants.ISORT_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('pycodestyle', common_constants.PYCODESTYLE_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('esprima', common_constants.ESPRIMA_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('PyGithub', common_constants.PYGITHUB_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('protobuf', common_constants.PROTOBUF_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('psutil', common_constants.PSUTIL_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('pip-tools', common_constants.PIP_TOOLS_VERSION, common_constants.OPPIA_TOOLS_DIR),
-        ('setuptools', common_constants.SETUPTOOLS_VERSION, common_constants.OPPIA_TOOLS_DIR),
+        (
+            'coverage', common_constants.COVERAGE_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'pylint', common_constants.PYLINT_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'Pillow', common_constants.PILLOW_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'pylint-quotes', common_constants.PYLINT_QUOTES_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'webtest', common_constants.WEBTEST_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'isort', common_constants.ISORT_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'pycodestyle', common_constants.PYCODESTYLE_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'esprima', common_constants.ESPRIMA_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'PyGithub', common_constants.PYGITHUB_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'protobuf', common_constants.PROTOBUF_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'psutil', common_constants.PSUTIL_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'pip-tools', common_constants.PIP_TOOLS_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
+        (
+            'setuptools', common_constants.SETUPTOOLS_VERSION,
+            common_constants.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in local_pip_dependencies:
@@ -286,7 +317,8 @@ def main():
     if not os.path.isdir(os.path.join(correct_google_path, 'appengine')):
         shutil.copytree(
             os.path.join(
-                common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'appengine'),
+                common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google',
+                'appengine'),
             os.path.join(correct_google_path, 'appengine'))
 
     if not os.path.isdir(os.path.join(correct_google_path, 'net')):
@@ -298,7 +330,8 @@ def main():
     if not os.path.isdir(os.path.join(correct_google_path, 'pyglib')):
         shutil.copytree(
             os.path.join(
-                common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google', 'pyglib'),
+                common_constants.GOOGLE_APP_ENGINE_SDK_HOME, 'google',
+                'pyglib'),
             os.path.join(correct_google_path, 'pyglib'))
 
     # The following for loop populates all of the google modules with

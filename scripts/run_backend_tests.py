@@ -67,19 +67,32 @@ from . import common_constants # isort:skip  pylint: disable=wrong-import-positi
 from . import concurrent_task_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DIRS_TO_ADD_TO_SYS_PATH = [
-    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'pylint-%s' % common_constants.PYLINT_VERSION),
-
-    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'webtest-%s' % common_constants.WEBTEST_VERSION),
-    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'Pillow-%s' % common_constants.PILLOW_VERSION),
     os.path.join(
-        common_constants.OPPIA_TOOLS_DIR, 'protobuf-%s' % common_constants.PROTOBUF_VERSION),
-    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'psutil-%s' % common_constants.PSUTIL_VERSION),
-    os.path.join(common_constants.OPPIA_TOOLS_DIR, 'grpcio-%s' % common_constants.GRPCIO_VERSION),
+        common_constants.OPPIA_TOOLS_DIR,
+        'pylint-%s' % common_constants.PYLINT_VERSION),
+
+    os.path.join(
+        common_constants.OPPIA_TOOLS_DIR,
+        'webtest-%s' % common_constants.WEBTEST_VERSION),
+    os.path.join(
+        common_constants.OPPIA_TOOLS_DIR,
+        'Pillow-%s' % common_constants.PILLOW_VERSION),
+    os.path.join(
+        common_constants.OPPIA_TOOLS_DIR,
+        'protobuf-%s' % common_constants.PROTOBUF_VERSION),
+    os.path.join(
+        common_constants.OPPIA_TOOLS_DIR,
+        'psutil-%s' % common_constants.PSUTIL_VERSION),
+    os.path.join(
+        common_constants.OPPIA_TOOLS_DIR,
+        'grpcio-%s' % common_constants.GRPCIO_VERSION),
     os.path.join(common_constants.OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
     os.path.join(
-        common_constants.OPPIA_TOOLS_DIR, 'PyGithub-%s' % common_constants.PYGITHUB_VERSION),
+        common_constants.OPPIA_TOOLS_DIR,
+        'PyGithub-%s' % common_constants.PYGITHUB_VERSION),
     os.path.join(
-        common_constants.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common_constants.PIP_TOOLS_VERSION),
+        common_constants.OPPIA_TOOLS_DIR,
+        'pip-tools-%s' % common_constants.PIP_TOOLS_VERSION),
     common_constants.CURR_DIR
 ]
 

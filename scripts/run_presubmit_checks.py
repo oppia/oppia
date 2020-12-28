@@ -94,7 +94,8 @@ def main(args=None):
         run_frontend_tests.main(args=['--run_minified_tests'])
         python_utils.PRINT('Frontend tests passed.')
     else:
-        # If files in common_constants.FRONTEND_DIR were not changed, skip the tests.
+        # If files in common_constants.FRONTEND_DIR were not changed, skip the
+        # tests.
         common.print_each_string_after_two_new_lines([
             'No frontend files were changed.',
             'Skipped frontend tests'])

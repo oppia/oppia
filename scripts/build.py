@@ -223,7 +223,8 @@ def modify_constants(prod_env=False, maintenance_mode=False):
     dev_mode_variable = (
         '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
     common.inplace_replace_file(
-        common_constants.CONSTANTS_FILE_PATH, r'"DEV_MODE": .*', dev_mode_variable)
+        common_constants.CONSTANTS_FILE_PATH, r'"DEV_MODE": .*',
+        dev_mode_variable)
 
     enable_maintenance_mode_variable = (
         'ENABLE_MAINTENANCE_MODE = %s' % python_utils.UNICODE(maintenance_mode))
