@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
 
+
 class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating RoleQueryAuditModels."""
 
