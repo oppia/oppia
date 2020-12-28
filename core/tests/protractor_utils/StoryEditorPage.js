@@ -321,8 +321,7 @@ var StoryEditorPage = function() {
       commitMessageField, commitMessage);
 
     await waitFor.elementToBeClickable(
-      closeSaveModalButton,
-      'Close save modal button takes too long to be clickable'); 
+      closeSaveModalButton, 'Close save modal button takes too long to be clickable'); 
     await action.click(
       'Close Save Modal Button', closeSaveModalButton);
     await waitFor.invisibilityOf(
