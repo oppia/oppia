@@ -29,8 +29,9 @@ import python_utils
 (
     base_models, exp_models, subtopic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model,models.NAMES.subtopic, models.NAMES.user
+    models.NAMES.base_model, models.NAMES.subtopic, models.NAMES.user
 ])
+
 
 class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SubtopicPageModel."""
@@ -68,6 +69,7 @@ class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
     def _get_custom_validation_functions(cls):
         return []
 
+            
 class SubtopicPageSnapshotMetadataModelValidator(
         base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""
@@ -93,6 +95,7 @@ class SubtopicPageSnapshotMetadataModelValidator(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
+            
 class SubtopicPageSnapshotContentModelValidator(
         base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating SubtopicPageSnapshotContentModel."""
@@ -111,6 +114,7 @@ class SubtopicPageSnapshotContentModelValidator(
                 subtopic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
+            
 class SubtopicPageCommitLogEntryModelValidator(
         base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating SubtopicPageCommitLogEntryModel."""
