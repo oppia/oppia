@@ -16,10 +16,7 @@
  * @fileoverview Tests formatBaseTranslatableObjectValues filter.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('filters/format-base-translatable-object-values.filter');
 
@@ -27,17 +24,9 @@ const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
 describe('formatBaseTranslatableObjectValues filter', function() {
   const filterName = 'formatBaseTranslatableObjectValues';
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', ($provide) => {
-    const upgradedServices = new UpgradedServices();
-    for (let [key, value] of Object.entries(
-      upgradedServices.getUpgradedServices())
-    ) {
-      $provide.value(key, value);
-    }
-  }));
 
   it('should be accessible', angular.mock.inject(($filter) => {
     expect($filter(filterName)).not.toEqual(null);
