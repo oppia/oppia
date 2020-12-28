@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
-describe('Language util service', function() {
+fdescribe('Language util service', function() {
   var lus: LanguageUtilService = null;
   const mockSupportedContentLanguages = [{
     code: 'en',
@@ -83,6 +83,12 @@ describe('Language util service', function() {
       expect(lus.getLanguageDirection('en')).toEqual('ltr');
       expect(lus.getLanguageDirection('ar')).toEqual('rtl');
       expect(lus.getLanguageDirection('bg')).toEqual('ltr');
+    }
+  );
+
+  it('should get "auto" language direction when given an invalid content language code',
+    () => {
+      expect(lus.getLanguageDirection('invalid code')).toEqual('auto');
     }
   );
 

@@ -148,7 +148,7 @@ export class LanguageUtilService {
     return language ? language.description : null;
   }
   getLanguageDirection(languageCode: string): string {
-    let languageDirection = 'ltr';
+    let languageDirection = 'auto'; // Default auto for invalid languageCode
     this.SUPPORTED_CONTENT_LANGUAGES.forEach((lang: ContentLanguage) => {
       if (lang.code === languageCode) {
         languageDirection = lang.direction;
