@@ -922,7 +922,7 @@ class ManagedProcessTests(test_utils.TestBase):
             stack.enter_context(self._swap_popen())
 
             # Entering the context should not raise.
-            stack.enter_context(common.managed_process(['a'], timeout=10))
+            stack.enter_context(common.managed_process(['a'], timeout_secs=10))
 
     def test_concats_command_args_when_shell_is_true(self):
         with contextlib2.ExitStack() as stack:
@@ -930,7 +930,7 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(
-                common.managed_process(['a', 1], shell=True, timeout=10))
+                common.managed_process(['a', 1], shell=True, timeout_secs=10))
 
         self.assertEqual(logs, [])
         self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
@@ -941,7 +941,7 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(
-                common.managed_process(['a', 1], shell=False, timeout=10))
+                common.managed_process(['a', 1], shell=False, timeout_secs=10))
 
         self.assertEqual(logs, [])
         self.assertEqual(
@@ -953,7 +953,7 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(common.managed_process(
-                ['', 'a', '', 1], shell=True, timeout=10))
+                ['', 'a', '', 1], shell=True, timeout_secs=10))
 
         self.assertEqual(logs, [])
         self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
@@ -964,7 +964,7 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls = stack.enter_context(self._swap_popen())
 
             stack.enter_context(common.managed_process(
-                ['', 'a', '', 1], shell=False, timeout=10))
+                ['', 'a', '', 1], shell=False, timeout_secs=10))
 
         self.assertEqual(logs, [])
         self.assertEqual(
@@ -976,8 +976,8 @@ class ManagedProcessTests(test_utils.TestBase):
             stack.enter_context(self._swap_popen(
                 make_processes_unresponsive=True))
 
-            proc = (
-                stack.enter_context(common.managed_process(['a'], timeout=10)))
+            proc = stack.enter_context(
+                    common.managed_process(['a'], timeout_secs=10))
             pid = proc.pid
 
         self.assertEqual(logs, ['Process killed (pid=%d)' % pid])
@@ -988,8 +988,8 @@ class ManagedProcessTests(test_utils.TestBase):
             stack.enter_context(self._swap_popen(
                 make_processes_unresponsive=True, num_children=3))
 
-            proc = (
-                stack.enter_context(common.managed_process(['a'], timeout=10)))
+            proc = stack.enter_context(
+                common.managed_process(['a'], timeout_secs=10))
             pids = [c.pid for c in proc.children()] + [proc.pid]
 
         self.assertEqual(len(pids), 4)
