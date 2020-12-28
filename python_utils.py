@@ -24,11 +24,10 @@ import io
 import os
 import sys
 
-_FUTURE_PATH = os.path.join(
-    os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _FUTURE_PATH)
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), "third_party", "python_libs")
+sys.path.insert(0, _THIRD_PARTY_PATH)
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+_YAML_PATH = os.path.join(os.getcwd(), "..", "oppia_tools", "pyyaml-5.1.2")
 sys.path.insert(0, _YAML_PATH)
 
 import yaml  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -52,7 +51,7 @@ UNICODE = builtins.str
 ZIP = builtins.zip
 
 
-def string_io(buffer_value=b''):
+def string_io(buffer_value=b""):
     """Returns StringIO from StringIO module if run under Python 2 and from io
     module if run under Python 3.
 
@@ -80,14 +79,17 @@ def get_args_of_function(function_node, args_to_ignore):
     """
     try:
         return [
-            a.arg for a in function_node.args.args if a.arg not in
-            args_to_ignore]
+            a.arg
+            for a in function_node.args.args
+            if a.arg not in args_to_ignore
+        ]
     except AttributeError:
         return [
-            a.id for a in function_node.args.args if a.id not in args_to_ignore]
+            a.id for a in function_node.args.args if a.id not in args_to_ignore
+        ]
 
 
-def open_file(filename, mode, encoding='utf-8', newline=None):
+def open_file(filename, mode, encoding="utf-8", newline=None):
     """Open file and return a corresponding file object.
 
     Args:
@@ -105,7 +107,7 @@ def open_file(filename, mode, encoding='utf-8', newline=None):
     try:
         return io.open(filename, mode, encoding=encoding, newline=newline)
     except:
-        raise IOError('Unable to open file: %s' % filename)
+        raise IOError("Unable to open file: %s" % filename)
 
 
 def url_join(base_url, relative_url):
@@ -213,9 +215,11 @@ def urllib_unquote(content):
     """
     try:
         import urllib
+
         return urllib.unquote(content)
     except ImportError:
         import urllib.parse
+
         return urllib.urlparse.unquote(content)
 
 
@@ -249,9 +253,11 @@ def url_unquote_plus(content):
     """
     try:
         import urllib
+
         return urllib.unquote_plus(content)
     except ImportError:
         import urllib.parse
+
         return urllib.parse.unquote_plus(content)
 
 
@@ -289,14 +295,17 @@ def url_retrieve(source_url, filename=None):
     """
     try:
         import urllib
+
         # Change the User-Agent to prevent servers from blocking requests.
         # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
         urllib.URLopener.version = (
-            'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
-            'Gecko/20100101 Firefox/47.0')
+            "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) "
+            "Gecko/20100101 Firefox/47.0"
+        )
         return urllib.urlretrieve(source_url, filename=filename)
     except ImportError:
         import urllib.request
+
         return urllib.request.urlretrieve(source_url, filename=filename)
 
 
@@ -313,9 +322,11 @@ def url_open(source_url):
     """
     try:
         import urllib2
+
         return urllib2.urlopen(source_url)
     except ImportError:
         import urllib.request
+
         return urllib.request.urlopen(source_url)
 
 
@@ -334,9 +345,11 @@ def url_request(source_url, data, headers):
     """
     try:
         import urllib2
+
         return urllib2.Request(source_url, data, headers)
     except ImportError:
         import urllib.request
+
         return urllib.request.Request(source_url)
 
 
@@ -390,7 +403,7 @@ def convert_to_bytes(string_to_convert):
         bytes. The encoded string.
     """
     if isinstance(string_to_convert, UNICODE):
-        return string_to_convert.encode('utf-8')
+        return string_to_convert.encode("utf-8")
     return bytes(string_to_convert)
 
 
@@ -411,15 +424,20 @@ def _recursively_convert_to_str(value):
         return [_recursively_convert_to_str(e) for e in value]
     elif isinstance(value, dict):
         return {
-            _recursively_convert_to_str(k): _recursively_convert_to_str(
-                v) for k, v in value.items()}
+            _recursively_convert_to_str(k): _recursively_convert_to_str(v)
+            for k, v in value.items()
+        }
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
-    elif type(value) == future.types.newstr:  # pylint: disable=unidiomatic-typecheck
-        temp = str(value.encode('utf-8'))
+    elif (
+        type(value) == future.types.newstr
+    ):  # pylint: disable=unidiomatic-typecheck
+        temp = str(value.encode("utf-8"))
         # Remove the b'' prefix from the string.
-        return temp[2:-1].decode('utf-8')
-    elif type(value) == future.types.newbytes:  # pylint: disable=unidiomatic-typecheck
+        return temp[2:-1].decode("utf-8")
+    elif (
+        type(value) == future.types.newbytes
+    ):  # pylint: disable=unidiomatic-typecheck
         temp = bytes(value)
         # Remove the b'' prefix from the string.
         return temp[2:-1]
