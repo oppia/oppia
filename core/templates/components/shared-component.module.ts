@@ -54,6 +54,8 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+import { TakeBreakModalComponent } from
+  'pages/exploration-player-page/templates/take-break-modal.component';
 
 
 @NgModule({
@@ -74,7 +76,8 @@ import { ProfileLinkTextComponent } from
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
-    TranslatePipe
+    TranslatePipe,
+    TakeBreakModalComponent
   ],
 
   entryComponents: [
@@ -84,6 +87,7 @@ import { ProfileLinkTextComponent } from
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
@@ -100,6 +104,7 @@ import { ProfileLinkTextComponent } from
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    TakeBreakModalComponent,
     TranslatePipe
   ],
 })

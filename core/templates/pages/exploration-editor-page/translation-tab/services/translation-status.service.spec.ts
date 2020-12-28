@@ -184,7 +184,8 @@ describe('Translation status service', function() {
                   translation: '<p>This is first card.</p>',
                   needs_update: false
                 }
-              }
+              },
+              rule_input_4: {}
             }
           },
           recorded_voiceovers: {
@@ -199,7 +200,8 @@ describe('Translation status service', function() {
                   duration_secs: 4.3
                 }
               },
-              feedback_1: {}
+              feedback_1: {},
+              rule_input_4: {}
             }
           },
           interaction: {

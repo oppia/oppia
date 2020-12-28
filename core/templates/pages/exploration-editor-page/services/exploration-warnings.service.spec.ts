@@ -893,7 +893,10 @@ describe('Exploration Warnings Service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: ['10']}
+                inputs: {x: {
+                  contentId: 'rule_input',
+                  normalizedStrSet: ['10']
+                }}
               }],
               training_data: ['1'],
               tagged_skill_misconception_id: null

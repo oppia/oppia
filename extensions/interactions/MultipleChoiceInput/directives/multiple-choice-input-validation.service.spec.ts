@@ -101,7 +101,8 @@ describe('MultipleChoiceInputValidationService', () => {
         inputs: {
           x: 1
         }
-      }].map(rof.createFromBackendDict),
+      }].map(
+        ruleDict => rof.createFromBackendDict(ruleDict, 'MultipleChoiceInput')),
       goodDefaultOutcome,
       null,
       null)];

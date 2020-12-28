@@ -132,7 +132,10 @@ describe('Question Creation Service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 10}
+                inputs: {x: {
+                  contentId: 'rule_input',
+                  normalizedStrSet: ['10']
+                }}
               }],
             }],
             confirmed_unclassified_answers: [],
@@ -203,15 +206,6 @@ describe('Question Creation Service', function() {
         {result: Promise.resolve([skillDiff])});
       qcs.createQuestion();
       expect(modalSpy).toHaveBeenCalled();
-    });
-
-    it('should return difficulty strings', function() {
-      expect(qcs.getDifficultyString(0.3)).toEqual('Easy');
-      expect(qcs.getDifficultyString(0.6)).toEqual('Medium');
-      expect(qcs.getDifficultyString(1)).toEqual('Hard');
-      expect(qcs.getDifficultyString(10)).toEqual('Hard');
-      expect(qcs.getDifficultyString(2)).toEqual('Hard');
-      expect(qcs.getDifficultyString(1.5)).toEqual('Hard');
     });
 
     it('should open question editor modal', function() {
@@ -322,10 +316,7 @@ describe('Question Creation Service', function() {
                 param_changes: [],
                 refresher_exploration_id: null
               },
-              rule_specs: [{
-                rule_type: 'Equals',
-                inputs: {x: 10}
-              }],
+              rule_specs: [],
             }],
             confirmed_unclassified_answers: [],
             customization_args: {},
@@ -489,7 +480,10 @@ describe('Question Creation Service', function() {
               },
               rule_specs: [{
                 rule_type: 'Equals',
-                inputs: {x: 10}
+                inputs: {x: {
+                  contentId: 'rule_input',
+                  normalizedStrSet: ['10']
+                }}
               }],
             }],
             confirmed_unclassified_answers: [],

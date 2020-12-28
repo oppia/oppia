@@ -49,6 +49,14 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             expected_audit_models,
             self.registry_instance.import_models([models.NAMES.audit]))
 
+    def test_import_models_auth_model(self):
+        """Tests import_models function with auth option."""
+        from core.storage.auth import gae_models as auth_models
+        expected_auth_models = (auth_models,)
+        self.assertEqual(
+            expected_auth_models,
+            self.registry_instance.import_models([models.NAMES.auth]))
+
     def test_import_models_base_model(self):
         """Tests import_models function with base model option."""
         from core.storage.base_model import gae_models as base_models
@@ -235,6 +243,13 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             self.registry_instance.import_transaction_services(),
             gae_transaction_services)
 
+    def test_import_auth_services(self):
+        """Tests import auth services function."""
+        from core.platform.auth import firebase_auth_services
+        self.assertIs(
+            self.registry_instance.import_auth_services(),
+            firebase_auth_services)
+
     def test_import_app_identity_services(self):
         """Tests import app identity services function."""
         from core.platform.app_identity import gae_app_identity_services
@@ -295,10 +310,11 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_search_services(self):
         """Tests import search services function."""
-        from core.platform.search import gae_search_services
+        # The search services module is stubbed out in the test environment,
+        # hence the comparison to self._search_services_stub instead.
         self.assertEqual(
             self.registry_instance.import_search_services(),
-            gae_search_services)
+            self._search_services_stub)
 
     def test_import_models_not_implemented_has_not_implemented_error(self):
         """Tests NotImplementedError of Platform."""

@@ -55,8 +55,8 @@ describe('Question Editor Modal Controller', function() {
   let question = null;
   let questionId = null;
   let questionStateData = null;
-  const rubrics = [];
-  const skillNames = [];
+  const rubric = [];
+  const skillName = [];
   let associatedSkillSummaries = null;
 
   describe('when question is valid', function() {
@@ -161,8 +161,8 @@ describe('Question Editor Modal Controller', function() {
         questionId: questionId,
         untriagedSkillSummaries: untriagedSkillSummaries,
         questionStateData: questionStateData,
-        rubrics: rubrics,
-        skillNames: skillNames
+        rubric: rubric,
+        skillName: skillName
       });
     }));
 
@@ -177,8 +177,8 @@ describe('Question Editor Modal Controller', function() {
         expect($scope.canEditQuestion).toBe(canEditQuestion);
         expect($scope.newQuestionIsBeingCreated).toBe(
           newQuestionIsBeingCreated);
-        expect($scope.rubrics).toEqual(rubrics);
-        expect($scope.skillNames).toEqual(skillNames);
+        expect($scope.rubric).toEqual(rubric);
+        expect($scope.skillName).toEqual(skillName);
       });
 
     it('should get skill editor url based on the skill id', function() {
@@ -512,8 +512,8 @@ describe('Question Editor Modal Controller', function() {
         questionId: questionId,
         questionStateData: questionStateData,
         untriagedSkillSummaries: [],
-        rubrics: rubrics,
-        skillNames: skillNames
+        rubric: rubric,
+        skillName: skillName
       });
     }));
 
