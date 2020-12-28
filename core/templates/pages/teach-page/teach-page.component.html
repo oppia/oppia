@@ -32,15 +32,15 @@
       </picture>
       <picture ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-main-image image-mobile">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.webp')]>">
-          <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>">
-          <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>" alt="">
+        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>" alt="">
       </picture>
     </div>
   </div>
 
   <div class="oppia-teach-section-two">
     <div class="oppia-teach-section-two-left">
-      <h3 ng-if="$ctrl.isWindowNarrow()" translate="I18N_SPLASH_BENEFITS_TITLE"></h3>
+      <h3 ng-if="$ctrl.isWindowNarrow()" translate="I18N_TEACH_BENEFITS_TITLE"></h3>
       <picture class="teach-matthew-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.webp')]>">
         <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.png')]>">
@@ -65,7 +65,7 @@
   </div>
 
   <div class="oppia-teach-section-three">
-    <div class="oppia-teach-section-three-left">
+    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-section-three-left">
       <h2 translate="I18N_TEACH_PAGE_CLASSROOM_TITLE"></h2>
       <p translate="I18N_TEACH_PAGE_CLASSROOM_CONTENT"></p>
       <div class="oppia-teach-button-container">
@@ -77,19 +77,37 @@
         </form>
       </div>
     </div>
-    <div class="oppia-teach-section-three-right" ng-if="!$ctrl.isWindowNarrow()">
+    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 (1).webp')]>">
         <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>">
         <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>" alt="">
       </picture>
     </div>
+    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-three-right">
+      <picture class="teach-with-oppia-image">
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 (1).webp')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>" alt="">
+      </picture>
+    </div>
+    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-three-left mobile">
+      <h2 class="mobile-h2" translate="I18N_TEACH_PAGE_CLASSROOM_TITLE"></h2>
+      <p class="mobile-h2" translate="I18N_TEACH_PAGE_CLASSROOM_CONTENT"></p>
+      <div class="oppia-teach-button-container">
+        <form action="<[$ctrl.classroomUrl]>">
+          <button type="submit" ng-click="$ctrl.onClickVisitClassroomButton()"
+                  class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                  translate="I18N_TEACH_PAGE_CLASSROOM_BUTTON">
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <div class="oppia-teach-section-four">
-    <div class="oppia-teach-section-four-left">
-      <h2 ng-if="!$ctrl.isWindowNarrow()" translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
-      <h2 ng-if="$ctrl.isWindowNarrow()" class="mobile-h2" translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
+    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-section-four-left">
+      <h2 translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
       <p translate="I18N_TEACH_PAGE_LIBRARY_CONTENT"></p>
       <div class="oppia-teach-button-container">
         <form action="/community-library">
@@ -107,6 +125,25 @@
         <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia1.png')]>" alt="">
       </picture>
     </div>
+    <div class="oppia-teach-section-four-right" ng-if="$ctrl.isWindowNarrow()">
+      <picture class="teach-with-oppia-image">
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia1.webp')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia1.png')]>">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia1.png')]>" alt="">
+      </picture>
+    </div>
+    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-four-left mobile">
+      <h2 class="mobile-h2" translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
+      <p class="mobile-h2" translate="I18N_TEACH_PAGE_LIBRARY_CONTENT"></p>
+      <div class="oppia-teach-button-container">
+        <form action="/community-library">
+          <button type="submit" ng-click="$ctrl.onClickBrowseLibraryButton()"
+                  class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                  translate="I18N_TEACH_PAGE_LIBRARY_BUTTON">
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <div class="oppia-teach-section-five" ng-style="{'background-image': '<[$ctrl.getTestimonialBackgroundUrl()]>'}">
@@ -117,11 +154,23 @@
         <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlPng)]>" ng-class="{'image-with-border': $ctrl.testimonials[$ctrl.displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
-    <div class="oppia-teach-section-five-left">
+    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-section-five-left">
       <div>
         <h2><[$ctrl.testimonials[$ctrl.displayedTestimonialId].quote]></h2>
         <h3><[$ctrl.testimonials[$ctrl.displayedTestimonialId].studentDetails]></h3>
       </div>
+      <div class="teach-arrows-container">
+        <span ng-click="$ctrl.decrementDisplayedTestimonialId()" class="material-icons">
+          arrow_back_ios
+        </span>
+        <span ng-click="$ctrl.incrementDisplayedTestimonialId()" class="material-icons">
+          arrow_forward_ios
+        </span>
+      </div>
+    </div>
+    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-five-left mobile">
+      <h2 class="mobile-h2"><[$ctrl.testimonials[$ctrl.displayedTestimonialId].quote]></h2>
+      <h3><[$ctrl.testimonials[$ctrl.displayedTestimonialId].studentDetails]></h3>
       <div class="teach-arrows-container">
         <span ng-click="$ctrl.decrementDisplayedTestimonialId()" class="material-icons">
           arrow_back_ios
@@ -142,23 +191,23 @@
 
   <div class="oppia-teach-section-six">
     <h2 translate="I18N_TEACH_PAGE_SIX_TITLE"></h2>
-    <div class="oppia-teach-button-container-button-one">
-      <form action="https://www.oppiafoundation.org/volunteer">
+    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
+      <form action="/teach">
         <button type="submit" ng-click="$ctrl.onClickGuideParentsButton()"
                 class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_GUIDE_FOR_TEACHERS">
         </button>
       </form>
     </div>
-    <div class="oppia-teach-button-container-button-one">
-      <form action="https://www.oppiafoundation.org/volunteer">
+    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
+      <form action="/teach">
         <button type="submit" ng-click="$ctrl.onClickTipforParentsButton()"
                 class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_TIPS_FOR_PARENTS">
         </button>
       </form>
     </div>
-    <div class="oppia-teach-button-container-button-one">
+    <div ng-if="!$ctrl.isWindowNarrow()"  class="oppia-teach-button-container-button-one">
       <form action="<[$ctrl.classroomUrl]>">
         <button type="submit" ng-click="$ctrl.onClickExploreLessonsButton()"
                 class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
@@ -166,14 +215,34 @@
         </button>
       </form>
     </div>
+    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
+      <form action="/teach">
+        <button type="submit" ng-click="$ctrl.onClickGuideParentsButton()"
+                class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                translate="I18N_ACTION_GUIDE_FOR_TEACHERS">
+        </button>
+      </form>
+    </div>
+    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
+      <form action="/teach">
+        <button type="submit" ng-click="$ctrl.onClickTipforParentsButton()"
+                class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                translate="I18N_ACTION_TIPS_FOR_PARENTS">
+        </button>
+      </form>
+    </div>
+    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
+      <form action="<[$ctrl.classroomUrl]>">
+        <button type="submit" ng-click="$ctrl.onClickExploreLessonsButton()"
+                class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                translate="I18N_ACTION_EXPLORE_LESSONS">
+        </button>
+      </form>
+    </div>
   </div>
-
 </div>
 
 <style>
-  .teach-page .image-mobile {
-    display: none;
-  }
   .teach-page .image-mobile {
     display: inherit;
   }
@@ -193,11 +262,26 @@
     margin-right: auto;
     width: fit-content;
   }
-  
-  .teach-page .oppia-teach-section-four-left .mobile-h2 {
-  width:fit-content
+
+  .teach-page .oppia-teach-section-three-left.mobile,
+  .teach-page .oppia-teach-section-four-left.mobile,
+  .teach-page .oppia-teach-section-five-left.mobile {
+   margin-left: 3vw;
+   margin-right: 3vw;
+   padding-bottom: 2vh;
+   text-align: center;
+   width: fit-content;
   }
 
+  .teach-page .oppia-teach-section-three-left .mobile-h2,
+  .teach-page .oppia-teach-section-four-left .mobile-h2,
+  .teach-page .oppia-teach-section-five-left .mobile-h2 {
+   margin-left: 0;
+   margin-right: 0;
+   padding: 0;
+   text-align: center;
+   width: fit-content;
+  }
   .teach-page .oppia-teach-button-container-button-one {
     margin-bottom: 5vh;
     margin-left: auto;
@@ -228,8 +312,8 @@
     display: flex;
     display: block;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
-    margin-left: 0;
     margin-bottom: 0;
+    margin-left: 0;
   }
 
   .teach-page .oppia-teach-h1 {
@@ -276,8 +360,8 @@
     color: #ffffff;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 16px;
-    margin-top: -20px;
     margin-bottom: 1vw;
+    margin-top: -20px;
     min-width: 250px;
     padding: 10px;
     text-transform: uppercase;
@@ -293,7 +377,9 @@
     padding: 10px;
     text-transform: uppercase;
   }
-
+  .teach-page .oppia-teach-bottom-button.mobile {
+    min-width: 83vw;
+  }
   .teach-page .oppia-teach-button:hover,
   .teach-page .oppia-teach-button:focus,
   .teach-page .oppia-teach-button:active,
@@ -444,6 +530,7 @@
   }
 
   .teach-page .teach-with-oppia-image img {
+    border: 4px solid #FFFFFF;
     border-radius: 10px;
     max-width: 500px;
     width: 100%;
@@ -493,14 +580,12 @@
   }
 
   .teach-page .oppia-teach-section-three-right {
-    border: 4px solid #FFFFFF;
-    border-radius: 10px;
+    align-items: center;
     margin-left: auto;
     margin-right: auto;
   }
 
   .teach-page .oppia-teach-section-four-right {
-    border-radius: 10px;
     filter: drop-shadow(0px 4px 4px #00000040);
     margin-left: auto;
     margin-right: auto;
