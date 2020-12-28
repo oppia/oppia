@@ -383,7 +383,7 @@ def install_redis_cli():
 
         # Temporarily change the working directory to redis-cli-6.0.6 so we can
         # build the source code.
-        with common_constants.CD(
+        with common.CD(
             os.path.join(
                 TARGET_DOWNLOAD_DIRS['oppiaTools'],
                 'redis-cli-%s' % common_constants.REDIS_CLI_VERSION)):

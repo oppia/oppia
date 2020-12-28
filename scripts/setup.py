@@ -140,7 +140,7 @@ def download_and_install_node():
         os.path.join(common_constants.OPPIA_TOOLS_DIR, node_file_name),
         common_constants.NODE_PATH)
     if node_file_name == 'node-v%s' % common_constants.NODE_VERSION:
-        with common_constants.CD(common_constants.NODE_PATH):
+        with common.CD(common_constants.NODE_PATH):
             subprocess.check_call(['./configure'])
             subprocess.check_call(['make'])
 
