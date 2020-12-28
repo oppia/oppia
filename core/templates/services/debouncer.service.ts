@@ -18,6 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { WindowRef } from './contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,11 +32,13 @@ export class DebouncerService {
     let context: this | null = this;
     let timestamp: number;
     let result: void;
+    let windowRef: WindowRef = new WindowRef();
 
     const later = () => {
       let last = new Date().getTime() - timestamp;
       if (last < millisecsToWait) {
-        timeout = window.setTimeout(later, millisecsToWait - last);
+        timeout = windowRef.nativeWindow.setTimeout(
+          later, millisecsToWait - last);
       } else {
         timeout = 0;
         result = func.apply(context);
