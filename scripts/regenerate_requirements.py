@@ -30,6 +30,7 @@ import re
 import sys
 
 from scripts import common
+from scripts import common_constants
 
 PIP_TOOLS_PATH = os.path.join(
     common_constants.OPPIA_TOOLS_DIR, 'pip-tools-%s' % common_constants.PIP_TOOLS_VERSION)

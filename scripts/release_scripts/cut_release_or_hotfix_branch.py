@@ -47,6 +47,7 @@ import subprocess
 import constants
 import python_utils
 from scripts import common
+from scripts import common_constants
 
 
 def require_release_version_to_have_correct_format(

@@ -37,6 +37,7 @@ import psutil
 import python_utils
 
 from . import common
+from . import common_constants
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(

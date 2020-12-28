@@ -27,6 +27,7 @@ import sys
 import pkg_resources
 import python_utils
 from scripts import common
+from scripts import common_constants
 
 
 def normalize_python_library_name(library_name):

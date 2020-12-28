@@ -30,6 +30,7 @@ from core.tests import test_utils
 from . import js_ts_linter
 from . import pre_commit_linter
 from .. import common
+from .. import common_constants
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')

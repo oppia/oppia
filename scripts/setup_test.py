@@ -31,6 +31,7 @@ import python_utils
 
 from . import clean
 from . import common
+from . import common_constants
 from . import setup
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')

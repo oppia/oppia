@@ -29,6 +29,7 @@ from core.tests import test_utils
 import pkg_resources
 import python_utils
 from scripts import common
+from scripts import common_constants
 from scripts import install_backend_python_libs
 
 

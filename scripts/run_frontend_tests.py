@@ -27,6 +27,7 @@ import python_utils
 from . import build
 from . import check_frontend_coverage
 from . import common
+from . import common_constants
 from . import install_third_party_libs
 
 # These is a relative path from the oppia/ folder. They are relative because the

@@ -34,6 +34,7 @@ install_third_party_libs.main()
 
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import common_constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 

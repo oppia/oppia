@@ -26,6 +26,7 @@ import sys
 
 import python_utils
 from scripts import common
+from scripts import common_constants
 
 
 def main():

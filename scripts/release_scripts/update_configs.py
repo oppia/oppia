@@ -31,6 +31,7 @@ import sys
 
 import python_utils
 from scripts import common
+from scripts import common_constants
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(

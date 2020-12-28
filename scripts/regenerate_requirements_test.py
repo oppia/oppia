@@ -24,6 +24,7 @@ import sys
 
 from core.tests import test_utils
 from scripts import common
+from scripts import common_constants
 from scripts import regenerate_requirements
 
 PIP_TOOLS_PATH = os.path.join(

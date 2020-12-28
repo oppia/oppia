@@ -29,6 +29,7 @@ import zipfile
 import python_utils
 
 from . import common
+from . import common_constants
 from . import install_backend_python_libs
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')

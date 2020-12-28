@@ -27,6 +27,7 @@ from core.tests import test_utils
 import python_utils
 
 from . import common
+from . import common_constants
 from . import setup_gae
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')

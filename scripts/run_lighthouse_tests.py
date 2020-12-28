@@ -28,6 +28,7 @@ import sys
 import python_utils
 from scripts import build
 from scripts import common
+from scripts import common_constants
 
 WEBPACK_BIN_PATH = os.path.join(
     common_constants.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')

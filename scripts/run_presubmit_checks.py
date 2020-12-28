@@ -28,6 +28,7 @@ import subprocess
 import python_utils
 
 from . import common
+from . import common_constants
 from . import run_backend_tests
 from . import run_frontend_tests
 from .linters import pre_commit_linter

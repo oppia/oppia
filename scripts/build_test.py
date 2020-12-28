@@ -32,6 +32,7 @@ import python_utils
 
 from . import build
 from . import common
+from . import common_constants
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')

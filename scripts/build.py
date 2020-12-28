@@ -30,6 +30,7 @@ import threading
 
 import python_utils
 from scripts import common
+from scripts import common_constants
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
