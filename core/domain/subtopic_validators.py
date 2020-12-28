@@ -124,7 +124,6 @@ class SubtopicPageSnapshotContentModelValidator(
                 subtopic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
-
 class SubtopicPageCommitLogEntryModelValidator(
         base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating SubtopicPageCommitLogEntryModel."""
