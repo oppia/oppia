@@ -65,6 +65,7 @@ import { WRITTEN_TRANSLATION_TYPE_HTML, WRITTEN_TRANSLATION_TYPE_UNICODE } from
 import { InteractionCustomizationArgs } from
   'interactions/customization-args-defs';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 
 angular.module('oppia').component('stateTranslation', {
   bindings: {
@@ -567,6 +568,22 @@ angular.module('oppia').component('stateTranslation', {
         ctrl.directiveSubscriptions.add(
           StateEditorService.onRefreshStateTranslation.subscribe(
             () => $scope.initStateTranslation())
+        );
+        ctrl.directiveSubscriptions.add(
+          TranslationTabActiveModeService
+            .onUpdateTranslationActiveMode.subscribe(
+              (activeMode) => {
+                const isVoiceOverMode = (
+                  activeMode ===
+                  ExplorationEditorPageConstants.VOICEOVER_MODE);
+                const ruleTabIsActive = $scope.isActive(
+                  $scope.TAB_ID_RULE_INPUTS);
+                if (isVoiceOverMode && ruleTabIsActive) {
+                  // Because rule inputs do not have voiceovers, we switch to
+                  // the content tab if the rule inputs tab is active.
+                  $scope.onTabClick($scope.TAB_ID_CONTENT);
+                }
+              })
         );
         $scope.initStateTranslation();
       };

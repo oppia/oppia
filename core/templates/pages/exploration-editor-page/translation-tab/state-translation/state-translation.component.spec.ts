@@ -390,6 +390,7 @@ describe('State translation component', function() {
   };
 
   var refreshStateTranslationEmitter = new EventEmitter();
+  var onUpdateTranslationActiveModeEmitter = new EventEmitter();
   var showTranslationTabBusyModalEmitter = new EventEmitter();
   beforeEach(angular.mock.module('oppia'));
 
@@ -460,6 +461,56 @@ describe('State translation component', function() {
 
   afterEach(function() {
     ctrl.$onDestroy();
+  });
+
+  describe('when translation tab is not busy and translation mode is' +
+    ' active', function() {
+    beforeEach(angular.mock.inject(function($injector, $componentController) {
+      var $filter = $injector.get('$filter');
+      $rootScope = $injector.get('$rootScope');
+      explorationStatesService = $injector.get('ExplorationStatesService');
+      routerService = $injector.get('RouterService');
+      translationLanguageService = $injector.get('TranslationLanguageService');
+      translationTabActiveContentIdService = $injector.get(
+        'TranslationTabActiveContentIdService');
+      translationTabActiveModeService = $injector.get(
+        'TranslationTabActiveModeService');
+
+      spyOn(ckEditorCopyContentService, 'copyModeActive').and
+        .returnValue(true);
+      spyOn(translationLanguageService, 'getActiveLanguageCode').and
+        .returnValue('en');
+      spyOnProperty(
+        translationTabActiveModeService, 'onUpdateTranslationActiveMode'
+      ).and.returnValue(onUpdateTranslationActiveModeEmitter);
+      spyOn(translationTabActiveModeService, 'isVoiceoverModeActive').and
+        .returnValue(false);
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        'Introduction');
+      explorationStatesService.init(explorationState1);
+      stateRecordedVoiceoversService.init(
+        'Introduction', recordedVoiceoversObjectFactory.createFromBackendDict(
+          recordedVoiceovers));
+
+      $scope = $rootScope.$new();
+      ctrl = $componentController('stateTranslation', {
+        $filter: $filter,
+        $rootScope: $rootScope,
+        $scope: $scope,
+        CkEditorCopyContentService: ckEditorCopyContentService,
+        StateEditorService: stateEditorService
+      }, {
+        isTranslationTabBusy: false
+      });
+      ctrl.$onInit();
+    }));
+
+    it('should switch to the content tab if the rule inputs tab is active and' +
+        ' the user switches to voiceover mode', function() {
+      $scope.activatedTabId = 'rule_input';
+      onUpdateTranslationActiveModeEmitter.emit('voiceoverMode');
+      expect($scope.activatedTabId).toBe('content');
+    });
   });
 
   describe('when translation tab is not busy and voiceover mode is' +

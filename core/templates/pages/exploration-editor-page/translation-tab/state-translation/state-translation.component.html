@@ -127,7 +127,7 @@
               <div class="oppia-editor-card-section">
                 <div class="oppia-rule-body-container">
                   <span>
-                    <[(ruleContent.rule | parameterizeRuleDescription:stateInteractionId:answerChoices:true)[ruleContent.inputName]]>
+                    <[ruleContent.rule.inputs[ruleContent.inputName] | formatBaseTranslatableObjectValues:ruleContent.rule.inputTypes[ruleContent.inputName]]>
                   </span>
                 </div>
               </div>

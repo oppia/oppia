@@ -17,7 +17,7 @@
  *      tab.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { ExplorationEditorPageConstants } from
@@ -28,13 +28,16 @@ import { ExplorationEditorPageConstants } from
 })
 export class TranslationTabActiveModeService {
   private activeMode: string = null;
+  private _updateTranslationActiveModeEventEmitter = new EventEmitter<string>();
 
   activateVoiceoverMode(): void {
     this.activeMode = ExplorationEditorPageConstants.VOICEOVER_MODE;
+    this._updateTranslationActiveModeEventEmitter.emit(this.activeMode);
   }
 
   activateTranslationMode(): void {
     this.activeMode = ExplorationEditorPageConstants.TRANSLATION_MODE;
+    this._updateTranslationActiveModeEventEmitter.emit(this.activeMode);
   }
 
   isTranslationModeActive(): boolean {
@@ -43,6 +46,10 @@ export class TranslationTabActiveModeService {
 
   isVoiceoverModeActive(): boolean {
     return this.activeMode === ExplorationEditorPageConstants.VOICEOVER_MODE;
+  }
+
+  get onUpdateTranslationActiveMode(): EventEmitter<string> {
+    return this._updateTranslationActiveModeEventEmitter;
   }
 }
 
