@@ -27,6 +27,10 @@
           <p ng-if="activeWrittenTranslation.isUnicode()">
             {{activeWrittenTranslation.getUnicode()}}
           </p>
+          <p ng-if="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml()">
+            <!-- <[activeWrittenTranslation.translation | formatBaseTranslatableObjects:dataFormat]> -->
+            {{getTranslatableContentPreview()}}
+          </p>
         </span>
       </div>
       <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
@@ -46,6 +50,9 @@
       <schema-based-editor schema="UNICODE_SCHEMA"
                            local-value="activeWrittenTranslation.translation">
       </schema-based-editor>
+    </div>
+    <div ng-if="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml()">
+      <object-editor obj-type="<[dataFormat]>" is-editable="true" always-editable="true" value="activeWrittenTranslation.translation" class="text-dark"></object-editor>
     </div>
 
     <div class="oppia-save-item-button-container">

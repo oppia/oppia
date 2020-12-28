@@ -175,6 +175,8 @@ import { ExtractImageFilenamesFromStateService } from
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { FormatBaseTranslatableObjectsPipe } from
+  'filters/format-base-translatable-objects.pipe';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { FractionInputValidationService } from
@@ -601,6 +603,8 @@ export class UpgradedServices {
       new ExplorationFeaturesService();
     upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['ExternalSaveService'] = new ExternalSaveService();
+    upgradedServices['FormatBaseTranslatableObjectsPipe'] =
+      new FormatBaseTranslatableObjectsPipe();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();

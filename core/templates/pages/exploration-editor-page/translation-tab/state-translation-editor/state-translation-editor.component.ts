@@ -16,27 +16,34 @@
  * @fileoverview Component for the state translation editor.
  */
 
+import _ from 'lodash';
 import { Subscription } from 'rxjs';
+
+import { WRITTEN_TRANSLATION_TYPE_HTML, WRITTEN_TRANSLATION_TYPE_UNICODE } from
+  'domain/exploration/WrittenTranslationObjectFactory.ts';
 
 require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('services/external-save.service.ts');
+require('filters/format-base-translatable-objects.pipe.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
+const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
+
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
-    '$scope', '$uibModal', 'EditabilityService',
+    '$filter', '$scope', '$uibModal', 'EditabilityService',
     'ExplorationStatesService', 'ExternalSaveService',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService', 'UrlInterpolationService',
     'WrittenTranslationObjectFactory',
     function(
-        $scope, $uibModal, EditabilityService,
+        $filter, $scope, $uibModal, EditabilityService,
         ExplorationStatesService, ExternalSaveService,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
@@ -134,9 +141,20 @@ angular.module('oppia').component('stateTranslationEditor', {
         if ($scope.isEditable()) {
           $scope.translationEditorIsOpen = true;
           if (!$scope.activeWrittenTranslation) {
+            let defaultValue;
+            if (
+              $scope.dataFormat !== WRITTEN_TRANSLATION_TYPE_HTML &&
+              $scope.dataFormat !== WRITTEN_TRANSLATION_TYPE_UNICODE
+            ) {
+              defaultValue = _.cloneDeep(
+                DEFAULT_OBJECT_VALUES[$scope.dataFormat]);
+              delete defaultValue.contentId;
+            } else {
+              defaultValue = '';
+            }
             $scope.activeWrittenTranslation = (
               WrittenTranslationObjectFactory
-                .createNew($scope.dataFormat, ''));
+                .createNew($scope.dataFormat, defaultValue));
           }
         }
       };
@@ -163,6 +181,13 @@ angular.module('oppia').component('stateTranslationEditor', {
         StateWrittenTranslationsService.restoreFromMemento();
         initEditor();
       };
+
+      $scope.getTranslatableContentPreview = () => {
+        return $filter('formatBaseTranslatableObjects')(
+          $scope.activeWrittenTranslation.translation,
+          $scope.dataFormat);
+      };
+
       ctrl.$onInit = function() {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
