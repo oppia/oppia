@@ -2832,7 +2832,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [['<p>Choice 1</p>', '<p>Choice 2</p>']]
+                    'x': [['<p>Choice 1</p>', '<p>Choice 2</p>', 'invalid']]
                 },
                 'rule_type': 'IsEqualToOrdering'
             }, {
@@ -2934,7 +2934,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         solution = question.question_state_data.interaction.solution
         self.assertEqual(
             answer_group.rule_specs[0].inputs['x'],
-            [['ca_choices_2', 'ca_choices_3']])
+            [['ca_choices_2', 'ca_choices_3', 'invalid_content_id']])
         self.assertEqual(
             answer_group.rule_specs[1].inputs['x'],
             [['ca_choices_2']])
