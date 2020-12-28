@@ -139,7 +139,7 @@ var ListEditor = function(elem) {
     }
   };
   var deleteItem = async function(index) {
-    await _elem.element(
+    await elem.element(
       await by.repeater('item in localValue track by $index').row(index)
     ).element(by.css('.protractor-test-delete-list-entry')).click();
   };

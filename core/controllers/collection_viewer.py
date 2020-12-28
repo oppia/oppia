@@ -21,11 +21,8 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import rights_manager
 from core.domain import summary_services
-from core.platform import models
 import feconf
 import utils
-
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class CollectionPage(base.BaseHandler):

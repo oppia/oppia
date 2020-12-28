@@ -25,11 +25,13 @@ angular.module('oppia').controller(
     'SuggestionModalService', 'currentContent',
     'newContent', 'suggestionIsHandled', 'suggestionIsValid',
     'suggestionStatus', 'threadUibModalInstance', 'unsavedChangesExist',
+    'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
     function(
         $scope, $uibModalInstance, EditabilityService,
         SuggestionModalService, currentContent,
         newContent, suggestionIsHandled, suggestionIsValid,
-        suggestionStatus, threadUibModalInstance, unsavedChangesExist) {
+        suggestionStatus, threadUibModalInstance, unsavedChangesExist,
+        ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
       $scope.isNotHandled = !suggestionIsHandled;
       $scope.canEdit = EditabilityService.isEditable();
       $scope.commitMessage = '';
@@ -60,7 +62,7 @@ angular.module('oppia').controller(
           threadUibModalInstance.close();
         }
         SuggestionModalService.acceptSuggestion($uibModalInstance, {
-          action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+          action: ACTION_ACCEPT_SUGGESTION,
           commitMessage: $scope.commitMessage,
           reviewMessage: $scope.reviewMessage,
           // TODO(sll): If audio files exist for the content being
@@ -79,7 +81,7 @@ angular.module('oppia').controller(
         }
         return SuggestionModalService.rejectSuggestion(
           $uibModalInstance, {
-            action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+            action: ACTION_REJECT_SUGGESTION,
             reviewMessage: $scope.reviewMessage
           });
       };

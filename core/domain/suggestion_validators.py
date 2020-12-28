@@ -39,13 +39,13 @@ import feconf
 ])
 
 TARGET_TYPE_TO_TARGET_MODEL = {
-    suggestion_models.TARGET_TYPE_EXPLORATION: (
+    feconf.ENTITY_TYPE_EXPLORATION: (
         exp_models.ExplorationModel),
-    suggestion_models.TARGET_TYPE_QUESTION: (
+    feconf.ENTITY_TYPE_QUESTION: (
         question_models.QuestionModel),
-    suggestion_models.TARGET_TYPE_SKILL: (
+    feconf.ENTITY_TYPE_SKILL: (
         skill_models.SkillModel),
-    suggestion_models.TARGET_TYPE_TOPIC: (
+    feconf.ENTITY_TYPE_TOPIC: (
         topic_models.TopicModel)
 }
 VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
@@ -232,7 +232,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
             item.score_category.split(
                 suggestion_models.SCORE_CATEGORY_DELIMITER)[0])
 
-        if item.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+        if item.target_type == feconf.ENTITY_TYPE_EXPLORATION:
             target_model_references = (
                 field_name_to_external_model_references[
                     '%s_ids' % item.target_type])
@@ -455,7 +455,7 @@ class CommunityContributionStatsModelValidator(
                 suggestion_models.STATUS_IN_REVIEW))
             .filter(
                 suggestion_models.GeneralSuggestionModel.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT))
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT))
         )
         for language_code in supported_language_codes:
             expected_translation_suggestion_count = (
@@ -538,7 +538,7 @@ class CommunityContributionStatsModelValidator(
                     suggestion_models.STATUS_IN_REVIEW))
             .filter(
                 suggestion_models.GeneralSuggestionModel.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION))
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION))
             .count()
         )
         if item.question_suggestion_count != expected_question_suggestion_count:
