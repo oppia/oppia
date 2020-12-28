@@ -310,10 +310,11 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_import_search_services(self):
         """Tests import search services function."""
-        from core.platform.search import gae_search_services
+        # The search services module is stubbed out in the test environment,
+        # hence the comparison to self._search_services_stub instead.
         self.assertEqual(
             self.registry_instance.import_search_services(),
-            gae_search_services)
+            self._search_services_stub)
 
     def test_import_models_not_implemented_has_not_implemented_error(self):
         """Tests NotImplementedError of Platform."""
