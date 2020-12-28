@@ -228,7 +228,7 @@ def get_exp_metadata_dicts_matching_query(query_string, search_cursor, user):
     """
     exp_ids, new_search_cursor = (
         exp_services.get_exploration_ids_matching_query(
-            query_string, cursor=search_cursor))
+            query_string, [], [], cursor=search_cursor))
 
     exploration_list = get_exploration_metadata_dicts(
         exp_ids, user)
@@ -485,31 +485,13 @@ def get_library_groups(language_codes):
             - full_results_url: str. The URL to the corresponding "full results"
                 page.
     """
-    language_codes_suffix = ''
-    if language_codes:
-        language_codes_suffix = ' language_code=("%s")' % (
-            '" OR "'.join(language_codes))
-
-    def _generate_query(categories):
-        """Generates query based on the categories and language codes.
-
-        Args:
-            categories: list(str). List of categories.
-
-        Returns:
-            str. Generated query.
-        """
-        # This assumes that 'categories' is non-empty.
-        return 'category=("%s")%s' % (
-            '" OR "'.join(categories), language_codes_suffix)
-
     # Collect all collection ids so that the summary details can be retrieved
     # with a single get_multi() call.
     all_collection_ids = []
     header_id_to_collection_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
         collection_ids = search_services.search_collections(
-            _generate_query(group['search_categories']), 8)[0]
+            '', group['search_categories'], language_codes, 8)[0]
         header_id_to_collection_ids[group['header_i18n_id']] = collection_ids
         all_collection_ids += collection_ids
 
@@ -530,7 +512,7 @@ def get_library_groups(language_codes):
     header_to_exp_ids = {}
     for group in _LIBRARY_INDEX_GROUPS:
         exp_ids = search_services.search_explorations(
-            _generate_query(group['search_categories']), 8)[0]
+            '', group['search_categories'], language_codes, 8)[0]
         header_to_exp_ids[group['header_i18n_id']] = exp_ids
         all_exp_ids += exp_ids
 
