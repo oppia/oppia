@@ -29,10 +29,9 @@ import python_utils
 import utils
 
 (
-    base_models, collection_models, exp_models, user_models
+    base_models, collection_models, exp_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
-    models.NAMES.user
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration
 ])
 
 
@@ -139,15 +138,12 @@ class CollectionRightsModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids',
                 collection_models.CollectionModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'owner_user_ids',
-                user_models.UserSettingsModel, item.owner_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'editor_user_ids',
-                user_models.UserSettingsModel, item.editor_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'viewer_user_ids',
-                user_models.UserSettingsModel, item.viewer_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'owner_user_ids', item.owner_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'editor_user_ids', item.editor_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'viewer_user_ids', item.viewer_ids),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 collection_models.CollectionRightsSnapshotMetadataModel,
@@ -284,18 +280,14 @@ class CollectionSummaryModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_rights_ids',
                 collection_models.CollectionRightsModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'owner_user_ids',
-                user_models.UserSettingsModel, item.owner_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'editor_user_ids',
-                user_models.UserSettingsModel, item.editor_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'viewer_user_ids',
-                user_models.UserSettingsModel, item.viewer_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'contributor_user_ids',
-                user_models.UserSettingsModel, item.contributor_ids)]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'owner_user_ids', item.owner_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'editor_user_ids', item.editor_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'viewer_user_ids', item.viewer_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'contributor_user_ids', item.contributor_ids)]
 
     @classmethod
     def _validate_contributors_summary(cls, item):

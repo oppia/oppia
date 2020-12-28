@@ -26,9 +26,9 @@ from core.platform import models
 
 
 (
-    exp_models, improvements_models, user_models
+    exp_models, improvements_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.improvements, models.NAMES.user
+    models.NAMES.exploration, models.NAMES.improvements
 ])
 
 
@@ -47,8 +47,8 @@ class TaskEntryModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'resolver_ids', user_models.UserSettingsModel,
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'resolver_ids',
                 [item.resolver_id] if item.resolver_id is not None else []),
             base_model_validators.ExternalModelFetcherDetails(
                 'entity_ids', exp_models.ExplorationModel, [item.entity_id])]

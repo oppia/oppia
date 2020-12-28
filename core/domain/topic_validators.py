@@ -27,12 +27,10 @@ from core.platform import models
 import python_utils
 
 (
-    base_models, skill_models, story_models, subtopic_models, topic_models,
-    user_models
+    base_models, skill_models, story_models, subtopic_models, topic_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.topic,
-    models.NAMES.user
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.topic
 ])
 
 
@@ -210,9 +208,8 @@ class TopicRightsModelValidator(base_model_validators.BaseModelValidator):
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'manager_user_ids', user_models.UserSettingsModel,
-                item.manager_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'manager_user_ids', item.manager_ids),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 topic_models.TopicRightsSnapshotMetadataModel,
