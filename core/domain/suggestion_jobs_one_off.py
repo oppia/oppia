@@ -27,7 +27,6 @@ from core.domain import html_validation_service
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
-import utils
 
 (feedback_models, suggestion_models, user_models,) = (
     models.Registry.import_models(
@@ -65,7 +64,7 @@ class QuestionSuggestionMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
 
         try:
             suggestion.validate()
-        except utils.ValidationError as e:
+        except Exception as e:
             yield ('POST_MIGRATION_VALIDATION_FALIURE', (item.id, e))
             return
 

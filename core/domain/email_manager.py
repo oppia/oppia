@@ -629,10 +629,11 @@ def get_moderator_unpublish_exploration_email():
 
     try:
         require_moderator_email_prereqs_are_satisfied()
-        return config_domain.Registry.get_config_property(
-            'unpublish_exploration_email_html_body').value
     except utils.ValidationError:
         return ''
+
+    return config_domain.Registry.get_config_property(
+        'unpublish_exploration_email_html_body').value
 
 
 def require_moderator_email_prereqs_are_satisfied():

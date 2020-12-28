@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import logging
-import sys
 
 from constants import constants
 from core.domain import opportunity_services
@@ -31,8 +30,6 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
-
-import six
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
@@ -574,10 +571,7 @@ def apply_change_list(question_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, question_id, change_list)
         )
-        # This code is needed in order to reraise the error properly with
-        # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
-        exec_info = sys.exc_info()
-        six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
+        python_utils.reraise_exception()
 
 
 def _save_question(committer_id, question, change_list, commit_message):

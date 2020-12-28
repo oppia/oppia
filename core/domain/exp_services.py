@@ -31,7 +31,6 @@ import logging
 import math
 import os
 import pprint
-import sys
 import zipfile
 
 from constants import constants
@@ -60,8 +59,6 @@ from core.platform import models
 import feconf
 import python_utils
 import utils
-
-import six
 
 datastore_services = models.Registry.import_datastore_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
@@ -528,10 +525,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        # This code is needed in order to reraise the error properly with
-        # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
-        exec_info = sys.exc_info()
-        six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
+        python_utils.reraise_exception()
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):

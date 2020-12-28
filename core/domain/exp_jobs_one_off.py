@@ -249,7 +249,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
         old_exploration = exp_fetchers.get_exploration_by_id(item.id)
         try:
             old_exploration.validate()
-        except utils.ValidationError as e:
+        except Exception as e:
             logging.error(
                 'Exploration %s failed non-strict validation: %s' %
                 (item.id, e))

@@ -526,8 +526,9 @@ class Collection(python_utils.OBJECT):
             schema format.
 
         Raises:
-            Exception. The 'yaml_content' or the collection schema version is
-                not valid.
+            InvalidInputException. The 'yaml_content' or the schema version
+                is not specified.
+            Exception. The collection schema version is not valid.
         """
         try:
             collection_dict = utils.dict_from_yaml(yaml_content)
