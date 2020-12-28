@@ -35,16 +35,15 @@ PREREQUISITES = [
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
-    if not os.path.exists(target_path):
-        command_text = [
-            sys.executable, '-m', 'pip', 'install', '%s==%s'
-            % (package_name, version_number), '--target', target_path]
-        uextention_text = ['--user', '--prefix=', '--system']
-        current_process = subprocess.Popen(
-            command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output_stderr = current_process.communicate()[1]
-        if 'can\'t combine user with prefix' in output_stderr:
-            subprocess.check_call(command_text + uextention_text)
+    command_text = [
+        sys.executable, '-m', 'pip', 'install', '%s==%s'
+        % (package_name, version_number), '--target', target_path]
+    uextention_text = ['--user', '--prefix=', '--system']
+    current_process = subprocess.Popen(
+        command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output_stderr = current_process.communicate()[1]
+    if 'can\'t combine user with prefix' in output_stderr:
+        subprocess.check_call(command_text + uextention_text)
 
 
 import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
