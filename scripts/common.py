@@ -718,16 +718,16 @@ class CD(python_utils.OBJECT):
 
 
 @contextlib.contextmanager
-def managed_process(args, shell=False, timeout=60, **kwargs):
+def managed_process(args, shell=False, timeout_secs=60, **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
         args: list(*). A sequence of program arguments, where the program to
             execute is the first item. All items are converted to strings first.
         shell: bool. Whether the command should be run inside of its own shell.
-        timeout: int. The time allotted for the managed process and its
-            descendants to terminate themselves, in seconds. After the timeout,
-            any remaining processes will be killed abruptly.
+        timeout_secs: int. The time allotted for the managed process and its
+            descendants to terminate themselves. After the timeout, any
+            remaining processes will be killed abruptly.
         **kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
@@ -751,7 +751,8 @@ def managed_process(args, shell=False, timeout=60, **kwargs):
             for proc in procs:
                 proc.terminate()
 
-            _, procs_still_running = psutil.wait_procs(procs, timeout=timeout)
+            _, procs_still_running = (
+                psutil.wait_procs(procs, timeout=timeout_secs))
             for proc in procs_still_running:
                 proc.kill()
                 logging.warn('Process killed (pid=%d)' % proc.pid)
