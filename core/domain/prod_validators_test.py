@@ -26,9 +26,7 @@ import random
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import feedback_services
 from core.domain import prod_validation_jobs_one_off
-from core.domain import prod_validators
 from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
