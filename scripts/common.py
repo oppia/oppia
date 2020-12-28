@@ -31,133 +31,22 @@ import time
 import constants
 import feconf
 import python_utils
-
-
-AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
-
-CURRENT_PYTHON_BIN = sys.executable
-
-# Versions of libraries used in devflow.
-COVERAGE_VERSION = '5.3'
-ESPRIMA_VERSION = '4.0.1'
-ISORT_VERSION = '4.3.21'
-PYCODESTYLE_VERSION = '2.6.0'
-PSUTIL_VERSION = '5.7.3'
-PYLINT_VERSION = '1.9.5'
-PYLINT_QUOTES_VERSION = '0.1.8'
-PYGITHUB_VERSION = '1.45'
-WEBTEST_VERSION = '2.0.35'
-PIP_TOOLS_VERSION = '5.4.0'
-GRPCIO_VERSION = '1.0.0'
-ENUM_VERSION = '1.1.10'
-PROTOBUF_VERSION = '3.13.0'
-SETUPTOOLS_VERSION = '36.6.0'
-
-# Node version.
-NODE_VERSION = '14.15.0'
-
-# NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = '1.22.10'
-
-# Versions of libraries used in backend.
-PILLOW_VERSION = '6.2.2'
-
-# Buf version.
-BUF_VERSION = '0.29.0'
-# Protoc is the compiler for protobuf files and the version must be same as
-# the version of protobuf library being used.
-PROTOC_VERSION = PROTOBUF_VERSION
-
-# We use redis 6.0.5 instead of the latest stable build of redis (6.0.6) because
-# there is a `make test` bug in redis 6.0.6 where the solution has not been
-# released. This is explained in this issue:
-# https://github.com/redis/redis/issues/7540.
-# IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
-# 1. Download the new version of the redis cli.
-# 2. Extract the cli in the folder that it was downloaded, most likely
-#    Downloads/.
-# 3. Change directories into the folder you extracted, titled
-#    redis-<new version>/ and change into that directory:
-#    cd redis-<new version>/
-# 4. From the top level of the redis-<new version> directory,
-#    run `make test`.
-# 5. All of the tests should pass with an [ok] status with no error codes. The
-#    final output should be 'All tests pass'.
-# 6. Be sure to leave a note in the PR description to confirm that you have read
-#    this message, and that all of the `make test` tests pass before you commit
-#    the upgrade to develop.
-# 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
-REDIS_CLI_VERSION = '6.0.5'
-
-RELEASE_BRANCH_NAME_PREFIX = 'release-'
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
-THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
-GOOGLE_CLOUD_SDK_HOME = os.path.join(
-    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-304.0.0', 'google-cloud-sdk')
-GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
-    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
-GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
-GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
-NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
-PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
-PYCODESTYLE_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION)
-PYLINT_QUOTES_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
-NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
-FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
-YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
-OS_NAME = platform.system()
-ARCHITECTURE = platform.machine()
-PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
-REDIS_SERVER_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
-    'src', 'redis-server')
-REDIS_CLI_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
-    'src', 'redis-cli')
-
-RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
-RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
-HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
-TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
-USER_PREFERENCES = {'open_new_tab_in_browser': None}
-
-FECONF_PATH = os.path.join('feconf.py')
-CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
-REDIS_CONF_PATH = os.path.join('redis.conf')
-# Path for the dump file the redis server autogenerates. It contains data
-# used by the Redis server.
-REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
-# The requirements.txt file is auto-generated and contains a deterministic list
-# of all libraries and versions that should exist in the
-# 'third_party/python_libs' directory.
-# NOTE: Developers should NOT modify this file.
-COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
-# The precompiled requirements file is the one that developers should be
-# modifying. It is the file that we use to recompile the
-# "requirements.txt" file so that all installations using "requirements.txt"
-# will be identical.
-REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
+from scripts import common_constants
 
 
 def is_windows_os():
     """Check if the running system is Windows."""
-    return OS_NAME == 'Windows'
+    return common_constants.OS_NAME == 'Windows'
 
 
 def is_mac_os():
     """Check if the running system is MacOS."""
-    return OS_NAME == 'Darwin'
+    return common_constants.OS_NAME == 'Darwin'
 
 
 def is_linux_os():
     """Check if the running system is Linux."""
-    return OS_NAME == 'Linux'
+    return common_constants.OS_NAME == 'Linux'
 
 
 def is_x64_architecture():
@@ -166,12 +55,12 @@ def is_x64_architecture():
     return sys.maxsize > 2**32
 
 
-NODE_BIN_PATH = os.path.join(
-    NODE_PATH, '' if is_windows_os() else 'bin', 'node')
-
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join([
-    os.path.dirname(NODE_BIN_PATH), os.path.join(YARN_PATH, 'bin'),
+    os.path.dirname(
+        common_constants.NODE_BIN_PATH_WINDOWS if is_windows_os() else
+        common_constants.NODE_BIN_PATH),
+    os.path.join(common_constants.YARN_PATH, 'bin'),
     os.environ['PATH']])
 
 
@@ -215,12 +104,12 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
 
 def open_new_tab_in_browser_if_possible(url):
     """Opens the given URL in a new browser tab, if possible."""
-    if USER_PREFERENCES['open_new_tab_in_browser'] is None:
+    if common_constants.USER_PREFERENCES['open_new_tab_in_browser'] is None:
         python_utils.PRINT(
             '\nDo you want the url to be opened in the browser? '
             'Confirm by entering y/ye/yes.')
-        USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
-    if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
+        common_constants.USER_PREFERENCES['open_new_tab_in_browser'] = python_utils.INPUT()
+    if common_constants.USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
         python_utils.PRINT(
             'Please open the following link in browser: %s' % url)
         return
@@ -298,11 +187,11 @@ def get_current_release_version_number(release_branch_name):
     Returns:
         str. The version of release.
     """
-    release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
+    release_match = re.match(common_constants.RELEASE_BRANCH_REGEX, release_branch_name)
     release_maintenance_match = re.match(
-        RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name)
+        common_constants.RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name)
     hotfix_match = re.match(
-        HOTFIX_BRANCH_REGEX, release_branch_name)
+        common_constants.HOTFIX_BRANCH_REGEX, release_branch_name)
     if release_match:
         return release_match.group(1)
     elif release_maintenance_match:
@@ -321,7 +210,7 @@ def is_current_branch_a_hotfix_branch():
     """
     current_branch_name = get_current_branch_name()
     return bool(
-        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+        re.match(common_constants.HOTFIX_BRANCH_REGEX, current_branch_name))
 
 
 def is_current_branch_a_release_branch():
@@ -331,11 +220,11 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    release_match = bool(re.match(RELEASE_BRANCH_REGEX, current_branch_name))
+    release_match = bool(re.match(common_constants.RELEASE_BRANCH_REGEX, current_branch_name))
     release_maintenance_match = bool(
-        re.match(RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
+        re.match(common_constants.RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
     hotfix_match = bool(
-        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+        re.match(common_constants.HOTFIX_BRANCH_REGEX, current_branch_name))
     return release_match or release_maintenance_match or hotfix_match
 
 
@@ -346,7 +235,7 @@ def is_current_branch_a_test_branch():
         bool. Whether the current branch is a test branch for deployment.
     """
     current_branch_name = get_current_branch_name()
-    return bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
+    return bool(re.match(common_constants.TEST_BRANCH_REGEX, current_branch_name))
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -423,7 +312,7 @@ def install_npm_library(library_name, version, path):
     """
     python_utils.PRINT(
         'Checking whether %s is installed in %s' % (library_name, path))
-    if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
+    if not os.path.exists(os.path.join(common_constants.NODE_MODULES_PATH, library_name)):
         python_utils.PRINT('Installing %s' % library_name)
         subprocess.check_call([
             'yarn', 'add', '%s@%s' % (library_name, version)])
@@ -442,7 +331,7 @@ def ask_user_to_confirm(message):
         python_utils.PRINT(message)
         python_utils.PRINT('Confirm once you are done by entering y/ye/yes.\n')
         answer = python_utils.INPUT().lower()
-        if answer in AFFIRMATIVE_CONFIRMATIONS:
+        if answer in common_constants.AFFIRMATIVE_CONFIRMATIONS:
             return
 
 
@@ -527,8 +416,8 @@ def kill_processes_based_on_regex(pattern):
         pattern: str. Pattern for searching processes.
     """
     regex = re.compile(pattern)
-    if PSUTIL_DIR not in sys.path:
-        sys.path.insert(1, PSUTIL_DIR)
+    if common_constants.PSUTIL_DIR not in sys.path:
+        sys.path.insert(1, common_constants.PSUTIL_DIR)
     import psutil
     for process in psutil.process_iter():
         try:
@@ -614,10 +503,10 @@ def wait_for_port_to_be_open(port_number):
     """
     waited_seconds = 0
     while (not is_port_open(port_number)
-           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+           and waited_seconds < common_constants.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1
-    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+    if (waited_seconds == common_constants.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_open(port_number)):
         python_utils.PRINT(
             'Failed to start server on port %s, exiting ...' %
@@ -638,15 +527,15 @@ def start_redis_server():
     # Check if a redis dump file currently exists. This file contains residual
     # data from a previous run of the redis server. If it exists, removes the
     # dump file so that the redis server starts with a clean slate.
-    if os.path.exists(REDIS_DUMP_PATH):
-        os.remove(REDIS_DUMP_PATH)
+    if os.path.exists(common_constants.REDIS_DUMP_PATH):
+        os.remove(common_constants.REDIS_DUMP_PATH)
 
     # Redis-cli is only required in a development environment.
     python_utils.PRINT('Starting Redis development server.')
     # Start the redis local development server. Redis doesn't run on
     # Windows machines.
     subprocess.call([
-        REDIS_SERVER_PATH, REDIS_CONF_PATH,
+        common_constants.REDIS_SERVER_PATH, common_constants.REDIS_CONF_PATH,
         '--daemonize', 'yes'
     ])
     wait_for_port_to_be_open(feconf.REDISPORT)
@@ -662,7 +551,7 @@ def stop_redis_server():
 
     python_utils.PRINT('Cleaning up the redis_servers.')
     # Shutdown the redis server before exiting.
-    subprocess.call([REDIS_CLI_PATH, 'shutdown'])
+    subprocess.call([common_constants.REDIS_CLI_PATH, 'shutdown'])
 
 
 def fix_third_party_imports():
@@ -691,12 +580,12 @@ def fix_third_party_imports():
     # imports from the 'third_party/python_libs' folder so that the imports are
     # correct.
     if 'google' in sys.modules:
-        google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
+        google_path = os.path.join(common_constants.THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         google_module = sys.modules['google']
         google_module.__path__ = [google_path]
         google_module.__file__ = os.path.join(google_path, '__init__.py')
 
-    sys.path.insert(1, THIRD_PARTY_PYTHON_LIBS_DIR)
+    sys.path.insert(1, common_constants.THIRD_PARTY_PYTHON_LIBS_DIR)
 
 
 class CD(python_utils.OBJECT):
