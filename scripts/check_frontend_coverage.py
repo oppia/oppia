@@ -255,6 +255,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'read-only-collection-backend-api.service.ts',
     'real-editor.directive.ts',
     'refresher-exploration-confirmation-modal.service.ts',
+    'remove-duplicates-in-array.pipe.ts',
     'request-interceptor.service.ts',
     'response-header.directive.ts',
     'review-material-editor.directive.ts',

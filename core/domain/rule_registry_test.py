@@ -50,8 +50,8 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
 
         spec_file_v41 = os.path.join(
             'extensions', 'interactions',
-            'legacy_html_field_types_to_rule_specs',
-            'html_field_types_to_rule_specs_stateV41.json')
+            'legacy_html_field_types_to_rule_specs_by_state_version',
+            'html_field_types_to_rule_specs_state_v41.json')
         with python_utils.open_file(spec_file_v41, 'r') as f:
             specs_from_json_v41 = json.loads(f.read())
 
