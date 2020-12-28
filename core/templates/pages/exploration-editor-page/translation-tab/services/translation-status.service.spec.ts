@@ -69,7 +69,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-written-translations.service.ts');
 
-describe('Translation status service', function() {
+fdescribe('Translation status service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   importAllAngularServices();
@@ -438,7 +438,7 @@ describe('Translation status service', function() {
       tls.setActiveLanguageCode('hi');
       var explorationTranslationsRequiredCount = (
         tss.getExplorationContentRequiredCount());
-      expect(explorationTranslationsRequiredCount).toBe(8);
+      expect(explorationTranslationsRequiredCount).toBe(9);
 
       // To test changes after adding a new state.
       ess.addState('Fourth');

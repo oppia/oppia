@@ -41,12 +41,12 @@ angular.module('oppia').factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',
   'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT',
-  'INTERACTION_SPECS',
+  'COMPONENT_NAME_RULE_INPUT', 'INTERACTION_SPECS',
   function(
       ExplorationStatesService, StateRecordedVoiceoversService,
       StateWrittenTranslationsService, TranslationLanguageService,
       TranslationTabActiveModeService, COMPONENT_NAME_HINT,
-      INTERACTION_SPECS) {
+      COMPONENT_NAME_RULE_INPUT, INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var TRANSLATION_NEEDS_UPDATE_MESSAGE = ['Translation needs update!'];
     var ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
@@ -56,8 +56,10 @@ angular.module('oppia').factory('TranslationStatusService', [
     var langCode = TranslationLanguageService.getActiveLanguageCode();
     var stateNeedsUpdateWarnings = {};
     var stateWiseStatusColor = {};
-    var explorationContentRequiredCount = 0;
-    var explorationContentNotAvailableCount = 0;
+    var explorationTranslationContentRequiredCount = 0;
+    var explorationVoiceoverContentRequiredCount = 0;
+    var explorationTranslationContentNotAvailableCount = 0;
+    var explorationVoiceoverContentNotAvailableCount = 0;
 
     var _getVoiceOverStatus = function(recordedVoiceovers, contentId) {
       var availabilityStatus = {
@@ -119,13 +121,16 @@ angular.module('oppia').factory('TranslationStatusService', [
     var _computeAllStatesStatus = function() {
       stateNeedsUpdateWarnings = {};
       stateWiseStatusColor = {};
-      explorationContentRequiredCount = 0;
-      explorationContentNotAvailableCount = 0;
+      explorationTranslationContentRequiredCount = 0;
+      explorationVoiceoverContentRequiredCount = 0;
+      explorationTranslationContentNotAvailableCount = 0;
+      explorationVoiceoverContentNotAvailableCount = 0;
 
       if (ExplorationStatesService.isInitialized()) {
         ExplorationStatesService.getStateNames().forEach(function(stateName) {
           var stateNeedsUpdate = false;
           var noTranslationCount = 0;
+          var noVoiceoverCount = 0;
           var recordedVoiceovers = (
             ExplorationStatesService.getRecordedVoiceoversMemento(stateName));
           var allContentIds = recordedVoiceovers.getAllContentId();
@@ -149,12 +154,25 @@ angular.module('oppia').factory('TranslationStatusService', [
             });
           }
 
-          explorationContentRequiredCount += allContentIds.length;
+          explorationTranslationContentRequiredCount += allContentIds.length;
+
+          // Rule inputs do not need voiceovers. To have an accurate
+          // representation of the progress bar for voiceovers, we remove rule
+          // input content ids.
+          const numOfRuleInputContentIds = (
+            _getContentIdListRelatedToComponent(
+              COMPONENT_NAME_RULE_INPUT, allContentIds).length);
+          explorationVoiceoverContentRequiredCount += (
+            allContentIds.length - numOfRuleInputContentIds);
+
           allContentIds.forEach(function(contentId) {
             var availabilityStatus = _getContentAvailabilityStatus(
               stateName, contentId);
             if (!availabilityStatus.available) {
               noTranslationCount++;
+              if (contentId.indexOf(COMPONENT_NAME_RULE_INPUT) !== 0) {
+                noVoiceoverCount++;
+              }
             }
             if (availabilityStatus.needsUpdate) {
               if (TranslationTabActiveModeService.isTranslationModeActive()) {
@@ -168,7 +186,8 @@ angular.module('oppia').factory('TranslationStatusService', [
               }
             }
           });
-          explorationContentNotAvailableCount += noTranslationCount;
+          explorationTranslationContentNotAvailableCount += noTranslationCount;
+          explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
           if (noTranslationCount === 0 && !stateNeedsUpdate) {
             stateWiseStatusColor[stateName] = ALL_ASSETS_AVAILABLE_COLOR;
           } else if (
@@ -272,6 +291,22 @@ angular.module('oppia').factory('TranslationStatusService', [
       return availabilityStatus.needsUpdate;
     };
 
+    const _getExplorationContentRequiredCount = () => {
+      if (TranslationTabActiveModeService.isTranslationModeActive()) {
+        return explorationTranslationContentRequiredCount;
+      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+        return explorationVoiceoverContentRequiredCount;
+      }
+    };
+
+    const _getExplorationContentNotAvailableCount = () => {
+      if (TranslationTabActiveModeService.isTranslationModeActive()) {
+        return explorationTranslationContentNotAvailableCount;
+      } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
+        return explorationVoiceoverContentNotAvailableCount;
+      }
+    };
+
     return {
       refresh: function() {
         _computeAllStatesStatus();
@@ -280,10 +315,10 @@ angular.module('oppia').factory('TranslationStatusService', [
         return stateNeedsUpdateWarnings;
       },
       getExplorationContentRequiredCount: function() {
-        return explorationContentRequiredCount;
+        return _getExplorationContentRequiredCount;
       },
       getExplorationContentNotAvailableCount: function() {
-        return explorationContentNotAvailableCount;
+        return _getExplorationContentNotAvailableCount;
       },
       getAllStateStatusColors: function() {
         return stateWiseStatusColor;
