@@ -28,8 +28,7 @@
             {{activeWrittenTranslation.getUnicode()}}
           </p>
           <p ng-if="!activeWrittenTranslation.isUnicode() && !activeWrittenTranslation.isHtml()">
-            <!-- <[activeWrittenTranslation.translation | formatBaseTranslatableObjects:dataFormat]> -->
-            {{getTranslatableContentPreview()}}
+            <[activeWrittenTranslation.translation | formatBaseTranslatableObjectValues:dataFormat]>
           </p>
         </span>
       </div>

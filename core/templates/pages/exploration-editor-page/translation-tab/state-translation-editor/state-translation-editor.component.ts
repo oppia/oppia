@@ -26,7 +26,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('services/external-save.service.ts');
-require('filters/format-base-translatable-objects.pipe.ts');
+require('filters/format-base-translatable-objects.filter.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -183,7 +183,7 @@ angular.module('oppia').component('stateTranslationEditor', {
       };
 
       $scope.getTranslatableContentPreview = () => {
-        return $filter('formatBaseTranslatableObjects')(
+        return $filter('formatBaseTranslatableObjectValues')(
           $scope.activeWrittenTranslation.translation,
           $scope.dataFormat);
       };
