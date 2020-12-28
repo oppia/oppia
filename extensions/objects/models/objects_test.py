@@ -906,7 +906,11 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
         for name, member in inspect.getmembers(objects):
             if not inspect.isclass(member):
                 continue
-
+            
+            # Assert that BaseTranslatableObject subclasses start with
+            # 'Translatable'. All objects that start with 'Translatable'
+            # subclassBaseTranslatableObject, with the exception of any object
+            # name that contains 'ContentId' (exm. TranslatableHtmlContentId).
             if isinstance(member(), objects.BaseTranslatableObject):
                 if name == 'BaseTranslatableObject':
                     continue
