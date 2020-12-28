@@ -17,14 +17,15 @@
  * editor.
  */
 
-angular.module('oppia').component('listOfSetsOfTranslatableHtmlContentIdEditor',
+angular.module('oppia').component(
+  'listOfSetsOfTranslatableHtmlContentIdsEditor',
   {
     bindings: {
       getInitArgs: '&',
       value: '='
     },
     template: require(
-      './list-of-sets-of-translatable-html-content-id-editor.component.html'),
+      './list-of-sets-of-translatable-html-content-ids-editor.component.html'),
     controller: [
       function() {
         const ctrl = this;

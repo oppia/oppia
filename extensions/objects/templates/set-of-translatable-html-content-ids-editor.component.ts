@@ -16,13 +16,13 @@
  * @fileoverview Component for set of translatable html content id editor.
  */
 
-angular.module('oppia').component('setOfTranslatableHtmlContentIdEditor', {
+angular.module('oppia').component('setOfTranslatableHtmlContentIdsEditor', {
   bindings: {
     getInitArgs: '&',
     value: '='
   },
   template: require(
-    './set-of-translatable-html-content-id-editor.component.html'),
+    './set-of-translatable-html-content-ids-editor.component.html'),
   controller: [
     function() {
       const ctrl = this;
