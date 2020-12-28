@@ -362,9 +362,32 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_model.put()
 
 
-class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
+class FillExplorationIdsInUserSubscriptionsModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One off job that removes nonexisting activity ids from
+    """One off job that copies from activity_ids to exploration_ids
+    in UserSubscriptionsModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSubscriptionsModel]
+
+    @staticmethod
+    def map(model_instance):
+        model_instance.exploration_ids = model_instance.activity_ids
+        model_instance.update_timestamps(update_last_updated_time=False)
+        model_instance.put()
+        yield ('SUCCESS', model_instance.exploration_ids)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One off job that removes nonexisting exploration ids from
     UserSubscriptionsModel.
     """
 
@@ -379,15 +402,15 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
         if not model_instance.deleted:
             fetched_exploration_model_instances = (
                 datastore_services.fetch_multiple_entities_by_ids_and_models(
-                    [('ExplorationModel', model_instance.activity_ids)]))[0]
+                    [('ExplorationModel', model_instance.exploration_ids)]))[0]
 
             exp_ids_removed = []
             for exp_id, exp_instance in list(python_utils.ZIP(
-                    model_instance.activity_ids,
+                    model_instance.exploration_ids,
                     fetched_exploration_model_instances)):
                 if exp_instance is None or exp_instance.deleted:
                     exp_ids_removed.append(exp_id)
-                    model_instance.activity_ids.remove(exp_id)
+                    model_instance.exploration_ids.remove(exp_id)
             if exp_ids_removed:
                 model_instance.update_timestamps()
                 model_instance.put()

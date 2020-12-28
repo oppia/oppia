@@ -89,8 +89,8 @@ def subscribe_to_exploration(user_id, exploration_id):
     if not subscriptions_model:
         subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
 
-    if exploration_id not in subscriptions_model.activity_ids:
-        subscriptions_model.activity_ids.append(exploration_id)
+    if exploration_id not in subscriptions_model.exploration_ids:
+        subscriptions_model.exploration_ids.append(exploration_id)
         subscriptions_model.update_timestamps()
         subscriptions_model.put()
 
@@ -229,7 +229,7 @@ def get_exploration_ids_subscribed_to(user_id):
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
     return (
-        subscriptions_model.activity_ids
+        subscriptions_model.exploration_ids
         if subscriptions_model else [])
 
 

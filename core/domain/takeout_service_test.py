@@ -275,7 +275,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     CREATOR_USERNAMES = ['username4', 'username8', 'username16']
     COLLECTION_IDS = ['23', '42', '4']
     COLLECTION_IDS_2 = ['32', '44', '6']
-    ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
     MESSAGE_IDS_READ_BY_USER = [0, 1]
     SKILL_ID_1 = 'skill_id_1'
@@ -373,7 +372,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_1, creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
-            activity_ids=self.ACTIVITY_IDS,
+            exploration_ids=self.EXPLORATION_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATE).put()
 
@@ -794,7 +793,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         stats_data = {}
         story_progress_data = {}
         subscriptions_data = {
-            'activity_ids': [],
+            'exploration_ids': [],
             'collection_ids': [],
             'creator_usernames': [],
             'feedback_thread_ids': [],
@@ -1270,7 +1269,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_subscriptions_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
+            'exploration_ids': self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
                                            [thread_id],
             'last_checked_msec': self.GENERIC_EPOCH

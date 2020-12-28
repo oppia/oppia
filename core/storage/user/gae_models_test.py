@@ -844,7 +844,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     CREATOR_IDS = [USER_ID_5, USER_ID_6]
     CREATOR_USERNAMES = ['usernameuser_id_5', 'usernameuser_id_6']
     COLLECTION_IDS = ['23', '42', '4']
-    ACTIVITY_IDS = ['8', '16', '23']
+    EXPLORATION_IDS = ['exp_1', 'exp_2', 'exp_3']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
     GENERIC_DATETIME = datetime.datetime(2020, 6, 2)
 
@@ -873,7 +873,8 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             id=self.USER_ID_2,
             creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
-            activity_ids=self.ACTIVITY_IDS,
+            activity_ids=self.EXPLORATION_IDS,
+            exploration_ids=self.EXPLORATION_IDS,
             feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATETIME
@@ -935,7 +936,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         test_data = {
             'creator_usernames': [],
             'collection_ids': [],
-            'activity_ids': [],
+            'exploration_ids': [],
             'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked_msec': None
@@ -949,7 +950,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         test_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': self.ACTIVITY_IDS,
+            'exploration_ids': self.EXPLORATION_IDS,
             'feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
             'last_checked_msec':
