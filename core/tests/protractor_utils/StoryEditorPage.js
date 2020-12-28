@@ -276,13 +276,15 @@ var StoryEditorPage = function() {
 
   this.changeStoryTitle = async function(storyTitle) {
     await action.clear('Story title Field', storyTitleField);
-    await action.sendKeys('Story Title Field',
+    await action.sendKeys(
+      'Story Title Field',
       storyTitleField, storyTitle);
   };
 
   this.returnToTopic = async function() {
     await general.scrollToTop();
-    await action.click('Return To Topic Button',
+    await action.click(
+      'Return To Topic Button',
       returnToTopicButton);
     await waitFor.pageToFullyLoad();
   };
@@ -318,9 +320,9 @@ var StoryEditorPage = function() {
       'Commit Message Field',
       commitMessageField, commitMessage);
 
-      await waitFor.elementToBeClickable(
-        closeSaveModalButton,
-        'Close save modal button takes too long to be clickable'); 
+    await waitFor.elementToBeClickable(
+      closeSaveModalButton,
+      'Close save modal button takes too long to be clickable'); 
     await action.click(
       'Close Save Modal Button', closeSaveModalButton);
     await waitFor.invisibilityOf(
@@ -342,10 +344,10 @@ var StoryEditorPage = function() {
 
     await action.sendKeys(
       'Exploration Id Input', explorationIdInput, explorationId);
-      await waitFor.elementToBeClickable(
-        explorationIdSaveButton,
-        'ExplorationIdSaveButton takes too long to be clickable'
-      );
+    await waitFor.elementToBeClickable(
+      explorationIdSaveButton,
+      'ExplorationIdSaveButton takes too long to be clickable'
+    );
     await action.click('Exploration Id Save Button', explorationIdSaveButton);
   };
 
@@ -386,7 +388,8 @@ var StoryEditorPage = function() {
     await action.clear('Editor', editor);
     await richTextInstructions(editor);
     await action.click('Chapter node editor', nodeOutlineEditor);
-    await action.click('Node Outline Save Button',
+    await action.click(
+      'Node Outline Save Button',
       nodeOutlineSaveButton);
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };
@@ -423,8 +426,7 @@ var StoryEditorPage = function() {
         await action.sendKeys(
           'Skill Name Input Field',
           skillNameInputField,
-          name 
-        );
+          name);
       },
 
       _selectSkillBasedOnIndex: async function(index) {
@@ -435,7 +437,7 @@ var StoryEditorPage = function() {
         );
         await action.click(
           'Selected Skill', selectedSkill
-        )
+        );
       },
 
       selectSkill: async function(name) {
