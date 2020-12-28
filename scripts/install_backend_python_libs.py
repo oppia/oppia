@@ -24,10 +24,11 @@ import shutil
 import subprocess
 import sys
 
-import pkg_resources
 import python_utils
 from scripts import common
 from scripts import common_constants
+
+import pkg_resources
 
 
 def normalize_python_library_name(library_name):
