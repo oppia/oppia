@@ -63,7 +63,7 @@ export class AboutPageComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef) {
-    }
+  }
 
   getCredits(startLetter: string): string[] {
     const results = AboutPageConstants.CREDITS_CONSTANTS.filter(
@@ -79,6 +79,14 @@ export class AboutPageComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  goToClassroomPage(): void {
+    window.location.pathname = '/community-library';
+  }
+
+  goToCreatePage(): void {
+    window.location.pathname = '/create';
   }
 
   ngOnInit(): void {
