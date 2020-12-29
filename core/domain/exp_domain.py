@@ -2214,7 +2214,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.convert_to_textangular,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
         return states_dict
 
     @classmethod
@@ -2234,7 +2235,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_caption_attr_to_image,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
         return states_dict
 
     @classmethod
@@ -2254,7 +2256,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.convert_to_ckeditor,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
         return states_dict
 
     @classmethod
@@ -2278,7 +2281,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 add_dimensions_to_image_tags,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
             if state_dict['interaction']['id'] == 'ImageClickInput':
                 filename = state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath']
@@ -2545,7 +2549,8 @@ class Exploration(python_utils.OBJECT):
             states_dict[key] = state_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_validation_service.add_math_content_to_math_rte_components,
-                state_uses_old_interaction_cust_args_schema=True)
+                state_uses_old_interaction_cust_args_schema=True,
+                state_uses_old_rule_template_schema=True)
 
         return states_dict
 
@@ -3076,6 +3081,157 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v41_dict_to_v42_dict(cls, states_dict):
+        """Converts from version 41 to 42. Version 42 changes rule input types
+        for DragAndDropSortInput and ItemSelectionInput interactions to better
+        support translations. Specifically, the rule inputs will store content
+        ids of the html rather than the raw html. Solution answers for
+        DragAndDropSortInput and ItemSelectionInput interactions are also
+        updated.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+
+        def migrate_rule_inputs_and_answers(new_type, value, choices):
+            """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
+            ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
+            and DragAndDropHtmlString to TranslatableHtmlContentId. These
+            migrations are necessary to have rules work easily for multiple
+            languages; instead of comparing html for equality, we compare
+            content_ids for equality.
+
+            Args:
+                new_type: str. The type to migrate to.
+                value: *. The value to migrate.
+                choices: list(dict). The list of subtitled html dicts to extract
+                    content ids from.
+
+            Returns:
+                *. The migrated rule input.
+            """
+
+            def extract_content_id_from_choices(html):
+                """Given a html, find its associated content id in choices,
+                which is a list of subtitled html dicts.
+
+                Args:
+                    html: str. The html to find the content id of.
+
+                Returns:
+                    str. The content id of html.
+                """
+                for subtitled_html_dict in choices:
+                    if subtitled_html_dict['html'] == html:
+                        return subtitled_html_dict['content_id']
+                # If there is no match, we discard the rule input. The frontend
+                # will handle invalid content ids similar to how it handled
+                # non-matching html.
+                return feconf.INVALID_CONTENT_ID
+
+            if new_type == 'TranslatableHtmlContentId':
+                return extract_content_id_from_choices(value)
+            elif new_type == 'SetOfTranslatableHtmlContentIds':
+                return [
+                    migrate_rule_inputs_and_answers(
+                        'TranslatableHtmlContentId', html, choices
+                    ) for html in value
+                ]
+            elif new_type == 'ListOfSetsOfTranslatableHtmlContentIds':
+                return [
+                    migrate_rule_inputs_and_answers(
+                        'SetOfTranslatableHtmlContentIds', html_set, choices
+                    ) for html_set in value
+                ]
+
+        for state_dict in states_dict.values():
+            interaction_id = state_dict['interaction']['id']
+            if interaction_id not in [
+                    'DragAndDropSortInput', 'ItemSelectionInput']:
+                continue
+
+            solution = state_dict['interaction']['solution']
+            choices = state_dict['interaction']['customization_args'][
+                'choices']['value']
+            if interaction_id == 'ItemSelectionInput':
+                # The solution type will be migrated from SetOfHtmlString to
+                # SetOfTranslatableHtmlContentIds.
+                if solution is not None:
+                    solution['correct_answer'] = (
+                        migrate_rule_inputs_and_answers(
+                            'SetOfTranslatableHtmlContentIds',
+                            solution['correct_answer'],
+                            choices)
+                    )
+            if interaction_id == 'DragAndDropSortInput':
+                # The solution type will be migrated from ListOfSetsOfHtmlString
+                # to ListOfSetsOfTranslatableHtmlContentIds.
+                if solution is not None:
+                    solution['correct_answer'] = (
+                        migrate_rule_inputs_and_answers(
+                            'ListOfSetsOfTranslatableHtmlContentIds',
+                            solution['correct_answer'],
+                            choices)
+                    )
+
+            for answer_group_dict in state_dict['interaction']['answer_groups']:
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    rule_inputs = rule_spec_dict['inputs']
+
+                    if interaction_id == 'ItemSelectionInput':
+                        # All rule inputs for ItemSelectionInput will be
+                        # migrated from SetOfHtmlString to
+                        # SetOfTranslatableHtmlContentIds.
+                        rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                            'SetOfTranslatableHtmlContentIds',
+                            rule_inputs['x'],
+                            choices)
+                    if interaction_id == 'DragAndDropSortInput':
+                        rule_types_with_list_of_sets = [
+                            'IsEqualToOrdering',
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                        ]
+                        if rule_type in rule_types_with_list_of_sets:
+                            # For rule type IsEqualToOrdering and
+                            # IsEqualToOrderingWithOneItemAtIncorrectPosition,
+                            # the x input will be migrated from
+                            # ListOfSetsOfHtmlStrings to
+                            # ListOfSetsOfTranslatableHtmlContentIds.
+                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                                'ListOfSetsOfTranslatableHtmlContentIds',
+                                rule_inputs['x'],
+                                choices)
+                        elif rule_type == 'HasElementXAtPositionY':
+                            # For rule type HasElementXAtPositionY,
+                            # the x input will be migrated from
+                            # DragAndDropHtmlString to
+                            # TranslatableHtmlContentId, and the y input will
+                            # remain as DragAndDropPositiveInt.
+                            rule_inputs['x'] = migrate_rule_inputs_and_answers(
+                                'TranslatableHtmlContentId',
+                                rule_inputs['x'],
+                                choices)
+                        elif rule_type == 'HasElementXBeforeElementY':
+                            # For rule type HasElementXBeforeElementY,
+                            # the x and y inputs will be migrated from
+                            # DragAndDropHtmlString to
+                            # TranslatableHtmlContentId.
+                            for rule_input_name in ['x', 'y']:
+                                rule_inputs[rule_input_name] = (
+                                    migrate_rule_inputs_and_answers(
+                                        'TranslatableHtmlContentId',
+                                        rule_inputs[rule_input_name],
+                                        choices))
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -3110,7 +3266,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 46
+    CURRENT_EXP_SCHEMA_VERSION = 47
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4182,6 +4338,29 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v46_dict_to_v47_dict(cls, exploration_dict):
+        """Converts a v46 exploration dict into a v47 exploration dict.
+        Changes rule input types for DragAndDropSortInput and ItemSelectionInput
+        interactions to better support translations. Specifically, the rule
+        inputs will store content ids of html rather than the raw html.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v46.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v47.
+        """
+        exploration_dict['schema_version'] = 47
+
+        exploration_dict['states'] = cls._convert_states_v41_dict_to_v42_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 42
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4443,6 +4622,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v45_dict_to_v46_dict(
                 exploration_dict)
             exploration_schema_version = 46
+
+        if exploration_schema_version == 46:
+            exploration_dict = cls._convert_v46_dict_to_v47_dict(
+                exploration_dict)
+            exploration_schema_version = 47
 
         return (exploration_dict, initial_schema_version)
 
