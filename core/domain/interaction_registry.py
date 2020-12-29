@@ -130,7 +130,8 @@ class Registry(python_utils.OBJECT):
         """
         if (state_schema_version not in
                 cls._state_schema_version_to_interaction_specs):
-            file_name = 'interaction_specs_stateV%i.json' % state_schema_version
+            file_name = (
+                'interaction_specs_state_v%i.json' % state_schema_version)
             spec_file = os.path.join(
                 feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
 

@@ -102,39 +102,40 @@ angular.module('oppia').directive('ruleEditor', [
                 // selection interaction.
                 // TODO(sll): Remove the need for this special case.
                 if (answerChoices.length > 0) {
-                  if (finalInputArray[2] === 'SetOfHtmlString') {
+                  if (
+                    finalInputArray[2] === 'SetOfTranslatableHtmlContentIds'
+                  ) {
                     ctrl.ruleDescriptionChoices = answerChoices.map(
-                      function(choice) {
-                        return {
-                          id: choice.label,
-                          val: choice.label
-                        };
-                      }
+                      choice => ({
+                        id: choice.label,
+                        val: choice.val
+                      })
                     );
                     result.push({
                       type: 'checkboxes',
                       varName: finalInputArray[i + 1]
                     });
-                  } else if (finalInputArray[2] === 'ListOfSetsOfHtmlStrings') {
+                  } else if (
+                    finalInputArray[2] ===
+                    'ListOfSetsOfTranslatableHtmlContentIds'
+                  ) {
                     ctrl.ruleDescriptionChoices = answerChoices.map(
-                      function(choice) {
-                        return {
-                          id: choice.label,
-                          val: choice.label
-                        };
-                      }
+                      choice => ({
+                        id: choice.label,
+                        val: choice.val
+                      })
                     );
                     result.push({
                       type: 'dropdown',
                       varName: finalInputArray[i + 1]
                     });
                   } else if (
-                    finalInputArray[i + 2] === 'DragAndDropHtmlString') {
+                    finalInputArray[i + 2] === 'TranslatableHtmlContentId') {
                     ctrl.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {
                         return {
                           id: choice.label,
-                          val: choice.label
+                          val: choice.val
                         };
                       }
                     );

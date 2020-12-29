@@ -6902,7 +6902,151 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V46
+    YAML_CONTENT_V47 = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V47
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -7342,7 +7486,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   (untitled state):
     classifier_model_id: null
@@ -7470,7 +7614,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: Title
 """)
@@ -7503,7 +7647,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   (untitled state):
     classifier_model_id: null
@@ -7636,7 +7780,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: Title
 """)
@@ -7687,7 +7831,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   (untitled state):
     classifier_model_id: null
@@ -7827,7 +7971,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: Title
 """)
@@ -7860,7 +8004,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   (untitled state):
     classifier_model_id: null
@@ -7992,7 +8136,7 @@ states:
         ca_customPlaceholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: Title
 """)
@@ -8055,7 +8199,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   (untitled state):
     classifier_model_id: null
@@ -8180,7 +8324,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: Title
 """)
@@ -8215,7 +8359,7 @@ title: Title
     def test_load_from_v40_special_cases(self):
         """Test to cover some special cases that occurs in the migration from
         v40 to v41 exploration schema. This includes modifying existing written
-        translations, converting hmtl to SubtitledHtml, and filling in empty
+        translations, converting html to SubtitledHtml, and filling in empty
         SubtitledHtml list customization arguments with a default value.
         """
         sample_yaml_content = (
@@ -8356,7 +8500,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   (untitled state):
     classifier_model_id: null
@@ -8483,7 +8627,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: Title
 """)
@@ -8633,7 +8777,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   (untitled state):
     classifier_model_id: null
@@ -8765,7 +8909,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: Title
 """)
@@ -8884,7 +9028,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   (untitled state):
     classifier_model_id: null
@@ -8970,7 +9114,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: Title
 """)
@@ -8979,6 +9123,500 @@ title: Title
         self.assertEqual(
             exploration.to_yaml(),
             latest_exploration_with_set_input_yaml)
+
+    def test_load_from_v46_with_item_selection_input_interaction(self):
+        """Tests the migration of ItemSelectionInput rule inputs."""
+        sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - <p>Choice 1</p>
+            - <p>Choice 2</p>
+            - <p>Choice Invalid</p>
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
+        maxAllowableSelectionCount:
+          value: 2
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+          - <p>Choice 1</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+
+        latest_sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - ca_choices_2
+            - ca_choices_3
+            - invalid_content_id
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
+        maxAllowableSelectionCount:
+          value: 2
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - ca_choices_2
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
+
+    def test_load_from_v46_with_drag_and_drop_sort_input_interaction(self):
+        """Tests the migration of DragAndDropSortInput rule inputs."""
+        sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 46
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - <p>Choice 1</p>
+              - <p>Choice 2</p>
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - <p>Choice 1</p>
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: <p>Choice 1</p>
+            y: 1
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x: <p>Choice 1</p>
+            y: <p>Choice 2</p>
+          rule_type: HasElementXBeforeElementY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - <p>Choice 1</p>
+          - <p>Choice 2</p>
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 41
+tags: []
+title: Title
+""")
+
+        latest_sample_yaml_content = (
+            """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - - ca_choices_2
+              - ca_choices_3
+          rule_type: IsEqualToOrdering
+        - inputs:
+            x:
+            - - ca_choices_2
+          rule_type: IsEqualToOrderingWithOneItemAtIncorrectPosition
+        - inputs:
+            x: ca_choices_2
+            y: 1
+          rule_type: HasElementXAtPositionY
+        - inputs:
+            x: ca_choices_2
+            y: ca_choices_3
+          rule_type: HasElementXBeforeElementY
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        allowMultipleItemsInSamePosition:
+          value: true
+        choices:
+          value:
+          - content_id: ca_choices_2
+            html: <p>Choice 1</p>
+          - content_id: ca_choices_3
+            html: <p>Choice 2</p>
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: DragAndDropSortInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer:
+        - - ca_choices_2
+          - ca_choices_3
+        explanation:
+          content_id: solution
+          html: This is <i>solution</i> for state1
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_choices_2: {}
+        ca_choices_3: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        solution: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', sample_yaml_content)
+        self.assertEqual(exploration.to_yaml(), latest_sample_yaml_content)
 
     def test_cannot_load_from_yaml_with_no_schema_version(self):
         sample_yaml_content = (
@@ -9370,11 +10008,11 @@ states:
         rule_specs:
         - inputs:
             x:
-            - This <span>is value1 for </span>ItemSelectionInput
+            - This <span>is value1 for </span>ItemSelection
           rule_type: Equals
         - inputs:
             x:
-            - This is value3 for ItemSelectionInput
+            - This is value3 for ItemSelection
           rule_type: Equals
         tagged_misconception_id: null
         training_data: []
@@ -9408,7 +10046,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long, single-line-pragma
-    YAML_CONTENT_V46_IMAGE_DIMENSIONS = (
+    YAML_CONTENT_V47_IMAGE_DIMENSIONS = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -9419,7 +10057,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   Introduction:
     classifier_model_id: null
@@ -9619,11 +10257,11 @@ states:
         rule_specs:
         - inputs:
             x:
-            - <p>This is value1 for ItemSelectionInput</p>
+            - ca_choices_2
           rule_type: Equals
         - inputs:
             x:
-            - <p>This is value3 for ItemSelectionInput</p>
+            - ca_choices_4
           rule_type: Equals
         tagged_skill_misconception_id: null
         training_data: []
@@ -9672,7 +10310,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: title
 """)
@@ -9920,7 +10558,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V46_WITH_IMAGE_CAPTION = (
+    YAML_CONTENT_V47_WITH_IMAGE_CAPTION = (
         """author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -9931,7 +10569,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 46
+schema_version: 47
 states:
   (untitled state):
     classifier_model_id: null
@@ -10063,7 +10701,7 @@ states:
         ca_placeholder_0: {}
         content: {}
         default_outcome: {}
-states_schema_version: 41
+states_schema_version: 42
 tags: []
 title: Title
 """)
@@ -10079,7 +10717,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V46_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V47_IMAGE_DIMENSIONS)
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
@@ -10091,7 +10729,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V46_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V47_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -10365,14 +11003,10 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         answer_group_list3 = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelectionInput</p>'
-                ]}
+                'inputs': {'x': ['ca_choices_0']}
             }, {
                 'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value3 for ItemSelectionInput</p>'
-                ]}
+                'inputs': {'x': ['ca_choices_2']}
             }],
             'outcome': {
                 'dest': 'state1',
@@ -10407,8 +11041,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             '<p>This is solution for state1</p>',
             '<p>Hello, this is state3</p>',
             '<p>Outcome for state3</p>',
-            '<p>This is value1 for ItemSelectionInput</p>',
-            '<p>This is value3 for ItemSelectionInput</p>',
             '',
             '<p>This is value1 for ItemSelection</p>',
             '<p>This is value2 for ItemSelection</p>',

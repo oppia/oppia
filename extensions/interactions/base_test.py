@@ -307,7 +307,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 input_variables_to_html_type_mapping_dict = (
                     collections.defaultdict(set))
                 for value in input_variables_with_html_type:
-                    if 'Html' in value[1]:
+                    if 'Html' in value[1] and 'HtmlContentId' not in value[1]:
                         input_variables_to_html_type_mapping_dict[
                             value[1]].add(value[0])
 

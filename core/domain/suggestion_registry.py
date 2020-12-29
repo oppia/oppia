@@ -907,7 +907,10 @@ class SuggestionAddQuestion(BaseSuggestion):
                 conversion_fn,
                 state_uses_old_interaction_cust_args_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 38)
+                        'question_state_data_schema_version'] < 38),
+                state_uses_old_rule_template_schema=(
+                    self.change.question_dict[
+                        'question_state_data_schema_version'] < 42)
             )
         )
 

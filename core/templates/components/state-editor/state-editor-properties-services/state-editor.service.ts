@@ -26,6 +26,8 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
@@ -41,7 +43,7 @@ import { SolutionValidityService } from
 import { State } from 'domain/state/StateObjectFactory';
 
 export interface AnswerChoice {
-  val: string | number;
+  val: string | number | SubtitledHtml;
   label: string;
 }
 
@@ -211,17 +213,17 @@ export class StateEditorService {
         });
       }
       return _answerChoices;
-    } else if (interactionId === 'ItemSelectionInput') {
+    } else if (
+      interactionId === 'ItemSelectionInput' ||
+      interactionId === 'DragAndDropSortInput'
+    ) {
       return (
-        <ItemSelectionInputCustomizationArgs> customizationArgs)
+        <
+          ItemSelectionInputCustomizationArgs|
+          DragAndDropSortInputCustomizationArgs
+        > customizationArgs)
         .choices.value.map(val => (
-          { val: val.getHtml(), label: val.getHtml() }
-        ));
-    } else if (interactionId === 'DragAndDropSortInput') {
-      return (
-        <DragAndDropSortInputCustomizationArgs> customizationArgs)
-        .choices.value.map(val => (
-          { val: val.getHtml(), label: val.getHtml() }
+          { val: val.getContentId(), label: val.getHtml() }
         ));
     } else {
       return null;

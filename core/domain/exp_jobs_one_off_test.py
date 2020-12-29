@@ -1393,31 +1393,9 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1512,7 +1490,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 self.assertTrue(invalid_tag in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
@@ -1698,31 +1676,9 @@ class ExplorationRteMathContentValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1821,7 +1777,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
                     invalid_tag_info['invalid_tag'] in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
