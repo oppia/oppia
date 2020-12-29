@@ -19,10 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import base_model_validators
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.platform import models
-from core.domain import base_model_validators
 
 import python_utils
 
@@ -64,17 +64,17 @@ class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
                 'snapshot_content_ids',
                 subtopic_models.SubtopicPageSnapshotContentModel,
                 snapshot_model_ids),
-            
+
     @classmethod
     def _get_custom_validation_functions(cls):
         return []
 
-            
+
 class SubtopicPageSnapshotMetadataModelValidator(
         base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""
 
-    EXTERNAL_MODEL_NAME = 'subtopic page'
+    EXTERNAL_MODEL_NAME='subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -95,12 +95,12 @@ class SubtopicPageSnapshotMetadataModelValidator(
                 'committer_ids', user_models.UserSettingsModel,
                 [item.committer_id])]
 
-            
+
 class SubtopicPageSnapshotContentModelValidator(
         base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating SubtopicPageSnapshotContentModel."""
 
-    EXTERNAL_MODEL_NAME = 'subtopic page'
+    EXTERNAL_MODEL_NAME='subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -114,17 +114,17 @@ class SubtopicPageSnapshotContentModelValidator(
                 subtopic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
 
-            
+
 class SubtopicPageCommitLogEntryModelValidator(
         base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating SubtopicPageCommitLogEntryModel."""
 
-    EXTERNAL_MODEL_NAME = 'subtopic page'
+    EXTERNAL_MODEL_NAME='subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [subtopicpage]-[subtopic_id]-[subtopic_version].
-        regex_string = '^(subtopicpage)-%s-\\d*$' % (
+        regex_string='^(subtopicpage)-%s-\\d*$' % (
             item.subtopic_page_id)
 
         return regex_string
