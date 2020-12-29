@@ -102,7 +102,7 @@ export class ContributionOpportunitiesBackendApiService {
       opportunityDict.topic_name, opportunityDict.question_count);
   }
 
-  fetchSkillOpportunities(cursor: string):
+  async fetchSkillOpportunitiesAsync(cursor: string):
   Promise<SkillContributionOpportunities> {
     const params = {
       cursor: cursor
@@ -127,8 +127,9 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  fetchTranslationOpportunities(languageCode: string, cursor: string):
-  Promise<TranslationContributionOpportunities> {
+  async fetchTranslationOpportunitiesAsync(
+      languageCode: string, cursor: string):
+    Promise<TranslationContributionOpportunities> {
     const params = {
       language_code: languageCode,
       cursor: cursor
@@ -153,7 +154,7 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  fetchVoiceoverOpportunities(languageCode: string, cursor: string):
+  async fetchVoiceoverOpportunitiesAsync(languageCode: string, cursor: string):
   Promise<VoiceoverContributionOpportunities> {
     const params = {
       language_code: languageCode,
@@ -179,7 +180,7 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
-  async fetchFeaturedTranslationLanguages():
+  async fetchFeaturedTranslationLanguagesAsync():
   Promise<FeaturedTranslationLanguage[]> {
     try {
       const response = await this.http
