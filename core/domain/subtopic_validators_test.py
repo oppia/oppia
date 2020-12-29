@@ -25,10 +25,10 @@ import datetime
 from constants import constants
 
 
+from core.domain import prod_validation_jobs_one_off
 from core.domain import subtopic_page_domain
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -67,7 +67,8 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
-
+            
+        language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
@@ -267,6 +268,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
+        language_codes = ['ar', 'en', 'en']
 
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
@@ -455,6 +457,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
+        language_codes = ['ar', 'en', 'en']
 
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
@@ -607,7 +610,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
 
-        language_codes=['ar', 'en', 'en']
+        language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
