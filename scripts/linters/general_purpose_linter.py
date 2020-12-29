@@ -581,6 +581,14 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please use keys() instead.',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\.put_async\('),
+        'message': (
+            'Please use put_async_for_human() or put_async_for_bot() '
+            'instead.'),
+        'excluded_files': (),
+        'excluded_dirs': ('core/storage/base_model/')
     }
 ]
 

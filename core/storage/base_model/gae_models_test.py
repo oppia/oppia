@@ -414,12 +414,6 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             previous_last_updated_by_human,
             self.model_instance.last_updated_by_human)
 
-    def test_put_async(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            'Use put_async_for_human or put_async_for_bot instead'):
-            self.model_instance.put_async()
-
     def test_put_async_for_human(self):
         previous_last_updated_by_human = (
             self.model_instance.last_updated_by_human)

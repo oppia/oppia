@@ -461,11 +461,6 @@ class BaseHumanMaintainedModel(BaseModel):
         """Stores the model instance on behalf of a non-human."""
         return super(BaseHumanMaintainedModel, self).put()
 
-    def put_async(self):
-        """Unsupported operation on human-maintained models."""
-        raise NotImplementedError(
-            'Use put_async_for_human or put_async_for_bot instead')
-
     def put_async_for_human(self):
         """Stores the model instance asynchronously on behalf of a human."""
         self.last_updated_by_human = datetime.datetime.utcnow()
