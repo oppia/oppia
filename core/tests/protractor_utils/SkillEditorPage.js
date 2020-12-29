@@ -113,7 +113,6 @@ var SkillEditorPage = function() {
   };
 
   this.selectDifficultyForRubric = async function(difficulty) {
-    
     await action.click(
       'Rubric difficulty option',
       selectRubricDifficulty.element(
@@ -131,7 +130,8 @@ var SkillEditorPage = function() {
       by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
-    await action.sendKeys('browser switchTo Active Element', (await browser.switchTo().activeElement()), explanation)
+    await action.sendKeys('browser switchTo Active Element', 
+      (await browser.switchTo().activeElement()), explanation);
 
     
     await action.click('Save Rubric Explanation Button', saveRubricExplanationButton);
@@ -172,7 +172,8 @@ var SkillEditorPage = function() {
       by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
-    await action.sendKeys('browser switchTo Active Element', (await browser.switchTo().activeElement()), explanation)
+    await action.sendKeys('browser switchTo Active Element', 
+      (await browser.switchTo().activeElement()), explanation);
     
     
     await action.click('Save Rubric Explanation Button', saveRubricExplanationButton);
@@ -249,7 +250,8 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       editor, 'Explanation Editor takes too long to appear');
 
-    await action.sendKeys('browser switchTo Active Element', (await browser.switchTo().activeElement()), explanation)
+    await action.sendKeys('browser switchTo Active Element', 
+      (await browser.switchTo().activeElement()), explanation);
 
     await action.click('Save concept Card Explanation Button', saveConceptCardExplanationButton);
     await waitFor.invisibilityOf(
@@ -272,7 +274,8 @@ var SkillEditorPage = function() {
     
 
     await action.click('Worked Example Explanation', workedExampleExplanation);
-    await action.sendKeys('browser switchTo Active Element', (await browser.switchTo().activeElement()), explanation)
+    await action.sendKeys('browser switchTo Active Element', 
+      (await browser.switchTo().activeElement()), explanation);
 
     await action.click(
       'Save worked example', saveWorkedExampleButton);
@@ -375,4 +378,5 @@ var SkillEditorPage = function() {
 };
 
 exports.SkillEditorPage = SkillEditorPage;
+
   
