@@ -26,7 +26,7 @@ require('pages/splash-page/splash-page.component.ts');
 const constants = require('constants.ts');
 
 describe('Splash Page', function() {
-  var $scope = null, ctrl = null;
+  var $scope = null, ctrl = null, $rootScope = null;
   var $timeout = null;
   var $q = null;
   var userService: UserService = null;
@@ -60,7 +60,7 @@ describe('Splash Page', function() {
       (message: string) => loadingMessage = message
     ));
     loadingMessage = '';
-    var $rootScope = $injector.get('$rootScope');
+    $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
 
     ctrl = $componentController('splashPage', {
@@ -156,5 +156,17 @@ describe('Splash Page', function() {
     $scope.$digest();
     expect(ctrl.userIsLoggedIn).toBe(false);
     expect(loadingMessage).toBe('');
+  });
+
+  it('should refresh translate labels once it\'s loaded', function() {
+    var functionCallCount = 0;
+    spyOn(ctrl, 'getTestimonials').and.callFake(function() {
+      functionCallCount++;
+    });
+    ctrl.$onInit();
+    $rootScope.$broadcast('$translateChangeSuccess');
+    $scope.$digest();
+    // Once, when $onInit() is called, and once when the broadcast is done.
+    expect(functionCallCount).toBe(2);
   });
 });
