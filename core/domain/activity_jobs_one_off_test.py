@@ -2643,6 +2643,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         ] = sorted(expected_results_dict['BETWEEN_1000_AND_1500'])
         self.assertDictEqual(one_off_results_dict, expected_results_dict)
 
+
 class SnapshotMetadataCommitMsgShrinkOneOffJob(
         test_utils.GenericTestBase):
     """Tests for the one-off commit message shrinking job."""
