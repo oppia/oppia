@@ -58,10 +58,7 @@ export class InteractionDetailsCacheService {
     };
   }
 
-  get(interactionId: string): InteractionCustomizationArgs{
-    /*if (!InteractionDetailsCacheService._cache.hasOwnProperty(interactionId)) {
-      return null;
-    }*/
+  get(interactionId: string): InteractionCustomizationArgs {
     return cloneDeep(InteractionDetailsCacheService._cache[interactionId]);
   }
 }
