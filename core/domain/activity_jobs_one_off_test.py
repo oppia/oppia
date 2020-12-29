@@ -2616,7 +2616,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
 
         one_off_results = self._run_one_off_job()
         expected_results = [
-            ['BETWEEN_1000_AND_1500', [
+            ['GREATER_THAN_1000', [
                 'ConfigPropertySnapshotMetadataModel with id model_id-1-1500',
                 'ConfigPropertySnapshotMetadataModel with id model_id-0-1200',
                 'ConfigPropertySnapshotMetadataModel with id model_id-0-1500',
@@ -2636,11 +2636,11 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
                 expected_results[i][0]] = expected_results[i][1]
 
         one_off_results_dict[
-            'BETWEEN_1000_AND_1500'
-        ] = sorted(one_off_results_dict['BETWEEN_1000_AND_1500'])
+            'GREATER_THAN_1000'
+        ] = sorted(one_off_results_dict['GREATER_THAN_1000'])
         expected_results_dict[
-            'BETWEEN_1000_AND_1500'
-        ] = sorted(expected_results_dict['BETWEEN_1000_AND_1500'])
+            'GREATER_THAN_1000'
+        ] = sorted(expected_results_dict['GREATER_THAN_1000'])
         self.assertDictEqual(one_off_results_dict, expected_results_dict)
 
 

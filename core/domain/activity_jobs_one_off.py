@@ -798,17 +798,13 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         identifier_message = '%s with id %s' % (model_name, model_id)
         if len(item.commit_message) <= 1000:
             yield ('LESS_OR_EQUAL_TO_1000', 1)
-        elif len(item.commit_message) <= 1500:
-            yield ('BETWEEN_1000_AND_1500', identifier_message)
         else:
-            yield ('GREATER_THAN_1500', identifier_message)
+            yield ('GREATER_THAN_1000', identifier_message)
 
     @staticmethod
     def reduce(key, values):
         if key == 'LESS_OR_EQUAL_TO_1000':
             yield (key, len(values))
-        elif key == 'BETWEEN_1000_AND_1500':
-            yield (key, values)
         else:
             yield (key, values)
 
