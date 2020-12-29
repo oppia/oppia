@@ -19,8 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
 import functools
-import json
 import logging
 import os
 import re
@@ -30,6 +30,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import html_validation_service
 from core.domain import interaction_registry
+from core.domain import rules_registry
 from core.domain import state_domain
 from core.tests import test_utils
 import feconf
@@ -327,7 +328,29 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        html_list = state.get_all_html_content_strings()
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        def mock_get_interaction_by_id(cls, interaction_id):
+            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
+            interaction.answer_type = 'ListOfSetsOfHtmlStrings'
+            return interaction
+
+        rules_registry_swap = self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs))
+
+        interaction_registry_swap = self.swap(
+            interaction_registry.Registry, 'get_interaction_by_id',
+            classmethod(mock_get_interaction_by_id))
+
+        with rules_registry_swap, interaction_registry_swap:
+            html_list = state.get_all_html_content_strings()
+
         self.assertEqual(
             html_list,
             [
@@ -578,11 +601,30 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_interaction_solution(solution)
         exp_services.save_new_exploration('owner_id', exploration)
 
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'ItemSelectionInput'))
-        interaction.can_have_solution = True
-        html_list = state.get_all_html_content_strings()
+        mock_html_field_types_to_rule_specs_dict = (
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        def mock_get_interaction_by_id(cls, interaction_id):
+            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
+            interaction.answer_type = 'SetOfHtmlString'
+            interaction.can_have_solution = True
+            return interaction
+
+        rules_registry_swap = self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs))
+
+        interaction_registry_swap = self.swap(
+            interaction_registry.Registry, 'get_interaction_by_id',
+            classmethod(mock_get_interaction_by_id))
+
+        with rules_registry_swap, interaction_registry_swap:
+            html_list = state.get_all_html_content_strings()
+
         self.assertEqual(
             html_list,
             [
@@ -651,17 +693,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state.update_interaction_id('ItemSelectionInput')
         state.update_interaction_answer_groups(state_answer_groups)
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             html_type_dict['format'] = 'invalid format'
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'The rule spec does not belong to a valid format.'):
@@ -765,19 +811,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_customization_args_dict)
         state.update_interaction_answer_groups(state_answer_groups)
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             if html_type_dict['interactionId'] == 'ItemSelectionInput':
                 html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
                     ['y'])
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'Rule spec should have at least one valid input variable with '
@@ -859,11 +908,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             interaction_registry.Registry.get_interaction_by_id(
                 'DragAndDropSortInput'))
         interaction.answer_type = 'DragAndDropHtmlString'
-        with self.assertRaisesRegexp(
-            Exception,
-            'The solution does not have a valid '
-            'correct_answer type.'):
-            state.get_all_html_content_strings()
+
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
+
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
+
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)):
+            with self.assertRaisesRegexp(
+                Exception,
+                'The solution does not have a valid '
+                'correct_answer type.'):
+                state.get_all_html_content_strings()
 
     def test_get_all_html_when_interaction_is_none(self):
         """Test the method for extracting all the HTML from a state
@@ -2092,7 +2152,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components),
+                add_math_content_to_math_rte_components,
+                state_uses_old_rule_template_schema=True),
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_item_selection_interaction(self):
@@ -2318,16 +2379,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'hints': []
             }
         }
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                'ItemSelectionInput'))
-        interaction.can_have_solution = True
+        interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            41)['ItemSelectionInput']['can_have_solution'] = True
 
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
                 state_dict_with_old_math_schema,
                 html_validation_service.
-                add_math_content_to_math_rte_components),
+                add_math_content_to_math_rte_components,
+                state_uses_old_rule_template_schema=True),
             state_dict_with_new_math_schema)
 
     def test_convert_html_fields_in_state_with_text_input_interaction(self):
@@ -2592,24 +2652,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             html_type_dict['format'] = 'invalid format'
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(
+                unused_cls, state_schema_version=None): # pylint: disable=unused-argument
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)):
             with self.assertRaisesRegexp(
                 Exception,
                 'The rule spec does not belong to a valid format.'):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
                     html_validation_service.
-                    add_math_content_to_math_rte_components)
+                    add_math_content_to_math_rte_components,
+                    state_uses_old_rule_template_schema=True)
 
     def test_convert_html_fields_in_rule_spec_with_invalid_input_variable(self):
         """Test the method for converting the HTML in a state
@@ -2695,19 +2759,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         for html_type_dict in (
                 mock_html_field_types_to_rule_specs_dict.values()):
             if html_type_dict['interactionId'] == 'ItemSelectionInput':
                 html_type_dict['ruleTypes']['Equals']['htmlInputVariables'] = (
                     ['y'])
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'Rule spec should have at least one valid input variable with '
@@ -2782,16 +2849,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        mock_html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        mock_html_field_types_to_rule_specs_dict = copy.deepcopy(
+            rules_registry.Registry.get_html_field_types_to_rule_specs(
+                state_schema_version=41))
         mock_html_field_types_to_rule_specs_dict['NormalizedString'] = (
             mock_html_field_types_to_rule_specs_dict.pop('SetOfHtmlString'))
 
-        def mock_get_file_contents(unused_file_path):
-            return json.dumps(mock_html_field_types_to_rule_specs_dict)
+        def mock_get_html_field_types_to_rule_specs(unused_cls):
+            return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(utils, 'get_file_contents', mock_get_file_contents):
+        with self.swap(
+            rules_registry.Registry, 'get_html_field_types_to_rule_specs',
+            classmethod(mock_get_html_field_types_to_rule_specs)
+        ):
             with self.assertRaisesRegexp(
                 Exception,
                 'The solution does not have a valid '
@@ -2915,7 +2985,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_domain.Solution.convert_html_in_solution(
                 None, solution_dict,
                 html_validation_service.
-                add_math_content_to_math_rte_components), solution_dict)
+                add_math_content_to_math_rte_components,
+                rules_registry.Registry.get_html_field_types_to_rule_specs(),
+                {}
+            ), solution_dict)
 
     def test_subtitled_html_validation_with_invalid_html_type(self):
         """Test validation of subtitled HTML with invalid html type."""
