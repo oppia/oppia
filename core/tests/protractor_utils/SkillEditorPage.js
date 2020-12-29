@@ -131,7 +131,8 @@ var SkillEditorPage = function() {
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
     await action.sendKeys(
-      'browser switchTo Active Element', (await browser.switchTo().activeElement()), explanation);
+      'browser switchTo Active Element', (
+        await browser.switchTo().activeElement()), explanation);
 
     
     await action.click('Save Rubric Explanation Button', saveRubricExplanationButton);
@@ -167,16 +168,19 @@ var SkillEditorPage = function() {
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
       
-    await action.click('Edit RubricExplanation Buttons', editRubricExplanationButtons.get(explIndex));
+    await action.click(
+      'Edit RubricExplanation Buttons', editRubricExplanationButtons.get(explIndex));
     var editor = element(
       by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
     await action.sendKeys(
-      'browser switchTo Active Element', (await browser.switchTo().activeElement()), explanation);
+      'browser switchTo Active Element', (
+        await browser.switchTo().activeElement()), explanation);
     
     
-    await action.click('Save Rubric Explanation Button', saveRubricExplanationButton);
+    await action.click(
+      'Save Rubric Explanation Button', saveRubricExplanationButton);
   };
 
   this.expectRubricExplanationsToMatch = async function(
@@ -251,7 +255,8 @@ var SkillEditorPage = function() {
       editor, 'Explanation Editor takes too long to appear');
 
     await action.sendKeys(
-      'browser switchTo Active Element', (await browser.switchTo().activeElement()), explanation);
+      'browser switchTo Active Element', (
+        await browser.switchTo().activeElement()), explanation);
 
     await action.click('Save concept Card Explanation Button', saveConceptCardExplanationButton);
     await waitFor.invisibilityOf(
@@ -270,12 +275,15 @@ var SkillEditorPage = function() {
       element(by.css('.protractor-test-add-worked-example-modal')));
     
     await action.click('Worked Example Question', workedExampleQuestion);
-    await action.sendKeys('browser switchTo Active Element', (await browser.switchTo().activeElement()), question)
+    await action.sendKeys(
+      'browser switchTo Active Element', (
+        await browser.switchTo().activeElement()), question);
     
 
     await action.click('Worked Example Explanation', workedExampleExplanation);
     await action.sendKeys(
-      'browser switchTo Active Element', (await browser.switchTo().activeElement()), explanation);
+      'browser switchTo Active Element', (
+        await browser.switchTo().activeElement()), explanation);
 
     await action.click(
       'Save worked example', saveWorkedExampleButton);
@@ -336,13 +344,19 @@ var SkillEditorPage = function() {
       element(by.css('.protractor-test-add-misconception-modal')));
     
     await action.click('Misconception Name Field', misconceptionNameField);
-    await action.sendKeys('browser switchTo Active Element', (await browser.switchTo().activeElement()), name)
+    await action.sendKeys(
+      'browser switchTo Active Element', (
+        await browser.switchTo().activeElement()), name);
 
     await action.click('Misconception Notes Field', misconceptionNotesField);
-    await action.sendKeys('browser switchTo Active Element', (await browser.switchTo().activeElement()), notes)
+    await action.sendKeys(
+      'browser switchTo Active Element', (
+        await browser.switchTo().activeElement()), notes);
 
     await action.click('Misconception Feedback Field', misconceptionFeedbackField);
-    await action.sendKeys('browser switchTo Active Element', (await browser.switchTo().activeElement()), feedback)
+    await action.sendKeys(
+      'browser switchTo Active Element', (
+        await browser.switchTo().activeElement()), feedback);
 
     await action.click('Confirm add misconception', confirmAddMisconception);
 
