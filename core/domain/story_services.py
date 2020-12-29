@@ -581,6 +581,20 @@ def update_story(
     new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
         apply_change_list(story_id, change_list))
     story_is_published = _is_story_published_and_present_in_topic(new_story)
+    exploration_context_models_to_be_deleted = (
+        exp_models.ExplorationContextModel.get_multi(
+            exp_ids_removed_from_story))
+    exploration_context_models_to_be_deleted = [
+        model for model in exploration_context_models_to_be_deleted
+        if model is not None]
+    exploration_context_models_collisions_list = (
+        exp_models.ExplorationContextModel.get_multi(
+            exp_ids_added_to_story))
+    for context_model in exploration_context_models_collisions_list:
+        if context_model is not None and context_model.story_id != story_id:
+            raise utils.ValidationError(
+                'The exploration with ID %s is already linked to story '
+                'with ID %s' % (context_model.id, context_model.story_id))
 
     if (
             old_story.url_fragment != new_story.url_fragment and
@@ -597,23 +611,8 @@ def update_story(
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
         exp_ids_removed_from_story)
 
-    exploration_context_models_to_be_deleted = (
-        exp_models.ExplorationContextModel.get_multi(
-            exp_ids_removed_from_story))
-    exploration_context_models_to_be_deleted = [
-        model for model in exploration_context_models_to_be_deleted
-        if model is not None]
     exp_models.ExplorationContextModel.delete_multi(
         exploration_context_models_to_be_deleted)
-
-    exploration_context_models_collisions_list = (
-        exp_models.ExplorationContextModel.get_multi(
-            exp_ids_added_to_story))
-    for context_model in exploration_context_models_collisions_list:
-        if context_model is not None and context_model.story_id != story_id:
-            raise utils.ValidationError(
-                'The exploration with ID %s is already linked to story '
-                'with ID %s' % (context_model.id, context_model.story_id))
 
     new_exploration_context_models = [exp_models.ExplorationContextModel(
         id=exp_id,
