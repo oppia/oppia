@@ -3934,11 +3934,7 @@ oppia-noninteractive-link {
 }
 
 .oppia-about-button {
-<<<<<<< HEAD
   background-color: #00645c;
-=======
-  background-color: rgb(0, 121, 109);
->>>>>>> upstream/develop
   border-radius: 4px;
   color: rgba(255,255,255,1.0);
   font-family: "Roboto", Arial, sans-serif;
