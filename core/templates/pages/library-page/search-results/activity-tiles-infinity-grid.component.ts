@@ -61,6 +61,7 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
             (activityList) => {
               ctrl.allActivitiesInOrder = activityList;
               ctrl.endOfPageIsReached = false;
+              $rootScope.$applyAsync();
             })
         );
         ctrl.endOfPageIsReached = false;
