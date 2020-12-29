@@ -60,7 +60,7 @@ export class InteractionDetailsCacheService {
 
   get(interactionId: string): InteractionCustomizationArgs {
     if (!InteractionDetailsCacheService._cache.hasOwnProperty(interactionId)) {
-      return null;
+      return {};
     }
     return cloneDeep(InteractionDetailsCacheService._cache[interactionId]);
   }
