@@ -48,6 +48,7 @@ import python_utils
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
 ])
 
+auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -207,7 +208,8 @@ def run_user_deletion(pending_deletion_request):
         return wipeout_domain.USER_DELETION_ALREADY_DONE
     else:
         delete_user(pending_deletion_request)
-        pending_deletion_request.deletion_complete = True
+        if auth_services.delete_user(pending_deletion_request.user_id):
+            pending_deletion_request.deletion_complete = True
         save_pending_deletion_requests([pending_deletion_request])
         return wipeout_domain.USER_DELETION_SUCCESS
 
