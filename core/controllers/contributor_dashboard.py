@@ -283,7 +283,9 @@ class UserContributionRightsDataHandler(base.BaseHandler):
                 if contribution_rights else []),
             'can_review_questions': (
                 contribution_rights.can_review_questions
-                if contribution_rights else False)
+                if contribution_rights else False),
+            'can_suggest_questions': (
+                config_domain.CONTRIBUTOR_CAN_SUGGEST_QUESTIONS.value)
         })
 
 
