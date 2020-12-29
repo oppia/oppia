@@ -607,7 +607,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3
 
-        language_codes = ['ar', 'en', 'en']
+        language_codes=['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
