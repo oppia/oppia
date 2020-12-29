@@ -309,7 +309,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
     def test_pre_delete_user_without_activities_works_correctly(self):
         user_models.UserSubscriptionsModel(
-            id=self.user_1_id, activity_ids=[], collection_ids=[]
+            id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
 
         user_settings = user_services.get_user_settings(self.user_1_id)

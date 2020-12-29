@@ -100,7 +100,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/skill-selector/' +
             'select-skill-modal.template.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {
           skillsInSameTopicCount: () => skillsInSameTopicCount,
           sortedSkillSummaries: () => sortedSkillSummaries,
@@ -154,7 +154,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
                    '/components/question-directives' +
                    '/modal-templates/' +
                    'question-editor-save-modal.template.html'),
-          backdrop: true,
+          backdrop: 'static',
           controller: 'ConfirmOrCancelModalController'
         }).result.then(function(commitMessage) {
           returnModalObject.commitMessage = commitMessage;
