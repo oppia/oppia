@@ -653,7 +653,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
-        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+        mocked_datetime =datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
         with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
