@@ -168,7 +168,7 @@ var SkillEditorPage = function() {
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     await waitFor.elementToBeClickable(
       
-    await action.click('Edit RubricExplanation Buttons', editRubricExplanationButtons.get(explIndex))
+    await action.click('Edit RubricExplanation Buttons', editRubricExplanationButtons.get(explIndex));
     var editor = element(
       by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
@@ -376,3 +376,4 @@ var SkillEditorPage = function() {
 };
 
 exports.SkillEditorPage = SkillEditorPage;
+  
