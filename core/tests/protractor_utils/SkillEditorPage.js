@@ -134,8 +134,8 @@ var SkillEditorPage = function() {
       'browser switchTo Active Element', (
         await browser.switchTo().activeElement()), explanation);
 
-    
-    await action.click('Save Rubric Explanation Button', saveRubricExplanationButton);
+    await action.click(
+      'Save Rubric Explanation Button', saveRubricExplanationButton);
     await waitFor.invisibilityOf(
       saveRubricExplanationButton,
       'Save Rubric Explanation editor takes too long to close.');
@@ -150,13 +150,13 @@ var SkillEditorPage = function() {
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     var button = await editRubricExplanationButtons.get(explIndex);
-    
     await action.click('Button', button);
     var editor = element(
       by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
       editor, 'Rubric explanation editor takes too long to appear');
-    await action.click('Delete Rubric Explanation Button', deleteRubricExplanationButton);
+    await action.click(
+      'Delete Rubric Explanation Button', deleteRubricExplanationButton);
   };
 
   this.editRubricExplanationWithIndex = async function(
@@ -167,9 +167,9 @@ var SkillEditorPage = function() {
     await this.selectDifficultyForRubric(difficulty);
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
-      
     await action.click(
-      'Edit RubricExplanation Buttons', editRubricExplanationButtons.get(explIndex));
+      'Edit RubricExplanation Buttons', 
+      editRubricExplanationButtons.get(explIndex));
     var editor = element(
       by.css('.protractor-test-rubric-explanation-text'));
     await waitFor.visibilityOf(
@@ -177,8 +177,6 @@ var SkillEditorPage = function() {
     await action.sendKeys(
       'browser switchTo Active Element', (
         await browser.switchTo().activeElement()), explanation);
-    
-    
     await action.click(
       'Save Rubric Explanation Button', saveRubricExplanationButton);
   };
@@ -258,7 +256,8 @@ var SkillEditorPage = function() {
       'browser switchTo Active Element', (
         await browser.switchTo().activeElement()), explanation);
 
-    await action.click('Save concept Card Explanation Button', saveConceptCardExplanationButton);
+    await action.click(
+      'Save concept Card Explanation Button', saveConceptCardExplanationButton);
     await waitFor.invisibilityOf(
       editor, 'Explanation Editor takes too long to close');
   };
