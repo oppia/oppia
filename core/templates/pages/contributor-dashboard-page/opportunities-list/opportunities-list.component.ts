@@ -58,6 +58,8 @@ angular.module('oppia').component('opportunitiesList', {
             });
             ctrl.visibleOpportunities = opportunities.slice(
               0, OPPORTUNITIES_PAGE_SIZE);
+            ctrl.lastPageNumber = Math.ceil(
+              opportunities.length / OPPORTUNITIES_PAGE_SIZE);
           }));
 
       ctrl.$onDestroy = function() {
