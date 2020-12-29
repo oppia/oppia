@@ -22,7 +22,7 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
 import { SearchBackendApiService } from './search-backend-api.service';
 
-class SelectionList {
+export class SelectionList {
   [key: string]: boolean;
 }
 
@@ -38,7 +38,7 @@ class FilterDetails {
   summary: string;
 }
 
-class SelectionDetails {
+export class SelectionDetails {
   categories: FilterDetails;
   languageCodes: FilterDetails;
 }

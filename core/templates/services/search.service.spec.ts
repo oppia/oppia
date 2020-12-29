@@ -21,9 +21,8 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { SearchService } from 'services/search.service';
+import { SearchService, SelectionDetails, SelectionList } from 'services/search.service';
 import { Subscription } from 'rxjs';
-import { SelectionDetails, SelectionList } from './search-backend-api.service';
 
 describe('Search Service', () => {
   let searchService: SearchService;
