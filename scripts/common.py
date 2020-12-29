@@ -722,8 +722,8 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
-        command_args: list(int | str). A sequence of program arguments, where the
-            program to execute is the first item.
+        command_args: list(int | str). A sequence of program arguments, where
+            the program to execute is the first item.
         shell: bool. Whether the command should be run inside of its own shell.
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
