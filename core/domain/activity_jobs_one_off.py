@@ -35,13 +35,13 @@ import feconf
 import python_utils
 
 (
-    collection_models, exp_models, question_models,
-    skill_models, story_models, topic_models,
-    subtopic_models
+    base_models, config_models, collection_models, exp_models,
+    skill_models, story_models, topic_models, subtopic_models,
+    question_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.topic,
-    models.NAMES.subtopic
+    models.NAMES.base_model, models.NAMES.config, models.NAMES.collection,
+    models.NAMES.exploration, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.topic, models.NAMES.subtopic, models.NAMES.question
 ])
 transaction_services = models.Registry.import_transaction_services()
 
@@ -761,3 +761,102 @@ class AddMissingCommitLogsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
         else:
             yield (key, len(values))
+
+
+class SnapshotMetadataCommitMsgAuditOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits the commit_message field of the
+    BaseSnapshotMetadataModels to determine frequency of string sizes. This job
+    is temporary and only used once.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(SnapshotMetadataCommitMsgAuditOneOffJob, cls).enqueue(
+            job_id, shard_count=16)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            config_models.ConfigPropertySnapshotMetadataModel,
+            collection_models.CollectionRightsSnapshotMetadataModel,
+            collection_models.CollectionSnapshotMetadataModel,
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+            skill_models.SkillSnapshotMetadataModel,
+            story_models.StorySnapshotMetadataModel,
+            subtopic_models.SubtopicPageSnapshotMetadataModel,
+            topic_models.TopicRightsSnapshotMetadataModel,
+            topic_models.TopicSnapshotMetadataModel,
+            question_models.QuestionSnapshotMetadataModel,
+        ]
+
+    @staticmethod
+    def map(item):
+        model_name = item.__class__.__name__
+        model_id = item.id
+        identifier_message = '%s with id %s' % (model_name, model_id)
+        if len(item.commit_message) <= 1000:
+            yield ('LESS_OR_EQUAL_TO_1000', 1)
+        elif len(item.commit_message) <= 1500:
+            yield ('BETWEEN_1000_AND_1500', identifier_message)
+        else:
+            yield ('GREATER_THAN_1500', identifier_message)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'LESS_OR_EQUAL_TO_1000':
+            yield (key, len(values))
+        elif key == 'BETWEEN_1000_AND_1500':
+            yield (key, values)
+        else:
+            yield (key, values)
+
+
+class SnapshotMetadataCommitMsgShrinkOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits the commit_message field of the
+    BaseSnapshotMetadataModels to determine frequency of string sizes. This job
+    is temporary and only used once.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(SnapshotMetadataCommitMsgShrinkOneOffJob, cls).enqueue(
+            job_id, shard_count=16)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            config_models.ConfigPropertySnapshotMetadataModel,
+            collection_models.CollectionRightsSnapshotMetadataModel,
+            collection_models.CollectionSnapshotMetadataModel,
+            exp_models.ExplorationRightsSnapshotMetadataModel,
+            exp_models.ExplorationSnapshotMetadataModel,
+            skill_models.SkillSnapshotMetadataModel,
+            story_models.StorySnapshotMetadataModel,
+            subtopic_models.SubtopicPageSnapshotMetadataModel,
+            topic_models.TopicRightsSnapshotMetadataModel,
+            topic_models.TopicSnapshotMetadataModel,
+            question_models.QuestionSnapshotMetadataModel,
+        ]
+
+    @staticmethod
+    def map(item):
+        model_name = item.__class__.__name__
+        model_id = item.id
+        identifier_message = '%s with id %s' % (model_name, model_id)
+        if len(item.commit_message) > 1000:
+            item.commit_message = item.commit_message[:1000]
+            item.update_timestamps(update_last_updated_time=False)
+            item.put()
+            yield ('TRUNCATED', identifier_message)
+        else:
+            yield ('NOT_TRUNCATED', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'NOT_TRUNCATED':
+            yield (key, len(values))
+        else:
+            yield (key, values)

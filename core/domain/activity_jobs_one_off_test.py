@@ -44,11 +44,11 @@ datastore_services = models.Registry.import_datastore_services()
 gae_search_services = models.Registry.import_search_services()
 
 (
-    base_models, collection_models,
+    base_models, collection_models, config_models,
     exp_models, question_models, skill_models,
     story_models, topic_models, subtopic_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection,
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
     models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
     models.NAMES.story, models.NAMES.topic, models.NAMES.subtopic
 ])
@@ -2551,3 +2551,134 @@ class AddMissingCommitLogsOneOffJobTests(test_utils.GenericTestBase):
 
         self.assertIsNone(commit_model)
         self.assertItemsEqual(expected_output, actual_output)
+
+
+class SnapshotMetadataCommitMsgAuditOneOffJob(
+        test_utils.GenericTestBase):
+    """Tests for the one-off commit message audit job."""
+
+    def _count_one_off_jobs_in_queue(self):
+        """Counts one off jobs in the taskqueue."""
+        return self.count_jobs_in_mapreduce_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgAuditOneOffJob.create_new())
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
+        (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgAuditOneOffJob.enqueue(job_id))
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
+        results = (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgAuditOneOffJob.get_output(job_id))
+        return [ast.literal_eval(stringified_item) for
+                stringified_item in results]
+
+    def test_message_counts_correct(self):
+        """Ensures the audit job correctly gets commit message counts of
+        varying lengths.
+        """
+
+        value_less_than_1000 = 100
+        value_equal_to_1000 = 1000
+        value_between_1000_and_1500 = 1200
+        value_equal_to_1500 = 1500
+        num_models_per_category = 2
+
+        model_class = config_models.ConfigPropertySnapshotMetadataModel
+        for i in python_utils.RANGE(num_models_per_category):
+            model_class(
+                id='model_id-%d-%d' % (i, value_less_than_1000),
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='a' * value_less_than_1000).put()
+            model_class(
+                id='model_id-%d-%d' % (i, value_equal_to_1000),
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='a' * value_equal_to_1000).put()
+            model_class(
+                id='model_id-%d-%d' % (i, value_between_1000_and_1500),
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='a' * value_between_1000_and_1500).put()
+            model_class(
+                id='model_id-%d-%d' % (i, value_equal_to_1500),
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='a' * value_equal_to_1500).put()
+
+        one_off_results = self._run_one_off_job()
+        expected_results = [
+            ['BETWEEN_1000_AND_1500', [
+                'ConfigPropertySnapshotMetadataModel with id model_id-1-1500',
+                'ConfigPropertySnapshotMetadataModel with id model_id-0-1200',
+                'ConfigPropertySnapshotMetadataModel with id model_id-0-1500',
+                'ConfigPropertySnapshotMetadataModel with id model_id-1-1200'
+            ]],
+            ['LESS_OR_EQUAL_TO_1000', 2 * num_models_per_category + 1]]
+
+        # Ensure results have same length.
+        self.assertEqual(len(one_off_results), len(expected_results))
+
+        # Create results dictionaries.
+        one_off_results_dict = dict()
+        expected_results_dict = dict()
+        for i, _ in enumerate(one_off_results):
+            one_off_results_dict[one_off_results[i][0]] = one_off_results[i][1]
+            expected_results_dict[
+                expected_results[i][0]] = expected_results[i][1]
+
+        one_off_results_dict[
+            'BETWEEN_1000_AND_1500'
+        ] = sorted(one_off_results_dict['BETWEEN_1000_AND_1500'])
+        expected_results_dict[
+            'BETWEEN_1000_AND_1500'
+        ] = sorted(expected_results_dict['BETWEEN_1000_AND_1500'])
+        self.assertDictEqual(one_off_results_dict, expected_results_dict)
+
+class SnapshotMetadataCommitMsgShrinkOneOffJob(
+        test_utils.GenericTestBase):
+    """Tests for the one-off commit message shrinking job."""
+
+    def _count_one_off_jobs_in_queue(self):
+        """Counts one off jobs in the taskqueue."""
+        return self.count_jobs_in_mapreduce_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgShrinkOneOffJob.create_new())
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
+        (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgShrinkOneOffJob.enqueue(job_id))
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        self.assertEqual(self._count_one_off_jobs_in_queue(), 0)
+        results = (
+            activity_jobs_one_off
+            .SnapshotMetadataCommitMsgShrinkOneOffJob.get_output(job_id))
+        return [ast.literal_eval(stringified_item) for
+                stringified_item in results]
+
+    def test_message_counts_correct(self):
+        """Ensures the job corretly shrinks commit message lengths."""
+        model_class = config_models.ConfigPropertySnapshotMetadataModel
+        model_class(
+            id='model_id-0',
+            committer_id='committer_id',
+            commit_type='create',
+            commit_message='a' * 1200).put()
+        self._run_one_off_job()
+        self.assertEqual(
+            len(model_class.get_by_id('model_id-0').commit_message),
+            1000)
