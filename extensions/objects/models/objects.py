@@ -1283,28 +1283,6 @@ class ParameterName(BaseObject):
         }
 
 
-class SetOfHtmlString(BaseObject):
-    """A Set of Html Strings."""
-
-    description = 'A list of Html strings.'
-    default_value = []
-
-    @classmethod
-    def get_schema(cls):
-        """Returns the object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        return {
-            'type': 'list',
-            'items': Html.get_schema(),
-            'validators': [{
-                'id': 'is_uniquified'
-            }]
-        }
-
-
 class Fraction(BaseObject):
     """Fraction class."""
 
@@ -1415,44 +1393,6 @@ class NumberWithUnits(BaseObject):
                 'name': 'units',
                 'schema': Units.get_schema()
             }]
-        }
-
-
-class ListOfSetsOfHtmlStrings(BaseObject):
-    """List of sets of Html strings class."""
-
-    description = 'A list of sets of Html strings.'
-    default_value = []
-
-    @classmethod
-    def get_schema(cls):
-        """Returns the object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        return {
-            'type': 'list',
-            'items': SetOfHtmlString.get_schema(),
-        }
-
-
-class DragAndDropHtmlString(BaseObject):
-    """A specific drag and drop Html string class."""
-
-    description = (
-        'A specific drag and drop item from collection of drag and drop items.')
-    default_value = ''
-
-    @classmethod
-    def get_schema(cls):
-        """Returns the object schema.
-
-        Returns:
-            dict. The object schema.
-        """
-        return {
-            'type': 'html'
         }
 
 
@@ -1791,3 +1731,57 @@ class TranslatableSetOfUnicodeString(BaseTranslatableObject):
                 'Duplicate unicode found in set: %s' % raw['unicodeStrSet'])
 
         return raw
+
+
+class TranslatableHtmlContentId(BaseObject):
+    """A TranslatableHtml content id."""
+
+    default_value = ''
+
+    @classmethod
+    def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        return UnicodeString.get_schema()
+
+
+class SetOfTranslatableHtmlContentIds(BaseObject):
+    """A Set of TranslatableHtml content ids."""
+
+    default_value = []
+
+    @classmethod
+    def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        return {
+            'type': 'list',
+            'items': TranslatableHtmlContentId.get_schema(),
+            'validators': [{
+                'id': 'is_uniquified'
+            }]
+        }
+
+
+class ListOfSetsOfTranslatableHtmlContentIds(BaseObject):
+    """List of sets of TranslatableHtml content ids."""
+
+    default_value = []
+
+    @classmethod
+    def get_schema(cls):
+        """Returns the object schema.
+
+        Returns:
+            dict. The object schema.
+        """
+        return {
+            'type': 'list',
+            'items': SetOfTranslatableHtmlContentIds.get_schema()
+        }
