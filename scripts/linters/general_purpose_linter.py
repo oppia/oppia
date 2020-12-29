@@ -42,7 +42,6 @@ EXCLUDED_PATHS = (
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
-    'auth.json.enc',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -288,6 +287,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'api services.'),
         'excluded_files': (
             'backend-api.service.ts',
+            'core/templates/services/auth-interceptor.service.spec.ts',
             'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()
     }

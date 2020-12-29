@@ -81,7 +81,7 @@ describe('NumberWithUnitsValidationService', () => {
           false, 0, 0, 1), [{unit: 'kg', exponent: 1},
           {unit: 'm', exponent: -2}])
       }
-    });
+    }, 'NumberWithUnits');
 
     equivalentToTwoThousandRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
@@ -90,7 +90,7 @@ describe('NumberWithUnitsValidationService', () => {
           false, 0, 0, 1), [{unit: 'g', exponent: 1},
           {unit: 'm', exponent: -2}])
       }
-    });
+    }, 'NumberWithUnits');
 
     equivalentToTwoRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
@@ -99,7 +99,7 @@ describe('NumberWithUnitsValidationService', () => {
           false, 0, 0, 1), [{unit: 'kg', exponent: 1},
           {unit: 'm', exponent: -2}])
       }
-    });
+    }, 'NumberWithUnits');
 
     equalsTwoByThreeRule = rof.createFromBackendDict({
       rule_type: 'IsEqualTo',
@@ -108,7 +108,7 @@ describe('NumberWithUnitsValidationService', () => {
           false, 0, 2, 3), [{unit: 'kg', exponent: 1},
           {unit: 'm', exponent: -2}])
       }
-    });
+    }, 'NumberWithUnits');
 
     equivalentToTwoByThreeRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
@@ -117,7 +117,7 @@ describe('NumberWithUnitsValidationService', () => {
           false, 0, 2000, 3), [{unit: 'g', exponent: 1},
           {unit: 'm', exponent: -2}])
       }
-    });
+    }, 'NumberWithUnits');
 
     answerGroups = [agof.createNew(
       [equalsTwoRule, equalsTwoByThreeRule],

@@ -23,6 +23,7 @@ import datetime
 
 from core.domain import base_model_validators
 from core.platform import models
+import feconf
 
 (
     base_models, email_models, feedback_models,
@@ -212,7 +213,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
             '^%s\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
             '[A-Za-z0-9=+/]{1,}') % (
                 base_model_validators.USER_ID_REGEX,
-                ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
+                ('|').join(feconf.SUGGESTION_TARGET_TYPE_CHOICES),
                 base_models.ID_LENGTH)
 
     @classmethod
