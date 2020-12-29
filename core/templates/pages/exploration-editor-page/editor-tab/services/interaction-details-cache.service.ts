@@ -58,10 +58,10 @@ export class InteractionDetailsCacheService {
     };
   }
 
-  get(interactionId: string): InteractionCustomizationArgs | null {
-    if (!InteractionDetailsCacheService._cache.hasOwnProperty(interactionId)) {
+  get(interactionId: string): InteractionCustomizationArgs{
+    /*if (!InteractionDetailsCacheService._cache.hasOwnProperty(interactionId)) {
       return null;
-    }
+    }*/
     return cloneDeep(InteractionDetailsCacheService._cache[interactionId]);
   }
 }
