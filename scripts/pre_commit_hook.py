@@ -50,7 +50,9 @@ KEYS_UPDATED_IN_FECONF = [
     'SYSTEM_EMAIL_NAME', 'MAILGUN_DOMAIN_NAME']
 KEYS_UPDATED_IN_CONSTANTS = [
     'CAN_SEND_ANALYTICS_EVENTS', 'SITE_FEEDBACK_FORM_URL',
-    'ANALYTICS_ID', 'SITE_NAME_FOR_ANALYTICS']
+    'ANALYTICS_ID', 'SITE_NAME_FOR_ANALYTICS', 'FIREBASE_ENVIRONMENT',
+    'useEmulator', 'config', 'apiKey', 'authDomain', 'databaseURL',
+    'projectId', 'storageBucket', 'messagingSenderId', 'appId']
 
 
 def install_hook():
