@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for searching for explorations.
+ * @fileoverview Service for executing searches.
  */
 
 import { HttpClient } from '@angular/common/http';
@@ -22,26 +22,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
 import { ServicesConstants } from './services.constants';
 
-export interface SelectionList {[key: string]: boolean}
-
-export interface FilterDetails {
-  description: string;
-  itemsName: string;
-  masterList: {
-    id: string;
-    text: string;
-  }[];
-  selections: SelectionList;
-  numSelections: number;
-  summary: string;
-}
-
-export interface SelectionDetails {
-  categories: FilterDetails;
-  languageCodes: FilterDetails;
-}
-
-export interface SearchResponse {
+export class SearchResponseBackendDict {
   'search_cursor': string;
   'activity_list': ExplorationSummaryBackendDict;
 }
@@ -53,12 +34,13 @@ export interface SearchResponse {
 export class SearchBackendApiService {
   constructor(private http: HttpClient) {}
 
-  async getSearchResults(searchQuery:string): Promise<SearchResponse> {
-    return this.http.get<SearchResponse>(
+  async fetchExplorationSearchResultAsync(
+      searchQuery: string): Promise<SearchResponseBackendDict> {
+    return this.http.get<SearchResponseBackendDict>(
       ServicesConstants.SEARCH_DATA_URL + searchQuery).toPromise();
   }
 }
 
 angular.module('oppia').factory(
-  'UserBackendApiService',
+  'SearchBackendApiService',
   downgradeInjectable(SearchBackendApiService));

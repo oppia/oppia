@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests that the user service is working as expected.
+ * @fileoverview Tests that search service is working as expected.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
-import { SearchBackendApiService } from 'services/search-backend-api.service';
+import { SearchBackendApiService, SearchResponseBackendDict } from 'services/search-backend-api.service';
 
 describe('Search Backend Api Service', () => {
   let searchBackendApiService: SearchBackendApiService;
@@ -35,17 +35,18 @@ describe('Search Backend Api Service', () => {
     searchBackendApiService = TestBed.inject(SearchBackendApiService);
   });
 
-  describe('getSearchResults', () => {
+  describe('fetchExplorationSearchResultAsync', () => {
     const sampleSearchResponse = {
       search_cursor: 'notempty',
       activity_list: []
     };
 
     it('should return exploration search results', fakeAsync(() => {
-      searchBackendApiService.getSearchResults('').then((response) => {
-        expect(response.activity_list).toEqual([]);
-        expect(response.search_cursor).toBe('notempty');
-      });
+      searchBackendApiService.fetchExplorationSearchResultAsync('').then(
+        (response: SearchResponseBackendDict) => {
+          expect(response.activity_list).toEqual([]);
+          expect(response.search_cursor).toBe('notempty');
+        });
       const req = httpTestingController.expectOne('/searchhandler/data');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleSearchResponse);

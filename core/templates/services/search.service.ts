@@ -20,7 +20,28 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable, EventEmitter } from '@angular/core';
 
 import { ExplorationSummaryBackendDict } from 'domain/summary/exploration-summary-backend-api.service';
-import { SearchBackendApiService, SelectionDetails, SelectionList } from './search-backend-api.service';
+import { SearchBackendApiService } from './search-backend-api.service';
+
+class SelectionList {
+  [key: string]: boolean;
+}
+
+class FilterDetails {
+  description: string;
+  itemsName: string;
+  masterList: {
+    id: string;
+    text: string;
+  }[];
+  selections: SelectionList;
+  numSelections: number;
+  summary: string;
+}
+
+class SelectionDetails {
+  categories: FilterDetails;
+  languageCodes: FilterDetails;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -133,7 +154,7 @@ export class SearchService {
 
     this._isCurrentlyFetchingResults = true;
     this.numSearchesInProgress++;
-    this._searchBackendApiService.getSearchResults(queryUrl)
+    this._searchBackendApiService.fetchExplorationSearchResultAsync(queryUrl)
       .then((response) => {
         this._lastQuery = searchQuery;
         this._lastSelectedCategories = angular.copy(selectedCategories);
@@ -223,8 +244,8 @@ export class SearchService {
     }
 
     this._isCurrentlyFetchingResults = true;
-    this._searchBackendApiService.getSearchResults(queryUrl).then(
-      (response) => {
+    this._searchBackendApiService.fetchExplorationSearchResultAsync(queryUrl)
+      .then((response) => {
         this._searchCursor = response.search_cursor;
         this._isCurrentlyFetchingResults = false;
 
