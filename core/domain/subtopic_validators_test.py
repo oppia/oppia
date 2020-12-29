@@ -605,7 +605,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
             '%s' % i,
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
-            'description%s' % i) for i in python_utils.RANGE(3
+            'description%s' % i) for i in python_utils.RANGE(3)]
 
         language_codes=['ar', 'en', 'en']
         for index, topic in enumerate(topics):
