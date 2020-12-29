@@ -58,7 +58,6 @@ import python_utils
     models.NAMES.user
 ])
 
-auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
 
 
