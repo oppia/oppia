@@ -127,6 +127,32 @@ def authenticate_request(request):
         return claims.get('sub', None)
 
 
+def delete_user(user_id):
+    """Deletes all associations referring to the given user_id.
+
+    Args:
+        user_id: str. The ID of the user being deleted.
+
+    Returns:
+        bool. Whether the user's data has been successfully deleted.
+    """
+    mapping = auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id)
+    if mapping is None:
+        return True
+
+    if not _initialize_firebase():
+        return False
+
+    try:
+        firebase_auth.delete_user(mapping.id)
+    except (ValueError, firebase_exceptions.FirebaseError) as e:
+        logging.exception(e)
+        return False
+    else:
+        mapping.delete()
+        return True
+
+
 def get_user_id_from_auth_id(auth_id):
     """Returns the user ID associated with the given auth ID.
 

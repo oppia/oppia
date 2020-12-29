@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
+import logging
 
 from core.domain import auth_domain
 from core.platform import models
@@ -125,6 +126,77 @@ class AuthenticateRequestTests(test_utils.TestBase):
             auth_id = auth_services.authenticate_request(request)
 
         self.assertIsNone(auth_id)
+
+
+class DeleteUserTests(test_utils.GenericTestBase):
+
+    USER_ID = 'uid'
+    AUTH_ID = 'sub'
+
+    def setUp(self):
+        super(DeleteUserTests, self).setUp()
+        auth_services.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.USER_ID))
+
+    def assert_association_still_exists(self):
+        """Asserts that the test association still exists."""
+        self.assertIsNotNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get(
+                self.AUTH_ID, strict=False))
+
+    def assert_association_no_longer_exists(self):
+        """Asserts that the test association does not exist."""
+        self.assertIsNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get(
+                self.AUTH_ID, strict=False))
+
+    def assert_only_item_is_exception(self, logs, msg):
+        """Asserts that only the given message appeared in the logs."""
+        self.assertEqual(len(logs), 1)
+        self.assertIn(msg, logs[0])
+
+    def test_delete_user_without_an_association_returns_true(self):
+        self.assertTrue(auth_services.delete_user('uid_DOES_NOT_EXIST'))
+
+    def test_delete_user_without_firebase_initialization_returns_false(self):
+        init_swap = self.swap_to_always_raise(
+            firebase_admin, 'initialize_app',
+            error=firebase_exceptions.UnknownError('could not init'))
+
+        # NDB internals print logging messages as well, so we'll just filter for
+        # ERROR messages.
+        with init_swap, self.capture_logging(min_level=logging.ERROR) as logs:
+            self.assertFalse(auth_services.delete_user(self.USER_ID))
+
+        self.assert_association_still_exists()
+        self.assert_only_item_is_exception(logs, 'could not init')
+
+    @mock_successful_firebase_initialization
+    def test_delete_user_when_firebase_raises_an_error(self):
+        delete_swap = self.swap_to_always_raise(
+            firebase_admin.auth, 'delete_user',
+            error=firebase_exceptions.InternalError('could not connect'))
+
+        # NDB internals print logging messages as well, so we'll just filter for
+        # ERROR messages.
+        with delete_swap, self.capture_logging(min_level=logging.ERROR) as logs:
+            self.assertFalse(auth_services.delete_user(self.USER_ID))
+
+        self.assert_association_still_exists()
+        self.assert_only_item_is_exception(logs, 'could not connect')
+
+    @mock_successful_firebase_initialization
+    def test_delete_user_when_firebase_succeeds(self):
+        delete_swap = (
+            self.swap_to_always_return(firebase_admin.auth, 'delete_user'))
+
+        # NDB internals print logging messages as well, so we'll just filter for
+        # ERROR messages.
+        with delete_swap, self.capture_logging(min_level=logging.ERROR) as logs:
+            self.assertTrue(auth_services.delete_user(self.USER_ID))
+
+        self.assert_association_no_longer_exists()
+        self.assertEqual(logs, [])
 
 
 class AuthIdUserIdAssociationOperationsTests(test_utils.GenericTestBase):
