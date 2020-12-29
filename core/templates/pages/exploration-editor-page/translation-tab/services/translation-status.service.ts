@@ -40,11 +40,13 @@ require(
 angular.module('oppia').factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',
-  'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT', 'INTERACTION_SPECS',
+  'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT',
+  'COMPONENT_NAME_RULE_INPUT', 'INTERACTION_SPECS',
   function(
       ExplorationStatesService, StateRecordedVoiceoversService,
       StateWrittenTranslationsService, TranslationLanguageService,
-      TranslationTabActiveModeService, COMPONENT_NAME_HINT, INTERACTION_SPECS) {
+      TranslationTabActiveModeService, COMPONENT_NAME_HINT,
+      COMPONENT_NAME_RULE_INPUT, INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var TRANSLATION_NEEDS_UPDATE_MESSAGE = ['Translation needs update!'];
     var ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
@@ -146,6 +148,16 @@ angular.module('oppia').factory('TranslationStatusService', [
               return contentIdToRemove.indexOf(contentId) < 0;
             });
           }
+
+          // As of now, there are no ways of contributing rule input
+          // translations. To have an accurate representation of the progress
+          // bar, we remove rule input content ids.
+          const contentIdsToRemove = _getContentIdListRelatedToComponent(
+            COMPONENT_NAME_RULE_INPUT, allContentIds);
+          allContentIds = allContentIds.filter(function(contentId) {
+            return contentIdsToRemove.indexOf(contentId) < 0;
+          });
+
           explorationContentRequiredCount += allContentIds.length;
           allContentIds.forEach(function(contentId) {
             var availabilityStatus = _getContentAvailabilityStatus(

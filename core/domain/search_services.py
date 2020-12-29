@@ -23,7 +23,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 
-search_services = models.Registry.import_search_services()
+platform_search_services = models.Registry.import_search_services()
 
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
@@ -43,7 +43,7 @@ def index_exploration_summaries(exp_summaries):
         exp_summaries: list(ExpSummaryModel). List of Exp Summary domain
             objects to be indexed.
     """
-    search_services.add_documents_to_index([
+    platform_search_services.add_documents_to_index([
         _exp_summary_to_search_dict(exp_summary)
         for exp_summary in exp_summaries
         if _should_index_exploration(exp_summary)
@@ -122,7 +122,7 @@ def index_collection_summaries(collection_summaries):
         collection_summaries: list(CollectionSummaryModel). List of
             Collection Summary domain objects to be indexed.
     """
-    search_services.add_documents_to_index([
+    platform_search_services.add_documents_to_index([
         _collection_summary_to_search_dict(collection_summary)
         for collection_summary in collection_summaries
         if _should_index_collection(collection_summary)
@@ -164,11 +164,19 @@ def _should_index_collection(collection):
     return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
-def search_explorations(query, limit, cursor=None):
+def search_explorations(query, categories, language_codes, limit, cursor=None):
     """Searches through the available explorations.
 
     Args:
         query: str or None. The query string to search for.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         limit: int. The maximum number of results to return.
         cursor: str or None. A cursor, used to get the next page of results. If
             there are more documents that match the query than 'limit', this
@@ -184,9 +192,9 @@ def search_explorations(query, limit, cursor=None):
     # TODO(#11314): Change this (and callers of this function) to use an offset
     # instead once the underlying search service is migrated over to
     # elasticsearch.
-    return search_services.search(
-        query, SEARCH_INDEX_EXPLORATIONS, cursor=cursor,
-        size=limit, ids_only=True)
+    return platform_search_services.search(
+        query, SEARCH_INDEX_EXPLORATIONS, categories, language_codes,
+        cursor=cursor, size=limit, ids_only=True)
 
 
 def delete_explorations_from_search_index(exploration_ids):
@@ -197,7 +205,7 @@ def delete_explorations_from_search_index(exploration_ids):
         exploration_ids: list(str). A list of exploration ids whose
             documents are to be deleted from the search index.
     """
-    search_services.delete_documents_from_index(
+    platform_search_services.delete_documents_from_index(
         exploration_ids, SEARCH_INDEX_EXPLORATIONS)
 
 
@@ -205,14 +213,22 @@ def clear_exploration_search_index():
     """WARNING: This runs in-request, and may therefore fail if there are too
     many entries in the index.
     """
-    search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
+    platform_search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
 
 
-def search_collections(query, limit, cursor=None):
+def search_collections(query, categories, language_codes, limit, cursor=None):
     """Searches through the available collections.
 
     Args:
         query: str or None. The query string to search for.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         limit: int. The maximum number of results to return.
         cursor: str or None. A cursor, used to get the next page of results.
             If there are more documents that match the query than 'limit', this
@@ -228,9 +244,9 @@ def search_collections(query, limit, cursor=None):
     # TODO(#11314): Change this (and callers of this function) to use an offset
     # instead once the underlying search service is migrated over to
     # elasticsearch.
-    return search_services.search(
-        query, SEARCH_INDEX_COLLECTIONS, cursor=cursor,
-        size=limit, ids_only=True)
+    return platform_search_services.search(
+        query, SEARCH_INDEX_COLLECTIONS, categories, language_codes,
+        cursor=cursor, size=limit, ids_only=True)
 
 
 def delete_collections_from_search_index(collection_ids):
@@ -240,7 +256,7 @@ def delete_collections_from_search_index(collection_ids):
         collection_ids: list(str). List of IDs of the collections to be removed
             from the search index.
     """
-    search_services.delete_documents_from_index(
+    platform_search_services.delete_documents_from_index(
         collection_ids, SEARCH_INDEX_COLLECTIONS)
 
 
@@ -250,4 +266,4 @@ def clear_collection_search_index():
     WARNING: This runs in-request, and may therefore fail if there are too
     many entries in the index.
     """
-    search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
+    platform_search_services.clear_index(SEARCH_INDEX_COLLECTIONS)

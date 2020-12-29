@@ -21,10 +21,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import suggestion_services
-from core.platform import models
 import feconf
-
-transaction_services = models.Registry.import_transaction_services()
 
 
 class ThreadListHandler(base.BaseHandler):
@@ -181,7 +178,6 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     @acl_decorators.can_comment_on_feedback_thread
     def post(self, thread_id):
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
-        transaction_services.run_in_transaction(
-            feedback_services.clear_feedback_message_references, self.user_id,
-            exploration_id, thread_id)
+        feedback_services.clear_feedback_message_references(
+            self.user_id, exploration_id, thread_id)
         self.render_json(self.values)

@@ -106,14 +106,14 @@ describe('GraphInputValidationService', () => {
           }
         },
         rule_type: 'IsIsomorphicTo'
-      }), rof.createFromBackendDict({
+      }, 'GraphInput'), rof.createFromBackendDict({
         inputs: {
           g: {
             vertices: new Array(10)
           }
         },
         rule_type: 'IsIsomorphicTo'
-      })],
+      }, 'GraphInput')],
       goodDefaultOutcome,
       null,
       null);
