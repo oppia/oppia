@@ -27,13 +27,13 @@
     <div class="oppia-teach-section-one-right">
       <picture class="oppia-teach-main-image image-desktop">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>" alt="">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.png')]>">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.png')]>" alt="">
       </picture>
       <picture ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-main-image image-mobile">
         <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.webp')]>">
-        <source type="image/jpeg" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.jpg')]>" alt="">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.png')]>">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.png')]>" alt="">
       </picture>
     </div>
   </div>
@@ -79,16 +79,16 @@
     </div>
     <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 (1).webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>" alt="">
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3.webp')]>">
+        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3.png')]>">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia3.png')]>" alt="">
       </picture>
     </div>
     <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 (1).webp')]>">
+        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3.webp')]>">
         <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>" alt="">
+        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia3.png')]>" alt="">
       </picture>
     </div>
     <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-three-left mobile">
@@ -264,8 +264,7 @@
   }
 
   .teach-page .oppia-teach-section-three-left.mobile,
-  .teach-page .oppia-teach-section-four-left.mobile,
-  .teach-page .oppia-teach-section-five-left.mobile {
+  .teach-page .oppia-teach-section-four-left.mobile {
    margin-left: 3vw;
    margin-right: 3vw;
    padding-bottom: 2vh;
@@ -273,15 +272,29 @@
    width: fit-content;
   }
 
+  .teach-page .oppia-teach-section-five-left.mobile {
+   margin-left: 3vw;
+   margin-right: 3vw;
+   padding-bottom: 2vh;
+   text-align: center;
+  }
+
   .teach-page .oppia-teach-section-three-left .mobile-h2,
-  .teach-page .oppia-teach-section-four-left .mobile-h2,
-  .teach-page .oppia-teach-section-five-left .mobile-h2 {
+  .teach-page .oppia-teach-section-four-left .mobile-h2 {
    margin-left: 0;
    margin-right: 0;
    padding: 0;
    text-align: center;
    width: fit-content;
   }
+
+  .teach-page .oppia-teach-section-five-left .mobile-h2 {
+   margin-left: 0;
+   margin-right: 0;
+   padding: 0;
+   text-align: center;
+  }
+
   .teach-page .oppia-teach-button-container-button-one {
     margin-bottom: 5vh;
     margin-left: auto;
