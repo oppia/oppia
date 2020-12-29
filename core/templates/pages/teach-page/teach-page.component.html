@@ -1,23 +1,23 @@
 <div class="teach-page">
   <div class="oppia-teach-section-one" dir="auto">
     <div class="oppia-teach-section-one-left">
-      <h1 ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-h1" translate="I18N_TEACH_PAGE_HEADING"></h1>
-      <h1 ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-h1 mobile-heading" translate="I18N_TEACH_PAGE_HEADING"></h1>
+      <h1 ng-if="isWindowNarrow()" class="oppia-teach-h1" translate="I18N_TEACH_PAGE_HEADING"></h1>
+      <h1 ng-if="isWindowNarrow()" class="oppia-teach-h1 mobile-heading" translate="I18N_TEACH_PAGE_HEADING"></h1>
       <div class="oppia-teach-h2-container">
-        <h2 ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-h2 oppia-teach-h2-text" translate="I18N_TEACH_PAGE_CONTENT"></h2>
+        <h2 ng-if="isWindowNarrow()" class="oppia-teach-h2 oppia-teach-h2-text" translate="I18N_TEACH_PAGE_CONTENT"></h2>
       </div>
-      <h2 ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-h2 oppia-teach-h2-text mobile-h2" translate="I18N_TEACH_PAGE_CONTENT"></h2>
-      <div ng-if="!$ctrl.isWindowNarrow()"class="oppia-teach-button-container">
-        <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" ng-click="$ctrl.onClickStartLearningButton()"
+      <h2 ng-if="isWindowNarrow()" class="oppia-teach-h2 oppia-teach-h2-text mobile-h2" translate="I18N_TEACH_PAGE_CONTENT"></h2>
+      <div ng-if="isWindowNarrow()"class="oppia-teach-button-container">
+        <form action="classroomUrl">
+          <button type="submit" ng-click="onClickStartLearningButton()"
                   class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_ACTION_START_LEARNING">
           </button>
         </form>
       </div>
-      <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-button-container mobile-button">
-        <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" ng-click="$ctrl.onClickStartLearningButton()"
+      <div ng-if="isWindowNarrow()" class="oppia-teach-button-container mobile-button">
+        <form action="classroomUrl">
+          <button type="submit" ng-click="onClickStartLearningButton()"
                   class="btn oppia-teach-button-one oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_ACTION_START_LEARNING">
           </button>
@@ -26,77 +26,77 @@
     </div>
     <div class="oppia-teach-section-one-right">
       <picture class="oppia-teach-main-image image-desktop">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.png')]>" alt="">
+        <source type="image/webp" ng-srcset="getStaticImageUrl('/teach/student.webp')">
+        <source type="image/png" ng-srcset="getStaticImageUrl('/teach/student.png')">
+        <img ng-src="getStaticImageUrl('/teach/student.png')" alt="">
       </picture>
-      <picture ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-main-image image-mobile">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/student.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/student.png')]>" alt="">
+      <picture ng-if="isWindowNarrow()" class="oppia-teach-main-image image-mobile">
+        <source type="image/webp" ng-srcset="getStaticImageUrl('/teach/student.webp')">
+        <source type="image/png" ng-srcset="getStaticImageUrl('/teach/student.png')">
+        <img ng-src="getStaticImageUrl('/teach/student.png')" alt="">
       </picture>
     </div>
   </div>
 
   <div class="oppia-teach-section-two">
     <div class="oppia-teach-section-two-left">
-      <h3 ng-if="$ctrl.isWindowNarrow()" translate="I18N_TEACH_BENEFITS_TITLE"></h3>
+      <h3 ng-if="isWindowNarrow()" translate="I18N_TEACH_BENEFITS_TITLE"></h3>
       <picture class="teach-matthew-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/matthew_fractions.png')]>" alt="">
+        <source type="image/webp" ng-srcset="getStaticImageUrl('/splash/matthew_fractions.webp')">
+        <source type="image/png" ng-srcset="getStaticImageUrl('/splash/matthew_fractions.png')">
+        <img ng-src="getStaticImageUrl('/splash/matthew_fractions.png')" alt="">
       </picture>
     </div>
     <div class="oppia-teach-section-two-right">
-      <h3 ng-if="!$ctrl.isWindowNarrow()" translate="I18N_SPLASH_BENEFITS_TITLE"></h3>
+      <h3 ng-if="isWindowNarrow()" translate="I18N_SPLASH_BENEFITS_TITLE"></h3>
       <div class="teach-benefits-section">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet1.svg')]>" alt="">
+        <img ng-src="getStaticImageUrl('/splash/bullet1.svg')" alt="">
         <h2 translate="I18N_SPLASH_BENEFITS_ONE" class="teach-benefits"></h2>
       </div>
       <div class="teach-benefits-section">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet2.svg')]>" alt="">
+        <img ng-src="getStaticImageUrl('/splash/bullet2.svg')" alt="">
         <h2 translate="I18N_SPLASH_BENEFITS_TWO" class="teach-benefits"></h2>
       </div>
       <div class="teach-benefits-section">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/splash/bullet3.svg')]>" alt="">
+        <img ng-src="getStaticImageUrl('/splash/bullet3.svg')" alt="">
         <h2 translate="I18N_SPLASH_BENEFITS_THREE" class="teach-benefits"></h2>
       </div>
     </div>
   </div>
 
   <div class="oppia-teach-section-three">
-    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-section-three-left">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-section-three-left">
       <h2 translate="I18N_TEACH_PAGE_CLASSROOM_TITLE"></h2>
       <p translate="I18N_TEACH_PAGE_CLASSROOM_CONTENT"></p>
       <div class="oppia-teach-button-container">
-        <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" ng-click="$ctrl.onClickVisitClassroomButton()"
+        <form action="classroomUrl">
+          <button type="submit" ng-click="onClickVisitClassroomButton()"
                   class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_CLASSROOM_BUTTON">
           </button>
         </form>
       </div>
     </div>
-    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-section-three-right">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia3.png')]>" alt="">
+        <source type="image/webp" ng-srcset="getStaticImageUrl('/teach/oppia3.webp')">
+        <source type="image/png" ng-srcset="getStaticImageUrl('/teach/oppia3.png')">
+        <img ng-src="getStaticImageUrl('/teach/oppia3.png')" alt="">
       </picture>
     </div>
-    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-three-right">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia3 .png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia3.png')]>" alt="">
+        <source type="image/webp" ng-srcset="getStaticImageUrl('/teach/oppia3.webp')">
+        <source type="image/png" ng-srcset="getStaticImageUrl('/teach/oppia3 .png')">
+        <img ng-src="getStaticImageUrl('/teach/oppia3.png')" alt="">
       </picture>
     </div>
-    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-three-left mobile">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-section-three-left mobile">
       <h2 class="mobile-h2" translate="I18N_TEACH_PAGE_CLASSROOM_TITLE"></h2>
       <p class="mobile-h2" translate="I18N_TEACH_PAGE_CLASSROOM_CONTENT"></p>
       <div class="oppia-teach-button-container">
-        <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" ng-click="$ctrl.onClickVisitClassroomButton()"
+        <form action="classroomUrl">
+          <button type="submit" ng-click="onClickVisitClassroomButton()"
                   class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_CLASSROOM_BUTTON">
           </button>
@@ -106,38 +106,38 @@
   </div>
 
   <div class="oppia-teach-section-four">
-    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-section-four-left">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-section-four-left">
       <h2 translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
       <p translate="I18N_TEACH_PAGE_LIBRARY_CONTENT"></p>
       <div class="oppia-teach-button-container">
         <form action="/community-library">
-          <button type="submit" ng-click="$ctrl.onClickBrowseLibraryButton()"
+          <button type="submit" ng-click="onClickBrowseLibraryButton()"
                   class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_LIBRARY_BUTTON">
           </button>
         </form>
       </div>
     </div>
-    <div class="oppia-teach-section-four-right" ng-if="!$ctrl.isWindowNarrow()">
+    <div class="oppia-teach-section-four-right" ng-if="isWindowNarrow()">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia1.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia1.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia1.png')]>" alt="">
+        <source type="image/webp" ng-srcset="getStaticImageUrl('/teach/oppia1.webp')">
+        <source type="image/png" ng-srcset="getStaticImageUrl('/teach/oppia1.png')">
+        <img ng-src="getStaticImageUrl('/teach/oppia1.png')" alt="">
       </picture>
     </div>
-    <div class="oppia-teach-section-four-right" ng-if="$ctrl.isWindowNarrow()">
+    <div class="oppia-teach-section-four-right" ng-if="isWindowNarrow()">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia1.webp')]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl('/teach/oppia1.png')]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl('/teach/oppia1.png')]>" alt="">
+        <source type="image/webp" ng-srcset="getStaticImageUrl('/teach/oppia1.webp')">
+        <source type="image/png" ng-srcset="getStaticImageUrl('/teach/oppia1.png')">
+        <img ng-src="getStaticImageUrl('/teach/oppia1.png')" alt="">
       </picture>
     </div>
-    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-four-left mobile">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-section-four-left mobile">
       <h2 class="mobile-h2" translate="I18N_TEACH_PAGE_LIBRARY_TITLE"></h2>
       <p class="mobile-h2" translate="I18N_TEACH_PAGE_LIBRARY_CONTENT"></p>
       <div class="oppia-teach-button-container">
         <form action="/community-library">
-          <button type="submit" ng-click="$ctrl.onClickBrowseLibraryButton()"
+          <button type="submit" ng-click="onClickBrowseLibraryButton()"
                   class="btn oppia-teach-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                   translate="I18N_TEACH_PAGE_LIBRARY_BUTTON">
           </button>
@@ -146,94 +146,94 @@
     </div>
   </div>
 
-  <div class="oppia-teach-section-five" ng-style="{'background-image': '<[$ctrl.getTestimonialBackgroundUrl()]>'}">
-    <div class="oppia-teach-section-five-image" ng-if="$ctrl.isWindowNarrow()">
+  <div class="oppia-teach-section-five" ng-style="{'background-image': 'getTestimonialBackgroundUrl()'}">
+    <div class="oppia-teach-section-five-image" ng-if="isWindowNarrow()">
       <picture class="teach-student-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlWebp)]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrl)]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlPng)]>" ng-class="{'image-with-border': $ctrl.testimonials[$ctrl.displayedTestimonialId].borderPresent}" alt="">
+        <source type="image/webp" ng-srcset="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
+        <source type="image/png" ng-srcset="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
+        <img ng-src="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlPng)" ng-class="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
-    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-section-five-left">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-section-five-left">
       <div>
-        <h2><[$ctrl.testimonials[$ctrl.displayedTestimonialId].quote]></h2>
-        <h3><[$ctrl.testimonials[$ctrl.displayedTestimonialId].studentDetails]></h3>
+        <h2>testimonials[displayedTestimonialId].quote</h2>
+        <h3>testimonials[displayedTestimonialId].studentDetails</h3>
       </div>
       <div class="teach-arrows-container">
-        <span ng-click="$ctrl.decrementDisplayedTestimonialId()" class="material-icons">
+        <span ng-click="decrementDisplayedTestimonialId()" class="material-icons">
           arrow_back_ios
         </span>
-        <span ng-click="$ctrl.incrementDisplayedTestimonialId()" class="material-icons">
+        <span ng-click="incrementDisplayedTestimonialId()" class="material-icons">
           arrow_forward_ios
         </span>
       </div>
     </div>
-    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-section-five-left mobile">
-      <h2 class="mobile-h2"><[$ctrl.testimonials[$ctrl.displayedTestimonialId].quote]></h2>
-      <h3><[$ctrl.testimonials[$ctrl.displayedTestimonialId].studentDetails]></h3>
+    <div ng-if="isWindowNarrow()" class="oppia-teach-section-five-left mobile">
+      <h2 class="mobile-h2">testimonials[displayedTestimonialId].quote</h2>
+      <h3>testimonials[displayedTestimonialId].studentDetails</h3>
       <div class="teach-arrows-container">
-        <span ng-click="$ctrl.decrementDisplayedTestimonialId()" class="material-icons">
+        <span ng-click="decrementDisplayedTestimonialId()" class="material-icons">
           arrow_back_ios
         </span>
-        <span ng-click="$ctrl.incrementDisplayedTestimonialId()" class="material-icons">
+        <span ng-click="incrementDisplayedTestimonialId()" class="material-icons">
           arrow_forward_ios
         </span>
       </div>
     </div>
-    <div class="oppia-teach-section-five-right" ng-if="!$ctrl.isWindowNarrow()">
+    <div class="oppia-teach-section-five-right" ng-if="isWindowNarrow()">
       <picture class="teach-student-image">
-        <source type="image/webp" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlWebp)]>">
-        <source type="image/png" ng-srcset="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrl)]>">
-        <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.testimonials[$ctrl.displayedTestimonialId].imageUrlPng)]>" ng-class="{'image-with-border': $ctrl.testimonials[$ctrl.displayedTestimonialId].borderPresent}" alt="">
+        <source type="image/webp" ng-srcset="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
+        <source type="image/png" ng-srcset="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
+        <img ng-src="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlPng)" ng-class="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
   </div>
 
   <div class="oppia-teach-section-six">
     <h2 translate="I18N_TEACH_PAGE_SIX_TITLE"></h2>
-    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-button-container-button-one">
       <form action="/teach">
-        <button type="submit" ng-click="$ctrl.onClickGuideParentsButton()"
+        <button type="submit" ng-click="onClickGuideParentsButton()"
                 class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_GUIDE_FOR_TEACHERS">
         </button>
       </form>
     </div>
-    <div ng-if="!$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-button-container-button-one">
       <form action="/teach">
-        <button type="submit" ng-click="$ctrl.onClickTipforParentsButton()"
+        <button type="submit" ng-click="onClickTipforParentsButton()"
                 class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_TIPS_FOR_PARENTS">
         </button>
       </form>
     </div>
-    <div ng-if="!$ctrl.isWindowNarrow()"  class="oppia-teach-button-container-button-one">
-      <form action="<[$ctrl.classroomUrl]>">
-        <button type="submit" ng-click="$ctrl.onClickExploreLessonsButton()"
+    <div ng-if="isWindowNarrow()"  class="oppia-teach-button-container-button-one">
+      <form action="classroomUrl">
+        <button type="submit" ng-click="onClickExploreLessonsButton()"
                 class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_EXPLORE_LESSONS">
         </button>
       </form>
     </div>
-    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-button-container-button-one">
       <form action="/teach">
-        <button type="submit" ng-click="$ctrl.onClickGuideParentsButton()"
+        <button type="submit" ng-click="onClickGuideParentsButton()"
                 class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_GUIDE_FOR_TEACHERS">
         </button>
       </form>
     </div>
-    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
+    <div ng-if="isWindowNarrow()" class="oppia-teach-button-container-button-one">
       <form action="/teach">
-        <button type="submit" ng-click="$ctrl.onClickTipforParentsButton()"
+        <button type="submit" ng-click="onClickTipforParentsButton()"
                 class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_TIPS_FOR_PARENTS">
         </button>
       </form>
     </div>
-    <div ng-if="$ctrl.isWindowNarrow()" class="oppia-teach-button-container-button-one">
-      <form action="<[$ctrl.classroomUrl]>">
-        <button type="submit" ng-click="$ctrl.onClickExploreLessonsButton()"
+    <div ng-if="isWindowNarrow()" class="oppia-teach-button-container-button-one">
+      <form action="classroomUrl">
+        <button type="submit" ng-click="onClickExploreLessonsButton()"
                 class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
                 translate="I18N_ACTION_EXPLORE_LESSONS">
         </button>

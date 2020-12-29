@@ -22,6 +22,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import { TeachPageComponent } from './teach-page.component';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -36,9 +37,11 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     SharedComponentsModule
   ],
   declarations: [
+    TeachPageComponent,
     OppiaAngularRootComponent
   ],
   entryComponents: [
+    TeachPageComponent,
     OppiaAngularRootComponent
   ],
   providers: [

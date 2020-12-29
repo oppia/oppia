@@ -15,128 +15,134 @@
 /**
  * @fileoverview Component for the teach page.
  */
-require('base-components/base-content.directive.ts');
-
-require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/site-analytics.service.ts');
-require('services/user.service.ts');
+import { Component, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 import splashConstants from 'assets/constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
+import { LoaderService } from 'services/loader.service.ts';
+@Component({
+  selector: 'teach-page',
+  templateUrl: './teach-page.component.html',
+  styleUrls: []
+})
+export class TeachPageComponent implements OnInit {
 
-angular.module('oppia').component('teachPage', {
-  template: require('./teach-page.component.html'),
-  controller: [
-    '$rootScope', '$translate', 'LoaderService', 'SiteAnalyticsService',
-    'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
-    function(
-        $rootScope, $translate, LoaderService, SiteAnalyticsService,
-        UrlInterpolationService, UserService, WindowDimensionsService) {
-      var ctrl = this;
-      ctrl.getStaticImageUrl = function(imagePath) {
-        if (imagePath) {
-          return UrlInterpolationService.getStaticImageUrl(imagePath);
-        }
-      };
+  classroomUrlFragment: string;
+  classroomUrl :string;
+  displayedTestimonialId: number;
+  testimonialCount: number;
+  testimonials: any;
 
-      ctrl.onClickStartLearningButton = function() {
-        SiteAnalyticsService.registerClickStartLearningButtonEvent();
-        return false;
-      };
+  constructor(
+    private loaderService: LoaderService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionService: WindowDimensionsService,
+    private windowRef: WindowRef,
+  ) {}
 
-      ctrl.onClickVisitClassroomButton = function() {
-        SiteAnalyticsService.registerClickVisitClassroomButtonEvent();
-        return false;
-      };
+  ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
+    this.displayedTestimonialId = 0;
+    this.testimonialCount = 4;
+    this.testimonials = this.getTestimonials();
+    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
+      '/learn/<classroomUrlFragment>', {
+        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+      });
+  }
 
-      ctrl.onClickBrowseLibraryButton = function() {
-        SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-        return false;
+  // The 2 functions below are to cycle between values:
+  // 0 to (testimonialCount - 1) for displayedTestimonialId.
+  incrementDisplayedTestimonialId(): void {
+  // This makes sure that incrementing from (testimonialCount - 1)
+  // returns 0 instead of testimonialCount,since we want the testimonials
+  // to cycle through.
+        this.displayedTestimonialId = (
+          this.displayedTestimonialId + 1) % this.testimonialCount;
       };
+  
+  decrementDisplayedTestimonialId(): void {
+  // This makes sure that decrementing from 0, returns
+  // (testimonialCount - 1) instead of -1, since we want the testimonials
+  // to cycle through.
+    this.displayedTestimonialId = (
+      this.displayedTestimonialId + this.testimonialCount - 1) %
+      this.testimonialCount;
+  };
 
-      ctrl.isWindowNarrow = function() {
-        return WindowDimensionsService.isWindowNarrow();
-      };
+  getTestimonials(): any {
+    return [{
+      quote: 'I18N_TEACH_TESTIMONIAL_1',
+      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
+      imageUrl: '/splash/mira.png',
+      imageUrlWebp: '/splash/mira.webp',
+      borderPresent: false
+    }, {
+      quote: 'I18N_TEACH_TESTIMONIAL_2',
+      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
+      imageUrl: '/splash/Dheeraj_3.png',
+      imageUrlWebp: '/splash/Dheeraj_3.webp',
+      borderPresent: true
+    }, {
+      quote: 'I18N_TEACH_TESTIMONIAL_3',
+      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
+      imageUrl: '/splash/sama.png',
+      imageUrlWebp: '/splash/sama.webp',
+      borderPresent: false
+    }, {
+      quote: 'I18N_TEACH_TESTIMONIAL_4',
+      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_4',
+      imageUrl: '/splash/Gaurav_2.png',
+      imageUrlWebp: '/splash/Gaurav_2.webp',
+      borderPresent: true
+    }];
+  };
 
-      // The 2 functions below are to cycle between values:
-      // 0 to (testimonialCount - 1) for displayedTestimonialId.
-      ctrl.incrementDisplayedTestimonialId = function() {
-        // This makes sure that incrementing from (testimonialCount - 1)
-        // returns 0 instead of testimonialCount,since we want the testimonials
-        // to cycle through.
-        ctrl.displayedTestimonialId = (
-          ctrl.displayedTestimonialId + 1) % ctrl.testimonialCount;
-      };
+  isWindowNarrow():boolean {
+    return this.windowDimensionService.isWindowNarrow();
+  };
 
-      ctrl.decrementDisplayedTestimonialId = function() {
-        // This makes sure that decrementing from 0, returns
-        // (testimonialCount - 1) instead of -1, since we want the testimonials
-        // to cycle through.
-        ctrl.displayedTestimonialId = (
-          ctrl.displayedTestimonialId + ctrl.testimonialCount - 1) %
-          ctrl.testimonialCount;
-      };
+  onClickStartLearningButton(): boolean {
+    this.siteAnalyticsService.registerClickStartLearningButtonEvent();
+    return false;
+  };
 
-      ctrl.getTestimonials = function() {
-        return [{
-          quote: $translate.instant('I18N_TEACH_TESTIMONIAL_1'),
-          studentDetails: $translate.instant('I18N_TEACH_STUDENT_DETAILS_1'),
-          imageUrl: '/splash/mira.png',
-          imageUrlWebp: '/splash/mira.webp',
-          borderPresent: false
-        }, {
-          quote: $translate.instant('I18N_TEACH_TESTIMONIAL_2'),
-          studentDetails: $translate.instant('I18N_TEACH_STUDENT_DETAILS_2'),
-          imageUrl: '/splash/Dheeraj_3.png',
-          imageUrlWebp: '/splash/Dheeraj_3.webp',
-          borderPresent: true
-        }, {
-          quote: $translate.instant('I18N_TEACH_TESTIMONIAL_3'),
-          studentDetails: $translate.instant('I18N_TEACH_STUDENT_DETAILS_3'),
-          imageUrl: '/splash/sama.png',
-          imageUrlWebp: '/splash/sama.webp',
-          borderPresent: false
-        }, {
-          quote: $translate.instant('I18N_TEACH_TESTIMONIAL_4'),
-          studentDetails: $translate.instant('I18N_TEACH_STUDENT_DETAILS_4'),
-          imageUrl: '/splash/Gaurav_2.png',
-          imageUrlWebp: '/splash/Gaurav_2.webp',
-          borderPresent: true
-        }];
-      };
+  onClickVisitClassroomButton(): boolean {
+    this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
+    return false;
+  };
 
-      ctrl.onClickGuideParentsButton = function() {
-        SiteAnalyticsService.registerClickGuideParentsButtonEvent();
-        return false;
-      };
+  onClickBrowseLibraryButton(): boolean {
+    this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+    return false;
+  };
 
-      ctrl.onClickTipforParentsButton = function() {
-        SiteAnalyticsService.registerClickTipforParentsButtonEvent();
-        return false;
-      };
+  onClickGuideParentsButton(): boolean {
+    this.siteAnalyticsService.registerClickGuideParentsButtonEvent();
+    return false;
+  };
 
-      ctrl.onClickExploreLessonsButton = function() {
-        SiteAnalyticsService.registerClickExploreLessonsButtonEvent();
-        return false;
-      };
+  onClickTipforParentsButton(): boolean {
+    this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
+    return false;
+  };
 
-      ctrl.$onInit = function() {
-        ctrl.userIsLoggedIn = null;
-        ctrl.displayedTestimonialId = 0;
-        ctrl.testimonialCount = 4;
-        ctrl.testimonials = ctrl.getTestimonials();
-        ctrl.classroomUrl = UrlInterpolationService.interpolateUrl(
-          '/learn/<classroomUrlFragment>', {
-            classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
-          });
-        LoaderService.showLoadingScreen('Loading');
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          LoaderService.hideLoadingScreen();
-          // TODO(#8521):Remove the use of $rootScope.$apply()
-          $rootScope.$applyAsync();
-        });
-      };
-    }
-  ]
-});
+  onClickExploreLessonsButton(): boolean {
+    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
+    return false;
+  };
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+}
+
+angular.module('oppia').directive('teachPage',
+  downgradeComponent({component: TeachPageComponent}));
