@@ -168,7 +168,7 @@ var SkillEditorPage = function() {
     var editRubricExplanationButtons = element.all(
       by.css('.protractor-test-edit-rubric-explanation-' + difficulty));
     await action.click(
-      'Edit RubricExplanation Buttons', 
+      'Edit RubricExplanation Buttons',
       editRubricExplanationButtons.get(explIndex));
     var editor = element(
       by.css('.protractor-test-rubric-explanation-text'));
@@ -272,13 +272,10 @@ var SkillEditorPage = function() {
 
     var addWorkedExampleModal = (
       element(by.css('.protractor-test-add-worked-example-modal')));
-    
     await action.click('Worked Example Question', workedExampleQuestion);
     await action.sendKeys(
       'browser switchTo Active Element', (
         await browser.switchTo().activeElement()), question);
-    
-
     await action.click('Worked Example Explanation', workedExampleExplanation);
     await action.sendKeys(
       'browser switchTo Active Element', (
@@ -341,7 +338,6 @@ var SkillEditorPage = function() {
 
     var addMisconceptionModal = (
       element(by.css('.protractor-test-add-misconception-modal')));
-    
     await action.click('Misconception Name Field', misconceptionNameField);
     await action.sendKeys(
       'browser switchTo Active Element', (
@@ -352,7 +348,8 @@ var SkillEditorPage = function() {
       'browser switchTo Active Element', (
         await browser.switchTo().activeElement()), notes);
 
-    await action.click('Misconception Feedback Field', misconceptionFeedbackField);
+    await action.click(
+      'Misconception Feedback Field', misconceptionFeedbackField);
     await action.sendKeys(
       'browser switchTo Active Element', (
         await browser.switchTo().activeElement()), feedback);
@@ -391,5 +388,3 @@ var SkillEditorPage = function() {
 };
 
 exports.SkillEditorPage = SkillEditorPage;
-
-  
