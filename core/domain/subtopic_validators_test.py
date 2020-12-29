@@ -28,7 +28,7 @@ from constants import constants
 from core.domain import subtopic_page_domain
 from core.domain import topic_domain
 from core.domain import topic_services
-
+from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -48,6 +48,8 @@ USER_NAME = 'username'
     models.NAMES.job, models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
+
+
 class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -65,7 +67,7 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
-        
+
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
@@ -603,32 +605,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
             '%s' % i,
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
-            'description%s' % i) for i in python_utils.RANGE(3)]
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
-        skills = [
-            skill_domain.Skill.create_default_skill(
-                '%s' % i, 'skill%s' % i, rubrics)
-            for i in python_utils.RANGE(9)]
-
-        for skill in skills:
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d',
-            'description %d' % i,
-            '%s' % (python_utils.divide(i, 2)),
-            'title-%s' % chr(97 + i)
-        ) for i in python_utils.RANGE(6)]
-
-        for story in stories:
-            story_services.save_new_story(self.owner_id, story)
+            'description%s' % i) for i in python_utils.RANGE(3
 
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
