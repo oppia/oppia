@@ -98,9 +98,6 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_2 = (
             subtopic_models.SubtopicPageModel.get_by_id('2-1'))
 
-        
-            
-
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
             self.owner_id, '0', [subtopic_page_domain.SubtopicPageChange({
@@ -268,7 +265,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
-        
+
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
@@ -307,10 +304,6 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         self.model_instance_2 = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '2-1-1'))
-
-        
-            
-            
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -460,7 +453,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
-      
+
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
@@ -676,10 +669,6 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
         self.model_instance_2 = (
             subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-2-1-1'))
-
-       
-           
-           
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
