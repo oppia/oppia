@@ -26,7 +26,7 @@
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_3": "Bu çabaları destekleyen yüzlerce diğer kişiye katılmak istiyorsanız, lütfen <a href=\"/donate\">Oppia Vakfı'na bağış yapın</a> veya <a href=\"/contact\">diğerlerine katılma</a> hakkında daha fazla bilgi edinin.",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4": "Vakfın yöneticileri Ben Henning, Jacob Davis ve Sean Lip'dir. Vakfı'nın <a href=\"https://drive.google.com/folderview?id=0B9KSjiibL_WDfjlpUUpqampZSTBOTmRqM2IyaGN3R3NlVWstZlhKcjlZQ3VMTHJBQWNGTFU&usp=sharing\" class=\"inline-links\">tüzük ve dakika</a> okumaya mevcuttur. Vakıf ile iletişime geçmek isterseniz, lütfen e-postaya bildirin: <a href=\"mailto:admin@oppia.org\" class=\"inline-links\">admin@oppia.org</a>.",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_4_HEADING": "Yönetmenler",
-	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5": "Oppia'nın keşiflerindeki tüm içerik <a href=\"https://creativecommons.org/licenses/by-sa/4.0/legalcode\" class=\"inline-links\">CC-BY-SA 4.0</a> altında lisanslanmıştır.",
+	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5": "Oppia'nın keşiflerindeki tüm içerik <a href=\"https://creativecommons.org/licenses/by-sa/4.0/legalcode.tr\" class=\"inline-links\">CC-BY-SA 4.0</a> altında lisanslanmıştır.",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING": "Lisans",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_6": "Oppia’yı destekleyen yazılım açık kaynak kodludur ve <a href=\"https://github.com/oppia/oppia/\" class=\"inline-links\">kodu</a> bir <a href=\"https://www.apache.org/licenses/\" class=\"inline-links\">Apache 2.0</a> lisansı altında yayınlanmıştır.",
 	"I18N_ABOUT_PAGE_HEADING": "Oppia: herkes için eğitim",
