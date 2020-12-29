@@ -795,7 +795,9 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
     def map(item):
         model_name = item.__class__.__name__
         model_id = item.id
-        identifier_message = '%s with id %s' % (model_name, model_id)
+        identifier_message = (
+            '%s with id %s. Message: %s' % (
+                model_name, model_id, item.commit_message))
         if len(item.commit_message) <= 1000:
             yield ('LESS_OR_EQUAL_TO_1000', 1)
         else:

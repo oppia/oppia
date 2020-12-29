@@ -2613,14 +2613,18 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
                 committer_id='committer_id',
                 commit_type='create',
                 commit_message='a' * value_equal_to_1500).put()
-
+        self.maxDiff = None
         one_off_results = self._run_one_off_job()
         expected_results = [
             ['GREATER_THAN_1000', [
-                'ConfigPropertySnapshotMetadataModel with id model_id-1-1500',
-                'ConfigPropertySnapshotMetadataModel with id model_id-0-1200',
-                'ConfigPropertySnapshotMetadataModel with id model_id-0-1500',
-                'ConfigPropertySnapshotMetadataModel with id model_id-1-1200'
+                'ConfigPropertySnapshotMetadataModel with id model_id-1-1500.' +
+                ' Message: %s' % ('a' * value_equal_to_1500),
+                'ConfigPropertySnapshotMetadataModel with id model_id-0-1200.' +
+                ' Message: %s' % ('a' * value_between_1000_and_1500),
+                'ConfigPropertySnapshotMetadataModel with id model_id-0-1500.' +
+                ' Message: %s' % ('a' * value_equal_to_1500),
+                'ConfigPropertySnapshotMetadataModel with id model_id-1-1200.' +
+                ' Message: %s' % ('a' * value_between_1000_and_1500)
             ]],
             ['LESS_OR_EQUAL_TO_1000', 2 * num_models_per_category + 1]]
 
