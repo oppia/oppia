@@ -148,12 +148,13 @@
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
     <li ng-class="{'open' : $ctrl.activeMenuName === 'profileMenu'}" uib-dropdown ng-if="$ctrl.userIsLoggedIn" class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown">
       <a ng-keydown="$ctrl.onMenuKeypress($event, 'profileMenu', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})"
-         class="nav-link oppia-navbar-dropdown-toggle"
+         class="nav-link oppia-navbar-dropdown-toggle"      
          aria-haspopup="true"
          aria-expanded="false"
          aria-label="User Menu"
          tabindex="0"
-         ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')">
+         ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
+         ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
         <div class="oppia-navbar-profile-picture-container dropdown-toggle">
           <span ng-if="$ctrl.profilePictureDataUrl">
             <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-navbar-profile-picture rounded-circle" alt="User Avatar">
