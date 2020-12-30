@@ -126,7 +126,8 @@ def get_exploration_titles_and_categories(exp_ids):
     return result
 
 
-def get_exploration_ids_matching_query(query_string, cursor=None):
+def get_exploration_ids_matching_query(
+        query_string, categories, language_codes, cursor=None):
     """Returns a list with all exploration ids matching the given search query
     string, as well as a search cursor for future fetches.
 
@@ -137,6 +138,14 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
 
     Args:
         query_string: str. A search query string.
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
         cursor: str or None. Optional cursor from which to start the search
             query. If no cursor is supplied, the first N results matching
             the query are returned.
@@ -152,7 +161,8 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
             returned_exploration_ids)
 
         exp_ids, search_cursor = search_services.search_explorations(
-            query_string, remaining_to_fetch, cursor=search_cursor)
+            query_string, categories, language_codes, remaining_to_fetch,
+            cursor=search_cursor)
 
         invalid_exp_ids = []
         for ind, model in enumerate(
@@ -787,7 +797,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):
-    """Remove explorations from all subscribers' activity_ids.
+    """Remove explorations from all subscribers' exploration_ids.
 
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
@@ -795,14 +805,12 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     if not exploration_ids:
         return
 
-    # TODO(#10727): activity_ids in UserSubscriptionsModel should be renamed
-    # to explorations_id.
     subscription_models = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
+        user_models.UserSubscriptionsModel.exploration_ids.IN(exploration_ids)
     ).fetch()
     for model in subscription_models:
-        model.activity_ids = [
-            id_ for id_ in model.activity_ids if id_ not in exploration_ids]
+        model.exploration_ids = [
+            id_ for id_ in model.exploration_ids if id_ not in exploration_ids]
     user_models.UserSubscriptionsModel.update_timestamps_multi(
         subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)

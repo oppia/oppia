@@ -24,15 +24,28 @@ import { HttpClient } from '@angular/common/http';
 import { QuestionObjectFactory, QuestionBackendDict, Question } from 'domain/question/QuestionObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { QuestionDomainConstants } from 'domain/question/question-domain.constants';
+import { SkillBackendDict } from 'domain/skill/SkillObjectFactory';
 
 export interface EditableQuestionBackendResponse {
   questionId: string;
 }
+
+export interface FetchQuestionBackendResponse {
+  'associated_skill_dicts': SkillBackendDict[];
+  'is_admin': boolean;
+  'is_moderator': boolean;
+  'is_super_admin': boolean;
+  'is_topic_manager': boolean;
+  'question_dict': QuestionBackendDict;
+  'user_email': string;
+  username: string;
+}
 export interface UpdateEditableQuestionBackendResponse {
   questionDict: QuestionBackendDict;
 }
-export interface fetchQuestionResponse{
-  questionObject: Question
+export interface FetchQuestionResponse{
+  questionObject: Question,
+  'associated_skill_dicts': SkillBackendDict[];
 }
 export interface ImageData {
   filename: string,
@@ -84,21 +97,27 @@ export class EditableQuestionBackendApiService {
   }
   private _fetchQuestion(
       questionId: string,
-      successCallback: (value: Question) => void,
-      errorCallback: (reason?: string) => void): Promise<Question> {
+      successCallback: (value: FetchQuestionResponse) => void,
+      errorCallback: (reason?: string) => void):
+        Promise<FetchQuestionBackendResponse> {
     return new Promise((resolve, reject) => {
       const questionDataUrl = this.urlInterpolationService.interpolateUrl(
         QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE, {
           question_id: questionId
         });
 
-      this.http.get<UpdateEditableQuestionBackendResponse>(questionDataUrl)
+      this.http.get<FetchQuestionBackendResponse>(questionDataUrl)
         .toPromise().then(
           response => {
-            successCallback(
-              this.questionObjectFactory
-                .createFromBackendDict(response.questionDict),
-            );
+            let questionObject = (
+              this.questionObjectFactory.createFromBackendDict(
+                response.question_dict));
+            let skillDicts = angular.copy(
+              response.associated_skill_dicts);
+            successCallback({
+              questionObject: questionObject,
+              associated_skill_dicts: skillDicts
+            });
           },
           errorResponse => {
             errorCallback(errorResponse.error.error);
@@ -166,34 +185,6 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  private _changeDifficulty(
-      questionId: string,
-      skillId: string,
-      newDifficulty: number,
-      successCallback: (value: void) => void,
-      errorCallback: (reason?: string) => void)
-    : Promise<Question> {
-    return new Promise((resolve, reject) => {
-      var changeDifficultyUrl = this.urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE, {
-          question_id: questionId
-        });
-      var putData = {
-        new_difficulty: newDifficulty,
-        action: 'update_difficulty',
-        skill_id: skillId
-      };
-      this.http.put(changeDifficultyUrl, putData).toPromise()
-        .then(
-          response => {
-            successCallback();
-          },
-          errorResponse => {
-            errorCallback(errorResponse.error.error);
-          });
-    });
-  }
-
   createQuestion(
       skillIds: string[],
       skillDifficulties: number[],
@@ -207,7 +198,7 @@ export class EditableQuestionBackendApiService {
   }
 
   fetchQuestion(questionId: string)
-  : Promise<Question> {
+  : Promise<FetchQuestionResponse> {
     return new Promise((resolve, reject) => {
       this._fetchQuestion(questionId, resolve, reject);
     });
@@ -221,17 +212,6 @@ export class EditableQuestionBackendApiService {
     return new Promise((resolve, reject) => {
       this._editQuestionSkillLinks(
         questionId, skillIdsTaskArray, difficulty, resolve, reject);
-    });
-  }
-
-  changeDifficulty(
-      questionId: string,
-      skillId: string,
-      newDifficulty: number)
-      : Promise<void> {
-    return new Promise((resolve, reject) => {
-      this._changeDifficulty(
-        questionId, skillId, newDifficulty, resolve, reject);
     });
   }
 

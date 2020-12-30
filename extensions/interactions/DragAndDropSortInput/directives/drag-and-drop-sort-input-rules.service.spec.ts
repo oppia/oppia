@@ -25,58 +25,114 @@ describe('Drag and Drop Sort Input rules service', () => {
 
   it('should have a correct \'is equal to ordering\' rule', () => {
     var RULE_INPUT: {x: string[][]} = {
-      x: [['a', 'b'], ['c'], ['de', 'f']]
+      x: [
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_3'],
+        ['rule_input_4', 'rule_input_6']
+      ]
     };
     expect(ddsrs.IsEqualToOrdering(
-      [['a', 'b'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(true);
+      [
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_3'],
+        ['rule_input_4', 'rule_input_6']
+      ], RULE_INPUT)).toBe(true);
     expect(ddsrs.IsEqualToOrdering(
-      [['b', 'a'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(true);
+      [
+        ['rule_input_2', 'rule_input_1'],
+        ['rule_input_3'],
+        ['rule_input_4', 'rule_input_6']], RULE_INPUT)).toBe(true);
     expect(ddsrs.IsEqualToOrdering(
-      [['abbb', 'b'], ['c'], ['d', 'f']], RULE_INPUT)).toBe(false);
+      [
+        ['abbb', 'rule_input_2'],
+        ['rule_input_3'],
+        ['rule_input_5', 'rule_input_6']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrdering(
-      [['a', 'b'], ['c', 'f'], ['de']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_3', 'rule_input_6'],
+        ['rule_input_4']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrdering(
-      [['a', 'b', 'g'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_1', 'rule_input_2', 'g'],
+        ['rule_input_3'],
+        ['rule_input_4', 'rule_input_6']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrdering(
-      [['c'], ['a', 'b'], ['de', 'f']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_3'],
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_4', 'rule_input_6']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrdering(
-      [['a', 'b'], ['c']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_3']], RULE_INPUT)).toBe(false);
   });
 
   it('should have a correct \'is equal to ordering with one item at incorrect' +
     ' position\' rule', () => {
     var RULE_INPUT: {x: string[][]} = {
-      x: [['a', 'b'], ['c'], ['de', 'f']]
+      x: [
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_3'],
+        ['rule_input_4', 'rule_input_6']]
     };
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-      [['a', 'b'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_3'],
+        ['rule_input_4', 'rule_input_6']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-      [['b', 'a'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_2', 'rule_input_1'],
+        ['rule_input_3'],
+        ['rule_input_4', 'rule_input_6']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-      [['a', 'b'], ['c', 'f']], RULE_INPUT)).toBe(true);
+      [
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_3', 'rule_input_6']], RULE_INPUT)).toBe(true);
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-      [['a', 'b', 'c'], ['de', 'f']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_1', 'rule_input_2', 'rule_input_3'],
+        ['rule_input_4', 'rule_input_6']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-      [['a'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(true);
+      [
+        ['rule_input_1'],
+        ['rule_input_3'],
+        ['rule_input_4', 'rule_input_6']], RULE_INPUT)).toBe(true);
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-      [['a', 'b', 'de'], ['c'], ['d', 'f']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_1', 'rule_input_2', 'rule_input_4'],
+        ['rule_input_3'],
+        ['rule_input_5', 'rule_input_6']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-      [['a', 'b'], ['c', 'de', 'f']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_3', 'rule_input_4', 'rule_input_6']
+      ], RULE_INPUT)).toBe(false);
   });
 
   it('should have a correct \'has element X at position Y\' rule', () => {
     var RULE_INPUT: {x:string, y:number} = {
-      x: 'b',
+      x: 'rule_input_2',
       y: 2
     };
     expect(ddsrs.HasElementXAtPositionY(
-      [['a'], ['b', 'c']], RULE_INPUT)).toBe(true);
+      [
+        ['rule_input_1'],
+        ['rule_input_2', 'rule_input_3']], RULE_INPUT)).toBe(true);
     expect(ddsrs.HasElementXAtPositionY(
-      [['a', 'b'], ['c']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_1', 'rule_input_2'],
+        ['rule_input_3']], RULE_INPUT)).toBe(false);
     expect(ddsrs.HasElementXAtPositionY(
-      [['a'], ['b']], RULE_INPUT)).toBe(true);
+      [
+        ['rule_input_1'],
+        ['rule_input_2']], RULE_INPUT)).toBe(true);
     expect(ddsrs.HasElementXAtPositionY(
-      [['a'], ['d'], ['b', 'c']], RULE_INPUT)).toBe(false);
+      [
+        ['rule_input_1'],
+        ['rule_input_5'],
+        ['rule_input_2', 'rule_input_3']], RULE_INPUT)).toBe(false);
     expect(
       ddsrs.HasElementXAtPositionY([], RULE_INPUT)
     ).toBe(false);
@@ -85,16 +141,24 @@ describe('Drag and Drop Sort Input rules service', () => {
   it('should have a correct \'has element X before element Y\' rule',
     () => {
       var RULE_INPUT: {x:string, y:string} = {
-        x: 'b',
-        y: 'd'
+        x: 'rule_input_2',
+        y: 'rule_input_5'
       };
       expect(ddsrs.HasElementXBeforeElementY(
-        [['a', 'b'], ['c', 'd']], RULE_INPUT)).toBe(true);
+        [
+          ['rule_input_1', 'rule_input_2'],
+          ['rule_input_3', 'rule_input_5']], RULE_INPUT)).toBe(true);
       expect(ddsrs.HasElementXBeforeElementY(
-        [['a', 'd'], ['c', 'b']], RULE_INPUT)).toBe(false);
+        [
+          ['rule_input_1', 'rule_input_5'],
+          ['rule_input_3', 'rule_input_2']], RULE_INPUT)).toBe(false);
       expect(ddsrs.HasElementXBeforeElementY(
-        [['a'], ['b'], ['c', 'd']], RULE_INPUT)).toBe(true);
+        [
+          ['rule_input_1'], ['rule_input_2'],
+          ['rule_input_3', 'rule_input_5']], RULE_INPUT)).toBe(true);
       expect(ddsrs.HasElementXBeforeElementY(
-        [['d', 'b'], ['c', 'a']], RULE_INPUT)).toBe(false);
+        [
+          ['rule_input_5', 'rule_input_2'],
+          ['rule_input_3', 'rule_input_1']], RULE_INPUT)).toBe(false);
     });
 });

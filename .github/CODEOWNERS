@@ -44,7 +44,8 @@
 
 
 # Android team
-/core/domain/android_validation_constants*.py @BenHenning
+# TODO(#11477): Replace @rt4914 with @BenHenning after 2021-01-04.
+/core/domain/android_validation_constants*.py @rt4914
 
 
 # Angular Migration team
@@ -71,13 +72,13 @@
 
 
 # Answer classification team.
-/core/controllers/classifier*.py @prasanna08
-/core/domain/classifier*.py @prasanna08
-/proto/ @prasanna08
-/core/templates/domain/classifier/ @prasanna08
-/extensions/classifiers/ @prasanna08
-/buf.yaml @prasanna08
-/buf.gen.yaml @prasanna08
+/core/controllers/classifier*.py @oppia/ml
+/core/domain/classifier*.py @oppia/ml
+/proto/ @oppia/ml
+/core/templates/domain/classifier/ @oppia/ml
+/extensions/classifiers/ @oppia/ml
+/buf.yaml @oppia/ml
+/buf.gen.yaml @oppia/ml
 
 
 # Audio and Translation team.
@@ -110,21 +111,17 @@
 
 
 # Core documentation
-# TODO(#11220): Add @seanlip as codeowner after 2020-11-29.
-/AUTHORS @BenHenning
-# TODO(#11220): Add @seanlip as codeowner after 2020-11-29.
-/CHANGELOG @BenHenning
-# TODO(#11220): Add @seanlip as codeowner after 2020-11-29.
-/CONTRIBUTORS @BenHenning
-/LICENSE @BenHenning
-/NOTICE @BenHenning
+/AUTHORS @seanlip
+/CHANGELOG @seanlip
+/CONTRIBUTORS @seanlip
+/LICENSE @seanlip
+/NOTICE @seanlip
 /core/templates/pages/about-page/ @DubeySandeep
-# TODO(#11220): Add @seanlip as codeowner after 2020-11-29.
-/core/templates/pages/about-page/about-page.constants.ts @BenHenning
+/core/templates/pages/about-page/about-page.constants.ts @seanlip
 /core/templates/pages/privacy-page/ @DubeySandeep
-/core/templates/pages/privacy-page/privacy-page.mainpage.html @BenHenning
+/core/templates/pages/privacy-page/privacy-page.mainpage.html @seanlip
 /core/templates/pages/terms-page/ @DubeySandeep
-/core/templates/pages/terms-page/terms-page.component.html @BenHenning
+/core/templates/pages/terms-page/terms-page.component.html @seanlip
 
 
 # Dashboard pages.
@@ -147,7 +144,8 @@
 
 
 # Dev workflow team.
-/.circleci/ @BenHenning @U8NWXD @kevintab95 @vinitamurthi
+# TODO(#11477): Restore codeowners to @BenHenning after 2021-01-04.
+/.circleci/ @U8NWXD @kevintab95 @vinitamurthi
 /.eslintignore @DubeySandeep
 /.eslintrc @DubeySandeep
 /.htmllintrc @DubeySandeep
@@ -188,9 +186,8 @@
 /core/templates/components/button-directives/hint-and-solution-buttons.directive.html @kevintab95
 /core/templates/components/state-directives/ @kevintab95
 /core/templates/components/graph-services/ @kevintab95
-/core/templates/components/on-screen-keyboard/* @aks681
-/core/templates/components/version-diff-visualization/version-diff-visualization.directive.html @aks681
-/core/templates/components/version-diff-visualization/version-diff-visualization.directive.ts @aks681
+/core/templates/components/on-screen-keyboard/ @aks681
+/core/templates/components/version-diff-visualization/ @aks681
 /core/templates/domain/editor/ @kevintab95
 /core/templates/domain/exploration/ @kevintab95
 /core/templates/domain/recommendations/ @kevintab95
@@ -279,21 +276,20 @@
 
 # Interaction project.
 /core/domain/customization_args_util*.py @brianrodri
-/core/domain/expression_parser*.py @aks681
-/core/domain/interaction_registry*.py @aks681
-/core/domain/obj_services*.py @aks681
-/core/templates/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
-/core/templates/domain/objects/ @aks681
+/core/domain/expression_parser*.py @iamprayush
+/core/domain/interaction_registry*.py @iamprayush
+/core/domain/obj_services*.py @iamprayush
+/core/templates/domain/objects/ @iamprayush
 /core/templates/expressions/ @brianrodri
-/core/templates/services/code-normalizer.service*.ts @aks681
-/core/templates/services/guppy-configuration.service.ts @aks681
-/core/templates/services/guppy-initialization.service.ts @aks681
-/core/templates/services/math-interactions.service.ts @aks681
+/core/templates/services/code-normalizer.service*.ts @iamprayush
+/core/templates/services/guppy-configuration.service.ts @iamprayush
+/core/templates/services/guppy-initialization.service.ts @iamprayush
+/core/templates/services/math-interactions.service.ts @iamprayush
 /extensions/domain*.py @brianrodri
-/extensions/interactions/ @aks681 @vojtechjelinek
-/extensions/objects/ @aks681
+/extensions/interactions/ @iamprayush @vojtechjelinek
+/extensions/objects/ @iamprayush
 /extensions/value_generators/ @vojtechjelinek
-/extensions/__init__.py @aks681
+/extensions/__init__.py @iamprayush
 
 
 # Lesson Analytics team.
@@ -423,8 +419,7 @@
 /main_cron.py @nithusha21
 /main_mail.py @aks681
 /main.py @DubeySandeep @nithusha21
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/feconf.py @BenHenning @nithusha21
+/feconf.py @seanlip @nithusha21
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/incoming_emails*.py @aks681
@@ -433,10 +428,8 @@
 /core/domain/image_service*.py @DubeySandeep
 /core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
 /core/domain/storage_model_audit_jobs_test.py @vojtechjelinek
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/core/jobs*.py @BenHenning
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/core/platform/ @BenHenning
+/core/jobs*.py @seanlip
+/core/platform/ @seanlip
 /core/templates/App*.ts @srijanreddy98
 /core/templates/app.constants.ts @srijanreddy98
 /core/templates/app.constants.ajs.ts @srijanreddy98
@@ -451,8 +444,7 @@
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
 /core/templates/services/translation-file-hash-loader.service.ts @nithusha21
-# TODO(#11220): Revert to @seanlip as codeowner after 2020-11-29.
-/redis.conf @BenHenning
+/redis.conf @seanlip
 /release_constants.json @DubeySandeep @nithusha21
 
 
@@ -462,25 +454,20 @@
 /core/controllers/__init__.py @nithusha21
 /core/domain/__init__.py @nithusha21
 /core/domain/config*.py @DubeySandeep
-# TODO(#11220): Revert to @seanlip as codeowner after 2020-11-29.
-/core/domain/change_domain.py @DubeySandeep
+/core/domain/change_domain.py @seanlip
 /core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @DubeySandeep
 /core/templates/Polyfills.ts @srijanreddy98
-# TODO(#11220): Revert to @seanlip as codeowner after 2020-11-29.
-/schema_utils*.py @DubeySandeep
+/schema_utils*.py @seanlip
 /utils*.py @aks681
 /python_utils*.py @DubeySandeep
 
 
 # Restricted pages.
 /core/controllers/admin*.py @DubeySandeep @nithusha21
-# TODO(#11220): Revert to @seanlip as codeowner after 2020-11-29.
-/core/controllers/moderator*.py @DubeySandeep
-# TODO(#11220): Revert to @seanlip as codeowner after 2020-11-29.
-/core/controllers/recent_commits*.py @DubeySandeep
-# TODO(#11220): Revert to @seanlip as codeowner after 2020-11-29.
-/core/domain/moderator_services*.py @DubeySandeep
+/core/controllers/moderator*.py @seanlip
+/core/controllers/recent_commits*.py @seanlip
+/core/domain/moderator_services*.py @seanlip
 /core/templates/domain/admin/ @DubeySandeep @nithusha21
 /core/templates/pages/admin-page/ @DubeySandeep @nithusha21
 /core/templates/pages/moderator-page/ @DubeySandeep @nithusha21
@@ -572,8 +559,10 @@
 
 
 # User Data Takeout.
-/core/domain/takeout_*.py @BenHenning @vojtechjelinek
-/core/domain/wipeout_*.py @BenHenning @vojtechjelinek
+# TODO(#11477): Replace @seanlip with @BenHenning after 2021-01-04.
+/core/domain/takeout_*.py @seanlip @vojtechjelinek
+# TODO(#11477): Replace @seanlip with @BenHenning after 2021-01-04.
+/core/domain/wipeout_*.py @seanlip @vojtechjelinek
 
 
 # User’s profile page.
@@ -590,13 +579,14 @@
 
 
 # Dynamic Feature Gating project
-/core/controllers/platform_feature*.py @BenHenning @vinitamurthi
-/core/domain/platform_feature_services*.py @BenHenning @vinitamurthi
-/core/domain/platform_parameter*.py @BenHenning @vinitamurthi
-/core/platform_feature*.py @BenHenning @vinitamurthi
-/core/templates/domain/platform_feature/ @BenHenning @vinitamurthi
-/core/templates/pages/admin-page/features-tab/ @BenHenning @vinitamurthi
-/core/templates/services/platform-feature*.ts @BenHenning @vinitamurthi
+# TODO(#11477): Restore codeowners to @BenHenning after 2021-01-04 (for all dynamic feature gating paths below).
+/core/controllers/platform_feature*.py @vinitamurthi
+/core/domain/platform_feature_services*.py @vinitamurthi
+/core/domain/platform_parameter*.py @vinitamurthi
+/core/platform_feature*.py @vinitamurthi
+/core/templates/domain/platform_feature/ @vinitamurthi
+/core/templates/pages/admin-page/features-tab/ @vinitamurthi
+/core/templates/services/platform-feature*.ts @vinitamurthi
 
 
 # Frontend unit tests
@@ -634,22 +624,14 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/pre_commit_linter.py in sync with the modifications.
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/scripts/linters/warranted_angular_security_bypasses.py @BenHenning
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/core/controllers/acl_decorators*.py @BenHenning
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/core/controllers/base*.py @BenHenning
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/core/domain/html*.py @BenHenning
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/core/domain/rights_manager*.py @BenHenning
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/core/domain/role_services*.py @BenHenning
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/core/storage/ @BenHenning
-# TODO(#11220): Replace @BenHenning with @seanlip as codeowner after 2020-11-29.
-/core/domain/user*.py @BenHenning
+/scripts/linters/warranted_angular_security_bypasses.py @seanlip
+/core/controllers/acl_decorators*.py @seanlip
+/core/controllers/base*.py @seanlip
+/core/domain/html*.py @seanlip
+/core/domain/rights_manager*.py @seanlip
+/core/domain/role_services*.py @seanlip
+/core/storage/ @seanlip
+/core/domain/user*.py @seanlip
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
 /manifest.json @vojtechjelinek
@@ -659,4 +641,5 @@
 /.github/ @DubeySandeep
 /.github/CODEOWNERS @DubeySandeep
 /.github/stale.yml @vojtechjelinek
-/.github/workflows/ @BenHenning @vinitamurthi
+# TODO(#11477): Restore codeowners to @BenHenning after 2021-01-04.
+/.github/workflows/ @vinitamurthi
