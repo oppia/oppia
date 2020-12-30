@@ -80,8 +80,7 @@ export class ExplorationHtmlFormatterService {
     var interactionChoices = null;
 
     if ('choices' in interactionCustomizationArgs) {
-      interactionChoices = interactionCustomizationArgs.choices.value.map(
-        choice => choice.getHtml());
+      interactionChoices = interactionCustomizationArgs.choices.value;
     }
 
     var el = $(
