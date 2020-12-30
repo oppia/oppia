@@ -415,8 +415,7 @@ MAILGUN_API_KEY = None
 MAILGUN_DOMAIN_NAME = None
 
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch Host
-# and Port when switching to prod server. Keep this in sync with
-# elasticsearch.yaml in the root folder.
+# and Port when switching to prod server.
 ES_HOST = 'localhost'
 ES_PORT = 9200
 
