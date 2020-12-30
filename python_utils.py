@@ -458,6 +458,8 @@ def yaml_from_dict(dictionary, width=80):
 
 def reraise_exception():
     """Reraise exception with complete stacktrace."""
+    # TODO(#11547): This method can be replace by 'raise e' after we migrate
+    # to Python 3.
     # This code is needed in order to reraise the error properly with
     # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
     exec_info = sys.exc_info()
