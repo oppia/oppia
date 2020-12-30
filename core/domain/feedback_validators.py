@@ -288,8 +288,8 @@ class GeneralFeedbackThreadUserModelValidator(
         thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_=]{1,}' % (
             ('|').join(feconf.SUGGESTION_TARGET_TYPE_CHOICES),
             base_models.ID_LENGTH)
-        regex_string = '^%s\\.%s$' % (base_model_validators.USER_ID_REGEX,
-            thread_id_string)
+        regex_string = '^%s\\.%s$' % (
+            base_model_validators.USER_ID_REGEX, thread_id_string)
         return regex_string
 
     @classmethod
