@@ -67,6 +67,12 @@ angular.module('oppia').directive('adminNavbar', [
           ctrl.deactivateProfileDropdown = function() {
             return ctrl.profileDropdownIsActive = false;
           };
+          ctrl.activateDropdownMenu = function() {
+            return ctrl.dropdownMenuisActive = true;
+          };
+          ctrl.deactivateDropdownMenu = function() {
+            return ctrl.dropdownMenuisActive = false;
+          };
           ctrl.$onInit = function() {
             ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
             UserService.getProfileImageDataUrlAsync().then(
