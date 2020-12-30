@@ -37,10 +37,10 @@ class AuthClaimsTests(test_utils.TestBase):
     EMAIL = 'test@test.com'
 
     def test_attributes(self):
-        auth_claims = auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL)
+        auth = auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL)
 
-        self.assertEqual(auth_claims.auth_id, self.AUTH_ID)
-        self.assertEqual(auth_claims.email, self.EMAIL)
+        self.assertEqual(auth.auth_id, self.AUTH_ID)
+        self.assertEqual(auth.email, self.EMAIL)
 
     def test_repr(self):
         self.assertEqual(
@@ -49,3 +49,9 @@ class AuthClaimsTests(test_utils.TestBase):
         self.assertEqual(
             repr(auth_domain.AuthClaims(None, None)),
             'AuthClaims(auth_id=None, email=None)')
+
+    def test_comparison(self):
+        auth = auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL)
+
+        self.assertEqual(auth, auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL))
+        self.assertNotEqual(auth, auth_domain.AuthClaims(None, None))

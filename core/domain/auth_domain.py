@@ -51,3 +51,13 @@ class AuthClaims(python_utils.OBJECT):
 
     def __repr__(self):
         return 'AuthClaims(auth_id=%r, email=%r)' % (self.auth_id, self.email)
+
+    def __eq__(self, other):
+        return (
+            # https://docs.python.org/2/library/constants.html#NotImplemented
+            NotImplemented if not isinstance(other, AuthClaims) else
+            self.auth_id == other.auth_id and self.email == other.email)
+
+    def __ne__(self, other):
+        # Required in Python 2: https://stackoverflow.com/a/30676267/4859885.
+        return not self == other
