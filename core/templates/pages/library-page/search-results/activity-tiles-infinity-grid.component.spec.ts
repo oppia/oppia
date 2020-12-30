@@ -54,8 +54,8 @@ describe('Activity tiles infinity grid component', function() {
   });
 
   beforeEach(function() {
-    userService = TestBed.get(UserService);
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
+    userService = TestBed.inject(UserService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
   });
 
   afterEach(function() {

@@ -25,7 +25,7 @@ describe('Thread message summary object factory', () => {
   let threadMessageSummaryObjectFactory: ThreadMessageSummaryObjectFactory;
 
   beforeEach(() => {
-    threadMessageSummaryObjectFactory = TestBed.get(
+    threadMessageSummaryObjectFactory = TestBed.inject(
       ThreadMessageSummaryObjectFactory);
   });
 

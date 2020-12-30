@@ -32,10 +32,10 @@ describe('Prediction Algorithm Registry Service', () => {
   let textInputPredictionService: TextInputPredictionService;
 
   beforeEach(() => {
-    codeReplPredictionService = TestBed.get(CodeReplPredictionService);
-    predictionAlgorithmRegistryService = TestBed.get(
+    codeReplPredictionService = TestBed.inject(CodeReplPredictionService);
+    predictionAlgorithmRegistryService = TestBed.inject(
       PredictionAlgorithmRegistryService);
-    textInputPredictionService = TestBed.get(TextInputPredictionService);
+    textInputPredictionService = TestBed.inject(TextInputPredictionService);
   });
 
   it('should return service for CodeClassifier at schema version 1.', () => {

@@ -71,7 +71,7 @@ describe('Error page', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    pageTitle = TestBed.get(PageTitleService);
+    pageTitle = TestBed.inject(PageTitleService);
   }));
 
   beforeEach(() => {

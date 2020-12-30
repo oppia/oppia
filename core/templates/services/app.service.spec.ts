@@ -25,7 +25,7 @@ describe('App Service', () => {
   let appService: AppService;
 
   beforeEach(() => {
-    appService = TestBed.get(AppService);
+    appService = TestBed.inject(AppService);
   });
 
   describe('querying the app for Machine Learning classifiers', () => {

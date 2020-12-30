@@ -44,12 +44,12 @@ describe('State card object factory', () => {
       providers: [CamelCaseToHyphensPipe]
     });
 
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
+    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     recordedVoiceoversObjectFactory = (
-      TestBed.get(RecordedVoiceoversObjectFactory));
+      TestBed.inject(RecordedVoiceoversObjectFactory));
     voiceoverObjectFactory =
-      TestBed.get(VoiceoverObjectFactory);
+      TestBed.inject(VoiceoverObjectFactory);
 
     let interactionDict = {
       answer_groups: [],

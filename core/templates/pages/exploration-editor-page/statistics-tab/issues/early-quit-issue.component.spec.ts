@@ -33,8 +33,8 @@ describe('Early Quit Issue Component', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
-    alertsService = TestBed.get(AlertsService);
-    playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
+    playthroughIssueObjectFactory = TestBed.inject(PlaythroughIssueObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

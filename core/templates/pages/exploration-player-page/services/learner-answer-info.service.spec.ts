@@ -168,18 +168,18 @@ describe('Learner answer info service', () =>{
       next_content_id_index: null
     };
 
-    sof = TestBed.get(StateObjectFactory);
-    oof = TestBed.get(OutcomeObjectFactory);
-    learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
-    answerClassificationService = TestBed.get(AnswerClassificationService);
-    ladbas = TestBed.get(
+    sof = TestBed.inject(StateObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
+    answerClassificationService = TestBed.inject(AnswerClassificationService);
+    ladbas = TestBed.inject(
       LearnerAnswerDetailsBackendApiService);
     DEFAULT_OUTCOME_CLASSIFICATION =
       ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION;
     firstState = sof.createFromBackendDict('new state', stateDict);
     secondState = sof.createFromBackendDict('fake state', stateDict);
     thirdState = sof.createFromBackendDict('demo state', stateDict);
-    tirs = TestBed.get(TextInputRulesService);
+    tirs = TestBed.inject(TextInputRulesService);
 
     spyOn(answerClassificationService, 'getMatchingClassificationResult')
       .and.returnValue(new AnswerClassificationResult(

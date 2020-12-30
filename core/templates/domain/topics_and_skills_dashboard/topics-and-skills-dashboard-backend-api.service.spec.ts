@@ -38,8 +38,8 @@ describe('Topics and Skills Dashboard backend API service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    topicsAndSkillsDashboardBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    topicsAndSkillsDashboardBackendApiService = TestBed.inject(
       TopicsAndSkillsDashboardBackendApiService);
     let sampleDataResults = {
       topic_summary_dicts: [{

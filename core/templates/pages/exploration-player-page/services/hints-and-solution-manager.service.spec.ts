@@ -40,12 +40,12 @@ describe('HintsAndSolutionManager service', () => {
   const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 60000;
 
   beforeEach(fakeAsync(() => {
-    pps = TestBed.get(PlayerPositionService);
+    pps = TestBed.inject(PlayerPositionService);
     spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
       mockNewCardAvailableEmitter);
-    hasms = TestBed.get(HintsAndSolutionManagerService);
-    hof = TestBed.get(HintObjectFactory);
-    sof = TestBed.get(SolutionObjectFactory);
+    hasms = TestBed.inject(HintsAndSolutionManagerService);
+    hof = TestBed.inject(HintObjectFactory);
+    sof = TestBed.inject(SolutionObjectFactory);
 
     firstHint = hof.createFromBackendDict({
       hint_content: {

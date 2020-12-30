@@ -53,15 +53,15 @@ describe('Answer Classification Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
 
-    answerClassificationService = TestBed.get(AnswerClassificationService);
-    appService = TestBed.get(AppService);
-    interactionSpecsService = TestBed.get(InteractionSpecsService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    predictionAlgorithmRegistryService = TestBed.get(
+    answerClassificationService = TestBed.inject(AnswerClassificationService);
+    appService = TestBed.inject(AppService);
+    interactionSpecsService = TestBed.inject(InteractionSpecsService);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    predictionAlgorithmRegistryService = TestBed.inject(
       PredictionAlgorithmRegistryService);
-    stateClassifierMappingService = TestBed.get(StateClassifierMappingService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
-    textInputRulesService = TestBed.get(TextInputRulesService);
+    stateClassifierMappingService = TestBed.inject(StateClassifierMappingService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
+    textInputRulesService = TestBed.inject(TextInputRulesService);
   });
 
   describe('with string classifier disabled', () => {

@@ -32,8 +32,8 @@ describe('Translations backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    translationsBackendApiService = TestBed.get(TranslationsBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    translationsBackendApiService = TestBed.inject(TranslationsBackendApiService);
   });
 
   afterEach(() => {

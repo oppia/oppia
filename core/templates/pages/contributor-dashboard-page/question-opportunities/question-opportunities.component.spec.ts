@@ -52,17 +52,17 @@ describe('Question opportunities component', function() {
       imports: [HttpClientTestingModule]
     });
 
-    alertsService = TestBed.get(AlertsService);
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
-    userService = TestBed.get(UserService);
+    alertsService = TestBed.inject(AlertsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    userService = TestBed.inject(UserService);
   });
 
   beforeEach(angular.mock.module(
     'oppia', function($provide) {
       $provide.value(
         'ContributionOpportunitiesBackendApiService',
-        TestBed.get(ContributionOpportunitiesBackendApiService));
+        TestBed.inject(ContributionOpportunitiesBackendApiService));
     }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

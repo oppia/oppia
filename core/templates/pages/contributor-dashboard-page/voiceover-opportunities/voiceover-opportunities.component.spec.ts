@@ -40,8 +40,8 @@ describe('Voiceover opportunities component', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'ContributionOpportunitiesBackendApiService',
-      TestBed.get(ContributionOpportunitiesBackendApiService));
-    $provide.value('LanguageUtilService', TestBed.get(LanguageUtilService));
+      TestBed.inject(ContributionOpportunitiesBackendApiService));
+    $provide.value('LanguageUtilService', TestBed.inject(LanguageUtilService));
   }));
 
   beforeEach(function() {

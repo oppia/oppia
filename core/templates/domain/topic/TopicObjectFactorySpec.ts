@@ -25,7 +25,7 @@ describe('Topic object factory', () => {
   let _sampleTopic: Topic;
 
   beforeEach(() => {
-    topicObjectFactory = TestBed.get(TopicObjectFactory);
+    topicObjectFactory = TestBed.inject(TopicObjectFactory);
 
     let sampleTopicBackendObject = {
       id: 'sample_topic_id',

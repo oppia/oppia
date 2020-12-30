@@ -51,18 +51,18 @@ describe('Library controller', function() {
     });
   });
   beforeEach(function() {
-    classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
-    i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     OppiaAngularRootComponent.pageTitleService = (
-      TestBed.get(PageTitleService)
+      TestBed.inject(PageTitleService)
     );
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'KeyboardShortcutService', TestBed.get(KeyboardShortcutService));
+      'KeyboardShortcutService', TestBed.inject(KeyboardShortcutService));
     $provide.value(
-      'UserService', TestBed.get(UserService));
+      'UserService', TestBed.inject(UserService));
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {

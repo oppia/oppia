@@ -29,8 +29,8 @@ describe('Worked example object factory', () => {
   let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
-    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
+    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
 
     workedExampleDict = {
       question: {

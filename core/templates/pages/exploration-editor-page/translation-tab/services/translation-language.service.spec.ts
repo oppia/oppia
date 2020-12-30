@@ -26,8 +26,8 @@ describe('Translation language service', () => {
   let languageUtilService: LanguageUtilService;
 
   beforeEach(() => {
-    translationLanguageService = TestBed.get(TranslationLanguageService);
-    languageUtilService = TestBed.get(LanguageUtilService);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
+    languageUtilService = TestBed.inject(LanguageUtilService);
     spyOn(languageUtilService, 'getAllVoiceoverLanguageCodes').and.returnValue(
       ['en', 'hi']);
     spyOn(languageUtilService, 'getAudioLanguageDescription').and.callFake(

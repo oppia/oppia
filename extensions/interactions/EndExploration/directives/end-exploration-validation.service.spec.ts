@@ -43,10 +43,10 @@ describe('EndExplorationValidationService', () => {
       providers: [EndExplorationValidationService]
     });
 
-    validatorService = TestBed.get(EndExplorationValidationService);
+    validatorService = TestBed.inject(EndExplorationValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 

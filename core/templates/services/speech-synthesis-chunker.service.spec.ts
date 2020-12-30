@@ -29,7 +29,7 @@ describe('Speech Synthesis Chunker Service', () => {
       providers: [SpeechSynthesisChunkerService]
     });
 
-    speechSynthesisChunkerService = TestBed.get(SpeechSynthesisChunkerService);
+    speechSynthesisChunkerService = TestBed.inject(SpeechSynthesisChunkerService);
   });
 
   describe('formatLatexToSpeakableText', () => {

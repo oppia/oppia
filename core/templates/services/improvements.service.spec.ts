@@ -34,7 +34,7 @@ describe('ImprovementsService', () => {
     });
 
     improvementsService = new ImprovementsService();
-    stateObjectFactory = TestBed.get(StateObjectFactory);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
 
   describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', () => {

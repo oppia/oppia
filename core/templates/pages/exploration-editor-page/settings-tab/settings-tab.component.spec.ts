@@ -102,10 +102,10 @@ describe('Settings Tab Component', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    alertsService = TestBed.get(AlertsService);
+    alertsService = TestBed.inject(AlertsService);
     userExplorationPermissionsService = (
-      TestBed.get(UserExplorationPermissionsService));
-    windowRef = TestBed.get(WindowRef);
+      TestBed.inject(UserExplorationPermissionsService));
+    windowRef = TestBed.inject(WindowRef);
     routerService = new MockRouterService();
     mockWindowDimensionsService = {
       isWindowNarrow: () => true
@@ -113,22 +113,22 @@ describe('Settings Tab Component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value('WindowDimensionsService', TestBed.get(
+    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
+    $provide.value('WindowDimensionsService', TestBed.inject(
       WindowDimensionsService));
     $provide.value(
       'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
+      TestBed.inject(TextInputRulesService));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
+      TestBed.inject(StateCustomizationArgsService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+      'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
+    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,
       getData: () => $q.resolve(),
@@ -136,7 +136,7 @@ describe('Settings Tab Component', function() {
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   afterEach(() => {

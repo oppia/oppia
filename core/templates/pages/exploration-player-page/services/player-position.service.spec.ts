@@ -36,9 +36,9 @@ describe('Player position service', () => {
   let subscriptions: Subscription;
 
   beforeEach(() => {
-    pts = TestBed.get(PlayerTranscriptService);
-    pps = TestBed.get(PlayerPositionService);
-    scof = TestBed.get(StateCardObjectFactory);
+    pts = TestBed.inject(PlayerTranscriptService);
+    pps = TestBed.inject(PlayerPositionService);
+    scof = TestBed.inject(StateCardObjectFactory);
     onQuestionChangeSpy = jasmine.createSpy('onQuestionChangeSpy');
     subscriptions = new Subscription();
     subscriptions.add(pps.onCurrentQuestionChange.subscribe(

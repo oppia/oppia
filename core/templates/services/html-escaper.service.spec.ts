@@ -24,7 +24,7 @@ describe('HTML escaper service', () => {
   let ohe: HtmlEscaperService;
 
   beforeEach(() => {
-    ohe = TestBed.get(HtmlEscaperService);
+    ohe = TestBed.inject(HtmlEscaperService);
   });
 
   it('should correctly translate between escaped and unescaped strings',

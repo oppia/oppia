@@ -121,8 +121,8 @@ describe('RecordedVoiceovers object factory', () => {
     TestBed.configureTestingModule({
       providers: [RecordedVoiceoversObjectFactory]
     });
-    rvof = TestBed.get(RecordedVoiceoversObjectFactory);
-    vof = TestBed.get(VoiceoverObjectFactory);
+    rvof = TestBed.inject(RecordedVoiceoversObjectFactory);
+    vof = TestBed.inject(VoiceoverObjectFactory);
 
     rv = rvof.createFromBackendDict(rvDict);
   });

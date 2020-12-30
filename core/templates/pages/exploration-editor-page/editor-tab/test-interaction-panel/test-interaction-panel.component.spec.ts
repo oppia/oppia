@@ -49,10 +49,10 @@ describe('Test Interaction Panel directive', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

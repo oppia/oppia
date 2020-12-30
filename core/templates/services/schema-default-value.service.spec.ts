@@ -29,8 +29,8 @@ describe('Schema Default Value Service', () => {
   let sdvs, ls;
 
   beforeEach(() => {
-    sdvs = TestBed.get(SchemaDefaultValueService);
-    ls = TestBed.get(LoggerService);
+    sdvs = TestBed.inject(SchemaDefaultValueService);
+    ls = TestBed.inject(LoggerService);
   });
 
   it('should get default value if schema has choices', () => {

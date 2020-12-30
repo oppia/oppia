@@ -28,8 +28,8 @@ describe('FeedbackThreadObjectFactory', () => {
   let threadMessageObjectFactory: ThreadMessageObjectFactory;
 
   beforeEach(() => {
-    feedbackThreadObjectFactory = TestBed.get(FeedbackThreadObjectFactory);
-    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
+    feedbackThreadObjectFactory = TestBed.inject(FeedbackThreadObjectFactory);
+    threadMessageObjectFactory = TestBed.inject(ThreadMessageObjectFactory);
   });
 
   describe('.createFromBackendDict', () => {

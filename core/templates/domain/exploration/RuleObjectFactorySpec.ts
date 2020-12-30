@@ -27,7 +27,7 @@ describe('RuleObjectFactory', () => {
   let inputBackend: RuleInputs = null;
 
   beforeEach(() => {
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
+    ruleObjectFactory = TestBed.inject(RuleObjectFactory);
     inputBackend = {
       x: [['<p>list_of_sets_of_html_strings</p>']]
     };

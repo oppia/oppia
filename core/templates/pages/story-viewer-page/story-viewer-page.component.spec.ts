@@ -49,9 +49,9 @@ describe('Story Viewer Page component', function() {
     });
 
     OppiaAngularRootComponent.pageTitleService = (
-      TestBed.get(PageTitleService)
+      TestBed.inject(PageTitleService)
     );
-    storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
+    storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -62,7 +62,7 @@ describe('Story Viewer Page component', function() {
     };
 
     $provide.value('$window', mockWindow);
-    $provide.value('UserService', TestBed.get(UserService));
+    $provide.value('UserService', TestBed.inject(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

@@ -109,29 +109,29 @@ describe('State Graph Visualization directive', function() {
   beforeEach(angular.mock.module('directiveTemplates'));
 
   beforeEach(function() {
-    stateGraphLayoutService = TestBed.get(StateGraphLayoutService);
+    stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
     $provide.value(
       'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
+      TestBed.inject(TextInputRulesService));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
+      TestBed.inject(StateCustomizationArgsService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+      'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
     $provide.value(
       'StateRecordedVoiceoversService',
-      TestBed.get(StateRecordedVoiceoversService));
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+      TestBed.inject(StateRecordedVoiceoversService));
+    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
     $provide.value(
       'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
+      TestBed.inject(StateWrittenTranslationsService));
     $provide.value('WindowDimensionsService', {
       getResizeEvent: function() {
         return of(new Event('resize'));
@@ -144,7 +144,7 @@ describe('State Graph Visualization directive', function() {
       });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector) {
     $flushPendingTasks = $injector.get('$flushPendingTasks');

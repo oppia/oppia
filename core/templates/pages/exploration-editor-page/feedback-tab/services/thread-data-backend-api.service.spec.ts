@@ -43,7 +43,7 @@ describe('retrieving threads service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
@@ -133,11 +133,11 @@ describe('retrieving threads service', () => {
   });
 
   beforeEach(() => {
-    contextService = TestBed.get(ContextService);
-    csrfTokenService = TestBed.get(CsrfTokenService);
-    feedbackThreadObjectFactory = TestBed.get(FeedbackThreadObjectFactory);
-    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
-    threadDataBackendApiService = TestBed.get(ThreadDataBackendApiService);
+    contextService = TestBed.inject(ContextService);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
+    feedbackThreadObjectFactory = TestBed.inject(FeedbackThreadObjectFactory);
+    suggestionThreadObjectFactory = TestBed.inject(SuggestionThreadObjectFactory);
+    threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(csrfTokenService, 'getTokenAsync')

@@ -29,8 +29,8 @@ describe('SuggestionThreadObjectFactory', () => {
 
   beforeEach(() => {
     suggestionThreadObjectFactory =
-      TestBed.get(SuggestionThreadObjectFactory);
-    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
+      TestBed.inject(SuggestionThreadObjectFactory);
+    threadMessageObjectFactory = TestBed.inject(ThreadMessageObjectFactory);
   });
 
   let suggestionThreadBackendDict;

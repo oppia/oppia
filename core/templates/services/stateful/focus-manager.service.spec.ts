@@ -38,9 +38,9 @@ describe('Focus Manager Service', () => {
   let testSubscriptions: Subscription;
 
   beforeEach(() => {
-    focusManagerService = TestBed.get(FocusManagerService);
-    deviceInfoService = TestBed.get(DeviceInfoService);
-    idGenerationService = TestBed.get(IdGenerationService);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    deviceInfoService = TestBed.inject(DeviceInfoService);
+    idGenerationService = TestBed.inject(IdGenerationService);
 
     focusOnSpy = jasmine.createSpy('focusOn');
     testSubscriptions = new Subscription();

@@ -43,10 +43,10 @@ describe('Exploration Graph Modal Controller', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     var $rootScope = $injector.get('$rootScope');

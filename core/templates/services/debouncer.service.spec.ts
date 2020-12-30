@@ -25,8 +25,8 @@ describe('Debouncer service', () => {
   var loggerServiceSpy;
 
   beforeEach(() => {
-    ds = TestBed.get(DebouncerService);
-    ls = TestBed.get(LoggerService);
+    ds = TestBed.inject(DebouncerService);
+    ls = TestBed.inject(LoggerService);
 
     loggerServiceSpy = spyOn(ls, 'log').and.callThrough();
   });

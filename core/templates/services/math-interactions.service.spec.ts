@@ -24,7 +24,7 @@ describe('MathInteractionsService', () => {
   let mathInteractionsService: MathInteractionsService;
 
   beforeEach(() => {
-    mathInteractionsService = TestBed.get(MathInteractionsService);
+    mathInteractionsService = TestBed.inject(MathInteractionsService);
   });
 
   it('should validate expressions correctly', function() {

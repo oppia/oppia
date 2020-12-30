@@ -49,10 +49,10 @@ describe('State Interaction Stats Service', () => {
       ],
     });
 
-    stateObjectFactory = TestBed.get(StateObjectFactory);
-    httpTestingController = TestBed.get(HttpTestingController);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
     stateInteractionStatsService = (
-      TestBed.get(StateInteractionStatsService));
+      TestBed.inject(StateInteractionStatsService));
   });
 
   afterEach(() => httpTestingController.verify());

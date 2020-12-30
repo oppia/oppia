@@ -35,9 +35,9 @@ describe('Skill backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    skillBackendApiService = TestBed.get(SkillBackendApiService);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     const misconceptionDict = {
       id: '2',

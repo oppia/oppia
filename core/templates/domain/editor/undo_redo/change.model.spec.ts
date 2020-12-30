@@ -29,7 +29,7 @@ describe('Change domain objects model', () => {
       imports: [],
       providers: [QuestionObjectFactory]
     });
-    questionObjectFactory = TestBed.get(QuestionObjectFactory);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
   });
 
   it('should invoke no callbacks after creation', () => {

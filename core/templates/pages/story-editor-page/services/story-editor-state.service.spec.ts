@@ -134,8 +134,8 @@ describe('Story editor state service', () => {
       ]
     }).compileComponents();
 
-    storyEditorStateService = TestBed.get(StoryEditorStateService);
-    storyObjectFactory = TestBed.get(StoryObjectFactory);
+    storyEditorStateService = TestBed.inject(StoryEditorStateService);
+    storyObjectFactory = TestBed.inject(StoryObjectFactory);
   });
 
   beforeEach(() => {

@@ -28,7 +28,7 @@ describe('subtopic viewer pre logo action', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
-    urlService = TestBed.get(UrlService);
+    urlService = TestBed.inject(UrlService);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
       .and.returnValue('url-fragment');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')

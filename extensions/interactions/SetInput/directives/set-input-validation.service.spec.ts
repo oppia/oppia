@@ -50,12 +50,12 @@ describe('SetInputValidationService', () => {
       providers: [SetInputValidationService]
     });
 
-    validatorService = TestBed.get(SetInputValidationService);
+    validatorService = TestBed.inject(SetInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
 
     goodCustomizationArgs = {
       buttonText: {

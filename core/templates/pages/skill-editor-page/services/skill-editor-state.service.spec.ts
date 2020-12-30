@@ -176,9 +176,9 @@ describe('Skill editor state service', () => {
       ],
     }).compileComponents();
 
-    skillEditorStateService = TestBed.get(SkillEditorStateService);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
-    skillUpdateService = TestBed.get(SkillUpdateService);
+    skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    skillUpdateService = TestBed.inject(SkillUpdateService);
 
     skillRightsObject = {
       skill_id: 'skill_id_1',

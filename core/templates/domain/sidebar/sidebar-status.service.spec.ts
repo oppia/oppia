@@ -25,8 +25,8 @@ describe('SidebarStatusService', () => {
   let sss, $window;
 
   beforeEach(() => {
-    $window = TestBed.get(WindowRef);
-    sss = TestBed.get(SidebarStatusService);
+    $window = TestBed.inject(WindowRef);
+    sss = TestBed.inject(SidebarStatusService);
 
     // This approach was choosen because spyOn() doesn't work on properties
     // that doesn't have a get access type.

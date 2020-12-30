@@ -84,10 +84,10 @@ describe('Admin page feature tab', function() {
 
     fixture = TestBed.createComponent(AdminFeaturesTabComponent);
     component = fixture.componentInstance;
-    adminDataService = TestBed.get(AdminDataService);
-    featureApiService = TestBed.get(PlatformFeatureAdminBackendApiService);
-    windowRef = TestBed.get(WindowRef);
-    adminTaskManagerService = TestBed.get(AdminTaskManagerService);
+    adminDataService = TestBed.inject(AdminDataService);
+    featureApiService = TestBed.inject(PlatformFeatureAdminBackendApiService);
+    windowRef = TestBed.inject(WindowRef);
+    adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
     let confirmResult = true;
     let promptResult = 'mock msg';
@@ -678,7 +678,7 @@ describe('Admin page feature tab', function() {
     let dummyApiSpy: jasmine.Spy;
 
     beforeEach(() => {
-      dummyApiService = TestBed.get(PlatformFeatureDummyBackendApiService);
+      dummyApiService = TestBed.inject(PlatformFeatureDummyBackendApiService);
 
       dummyApiSpy = spyOn(dummyApiService, 'isHandlerEnabled')
         .and.resolveTo(null);

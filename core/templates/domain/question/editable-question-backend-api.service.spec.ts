@@ -40,11 +40,11 @@ describe('Editable question backend API service', function() {
       imports: [HttpClientTestingModule],
       providers: [EditableQuestionBackendApiService]
     });
-    editableQuestionBackendApiService = TestBed.get(
+    editableQuestionBackendApiService = TestBed.inject(
       EditableQuestionBackendApiService);
-    questionObjectFactory = TestBed.get(QuestionObjectFactory);
-    httpTestingController = TestBed.get(HttpTestingController);
-    csrfService = TestBed.get(CsrfTokenService);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfService = TestBed.inject(CsrfTokenService);
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');
     });

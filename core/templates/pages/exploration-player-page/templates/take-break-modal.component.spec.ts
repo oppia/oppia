@@ -53,7 +53,7 @@ describe('TakeBreakModalComponent', function() {
   beforeEach(() => {
     fixture = TestBed.createComponent(TakeBreakModalComponent);
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.get(NgbActiveModal);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
   it('should close modal', () => {

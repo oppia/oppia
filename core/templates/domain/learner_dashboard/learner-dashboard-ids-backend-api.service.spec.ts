@@ -55,10 +55,10 @@ describe('Learner Dashboard Backend API Service', () => {
       imports: [HttpClientTestingModule],
       providers: [LearnerDashboardIdsBackendApiService]
     });
-    learnerDashboardIdsBackendApiService = TestBed.get(
+    learnerDashboardIdsBackendApiService = TestBed.inject(
       LearnerDashboardIdsBackendApiService);
 
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

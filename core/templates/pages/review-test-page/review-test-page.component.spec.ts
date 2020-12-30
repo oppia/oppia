@@ -38,9 +38,9 @@ describe('Review test page component', function() {
       imports: [HttpClientTestingModule]
     });
 
-    pageTitleService = TestBed.get(PageTitleService);
-    reviewTestBackendApiService = TestBed.get(ReviewTestBackendApiService);
-    reviewTestEngineService = TestBed.get(ReviewTestEngineService);
+    pageTitleService = TestBed.inject(PageTitleService);
+    reviewTestBackendApiService = TestBed.inject(ReviewTestBackendApiService);
+    reviewTestEngineService = TestBed.inject(ReviewTestEngineService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {

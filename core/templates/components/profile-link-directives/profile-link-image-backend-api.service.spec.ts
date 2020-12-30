@@ -31,8 +31,8 @@ describe('Profile Link Backend Api Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    profileLinkImageBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    profileLinkImageBackendApiService = TestBed.inject(
       ProfileLinkImageBackendApiService);
   });
 

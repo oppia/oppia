@@ -30,8 +30,8 @@ describe('Translate service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    translate = TestBed.get(TranslateService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    translate = TestBed.inject(TranslateService);
   });
 
   afterEach(() => {

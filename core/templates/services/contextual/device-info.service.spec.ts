@@ -32,8 +32,8 @@ describe('Device Info Service', () => {
     'Safari/537.36';
 
   beforeEach(() => {
-    dis = TestBed.get(DeviceInfoService);
-    wrs = TestBed.get(WindowRef);
+    dis = TestBed.inject(DeviceInfoService);
+    wrs = TestBed.inject(WindowRef);
   });
 
   it('should evaluate when a device is a mobile device', () => {

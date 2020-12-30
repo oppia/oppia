@@ -76,11 +76,11 @@ describe('Topic viewer page', () => {
       imports: [HttpClientTestingModule],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    httpTestingController = TestBed.get(HttpTestingController);
-    alertsService = TestBed.get(AlertsService);
-    pageTitleService = TestBed.get(PageTitleService);
-    urlService = TestBed.get(UrlService);
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    alertsService = TestBed.inject(AlertsService);
+    pageTitleService = TestBed.inject(PageTitleService);
+    urlService = TestBed.inject(UrlService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     let fixture = TestBed.createComponent(TopicViewerPageComponent);
     topicViewerPageComponent = fixture.componentInstance;
   });

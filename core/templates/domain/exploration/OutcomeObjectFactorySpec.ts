@@ -28,7 +28,7 @@ describe('Outcome object factory', () => {
       providers: [OutcomeObjectFactory]
     });
 
-    oof = TestBed.get(OutcomeObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
   });
 
   it('should correctly determine if an outcome is confusing given a ' +

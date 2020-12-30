@@ -38,8 +38,8 @@ describe('Skill creation backend api service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    skillCreationBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    skillCreationBackendApiService = TestBed.inject(
       SkillCreationBackendApiService);
 
     rubricDict = {

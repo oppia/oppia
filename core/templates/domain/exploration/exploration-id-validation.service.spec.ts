@@ -36,8 +36,8 @@ describe('Exploration id validation service', function() {
       imports: [HttpClientTestingModule]
     });
     explorationIdValidationService =
-      TestBed.get(ExplorationIdValidationService);
-    httpTestingController = TestBed.get(HttpTestingController);
+      TestBed.inject(ExplorationIdValidationService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   beforeEach(() => {

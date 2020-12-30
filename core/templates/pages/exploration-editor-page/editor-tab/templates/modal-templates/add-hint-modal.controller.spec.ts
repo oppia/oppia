@@ -36,9 +36,9 @@ describe('Add Hint Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
-    generateContentIdService = TestBed.get(GenerateContentIdService);
-    hintObjectFactory = TestBed.get(HintObjectFactory);
-    stateHintsService = TestBed.get(StateHintsService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    hintObjectFactory = TestBed.inject(HintObjectFactory);
+    stateHintsService = TestBed.inject(StateHintsService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {

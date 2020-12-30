@@ -41,7 +41,7 @@ describe('Topic preview tab', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'EditableStoryBackendApiService',
-      TestBed.get(EditableStoryBackendApiService));
+      TestBed.inject(EditableStoryBackendApiService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');

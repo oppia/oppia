@@ -46,12 +46,12 @@ describe('NumericInputValidationService', () => {
       providers: [NumericInputValidationService]
     });
 
-    validatorService = TestBed.get(NumericInputValidationService);
+    validatorService = TestBed.inject(NumericInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({

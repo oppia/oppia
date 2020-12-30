@@ -43,9 +43,9 @@ describe('Assets Backend API Service', () => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
       });
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-      csrfTokenService = TestBed.get(CsrfTokenService);
-      httpTestingController = TestBed.get(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+      csrfTokenService = TestBed.inject(CsrfTokenService);
+      httpTestingController = TestBed.inject(HttpTestingController);
 
       spyOn(csrfTokenService, 'getTokenAsync')
         .and.returnValue(Promise.resolve('token'));
@@ -381,7 +381,7 @@ describe('Assets Backend API Service', () => {
     it('should throw an error when is not on dev mode and Google Cloud' +
         ' Service bucket name is not set', fakeAsync(() => {
       expect(() => {
-        TestBed.get(AssetsBackendApiService);
+        TestBed.inject(AssetsBackendApiService);
       }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }));
   });
@@ -398,8 +398,8 @@ describe('Assets Backend API Service', () => {
         imports: [HttpClientTestingModule],
         providers: [AssetsBackendApiService]
       });
-      httpTestingController = TestBed.get(HttpTestingController);
-      assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+      httpTestingController = TestBed.inject(HttpTestingController);
+      assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     });
 
     it('should correctly formulate the download URL for audios', () => {

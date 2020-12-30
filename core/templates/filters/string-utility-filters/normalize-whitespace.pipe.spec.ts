@@ -26,7 +26,7 @@ describe('Testing NormalizeWhitespacePipe', () => {
     TestBed.configureTestingModule({
       providers: [NormalizeWhitespacePipe]
     });
-    nwp = TestBed.get(NormalizeWhitespacePipe);
+    nwp = TestBed.inject(NormalizeWhitespacePipe);
   });
 
   it('should have all expected pipes', () => {

@@ -46,8 +46,8 @@ describe('Questions List Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    qls = TestBed.get(QuestionsListService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    qls = TestBed.inject(QuestionsListService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   beforeEach(() => {

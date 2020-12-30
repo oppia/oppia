@@ -27,8 +27,8 @@ describe('Player transcript service', () => {
   let pts;
   let scof;
   beforeEach(() => {
-    pts = TestBed.get(PlayerTranscriptService);
-    scof = TestBed.get(StateCardObjectFactory);
+    pts = TestBed.inject(PlayerTranscriptService);
+    scof = TestBed.inject(StateCardObjectFactory);
   });
 
   it('should reset the transcript correctly', () => {

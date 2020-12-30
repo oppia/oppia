@@ -30,8 +30,8 @@ describe('Browser Checker Service', function() {
   ' Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko)' +
   ' Chrome/62.0.3202.84 Mobile Safari/537.36';
   beforeEach(() => {
-    bcs = TestBed.get(BrowserCheckerService);
-    wrs = TestBed.get(WindowRef);
+    bcs = TestBed.inject(BrowserCheckerService);
+    wrs = TestBed.inject(WindowRef);
 
     let userAgent: string;
     spyOnProperty(wrs.nativeWindow.navigator, 'userAgent')

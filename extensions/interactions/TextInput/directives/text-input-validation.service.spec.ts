@@ -42,10 +42,10 @@ describe('TextInputValidationService', () => {
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(() => {
-    validatorService = TestBed.get(TextInputValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    validatorService = TestBed.inject(TextInputValidationService);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     INTERACTION_SPECS = InteractionSpecsConstants.INTERACTION_SPECS;
     customizationArgSpecs = INTERACTION_SPECS.TextInput.customization_arg_specs;

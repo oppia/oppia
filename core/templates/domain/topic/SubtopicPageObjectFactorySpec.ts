@@ -29,7 +29,7 @@ describe('Subtopic page object factory', () => {
       providers: [SubtopicPageObjectFactory]
     });
 
-    subtopicPageObjectFactory = TestBed.get(SubtopicPageObjectFactory);
+    subtopicPageObjectFactory = TestBed.inject(SubtopicPageObjectFactory);
   });
 
   it('should be able to create a subtopic page object with given topic and ' +

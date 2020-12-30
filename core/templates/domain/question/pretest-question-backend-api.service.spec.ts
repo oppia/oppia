@@ -81,9 +81,9 @@ describe('Pretest question backend API service', function() {
       imports: [HttpClientTestingModule],
       providers: [PretestQuestionBackendApiService]
     });
-    pretestQuestionBackendApiService = TestBed.get(
+    pretestQuestionBackendApiService = TestBed.inject(
       PretestQuestionBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

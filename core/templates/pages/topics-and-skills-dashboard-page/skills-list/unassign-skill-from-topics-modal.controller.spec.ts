@@ -48,7 +48,7 @@ describe('Unassign Skill from Topics Modal', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'TopicsAndSkillsDashboardBackendApiService',
-      TestBed.get(TopicsAndSkillsDashboardBackendApiService));
+      TestBed.inject(TopicsAndSkillsDashboardBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $controller) {

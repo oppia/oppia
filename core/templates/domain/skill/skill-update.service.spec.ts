@@ -53,13 +53,13 @@ describe('Skill update service', () => {
       ],
     });
 
-    skillUpdateService = TestBed.get(SkillUpdateService);
-    undoRedoService = TestBed.get(UndoRedoService);
+    skillUpdateService = TestBed.inject(SkillUpdateService);
+    undoRedoService = TestBed.inject(UndoRedoService);
 
-    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
-    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
+    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
 
     const misconceptionDict1 = {
       id: '2',

@@ -41,7 +41,7 @@ describe('LocalStorageService', () => {
     let draftTwo = null;
 
     beforeEach(() => {
-      localStorageService = TestBed.get(LocalStorageService);
+      localStorageService = TestBed.inject(LocalStorageService);
 
       draftOne = ExplorationDraft.createFromLocalStorageDict(draftDictOne);
       draftTwo = ExplorationDraft.createFromLocalStorageDict(draftDictTwo);

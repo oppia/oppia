@@ -64,20 +64,20 @@ describe('State Name Editor component', function() {
       imports: [HttpClientTestingModule]
     });
 
-    editabilityService = TestBed.get(EditabilityService);
-    stateEditorService = TestBed.get(StateEditorService);
-    stateNameService = TestBed.get(StateNameService);
+    editabilityService = TestBed.inject(EditabilityService);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateNameService = TestBed.inject(StateNameService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ExplorationDataService', mockExplorationData);
     $provide.value(
       'ExplorationImprovementsTaskRegistryService',
-      TestBed.get(ExplorationImprovementsTaskRegistryService));
+      TestBed.inject(ExplorationImprovementsTaskRegistryService));
     $provide.value(
-      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+      'ExplorationStatsService', TestBed.inject(ExplorationStatsService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {

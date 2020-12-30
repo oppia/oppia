@@ -89,7 +89,7 @@ describe('Practice tab component', function() {
   }));
 
   beforeEach(() => {
-    subtopicObjectFactory = TestBed.get(SubtopicObjectFactory);
+    subtopicObjectFactory = TestBed.inject(SubtopicObjectFactory);
   });
 
   beforeEach(() => {

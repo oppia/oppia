@@ -31,7 +31,7 @@ describe('Editor state service', () => {
       providers: [StateEditorService]
     });
 
-    ecs = TestBed.get(StateEditorService);
+    ecs = TestBed.inject(StateEditorService);
   });
 
   it('should correctly set and get state names', () => {

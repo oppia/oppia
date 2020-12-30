@@ -36,10 +36,10 @@ describe('NumberWithUnitsValidationService', () => {
   var oof, agof, rof;
 
   beforeEach(() => {
-    validatorService = TestBed.get(NumberWithUnitsValidationService);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    validatorService = TestBed.inject(NumberWithUnitsValidationService);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     var createFractionDict = (

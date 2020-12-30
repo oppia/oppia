@@ -67,7 +67,7 @@ describe('Preview Tab Component', function() {
   }];
 
   beforeEach(function() {
-    paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);
+    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
   });
 
   beforeEach(angular.mock.module(function($provide) {

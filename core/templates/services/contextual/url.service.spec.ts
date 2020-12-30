@@ -38,8 +38,8 @@ describe('Url Service', () => {
       search: ''
     };
 
-    urlService = TestBed.get(UrlService);
-    windowRef = TestBed.get(WindowRef);
+    urlService = TestBed.inject(UrlService);
+    windowRef = TestBed.inject(WindowRef);
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
       location: mockLocation}));
   });

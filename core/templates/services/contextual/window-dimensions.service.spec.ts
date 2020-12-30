@@ -24,8 +24,8 @@ describe('Window Dimensions Service', () => {
   let wds, wr;
 
   beforeEach(() => {
-    wds = TestBed.get(WindowDimensionsService);
-    wr = TestBed.get(WindowRef);
+    wds = TestBed.inject(WindowDimensionsService);
+    wr = TestBed.inject(WindowRef);
 
     // This approach was choosen because spyOn() doesn't work on properties
     // that doesn't have a get access type.

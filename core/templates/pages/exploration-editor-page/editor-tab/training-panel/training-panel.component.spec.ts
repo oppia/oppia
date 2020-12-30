@@ -120,29 +120,29 @@ describe('Training Panel Component', function() {
   });
 
   beforeEach(function() {
-    generateContentIdService = TestBed.get(GenerateContentIdService);
-    stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
-    stateInteractionIdService = TestBed.get(StateInteractionIdService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    stateCustomizationArgsService = TestBed.inject(StateCustomizationArgsService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
     $provide.value('GenerateContentIdService', generateContentIdService);
     $provide.value(
       'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
+      TestBed.inject(TextInputRulesService));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

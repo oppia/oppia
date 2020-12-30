@@ -38,10 +38,10 @@ describe('Topic rights backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    topicRightsBackendApiService = TestBed.get(TopicRightsBackendApiService);
+    topicRightsBackendApiService = TestBed.inject(TopicRightsBackendApiService);
 
-    csrfService = TestBed.get(CsrfTokenService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.inject(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
 
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');

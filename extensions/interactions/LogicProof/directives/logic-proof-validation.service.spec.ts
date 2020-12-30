@@ -38,10 +38,10 @@ describe('LogicProofValidationService', () => {
       providers: [LogicProofValidationService]
     });
 
-    validatorService = TestBed.get(LogicProofValidationService);
+    validatorService = TestBed.inject(LogicProofValidationService);
 
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 

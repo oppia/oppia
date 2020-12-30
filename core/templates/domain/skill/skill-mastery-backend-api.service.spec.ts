@@ -40,9 +40,9 @@ describe('Skill mastery backend API service', () => {
       providers: [SkillMasteryBackendApiService]
     });
 
-    skillMasteryBackendApiService = TestBed.get(SkillMasteryBackendApiService);
-    csrfService = TestBed.get(CsrfTokenService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    skillMasteryBackendApiService = TestBed.inject(SkillMasteryBackendApiService);
+    csrfService = TestBed.inject(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(function() {
       return Promise.resolve('sample-csrf-token');

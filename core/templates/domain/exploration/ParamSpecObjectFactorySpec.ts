@@ -27,8 +27,8 @@ describe('Param Spec Object Factory', () => {
   let paramType;
 
   beforeEach(() => {
-    psof = TestBed.get(ParamSpecObjectFactory);
-    ptof = TestBed.get(ParamTypeObjectFactory);
+    psof = TestBed.inject(ParamSpecObjectFactory);
+    ptof = TestBed.inject(ParamTypeObjectFactory);
 
     paramType = ptof.getDefaultType();
   });

@@ -32,7 +32,7 @@ describe('Image preloader service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
@@ -364,10 +364,10 @@ describe('Image preloader service', () => {
   let exploration: Exploration;
 
   beforeEach(() => {
-    imagePreloaderService = TestBed.get(ImagePreloaderService);
-    explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
-    contextService = TestBed.get(ContextService);
-    assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+    imagePreloaderService = TestBed.inject(ImagePreloaderService);
+    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
+    contextService = TestBed.inject(ContextService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');

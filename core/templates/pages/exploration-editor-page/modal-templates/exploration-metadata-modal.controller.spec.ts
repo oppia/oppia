@@ -38,7 +38,7 @@ describe('Exploration Metadata Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value('ExplorationDataService', {
       autosaveChangeList: function() {}
     });

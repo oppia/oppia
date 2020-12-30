@@ -86,53 +86,53 @@ describe('Exploration editor tab component', function() {
   importAllAngularServices();
 
   beforeEach(function() {
-    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
-    explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
-    hintObjectFactory = TestBed.get(HintObjectFactory);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    solutionObjectFactory = TestBed.get(SolutionObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
+    explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
+    hintObjectFactory = TestBed.inject(HintObjectFactory);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
     $provide.value(
       'AnswerGroupObjectFactory', answerGroupObjectFactory);
     $provide.value(
-      'AnswerStatsObjectFactory', TestBed.get(AnswerStatsObjectFactory));
+      'AnswerStatsObjectFactory', TestBed.inject(AnswerStatsObjectFactory));
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
-    $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
+    $provide.value('FractionObjectFactory', TestBed.inject(FractionObjectFactory));
     $provide.value('HintObjectFactory', hintObjectFactory);
-    $provide.value('ImprovementsService', TestBed.get(ImprovementsService));
+    $provide.value('ImprovementsService', TestBed.inject(ImprovementsService));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
     $provide.value(
-      'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
+      'ParamChangeObjectFactory', TestBed.inject(ParamChangeObjectFactory));
     $provide.value(
-      'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
+      'ParamChangesObjectFactory', TestBed.inject(ParamChangesObjectFactory));
     $provide.value(
       'RecordedVoiceoversObjectFactory',
-      TestBed.get(RecordedVoiceoversObjectFactory));
-    $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
+      TestBed.inject(RecordedVoiceoversObjectFactory));
+    $provide.value('RuleObjectFactory', TestBed.inject(RuleObjectFactory));
     $provide.value(
-      'SolutionValidityService', TestBed.get(SolutionValidityService));
+      'SolutionValidityService', TestBed.inject(SolutionValidityService));
     $provide.value(
       'StateClassifierMappingService',
-      TestBed.get(StateClassifierMappingService));
+      TestBed.inject(StateClassifierMappingService));
     $provide.value(
-      'StateEditorService', TestBed.get(StateEditorService));
+      'StateEditorService', TestBed.inject(StateEditorService));
     $provide.value(
-      'SubtitledHtmlObjectFactory', TestBed.get(SubtitledHtmlObjectFactory));
-    $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
+      'SubtitledHtmlObjectFactory', TestBed.inject(SubtitledHtmlObjectFactory));
+    $provide.value('UnitsObjectFactory', TestBed.inject(UnitsObjectFactory));
     $provide.value(
-      'VoiceoverObjectFactory', TestBed.get(VoiceoverObjectFactory));
+      'VoiceoverObjectFactory', TestBed.inject(VoiceoverObjectFactory));
     $provide.value(
       'WrittenTranslationObjectFactory',
-      TestBed.get(WrittenTranslationObjectFactory));
+      TestBed.inject(WrittenTranslationObjectFactory));
     $provide.value(
       'WrittenTranslationsObjectFactory',
-      TestBed.get(WrittenTranslationsObjectFactory));
+      TestBed.inject(WrittenTranslationsObjectFactory));
     $provide.value('ExplorationDataService', {
       autosaveChangeList: function() {}
     });

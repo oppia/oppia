@@ -42,7 +42,7 @@ describe('Guest collection progress service', () => {
       providers: [GuestCollectionProgressService]
     });
 
-    guestCollectionProgressService = TestBed.get(
+    guestCollectionProgressService = TestBed.inject(
       GuestCollectionProgressService);
 
     _collectionId0 = 'sample_collection_id0';

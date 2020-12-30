@@ -74,44 +74,44 @@ describe('Exploration save and publish buttons component', function() {
       imports: [HttpClientTestingModule]
     });
 
-    contextService = TestBed.get(ContextService);
+    contextService = TestBed.inject(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-    editabilityService = TestBed.get(EditabilityService);
-    userExplorationPermissionsService = TestBed.get(
+    editabilityService = TestBed.inject(EditabilityService);
+    userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
     $provide.value(
-      'ExplorationDiffService', TestBed.get(ExplorationDiffService));
+      'ExplorationDiffService', TestBed.inject(ExplorationDiffService));
     $provide.value(
       'ExplorationImprovementsTaskRegistryService',
-      TestBed.get(ExplorationImprovementsTaskRegistryService));
+      TestBed.inject(ExplorationImprovementsTaskRegistryService));
     $provide.value(
-      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
+      'ExplorationStatsService', TestBed.inject(ExplorationStatsService));
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value(
       'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
+      TestBed.inject(TextInputRulesService));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
-    $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
-    $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
+    $provide.value('SiteAnalyticsService', TestBed.inject(SiteAnalyticsService));
+    $provide.value('StatesObjectFactory', TestBed.inject(StatesObjectFactory));
     $provide.value(
       'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
+      TestBed.inject(StateCustomizationArgsService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+      'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
+    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

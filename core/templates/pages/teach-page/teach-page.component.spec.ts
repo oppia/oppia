@@ -122,7 +122,7 @@ describe('Teach Page', function() {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   }));
 
   beforeEach(() => {

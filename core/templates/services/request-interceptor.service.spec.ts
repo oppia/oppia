@@ -42,9 +42,9 @@ describe('Request Interceptor Service', () => {
       }]
     });
 
-    mcts = TestBed.get(MockCsrfTokenService);
-    httpClient = TestBed.get(HttpClient);
-    httpTestingController = TestBed.get(HttpTestingController);
+    mcts = TestBed.inject(MockCsrfTokenService);
+    httpClient = TestBed.inject(HttpClient);
+    httpTestingController = TestBed.inject(HttpTestingController);
     // This throws "Argument of type 'string[]' is not assignable to parameter
     // of type 'PromiseLike<string>'.". We need to suppress this error because
     // we need to mock the `getTokenAsync` function for testing purposes.

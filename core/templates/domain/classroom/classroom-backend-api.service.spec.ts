@@ -77,8 +77,8 @@ describe('Classroom backend API service', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
 
     // Sample topic object returnable from the backend.
     sampleClassroomDataObject = (

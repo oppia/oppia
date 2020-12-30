@@ -134,11 +134,11 @@ describe('State Translation Editor Component', function() {
   importAllAngularServices();
 
   beforeEach(function() {
-    stateEditorService = TestBed.get(StateEditorService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
-    stateWrittenTranslationsService = TestBed.get(
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
+    stateWrittenTranslationsService = TestBed.inject(
       StateWrittenTranslationsService);
-    writtenTranslationObjectFactory = TestBed.get(
+    writtenTranslationObjectFactory = TestBed.inject(
       WrittenTranslationObjectFactory);
   });
 
@@ -148,14 +148,14 @@ describe('State Translation Editor Component', function() {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value('StateRecordedVoiceoversService', TestBed.get(
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
+    $provide.value('StateRecordedVoiceoversService', TestBed.inject(
       StateRecordedVoiceoversService));
     $provide.value(
       'StateWrittenTranslationsService', stateWrittenTranslationsService);
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   describe('when has written translation', function() {

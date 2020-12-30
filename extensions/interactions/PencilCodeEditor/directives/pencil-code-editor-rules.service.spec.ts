@@ -30,7 +30,7 @@ describe('Pencil Code Editor rules service', () => {
       providers: [
         NormalizeWhitespacePipe, NormalizeWhitespacePunctuationAndCasePipe]
     });
-    pcers = TestBed.get(PencilCodeEditorRulesService);
+    pcers = TestBed.inject(PencilCodeEditorRulesService);
   });
 
   describe('\'equals\' rule', () => {

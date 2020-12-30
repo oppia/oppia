@@ -26,8 +26,8 @@ describe('Site Analytics Service', () => {
   let gaSpy: jasmine.Spy = null;
 
   beforeEach(() => {
-    sas = TestBed.get(SiteAnalyticsService);
-    ws = TestBed.get(WindowRef);
+    sas = TestBed.inject(SiteAnalyticsService);
+    ws = TestBed.inject(WindowRef);
     spyOnProperty(sas, 'CAN_SEND_ANALYTICS_EVENTS', 'get')
       .and.returnValue(true);
 

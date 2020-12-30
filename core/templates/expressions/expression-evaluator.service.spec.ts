@@ -39,9 +39,9 @@ describe('Expression evaluator service', () => {
   let expressionSyntaxTreeService: ExpressionSyntaxTreeService;
 
   beforeEach(() => {
-    expressionEvaluatorService = TestBed.get(ExpressionEvaluatorService);
-    expressionParserService = TestBed.get(ExpressionParserService);
-    expressionSyntaxTreeService = TestBed.get(ExpressionSyntaxTreeService);
+    expressionEvaluatorService = TestBed.inject(ExpressionEvaluatorService);
+    expressionParserService = TestBed.inject(ExpressionParserService);
+    expressionSyntaxTreeService = TestBed.inject(ExpressionSyntaxTreeService);
   });
 
   const ENVS: EnvDict[] = [

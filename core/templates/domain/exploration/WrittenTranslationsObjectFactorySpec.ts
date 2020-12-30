@@ -28,9 +28,9 @@ describe('Written Translations Object Factory', () => {
   let writtenTranslationsBackendDict;
 
   beforeEach(() => {
-    writtenTranslationsObjectFactory = TestBed.get(
+    writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory);
-    writtenTranslationObjectFactory = TestBed.get(
+    writtenTranslationObjectFactory = TestBed.inject(
       WrittenTranslationObjectFactory);
 
     writtenTranslationsBackendDict = (

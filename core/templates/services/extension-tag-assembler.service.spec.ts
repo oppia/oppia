@@ -32,7 +32,7 @@ describe('Extension Tag Assembler Service', () => {
         CamelCaseToHyphensPipe
       ]
     });
-    etas = TestBed.get(ExtensionTagAssemblerService);
+    etas = TestBed.inject(ExtensionTagAssemblerService);
   });
 
   it('should not format element without customization', () => {

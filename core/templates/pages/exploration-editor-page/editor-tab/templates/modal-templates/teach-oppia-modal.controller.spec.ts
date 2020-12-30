@@ -132,32 +132,32 @@ describe('Teach Oppia Modal Controller', function() {
   });
 
   beforeEach(function() {
-    angularNameService = TestBed.get(AngularNameService);
-    stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
-    stateInteractionIdService = TestBed.get(StateInteractionIdService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
+    angularNameService = TestBed.inject(AngularNameService);
+    stateCustomizationArgsService = TestBed.inject(StateCustomizationArgsService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', angularNameService);
     $provide.value(
       'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
+      TestBed.inject(TextInputRulesService));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
     $provide.value(
       'StateCustomizationArgsService', stateCustomizationArgsService);
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   describe('when successfully fetching top unresolved answers', function() {

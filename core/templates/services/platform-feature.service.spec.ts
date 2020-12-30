@@ -56,9 +56,9 @@ describe('PlatformFeatureService', () => {
       imports: [HttpClientTestingModule],
     });
 
-    windowRef = TestBed.get(WindowRef);
-    apiService = TestBed.get(PlatformFeatureBackendApiService);
-    urlService = TestBed.get(UrlService);
+    windowRef = TestBed.inject(WindowRef);
+    apiService = TestBed.inject(PlatformFeatureBackendApiService);
+    urlService = TestBed.inject(UrlService);
 
     clearStaticProperties();
 
@@ -102,7 +102,7 @@ describe('PlatformFeatureService', () => {
     it('should load from server when storage is clean.', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
-      platformFeatureService = TestBed.get(PlatformFeatureService);
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
       platformFeatureService.initialize()
         .then(successHandler, failHandler);
 
@@ -117,7 +117,7 @@ describe('PlatformFeatureService', () => {
     it('should save results in sessionStorage after loading.', fakeAsync(() => {
       const sessionId = 'session_id';
       mockCookie(`SACSID=${sessionId}`);
-      platformFeatureService = TestBed.get(PlatformFeatureService);
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       const timestamp = Date.now();
 
@@ -146,7 +146,7 @@ describe('PlatformFeatureService', () => {
         const sessionId = 'session_id';
         mockCookie(`SACSID=${sessionId}; dev_appserver_login=should_not_use`);
 
-        platformFeatureService = TestBed.get(PlatformFeatureService);
+        platformFeatureService = TestBed.inject(PlatformFeatureService);
 
         flushMicrotasks();
 
@@ -164,7 +164,7 @@ describe('PlatformFeatureService', () => {
         const sessionId = 'session_id';
         mockCookie(`dev_appserver_login=${sessionId}`);
 
-        platformFeatureService = TestBed.get(PlatformFeatureService);
+        platformFeatureService = TestBed.inject(PlatformFeatureService);
 
         flushMicrotasks();
 
@@ -193,7 +193,7 @@ describe('PlatformFeatureService', () => {
         // Ticks 60 secs, as stored results are valid for 12 hrs, the results
         // should still be valid.
         tick(60 * 1000);
-        platformFeatureService = TestBed.get(PlatformFeatureService);
+        platformFeatureService = TestBed.inject(PlatformFeatureService);
 
         flushMicrotasks();
 
@@ -219,7 +219,7 @@ describe('PlatformFeatureService', () => {
         // Ticks 13 hrs, as stored results are valid for 12 hrs, ths results
         // should have expired.
         tick(13 * 3600 * 1000);
-        platformFeatureService = TestBed.get(PlatformFeatureService);
+        platformFeatureService = TestBed.inject(PlatformFeatureService);
 
         flushMicrotasks();
 
@@ -243,7 +243,7 @@ describe('PlatformFeatureService', () => {
           })
         });
 
-        platformFeatureService = TestBed.get(PlatformFeatureService);
+        platformFeatureService = TestBed.inject(PlatformFeatureService);
 
         flushMicrotasks();
 
@@ -269,7 +269,7 @@ describe('PlatformFeatureService', () => {
         })
       });
 
-      platformFeatureService = TestBed.get(PlatformFeatureService);
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       flushMicrotasks();
 
@@ -279,7 +279,7 @@ describe('PlatformFeatureService', () => {
 
     it('should request only once if there are more than one call to ' +
       '.initialize.', fakeAsync(() => {
-      platformFeatureService = TestBed.get(PlatformFeatureService);
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       platformFeatureService.initialize();
       platformFeatureService.initialize();
@@ -293,7 +293,7 @@ describe('PlatformFeatureService', () => {
     it('should disable all features when loading fails.', fakeAsync(() => {
       apiSpy.and.throwError('mock error');
 
-      platformFeatureService = TestBed.get(PlatformFeatureService);
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       flushMicrotasks();
 
@@ -306,7 +306,7 @@ describe('PlatformFeatureService', () => {
     it('should skip on the signup page', fakeAsync(() => {
       mockPathName('/signup');
 
-      platformFeatureService = TestBed.get(PlatformFeatureService);
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       flushMicrotasks();
 
@@ -317,7 +317,7 @@ describe('PlatformFeatureService', () => {
 
   describe('.featureSummary', () => {
     it('should return correct values of feature flags', fakeAsync(() => {
-      platformFeatureService = TestBed.get(PlatformFeatureService);
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       flushMicrotasks();
 
@@ -329,7 +329,7 @@ describe('PlatformFeatureService', () => {
 
     it('should throw error when accessed before initialization.', fakeAsync(
       () => {
-        platformFeatureService = TestBed.get(PlatformFeatureService);
+        platformFeatureService = TestBed.inject(PlatformFeatureService);
         expect(
           () => platformFeatureService.status.DummyFeature.isEnabled
         ).toThrowError(
@@ -343,7 +343,7 @@ describe('PlatformFeatureService', () => {
 
     beforeEach(() => {
       factoryFn = platformFeatureInitFactory;
-      platformFeatureService = TestBed.get(PlatformFeatureService);
+      platformFeatureService = TestBed.inject(PlatformFeatureService);
     });
 
     it('should return a function that calls initialize', () => {

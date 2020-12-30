@@ -29,7 +29,7 @@ describe('Delete account modal', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UserService', TestBed.get(UserService));
+    $provide.value('UserService', TestBed.inject(UserService));
   }));
 
   var $q = null;

@@ -42,9 +42,9 @@ describe('Concept card backend API service', () => {
       providers: [ConceptCardBackendApiService]
     });
 
-    conceptCardBackendApiService = TestBed.get(ConceptCardBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
+    conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
 
     var example1 = {
       question: {

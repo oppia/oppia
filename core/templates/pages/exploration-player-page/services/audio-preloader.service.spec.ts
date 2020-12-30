@@ -29,7 +29,7 @@ describe('Audio preloader service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
@@ -301,11 +301,11 @@ describe('Audio preloader service', () => {
   let requestUrl4 = '/assetsdevhandler/exploration/1/assets/audio/en-4.mp3';
 
   beforeEach(() => {
-    audioPreloaderService = TestBed.get(AudioPreloaderService);
+    audioPreloaderService = TestBed.inject(AudioPreloaderService);
     audioTranslationLanguageService = (
-      TestBed.get(AudioTranslationLanguageService));
-    explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
-    contextService = TestBed.get(ContextService);
+      TestBed.inject(AudioTranslationLanguageService));
+    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
+    contextService = TestBed.inject(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
   });
 

@@ -69,16 +69,16 @@ describe('Customize Interaction Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
-    editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
-    imageClickInputValidationService = TestBed.get(
+    editorFirstTimeEventsService = TestBed.inject(EditorFirstTimeEventsService);
+    imageClickInputValidationService = TestBed.inject(
       ImageClickInputValidationService);
-    interactionDetailsCacheService = TestBed.get(
+    interactionDetailsCacheService = TestBed.inject(
       InteractionDetailsCacheService);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
-    stateEditorService = TestBed.get(StateEditorService);
-    stateInteractionIdService = TestBed.get(StateInteractionIdService);
-    stateNextContentIdIndexService = TestBed.get(
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
+    stateCustomizationArgsService = TestBed.inject(StateCustomizationArgsService);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateNextContentIdIndexService = TestBed.inject(
       StateNextContentIdIndexService);
   });
 

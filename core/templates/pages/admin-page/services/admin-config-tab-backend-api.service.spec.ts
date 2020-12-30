@@ -33,11 +33,11 @@ describe('Admin Config Tab Backend API service', () => {
       imports: [HttpClientTestingModule],
       providers: [AdminConfigTabBackendApiService]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    adminConfigTabBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    adminConfigTabBackendApiService = TestBed.inject(
       AdminConfigTabBackendApiService
     );
-    csrfService = TestBed.get(CsrfTokenService);
+    csrfService = TestBed.inject(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');

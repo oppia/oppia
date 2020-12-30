@@ -35,10 +35,10 @@ describe('Answer Submit Action directive', function() {
   var interactionObjectFactory = null;
 
   beforeEach(function() {
-    explorationHtmlFormatterService = TestBed.get(
+    explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService);
-    htmlEscaperService = TestBed.get(HtmlEscaperService);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
+    htmlEscaperService = TestBed.inject(HtmlEscaperService);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {

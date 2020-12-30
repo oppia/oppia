@@ -45,12 +45,12 @@ describe('Exploration object factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    eof = TestBed.get(ExplorationObjectFactory);
-    sof = TestBed.get(StateObjectFactory);
-    vof = TestBed.get(VoiceoverObjectFactory);
-    ssof = TestBed.get(StatesObjectFactory);
-    iof = TestBed.get(InteractionObjectFactory);
-    ls = TestBed.get(LoggerService);
+    eof = TestBed.inject(ExplorationObjectFactory);
+    sof = TestBed.inject(StateObjectFactory);
+    vof = TestBed.inject(VoiceoverObjectFactory);
+    ssof = TestBed.inject(StatesObjectFactory);
+    iof = TestBed.inject(InteractionObjectFactory);
+    ls = TestBed.inject(LoggerService);
 
     firstState = {
       content: {

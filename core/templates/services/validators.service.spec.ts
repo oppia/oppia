@@ -31,7 +31,7 @@ describe('Validators service', () => {
     TestBed.configureTestingModule({
       providers: [AlertsService, NormalizeWhitespacePipe]
     });
-    vs = TestBed.get(ValidatorsService);
+    vs = TestBed.inject(ValidatorsService);
     // This throws "Cannot assign to 'INVALID_NAME_CHARS' because it
     // is a read-only property.". We need to suppress this error because
     // we need to change the value of 'INVALID_NAME_CHARS' for testing

@@ -38,8 +38,8 @@ describe('CodeRepl prediction service', () => {
           WinnowingPreprocessingService
         ]
       });
-      tokenizer = TestBed.get(PythonProgramTokenizer);
-      service = TestBed.get(CodeReplPredictionService);
+      tokenizer = TestBed.inject(PythonProgramTokenizer);
+      service = TestBed.inject(CodeReplPredictionService);
     }));
 
     it('should calculate correct jaccard index', () => {

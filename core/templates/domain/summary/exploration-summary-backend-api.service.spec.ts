@@ -39,12 +39,12 @@ describe('Exploration Summary Backend Api Service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    explorationSummaryBackendApiService = TestBed.get(
+    explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService
     );
-    csrfService = TestBed.get(CsrfTokenService);
-    alertsService = TestBed.get(AlertsService);
-    httpTestingController = TestBed.get(
+    csrfService = TestBed.inject(CsrfTokenService);
+    alertsService = TestBed.inject(AlertsService);
+    httpTestingController = TestBed.inject(
       HttpTestingController
     );
 

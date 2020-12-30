@@ -34,8 +34,8 @@ describe('ParamSpecs', () => {
       providers: [ParamSpecsObjectFactory]
     });
 
-    paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
-    paramSpecObjectFactory = TestBed.get(ParamSpecObjectFactory);
+    paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
+    paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
     emptyParamSpecs = paramSpecsObjectFactory.createFromBackendDict({});
   });
 

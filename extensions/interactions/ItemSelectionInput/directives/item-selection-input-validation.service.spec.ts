@@ -51,12 +51,12 @@ describe('ItemSelectionInputValidationService', () => {
       providers: [ItemSelectionInputValidationService]
     });
 
-    validatorService = TestBed.get(ItemSelectionInputValidationService);
+    validatorService = TestBed.inject(ItemSelectionInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
 
     currentState = 'First State';
 

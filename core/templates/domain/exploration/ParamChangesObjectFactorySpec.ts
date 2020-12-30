@@ -36,7 +36,7 @@ describe('ParamChanges Object Factory', () => {
       providers: [ParamChangesObjectFactory]
     });
 
-    pcsof = TestBed.get(ParamChangesObjectFactory);
+    pcsof = TestBed.inject(ParamChangesObjectFactory);
   });
 
   it('should create a ParamChange array from a list of dictionaries',

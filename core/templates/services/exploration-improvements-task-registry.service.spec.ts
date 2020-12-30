@@ -81,11 +81,11 @@ describe('Exploration improvements task registrar service', () => {
 
   beforeEach(() => {
     taskRegistryService = (
-      TestBed.get(ExplorationImprovementsTaskRegistryService));
+      TestBed.inject(ExplorationImprovementsTaskRegistryService));
 
-    answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
-    playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
-    statesObjectFactory = TestBed.get(StatesObjectFactory);
+    answerStatsObjectFactory = TestBed.inject(AnswerStatsObjectFactory);
+    playthroughIssueObjectFactory = TestBed.inject(PlaythroughIssueObjectFactory);
+    statesObjectFactory = TestBed.inject(StatesObjectFactory);
 
     config = new ExplorationImprovementsConfig(
       expId, expVersion, true, 0.25, 0.20, 100);

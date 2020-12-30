@@ -65,7 +65,7 @@ describe('State classifier mapping service', () => {
         providers: [StateClassifierMappingService]
       });
 
-      mappingService = TestBed.get(StateClassifierMappingService);
+      mappingService = TestBed.inject(StateClassifierMappingService);
     });
 
     it('should return correct classifier details.', () => {

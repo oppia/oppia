@@ -41,7 +41,7 @@ describe('Splash Page', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UserService', TestBed.get(UserService));
+    $provide.value('UserService', TestBed.inject(UserService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $timeout = $injector.get('$timeout');

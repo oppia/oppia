@@ -36,8 +36,8 @@ describe('Email dashboard backend api service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    edbas = TestBed.get(EmailDashboardBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    edbas = TestBed.inject(EmailDashboardBackendApiService);
   });
 
   afterEach(() => {

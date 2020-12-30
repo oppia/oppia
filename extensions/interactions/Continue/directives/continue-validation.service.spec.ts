@@ -45,10 +45,10 @@ describe('ContinueValidationService', () => {
       providers: [ContinueValidationService]
     });
 
-    validatorService = TestBed.get(ContinueValidationService);
+    validatorService = TestBed.inject(ContinueValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',

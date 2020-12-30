@@ -52,7 +52,7 @@ describe('GuppyInitializationService', () => {
   let guppyInitializationService: GuppyInitializationService = null;
 
   beforeEach(() => {
-    guppyInitializationService = TestBed.get(GuppyInitializationService);
+    guppyInitializationService = TestBed.inject(GuppyInitializationService);
     window.Guppy = MockGuppy;
   });
 

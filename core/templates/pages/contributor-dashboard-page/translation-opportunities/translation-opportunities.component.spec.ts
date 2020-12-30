@@ -46,16 +46,16 @@ describe('Translation opportunities component', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'ContributionOpportunitiesBackendApiService',
-      TestBed.get(ContributionOpportunitiesBackendApiService));
-    $provide.value('LanguageUtilService', TestBed.get(LanguageUtilService));
+      TestBed.inject(ContributionOpportunitiesBackendApiService));
+    $provide.value('LanguageUtilService', TestBed.inject(LanguageUtilService));
     $provide.value(
-      'UserService', TestBed.get(UserService));
+      'UserService', TestBed.inject(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

@@ -36,9 +36,9 @@ describe('URL Interpolation Service', () => {
       origin: 'http://sample.com'
     };
 
-    uis = TestBed.get(UrlInterpolationService);
-    urlService = TestBed.get(UrlService);
-    alertsService = TestBed.get(AlertsService);
+    uis = TestBed.inject(UrlInterpolationService);
+    urlService = TestBed.inject(UrlService);
+    alertsService = TestBed.inject(AlertsService);
     spyOnProperty(uis, 'DEV_MODE', 'get').and.returnValue(false);
     spyOn(urlService, 'getCurrentLocation').and.returnValue(mockLocation);
     alertsObject.alertsService = alertsService;

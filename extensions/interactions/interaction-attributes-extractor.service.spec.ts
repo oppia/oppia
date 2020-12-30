@@ -33,8 +33,8 @@ describe('Interaction attributes extractor service', () => {
       providers: [InteractionAttributesExtractorService, HtmlEscaperService]
     });
 
-    iaes = TestBed.get(InteractionAttributesExtractorService);
-    hes = TestBed.get(HtmlEscaperService);
+    iaes = TestBed.inject(InteractionAttributesExtractorService);
+    hes = TestBed.inject(HtmlEscaperService);
   });
 
   it('should properly extract customization arguments values from attributes',

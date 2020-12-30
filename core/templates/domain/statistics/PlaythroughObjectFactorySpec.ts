@@ -32,8 +32,8 @@ describe('Playthrough Object Factory', () => {
       providers: [PlaythroughObjectFactory]
     });
 
-    pof = TestBed.get(PlaythroughObjectFactory);
-    laof = TestBed.get(LearnerActionObjectFactory);
+    pof = TestBed.inject(PlaythroughObjectFactory);
+    laof = TestBed.inject(LearnerActionObjectFactory);
   });
 
   it('should create a new playthrough', () => {

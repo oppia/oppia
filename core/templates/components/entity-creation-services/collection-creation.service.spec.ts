@@ -43,11 +43,11 @@ describe('Collection Creation service', () => {
       ],
     });
 
-    collectionCreationService = TestBed.get(CollectionCreationService);
-    loaderService = TestBed.get(LoaderService);
-    analyticsService = TestBed.get(SiteAnalyticsService);
-    windowRef = TestBed.get(WindowRef);
-    httpTestingController = TestBed.get(HttpTestingController);
+    collectionCreationService = TestBed.inject(CollectionCreationService);
+    loaderService = TestBed.inject(LoaderService);
+    analyticsService = TestBed.inject(SiteAnalyticsService);
+    windowRef = TestBed.inject(WindowRef);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

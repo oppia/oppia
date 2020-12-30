@@ -33,11 +33,11 @@ describe('Current Interaction Service', () => {
   // since ContextService will error if it is used outside the context
   // of an exploration.
   beforeEach(() => {
-    urlService = TestBed.get(UrlService);
+    urlService = TestBed.inject(UrlService);
     spyOn(urlService, 'getPathname').and.callFake(() => {
       return '/explore/123';
     });
-    currentInteractionService = TestBed.get(CurrentInteractionService);
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
   });
 
 

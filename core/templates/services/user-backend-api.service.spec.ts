@@ -36,10 +36,10 @@ describe('User Backend Api Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    userBackendApiService = TestBed.get(UserBackendApiService);
-    urlInterpolationService = TestBed.get(UrlInterpolationService);
-    csrfService = TestBed.get(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    userBackendApiService = TestBed.inject(UserBackendApiService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    csrfService = TestBed.inject(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(
       () => {

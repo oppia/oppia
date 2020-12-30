@@ -24,7 +24,7 @@ describe('Schema Undefined Last Element Service', () => {
   let sules;
 
   beforeEach(() => {
-    sules = TestBed.get(SchemaUndefinedLastElementService);
+    sules = TestBed.inject(SchemaUndefinedLastElementService);
   });
 
   it('should get undefined value by schema', () => {

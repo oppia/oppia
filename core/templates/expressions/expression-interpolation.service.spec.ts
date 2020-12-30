@@ -33,7 +33,7 @@ describe('expression interpolation service', ()=> {
       imports: [HttpClientTestingModule]
     });
     expressionInterpolationService =
-      TestBed.get(ExpressionInterpolationService);
+      TestBed.inject(ExpressionInterpolationService);
   });
 
   it('should correctly interpolate and escape HTML strings', ()=> {

@@ -35,7 +35,7 @@ describe('Learner Action Object Factory', () => {
     });
 
     learnerActionObjectFactory =
-      TestBed.get(LearnerActionObjectFactory);
+      TestBed.inject(LearnerActionObjectFactory);
   });
 
   it('should create a new learner action', () => {

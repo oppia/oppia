@@ -51,11 +51,11 @@ describe('Interaction object factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    iof = TestBed.get(InteractionObjectFactory);
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    hof = TestBed.get(HintObjectFactory);
-    sof = TestBed.get(SolutionObjectFactory);
+    iof = TestBed.inject(InteractionObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    hof = TestBed.inject(HintObjectFactory);
+    sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
       feedback: {

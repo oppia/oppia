@@ -38,12 +38,12 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
   }));
 
   beforeEach(function() {
-    learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    learnerActionObjectFactory = TestBed.inject(LearnerActionObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

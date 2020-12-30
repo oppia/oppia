@@ -36,10 +36,10 @@ describe('MusicNotesInputValidationService', () => {
       providers: [MusicNotesInputValidationService]
     });
 
-    validatorService = TestBed.get(MusicNotesInputValidationService);
+    validatorService = TestBed.inject(MusicNotesInputValidationService);
 
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({

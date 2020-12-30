@@ -48,12 +48,12 @@ describe('StateTopAnswersStatsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
+    answerStatsObjectFactory = TestBed.inject(AnswerStatsObjectFactory);
+    ruleObjectFactory = TestBed.inject(RuleObjectFactory);
     stateTopAnswersStatsBackendApiService = (
-      TestBed.get(StateTopAnswersStatsBackendApiService));
-    stateTopAnswersStatsService = TestBed.get(StateTopAnswersStatsService);
-    statesObjectFactory = TestBed.get(StatesObjectFactory);
+      TestBed.inject(StateTopAnswersStatsBackendApiService));
+    stateTopAnswersStatsService = TestBed.inject(StateTopAnswersStatsService);
+    statesObjectFactory = TestBed.inject(StatesObjectFactory);
   });
 
   const expId = '7';

@@ -33,8 +33,8 @@ describe('Exploration stats service', function() {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
     explorationStatsBackendApiService = (
-      TestBed.get(ExplorationStatsBackendApiService));
-    explorationStatsService = TestBed.get(ExplorationStatsService);
+      TestBed.inject(ExplorationStatsBackendApiService));
+    explorationStatsService = TestBed.inject(ExplorationStatsService);
   });
 
   beforeEach(() => {

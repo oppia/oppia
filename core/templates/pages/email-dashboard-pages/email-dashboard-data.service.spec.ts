@@ -38,9 +38,9 @@ describe('Email Dashboard Services', () => {
         imports: [HttpClientTestingModule],
         providers: [EmailDashboardDataService]
       });
-      csrfService = TestBed.get(CsrfTokenService);
-      emailDashboardDataService = TestBed.get(EmailDashboardDataService);
-      httpTestingController = TestBed.get(HttpTestingController);
+      csrfService = TestBed.inject(CsrfTokenService);
+      emailDashboardDataService = TestBed.inject(EmailDashboardDataService);
+      httpTestingController = TestBed.inject(HttpTestingController);
 
       spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
         return new Promise((resolve) => {

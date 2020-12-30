@@ -67,35 +67,35 @@ describe('Param Changes Editor Component', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
-    alertsService = TestBed.get(AlertsService);
-    paramChangeObjectFactory = TestBed.get(ParamChangeObjectFactory);
-    paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
-    stateParamChangesService = TestBed.get(StateParamChangesService);
+    alertsService = TestBed.inject(AlertsService);
+    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
+    paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
+    stateParamChangesService = TestBed.inject(StateParamChangesService);
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ExplorationDataService', {
       autosaveChangeList: function() {}
     });
 
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
     $provide.value(
       'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
+      TestBed.inject(TextInputRulesService));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value(
       'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
+      TestBed.inject(StateCustomizationArgsService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+      'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
     $provide.value(
-      'StateSolutionService', TestBed.get(StateSolutionService));
+      'StateSolutionService', TestBed.inject(StateSolutionService));
   }));
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $rootScope = $injector.get('$rootScope');

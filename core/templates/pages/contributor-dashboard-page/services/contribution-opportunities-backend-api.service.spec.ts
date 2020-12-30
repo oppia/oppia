@@ -69,9 +69,9 @@ describe('Contribution Opportunities backend API service', function() {
       imports: [HttpClientTestingModule]
     });
     contributionOpportunitiesBackendApiService =
-      TestBed.get(ContributionOpportunitiesBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    urlInterpolationService = TestBed.get(UrlInterpolationService);
+      TestBed.inject(ContributionOpportunitiesBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     sampleSkillOpportunitiesResponse = [
       SkillOpportunity.createFromBackendDict(
         skillOpportunityResponse.opportunities[0])

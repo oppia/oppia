@@ -36,10 +36,10 @@ describe('Pencil Code Editor Validation Service', () => {
   let agof : AnswerGroupObjectFactory = null;
 
   beforeEach(() => {
-    oof = TestBed.get(OutcomeObjectFactory);
-    pcevs = TestBed.get(PencilCodeEditorValidationService);
-    rof = TestBed.get(RuleObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    pcevs = TestBed.inject(PencilCodeEditorValidationService);
+    rof = TestBed.inject(RuleObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
   });
 
   describe('on calling getCustomizationArgsWarnings', () => {

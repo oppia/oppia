@@ -47,9 +47,9 @@ describe('Search bar component', function() {
   var mockWindow = null;
 
   beforeEach(function() {
-    constructTranslationIdsService = TestBed.get(
+    constructTranslationIdsService = TestBed.inject(
       ConstructTranslationIdsService);
-    i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {

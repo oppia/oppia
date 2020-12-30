@@ -34,9 +34,9 @@ describe('Concept card object factory', () => {
   let workedExampleObjectFactory: WorkedExampleObjectFactory;
 
   beforeEach(() => {
-    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
-    workedExampleObjectFactory = TestBed.get(WorkedExampleObjectFactory);
+    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
+    workedExampleObjectFactory = TestBed.inject(WorkedExampleObjectFactory);
 
     example1 = {
       question: {

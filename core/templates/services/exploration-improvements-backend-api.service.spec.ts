@@ -44,8 +44,8 @@ describe('Exploration stats back-end API service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
     explorationImprovementsBackendApiService = (
-      TestBed.get(ExplorationImprovementsBackendApiService));
-    httpTestingController = TestBed.get(HttpTestingController);
+      TestBed.inject(ExplorationImprovementsBackendApiService));
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

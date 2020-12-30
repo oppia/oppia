@@ -38,7 +38,7 @@ describe('Registration Session Expired Modal Controller', function() {
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UserService', TestBed.get(UserService));
+    $provide.value('UserService', TestBed.inject(UserService));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('$window', mockWindow);

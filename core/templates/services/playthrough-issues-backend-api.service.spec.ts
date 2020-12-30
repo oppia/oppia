@@ -44,10 +44,10 @@ describe('PlaythroughIssuesBackendApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
-    httpTestingController = TestBed.get(HttpTestingController);
-    playthroughIssuesBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    playthroughIssuesBackendApiService = TestBed.inject(
       PlaythroughIssuesBackendApiService);
-    playthroughIssueObjectFactory = TestBed.get(PlaythroughIssueObjectFactory);
+    playthroughIssueObjectFactory = TestBed.inject(PlaythroughIssueObjectFactory);
   });
 
   afterEach(() => {

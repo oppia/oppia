@@ -41,10 +41,10 @@ describe('CodeReplValidationService', () => {
       providers: [CodeReplValidationService]
     });
 
-    validatorService = TestBed.get(CodeReplValidationService);
+    validatorService = TestBed.inject(CodeReplValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({

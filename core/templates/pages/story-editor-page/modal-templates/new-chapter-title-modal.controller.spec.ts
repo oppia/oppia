@@ -55,16 +55,16 @@ describe('Create New Chapter Modal Controller', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'ExplorationIdValidationService',
-      TestBed.get(ExplorationIdValidationService));
+      TestBed.inject(ExplorationIdValidationService));
     $provide.value(
       'ExplorationSummaryBackendApiService',
-      TestBed.get(ExplorationSummaryBackendApiService));
+      TestBed.inject(ExplorationSummaryBackendApiService));
   }));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'EditableStoryBackendApiService',
-      TestBed.get(
+      TestBed.inject(
         EditableStoryBackendApiService));
     $provide.value(
       'StoryObjectFactory',

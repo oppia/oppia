@@ -196,7 +196,7 @@ describe('Topic editor state service', function() {
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     subtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
-    topicUpdateService = TestBed.get(TopicUpdateService);
+    topicUpdateService = TestBed.inject(TopicUpdateService);
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
 

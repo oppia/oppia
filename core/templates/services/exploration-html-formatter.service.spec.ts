@@ -35,7 +35,7 @@ describe('Exploration Html Formatter Service', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    ehfs = TestBed.get(ExplorationHtmlFormatterService);
+    ehfs = TestBed.inject(ExplorationHtmlFormatterService);
   });
 
   it('should correctly set interaction HTML for TextInput when it is in' +

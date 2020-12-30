@@ -28,7 +28,7 @@ describe('Python program tokenizer', () => {
       TestBed.configureTestingModule({
         providers: [LoggerService, PythonProgramTokenizer]
       });
-      tokenizer = TestBed.get(PythonProgramTokenizer);
+      tokenizer = TestBed.inject(PythonProgramTokenizer);
     });
 
     it('should generate correct tokens for a program', () => {

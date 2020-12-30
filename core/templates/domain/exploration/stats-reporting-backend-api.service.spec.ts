@@ -64,11 +64,11 @@ describe('Stats reporting backend API Service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    contextService = TestBed.get(ContextService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    statsReportingBackendApiService = TestBed.get(
+    contextService = TestBed.inject(ContextService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    statsReportingBackendApiService = TestBed.inject(
       StatsReportingBackendApiService);
-    urlInterpolationService = TestBed.get(UrlInterpolationService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
   afterEach(() => {

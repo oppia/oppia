@@ -43,10 +43,10 @@ describe('Review test backend API service', () => {
       imports: [HttpClientTestingModule],
       providers: [ReviewTestBackendApiService]
     });
-    reviewTestBackendApiService = TestBed.get(
+    reviewTestBackendApiService = TestBed.inject(
       ReviewTestBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    urlService = TestBed.get(UrlService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    urlService = TestBed.inject(UrlService);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.callFake(
       () => 'abbrev-topic');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.callFake(

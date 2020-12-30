@@ -26,13 +26,13 @@ import { GraphAnswer } from 'interactions/answer-defs';
 describe('Graph Input service', () => {
   let girs: GraphInputRulesService = null;
   beforeEach(() => {
-    girs = TestBed.get(GraphInputRulesService);
+    girs = TestBed.inject(GraphInputRulesService);
   });
 
   describe('graph utilities', () => {
     let utils: GraphUtilsService = null;
     beforeEach(() => {
-      utils = TestBed.get(GraphUtilsService);
+      utils = TestBed.inject(GraphUtilsService);
     });
 
     it('should construct an adjacency matrix from a graph', () => {

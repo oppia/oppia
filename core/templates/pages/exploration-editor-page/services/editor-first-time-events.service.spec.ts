@@ -25,8 +25,8 @@ describe('Editor First Time Events Service', () => {
   let eftes, sas;
 
   beforeEach(() => {
-    eftes = TestBed.get(EditorFirstTimeEventsService);
-    sas = TestBed.get(SiteAnalyticsService);
+    eftes = TestBed.inject(EditorFirstTimeEventsService);
+    sas = TestBed.inject(SiteAnalyticsService);
   });
 
   it('should intialize register events', () => {

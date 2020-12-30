@@ -69,22 +69,22 @@ describe('Translator Overview component', function() {
       imports: [HttpClientTestingModule]
     });
 
-    languageUtilService = TestBed.get(LanguageUtilService);
+    languageUtilService = TestBed.inject(LanguageUtilService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', languageUtilService);
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
     $provide.value(
       'StateRecordedVoiceoversService',
-      TestBed.get(StateRecordedVoiceoversService));
+      TestBed.inject(StateRecordedVoiceoversService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
       'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
+      TestBed.inject(StateWrittenTranslationsService));
     mockWindow = new MockWindow();
     $provide.value('$window', mockWindow);
   }));

@@ -47,9 +47,9 @@ describe('StateTopAnswersStatsBackendApiService', () => {
       imports: [HttpClientTestingModule],
       providers: [StateTopAnswersStatsBackendApiService]
     });
-    stateTopAnswersStatsBackendApiService = TestBed.get(
+    stateTopAnswersStatsBackendApiService = TestBed.inject(
       StateTopAnswersStatsBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

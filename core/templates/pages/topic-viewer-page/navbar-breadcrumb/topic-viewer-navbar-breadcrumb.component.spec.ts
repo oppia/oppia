@@ -40,9 +40,9 @@ describe('Topic viewer navbar breadcrumb component', () => {
       declarations: [TopicViewerNavbarBreadcrumbComponent],
     }).compileComponents();
 
-    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
-    topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
-    urlService = TestBed.get(UrlService);
+    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
+    topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
+    urlService = TestBed.inject(UrlService);
 
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       'topic1');

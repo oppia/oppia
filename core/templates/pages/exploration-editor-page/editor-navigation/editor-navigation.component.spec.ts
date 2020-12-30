@@ -72,8 +72,8 @@ describe('Editor Navigation Component', function() {
   importAllAngularServices();
 
   beforeEach(function() {
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
-    userService = TestBed.get(UserService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    userService = TestBed.inject(UserService);
   });
 
   describe('when screen is large', function() {

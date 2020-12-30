@@ -66,9 +66,9 @@ describe('Keyboard Shortcuts', () => {
   }));
 
   beforeEach(async() => {
-    ngbModal = TestBed.get(NgbModal);
+    ngbModal = TestBed.inject(NgbModal);
     windowRef = new WindowRef();
-    appRef = TestBed.get(ApplicationRef);
+    appRef = TestBed.inject(ApplicationRef);
     keyboardShortcutService = new KeyboardShortcutService(
       windowRef,
       ngbModal,

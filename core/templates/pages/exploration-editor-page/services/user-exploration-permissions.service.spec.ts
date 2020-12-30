@@ -50,9 +50,9 @@ describe('User Exploration Permissions Service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    ueps = TestBed.get(UserExplorationPermissionsService);
-    contextService = TestBed.get(ContextService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    ueps = TestBed.inject(UserExplorationPermissionsService);
+    contextService = TestBed.inject(ContextService);
     permissionsResponse =
       ExplorationPermissions.createFromBackendDict(samplePermissionsData);
     spyOn(contextService, 'getExplorationId').and.returnValue(

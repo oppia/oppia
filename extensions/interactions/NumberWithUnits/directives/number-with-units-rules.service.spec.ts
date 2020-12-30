@@ -27,7 +27,7 @@ describe('Number with Units rules service', () => {
     TestBed.configureTestingModule({
       providers: [NumberWithUnitsRulesService]
     });
-    nurs = TestBed.get(NumberWithUnitsRulesService);
+    nurs = TestBed.inject(NumberWithUnitsRulesService);
   });
 
   var createFractionDict = (

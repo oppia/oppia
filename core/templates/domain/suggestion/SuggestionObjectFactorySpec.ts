@@ -25,7 +25,7 @@ describe('SuggestionObjectFactory', () => {
   let suggestionObjectFactory: SuggestionObjectFactory;
 
   beforeEach(() => {
-    suggestionObjectFactory = TestBed.get(SuggestionObjectFactory);
+    suggestionObjectFactory = TestBed.inject(SuggestionObjectFactory);
   });
 
   it('should create a new suggestion from a backend dict.', () => {

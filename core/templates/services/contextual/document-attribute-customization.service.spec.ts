@@ -25,8 +25,8 @@ describe('Document Attribute Customization Service', () => {
   let dacs, wrs;
 
   beforeEach(() => {
-    dacs = TestBed.get(DocumentAttributeCustomizationService);
-    wrs = TestBed.get(WindowRef);
+    dacs = TestBed.inject(DocumentAttributeCustomizationService);
+    wrs = TestBed.inject(WindowRef);
   });
 
   it('should add a atribute', () => {

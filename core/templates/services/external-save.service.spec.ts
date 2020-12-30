@@ -26,7 +26,7 @@ describe('External Save Service', () => {
   let externalSaveService: ExternalSaveService;
 
   beforeEach(() => {
-    externalSaveService = TestBed.get(ExternalSaveService);
+    externalSaveService = TestBed.inject(ExternalSaveService);
   });
 
   it('should fetch externalSave event emitter', () => {

@@ -24,7 +24,7 @@ describe('UnitsObjectFactory', () => {
   let units: UnitsObjectFactory = null;
 
   beforeEach(() => {
-    units = TestBed.get(UnitsObjectFactory);
+    units = TestBed.inject(UnitsObjectFactory);
   });
 
   it('should test the createCurrencyUnits function', () => {

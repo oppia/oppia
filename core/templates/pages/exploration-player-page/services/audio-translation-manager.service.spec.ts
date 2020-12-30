@@ -31,8 +31,8 @@ describe('Audio translation manager service', () => {
       providers: [AudioTranslationManagerService, VoiceoverObjectFactory]
     });
 
-    atms = TestBed.get(AudioTranslationManagerService);
-    vof = TestBed.get(VoiceoverObjectFactory);
+    atms = TestBed.inject(AudioTranslationManagerService);
+    vof = TestBed.inject(VoiceoverObjectFactory);
   });
 
   var testAudioTranslations: AudioTranslations;

@@ -53,7 +53,7 @@ describe('Topics List Directive', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   beforeEach(angular.mock.inject(function($injector) {

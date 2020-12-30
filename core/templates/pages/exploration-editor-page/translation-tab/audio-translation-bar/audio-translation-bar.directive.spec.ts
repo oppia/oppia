@@ -110,45 +110,45 @@ describe('Audio translation bar directive', function() {
     });
   });
   beforeEach(function() {
-    alertsService = TestBed.get(AlertsService);
-    editabilityService = TestBed.get(EditabilityService);
-    recordedVoiceoversObjectFactory = TestBed.get(
+    alertsService = TestBed.inject(AlertsService);
+    editabilityService = TestBed.inject(EditabilityService);
+    recordedVoiceoversObjectFactory = TestBed.inject(
       RecordedVoiceoversObjectFactory);
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-    stateRecordedVoiceoversService = TestBed.get(
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value('IdGenerationService', TestBed.get(IdGenerationService));
+    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
+    $provide.value('IdGenerationService', TestBed.inject(IdGenerationService));
     $provide.value(
       'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
+      TestBed.inject(TextInputRulesService));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
-    $provide.value('SiteAnalyticsService', TestBed.get(SiteAnalyticsService));
+    $provide.value('SiteAnalyticsService', TestBed.inject(SiteAnalyticsService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value('StateEditorService', TestBed.get(StateEditorService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
+    $provide.value('StateEditorService', TestBed.inject(StateEditorService));
     $provide.value(
       'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
+      TestBed.inject(StateCustomizationArgsService));
     $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+      'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
     $provide.value(
       'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
     $provide.value(
       'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
+      TestBed.inject(StateWrittenTranslationsService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-    $provide.value('UserService', TestBed.get(UserService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
+    $provide.value('UserService', TestBed.inject(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

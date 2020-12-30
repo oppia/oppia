@@ -57,11 +57,11 @@ describe('Solution Verification Service', () => {
       ]
     });
 
-    siis = TestBed.get(StateInteractionIdService);
-    scas = TestBed.get(StateCustomizationArgsService);
-    sof = TestBed.get(SolutionObjectFactory);
-    see = TestBed.get(StateEditorService);
-    svs = TestBed.get(SolutionVerificationService);
+    siis = TestBed.inject(StateInteractionIdService);
+    scas = TestBed.inject(StateCustomizationArgsService);
+    sof = TestBed.inject(SolutionObjectFactory);
+    see = TestBed.inject(StateEditorService);
+    svs = TestBed.inject(SolutionVerificationService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -80,7 +80,7 @@ describe('Solution Verification Service', () => {
     });
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
-  // TODO(#11149): Replace $injector.get(...) to TestBed.get in following
+  // TODO(#11149): Replace $injector.get(...) to TestBed.inject in following
   // block when ExplorationStateService has been migrated to Angular 8.
   beforeEach(angular.mock.inject(function($injector) {
     ess = $injector.get('ExplorationStatesService');

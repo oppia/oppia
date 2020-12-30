@@ -80,8 +80,8 @@ describe('Topic Landing Page', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
-    pageTitleService = TestBed.get(PageTitleService);
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+    pageTitleService = TestBed.inject(PageTitleService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   }));
 
   beforeEach(() => {

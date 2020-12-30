@@ -32,8 +32,8 @@ describe('Learner answer info backend Api service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    learnerAnswerDetailsBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    learnerAnswerDetailsBackendApiService = TestBed.inject(
       LearnerAnswerDetailsBackendApiService);
   });
 

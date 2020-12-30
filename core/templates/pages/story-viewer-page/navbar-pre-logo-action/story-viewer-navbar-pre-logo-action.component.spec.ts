@@ -42,7 +42,7 @@ describe('story viewer pre logo action', function() {
   }));
 
   beforeEach(() => {
-    urlService = TestBed.get(UrlService);
+    urlService = TestBed.inject(UrlService);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl')
       .and.returnValue('abbrev');
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl')

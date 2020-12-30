@@ -56,7 +56,7 @@ describe('Compare versions service', function() {
       cvs = $injector.get('CompareVersionsService');
       vts = $injector.get('VersionTreeService');
       $httpBackend = $injector.get('$httpBackend');
-      httpTestingController = TestBed.get(HttpTestingController);
+      httpTestingController = TestBed.inject(HttpTestingController);
     }));
 
     afterEach(function() {

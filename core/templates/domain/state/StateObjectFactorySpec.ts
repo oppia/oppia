@@ -28,7 +28,7 @@ describe('State Object Factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    sof = TestBed.get(StateObjectFactory);
+    sof = TestBed.inject(StateObjectFactory);
 
     spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,

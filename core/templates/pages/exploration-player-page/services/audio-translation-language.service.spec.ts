@@ -26,7 +26,7 @@ describe('Audio translation language service', () => {
   let allAudioLanguageCodesInExploration;
 
   beforeEach(() => {
-    atls = TestBed.get(AudioTranslationLanguageService);
+    atls = TestBed.inject(AudioTranslationLanguageService);
 
     spyOn(window.speechSynthesis, 'getVoices').and.returnValue([{
       'default': false,

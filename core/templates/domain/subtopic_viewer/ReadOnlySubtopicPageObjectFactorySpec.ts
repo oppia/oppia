@@ -33,10 +33,10 @@ describe('Subtopic data object factory', () => {
       null;
 
     beforeEach(() => {
-      readOnlySubtopicPageObjectFactory = TestBed.get(
+      readOnlySubtopicPageObjectFactory = TestBed.inject(
         ReadOnlySubtopicPageObjectFactory
       );
-      subtopicPageContentsObjectFactory = TestBed.get(
+      subtopicPageContentsObjectFactory = TestBed.inject(
         SubtopicPageContentsObjectFactory);
 
       var sampleSubtopicDataBackendDict = {

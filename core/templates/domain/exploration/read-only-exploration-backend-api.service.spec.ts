@@ -84,8 +84,8 @@ describe('Read only exploration backend API service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    roebas = TestBed.get(ReadOnlyExplorationBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    roebas = TestBed.inject(ReadOnlyExplorationBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

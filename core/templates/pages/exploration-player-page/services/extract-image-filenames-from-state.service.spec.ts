@@ -39,9 +39,9 @@ describe('Extracting Image file names in the state service', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
     });
-    eof = TestBed.get(ExplorationObjectFactory);
-    ecs = TestBed.get(ContextService);
-    eifss = TestBed.get(ExtractImageFilenamesFromStateService);
+    eof = TestBed.inject(ExplorationObjectFactory);
+    ecs = TestBed.inject(ContextService);
+    eifss = TestBed.inject(ExtractImageFilenamesFromStateService);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
 
     explorationDict = {

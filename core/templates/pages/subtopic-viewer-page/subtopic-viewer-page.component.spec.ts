@@ -53,7 +53,7 @@ describe('Subtopic viewer page', function() {
   }));
   beforeEach(() => {
     OppiaAngularRootComponent.pageTitleService = (
-      TestBed.get(PageTitleService)
+      TestBed.inject(PageTitleService)
     );
   });
 

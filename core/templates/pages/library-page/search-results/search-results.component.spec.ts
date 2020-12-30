@@ -50,7 +50,7 @@ describe('Search Results component', function() {
   }));
 
   beforeEach(function() {
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

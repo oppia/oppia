@@ -27,7 +27,7 @@ describe('Hint object factory', () => {
       providers: [HintObjectFactory]
     });
 
-    hof = TestBed.get(HintObjectFactory);
+    hof = TestBed.inject(HintObjectFactory);
   });
 
   it('should create a Hint from dict and convert a Hint Object to' +

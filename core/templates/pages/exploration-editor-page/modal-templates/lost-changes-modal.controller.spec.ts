@@ -41,7 +41,7 @@ describe('Lost Changes Modal Controller', () => {
   });
 
   beforeEach(angular.mock.module('oppia', ($provide) => {
-    $provide.value('LostChangeObjectFactory', TestBed.get(
+    $provide.value('LostChangeObjectFactory', TestBed.inject(
       LostChangeObjectFactory));
   }));
 

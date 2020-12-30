@@ -67,11 +67,11 @@ describe('Subtopic page contents object factory', () => {
       providers: [SubtopicPageContentsObjectFactory]
     });
 
-    subtopicPageContentsObjectFactory = TestBed.get(
+    subtopicPageContentsObjectFactory = TestBed.inject(
       SubtopicPageContentsObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
+    recordedVoiceoversObjectFactory = TestBed.inject(
       RecordedVoiceoversObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
   });
 
   it('should be able to create a default object', () => {

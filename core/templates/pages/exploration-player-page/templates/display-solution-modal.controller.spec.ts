@@ -56,10 +56,10 @@ describe('Display Solution Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
+    recordedVoiceoversObjectFactory = TestBed.inject(
       RecordedVoiceoversObjectFactory);
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
+    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {

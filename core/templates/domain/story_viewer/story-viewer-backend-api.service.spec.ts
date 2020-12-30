@@ -37,8 +37,8 @@ describe('Story viewer backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

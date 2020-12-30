@@ -27,7 +27,7 @@ describe('Expression syntax tree service', () => {
     let expressionSyntaxTreeService: ExpressionSyntaxTreeService;
 
     beforeEach(() => {
-      expressionSyntaxTreeService = TestBed.get(ExpressionSyntaxTreeService);
+      expressionSyntaxTreeService = TestBed.inject(ExpressionSyntaxTreeService);
     });
 
     it('should throw if environment is not found', () => {

@@ -56,20 +56,20 @@ describe('Unresolved Answers Overview Component', function() {
   });
 
   beforeEach(function() {
-    editabilityService = TestBed.get(EditabilityService);
-    stateInteractionIdService = TestBed.get(StateInteractionIdService);
+    editabilityService = TestBed.inject(EditabilityService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

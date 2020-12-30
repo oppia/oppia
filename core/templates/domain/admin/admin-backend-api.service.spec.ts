@@ -125,8 +125,8 @@ describe('Admin backend api service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    abas = TestBed.get(AdminBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    abas = TestBed.inject(AdminBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
     adminDataObject = {
       demoExplorations: adminBackendResponse.demo_explorations,
       demoCollections: adminBackendResponse.demo_collections,

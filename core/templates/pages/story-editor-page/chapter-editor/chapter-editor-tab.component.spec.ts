@@ -47,11 +47,11 @@ describe('Chapter Editor tab', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'EditableStoryBackendApiService',
-      TestBed.get(EditableStoryBackendApiService));
-    $provide.value('StoryObjectFactory', TestBed.get(StoryObjectFactory));
+      TestBed.inject(EditableStoryBackendApiService));
+    $provide.value('StoryObjectFactory', TestBed.inject(StoryObjectFactory));
     $provide.value(
       'StoryEditorNavigationService',
-      TestBed.get(StoryEditorNavigationService));
+      TestBed.inject(StoryEditorNavigationService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

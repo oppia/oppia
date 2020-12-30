@@ -31,14 +31,14 @@ describe('Oppia sorted tiles visualization', function() {
   let utilsService: UtilsService;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    utilsService = TestBed.get(UtilsService);
+    utilsService = TestBed.inject(UtilsService);
     $provide.value('UtilsService', utilsService);
   }));
   beforeEach(angular.mock.inject(function($injector) {
     $compile = $injector.get('$compile');
     $rootScope = $injector.get('$rootScope');
     $uibModal = $injector.get('$uibModal');
-    answerStatsObjectFactory = TestBed.get(AnswerStatsObjectFactory);
+    answerStatsObjectFactory = TestBed.inject(AnswerStatsObjectFactory);
   }));
 
   const newDirective = (

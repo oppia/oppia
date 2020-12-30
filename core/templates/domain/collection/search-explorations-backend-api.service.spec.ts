@@ -35,9 +35,9 @@ describe('Exploration search backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    SearchExplorationsService = TestBed.get(
+    SearchExplorationsService = TestBed.inject(
       SearchExplorationsBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

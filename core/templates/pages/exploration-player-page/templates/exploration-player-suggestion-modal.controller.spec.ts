@@ -51,13 +51,13 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    playerPositionService = TestBed.get(PlayerPositionService);
-    playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    recordedVoiceoversObjectFactory = TestBed.get(
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    recordedVoiceoversObjectFactory = TestBed.inject(
       RecordedVoiceoversObjectFactory);
-    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
-    suggestionModalService = TestBed.get(SuggestionModalService);
+    stateCardObjectFactory = TestBed.inject(StateCardObjectFactory);
+    suggestionModalService = TestBed.inject(SuggestionModalService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {

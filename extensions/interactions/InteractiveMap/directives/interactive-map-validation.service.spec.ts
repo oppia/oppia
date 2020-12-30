@@ -45,11 +45,11 @@ describe('InteractiveMapValidationService', () => {
       providers: [InteractiveMapValidationService]
     });
 
-    validatorService = TestBed.get(InteractiveMapValidationService);
+    validatorService = TestBed.inject(InteractiveMapValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-    rof = TestBed.get(RuleObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
+    agof = TestBed.inject(AnswerGroupObjectFactory);
+    rof = TestBed.inject(RuleObjectFactory);
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',

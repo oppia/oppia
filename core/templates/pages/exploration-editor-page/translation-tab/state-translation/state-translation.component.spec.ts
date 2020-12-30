@@ -380,57 +380,57 @@ describe('State translation component', function() {
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', TestBed.get(AngularNameService));
+    $provide.value('AngularNameService', TestBed.inject(AngularNameService));
     $provide.value(
-      'ContinueValidationService', TestBed.get(ContinueValidationService));
+      'ContinueValidationService', TestBed.inject(ContinueValidationService));
     $provide.value(
-      'ContinueRulesService', TestBed.get(ContinueRulesService));
+      'ContinueRulesService', TestBed.inject(ContinueRulesService));
     $provide.value(
       'ExplorationImprovementsTaskRegistryService',
-      TestBed.get(ExplorationImprovementsTaskRegistryService));
+      TestBed.inject(ExplorationImprovementsTaskRegistryService));
     $provide.value(
-      'ExplorationStatsService', TestBed.get(ExplorationStatsService));
-    $provide.value('ExternalSaveService', TestBed.get(ExternalSaveService));
-    $provide.value('FractionObjectFactory', TestBed.get(FractionObjectFactory));
+      'ExplorationStatsService', TestBed.inject(ExplorationStatsService));
+    $provide.value('ExternalSaveService', TestBed.inject(ExternalSaveService));
+    $provide.value('FractionObjectFactory', TestBed.inject(FractionObjectFactory));
     $provide.value(
       'NumberWithUnitsObjectFactory',
-      TestBed.get(NumberWithUnitsObjectFactory));
+      TestBed.inject(NumberWithUnitsObjectFactory));
     $provide.value(
       'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
+      TestBed.inject(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', outcomeObjectFactory);
     $provide.value(
       'StateCustomizationArgsService',
-      TestBed.get(StateCustomizationArgsService));
+      TestBed.inject(StateCustomizationArgsService));
     $provide.value(
-      'StateInteractionIdService', TestBed.get(StateInteractionIdService));
+      'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
       'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
     $provide.value(
       'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
+      TestBed.inject(StateWrittenTranslationsService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(function() {
-    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
-    ckEditorCopyContentService = TestBed.get(CkEditorCopyContentService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    recordedVoiceoversObjectFactory = TestBed.get(
+    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
+    ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    recordedVoiceoversObjectFactory = TestBed.inject(
       RecordedVoiceoversObjectFactory);
-    stateEditorService = TestBed.get(StateEditorService);
+    stateEditorService = TestBed.inject(StateEditorService);
     spyOnProperty(stateEditorService, 'onRefreshStateTranslation').and
       .returnValue(refreshStateTranslationEmitter);
-    stateRecordedVoiceoversService = TestBed.get(
+    stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
-    subtitledUnicodeObjectFactory = TestBed.get(SubtitledUnicodeObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
+    subtitledUnicodeObjectFactory = TestBed.inject(SubtitledUnicodeObjectFactory);
   });
 
   afterEach(function() {

@@ -63,26 +63,26 @@ describe('State Translation Status Graph Component', function() {
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AlertsService', TestBed.get(AlertsService));
+    $provide.value('AlertsService', TestBed.inject(AlertsService));
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
       'StateRecordedVoiceoversService',
-      TestBed.get(StateRecordedVoiceoversService));
+      TestBed.inject(StateRecordedVoiceoversService));
     $provide.value(
       'StateWrittenTranslationsService',
-      TestBed.get(StateWrittenTranslationsService));
-    $provide.value('UtilsService', TestBed.get(UtilsService));
+      TestBed.inject(StateWrittenTranslationsService));
+    $provide.value('UtilsService', TestBed.inject(UtilsService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(function() {
-    stateEditorService = TestBed.get(StateEditorService);
-    stateRecordedVoiceoversService = TestBed.get(
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
-    stateWrittenTranslationsService = TestBed.get(
+    stateWrittenTranslationsService = TestBed.inject(
       StateWrittenTranslationsService);
   });
 

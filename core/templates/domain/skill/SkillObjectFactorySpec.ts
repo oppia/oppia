@@ -52,12 +52,12 @@ describe('Skill object factory', () => {
         NormalizeWhitespacePipe,
       ]
     });
-    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
-    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
-    rubricObjectFactory = TestBed.get(RubricObjectFactory);
+    conceptCardObjectFactory = TestBed.inject(ConceptCardObjectFactory);
+    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
+    rubricObjectFactory = TestBed.inject(RubricObjectFactory);
     skillDifficulties = constants.SKILL_DIFFICULTIES;
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
     misconceptionDict1 = {
       id: '2',
       name: 'test name',

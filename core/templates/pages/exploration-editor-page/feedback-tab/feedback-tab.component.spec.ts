@@ -59,23 +59,23 @@ describe('Feedback Tab Component', function() {
     });
   });
   beforeEach(function() {
-    alertsService = TestBed.get(AlertsService);
-    dateTimeFormatService = TestBed.get(DateTimeFormatService);
-    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
+    dateTimeFormatService = TestBed.inject(DateTimeFormatService);
+    suggestionThreadObjectFactory = TestBed.inject(SuggestionThreadObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value('StateObjectFactory', TestBed.get(StateObjectFactory));
+      'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
+    $provide.value('StateObjectFactory', TestBed.inject(StateObjectFactory));
     $provide.value(
-      'SuggestionModalService', TestBed.get(SuggestionModalService));
+      'SuggestionModalService', TestBed.inject(SuggestionModalService));
     $provide.value('RouterService', {});
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
     $provide.value(
-      'UserService', TestBed.get(UserService));
+      'UserService', TestBed.inject(UserService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

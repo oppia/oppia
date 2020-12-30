@@ -34,7 +34,7 @@ describe('Question summary for one skill object factory', () => {
         providers: [QuestionSummaryForOneSkillObjectFactory]
       });
 
-      questionSummaryForOneSkillObjectFactory = TestBed.get(
+      questionSummaryForOneSkillObjectFactory = TestBed.inject(
         QuestionSummaryForOneSkillObjectFactory);
       backendDict = {
         skill_id: 'skill_id',

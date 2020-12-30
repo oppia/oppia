@@ -52,11 +52,11 @@ describe('Add Answer Group Modal Controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
-    editorFirstTimeEventsService = TestBed.get(EditorFirstTimeEventsService);
-    generateContentIdService = TestBed.get(GenerateContentIdService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    ruleObjectFactory = TestBed.get(RuleObjectFactory);
-    stateEditorService = TestBed.get(StateEditorService);
+    editorFirstTimeEventsService = TestBed.inject(EditorFirstTimeEventsService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    ruleObjectFactory = TestBed.inject(RuleObjectFactory);
+    stateEditorService = TestBed.inject(StateEditorService);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {

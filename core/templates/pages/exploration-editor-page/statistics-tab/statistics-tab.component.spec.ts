@@ -124,11 +124,11 @@ describe('Statistics Tab Component', function() {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    alertsService = TestBed.get(AlertsService);
-    computeGraphService = TestBed.get(ComputeGraphService);
-    explorationStatsService = TestBed.get(ExplorationStatsService);
-    stateInteractionStatsService = TestBed.get(StateInteractionStatsService);
-    statesObjectFactory = TestBed.get(StatesObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
+    computeGraphService = TestBed.inject(ComputeGraphService);
+    explorationStatsService = TestBed.inject(ExplorationStatsService);
+    stateInteractionStatsService = TestBed.inject(StateInteractionStatsService);
+    statesObjectFactory = TestBed.inject(StatesObjectFactory);
     routerService = new MockRouterService();
   });
 
@@ -138,7 +138,7 @@ describe('Statistics Tab Component', function() {
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

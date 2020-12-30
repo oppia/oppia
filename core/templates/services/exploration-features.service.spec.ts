@@ -30,7 +30,7 @@ describe('ExplorationFeatureService', () => {
   let testParamChanges: ParamChanges = null;
 
   beforeEach(() => {
-    explorationFeatureService = TestBed.get(ExplorationFeaturesService);
+    explorationFeatureService = TestBed.inject(ExplorationFeaturesService);
     ExplorationFeaturesService.settings.areParametersEnabled = false;
     ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled = false;
     ExplorationFeaturesService.serviceIsInitialized = false;

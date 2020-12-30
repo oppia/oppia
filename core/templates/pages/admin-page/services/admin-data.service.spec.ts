@@ -129,8 +129,8 @@ describe('Admin Data Service', () => {
       imports: [HttpClientTestingModule],
       providers: [AdminDataService]
     });
-    adminDataService = TestBed.get(AdminDataService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    adminDataService = TestBed.inject(AdminDataService);
+    httpTestingController = TestBed.inject(HttpTestingController);
     adminDataResponse = {
       demoExplorations: sampleAdminData.demo_explorations,
       demoCollections: sampleAdminData.demo_collections,

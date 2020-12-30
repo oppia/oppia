@@ -36,8 +36,8 @@ describe('PlatformFeatureAdminBackendApiService', () => {
       imports: [HttpClientTestingModule]
     });
 
-    featureAdminService = TestBed.get(PlatformFeatureAdminBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    featureAdminService = TestBed.inject(PlatformFeatureAdminBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

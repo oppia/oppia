@@ -35,9 +35,9 @@ describe('Playthrough backend api service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    pbas = TestBed.get(PlaythroughBackendApiService);
-    pof = TestBed.get(PlaythroughObjectFactory);
-    httpTestingController = TestBed.get(HttpTestingController);
+    pbas = TestBed.inject(PlaythroughBackendApiService);
+    pof = TestBed.inject(PlaythroughObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

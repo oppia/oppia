@@ -25,8 +25,8 @@ describe('Story Validation Service', () => {
   let svs: StoryValidationService = null;
   let storyContentsObjectFactory: StoryContentsObjectFactory = null;
   beforeEach(() => {
-    svs = TestBed.get(StoryValidationService);
-    storyContentsObjectFactory = TestBed.get(StoryContentsObjectFactory);
+    svs = TestBed.inject(StoryValidationService);
+    storyContentsObjectFactory = TestBed.inject(StoryContentsObjectFactory);
   });
 
   it('should report a validation error when skill is not aquired in previous' +

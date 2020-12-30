@@ -91,45 +91,45 @@ describe('History tab component', function() {
   });
 
   beforeEach(function() {
-    dateTimeFormatService = TestBed.get(DateTimeFormatService);
-    editabilityService = TestBed.get(EditabilityService);
-    windowRef = TestBed.get(WindowRef);
+    dateTimeFormatService = TestBed.inject(DateTimeFormatService);
+    editabilityService = TestBed.inject(EditabilityService);
+    windowRef = TestBed.inject(WindowRef);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
-      'AnswerGroupObjectFactory', TestBed.get(AnswerGroupObjectFactory));
-    $provide.value('CsrfTokenService', TestBed.get(CsrfTokenService));
-    $provide.value('EditabilityService', TestBed.get(EditabilityService));
+      'AnswerGroupObjectFactory', TestBed.inject(AnswerGroupObjectFactory));
+    $provide.value('CsrfTokenService', TestBed.inject(CsrfTokenService));
+    $provide.value('EditabilityService', TestBed.inject(EditabilityService));
     $provide.value(
-      'ExplorationDiffService', TestBed.get(ExplorationDiffService));
+      'ExplorationDiffService', TestBed.inject(ExplorationDiffService));
     $provide.value(
-      'FractionObjectFactory', TestBed.get(FractionObjectFactory));
-    $provide.value('StatesObjectFactory', TestBed.get(StatesObjectFactory));
+      'FractionObjectFactory', TestBed.inject(FractionObjectFactory));
+    $provide.value('StatesObjectFactory', TestBed.inject(StatesObjectFactory));
     $provide.value(
-      'HintObjectFactory', TestBed.get(HintObjectFactory));
+      'HintObjectFactory', TestBed.inject(HintObjectFactory));
     $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
+      'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
     $provide.value(
-      'ParamChangeObjectFactory', TestBed.get(ParamChangeObjectFactory));
+      'ParamChangeObjectFactory', TestBed.inject(ParamChangeObjectFactory));
     $provide.value(
-      'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
+      'ParamChangesObjectFactory', TestBed.inject(ParamChangesObjectFactory));
     $provide.value(
       'RecordedVoiceoversObjectFactory',
-      TestBed.get(RecordedVoiceoversObjectFactory));
-    $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
+      TestBed.inject(RecordedVoiceoversObjectFactory));
+    $provide.value('RuleObjectFactory', TestBed.inject(RuleObjectFactory));
     $provide.value(
-      'SubtitledHtmlObjectFactory', TestBed.get(SubtitledHtmlObjectFactory));
-    $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
-    $provide.value('VersionTreeService', TestBed.get(VersionTreeService));
+      'SubtitledHtmlObjectFactory', TestBed.inject(SubtitledHtmlObjectFactory));
+    $provide.value('UnitsObjectFactory', TestBed.inject(UnitsObjectFactory));
+    $provide.value('VersionTreeService', TestBed.inject(VersionTreeService));
     $provide.value(
-      'VoiceoverObjectFactory', TestBed.get(VoiceoverObjectFactory));
+      'VoiceoverObjectFactory', TestBed.inject(VoiceoverObjectFactory));
     $provide.value(
       'WrittenTranslationObjectFactory',
-      TestBed.get(WrittenTranslationObjectFactory));
+      TestBed.inject(WrittenTranslationObjectFactory));
     $provide.value(
       'WrittenTranslationsObjectFactory',
-      TestBed.get(WrittenTranslationsObjectFactory));
+      TestBed.inject(WrittenTranslationsObjectFactory));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,
       data: {
@@ -144,7 +144,7 @@ describe('History tab component', function() {
     });
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
+      TestBed.inject(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

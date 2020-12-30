@@ -25,8 +25,8 @@ describe('Meta Tag Customization Service', () => {
   let mtcs, wrs;
 
   beforeEach(() => {
-    mtcs = TestBed.get(MetaTagCustomizationService);
-    wrs = TestBed.get(WindowRef);
+    mtcs = TestBed.inject(MetaTagCustomizationService);
+    wrs = TestBed.inject(WindowRef);
   });
 
   it('should add a meta tag in the html head', () => {

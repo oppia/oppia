@@ -29,7 +29,7 @@ describe('Story object factory', () => {
       providers: [StoryObjectFactory]
     });
 
-    storyObjectFactory = TestBed.get(StoryObjectFactory);
+    storyObjectFactory = TestBed.inject(StoryObjectFactory);
 
     var sampleStoryBackendDict = {
       id: 'sample_story_id',

@@ -59,9 +59,9 @@ describe('Topic viewer backend API service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
-    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
+    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
 
     // Sample topic object returnable from the backend.
     sampleDataResults = {

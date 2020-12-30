@@ -28,8 +28,8 @@ describe('Context service', () => {
 
   describe('behavior in the exploration learner view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
+      ecs = TestBed.inject(ContextService);
+      urlService = TestBed.inject(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
       spyOn(urlService, 'getHash').and.returnValue('');
     });
@@ -68,8 +68,8 @@ describe('Context service', () => {
 
   describe('behavior in the exploration learner embed view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
+      ecs = TestBed.inject(ContextService);
+      urlService = TestBed.inject(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue(
         '/embed/exploration/123');
       spyOn(urlService, 'getHash').and.returnValue('');
@@ -103,8 +103,8 @@ describe('Context service', () => {
 
   describe('behavior in the exploration editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
+      ecs = TestBed.inject(ContextService);
+      urlService = TestBed.inject(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/create/123');
       spyOn(urlService, 'getHash').and.returnValue('#/gui');
     });
@@ -133,8 +133,8 @@ describe('Context service', () => {
 
   describe('behavior in the topic editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
+      ecs = TestBed.inject(ContextService);
+      urlService = TestBed.inject(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
       spyOn(urlService, 'getHash').and.returnValue('');
     });
@@ -164,8 +164,8 @@ describe('Context service', () => {
 
   describe('behavior in question editor modal', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
+      ecs = TestBed.inject(ContextService);
+      urlService = TestBed.inject(UrlService);
     });
 
     it('should correctly retrieve the values in topic editor', () => {
@@ -187,8 +187,8 @@ describe('Context service', () => {
 
   describe('behavior in the story editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
+      ecs = TestBed.inject(ContextService);
+      urlService = TestBed.inject(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
     });
 
@@ -217,8 +217,8 @@ describe('Context service', () => {
 
   describe('behavior in the skill editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
+      ecs = TestBed.inject(ContextService);
+      urlService = TestBed.inject(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
       spyOn(urlService, 'getHash').and.returnValue('');
     });
@@ -248,8 +248,8 @@ describe('Context service', () => {
 
   describe('behavior in other pages', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
+      ecs = TestBed.inject(ContextService);
+      urlService = TestBed.inject(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
       spyOn(urlService, 'getHash').and.returnValue('');
     });

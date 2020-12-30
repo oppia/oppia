@@ -41,7 +41,7 @@ describe('Delete Skill Modal Controller', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'TopicsAndSkillsDashboardBackendApiService',
-      TestBed.get(TopicsAndSkillsDashboardBackendApiService));
+      TestBed.inject(TopicsAndSkillsDashboardBackendApiService));
   }));
 
   describe('when skill has no assigned topics', function() {

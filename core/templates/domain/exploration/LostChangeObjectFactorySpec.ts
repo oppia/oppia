@@ -29,8 +29,8 @@ describe('Lost Change Object Factory', () => {
       providers: [LostChangeObjectFactory]
     });
 
-    lcof = TestBed.get(LostChangeObjectFactory);
-    oof = TestBed.get(OutcomeObjectFactory);
+    lcof = TestBed.inject(LostChangeObjectFactory);
+    oof = TestBed.inject(OutcomeObjectFactory);
   });
 
   it('should evaluate values from a Lost Change', () => {

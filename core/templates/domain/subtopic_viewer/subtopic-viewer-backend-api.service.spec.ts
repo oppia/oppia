@@ -53,9 +53,9 @@ describe('Subtopic viewer backend API service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    subtopicViewerBackendApiService = TestBed.get(
+    subtopicViewerBackendApiService = TestBed.inject(
       SubtopicViewerBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

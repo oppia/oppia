@@ -77,8 +77,8 @@ describe('TranslatePipe', () => {
         { provide: ChangeDetectorRef, useClass: MockChangeDetectorRef}
       ]
     }).compileComponents();
-    translateService = TestBed.get(TranslateService);
-    changeDectorRef = TestBed.get(ChangeDetectorRef);
+    translateService = TestBed.inject(TranslateService);
+    changeDectorRef = TestBed.inject(ChangeDetectorRef);
     pipe = new TranslatePipe(
       translateService, changeDectorRef, new UtilsService());
   }));

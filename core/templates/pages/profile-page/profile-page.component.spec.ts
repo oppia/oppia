@@ -69,10 +69,10 @@ describe('Profile page', function() {
       providers: [ProfilePageBackendApiService]
     });
     OppiaAngularRootComponent.profilePageBackendApiService = (
-      TestBed.get(ProfilePageBackendApiService)
+      TestBed.inject(ProfilePageBackendApiService)
     );
     OppiaAngularRootComponent.ratingComputationService = (
-      TestBed.get(RatingComputationService));
+      TestBed.inject(RatingComputationService));
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

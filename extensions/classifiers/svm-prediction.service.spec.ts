@@ -28,7 +28,7 @@ describe('SVM prediction functions', () => {
         providers: [SVMPredictionService]
       });
 
-      service = TestBed.get(SVMPredictionService);
+      service = TestBed.inject(SVMPredictionService);
     });
 
     it('should calculate correct kernel values', () => {

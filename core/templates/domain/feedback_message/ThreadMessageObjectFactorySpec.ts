@@ -25,7 +25,7 @@ describe('ThreadMessageObjectFactory', () => {
   let threadMessageObjectFactory: ThreadMessageObjectFactory;
 
   beforeEach(() => {
-    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
+    threadMessageObjectFactory = TestBed.inject(ThreadMessageObjectFactory);
   });
 
   describe('.createFromBackendDict', () => {

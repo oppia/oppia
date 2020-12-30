@@ -29,7 +29,7 @@ describe('Subtopic object factory', () => {
     TestBed.configureTestingModule({
       providers: [SubtopicObjectFactory]
     });
-    subtopicObjectFactory = TestBed.get(SubtopicObjectFactory);
+    subtopicObjectFactory = TestBed.inject(SubtopicObjectFactory);
 
     var sampleSubtopicBackendObject = {
       id: 1,

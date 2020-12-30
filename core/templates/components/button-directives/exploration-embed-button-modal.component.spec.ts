@@ -61,8 +61,8 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationEmbedButtonModalComponent);
     component = fixture.componentInstance;
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-    ngbActiveModal = TestBed.get(NgbActiveModal);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
     component.explorationId = '3f6cD869';
     component.serverName = 'https://oppia.org';
     fixture.detectChanges();

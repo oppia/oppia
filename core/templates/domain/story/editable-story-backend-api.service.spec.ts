@@ -36,11 +36,11 @@ describe('Editable story backend API service', () => {
       imports: [HttpClientTestingModule],
       providers: [EditableStoryBackendApiService]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    editableStoryBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    editableStoryBackendApiService = TestBed.inject(
       EditableStoryBackendApiService
     );
-    csrfService = TestBed.get(CsrfTokenService);
+    csrfService = TestBed.inject(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');

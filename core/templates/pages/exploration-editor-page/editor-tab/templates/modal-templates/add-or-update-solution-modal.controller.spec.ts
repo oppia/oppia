@@ -51,14 +51,14 @@ describe('Add Or Update Solution Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
-    currentInteractionService = TestBed.get(CurrentInteractionService);
-    explorationHtmlFormatterService = TestBed.get(
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
+    explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService);
-    solutionObjectFactory = TestBed.get(SolutionObjectFactory);
-    stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
-    stateInteractionIdService = TestBed.get(StateInteractionIdService);
-    stateSolutionService = TestBed.get(StateSolutionService);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    stateCustomizationArgsService = TestBed.inject(StateCustomizationArgsService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateSolutionService = TestBed.inject(StateSolutionService);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
   });
 
   describe('when solution is valid', function() {

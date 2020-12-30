@@ -27,7 +27,7 @@ describe('Suggestion Modal Service', () => {
   };
 
   beforeEach(() => {
-    sms = TestBed.get(SuggestionModalService);
+    sms = TestBed.inject(SuggestionModalService);
   });
 
   it('should accept suggestion', () => {

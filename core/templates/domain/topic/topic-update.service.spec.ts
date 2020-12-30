@@ -105,14 +105,14 @@ describe('Topic update service', function() {
   };
 
   beforeEach(() => {
-    recordedVoiceoversObjectFactory = TestBed.get(
+    recordedVoiceoversObjectFactory = TestBed.inject(
       RecordedVoiceoversObjectFactory);
-    topicUpdateService = TestBed.get(TopicUpdateService);
-    topicObjectFactory = TestBed.get(TopicObjectFactory);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
-    subtopicPageObjectFactory = TestBed.get(SubtopicPageObjectFactory);
-    undoRedoService = TestBed.get(UndoRedoService);
-    skillSummaryObjectFactory = TestBed.get(ShortSkillSummaryObjectFactory);
+    topicUpdateService = TestBed.inject(TopicUpdateService);
+    topicObjectFactory = TestBed.inject(TopicObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
+    subtopicPageObjectFactory = TestBed.inject(SubtopicPageObjectFactory);
+    undoRedoService = TestBed.inject(UndoRedoService);
+    skillSummaryObjectFactory = TestBed.inject(ShortSkillSummaryObjectFactory);
 
     _firstSkillSummary = skillSummaryObjectFactory.create(
       'skill_1', 'Description 1');

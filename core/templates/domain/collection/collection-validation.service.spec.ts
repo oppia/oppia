@@ -40,7 +40,7 @@ describe('Collection validation service', function() {
       providers: [CollectionValidationService]
     });
 
-    collectionValidationService = TestBed.get(CollectionValidationService);
+    collectionValidationService = TestBed.inject(CollectionValidationService);
 
     sampleCollectionBackendObject = {
       id: 'sample_collection_id',

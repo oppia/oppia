@@ -35,9 +35,9 @@ describe('Exploration permissions backend api service', () => {
       imports: [HttpClientTestingModule]
     });
 
-    epbas = TestBed.get(ExplorationPermissionsBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
-    contextService = TestBed.get(ContextService);
+    epbas = TestBed.inject(ExplorationPermissionsBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    contextService = TestBed.inject(ContextService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
   });

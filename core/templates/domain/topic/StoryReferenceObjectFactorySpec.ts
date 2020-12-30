@@ -30,7 +30,7 @@ describe('Story reference object factory', () => {
       providers: [StoryReferenceObjectFactory]
     });
 
-    storyReferenceObjectFactory = TestBed.get(StoryReferenceObjectFactory);
+    storyReferenceObjectFactory = TestBed.inject(StoryReferenceObjectFactory);
 
     var sampleStoryReferenceBackendObject = {
       story_id: 'story_id',

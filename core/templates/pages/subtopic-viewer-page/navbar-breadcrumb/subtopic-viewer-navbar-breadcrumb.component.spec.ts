@@ -82,7 +82,7 @@ describe('Subtopic viewer navbar breadcrumb component', function() {
         UrlInterpolationService,
       ],
     }).compileComponents();
-    readOnlySubtopicPageObjectFactory = TestBed.get(
+    readOnlySubtopicPageObjectFactory = TestBed.inject(
       ReadOnlySubtopicPageObjectFactory);
   }));
 

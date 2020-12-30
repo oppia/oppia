@@ -43,7 +43,7 @@ describe('Solution object factory', () => {
           FormatRtePreviewPipe
         ]
       });
-      sof = TestBed.get(SolutionObjectFactory);
+      sof = TestBed.inject(SolutionObjectFactory);
       solution = sof.createFromBackendDict({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',

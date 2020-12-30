@@ -54,19 +54,19 @@ describe('Responses Service', () => {
   let subtitledHtmlObjectFactory: SubtitledHtmlObjectFactory = null;
 
   beforeEach(() => {
-    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
-    alertsService = TestBed.get(AlertsService);
-    explorationHtmlFormatterService = TestBed.get(
+    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
+    explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
-    loggerService = TestBed.get(LoggerService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
-    responsesService = TestBed.get(ResponsesService);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
-    stateEditorService = TestBed.get(StateEditorService);
-    stateInteractionIdService = TestBed.get(StateInteractionIdService);
-    stateSolutionService = TestBed.get(StateSolutionService);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    loggerService = TestBed.inject(LoggerService);
+    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
+    responsesService = TestBed.inject(ResponsesService);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateSolutionService = TestBed.inject(StateSolutionService);
+    subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
 
     savedMemento = {
       ehfs: explorationHtmlFormatterService,

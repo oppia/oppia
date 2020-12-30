@@ -40,7 +40,7 @@ describe('Maintenance page', () => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
     documentAttributeCustomizationService =
-      TestBed.get(DocumentAttributeCustomizationService);
+      TestBed.inject(DocumentAttributeCustomizationService);
   }));
 
   beforeEach(() => {

@@ -95,10 +95,10 @@ describe('PlaythroughService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
-    learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
-    playthroughBackendApiService = TestBed.get(PlaythroughBackendApiService);
-    playthroughService = TestBed.get(PlaythroughService);
+    explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
+    learnerActionObjectFactory = TestBed.inject(LearnerActionObjectFactory);
+    playthroughBackendApiService = TestBed.inject(PlaythroughBackendApiService);
+    playthroughService = TestBed.inject(PlaythroughService);
   });
 
   describe('Recording playthroughs', () => {
