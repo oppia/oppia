@@ -45,12 +45,21 @@ export interface ParamChanges {
   providedIn: 'root'
 })
 export class ExplorationFeaturesService {
+  /**
+   * Variable to keep track of whether the service has been initialised.
+   */
   static serviceIsInitialized = false;
   static settings = {
     areParametersEnabled: false,
     isPlaythroughRecordingEnabled: false
   };
 
+  /**
+   * Initialises the service by enabling the parameters feature based
+   * on whether the exploration contains parameters.
+   * @param explorationData - An ExplorationData object.
+   * @param featuresData - An ExplorationFeatures object.
+   */
   init(
       explorationData: ExplorationDataDict,
       featuresData: ExplorationFeatures): void {
@@ -73,18 +82,30 @@ export class ExplorationFeaturesService {
     ExplorationFeaturesService.serviceIsInitialized = true;
   }
 
+  /**
+   * @returns - Whether a service is initialized.
+   */
   isInitialized(): boolean {
     return ExplorationFeaturesService.serviceIsInitialized;
   }
 
+  /**
+   * @returns - Checks whether the parameters are enabled.
+   */
   areParametersEnabled(): boolean {
     return ExplorationFeaturesService.settings.areParametersEnabled;
   }
 
+  /**
+   * @returns - Whether the play through recording is enabled.
+   */
   isPlaythroughRecordingEnabled(): boolean {
     return ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled;
   }
 
+  /**
+   * Enables the parameters feature.
+   */
   enableParameters(): void {
     ExplorationFeaturesService.settings.areParametersEnabled = true;
   }
