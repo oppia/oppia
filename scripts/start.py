@@ -98,6 +98,7 @@ def cleanup():
         time.sleep(1)
     build.set_constants_to_default()
     common.stop_redis_server()
+    common.stop_elasticsearch_server()
 
 
 def main(args=None):
@@ -155,6 +156,7 @@ def main(args=None):
         time.sleep(10)
 
     common.start_redis_server()
+    common.start_elasticsearch_server()
 
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(

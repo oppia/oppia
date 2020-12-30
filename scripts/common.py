@@ -88,6 +88,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.0.5'
+ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -119,6 +120,13 @@ REDIS_SERVER_PATH = os.path.join(
 REDIS_CLI_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-cli')
+
+ES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
+ES_PATH_CONF = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config')
+ES_PATH_DATA = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data')
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
@@ -623,6 +631,30 @@ def wait_for_port_to_be_open(port_number):
             'Failed to start server on port %s, exiting ...' %
             port_number)
         sys.exit(1)
+
+
+def start_elasticsearch_server():
+    """Start the ElasticSearch server for running tests in development mode."""
+
+    # ElasticSearch server is only required in a development environment.
+    python_utils.PRINT('Starting ElasticSearch development server.')
+
+    # Clear previous data stored in the cluster.
+    if os.path.exists(ES_PATH_DATA):
+        os.remove(ES_PATH_DATA)
+
+    os.environ['ES_PATH_CONF'] = ES_PATH_CONF
+    subprocess.call(
+        ['%s/bin/elasticsearch' % ES_PATH, '-d', '-p'  '%s/pid' % ES_PATH])
+    wait_for_port_to_be_open(feconf.ES_PORT)
+
+
+def stop_elasticsearch_server():
+    """Stops the ElasticSearch server by shutting it down."""
+
+    # Shut down Elasticsearch using the PID.
+    python_utils.PRINT('Shutting down the ElasticSearch cluster.')
+    subprocess.call(['pkill', '-F', '%s/pid' % ES_PATH])
 
 
 def start_redis_server():

@@ -341,6 +341,42 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
+def install_elasticsearch():
+    """This installs a local ElasticSearch server to the oppia_tools
+    directory to be used by development servers and backend tests.
+    """
+
+    try:
+        subprocess.call(
+            [common.ES_PATH, '--version'],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        python_utils.PRINT('ElasticSearch is already installed.')
+    except OSError:
+        python_utils.PRINT('Installing ElasticSearch...')
+
+        if common.is_mac_os() or common.is_linux_os():
+            download_and_untar_files(
+                'https://artifacts.elastic.co/downloads/elasticsearch/' +
+                'elasticsearch-%s-%s-x86_64.tar.gz' %
+                (common.ELASTICSEARCH_VERSION, common.OS_NAME.lower()),
+                TARGET_DOWNLOAD_DIRS['oppiaTools'],
+                'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
+                'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
+            )
+        elif common.is_windows_os():
+            download_and_unzip_files(
+                'https://artifacts.elastic.co/downloads/elasticsearch/' +
+                'elasticsearch-%s-windows-x86_64.zip' %
+                common.ELASTICSEARCH_VERSION,
+                TARGET_DOWNLOAD_DIRS['oppiaTools'],
+                'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
+                'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
+            )
+        python_utils.PRINT('ElasticSearch installed successfully.')
+
+
 def install_redis_cli():
     """This installs the redis-cli to the local oppia third_party directory so
     that development servers and backend tests can make use of a local redis
@@ -414,6 +450,7 @@ def main(args=None):
     install_backend_python_libs.main()
     download_manifest_files(MANIFEST_FILE_PATH)
     install_redis_cli()
+    install_elasticsearch()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
