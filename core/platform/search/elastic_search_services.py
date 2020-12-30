@@ -34,8 +34,9 @@ import elasticsearch
 # scrolling option as mentioned in the link above.
 MAXIMUM_NUMBER_OF_RESULTS = 10000
 ES = elasticsearch.Elasticsearch([{
-    'host': feconf.ES_HOST, 'port': feconf.ES_PORT}
-                                 ])
+    'host': feconf.ES_HOST,
+    'port': feconf.ES_PORT
+}])
 
 
 def add_documents_to_index(documents, index_name):

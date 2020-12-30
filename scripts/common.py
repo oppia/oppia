@@ -123,9 +123,9 @@ REDIS_CLI_PATH = os.path.join(
 
 ES_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
-ES_PATH_CONF = os.path.join(
+ES_PATH_CONFIG_DIR = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config')
-ES_PATH_DATA = os.path.join(
+ES_PATH_DATA_DIR = os.path.join(
     OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data')
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
@@ -633,23 +633,25 @@ def wait_for_port_to_be_open(port_number):
         sys.exit(1)
 
 
-def start_elasticsearch_server():
-    """Start the ElasticSearch server for running tests in development mode."""
+def start_elasticsearch_dev_server():
+    """Start the ElasticSearch server for running tests in development mode
+    and running local dev server. This is only required in a development
+    environment.
+    """
 
-    # ElasticSearch server is only required in a development environment.
     python_utils.PRINT('Starting ElasticSearch development server.')
 
-    # Clear previous data stored in the cluster.
-    if os.path.exists(ES_PATH_DATA):
-        shutil.rmtree(ES_PATH_DATA)
+    # Clear previous data stored in the local cluster.
+    if os.path.exists(ES_PATH_DATA_DIR):
+        shutil.rmtree(ES_PATH_DATA_DIR)
 
-    os.environ['ES_PATH_CONF'] = ES_PATH_CONF
+    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
     subprocess.call(
-        ['%s/bin/elasticsearch' % ES_PATH, '-d', '-p'  '%s/pid' % ES_PATH])
+        ['%s/bin/elasticsearch' % ES_PATH, '-d', '-p', '%s/pid' % ES_PATH])
     wait_for_port_to_be_open(feconf.ES_PORT)
 
 
-def stop_elasticsearch_server():
+def stop_elasticsearch_dev_server():
     """Stops the ElasticSearch server by shutting it down."""
 
     # Shut down Elasticsearch using the PID.

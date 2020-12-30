@@ -341,7 +341,7 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-def install_elasticsearch():
+def install_elasticsearch_dev_server():
     """This installs a local ElasticSearch server to the oppia_tools
     directory to be used by development servers and backend tests.
     """
@@ -450,7 +450,7 @@ def main(args=None):
     install_backend_python_libs.main()
     download_manifest_files(MANIFEST_FILE_PATH)
     install_redis_cli()
-    install_elasticsearch()
+    install_elasticsearch_dev_server()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
