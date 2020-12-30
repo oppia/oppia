@@ -32,7 +32,6 @@ import python_utils
     models.NAMES.suggestion, models.NAMES.user
 ])
 
-USER_ID_REGEX = 'uid_[a-z]{32}'
 TARGET_TYPE_TO_TARGET_MODEL = {
     feconf.ENTITY_TYPE_EXPLORATION: (
         exp_models.ExplorationModel)
@@ -289,7 +288,8 @@ class GeneralFeedbackThreadUserModelValidator(
         thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_=]{1,}' % (
             ('|').join(feconf.SUGGESTION_TARGET_TYPE_CHOICES),
             base_models.ID_LENGTH)
-        regex_string = '^%s\\.%s$' % (USER_ID_REGEX, thread_id_string)
+        regex_string = '^%s\\.%s$' % (base_model_validators.USER_ID_REGEX,
+            thread_id_string)
         return regex_string
 
     @classmethod
@@ -326,7 +326,7 @@ class UnsentFeedbackEmailModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^%s$' % USER_ID_REGEX
+        return '^%s$' % base_model_validators.USER_ID_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
