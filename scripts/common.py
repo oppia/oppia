@@ -33,6 +33,8 @@ import constants
 import feconf
 import python_utils
 
+import contextlib2
+
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -113,7 +115,7 @@ PYLINT_QUOTES_PATH = os.path.join(
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
-FIREBASE_JS_PATH = os.path.join(
+FIREBASE_PATH = os.path.join(
     NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
@@ -721,6 +723,29 @@ class CD(python_utils.OBJECT):
 
 
 @contextlib.contextmanager
+def swap_env(key, value):
+    """Context manager that temporarily changes the value of os.environ[key].
+
+    Args:
+        key: str. The name of the environment variable to change.
+        value: str. The value to give the environment variable.
+
+    Yields:
+        str|None. The old value of the environment variable, or None if it did
+        not exist.
+    """
+    old_value = os.environ.get(key, None)
+    os.environ[key] = value
+    try:
+        yield old_value
+    finally:
+        if old_value is None:
+            del os.environ[key]
+        else:
+            os.environ[key] = old_value
+
+
+@contextlib.contextmanager
 def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
@@ -825,15 +850,21 @@ def managed_dev_appserver(
 
 
 @contextlib.contextmanager
-def managed_firebase_emulator():
-    """Returns a context manager to start up and shut down a Firebase emulator.
+def managed_firebase_auth_emulator():
+    """Returns a context manager to manage the Firebase auth emulator.
 
     Yields:
         psutil.Process. The Firebase emulator process.
     """
     emulator_args = [
-        FIREBASE_JS_PATH, 'emulators:start', '--only', 'auth',
+        FIREBASE_PATH, 'emulators:start', '--only', 'auth',
         '--project', feconf.OPPIA_PROJECT_ID
     ]
-    with managed_process(emulator_args, shell=True) as proc:
-        yield proc
+    with contextlib2.ExitStack() as stack:
+        # These two environment values allow the Firebase SDKs to acknowledge
+        # the existence of the Firebase emulator.
+        stack.enter_context(swap_env('GCLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
+        stack.enter_context(swap_env(
+            'FIREBASE_AUTH_EMULATOR_HOST', feconf.FIREBASE_AUTH_EMULATOR_HOST))
+
+        yield stack.enter_context(managed_process(emulator_args, shell=True))

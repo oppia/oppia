@@ -426,6 +426,8 @@ REDISPORT = 6379
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
+FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
+
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'

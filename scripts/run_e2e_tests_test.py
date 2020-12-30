@@ -835,7 +835,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
-                common, 'managed_firebase_emulator',
+                common, 'managed_firebase_auth_emulator',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
@@ -950,7 +950,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
-                common, 'managed_firebase_emulator',
+                common, 'managed_firebase_auth_emulator',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
@@ -1294,7 +1294,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
-                common, 'managed_firebase_emulator',
+                common, 'managed_firebase_auth_emulator',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
@@ -1464,7 +1464,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
-                common, 'managed_firebase_emulator',
+                common, 'managed_firebase_auth_emulator',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
@@ -1585,7 +1585,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
-                common, 'managed_firebase_emulator',
+                common, 'managed_firebase_auth_emulator',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',

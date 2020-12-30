@@ -205,7 +205,7 @@ def main(args=None):
     import contextlib2
 
     with contextlib2.ExitStack() as stack:
-        stack.enter_context(common.managed_firebase_emulator())
+        stack.enter_context(common.managed_firebase_auth_emulator())
 
         stack.enter_context(common.managed_dev_appserver(
             APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,

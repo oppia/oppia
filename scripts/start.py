@@ -150,7 +150,7 @@ def main(args=None):
 
     with contextlib2.ExitStack() as stack:
         python_utils.PRINT('Starting Firebase emulators')
-        stack.enter_context(common.managed_firebase_emulator())
+        stack.enter_context(common.managed_firebase_auth_emulator())
 
         python_utils.PRINT('Starting GAE development server')
         stack.enter_context(common.managed_dev_appserver(
