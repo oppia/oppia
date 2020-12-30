@@ -62,10 +62,10 @@ angular.module('oppia').directive('adminNavbar', [
             return AdminRouterService.isMiscTabOpen();
           };
           ctrl.activateProfileDropdown = function() {
-            return ctrl.profileDropdownIsActive = true
+            return ctrl.profileDropdownIsActive = true;
           };
           ctrl.deactivateProfileDropdown = function() {
-            return ctrl.profileDropdownIsActive = false
+            return ctrl.profileDropdownIsActive = false;
           };
           ctrl.$onInit = function() {
             ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
