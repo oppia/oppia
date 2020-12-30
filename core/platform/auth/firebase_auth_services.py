@@ -56,6 +56,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from core.domain import auth_domain
 from core.platform import models
 import python_utils
 
@@ -108,8 +109,8 @@ def authenticate_request(request):
         request: webapp2.Request. The HTTP request to inspect.
 
     Returns:
-        str|None. The ID of the user that authorized the request. If the request
-        could not be authenticated, then returns None instead.
+        AuthClaims|None. Claims of the user who authorized the request, or None
+        if the request could not be authenticated.
     """
     if not _initialize_firebase():
         return None
@@ -123,8 +124,12 @@ def authenticate_request(request):
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
         return None
-    else:
-        return claims.get('sub', None)
+
+    # We want to convert empty string values as None.
+    auth_id = claims.get('sub', '') or None
+    email = claims.get('email', '') or None
+    # Auth ID is a required claim, so return None if missing.
+    return None if auth_id is None else auth_domain.AuthClaims(auth_id, email)
 
 
 def get_user_id_from_auth_id(auth_id):
