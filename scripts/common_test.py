@@ -855,13 +855,15 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_swap_env_when_var_had_a_value(self):
         os.environ['ABC'] = 'Hard as Rocket Science'
-        with common.swap_env('ABC', 'Easy as 123'):
+        with common.swap_env('ABC', 'Easy as 123') as old_value:
+            self.assertEqual(old_value, 'Hard as Rocket Science')
             self.assertEqual(os.environ['ABC'], 'Easy as 123')
         self.assertEqual(os.environ['ABC'], 'Hard as Rocket Science')
 
     def test_swap_env_when_var_did_not_exist(self):
         self.assertNotIn('DEF', os.environ)
-        with common.swap_env('DEF', 'Easy as 123'):
+        with common.swap_env('DEF', 'Easy as 123') as old_value:
+            self.assertIsNone(old_value)
             self.assertEqual(os.environ['DEF'], 'Easy as 123')
         self.assertNotIn('DEF', os.environ)
 
