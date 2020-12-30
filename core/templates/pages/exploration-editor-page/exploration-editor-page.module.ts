@@ -30,6 +30,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { StateParamChangesEditorComponent } from './editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 import { ParamChangesEditorDirective } from './param-changes-editor/param-changes-editor.component';
+import { ContentLanguageSelectorComponent } from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
 
 @NgModule({
   imports: [
@@ -39,12 +40,14 @@ import { ParamChangesEditorDirective } from './param-changes-editor/param-change
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
+    ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     ParamChangesEditorDirective,
     StateParamChangesEditorComponent,
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
+    ContentLanguageSelectorComponent,
     OppiaAngularRootComponent,
     StateParamChangesEditorComponent
   ],

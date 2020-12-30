@@ -34,6 +34,8 @@ import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { WrittenTranslations } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 
 export interface InputResponsePair {
   learnerInput: string,
@@ -48,6 +50,7 @@ export class StateCard {
   _interaction: Interaction;
   _inputResponsePairs: InputResponsePair[];
   _recordedVoiceovers: RecordedVoiceovers;
+  _writtenTranslations: WrittenTranslations;
   _contentId: string;
   _completed: boolean;
   audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -55,7 +58,9 @@ export class StateCard {
       stateName: string, contentHtml: string,
       interactionHtml: string, interaction: Interaction,
       inputResponsePairs: InputResponsePair[],
-      recordedVoiceovers: RecordedVoiceovers, contentId: string,
+      recordedVoiceovers: RecordedVoiceovers,
+      writtenTranslations: WrittenTranslations,
+      contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService) {
     this._stateName = stateName;
     this._contentHtml = contentHtml;
@@ -63,6 +68,7 @@ export class StateCard {
     this._inputResponsePairs = inputResponsePairs;
     this._interaction = interaction;
     this._recordedVoiceovers = recordedVoiceovers;
+    this._writtenTranslations = writtenTranslations;
     this._contentId = contentId;
     this._completed = false;
     this.audioTranslationLanguageService = audioTranslationLanguageService;
@@ -239,10 +245,11 @@ export class StateCardObjectFactory {
   createNewCard(
       stateName: string, contentHtml: string, interactionHtml: string,
       interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
-      contentId: string): StateCard {
+      writtenTranslations: WrittenTranslations, contentId: string): StateCard {
     return new StateCard(
       stateName, contentHtml, interactionHtml, interaction, [],
-      recordedVoiceovers, contentId, this.audioTranslationLanguageService);
+      recordedVoiceovers, writtenTranslations, contentId,
+      this.audioTranslationLanguageService);
   }
 }
 

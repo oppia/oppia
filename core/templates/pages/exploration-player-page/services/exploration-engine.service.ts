@@ -58,7 +58,8 @@ require('pages/interaction-specs.constants.ajs.ts');
 // in the learner view, or whether it is being previewed in the editor view.
 angular.module('oppia').factory('ExplorationEngineService', [
   '$rootScope', 'AlertsService', 'AnswerClassificationService',
-  'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
+  'AudioPreloaderService', 'AudioTranslationLanguageService',
+  'ContentTranslationLanguageService', 'ContextService',
   'ExplorationFeaturesBackendApiService', 'ExplorationHtmlFormatterService',
   'ExplorationObjectFactory', 'ExpressionInterpolationService',
   'FocusManagerService', 'ImagePreloaderService', 'LearnerParamsService',
@@ -66,7 +67,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
   'StateCardObjectFactory', 'StatsReportingService', 'UrlService',
   function(
       $rootScope, AlertsService, AnswerClassificationService,
-      AudioPreloaderService, AudioTranslationLanguageService, ContextService,
+      AudioPreloaderService, AudioTranslationLanguageService, 
+      ContentTranslationLanguageService, ContextService,
       ExplorationFeaturesBackendApiService, ExplorationHtmlFormatterService,
       ExplorationObjectFactory, ExpressionInterpolationService,
       FocusManagerService, ImagePreloaderService, LearnerParamsService,
@@ -272,11 +274,18 @@ angular.module('oppia').factory('ExplorationEngineService', [
        */
       init: function(
           explorationDict, explorationVersion, preferredAudioLanguage,
-          autoTtsEnabled, successCallback) {
+          autoTtsEnabled, preferredContentLanguageCodes,
+          preferredSiteLanguageCode, successCallback) {
+        exploration = ExplorationObjectFactory.createFromBackendDict(
+          explorationDict);
         answerIsBeingProcessed = false;
+        ContentTranslationLanguageService.init(
+          exploration.getWrittenTranslationLanguageCodesReadyForDisplay(),
+          preferredContentLanguageCodes,
+          preferredSiteLanguageCode,
+          exploration.getLanguageCode()
+        );
         if (_editorPreviewMode) {
-          exploration = ExplorationObjectFactory.createFromBackendDict(
-            explorationDict);
           exploration.setInitialStateName(initStateName);
           visitedStateNames = [exploration.getInitialState().name];
           initParams(manualParamChanges);
@@ -289,8 +298,6 @@ angular.module('oppia').factory('ExplorationEngineService', [
           AudioPreloaderService.kickOffAudioPreloader(initStateName);
           _loadInitialState(successCallback);
         } else {
-          exploration = ExplorationObjectFactory.createFromBackendDict(
-            explorationDict);
           visitedStateNames.push(exploration.getInitialState().name);
           version = explorationVersion;
           initParams([]);

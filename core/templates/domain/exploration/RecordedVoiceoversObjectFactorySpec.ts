@@ -182,7 +182,7 @@ describe('RecordedVoiceovers object factory', () => {
 
   it('should get all language code for a given content id', () => {
     var LanguageCodeList = ['en', 'hi'];
-    expect(rv.getVoiceoverLanguageCodes('hint_1')).toEqual(LanguageCodeList);
+    expect(rv.getLanguageCodes('hint_1')).toEqual(LanguageCodeList);
   });
 
   it('should correctly check content id has voiceovers', () => {

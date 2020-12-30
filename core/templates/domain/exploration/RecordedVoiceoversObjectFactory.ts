@@ -66,12 +66,12 @@ export class RecordedVoiceovers {
     }
   }
 
-  getVoiceoverLanguageCodes(contentId: string): string[] {
+  getLanguageCodes(contentId: string): string[] {
     return Object.keys(this.voiceoversMapping[contentId]);
   }
 
   hasVoiceovers(contentId: string): boolean {
-    return this.getVoiceoverLanguageCodes(contentId).length > 0;
+    return this.getLanguageCodes(contentId).length > 0;
   }
 
   hasUnflaggedVoiceovers(contentId: string): boolean {

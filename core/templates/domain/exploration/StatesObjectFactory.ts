@@ -25,8 +25,11 @@ import {
   State
 } from 'domain/state/StateObjectFactory';
 import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { AppConstants } from 'app.constants';
 
 export interface StateObjectsDict {
   [state: string]: State;
@@ -38,6 +41,10 @@ export interface StateObjectsBackendDict {
 
 export interface VoiceoverObjectsDict {
   [state: string]: Voiceover[];
+}
+
+export interface WrittenTranslationObjectsDict {
+  [state: string]: WrittenTranslation[];
 }
 
 export class States {
@@ -120,22 +127,28 @@ export class States {
     return finalStateNames;
   }
 
-  getAllVoiceoverLanguageCodes(): string[] {
-    var allAudioLanguageCodes = [];
-    for (var stateName in this._states) {
-      var state = this._states[stateName];
-      var contentIdsList = state.recordedVoiceovers.getAllContentId();
-      contentIdsList.forEach(function(contentId) {
-        var audioLanguageCodes = (
-          state.recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
-        audioLanguageCodes.forEach(function(languageCode) {
-          if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
-            allAudioLanguageCodes.push(languageCode);
-          }
-        });
+  _getAllLanguageCodesFor(
+      translationType: 'recordedVoiceovers' | 'writtenTranslations'
+  ) : string[] {
+    const allLanguageCodes = new Set<string>();
+    Object.values(this._states).forEach(state => {
+      state[translationType].getAllContentId().forEach(contentId => {
+        const contentLanguageCodes = (
+          state[translationType].getLanguageCodes(contentId));
+        contentLanguageCodes.forEach(
+          allLanguageCodes.add,
+          allLanguageCodes);
       });
-    }
-    return allAudioLanguageCodes;
+    });
+    return [...allLanguageCodes];
+  }
+
+  getAllVoiceoverLanguageCodes(): string[] {
+    return this._getAllLanguageCodesFor('recordedVoiceovers');
+  }
+
+  getAllWrittenTranslationLanguageCodes(): string[] {
+    return this._getAllLanguageCodesFor('writtenTranslations');
   }
 
   getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
@@ -154,6 +167,33 @@ export class States {
       });
     }
     return allAudioTranslations;
+  }
+
+  getTotalRequiredWrittenTranslationsCount(): number {
+    let total = 0;
+    Object.values(this._states).forEach(
+      state => total += state.getRequiredWrittenTranslationsCount());
+    return total;
+  }
+
+  getAllWrittenTranslations(
+      languageCode: string
+  ): WrittenTranslationObjectsDict {
+    const allWrittenTranslations = {};
+    for (const stateName in this._states) {
+      const state = this._states[stateName];
+      allWrittenTranslations[stateName] = [];
+      const contentIdsList = state.writtenTranslations.getAllContentId();
+      contentIdsList.forEach(contentId => {
+        const writtenTranslation = (
+          state.writtenTranslations.getWrittenTranslation(
+            contentId, languageCode));
+        if (writtenTranslation !== undefined) {
+          allWrittenTranslations[stateName].push(writtenTranslation);
+        }
+      });
+    }
+    return allWrittenTranslations;
   }
 }
 

@@ -64,7 +64,7 @@ angular.module('oppia').factory('TranslationStatusService', [
         available: false,
         needsUpdate: false,
       };
-      var availableLanguages = recordedVoiceovers.getVoiceoverLanguageCodes(
+      var availableLanguages = recordedVoiceovers.getLanguageCodes(
         contentId);
       if (availableLanguages.indexOf(langCode) !== -1) {
         availabilityStatus.available = true;
@@ -82,7 +82,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       };
       langCode = TranslationLanguageService.getActiveLanguageCode();
       var availableLanguages = (
-        writtenTranslations.getTranslationsLanguageCodes(contentId));
+        writtenTranslations.getLanguageCodes(contentId));
       if (availableLanguages.indexOf(langCode) !== -1) {
         var writtenTranslation = (
           writtenTranslations.getWrittenTranslation(contentId, langCode));
