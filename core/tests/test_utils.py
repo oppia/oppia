@@ -1342,7 +1342,7 @@ tags: []
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self._taskqueue_stub = (
-            self.TestBed.inject_stub(testbed.TASKQUEUE_SERVICE_NAME))
+            self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME))
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
