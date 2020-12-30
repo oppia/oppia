@@ -153,8 +153,8 @@
          aria-expanded="false"
          aria-label="User Menu"
          tabindex="0"
-         ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')"
-         ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)">
+         ng-mouseover="$ctrl.openSubmenu($event, 'profileMenu')">
+         <!--ng-mouseleave="$ctrl.closeSubmenuIfNotMobile($event)"-->
         <div class="oppia-navbar-profile-picture-container dropdown-toggle">
           <span ng-if="$ctrl.profilePictureDataUrl">
             <img ng-src="<[$ctrl.profilePictureDataUrl]>" class="oppia-navbar-profile-picture rounded-circle" alt="User Avatar">
