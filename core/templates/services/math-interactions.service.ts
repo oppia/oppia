@@ -107,6 +107,11 @@ export class MathInteractionsService {
       this.warningText = 'Your answer contains an invalid character: "_".';
       return false;
     }
+    if (expressionString.match(/(\+$)|(\+\))/g)) {
+      this.warningText = (
+        'Your answer seems to be missing a variable/number after the "+".');
+      return false;
+    }
     let invalidIntegers = expressionString.match(
       /(\d*\.\d*\.\d*)|(\d+\.\D)|(\D\.\d+)|(\d+\.$)/g);
     if (invalidIntegers !== null) {
