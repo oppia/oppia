@@ -1,3 +1,4 @@
+
 # coding: utf-8
 #
 # Copyright 2018 The Oppia Authors. All Rights Reserved.
@@ -2915,3 +2916,166 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         compare_node = if_node.test
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_compare(compare_node)
+
+
+class DisallowedFunctionCallsCheckerTest(unittest.TestCase):
+
+    def setUp(self):
+        super(DisallowedFunctionCallsCheckerTest, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DisallowedFunctionCallsChecker)
+        self.checker_test_object.setup_method()
+
+    def test_disallowed_basic_rgx(self):
+        # pylint: disable=disallowed-function-calls,single-line-pragma
+        (
+            call1, call2, call3,
+            call4, call5, call6,
+            call7, call8,
+            ) = astroid.extract_node(
+                """
+        datetime.datetime.now() #@
+        self.assertEquals() #@
+        StringIO() #@
+        urllib.quote() #@
+        urllib.unquote_plus() #@
+        urlsplit() #@
+        urllib.Request() #@
+        itervalues() #@
+        """)
+
+        message_replace_disallowed_datetime = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call1,
+            args=(
+                b'datetime.datetime.now()',
+                b'datetime.datetime.utcnow()')
+        )
+
+        message_replace_disallowed_assert_equals = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call2,
+            args=(
+                b'self.assertEquals()',
+                b'self.assertEqual()')
+        )
+
+        message_replace_disallowed_stringio = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call3,
+            args=(
+                b'StringIO()',
+                b'python_utils.string_io()')
+        )
+
+        message_replace_disallowed_urllibquote = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call4,
+            args=(
+                b'urllib.quote()',
+                b'python_utils.url_quote()')
+        )
+
+        message_replace_disallowed_urllibunquoteplus = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call5,
+            args=(
+                b'urllib.unquote_plus()',
+                b'python_utils.url_unquote_plus()')
+        )
+
+        message_replace_disallowed_urlsplit = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call6,
+            args=(
+                b'urlsplit()',
+                b'python_utils.url_split()')
+        )
+
+        message_replace_disallowed_urllib_request = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call7,
+            args=(
+                b'urllib.Request()',
+                b'python_utils.url_request()')
+        )
+
+        message_replace_disallowed_itervalues = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call8,
+            args=(
+                b'itervalues()',
+                b'values()')
+        )
+
+        # pylint: enable=disallowed-function-calls,single-line-pragma
+        with self.checker_test_object.assertAddsMessages(
+            message_replace_disallowed_datetime,
+            message_replace_disallowed_assert_equals,
+            message_replace_disallowed_stringio,
+            message_replace_disallowed_urllibquote,
+            message_replace_disallowed_urllibunquoteplus,
+            message_replace_disallowed_urlsplit,
+            message_replace_disallowed_urllib_request,
+            message_replace_disallowed_itervalues):
+            self.checker_test_object.checker.visit_call(call1)
+            self.checker_test_object.checker.visit_call(call2)
+            self.checker_test_object.checker.visit_call(call3)
+            self.checker_test_object.checker.visit_call(call4)
+            self.checker_test_object.checker.visit_call(call5)
+            self.checker_test_object.checker.visit_call(call6)
+            self.checker_test_object.checker.visit_call(call7)
+            self.checker_test_object.checker.visit_call(call8)
+
+    def test_disallowed_backslash_w_rgx(self):
+        # pylint: disable=disallowed-function-calls,single-line-pragma
+        (
+            call1, call2, call3
+            ) = astroid.extract_node(
+                """
+        class Temp:
+            def str(self):
+                return 1
+            def next(self):
+                return 1
+            def unquote(self):
+                return 1
+        b = Temp()
+        b.str() #@
+        b.next() #@
+        b.unquote() #@
+        """)
+
+        message_replace_disallowed_str = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call1,
+            args=(
+                b'b.str()',
+                b'python_utils.convert_to_bytes() or python_utils.UNICODE()')
+        )
+
+        message_replace_disallowed_next = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call2,
+            args=(
+                b'b.next()',
+                b'python_utils.NEXT()')
+        )
+
+        message_replace_disallowed_unquote = testutils.Message(
+            msg_id='replace-disallowed-function-calls',
+            node=call3,
+            args=(
+                b'b.unquote()',
+                b'python_utils.urllib_unquote()')
+        )
+
+        # pylint: enable=disallowed-function-calls,single-line-pragma
+        with self.checker_test_object.assertAddsMessages(
+            message_replace_disallowed_str,
+            message_replace_disallowed_next,
+            message_replace_disallowed_unquote,):
+            self.checker_test_object.checker.visit_call(call1)
+            self.checker_test_object.checker.visit_call(call2)
+            self.checker_test_object.checker.visit_call(call3)

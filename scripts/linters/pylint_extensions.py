@@ -1893,6 +1893,204 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
                 self.add_message('inequality-with-none', node=node)
 
 
+class DisallowedFunctionCallsChecker(checkers.BaseChecker):
+    """Custom pylint checker for language specific general purpose
+    regex checks of functions calls to be removed or replaced.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+    name = 'disallowed-function-calls'
+    priority = -1
+    msgs = {
+        'C0031': (
+            'Please do not use %s.',
+            'remove-disallowed-function-calls',
+            'Please remove disallowed function calls.',
+        ),
+        'C0032': (
+            'Please replace %s with %s.',
+            'replace-disallowed-function-calls',
+            'Please replace disallowed function' +
+            'calls with allowed alternative.',
+        ),
+    }
+    python_utils_file = b'python_utils.py'
+    python_utils_test_file = b'python_utils_test.py'
+
+    # pylint: disable=disallowed-function-calls,single-line-pragma
+    options = ((
+        'disallowed-functions',
+        {
+            'default': (
+                (
+                    re.compile(r'datetime.datetime.now\(\)'),
+                    b'datetime.datetime.utcnow()',
+                    (),
+                    ()),
+                (
+                    re.compile(r'self.assertEquals\('),
+                    b'self.assertEqual()',
+                    (),
+                    ()),
+                (
+                    re.compile(r'StringIO\('),
+                    b'python_utils.string_io()',
+                    (python_utils_file, python_utils_test_file,),
+                    ()),
+                (
+                    re.compile(r'urllib\..*quote\('),
+                    b'python_utils.url_quote()',
+                    (python_utils_file, python_utils_test_file,),
+                    ()),
+                (
+                    re.compile(r'urllib\..*unquote_plus\('),
+                    b'python_utils.url_unquote_plus()',
+                    (python_utils_file, python_utils_test_file,),
+                    ()),
+                (
+                    re.compile(r'urllib\..*urlencode\('),
+                    b'python_utils.url_encode()',
+                    (python_utils_file, python_utils_test_file,),
+                    ()),
+                (
+                    re.compile(r'urllib\..*urlretrieve\('),
+                    b'python_utils.url_retrieve()',
+                    (python_utils_file, python_utils_test_file,),
+                    ()),
+                (
+                    re.compile(r'urllib(2)?\..*urlopen\('),
+                    b'python_utils.url_open()',
+                    (python_utils_file, python_utils_test_file,),
+                    ()),
+                (
+                    re.compile(r'urlsplit\('),
+                    b'python_utils.url_split()',
+                    (python_utils_file,),
+                    ()),
+                (
+                    re.compile(r'urlparse\('),
+                    b'python_utils.url_parse()',
+                    (python_utils_file,),
+                    ()),
+                (
+                    re.compile(r'urlunsplit\('),
+                    b'python_utils.url_unsplit()',
+                    (python_utils_file,),
+                    ()),
+                (
+                    re.compile(r'parse_qs\('),
+                    b'python_utils.parse_query_string()',
+                    (python_utils_file,),
+                    ()),
+                (
+                    re.compile(r'\Wunquote\('),
+                    b'python_utils.urllib_unquote()',
+                    (python_utils_file,),
+                    ()),
+                (
+                    re.compile(r'urljoin\('),
+                    b'python_utils.url_join()',
+                    (python_utils_file,),
+                    ()),
+                (
+                    re.compile(r'urllib(2)?\..*Request\('),
+                    b'python_utils.url_request()',
+                    (python_utils_file, python_utils_test_file,),
+                    ()),
+                (
+                    re.compile(r'\Wnext\('),
+                    b'python_utils.NEXT()',
+                    (),
+                    ()),
+                (
+                    re.compile(r'\Wrange\('),
+                    b'python_utils.RANGE()',
+                    (),
+                    ()),
+                (
+                    re.compile(r'\Wround\('),
+                    b'python_utils.ROUND()',
+                    (),
+                    ()),
+                (
+                    re.compile(r'\Wstr\('),
+                    b'python_utils.convert_to_bytes() ' +
+                    b'or python_utils.UNICODE()',
+                    (python_utils_file,),
+                    ()),
+                (
+                    re.compile(r'\Wzip\('),
+                    b'python_utils.ZIP()',
+                    (),
+                    ()),
+                (
+                    re.compile(r'basestring\('),
+                    b'python_utils.BASESTRING()',
+                    (python_utils_file,),
+                    ()),
+                (
+                    re.compile(r'iteritems\('),
+                    b'items()',
+                    (),
+                    ()),
+                (
+                    re.compile(r'itervalues\('),
+                    b'values()',
+                    (),
+                    ()),
+                (
+                    re.compile(r'iterkeys\('),
+                    b'keys()',
+                    (),
+                    ()),
+            ),
+            'type': 'csv',
+            'metavar': '<comma separated list>',
+            'help': 'List of tuples of disallowed functions '
+                    'and optionally their allowed alternatives.'
+        }),)
+
+    # pylint: enable=disallowed-function-calls,single-line-pragma
+    def _check_exclusion(self, path, excluded_files, excluded_dirs):
+        """Checks if current path should be excluded given a list of
+        excluded files and a list of excluded directories.
+        """
+
+        return any(
+            path.endswith(excluded_file) for excluded_file in excluded_files
+        ) or any(
+            path.startswith(excluded_dir) for excluded_dir in excluded_dirs
+        )
+
+    def visit_call(self, node):
+        """Visit a function call to ensure that the call is
+        not using any disallowed functions.
+
+        Args:
+            node: astroid.nodes.Call. Node to access call content.
+        """
+
+        called = node.as_string()
+        curr_path = node.root().path
+
+        for (
+                func_rgx,
+                replace_msg,
+                excluded_files,
+                excluded_dirs) in self.config.disallowed_functions:
+            if self._check_exclusion(curr_path, excluded_files, excluded_dirs):
+                continue
+            if func_rgx.search(called):
+                if replace_msg is None:
+                    self.add_message(
+                        'remove-disallowed-function-calls',
+                        node=node, args=(called))
+                else:
+                    self.add_message(
+                        'replace-disallowed-function-calls',
+                        node=node, args=(called, replace_msg))
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1913,3 +2111,4 @@ def register(linter):
     linter.register_checker(SingleLinePragmaChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
     linter.register_checker(InequalityWithNoneChecker(linter))
+    linter.register_checker(DisallowedFunctionCallsChecker(linter))
