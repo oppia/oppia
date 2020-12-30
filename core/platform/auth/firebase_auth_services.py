@@ -77,7 +77,7 @@ def _acquire_firebase_context(credential=None):
         credential: *|None. The credentials used to call the SDK from within the
             context.
     """
-    app = firebase_admin.initialize_app()
+    app = firebase_admin.initialize_app(credential=credential)
     try:
         yield
     finally:
@@ -127,10 +127,10 @@ def authenticate_request(request):
         logging.exception(e)
         return None
 
-    # We want to convert empty string values as None.
+    # We want to convert empty string values to None.
     auth_id = claims.get('sub', '') or None
     email = claims.get('email', '') or None
-    # Auth ID is a required claim, so return None if missing.
+    # Auth ID is a required Claim, so return None when it is missing.
     return None if auth_id is None else auth_domain.AuthClaims(auth_id, email)
 
 
