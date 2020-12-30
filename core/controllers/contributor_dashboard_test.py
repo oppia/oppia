@@ -467,8 +467,8 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             'translation_html': '<p>Translation for content.</p>'
         }
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             '0', 1, self.owner_id, change_dict, 'description')
 
         output = self.get_json('/gettranslatabletexthandler', params={
@@ -492,12 +492,15 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
 
     def test_guest_user_check_contribution_rights(self):
         response = self.get_json('/usercontributionrightsdatahandler')
+        config_services.set_property(
+            'admin', 'contributor_can_suggest_questions', False)
 
         self.assertEqual(
             response, {
                 'can_review_translation_for_language_codes': [],
                 'can_review_voiceover_for_language_codes': [],
-                'can_review_questions': False
+                'can_review_questions': False,
+                'can_suggest_questions': False
             })
 
     def test_user_check_contribution_rights(self):
@@ -506,12 +509,16 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
         user_id = self.get_user_id_from_email(user_email)
         self.login(user_email)
 
+        config_services.set_property(
+            'admin', 'contributor_can_suggest_questions', False)
+
         response = self.get_json('/usercontributionrightsdatahandler')
         self.assertEqual(
             response, {
                 'can_review_translation_for_language_codes': [],
                 'can_review_voiceover_for_language_codes': [],
-                'can_review_questions': False
+                'can_review_questions': False,
+                'can_suggest_questions': False
             })
 
         user_services.allow_user_to_review_question(user_id)
@@ -521,7 +528,36 @@ class UserContributionRightsDataHandlerTest(test_utils.GenericTestBase):
             response, {
                 'can_review_translation_for_language_codes': [],
                 'can_review_voiceover_for_language_codes': [],
-                'can_review_questions': True
+                'can_review_questions': True,
+                'can_suggest_questions': False
+            })
+
+    def test_can_suggest_questions_flag_in_response(self):
+        user_email = 'user@example.com'
+        self.signup(user_email, 'user')
+        self.login(user_email)
+        config_services.set_property(
+            'admin', 'contributor_can_suggest_questions', False)
+
+        response = self.get_json('/usercontributionrightsdatahandler')
+        self.assertEqual(
+            response, {
+                'can_review_translation_for_language_codes': [],
+                'can_review_voiceover_for_language_codes': [],
+                'can_review_questions': False,
+                'can_suggest_questions': False
+            })
+
+        config_services.set_property(
+            'admin', 'contributor_can_suggest_questions', True)
+
+        response = self.get_json('/usercontributionrightsdatahandler')
+        self.assertEqual(
+            response, {
+                'can_review_translation_for_language_codes': [],
+                'can_review_voiceover_for_language_codes': [],
+                'can_review_questions': False,
+                'can_suggest_questions': True
             })
 
 
