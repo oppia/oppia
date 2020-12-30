@@ -5338,9 +5338,9 @@ export default {
   "SITE_NAME_FOR_ANALYTICS": "",
 
   // Data required for Firebase authentication.
-  // NOTE TO RELEASE COORDINATORS: Please change these values to the production
-  // values, and change useEmulator to be false, before deployment.
-  // HOWTO obtain config: https://support.google.com/firebase/answer/7015592#web
+  //
+  // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
+  // and change useEmulator to be false, before deploying to production.
   "FIREBASE_ENVIRONMENT": {
     "useEmulator": true,
     "config": {
