@@ -29,3 +29,23 @@ class AuthIdUserIdPairTests(test_utils.TestBase):
         auth_id, user_id = auth_domain.AuthIdUserIdPair('aid', 'uid')
         self.assertEqual(auth_id, 'aid')
         self.assertEqual(user_id, 'uid')
+
+
+class AuthClaimsTests(test_utils.TestBase):
+
+    AUTH_ID = 'aid'
+    EMAIL = 'test@test.com'
+
+    def test_attributes(self):
+        auth_claims = auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL)
+
+        self.assertEqual(auth_claims.auth_id, self.AUTH_ID)
+        self.assertEqual(auth_claims.email, self.EMAIL)
+
+    def test_repr(self):
+        self.assertEqual(
+            repr(auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL)),
+            'AuthClaims(auth_id=%r, email=%r)' % (self.AUTH_ID, self.EMAIL))
+        self.assertEqual(
+            repr(auth_domain.AuthClaims(None, None)),
+            'AuthClaims(auth_id=None, email=None)')

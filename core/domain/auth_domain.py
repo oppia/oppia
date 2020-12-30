@@ -21,6 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 
+import python_utils
+
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
 # would all map to a single Auth ID.
@@ -31,3 +33,21 @@ import collections
 # corresponding Oppia-generated IDs in our APIs.
 AuthIdUserIdPair = (
     collections.namedtuple('AuthIdUserIdPair', ['auth_id', 'user_id']))
+
+
+class AuthClaims(python_utils.OBJECT):
+    """Domain object representing essential Claims (a piece of information about
+    a user, like name, address, phone number, etc.) of an authorized user.
+
+    Attributes:
+        auth_id: str|None. A unique identifier associated to the user. The ID is
+            only unique with respect to the Identity Provider who produced it.
+        email: str|None. The email address associated to the user.
+    """
+
+    def __init__(self, auth_id, email):
+        self.auth_id = auth_id
+        self.email = email
+
+    def __repr__(self):
+        return 'AuthClaims(auth_id=%r, email=%r)' % (self.auth_id, self.email)
