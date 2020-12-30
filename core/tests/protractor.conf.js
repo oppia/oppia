@@ -1,6 +1,8 @@
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
-var glob = require('glob')
-var path = require('path')
+var glob = require('glob');
+var path = require('path');
+var Constants = require('./protractor_utils/ProtractorConstants');
+var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -81,6 +83,10 @@ var suites = {
       'protractor_desktop/extensions.js'
     ],
 
+    featureGating: [
+      'protractor/featureGatingFlow.js'
+    ],
+
     fileUploadFeatures: [
       'protractor_desktop/voiceoverUploadFeatures.js'
     ],
@@ -145,9 +151,17 @@ var suites = {
       'protractor_desktop/skillEditor.js'
     ],
 
+    topicAndStoryViewer: [
+      'protractor_desktop/topicAndStoryViewer.js'
+    ],
+
     users: [
       'protractor_desktop/userJourneys.js',
     ],
+
+    wipeout: [
+      'protractor_desktop/wipeout.js',
+    ]
   };
 
 // A reference configuration file.
@@ -256,7 +270,13 @@ exports.config = {
         // Actions.
         '--no-sandbox',
         '--disable-dev-shm-usage',
-      ]
+      ],
+      prefs: {
+        download: {
+            'prompt_for_download': false,
+            'default_directory': DOWNLOAD_PATH,
+          }
+      }
     },
     prefs: {
       intl: {
@@ -294,13 +314,7 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
-
-    // This is currently pulled out into a flag because it sometimes obscures
-    // the actual protractor error logs and does not close the browser after
-    // a failed run.
-    // TODO(sll): Switch this option on by default, once the above issues are
-    // fixed.
-    var _ADD_SCREENSHOT_REPORTER = false;
+    var _ADD_SCREENSHOT_REPORTER = true;
 
     if (_ADD_SCREENSHOT_REPORTER) {
       // This takes screenshots of failed tests. For more information see
@@ -312,7 +326,9 @@ exports.config = {
         pathBuilder: function(currentSpec) {
           return currentSpec.fullName;
         },
-        captureOnlyFailedSpecs: true
+        captureOnlyFailedSpecs: true,
+        reportFailedUrl: true,
+        preserveDirectory: true
       }));
     }
 

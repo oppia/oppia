@@ -16,13 +16,11 @@
  * @fileoverview Unit tests for the training data service.
  */
 
+
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // training-data.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  /* eslint-disable-next-line max-len */
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -53,6 +51,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 require('App.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -80,6 +79,7 @@ describe('TrainingDataService', function() {
       $provide.value(key, value);
     }
   }));
+  importAllAngularServices();
 
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -87,8 +87,6 @@ describe('TrainingDataService', function() {
     // descendant dependencies.
     angular.mock.module(function($provide) {
       $provide.value('AngularNameService', new AngularNameService());
-      $provide.value(
-        'AnswerGroupsCacheService', new AnswerGroupsCacheService());
       $provide.value(
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
           new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
@@ -166,7 +164,10 @@ describe('TrainingDataService', function() {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: 'Test'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['Test']
+              }}
             }],
             outcome: {
               dest: 'State',

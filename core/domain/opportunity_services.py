@@ -28,7 +28,6 @@ from core.domain import question_fetchers
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
 from core.platform import models
-import feconf
 import utils
 
 (opportunity_models,) = models.Registry.import_models(
@@ -465,7 +464,7 @@ def get_translation_opportunities(language_code, cursor):
             more: bool. If True, there are (probably) more results after this
                 batch. If False, there are no further results after this batch.
     """
-    page_size = feconf.OPPORTUNITIES_PAGE_SIZE
+    page_size = constants.OPPORTUNITIES_PAGE_SIZE
     exp_opportunity_summary_models, cursor, more = (
         opportunity_models
         .ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
@@ -501,7 +500,7 @@ def get_voiceover_opportunities(language_code, cursor):
                 this batch. If False, there are no further results after
                 this batch.
     """
-    page_size = feconf.OPPORTUNITIES_PAGE_SIZE
+    page_size = constants.OPPORTUNITIES_PAGE_SIZE
     exp_opportunity_summary_models, cursor, more = (
         opportunity_models.ExplorationOpportunitySummaryModel
         .get_all_voiceover_opportunities(page_size, cursor, language_code))
@@ -595,7 +594,7 @@ def get_skill_opportunities(cursor):
                 this batch. If False, there are no further results after
                 this batch.
     """
-    page_size = feconf.OPPORTUNITIES_PAGE_SIZE
+    page_size = constants.OPPORTUNITIES_PAGE_SIZE
     skill_opportunity_models, cursor, more = (
         opportunity_models.SkillOpportunityModel
         .get_skill_opportunities(page_size, cursor))

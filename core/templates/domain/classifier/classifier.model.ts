@@ -17,6 +17,12 @@
  *     domain objects.
  */
 
+export interface ClassifierBackendDict {
+  'algorithm_id': string;
+  'classifier_data': ClassifierData;
+  'data_schema_version': number;
+}
+
 export class Classifier {
   algorithmId: string;
   classifierData: ClassifierData;
@@ -28,5 +34,13 @@ export class Classifier {
     this.algorithmId = algorithmId;
     this.classifierData = classifierData;
     this.dataSchemaVersion = dataSchemaVersion;
+  }
+
+  static createFromBackendDict(
+      backendDict: ClassifierBackendDict): Classifier {
+    return new Classifier(
+      backendDict.algorithm_id,
+      backendDict.classifier_data,
+      backendDict.data_schema_version);
   }
 }

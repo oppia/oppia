@@ -19,6 +19,8 @@ subclasses for each type of suggestion.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import copy
+
 from constants import constants
 from core.domain import config_domain
 from core.domain import exp_domain
@@ -153,12 +155,12 @@ class BaseSuggestion(python_utils.OBJECT):
         """
         if (
                 self.suggestion_type not in
-                suggestion_models.SUGGESTION_TYPE_CHOICES):
+                feconf.SUGGESTION_TYPE_CHOICES):
             raise utils.ValidationError(
                 'Expected suggestion_type to be among allowed choices, '
                 'received %s' % self.suggestion_type)
 
-        if self.target_type not in suggestion_models.TARGET_TYPE_CHOICES:
+        if self.target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
             raise utils.ValidationError(
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
@@ -344,8 +346,8 @@ class SuggestionEditStateContent(BaseSuggestion):
             status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
-        self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        self.target_type = feconf.ENTITY_TYPE_EXPLORATION
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
@@ -392,7 +394,7 @@ class SuggestionEditStateContent(BaseSuggestion):
 
         # Suggestions of this type do not have an associated language code,
         # since they are not translation-related.
-        if self.language_code != None:
+        if self.language_code is not None:
             raise utils.ValidationError(
                 'Expected language_code to be None, received %s' % (
                     self.language_code))
@@ -530,8 +532,8 @@ class SuggestionTranslateContent(BaseSuggestion):
             status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT)
-        self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
+        self.target_type = feconf.ENTITY_TYPE_EXPLORATION
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
@@ -674,20 +676,51 @@ class SuggestionAddQuestion(BaseSuggestion):
         """
         super(SuggestionAddQuestion, self).__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
-        self.suggestion_type = suggestion_models.SUGGESTION_TYPE_ADD_QUESTION
-        self.target_type = suggestion_models.TARGET_TYPE_SKILL
+        self.suggestion_type = feconf.SUGGESTION_TYPE_ADD_QUESTION
+        self.target_type = feconf.ENTITY_TYPE_SKILL
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
         self.change = question_domain.QuestionSuggestionChange(change)
-        # Update question_state_data_schema_version here instead of surfacing
-        # the version in the frontend.
-        self.change.question_dict['question_state_data_schema_version'] = (
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
         self.language_code = language_code
         self.last_updated = last_updated
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
+        self._update_change_to_latest_state_schema_version()
+
+    def _update_change_to_latest_state_schema_version(self):
+        """Holds the responsibility of performing a step-by-step, sequential
+        update of the state structure inside the change_cmd based on the schema
+        version of the current state dictionary.
+
+        Raises:
+            Exception. The state_schema_version of suggestion cannot be
+                processed.
+        """
+        state_schema_version = self.change.question_dict[
+            'question_state_data_schema_version']
+
+        versioned_question_state = {
+            'state': copy.deepcopy(
+                self.change.question_dict['question_state_data'])
+        }
+
+        if not (25 <= state_schema_version
+                <= feconf.CURRENT_STATE_SCHEMA_VERSION):
+            raise Exception(
+                'Expected state schema version to be in between 25 and %d, '
+                'received %s.' % (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION, state_schema_version))
+
+        while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
+            question_domain.Question.update_state_from_model(
+                versioned_question_state, state_schema_version)
+            state_schema_version += 1
+
+        self.change.question_dict['question_state_data'] = (
+            versioned_question_state['state'])
+        self.change.question_dict['question_state_data_schema_version'] = (
+            state_schema_version)
 
     def validate(self):
         """Validates a suggestion object of type SuggestionAddQuestion.
@@ -723,12 +756,15 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
-        if self.language_code is None:
-            raise utils.ValidationError('language_code cannot be None')
+        if self.language_code != constants.DEFAULT_LANGUAGE_CODE:
+            raise utils.ValidationError(
+                'Expected language_code to be %s, received %s' % (
+                    constants.DEFAULT_LANGUAGE_CODE, self.language_code))
 
         if self.language_code != self.change.question_dict['language_code']:
             raise utils.ValidationError(
-                'Expected language_code to be %s, received %s' % (
+                'Expected question language_code(%s) to be same as suggestion '
+                'language_code(%s)' % (
                     self.change.question_dict['language_code'],
                     self.language_code))
 
@@ -753,13 +789,13 @@ class SuggestionAddQuestion(BaseSuggestion):
         question.partial_validate()
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
-        if not (
-                question_state_data_schema_version >= 1 and
-                question_state_data_schema_version <=
+        if question_state_data_schema_version != (
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise utils.ValidationError(
-                'Expected question state schema version to be between 1 and '
-                '%s' % feconf.CURRENT_STATE_SCHEMA_VERSION)
+                'Expected question state schema version to be %s, received '
+                '%s' % (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION,
+                    question_state_data_schema_version))
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
@@ -767,13 +803,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         """
         if self.change.skill_id is None:
             raise utils.ValidationError('Expected change to contain skill_id')
-        question_dict = self.change.question_dict
         self.validate()
-        if (
-                question_dict['question_state_data_schema_version'] !=
-                feconf.CURRENT_STATE_SCHEMA_VERSION):
-            raise utils.ValidationError(
-                'Question state schema version is not up to date.')
 
         skill_domain.Skill.require_valid_skill_id(self.change.skill_id)
         skill = skill_fetchers.get_skill_by_id(
@@ -877,7 +907,10 @@ class SuggestionAddQuestion(BaseSuggestion):
                 conversion_fn,
                 state_uses_old_interaction_cust_args_schema=(
                     self.change.question_dict[
-                        'question_state_data_schema_version'] < 38)
+                        'question_state_data_schema_version'] < 38),
+                state_uses_old_rule_template_schema=(
+                    self.change.question_dict[
+                        'question_state_data_schema_version'] < 42)
             )
         )
 
@@ -935,7 +968,7 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                 BaseVoiceoverApplication object are invalid.
         """
 
-        if self.target_type not in suggestion_models.TARGET_TYPE_CHOICES:
+        if self.target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
             raise utils.ValidationError(
                 'Expected target_type to be among allowed choices, '
                 'received %s' % self.target_type)
@@ -1046,7 +1079,7 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
                 reviewer while rejecting the application.
         """
         self.voiceover_application_id = voiceover_application_id
-        self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
+        self.target_type = feconf.ENTITY_TYPE_EXPLORATION
         self.target_id = target_id
         self.status = status
         self.author_id = author_id
@@ -1082,16 +1115,16 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
 
 
 VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES = {
-    suggestion_models.TARGET_TYPE_EXPLORATION: (
+    feconf.ENTITY_TYPE_EXPLORATION: (
         ExplorationVoiceoverApplication)
 }
 
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
-    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT: (
+    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT: (
         SuggestionEditStateContent),
-    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
+    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
         SuggestionTranslateContent),
-    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
+    feconf.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
 }
 
 

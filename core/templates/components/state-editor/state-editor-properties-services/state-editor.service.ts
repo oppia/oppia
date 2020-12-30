@@ -18,6 +18,7 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
+import { Observable } from 'rxjs';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
@@ -25,6 +26,8 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { AnswerGroup } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { Hint } from 'domain/exploration/HintObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
@@ -39,8 +42,8 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { State } from 'domain/state/StateObjectFactory';
 
-interface AnswerChoice {
-  val: string | number;
+export interface AnswerChoice {
+  val: string | number | SubtitledHtml;
   label: string;
 }
 
@@ -60,6 +63,7 @@ export class StateEditorService {
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
   private _handleCustomArgsUpdateEventEmitter =
     new EventEmitter<AnswerChoice[]>();
+  private _stateNamesChangedEventEmitter = new EventEmitter<void>();
 
   activeStateName: string = null;
   stateNames: string[] = [];
@@ -108,6 +112,10 @@ export class StateEditorService {
 
   updateCurrentRuleInputIsValid(value: boolean): void {
     this.currentRuleInputIsValid = value;
+  }
+
+  get onStateNamesChanged(): Observable<void> {
+    return this._stateNamesChangedEventEmitter;
   }
 
   checkCurrentRuleInputIsValid(): boolean {
@@ -205,17 +213,17 @@ export class StateEditorService {
         });
       }
       return _answerChoices;
-    } else if (interactionId === 'ItemSelectionInput') {
+    } else if (
+      interactionId === 'ItemSelectionInput' ||
+      interactionId === 'DragAndDropSortInput'
+    ) {
       return (
-        <ItemSelectionInputCustomizationArgs> customizationArgs)
+        <
+          ItemSelectionInputCustomizationArgs|
+          DragAndDropSortInputCustomizationArgs
+        > customizationArgs)
         .choices.value.map(val => (
-          { val: val.getHtml(), label: val.getHtml() }
-        ));
-    } else if (interactionId === 'DragAndDropSortInput') {
-      return (
-        <DragAndDropSortInputCustomizationArgs> customizationArgs)
-        .choices.value.map(val => (
-          { val: val.getHtml(), label: val.getHtml() }
+          { val: val.getContentId(), label: val.getHtml() }
         ));
     } else {
       return null;
@@ -248,6 +256,7 @@ export class StateEditorService {
 
   setStateNames(newStateNames: string[]): void {
     this.stateNames = newStateNames;
+    this._stateNamesChangedEventEmitter.emit();
   }
 
   getStateNames(): string[] {

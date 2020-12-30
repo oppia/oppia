@@ -18,10 +18,14 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
+import { EditableStoryBackendApiService } from
+  'domain/story/editable-story-backend-api.service';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Chapter Editor tab', function() {
   var $scope = null;
@@ -29,9 +33,21 @@ describe('Chapter Editor tab', function() {
   var MockStoryEditorNavigationService = null;
   var storyInitializedEventEmitter = null;
   var storyReinitializedEventEmitter = null;
+  importAllAngularServices();
 
+  importAllAngularServices();
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [StoryObjectFactory, StoryEditorNavigationService,
+        EditableStoryBackendApiService]
+    });
+  });
   beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'EditableStoryBackendApiService',
+      TestBed.get(EditableStoryBackendApiService));
     $provide.value('StoryObjectFactory', TestBed.get(StoryObjectFactory));
     $provide.value(
       'StoryEditorNavigationService',

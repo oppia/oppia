@@ -45,9 +45,6 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
@@ -309,6 +306,8 @@ import { PencilCodeEditorRulesService } from
 import { PencilCodeEditorValidationService } from
   // eslint-disable-next-line max-len
   'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { PlatformFeatureDummyBackendApiService } from
+  'domain/platform_feature/platform-feature-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { PlatformFeatureAdminBackendApiService } from
   'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -329,6 +328,8 @@ import { PlaythroughIssuesBackendApiService } from
   'services/playthrough-issues-backend-api.service';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PopulateRuleContentIdsService } from
+  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import { PredictionAlgorithmRegistryService } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/prediction-algorithm-registry.service';
@@ -512,6 +513,8 @@ import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
 import { UserExplorationPermissionsService } from
   'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import { UtilsService } from 'services/utils.service';
@@ -531,6 +534,9 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { SolutionVerificationService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 
 interface UpgradedServicesDict {
   [service: string]: unknown;
@@ -556,8 +562,6 @@ export class UpgradedServices {
     upgradedServices['AlgebraicExpressionInputRulesService'] =
       new AlgebraicExpressionInputRulesService();
     upgradedServices['AngularNameService'] = new AngularNameService();
-    upgradedServices['AnswerGroupsCacheService'] =
-      new AnswerGroupsCacheService();
     upgradedServices['AnswerStatsObjectFactory'] =
       new AnswerStatsObjectFactory();
     upgradedServices['AppService'] = new AppService();
@@ -1104,6 +1108,9 @@ export class UpgradedServices {
     upgradedServices['PlatformFeatureAdminBackendApiService'] =
       new PlatformFeatureAdminBackendApiService(
         upgradedServices['HttpClient']);
+    upgradedServices['PlatformFeatureDummyBackendApiService'] =
+      new PlatformFeatureDummyBackendApiService(
+        upgradedServices['HttpClient']);
     upgradedServices['PlayerPositionService'] = new PlayerPositionService(
       upgradedServices['PlayerTranscriptService']);
     upgradedServices['PlaythroughBackendApiService'] =
@@ -1149,6 +1156,11 @@ export class UpgradedServices {
       new SearchExplorationsBackendApiService(
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']);
+    upgradedServices['SolutionVerificationService'] =
+      new SolutionVerificationService(
+        upgradedServices['InteractionRulesRegistryService'],
+        upgradedServices['AnswerClassificationService'],
+        upgradedServices['StateEditorService']);
     upgradedServices['SkillCreationBackendApiService'] =
       new SkillCreationBackendApiService(
         upgradedServices['HttpClient']);
@@ -1217,6 +1229,14 @@ export class UpgradedServices {
     upgradedServices['TranslationsBackendApiService'] =
       new TranslationsBackendApiService(
         upgradedServices['HttpClient']);
+    upgradedServices['UserBackendApiService'] = new UserBackendApiService(
+      upgradedServices['HttpClient']);
+    upgradedServices['UserService'] = new UserService(
+      upgradedServices['UrlInterpolationService'],
+      upgradedServices['UrlService'],
+      upgradedServices['WindowRef'],
+      upgradedServices['UserBackendApiService']
+    );
 
     // Topological level: 4.
     upgradedServices['CollectionCreationService'] =
@@ -1245,11 +1265,13 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe']);
     upgradedServices['PlatformFeatureService'] = new PlatformFeatureService(
       upgradedServices['PlatformFeatureBackendApiService'],
-      upgradedServices['I18nLanguageCodeService'],
       upgradedServices['WindowRef'],
       upgradedServices['LoggerService'],
       upgradedServices['UrlService'],
       upgradedServices['BrowserCheckerService']);
+    upgradedServices['PopulateRuleContentIdsService'] =
+      new PopulateRuleContentIdsService(
+        upgradedServices['GenerateContentIdService']);
     upgradedServices['PredictionAlgorithmRegistryService'] =
       new PredictionAlgorithmRegistryService(
         upgradedServices['CodeReplPredictionService'],

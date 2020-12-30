@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for TranslationModalController.
  */
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 describe('Translation Modal Controller', function() {
   let $httpBackend = null;
@@ -23,6 +24,7 @@ describe('Translation Modal Controller', function() {
   let $uibModalInstance = null;
   let CkEditorCopyContentService = null;
   let CsrfTokenService = null;
+  let SiteAnalyticsService = null;
   let TranslateTextService = null;
   let TranslationLanguageService = null;
 
@@ -33,12 +35,15 @@ describe('Translation Modal Controller', function() {
   };
   let getTextToTranslateSpy = null;
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector, $controller) {
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
     const $rootScope = $injector.get('$rootScope');
     CsrfTokenService = $injector.get('CsrfTokenService');
+    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
     TranslateTextService = $injector.get('TranslateTextService');
     TranslationLanguageService = $injector.get('TranslationLanguageService');
     CkEditorCopyContentService = $injector.get('CkEditorCopyContentService');
@@ -99,6 +104,19 @@ describe('Translation Modal Controller', function() {
       expect($scope.moreAvailable).toBe(true);
       expect($scope.loadingData).toBe(false);
     });
+
+  it('should register Contributor Dashboard submit suggestion event when' +
+    ' suggesting translated text',
+  function() {
+    $httpBackend.flush();
+    spyOn(
+      SiteAnalyticsService,
+      'registerContributorDashboardSubmitSuggestionEvent');
+    $scope.suggestTranslatedText();
+    expect(
+      SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
+      .toHaveBeenCalledWith('Translation');
+  });
 
   it('should suggest more text to be translated when contributor finish' +
     ' translating text and they would like to continue translating',

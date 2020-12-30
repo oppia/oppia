@@ -35,6 +35,7 @@ from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import stats_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -1730,6 +1731,26 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             response['error'],
             'Sorry, we could not find the specified user.')
 
+    def test_put_with_deleted_user_raises_error(self):
+        wipeout_service.pre_delete_user(self.viewer_id)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'exp_id'
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+        csrf_token = self.get_new_csrf_token()
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
+            {
+                'version': exploration.version,
+                'new_member_username': self.VIEWER_USERNAME},
+            csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Sorry, we could not find the specified user.')
+
     def test_make_private_exploration_viewable(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
@@ -2422,6 +2443,21 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         # Draft changes None.
         self.assertIsNone(response['draft_changes'])
 
+    def test_exploration_not_updated_because_cmd_is_invalid(self):
+        changelist = [dict(self.NEW_CHANGELIST[0])]
+        changelist[0]['cmd'] = 'edit_exploration_propert'
+        payload = {
+            'change_list': changelist,
+            'version': 1,
+        }
+        response = self.put_json(
+            '/createhandler/data/%s' % self.EXP_ID3, payload,
+            csrf_token=self.csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Command edit_exploration_propert is not allowed'
+        )
+
     def test_draft_not_updated_because_newer_draft_exists(self):
         payload = {
             'change_list': self.NEW_CHANGELIST,
@@ -2437,6 +2473,21 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
         self.assertTrue(response['is_version_of_draft_valid'])
         self.assertEqual(response['draft_change_list_id'], 1)
+
+    def test_draft_not_updated_because_cmd_is_invalid(self):
+        changelist = [dict(self.NEW_CHANGELIST[0])]
+        changelist[0]['cmd'] = 'edit_exploration_propert'
+        payload = {
+            'change_list': changelist,
+            'version': 1,
+        }
+        response = self.put_json(
+            '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload,
+            csrf_token=self.csrf_token, expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Command edit_exploration_propert is not allowed'
+        )
 
     def test_draft_not_updated_validation_error(self):
         self.put_json(

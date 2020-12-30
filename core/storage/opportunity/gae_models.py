@@ -51,14 +51,17 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """ExplorationOpportunitySummaryModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -190,14 +193,17 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """SkillOpportunityModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'skill_description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'question_count': base_models.EXPORT_POLICY.NOT_APPLICABLE

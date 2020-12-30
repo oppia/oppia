@@ -118,7 +118,7 @@
           </div>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" ng-if="chapterOutlineIsShown">
             Outline Finalized
-            <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18" aria-label="Finalize outline">check_box_outline_blank</i>
+            <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18 protractor-test-finalize-outline" aria-label="Finalize outline">check_box_outline_blank</i>
             <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18" aria-label="Unfinalize outline">check_box</i>
             <div tabindex="-1" ng-blur="toggleChapterOutlineButtons()" ng-click="toggleChapterOutlineButtons()">
               <schema-based-editor id="storyNodeOutline"
@@ -163,7 +163,7 @@
                   </span>
                 </div>
               </div>
-              <button class="btn add-skill-btn protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()">+ ADD PREREQUISITE SKILL</button>
+              <button class="btn add-skill-btn protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()" ng-disabled="!skillInfoHasLoaded">+ ADD PREREQUISITE SKILL</button>
             </div>
           </div>
           <div class="acquired-skills">
@@ -179,7 +179,7 @@
                   </span>
                 </div>
               </div>
-              <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">+ ADD ACQUIRED SKILL</button>
+              <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()" ng-disabled="!skillInfoHasLoaded">+ ADD ACQUIRED SKILL</button>
             </div>
           </div>
         </div>
@@ -216,7 +216,7 @@
                     </span>
                   </div>
                 </div>
-                <button class="btn add-skill-btn protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()">+ ADD PREREQUISITE SKILL</button>
+                <button class="btn add-skill-btn protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()" ng-disabled="!skillInfoHasLoaded">+ ADD PREREQUISITE SKILL</button>
               </div>
             </div>
           </div>
@@ -252,7 +252,7 @@
                     </span>
                   </div>
                 </div>
-                <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">+ ADD ACQUIRED SKILL</button>
+                <button class="btn add-skill-btn protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()" ng-disabled="!skillInfoHasLoaded">+ ADD ACQUIRED SKILL</button>
               </div>
             </div>
           </div>

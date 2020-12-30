@@ -37,9 +37,7 @@ class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """SkillSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -94,9 +92,7 @@ class SkillModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """SkillModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @classmethod
@@ -140,9 +136,14 @@ class SkillModel(base_models.VersionedModel):
         skill_commit_log_entry.update_timestamps()
         skill_commit_log_entry.put()
 
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconceptions_schema_version':
@@ -187,9 +188,17 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'skill-%s-%s' % (skill_id, version)
 
+    @staticmethod
+    def get_model_association_to_user():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
     @classmethod
     def get_export_policy(cls):
-        """This model is only stored for archive purposes. The commit log of
+        """Model doesn't contain any data directly corresponding to a user.
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
@@ -235,14 +244,17 @@ class SkillSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """SkillSummaryModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user():
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,

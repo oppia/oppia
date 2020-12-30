@@ -30,7 +30,6 @@ from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import fs_domain
-from core.domain import image_validation_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import taskqueue_services
@@ -397,8 +396,8 @@ class ExplorationMigrationAuditJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.regenerate_exploration_summary(
-            self.NEW_EXP_ID, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.NEW_EXP_ID)
 
         # Delete the exploration before migration occurs.
         exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
@@ -706,8 +705,8 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
 
         # Note: This creates a summary based on the upgraded model (which is
         # fine). A summary is needed to delete the exploration.
-        exp_services.regenerate_exploration_summary(
-            self.NEW_EXP_ID, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.NEW_EXP_ID)
 
         # Delete the exploration before migration occurs.
         exp_services.delete_exploration(self.albert_id, self.NEW_EXP_ID)
@@ -763,9 +762,9 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             datetime.datetime.utcnow(), {}, initial_state_name,
             feconf.TRAINING_JOB_STATUS_COMPLETE, 1)
         # Store training job model for the classifier model.
-        classifier_models.TrainingJobExplorationMappingModel.create(
+        classifier_models.StateTrainingJobsMappingModel.create(
             self.NEW_EXP_ID, exploration.version, initial_state_name,
-            classifier_model_id)
+            {'TextClassifier': classifier_model_id})
 
         # Start migration job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
@@ -778,11 +777,12 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         new_exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         initial_state_name = list(new_exploration.states.keys())[0]
         self.assertLess(exploration.version, new_exploration.version)
-        classifier_exp_mapping_model = classifier_models.TrainingJobExplorationMappingModel.get_models( # pylint: disable=line-too-long
+        classifier_exp_mapping_model = classifier_models.StateTrainingJobsMappingModel.get_models( # pylint: disable=line-too-long
             self.NEW_EXP_ID, new_exploration.version,
             [initial_state_name])[0]
         self.assertEqual(
-            classifier_exp_mapping_model.job_id, classifier_model_id)
+            classifier_exp_mapping_model.algorithm_ids_to_job_ids[
+                'TextClassifier'], classifier_model_id)
 
     def test_migration_job_fails_with_invalid_exploration(self):
         observed_log_messages = []
@@ -1393,31 +1393,9 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1512,7 +1490,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 self.assertTrue(invalid_tag in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
@@ -1698,31 +1676,9 @@ class ExplorationRteMathContentValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1821,7 +1777,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
                     invalid_tag_info['invalid_tag'] in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
@@ -2222,218 +2178,6 @@ class RTECustomizationArgsValidationOneOffJobTests(test_utils.GenericTestBase):
             '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
-
-
-class PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests(
-        test_utils.GenericTestBase):
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(
-            PopulateXmlnsAttributeInExplorationMathSvgImagesJobTests,
-            self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-        exp_services.save_new_exploration(self.albert_id, exploration)
-
-        self.process_and_flush_pending_tasks()
-
-    def test_the_job_adds_xmlns_attribute_in_svg_images_successful(self):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        invalid_svg_string = (
-            '<svg version="1.0" width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'The svg tag does not contains the \'xmlns\' attribute.'):
-            image_validation_services.validate_image_and_filename(
-                invalid_svg_string.encode(encoding='utf-8'), svg_filename)
-
-        fs.commit(
-            'image/%s' % svg_filename, invalid_svg_string,
-            mimetype='image/svg+xml')
-
-        job_id = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
-        (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .get_output(job_id))
-
-        self.assertEqual(actual_output, [
-            u'[u\'SUCCESS - CHANGED\', [u\'mathImg_12ab_height_1d2_width_2d3_'
-            u'vertical_3d2.svg\', u\'Exp Id: exp_id0\']]'])
-
-    def test_the_job_reports_validation_failure(self):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        invalid_svg_string = (
-            '<svg version="1.0" role="" width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Unsupported tags/attributes found in the SVG:'):
-            image_validation_services.validate_image_and_filename(
-                invalid_svg_string.encode(encoding='utf-8'), svg_filename)
-
-        fs.commit(
-            'image/%s' % svg_filename, invalid_svg_string,
-            mimetype='image/svg+xml')
-
-        job_id = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
-        (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .get_output(job_id))
-
-        self.assertEqual(actual_output, [
-            u'[u\'FAILED validation\', [u"Exploration with id exp_id0 failed '
-            'image validation for the filename '
-            'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg with following'
-            ' error: Unsupported tags/attributes found in the SVG:'
-            '\\n\\nattributes: [u\'svg:role\']"]]'])
-
-    def test_the_job_does_not_changes_a_valid_svg_image(self):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        old_svg_string = (
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
-            'width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        image_validation_services.validate_image_and_filename(
-            old_svg_string.encode(encoding='utf-8'), svg_filename)
-
-        filepath = 'image/%s' % svg_filename
-        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
-
-        job_id = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
-        (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .get_output(job_id))
-
-        self.assertEqual(actual_output, [u'[u\'UNCHANGED\', 1]'])
-
-        new_svg_string = fs.get(filepath)
-
-        self.assertEqual(
-            old_svg_string.encode(encoding='utf-8'), new_svg_string)
-
-    def test_no_action_is_performed_on_non_math_svgs(self):
-        """Test that no action is performed on non-math SVGs."""
-
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        old_svg_string = (
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" '
-            'width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'random_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        filepath = 'image/%s' % svg_filename
-        fs.commit(filepath, old_svg_string, mimetype='image/svg+xml')
-
-        job_id = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob.create_new())
-        (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .enqueue(job_id))
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        actual_output = (
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob
-            .get_output(job_id))
-
-        self.assertEqual(actual_output, [])
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, self.VALID_EXP_ID))
-
-        invalid_svg_string = (
-            '<svg version="1.0" role="" width="100pt" height="100pt" '
-            'viewBox="0 0 100 100"><g><path d="M5455 '
-            '2632 9z"/></g><text transform="matrix(1 0 0 -1 0 0)" font-size'
-            '="884px" font-family="serif">Ì</text></svg>')
-
-        svg_filename = 'mathImg_12ab_height_1d2_width_2d3_vertical_3d2.svg'
-
-        fs.commit(
-            'image/%s' % svg_filename, invalid_svg_string,
-            mimetype='image/svg+xml')
-
-        exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
-
-        run_job_for_deleted_exp(
-            self,
-            exp_jobs_one_off
-            .PopulateXmlnsAttributeInExplorationMathSvgImagesJob)
 
 
 class XmlnsAttributeInExplorationMathSvgImagesAuditJobTests(

@@ -247,6 +247,10 @@ angular.module('oppia').factory('ExplorationSaveService', [
             keyboard: false,
             controller: 'EditorReloadingModalController',
             windowClass: 'oppia-loading-modal'
+          }).result.then(() => {}, () => {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
           });
 
           ChangeListService.discardAllChanges();
@@ -388,7 +392,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/modal-templates/' +
               'exploration-save-modal.template.html'),
-            backdrop: true,
+            backdrop: 'static',
             resolve: {
               isExplorationPrivate: function() {
                 return ExplorationRightsService.isPrivate();
