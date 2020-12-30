@@ -167,6 +167,13 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': re.compile(r'\bTestBed.get'),
+        'message': 'In unit tests, please use \'TestBed.inject\' instead of '
+                   '\'TestBed.get\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': re.compile(r'templateUrl: \''),
         'message': 'The directives must be directly referenced.',
         'excluded_files': (

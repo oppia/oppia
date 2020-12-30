@@ -60,6 +60,8 @@ INVALID_FDESCRIBE_DDESCRIBE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_ddescribe_fdescribe.ts')
 INVALID_IIT_FIT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iit_fit.ts')
 INVALID_INJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_inject.ts')
+INVALID_TESTBED_GET_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_testbed_get.ts')
 INVALID_INNER_HTML_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_innerhtml.ts')
 INVALID_RELATIVE_IMPORT_FILEPATH = os.path.join(
@@ -269,6 +271,16 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements([
             'Line 26: In tests, please use \'angular.mock.inject\' '
             'instead of \'inject\''], lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+    
+    def test_invalid_use_of_TestBed_get(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_TESTBED_GET_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements([
+            'Line 24: In unit tests, please use \'TestBed.inject\' instead of '
+            '\'TestBed.get\''], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
