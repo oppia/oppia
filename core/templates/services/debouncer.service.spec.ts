@@ -31,8 +31,7 @@ describe('Debouncer service', () => {
     loggerServiceSpy = spyOn(ls, 'log').and.callThrough();
   });
 
-  it(
-    'should call a debounced function after a non-zero given wait time',
+  it('should call a debounced function after a non-zero given wait time',
     () => {
       // Ref: https://github.com/gruntjs/grunt-contrib-jasmine/issues/213.
       jasmine.clock().uninstall();
@@ -45,8 +44,7 @@ describe('Debouncer service', () => {
       expect(loggerServiceSpy).toHaveBeenCalled();
     });
 
-  it(
-    'should instantly call a debounced function with wait time as zero',
+  it('should instantly call a debounced function with wait time as zero',
     () => {
       jasmine.clock().uninstall();
       jasmine.clock().install();
