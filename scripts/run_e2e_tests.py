@@ -193,6 +193,7 @@ def cleanup():
 
     build.set_constants_to_default()
     common.stop_redis_server()
+    common.stop_elasticsearch_server()
 
 
 def is_oppia_server_already_running():
@@ -527,6 +528,7 @@ def run_tests(args):
     setup_and_install_dependencies(args.skip_install)
 
     common.start_redis_server()
+    common.start_elasticsearch_server()
     atexit.register(cleanup)
 
     dev_mode = not args.prod_env
