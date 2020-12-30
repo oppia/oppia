@@ -798,7 +798,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         identifier_message = (
             '%s with id %s. Message: %s' % (
                 model_name, model_id, item.commit_message))
-        if len(item.commit_message) <= 1000:
+        if not item.commit_message or len(item.commit_message) <= 1000:
             yield ('LESS_OR_EQUAL_TO_1000', 1)
         else:
             yield ('GREATER_THAN_1000', identifier_message)
@@ -846,7 +846,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
         identifier_message = (
             '%s with id %s. Message: %s' % (
                 model_name, model_id, item.commit_message))
-        if len(item.commit_message) > 1000:
+        if item.commit_message and len(item.commit_message) > 1000:
             item.commit_message = item.commit_message[:1000]
             item.update_timestamps(update_last_updated_time=False)
             item.put()
