@@ -588,7 +588,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
             'Please use put_async_for_human() or put_async_for_bot() '
             'instead.'),
         'excluded_files': (),
-        'excluded_dirs': ('core/storage/base_model/')
+        'excluded_dirs': ('core/storage/base_model/',)
     }
 ]
 
