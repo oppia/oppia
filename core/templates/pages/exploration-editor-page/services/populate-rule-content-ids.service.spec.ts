@@ -25,7 +25,8 @@ describe('Populate Rule Content Ids Service', () => {
   let populateRuleContentIdsService = null;
 
   beforeEach(() => {
-    populateRuleContentIdsService = TestBed.inject(PopulateRuleContentIdsService);
+    populateRuleContentIdsService = TestBed.inject(
+      PopulateRuleContentIdsService);
   });
 
   it('should populate null content ids on save', () => {

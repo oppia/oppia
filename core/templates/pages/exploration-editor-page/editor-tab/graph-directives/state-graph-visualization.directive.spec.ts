@@ -128,7 +128,8 @@ describe('State Graph Visualization directive', function() {
     $provide.value(
       'StateRecordedVoiceoversService',
       TestBed.inject(StateRecordedVoiceoversService));
-    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(
+      StateSolutionService));
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.inject(StateWrittenTranslationsService));

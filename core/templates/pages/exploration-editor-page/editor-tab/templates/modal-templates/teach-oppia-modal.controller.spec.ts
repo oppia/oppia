@@ -133,7 +133,8 @@ describe('Teach Oppia Modal Controller', function() {
 
   beforeEach(function() {
     angularNameService = TestBed.inject(AngularNameService);
-    stateCustomizationArgsService = TestBed.inject(StateCustomizationArgsService);
+    stateCustomizationArgsService = TestBed.inject(
+      StateCustomizationArgsService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
@@ -150,7 +151,8 @@ describe('Teach Oppia Modal Controller', function() {
     $provide.value(
       'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
-    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(
+      StateSolutionService));
     mockExternalSaveEventEmitter = new EventEmitter();
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter

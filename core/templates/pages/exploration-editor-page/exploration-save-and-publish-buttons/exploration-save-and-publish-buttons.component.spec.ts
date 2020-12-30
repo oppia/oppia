@@ -99,7 +99,8 @@ describe('Exploration save and publish buttons component', function() {
       TestBed.inject(TextInputRulesService));
     $provide.value(
       'OutcomeObjectFactory', TestBed.inject(OutcomeObjectFactory));
-    $provide.value('SiteAnalyticsService', TestBed.inject(SiteAnalyticsService));
+    $provide.value('SiteAnalyticsService', TestBed.inject(
+      SiteAnalyticsService));
     $provide.value('StatesObjectFactory', TestBed.inject(StatesObjectFactory));
     $provide.value(
       'StateCustomizationArgsService',
@@ -108,7 +109,8 @@ describe('Exploration save and publish buttons component', function() {
       'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
       'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
-    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(
+      StateSolutionService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.inject(ReadOnlyExplorationBackendApiService));

@@ -84,7 +84,8 @@ describe('Exploration improvements task registrar service', () => {
       TestBed.inject(ExplorationImprovementsTaskRegistryService));
 
     answerStatsObjectFactory = TestBed.inject(AnswerStatsObjectFactory);
-    playthroughIssueObjectFactory = TestBed.inject(PlaythroughIssueObjectFactory);
+    playthroughIssueObjectFactory = TestBed.inject(
+      PlaythroughIssueObjectFactory);
     statesObjectFactory = TestBed.inject(StatesObjectFactory);
 
     config = new ExplorationImprovementsConfig(

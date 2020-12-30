@@ -34,7 +34,8 @@ describe('Early Quit Issue Component', function() {
 
   beforeEach(function() {
     alertsService = TestBed.inject(AlertsService);
-    playthroughIssueObjectFactory = TestBed.inject(PlaythroughIssueObjectFactory);
+    playthroughIssueObjectFactory = TestBed.inject(
+      PlaythroughIssueObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

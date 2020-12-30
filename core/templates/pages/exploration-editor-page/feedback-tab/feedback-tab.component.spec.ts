@@ -61,7 +61,8 @@ describe('Feedback Tab Component', function() {
   beforeEach(function() {
     alertsService = TestBed.inject(AlertsService);
     dateTimeFormatService = TestBed.inject(DateTimeFormatService);
-    suggestionThreadObjectFactory = TestBed.inject(SuggestionThreadObjectFactory);
+    suggestionThreadObjectFactory = TestBed.inject(
+      SuggestionThreadObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {

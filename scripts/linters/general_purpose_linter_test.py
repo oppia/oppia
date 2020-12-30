@@ -273,8 +273,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'instead of \'inject\''], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
-    
-    def test_invalid_use_of_TestBed_get(self):
+
+    def test_invalid_use_of_testbed_get(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_TESTBED_GET_FILEPATH], FILE_CACHE)
         lint_task_report = linter.check_bad_patterns()

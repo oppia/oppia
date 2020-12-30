@@ -33,7 +33,8 @@ describe('Translations backend API service', () => {
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
-    translationsBackendApiService = TestBed.inject(TranslationsBackendApiService);
+    translationsBackendApiService = TestBed.inject(
+      TranslationsBackendApiService);
   });
 
   afterEach(() => {

@@ -52,7 +52,8 @@ describe('Questions List Select Skill And Difficulty Modal Controller',
           ShortSkillSummaryObjectFactory
         ]
       });
-      skillSummaryObjectFactory = TestBed.inject(ShortSkillSummaryObjectFactory);
+      skillSummaryObjectFactory = TestBed.inject(
+        ShortSkillSummaryObjectFactory);
     });
 
     beforeEach(angular.mock.inject(function($injector, $controller) {

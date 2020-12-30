@@ -47,7 +47,8 @@ describe('PlaythroughIssuesBackendApiService', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
     playthroughIssuesBackendApiService = TestBed.inject(
       PlaythroughIssuesBackendApiService);
-    playthroughIssueObjectFactory = TestBed.inject(PlaythroughIssueObjectFactory);
+    playthroughIssueObjectFactory = TestBed.inject(
+      PlaythroughIssueObjectFactory);
   });
 
   afterEach(() => {

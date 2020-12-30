@@ -75,7 +75,8 @@ describe('Customize Interaction Modal Controller', function() {
     interactionDetailsCacheService = TestBed.inject(
       InteractionDetailsCacheService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    stateCustomizationArgsService = TestBed.inject(StateCustomizationArgsService);
+    stateCustomizationArgsService = TestBed.inject(
+      StateCustomizationArgsService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateNextContentIdIndexService = TestBed.inject(

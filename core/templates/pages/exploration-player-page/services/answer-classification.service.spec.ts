@@ -48,7 +48,7 @@ describe('Answer Classification Service', () => {
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
   let stateClassifierMappingService: StateClassifierMappingService;
   let stateObjectFactory: StateObjectFactory;
-  let textInputRulesService: InteractionRulesService;
+  let textInputRulesService: InteractionRulesService | TextInputRulesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({providers: [CamelCaseToHyphensPipe]});
@@ -59,7 +59,8 @@ describe('Answer Classification Service', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     predictionAlgorithmRegistryService = TestBed.inject(
       PredictionAlgorithmRegistryService);
-    stateClassifierMappingService = TestBed.inject(StateClassifierMappingService);
+    stateClassifierMappingService = TestBed.inject(
+      StateClassifierMappingService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     textInputRulesService = TestBed.inject(TextInputRulesService);
   });
@@ -201,7 +202,8 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name, state.interaction, '10', textInputRulesService)
+          state.name, state.interaction, '10',
+          textInputRulesService as InteractionRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 1', 'feedback_1', '', []),
@@ -210,7 +212,8 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name, state.interaction, '5', textInputRulesService)
+          state.name, state.interaction, '5',
+          textInputRulesService as InteractionRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
@@ -219,7 +222,8 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name, state.interaction, '6', textInputRulesService)
+          state.name, state.interaction, '6',
+          textInputRulesService as InteractionRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('outcome 2', 'feedback_2', '', []),
@@ -233,7 +237,8 @@ describe('Answer Classification Service', () => {
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
-          state.name, state.interaction, '777', textInputRulesService)
+          state.name, state.interaction, '777',
+          textInputRulesService as InteractionRulesService)
       ).toEqual(
         new AnswerClassificationResult(
           outcomeObjectFactory.createNew('default', 'default_outcome', '', []),
@@ -438,7 +443,8 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, '0', textInputRulesService)
+            state.name, state.interaction, '0',
+            textInputRulesService as InteractionRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, null,
@@ -458,7 +464,8 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, '0', textInputRulesService)
+            state.name, state.interaction, '0',
+            textInputRulesService as InteractionRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             outcomeObjectFactory.createNew(
@@ -584,7 +591,8 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, 'abc', textInputRulesService)
+            state.name, state.interaction, 'abc',
+            textInputRulesService as InteractionRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[0].outcome, 0, null,
@@ -592,7 +600,8 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, 'xyz', textInputRulesService)
+            state.name, state.interaction, 'xyz',
+            textInputRulesService as InteractionRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, null,
@@ -608,7 +617,8 @@ describe('Answer Classification Service', () => {
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
-            state.name, state.interaction, 'input', textInputRulesService)
+            state.name, state.interaction, 'input',
+            textInputRulesService as InteractionRulesService)
         ).toEqual(
           new AnswerClassificationResult(
             state.interaction.answerGroups[1].outcome, 1, 0,

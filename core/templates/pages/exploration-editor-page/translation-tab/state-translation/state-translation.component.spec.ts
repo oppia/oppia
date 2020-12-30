@@ -391,7 +391,8 @@ describe('State translation component', function() {
     $provide.value(
       'ExplorationStatsService', TestBed.inject(ExplorationStatsService));
     $provide.value('ExternalSaveService', TestBed.inject(ExternalSaveService));
-    $provide.value('FractionObjectFactory', TestBed.inject(FractionObjectFactory));
+    $provide.value('FractionObjectFactory', TestBed.inject(
+      FractionObjectFactory));
     $provide.value(
       'NumberWithUnitsObjectFactory',
       TestBed.inject(NumberWithUnitsObjectFactory));
@@ -409,7 +410,8 @@ describe('State translation component', function() {
       'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
       'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
-    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(
+      StateSolutionService));
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.inject(StateWrittenTranslationsService));
@@ -430,7 +432,8 @@ describe('State translation component', function() {
     stateRecordedVoiceoversService = TestBed.inject(
       StateRecordedVoiceoversService);
     subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);
-    subtitledUnicodeObjectFactory = TestBed.inject(SubtitledUnicodeObjectFactory);
+    subtitledUnicodeObjectFactory = TestBed.inject(
+      SubtitledUnicodeObjectFactory);
   });
 
   afterEach(function() {

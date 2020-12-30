@@ -136,7 +136,8 @@ describe('retrieving threads service', () => {
     contextService = TestBed.inject(ContextService);
     csrfTokenService = TestBed.inject(CsrfTokenService);
     feedbackThreadObjectFactory = TestBed.inject(FeedbackThreadObjectFactory);
-    suggestionThreadObjectFactory = TestBed.inject(SuggestionThreadObjectFactory);
+    suggestionThreadObjectFactory = TestBed.inject(
+      SuggestionThreadObjectFactory);
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');

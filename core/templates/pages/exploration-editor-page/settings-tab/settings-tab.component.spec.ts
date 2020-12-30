@@ -128,7 +128,8 @@ describe('Settings Tab Component', function() {
       'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value(
       'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
-    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(
+      StateSolutionService));
     $provide.value('ExplorationDataService', {
       explorationId: explorationId,
       getData: () => $q.resolve(),

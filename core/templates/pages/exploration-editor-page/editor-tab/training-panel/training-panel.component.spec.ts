@@ -121,7 +121,8 @@ describe('Training Panel Component', function() {
 
   beforeEach(function() {
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    stateCustomizationArgsService = TestBed.inject(StateCustomizationArgsService);
+    stateCustomizationArgsService = TestBed.inject(
+      StateCustomizationArgsService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
@@ -139,7 +140,8 @@ describe('Training Panel Component', function() {
     $provide.value(
       'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value('StateInteractionIdService', stateInteractionIdService);
-    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(
+      StateSolutionService));
     $provide.value(
       'ReadOnlyExplorationBackendApiService',
       TestBed.inject(ReadOnlyExplorationBackendApiService));

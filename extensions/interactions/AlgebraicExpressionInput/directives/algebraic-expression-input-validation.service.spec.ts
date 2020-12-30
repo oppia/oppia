@@ -49,7 +49,8 @@ describe('AlgebraicExpressionInputValidationService', () => {
       providers: [AlgebraicExpressionInputValidationService]
     });
 
-    validatorService = TestBed.inject(AlgebraicExpressionInputValidationService);
+    validatorService = TestBed.inject(
+      AlgebraicExpressionInputValidationService);
     oof = TestBed.inject(OutcomeObjectFactory);
     agof = TestBed.inject(AnswerGroupObjectFactory);
     rof = TestBed.inject(RuleObjectFactory);

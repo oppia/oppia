@@ -102,7 +102,8 @@ describe('Exploration editor tab component', function() {
       'AnswerStatsObjectFactory', TestBed.inject(AnswerStatsObjectFactory));
     $provide.value(
       'ExplorationFeaturesService', explorationFeaturesService);
-    $provide.value('FractionObjectFactory', TestBed.inject(FractionObjectFactory));
+    $provide.value('FractionObjectFactory', TestBed.inject(
+      FractionObjectFactory));
     $provide.value('HintObjectFactory', hintObjectFactory);
     $provide.value('ImprovementsService', TestBed.inject(ImprovementsService));
     $provide.value(

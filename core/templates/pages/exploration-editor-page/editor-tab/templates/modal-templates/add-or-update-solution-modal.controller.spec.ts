@@ -55,7 +55,8 @@ describe('Add Or Update Solution Modal Controller', function() {
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
-    stateCustomizationArgsService = TestBed.inject(StateCustomizationArgsService);
+    stateCustomizationArgsService = TestBed.inject(
+      StateCustomizationArgsService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateSolutionService = TestBed.inject(StateSolutionService);
     subtitledHtmlObjectFactory = TestBed.inject(SubtitledHtmlObjectFactory);

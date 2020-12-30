@@ -130,7 +130,8 @@ describe('Audio translation bar directive', function() {
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
-    $provide.value('SiteAnalyticsService', TestBed.inject(SiteAnalyticsService));
+    $provide.value('SiteAnalyticsService', TestBed.inject(
+      SiteAnalyticsService));
     $provide.value(
       'StateEditorRefreshService', TestBed.inject(StateEditorRefreshService));
     $provide.value('StateEditorService', TestBed.inject(StateEditorService));
@@ -141,7 +142,8 @@ describe('Audio translation bar directive', function() {
       'StateInteractionIdService', TestBed.inject(StateInteractionIdService));
     $provide.value(
       'StateRecordedVoiceoversService', stateRecordedVoiceoversService);
-    $provide.value('StateSolutionService', TestBed.inject(StateSolutionService));
+    $provide.value('StateSolutionService', TestBed.inject(
+      StateSolutionService));
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.inject(StateWrittenTranslationsService));
