@@ -101,7 +101,7 @@ describe('Story node editor directive', function() {
     spyOn(StoryEditorStateService, 'getTopicName').and.returnValue('addition');
 
     var MockTopicsAndSkillsDashboardBackendApiService = {
-      fetchDashboardData: () => {
+      fetchDashboardDataAsync: () => {
         var deferred = $q.defer();
         deferred.resolve({
           categorizedSkillsDict: {},

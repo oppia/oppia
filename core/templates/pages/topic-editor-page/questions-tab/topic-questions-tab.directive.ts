@@ -63,8 +63,8 @@ angular.module('oppia').directive('questionsTab', [
               $scope.allSkillSummaries = $scope.allSkillSummaries.concat(
                 subtopic.getSkillSummaries());
             }
-            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-              function(response) {
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+              .then(function(response) {
                 $scope.getSkillsCategorizedByTopics = (
                   response.categorizedSkillsDict);
                 $scope.getUntriagedSkillSummaries = (

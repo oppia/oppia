@@ -47,7 +47,7 @@ describe('Skills List Directive', function() {
   var testSubscription = null;
 
   var MockTopicsAndSkillsDashboardBackendApiService = {
-    mergeSkills: () => {
+    mergeSkillsAsync: () => {
       var deferred = $q.defer();
       deferred.resolve();
       return deferred.promise;
