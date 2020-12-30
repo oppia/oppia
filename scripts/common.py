@@ -641,7 +641,7 @@ def start_elasticsearch_server():
 
     # Clear previous data stored in the cluster.
     if os.path.exists(ES_PATH_DATA):
-        os.rmdir(ES_PATH_DATA)
+        shutil.rmtree(ES_PATH_DATA)
 
     os.environ['ES_PATH_CONF'] = ES_PATH_CONF
     subprocess.call(
