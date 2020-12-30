@@ -636,10 +636,12 @@ def apply_change_list(collection_id, change_list):
         Collection. The resulting collection domain object.
     """
     collection = get_collection_by_id(collection_id)
-    try:
-        changes = [collection_domain.CollectionChange(change_dict)
-                   for change_dict in change_list]
 
+    try:
+        changes = [
+            collection_domain.CollectionChange(change_dict)
+            for change_dict in change_list
+        ]
         for change in changes:
             if change.cmd == collection_domain.CMD_ADD_COLLECTION_NODE:
                 collection.add_node(change.exploration_id)
@@ -670,6 +672,7 @@ def apply_change_list(collection_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
                 continue
+
         return collection
 
     except Exception as e:
@@ -677,7 +680,7 @@ def apply_change_list(collection_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, collection_id, change_list)
         )
-        raise
+        python_utils.reraise_exception()
 
 
 def validate_exps_in_collection_are_public(collection):

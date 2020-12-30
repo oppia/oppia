@@ -407,8 +407,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
 
-        self.save_new_valid_collection(
-            'collection_id', self.owner_id)
+        self.save_new_valid_collection('collection_id', self.owner_id)
 
         with self.assertRaisesRegexp(
             Exception, 'Command invalid command is not allowed'), logging_swap:

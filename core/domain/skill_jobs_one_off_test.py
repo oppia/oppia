@@ -199,14 +199,14 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_updated_skill_failing_validation(self):
-
-        def _mock_get_skill_by_id(unused_skill_id):
-            """Mocks get_skill_by_id()."""
-            return 'invalid_skill'
-
         skill = skill_domain.Skill.create_default_skill(
             self.SKILL_ID, 'A description', self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
+        skill.description = ''
+
+        def _mock_get_skill_by_id(unused_skill_id):
+            """Mocks get_skill_by_id()."""
+            return skill
 
         get_skill_by_id_swap = self.swap(
             skill_fetchers, 'get_skill_by_id', _mock_get_skill_by_id)
@@ -223,9 +223,9 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         # If the skill had been successfully migrated, this would include a
         # 'successfully migrated' message. Its absence means that the skill
         # could not be processed.
-        expected = [[u'validation_error',
-                     [u'Skill %s failed validation: \'unicode\' object has '
-                      'no attribute \'validate\'' % (self.SKILL_ID)]]]
+        expected = [['validation_error',
+                     ['Skill %s failed validation: Description '
+                      'field should not be empty' % (self.SKILL_ID)]]]
         self.assertEqual(
             expected, [ast.literal_eval(x) for x in output])
 

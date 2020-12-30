@@ -4378,13 +4378,14 @@ class Exploration(python_utils.OBJECT):
             schema version provided in 'yaml_content'.
 
         Raises:
-            Exception. The 'yaml_content' or the exploration schema version is
-                not valid.
+            InvalidInputException. The 'yaml_content' or the schema version
+                is not specified.
+            Exception. The exploration schema version is not valid.
         """
         try:
             exploration_dict = utils.dict_from_yaml(yaml_content)
-        except Exception as e:
-            raise Exception(
+        except utils.InvalidInputException as e:
+            raise utils.InvalidInputException(
                 'Please ensure that you are uploading a YAML text file, not '
                 'a zip file. The YAML parser returned the following error: %s'
                 % e)
@@ -4392,7 +4393,8 @@ class Exploration(python_utils.OBJECT):
         exploration_schema_version = exploration_dict.get('schema_version')
         initial_schema_version = exploration_schema_version
         if exploration_schema_version is None:
-            raise Exception('Invalid YAML file: no schema version specified.')
+            raise utils.InvalidInputException(
+                'Invalid YAML file: no schema version specified.')
         if not (1 <= exploration_schema_version
                 <= cls.CURRENT_EXP_SCHEMA_VERSION):
             raise Exception(

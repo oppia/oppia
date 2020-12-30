@@ -56,10 +56,10 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     if new_rating not in ALLOWED_RATINGS:
         raise ValueError('Expected a rating 1-5, received %s.' % new_rating)
 
-    try:
-        exp_fetchers.get_exploration_by_id(exploration_id)
-    except:
-        raise Exception('Invalid exploration id %s' % exploration_id)
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, strict=False)
+    if exploration is None:
+        raise ValueError('Invalid exploration id %s' % exploration_id)
 
     def _update_user_rating():
         """Updates the user rating of the exploration. Returns the old rating

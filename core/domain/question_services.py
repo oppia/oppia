@@ -571,7 +571,7 @@ def apply_change_list(question_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, question_id, change_list)
         )
-        raise
+        python_utils.reraise_exception()
 
 
 def _save_question(committer_id, question, change_list, commit_message):

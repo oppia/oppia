@@ -31,7 +31,6 @@ import logging
 import math
 import os
 import pprint
-import traceback
 import zipfile
 
 from constants import constants
@@ -414,8 +413,10 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected hints_list to be a list,'
                             ' received %s' % change.new_value)
-                    new_hints_list = [state_domain.Hint.from_dict(hint_dict)
-                                      for hint_dict in change.new_value]
+                    new_hints_list = [
+                        state_domain.Hint.from_dict(hint_dict)
+                        for hint_dict in change.new_value
+                    ]
                     state.update_interaction_hints(new_hints_list)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
@@ -489,9 +490,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'param_specs':
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
-                    exploration.update_param_changes(
-                        list(python_utils.MAP(
-                            to_param_domain, change.new_value)))
+                    exploration.update_param_changes(list(
+                        python_utils.MAP(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -499,9 +499,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
-            elif (
-                    change.cmd ==
-                    exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
@@ -526,8 +525,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        logging.error(traceback.format_exc())
-        raise
+        python_utils.reraise_exception()
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
