@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AboutPageConstants } from './about-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
+import { UserService } from 'services/user.service';
 import { WindowRef } from
   'services/contextual/window-ref.service.ts';
 
@@ -38,6 +39,7 @@ export class AboutPageComponent implements OnInit {
   aboutPageMascotImgUrl: string;
   activeTabName: string;
   allCredits: CreditNames[] = [];
+  canCreateCollections: null;
   listOfNames: string;
   listOfNamesToThank = [
     'Alex Kauffmann', 'Allison Barros',
@@ -58,11 +60,13 @@ export class AboutPageComponent implements OnInit {
   TAB_ID_ABOUT = 'about';
   TAB_ID_FOUNDATION = 'foundation';
   TAB_ID_CREDITS = 'credits';
+  userIsLoggedIn: null;
   ALLOWED_TABS = [
     this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef) {
+    private windowRef: WindowRef,
+    private UserService: UserService) {
   }
 
   getCredits(startLetter: string): string[] {
@@ -82,11 +86,16 @@ export class AboutPageComponent implements OnInit {
   }
 
   goToClassroomPage(): void {
-    window.location.pathname = '/community-library';
+    window.location.pathname = '/learn/math';
   }
 
   goToCreatePage(): void {
-    window.location.pathname = '/create';
+    window.location.pathname = '/creator-dashboard?mode=create';
+    this.userIsLoggedIn = null;
+    /*UserService.getUserInfoAsync().then(function(userInfo) {
+      this.canCreateCollections = userInfo.canCreateCollections();
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+    });*/
   }
 
   ngOnInit(): void {
@@ -111,6 +120,13 @@ export class AboutPageComponent implements OnInit {
       ' & ' + this.listOfNamesToThank[this.listOfNamesToThank.length - 1];
     this.aboutPageMascotImgUrl = this.urlInterpolationService
       .getStaticImageUrl('/general/about_page_mascot.webp');
+
+      this.canCreateCollections = null;
+      this.userIsLoggedIn = null;
+      UserService.getUserInfoAsync().then((userInfo: any) => {
+        this.canCreateCollections = userInfo.canCreateCollections();
+        this.userIsLoggedIn = userInfo.isLoggedIn();
+      });
 
     this.windowRef.nativeWindow.onhashchange = () => {
       const hashChange = this.windowRef.nativeWindow.location.hash.slice(1);
