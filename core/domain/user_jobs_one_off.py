@@ -493,6 +493,9 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class RemoveFeedbackThreadIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes the feedback_thread_ids from the UserSubscriptionsModel.
+
+    NOTE TO DEVELOPERS: This job can be deleted after it is run in January
+    2021 release.
     """
 
     @classmethod
