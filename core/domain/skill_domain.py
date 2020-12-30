@@ -1510,8 +1510,8 @@ class SkillSummary(python_utils.OBJECT):
 
 class AugmentedSkillSummary(python_utils.OBJECT):
     """Domain object for Augmented Skill Summary, which has all the properties
-    of SkillSummary along with the topic name to which the skill is assigned
-    and the classroom name to which the topic is assigned.
+    of SkillSummary along with the topic names to which the skill is assigned
+    and the classroom names to which the topics are assigned.
     """
 
     def __init__(
@@ -1529,9 +1529,9 @@ class AugmentedSkillSummary(python_utils.OBJECT):
                 with the skill.
             worked_examples_count: int. The number of worked examples in the
                 skill.
-            topic_names: list(str). The name of the topic to which the skill
+            topic_names: list(str). The names of the topics to which the skill
                 is assigned.
-            classroom_names: list(str). The name of the classroom to which the
+            classroom_names: list(str). The names of the classrooms to which the
                 skill is assigned.
             skill_model_created_on: datetime.datetime. Date and time when
                 the skill model is created.
