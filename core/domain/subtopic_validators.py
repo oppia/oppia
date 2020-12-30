@@ -74,7 +74,7 @@ class SubtopicPageSnapshotMetadataModelValidator(
         base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""
 
-    EXTERNAL_MODEL_NAME='subtopic page'
+    EXTERNAL_MODEL_NAME = 'subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -100,7 +100,7 @@ class SubtopicPageSnapshotContentModelValidator(
         base_model_validators.BaseSnapshotContentModelValidator):
     """Class for validating SubtopicPageSnapshotContentModel."""
 
-    EXTERNAL_MODEL_NAME='subtopic page'
+    EXTERNAL_MODEL_NAME = 'subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -119,12 +119,12 @@ class SubtopicPageCommitLogEntryModelValidator(
         base_model_validators.BaseCommitLogEntryModelValidator):
     """Class for validating SubtopicPageCommitLogEntryModel."""
 
-    EXTERNAL_MODEL_NAME='subtopic page'
+    EXTERNAL_MODEL_NAME = 'subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [subtopicpage]-[subtopic_id]-[subtopic_version].
-        regex_string='^(subtopicpage)-%s-\\d*$' % (
+        regex_string = '^(subtopicpage)-%s-\\d*$' % (
             item.subtopic_page_id)
 
         return regex_string
