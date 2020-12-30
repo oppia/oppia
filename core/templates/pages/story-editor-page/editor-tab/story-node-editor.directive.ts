@@ -118,8 +118,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.allowedBgColors = (
               storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
-            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-              function(response) {
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+              .then(function(response) {
                 categorizedSkills = response.categorizedSkillsDict;
                 untriagedSkillSummaries = response.untriagedSkillSummaries;
                 $scope.skillInfoHasLoaded = true;

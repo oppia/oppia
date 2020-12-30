@@ -13,22 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for list of sets of html strings editor.
+ * @fileoverview Component for list of sets of translatable html content id
+ * editor.
  */
 
-angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {
-        getInitArgs: '&',
-        value: '='
-      },
-      template: require('./list-of-sets-of-html-strings-editor.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {
-        var ctrl = this;
+angular.module('oppia').component(
+  'listOfSetsOfTranslatableHtmlContentIdsEditor',
+  {
+    bindings: {
+      getInitArgs: '&',
+      value: '='
+    },
+    template: require(
+      './list-of-sets-of-translatable-html-content-ids-editor.component.html'),
+    controller: [
+      function() {
+        const ctrl = this;
         var errorMessage = '';
         ctrl.validOrdering = true;
 
@@ -41,7 +41,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
         };
 
         ctrl.selectItem = function(choiceListIndex) {
-          var choiceId = ctrl.choices[choiceListIndex].id;
+          var choiceContentId = ctrl.choices[choiceListIndex].val;
           var selectedRank = parseInt(
             ctrl.choices[choiceListIndex].selectedRank) - 1;
           errorMessage = '';
@@ -49,14 +49,14 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
 
           for (var i = 0; i < ctrl.value.length; i++) {
             choiceIdHasBeenAdded = false;
-            var choiceIdIndex = ctrl.value[i].indexOf(choiceId);
+            var choiceIdIndex = ctrl.value[i].indexOf(choiceContentId);
             if (choiceIdIndex > -1) {
               if (i !== selectedRank) {
                 ctrl.value[i].splice(choiceIdIndex, 1);
                 if (ctrl.value[selectedRank] === undefined) {
-                  ctrl.value[selectedRank] = [choiceId];
+                  ctrl.value[selectedRank] = [choiceContentId];
                 } else {
-                  ctrl.value[selectedRank].push(choiceId);
+                  ctrl.value[selectedRank].push(choiceContentId);
                 }
               }
               choiceIdHasBeenAdded = true;
@@ -65,9 +65,9 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           }
           if (!choiceIdHasBeenAdded) {
             if (ctrl.value[selectedRank] === undefined) {
-              ctrl.value[selectedRank] = [choiceId];
+              ctrl.value[selectedRank] = [choiceContentId];
             } else {
-              ctrl.value[selectedRank].push(choiceId);
+              ctrl.value[selectedRank].push(choiceContentId);
             }
           }
           // Removing any empty arrays from the end.
@@ -121,12 +121,12 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           if (ctrl.value[0] === undefined || ctrl.value[0].length === 0) {
             ctrl.value = [];
             for (var i = 0; i < ctrl.choices.length; i++) {
-              ctrl.value.push([ctrl.choices[i].id]);
+              ctrl.value.push([ctrl.choices[i].val]);
               ctrl.initValues.push(i + 1);
             }
           } else {
             for (var i = 0; i < ctrl.choices.length; i++) {
-              var choice = ctrl.choices[i].id;
+              var choice = ctrl.choices[i].val;
               for (var j = 0; j < ctrl.value.length; j++) {
                 if (ctrl.value[j].indexOf(choice) !== -1) {
                   ctrl.initValues.push(j + 1);
@@ -136,6 +136,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
             }
           }
         };
-      }]
-    };
-  }]);
+      }
+    ]
+  }
+);
