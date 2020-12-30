@@ -25,7 +25,9 @@ from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services as auth_services
 from core.tests import test_utils
+import python_utils
 
+import contextlib2
 import firebase_admin
 from firebase_admin import exceptions as firebase_exceptions
 import webapp2
@@ -73,6 +75,28 @@ class AuthenticateRequestTests(test_utils.TestBase):
         self.assertIsNone(auth_claims)
         self.assertEqual(len(errors), 1)
         self.assertIn('could not init', errors[0])
+
+    def test_cleans_up_firebase_app(self):
+        mock_app = python_utils.OBJECT()
+        initialize_app_swap = self.swap_to_always_return(
+            firebase_admin, 'initialize_app', value=mock_app)
+        verify_id_token_swap = self.swap_to_always_return(
+            firebase_admin.auth, 'verify_id_token', value={})
+        delete_app_swap = self.swap(
+            firebase_admin, 'delete_app',
+            lambda app: self.assertIs(app, mock_app))
+        request = self.make_request(auth_header='Bearer DUMMY_JWT')
+
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(initialize_app_swap)
+            stack.enter_context(verify_id_token_swap)
+            stack.enter_context(delete_app_swap)
+            errors = stack.enter_context(self.capture_logging())
+
+            auth_claims = auth_services.authenticate_request(request)
+
+        self.assertIsNone(auth_claims)
+        self.assertEqual(errors, [])
 
     @mock_successful_firebase_initialization
     def test_returns_auth_claims_from_valid_auth_token(self):

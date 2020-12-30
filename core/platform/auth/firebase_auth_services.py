@@ -54,6 +54,7 @@ Terminology:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import contextlib
 import logging
 
 from core.domain import auth_domain
@@ -68,17 +69,20 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 transaction_services = models.Registry.import_transaction_services()
 
 
-def _initialize_firebase():
-    """Initializes the Firebase Admin SDK, returns True when successful.
-    Otherwise, logs the failure reason and returns False.
+@contextlib.contextmanager
+def _acquire_firebase_context(credential=None):
+    """Returns a context for calling the Firebase Admin SDK.
+
+    Args:
+        credential: *|None. The credentials used to call the SDK from within the
+            context.
     """
+    app = firebase_admin.initialize_app()
     try:
-        firebase_admin.initialize_app()
-    except (ValueError, firebase_exceptions.FirebaseError) as e:
-        logging.exception(e)
-        return False
-    else:
-        return True
+        yield
+    finally:
+        if app is not None:
+            firebase_admin.delete_app(app)
 
 
 def authenticate_request(request):
@@ -112,15 +116,13 @@ def authenticate_request(request):
         AuthClaims|None. Claims of the user who authorized the request, or None
         if the request could not be authenticated.
     """
-    if not _initialize_firebase():
-        return None
-
     scheme, _, token = request.headers.get('Authorization', '').partition(' ')
     if scheme != 'Bearer':
         return None
 
     try:
-        claims = firebase_auth.verify_id_token(token)
+        with _acquire_firebase_context():
+            claims = firebase_auth.verify_id_token(token)
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
         return None
