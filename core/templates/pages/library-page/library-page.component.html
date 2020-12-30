@@ -47,7 +47,7 @@
           <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
         </div>
 
-        <div class="d-lg-none oppia-search-bar-container">
+        <div class="oppia-search-bar-container">
           <search-bar enable-dropup="false"></search-bar>
         </div>
 
@@ -463,6 +463,11 @@
     }
     library-page .oppia-classroom-text > a {
       margin-top: 40px;
+    }
+  }
+  @media(min-width: 1011px) {
+    .oppia-search-bar-container {
+      display: none;
     }
   }
 </style>
