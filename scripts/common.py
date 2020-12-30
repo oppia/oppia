@@ -530,6 +530,7 @@ def kill_processes_based_on_regex(pattern):
         pattern: str. Pattern for searching processes.
     """
     regex = re.compile(pattern)
+    # TODO(#11549): Move this to top of the file.
     if PSUTIL_DIR not in sys.path:
         sys.path.insert(1, PSUTIL_DIR)
     import psutil
@@ -722,9 +723,16 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
-        command_args: list(int | str). A sequence of program arguments, where
-            the program to execute is the first item.
+        command_args: list(int|str). A sequence of program arguments, where the
+            program to execute is the first item. Ints are allowed in order to
+            accomodate e.g. port numbers.
         shell: bool. Whether the command should be run inside of its own shell.
+            WARNING: Executing shell commands that incorporate unsanitized input
+            from an untrusted source makes a program vulnerable to
+            [shell injection](https://w.wiki/_Ac2), a serious security flaw
+            which can result in arbitrary command execution. For this reason,
+            the use of `shell=True` is **strongly discouraged** in cases where
+            the command string is constructed from external input.
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
             remaining processes will be killed abruptly.
@@ -733,12 +741,13 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     Yields:
         psutil.Process. The process managed by the context manager.
     """
+    # TODO(#11549): Move this to top of the file.
     if PSUTIL_DIR not in sys.path:
         sys.path.insert(1, PSUTIL_DIR)
     import psutil
 
     # We're only using these generators to reduce code duplication.
-    stripped_args = (python_utils.UNICODE(a).strip() for a in command_args)
+    stripped_args = (('%s' % arg).strip() for arg in command_args)
     non_empty_args = (s for s in stripped_args if s)
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
