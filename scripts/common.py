@@ -33,8 +33,6 @@ import constants
 import feconf
 import python_utils
 
-import contextlib2
-
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -856,6 +854,9 @@ def managed_firebase_auth_emulator():
     Yields:
         psutil.Process. The Firebase emulator process.
     """
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+
     emulator_args = [
         FIREBASE_PATH, 'emulators:start', '--only', 'auth',
         '--project', feconf.OPPIA_PROJECT_ID
