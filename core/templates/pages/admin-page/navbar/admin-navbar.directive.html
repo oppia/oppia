@@ -85,7 +85,7 @@
                   ng-mouseleave="$ctrl.deactivateDropdownMenu()"
                   ng-show="$ctrl.dropdownMenuisActive"
                   role="menu">
-                <li ng-repeat="(toverabName, url) in $ctrl.ADMIN_TAB_URLS">
+                <li ng-repeat="(tabName, url) in $ctrl.ADMIN_TAB_URLS">
                   <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab"
                      ng-href="<[url]>">
                     <[tabName]>
