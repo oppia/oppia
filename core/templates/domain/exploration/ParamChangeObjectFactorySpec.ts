@@ -20,7 +20,7 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 
 describe('Param Change Object Factory', () => {
-  let pcof;
+  let pcof: ParamChangeObjectFactory;
 
   beforeEach(() => {
     pcof = new ParamChangeObjectFactory();
