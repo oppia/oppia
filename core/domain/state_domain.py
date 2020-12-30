@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import collections
 import copy
 import itertools
-import json
 import logging
 import re
 
@@ -32,6 +31,7 @@ from core.domain import customization_args_util
 from core.domain import html_cleaner
 from core.domain import interaction_registry
 from core.domain import param_domain
+from core.domain import rules_registry
 from extensions.objects.models import objects
 import feconf
 import python_utils
@@ -178,12 +178,11 @@ class AnswerGroup(python_utils.OBJECT):
         outcome_html = self.outcome.feedback.html
         html_list += [outcome_html]
 
-        html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        html_field_types_to_rule_specs = (
+            rules_registry.Registry.get_html_field_types_to_rule_specs())
         for rule_spec in self.rule_specs:
             for interaction_and_rule_details in (
-                    html_field_types_to_rule_specs_dict.values()):
+                    html_field_types_to_rule_specs.values()):
                 # Check that the value corresponds to the answer group's
                 # associated interaction id.
                 if (
@@ -232,7 +231,8 @@ class AnswerGroup(python_utils.OBJECT):
         return html_list
 
     @staticmethod
-    def convert_html_in_answer_group(answer_group_dict, conversion_fn):
+    def convert_html_in_answer_group(
+            answer_group_dict, conversion_fn, html_field_types_to_rule_specs):
         """Checks for HTML fields in an answer group dict and converts it
         according to the conversion function.
 
@@ -240,6 +240,11 @@ class AnswerGroup(python_utils.OBJECT):
             answer_group_dict: dict. The answer group dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+            html_field_types_to_rule_specs: dict. A dictionary that specifies
+                the locations of html fields in rule specs. It is defined as a
+                mapping of rule input types to a dictionary containing
+                interaction id, format, and rule types. See
+                html_field_types_to_rule_specs_state_v41.json for an example.
 
         Returns:
             dict. The converted answer group dict.
@@ -251,7 +256,7 @@ class AnswerGroup(python_utils.OBJECT):
                 answer_group_dict['rule_specs']):
             answer_group_dict['rule_specs'][rule_spec_index] = (
                 RuleSpec.convert_html_in_rule_spec(
-                    rule_spec, conversion_fn))
+                    rule_spec, conversion_fn, html_field_types_to_rule_specs))
 
         return answer_group_dict
 
@@ -400,7 +405,9 @@ class Solution(python_utils.OBJECT):
         self.explanation.validate()
 
     @staticmethod
-    def convert_html_in_solution(interaction_id, solution_dict, conversion_fn):
+    def convert_html_in_solution(
+            interaction_id, solution_dict, conversion_fn,
+            html_field_types_to_rule_specs, interaction_spec):
         """Checks for HTML fields in a solution and convert it according
         to the conversion function.
 
@@ -409,6 +416,12 @@ class Solution(python_utils.OBJECT):
             solution_dict: dict. The Solution dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+            html_field_types_to_rule_specs: dict. A dictionary that specifies
+                the locations of html fields in rule specs. It is defined as a
+                mapping of rule input types to a dictionary containing
+                interaction id, format, and rule types. See
+                html_field_types_to_rule_specs_state_v41.json for an example.
+            interaction_spec: dict. The specification for the interaction.
 
         Returns:
             dict. The converted Solution dict.
@@ -416,20 +429,13 @@ class Solution(python_utils.OBJECT):
         if interaction_id is None:
             return solution_dict
 
-        interaction = (
-            interaction_registry.Registry.get_interaction_by_id(
-                interaction_id))
-
         solution_dict['explanation']['html'] = (
             conversion_fn(solution_dict['explanation']['html']))
 
-        if interaction.can_have_solution:
-            html_field_types_to_rule_specs_dict = json.loads(
-                utils.get_file_contents(
-                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+        if interaction_spec['can_have_solution']:
             if solution_dict['correct_answer']:
-                for html_type in html_field_types_to_rule_specs_dict.keys():
-                    if html_type == interaction.answer_type:
+                for html_type in html_field_types_to_rule_specs.keys():
+                    if html_type == interaction_spec['answer_type']:
 
                         if (
                                 html_type ==
@@ -783,8 +789,7 @@ class InteractionInstance(python_utils.OBJECT):
         html_list = []
 
         for answer_group in self.answer_groups:
-            html_list += answer_group.get_all_html_content_strings(
-                self.id)
+            html_list += answer_group.get_all_html_content_strings(self.id)
 
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
@@ -804,12 +809,11 @@ class InteractionInstance(python_utils.OBJECT):
         if self.solution and interaction.can_have_solution:
             solution_html = self.solution.explanation.html
             html_list += [solution_html]
-            html_field_types_to_rule_specs_dict = json.loads(
-                utils.get_file_contents(
-                    feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
+            html_field_types_to_rule_specs = (
+                rules_registry.Registry.get_html_field_types_to_rule_specs())
 
             if self.solution.correct_answer:
-                for html_type in html_field_types_to_rule_specs_dict.keys():
+                for html_type in html_field_types_to_rule_specs.keys():
                     if html_type == interaction.answer_type:
                         if (
                                 html_type ==
@@ -2033,7 +2037,8 @@ class RuleSpec(python_utils.OBJECT):
                 param_obj.normalize(param_value)
 
     @staticmethod
-    def convert_html_in_rule_spec(rule_spec_dict, conversion_fn):
+    def convert_html_in_rule_spec(
+            rule_spec_dict, conversion_fn, html_field_types_to_rule_specs):
         """Checks for HTML fields in a Rule Spec and converts it according
         to the conversion function.
 
@@ -2041,14 +2046,15 @@ class RuleSpec(python_utils.OBJECT):
             rule_spec_dict: dict. The Rule Spec dict.
             conversion_fn: function. The function to be used for converting the
                 HTML.
+            html_field_types_to_rule_specs: dict. A dictionary that specifies
+                the locations of html fields in rule specs. It is defined as a
+                mapping of rule input types to a dictionary containing
+                interaction id, format, and rule types. See
+                html_field_types_to_rule_specs_state_v41.json for an example.
 
         Returns:
             dict. The converted Rule Spec dict.
         """
-        html_field_types_to_rule_specs_dict = json.loads(
-            utils.get_file_contents(
-                feconf.HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH))
-
         # TODO(#9413): Find a way to include a reference to the interaction
         # type in the Draft change lists.
         # See issue: https://github.com/oppia/oppia/issues/9413. We cannot use
@@ -2057,7 +2063,7 @@ class RuleSpec(python_utils.OBJECT):
         # type and draft changes use this method. The rules_index_dict below
         # is used to figure out the assembly of the html in the rulespecs.
         for interaction_and_rule_details in (
-                html_field_types_to_rule_specs_dict.values()):
+                html_field_types_to_rule_specs.values()):
             rule_type_has_html = (
                 rule_spec_dict['rule_type'] in
                 interaction_and_rule_details['ruleTypes'].keys())
@@ -3074,7 +3080,8 @@ class State(python_utils.OBJECT):
     @classmethod
     def convert_html_fields_in_state(
             cls, state_dict, conversion_fn,
-            state_uses_old_interaction_cust_args_schema=False):
+            state_uses_old_interaction_cust_args_schema=False,
+            state_uses_old_rule_template_schema=False):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -3085,7 +3092,11 @@ class State(python_utils.OBJECT):
             state_uses_old_interaction_cust_args_schema: bool. Whether the
                 interaction customization arguments contain SubtitledHtml
                 and SubtitledUnicode dicts (should be True if prior to state
-                schema v40).
+                schema v36).
+            state_uses_old_rule_template_schema: bool. Wheter the rule inputs
+                contain html in the form of DragAndDropHtmlString,
+                SetOfHtmlString, or ListOfSetsOfHtmlString (shoud be True if
+                prior to state schema v42).
 
         Returns:
             dict. The converted state_dict.
@@ -3098,11 +3109,22 @@ class State(python_utils.OBJECT):
                     state_dict['interaction']['default_outcome'],
                     conversion_fn))
 
+        if state_uses_old_rule_template_schema:
+            # We need to retrieve an older version of
+            # html_field_types_to_rule_specs to properly convert html, since
+            # after state schema v41, some html fields were removed.
+            html_field_types_to_rule_specs = (
+                rules_registry.Registry.get_html_field_types_to_rule_specs(
+                    state_schema_version=41))
+        else:
+            html_field_types_to_rule_specs = (
+                rules_registry.Registry.get_html_field_types_to_rule_specs())
+
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
             state_dict['interaction']['answer_groups'][answer_group_index] = (
                 AnswerGroup.convert_html_in_answer_group(
-                    answer_group, conversion_fn)
+                    answer_group, conversion_fn, html_field_types_to_rule_specs)
             )
 
         if 'written_translations' in state_dict.keys():
@@ -3120,10 +3142,24 @@ class State(python_utils.OBJECT):
             return state_dict
 
         if state_dict['interaction']['solution']:
+            if state_uses_old_rule_template_schema:
+                interaction_spec = (
+                    interaction_registry.Registry
+                    .get_all_specs_for_state_schema_version(41)[
+                        interaction_id]
+                )
+            else:
+                interaction_spec = (
+                    interaction_registry.Registry
+                    .get_all_specs()[interaction_id]
+                )
             state_dict['interaction']['solution'] = (
                 Solution.convert_html_in_solution(
                     state_dict['interaction']['id'],
-                    state_dict['interaction']['solution'], conversion_fn))
+                    state_dict['interaction']['solution'],
+                    conversion_fn,
+                    html_field_types_to_rule_specs,
+                    interaction_spec))
 
         if state_uses_old_interaction_cust_args_schema:
             # We need to retrieve an older version of interaction_specs to
