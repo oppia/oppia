@@ -882,9 +882,6 @@ export class UpgradedServices {
         upgradedServices['WrittenTranslationObjectFactory']);
 
     // Topological level: 2.
-    upgradedServices['ContentTranslationManagerService'] =
-      new ContentTranslationManagerService(
-        upgradedServices['PlayerTranscriptService']);
     upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
       upgradedServices['OutcomeObjectFactory'],
       upgradedServices['RuleObjectFactory']);
@@ -1016,6 +1013,10 @@ export class UpgradedServices {
       new ContentTranslationLanguageService(
         upgradedServices['LanguageUtilService'],
         upgradedServices['ContentTranslationManagerService']);
+    upgradedServices['ContentTranslationManagerService'] =
+      new ContentTranslationManagerService(
+        upgradedServices['PlayerTranscriptService'],
+        upgradedServices['ExtensionTagAssemblerService']);
     upgradedServices['EmailDashboardBackendApiService'] =
       new EmailDashboardBackendApiService(
         upgradedServices['HttpClient']);

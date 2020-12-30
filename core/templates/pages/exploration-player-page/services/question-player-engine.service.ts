@@ -125,7 +125,8 @@ export class QuestionPlayerEngineService {
     var initialCard =
       this.stateCardObjectFactory.createNewCard(
         null, questionHtml, interactionHtml, interaction,
-        initialState.recordedVoiceovers, initialState.content.getContentId());
+        initialState.recordedVoiceovers,
+        initialState.writtenTranslations, initialState.content.getContentId());
     successCallback(initialCard, nextFocusLabel);
   }
 
@@ -313,6 +314,7 @@ export class QuestionPlayerEngineService {
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
         this.getNextStateData().recordedVoiceovers,
+        this.getNextStateData().writtenTranslations,
         this.getNextStateData().content.getContentId()
       );
     } else if (!onSameCard) {

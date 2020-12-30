@@ -60,6 +60,14 @@ export class SubtitledUnicode {
   isEmpty(): boolean {
     return !this._unicode;
   }
+
+  get contentId(): string {
+    return this._contentId;
+  }
+
+  set unicode(unicode: string) {
+    this._unicode = unicode;
+  }
 }
 
 @Injectable({

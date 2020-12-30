@@ -74,6 +74,10 @@ export class StateCard {
     this.audioTranslationLanguageService = audioTranslationLanguageService;
   }
 
+  restoreImmutable(stateCard: StateCard): void {
+    Object.assign(this, stateCard);
+  }
+
   getStateName(): string {
     return this._stateName;
   }
@@ -221,6 +225,22 @@ export class StateCard {
 
   setInteractionHtml(interactionHtml: string): void {
     this._interactionHtml = interactionHtml;
+  }
+
+  get writtenTranslations(): WrittenTranslations {
+    return this._writtenTranslations;
+  }
+
+  get contentHtml(): string {
+    return this._contentHtml;
+  }
+
+  set contentHtml(html: string) {
+    this._contentHtml = html;
+  }
+
+  get contentId(): string {
+    return this._contentId;
   }
 }
 

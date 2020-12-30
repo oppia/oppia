@@ -62,6 +62,14 @@ export class SubtitledHtml {
   isEmpty(): boolean {
     return !this._html;
   }
+
+  get contentId(): string {
+    return this._contentId;
+  }
+
+  set html(html: string) {
+    this._html = html;
+  }
 }
 
 @Injectable({

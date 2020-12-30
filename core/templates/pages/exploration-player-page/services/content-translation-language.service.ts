@@ -46,6 +46,7 @@ export class ContentTranslationLanguageService {
       preferredSiteLanguageCode: string,
       explorationLanguageCode: string
   ): void {
+    this._currentContentLanguageCode = null;
     this._allContentLanguageCodesInExploration =
         allContentLanguageCodesInExploration;
     this._explorationLanguageCode = explorationLanguageCode;
@@ -126,7 +127,7 @@ export class ContentTranslationLanguageService {
   setCurrentContentLanguageCode(newLanguageCode: string): void {
     if (this._currentContentLanguageCode !== newLanguageCode) {
       this.contentTranslationManagerService.displayTranslations(
-        newLanguageCode);
+        this._currentContentLanguageCode, newLanguageCode);
       this._currentContentLanguageCode = newLanguageCode;
     }
   }

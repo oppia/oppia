@@ -206,6 +206,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         StateCardObjectFactory.createNewCard(
           currentStateName, questionHtml, interactionHtml,
           interaction, initialState.recordedVoiceovers,
+          initialState.writtenTranslations,
           initialState.content.getContentId());
       successCallback(initialCard, nextFocusLabel);
     };
@@ -454,6 +455,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
           nextStateName, questionHtml, nextInteractionHtml,
           exploration.getInteraction(nextStateName),
           exploration.getState(nextStateName).recordedVoiceovers,
+          exploration.getState(nextStateName).writtenTranslations,
           exploration.getState(nextStateName).content.getContentId());
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
