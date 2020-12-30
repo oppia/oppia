@@ -4770,9 +4770,6 @@ export default {
     "code": "da",
     "description": "dansk (Danish)"
   }, {
-    "code": "prs",
-    "description": "دری (Dari)"
-  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)"
   }, {
@@ -4964,6 +4961,10 @@ export default {
     "description": "Danish",
     "relatedLanguages": ["da"]
   }, {
+    "id": "prs",
+    "description": "Dari",
+    "relatedLanguages": ["prs"]
+  }, {
     "id": "nl",
     "description": "Dutch",
     "relatedLanguages": ["nl"]
@@ -5083,6 +5084,10 @@ export default {
     "id": "sv",
     "description": "Swedish",
     "relatedLanguages": ["sw"]
+  }, {
+    "id": "te",
+    "description": "Telugu",
+    "relatedLanguages": ["te"]
   }, {
     "id": "th",
     "description": "Thai",
@@ -5451,7 +5456,7 @@ export default {
   "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
 
   // eslint-disable-next-line max-len
-  "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson I created on Oppia - a free platform for teaching and learning!",
+  "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson on Oppia - a free platform for teaching and learning!",
 
   "OPPORTUNITY_TYPE_SKILL": "skill",
   "OPPORTUNITY_TYPE_TRANSLATION": "translation",
