@@ -262,8 +262,6 @@ env_variables:
 # redirects to these instructions to disable URL fetch:
 # https://cloud.google.com/appengine/docs/standard/python/sockets#making_httplib_use_sockets
   GAE_USE_SOCKETS_HTTPLIB : "anyvalue"
-  # NOTE TO RELEASE COORDINATORS: Point this to the appropriate path before deploying the server.
-  GOOGLE_APPLICATION_CREDENTIALS: "/path/to/service-account-file.json"
 
 skip_files:
 # .pyc and .pyo files
