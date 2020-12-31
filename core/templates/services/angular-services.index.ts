@@ -327,6 +327,7 @@ import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import { ExplorationDataBackendApiService } from 'pages/exploration-editor-page/services/exploration-data-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -401,6 +402,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
+  ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
   ['ExplorationFeaturesBackendApiService',
