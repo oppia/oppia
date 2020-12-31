@@ -139,6 +139,38 @@ describe('Exploration data service', function() {
     httpTestingController.verify();
   });
 
+  it('should trigger success handler when auto saved successfully', fakeAsync(
+    () => {
+      eds.data = sampleDataResults;
+      const errorCallback = jasmine.createSpy('error');
+      const successCallback = jasmine.createSpy('success');
+      eds.autosaveChangeList([], successCallback, errorCallback);
+      const req = httpTestingController.expectOne(
+        '/createhandler/autosave_draft/0');
+      expect(req.request.method).toBe('PUT');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
+      expect(successCallback).toHaveBeenCalledWith(sampleDataResults);
+      expect(errorCallback).not.toHaveBeenCalled();
+    }
+  ));
+
+  it('should trigger errorcallback handler when auto save fails', fakeAsync(
+    () => {
+      eds.data = sampleDataResults;
+      const errorCallback = jasmine.createSpy('error');
+      const successCallback = jasmine.createSpy('success');
+      eds.autosaveChangeList([], successCallback, errorCallback);
+      const req = httpTestingController.expectOne(
+        '/createhandler/autosave_draft/0');
+      expect(req.request.method).toBe('PUT');
+      req.error(new ErrorEvent('Server error'));
+      flushMicrotasks();
+      expect(successCallback).not.toHaveBeenCalled();
+      expect(errorCallback).toHaveBeenCalled();
+    }
+  ));
+
   it('should autosave draft changes when draft ids match', fakeAsync(() => {
     const errorCallback = jasmine.createSpy('error');
     const successCallback = jasmine.createSpy('success');
