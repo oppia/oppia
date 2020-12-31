@@ -427,8 +427,9 @@ OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
 
 # Used by the Admin SDK to connect with the Firebase Authentication emulator.
-# NOTE: this name is NOT a typo, it is the environment variable expected to be
-# set: https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks.
+# NOTE: this name is is NOT a typo despite the inclusion of the port number, it
+# is the environment variable expected to be set:
+# https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks.
 FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
 
 # Committer id for system actions. The username for the system committer
