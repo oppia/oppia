@@ -29,7 +29,10 @@ export type ExplorationChange = (
   ExplorationChangeRenameState |
   ExplorationChangeDeleteState |
   ExplorationChangeEditStateProperty |
-  ExplorationChangeEditExplorationProperty);
+  ExplorationChangeEditExplorationProperty|
+  RevertChangeList |
+  CreateChangeList |
+  MigrateStatesVersionChangeList);
 
 export interface ExplorationChangeAddState {
   cmd: 'add_state';

@@ -195,7 +195,8 @@ export class LostChangeObjectFactory {
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
    */
-  createNew(lostChangeDict: ExplorationChange): LostChange {
+  createNew(
+      lostChangeDict: ExplorationChange | LostChangeBackendDict): LostChange {
     let newStateName: string | undefined;
     let oldStateName: string | undefined;
     let stateName: string | undefined;
