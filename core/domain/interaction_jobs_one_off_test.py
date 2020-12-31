@@ -1072,11 +1072,11 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
             .RuleInputToCustomizationArgsMappingOneOffJob.get_output(job_id))
         expected_output = [(
             u'[u\'exp_id0\', [u"<ItemSelectionInput Answer> State: State2, '
-            'Invalid Values: [u\'<p>This is value3 for DragAndDropSort</p>\']"'
+            'Invalid Values: [\'<p>This is value3 for DragAndDropSort</p>\']"'
             ', u"<ItemSelectionInput Rule> State: State2, '
             'Answer Group Index: 0, Invalid Values: [u\'<p>This is value3 '
             'for ItemSelection</p>\']", u"<ItemSelectionInput Answer> State: '
-            'State1, Invalid Values: [u\'<p>This is value2 for '
+            'State1, Invalid Values: [\'<p>This is value2 for '
             'DragAndDropSort</p>\']"]]'
         )]
 
@@ -1262,7 +1262,7 @@ class RuleInputToCustomizationArgsMappingOneOffJobTests(
         expected_output = [(
             u'[u\'exp_id0\', [u"<DragAndDropSortInput Answer> State: '
             '\\u0627\\u062e\\u062a\\u0628\\u0627\\u0631\\u0627\\u062a, '
-            'Invalid Values: [u\'<p>This is value3 for DragAndDropSort</p>\']"'
+            'Invalid Values: [\'<p>This is value3 for DragAndDropSort</p>\']"'
             ', u"<DragAndDropSortInput Rule> State: \\u0627\\u062e\\u062a'
             '\\u0628\\u0627\\u0631\\u0627\\u062a, Answer Group Index: 0, '
             'Invalid Values: [u\'<p>This is value3 for DragAndDropSort</p>\']"'

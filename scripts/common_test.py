@@ -18,23 +18,27 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import contextlib
 import getpass
 import http.server
 import os
 import re
 import shutil
+import signal
 import socketserver
 import stat
 import subprocess
 import sys
 import tempfile
+import time
 
 import constants
 from core.tests import test_utils
-
-import psutil
 import python_utils
+
+import contextlib2
+import psutil
 
 from . import common
 
@@ -847,3 +851,158 @@ class CommonTests(test_utils.GenericTestBase):
         # Asserts that imports from problematic modules do not error.
         from google.cloud import tasks_v2 # pylint: disable=unused-variable
         from google.appengine.api import app_identity # pylint: disable=unused-variable
+
+
+class ManagedProcessTests(test_utils.TestBase):
+
+    # Helper class for improving the readability of tests.
+    POPEN_CALL = (
+        collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs']))
+
+    @contextlib.contextmanager
+    def _swap_popen(
+            self, make_processes_unresponsive=False, num_children=0):
+        """Returns values for inspecting and mocking calls to psutil.Popen.
+
+        Args:
+            make_processes_unresponsive: bool. Whether the processes created by
+                the mock will stall when asked to terminate. Processes will
+                always terminate within ~1 minute regardless of this choice.
+            num_children: int. The number of child processes the process created
+                by the mock should create. Children inherit the same termination
+                behavior.
+
+        Returns:
+            Context manager. A context manager in which calls to psutil.Popen
+            create a simple program that simply waits and then exits.
+
+        Yields:
+            list(POPEN_CALL). A list with the most up-to-date arguments passed
+            to psutil.Popen from within the context manager returned.
+        """
+        popen_calls = []
+
+        def popen_mock(program_args, **kwargs):
+            """Mock of psutil.Popen that creates processes using os.fork().
+
+            The processes created will always terminate within ~1 minute.
+
+            Args:
+                program_args: list(*). Unused program arguments that would
+                    otherwise be used by psutil.Popen.
+                **kwargs: dict(str: *). Unused keyword arguments that would
+                    otherwise be used by psutil.Popen.
+
+            Returns:
+                psutil.Process. Handle for the parent of the new process tree.
+            """
+            child_pid = os.fork()
+            if child_pid != 0:
+                popen_calls.append(self.POPEN_CALL(program_args, kwargs))
+                time.sleep(1) # Give child a chance to start running.
+                return psutil.Process(pid=child_pid)
+
+            for _ in python_utils.RANGE(num_children):
+                if os.fork() == 0:
+                    break
+
+            if make_processes_unresponsive:
+                # Register an unresponsive function as the SIGTERM handler.
+                signal.signal(signal.SIGTERM, lambda *_: time.sleep(30))
+
+            time.sleep(30)
+            sys.exit()
+
+        with self.swap(psutil, 'Popen', popen_mock):
+            yield popen_calls
+
+    def test_does_not_raise_when_psutil_not_in_path(self):
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self.swap(sys, 'path', []))
+            stack.enter_context(self._swap_popen())
+
+            # Entering the context should not raise.
+            stack.enter_context(common.managed_process(['a'], timeout_secs=10))
+
+    def test_concats_command_args_when_shell_is_true(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(
+                common.managed_process(['a', 1], shell=True, timeout_secs=10))
+
+        self.assertEqual(logs, [])
+        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
+
+    def test_passes_command_args_as_list_of_strings_when_shell_is_false(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(
+                common.managed_process(['a', 1], shell=False, timeout_secs=10))
+
+        self.assertEqual(logs, [])
+        self.assertEqual(
+            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
+
+    def test_filters_empty_strings_from_command_args_when_shell_is_true(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(common.managed_process(
+                ['', 'a', '', 1], shell=True, timeout_secs=10))
+
+        self.assertEqual(logs, [])
+        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
+
+    def test_filters_empty_strings_from_command_args_when_shell_is_false(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(common.managed_process(
+                ['', 'a', '', 1], shell=False, timeout_secs=10))
+
+        self.assertEqual(logs, [])
+        self.assertEqual(
+            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
+
+    def test_reports_killed_processes_as_warnings(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            stack.enter_context(self._swap_popen(
+                make_processes_unresponsive=True))
+
+            proc = stack.enter_context(
+                common.managed_process(['a'], timeout_secs=10))
+            pid = proc.pid
+
+        self.assertEqual(logs, ['Process killed (pid=%d)' % pid])
+
+    def test_kills_child_processes(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            stack.enter_context(self._swap_popen(
+                make_processes_unresponsive=True, num_children=3))
+
+            proc = stack.enter_context(
+                common.managed_process(['a'], timeout_secs=10))
+            pids = [c.pid for c in proc.children()] + [proc.pid]
+
+        self.assertEqual(len(pids), 4)
+        self.assertItemsEqual(
+            logs, ['Process killed (pid=%d)' % p for p in pids])
+
+    def test_managed_dev_appserver(self):
+        with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(
+                common.managed_dev_appserver('app.yaml', env=None))
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn('dev_appserver.py', popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'env': None})
