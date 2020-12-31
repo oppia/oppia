@@ -31,7 +31,6 @@ import logging
 import math
 import os
 import pprint
-import traceback
 import zipfile
 
 from constants import constants
@@ -414,8 +413,10 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected hints_list to be a list,'
                             ' received %s' % change.new_value)
-                    new_hints_list = [state_domain.Hint.from_dict(hint_dict)
-                                      for hint_dict in change.new_value]
+                    new_hints_list = [
+                        state_domain.Hint.from_dict(hint_dict)
+                        for hint_dict in change.new_value
+                    ]
                     state.update_interaction_hints(new_hints_list)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
@@ -489,9 +490,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'param_specs':
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
-                    exploration.update_param_changes(
-                        list(python_utils.MAP(
-                            to_param_domain, change.new_value)))
+                    exploration.update_param_changes(list(
+                        python_utils.MAP(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -499,9 +499,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
-            elif (
-                    change.cmd ==
-                    exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
@@ -526,8 +525,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        logging.error(traceback.format_exc())
-        raise
+        python_utils.reraise_exception()
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
@@ -797,7 +795,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):
-    """Remove explorations from all subscribers' activity_ids.
+    """Remove explorations from all subscribers' exploration_ids.
 
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
@@ -805,14 +803,12 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     if not exploration_ids:
         return
 
-    # TODO(#10727): activity_ids in UserSubscriptionsModel should be renamed
-    # to explorations_id.
     subscription_models = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
+        user_models.UserSubscriptionsModel.exploration_ids.IN(exploration_ids)
     ).fetch()
     for model in subscription_models:
-        model.activity_ids = [
-            id_ for id_ in model.activity_ids if id_ not in exploration_ids]
+        model.exploration_ids = [
+            id_ for id_ in model.exploration_ids if id_ not in exploration_ids]
     user_models.UserSubscriptionsModel.update_timestamps_multi(
         subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
