@@ -104,37 +104,41 @@ class MockExplorationModelWithDeprecatedFields(exp_models.ExplorationModel):
     skin_customizations = datastore_services.JsonProperty(indexed=False)
 
     def _trusted_commit(
-        self, committer_id, commit_type, commit_message, commit_cmds):
+            self, committer_id, commit_type, commit_message, commit_cmds):
         """Override this to escape recursion, which will otherwise occur
         when super() is used in a mocked class.
         """
 
-        base_models.VersionedModel._trusted_commit(
+        base_models.VersionedModel._trusted_commit( # pylint: disable=protected-access
             self, committer_id, commit_type, commit_message, commit_cmds)
         exp_rights = exp_models.ExplorationRightsModel.get_by_id(self.id)
 
         # TODO(msl): Test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when explorations
         # are changed).
-        exploration_commit_log = exp_models.ExplorationCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type, commit_message,
-            commit_cmds, exp_rights.status, exp_rights.community_owned
-        )
+        exploration_commit_log = (
+            exp_models.ExplorationCommitLogEntryModel.create(
+                self.id, self.version, committer_id,
+                commit_type, commit_message,
+                commit_cmds, exp_rights.status,
+                exp_rights.community_owned
+            ))
         exploration_commit_log.exploration_id = self.id
         exploration_commit_log.update_timestamps()
         exploration_commit_log.put()
 
 
 class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
-    test_utils.GenericTestBase):
+        test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
             exp_jobs_one_off.RemoveDeprecatedExplorationModelFieldsOneOffJob
             .create_new()
         )
-        (exp_jobs_one_off.RemoveDeprecatedExplorationModelFieldsOneOffJob
-        .enqueue(job_id))
+        (
+            exp_jobs_one_off.RemoveDeprecatedExplorationModelFieldsOneOffJob
+            .enqueue(job_id))
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
@@ -152,7 +156,7 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
             'ExplorationModel',
             MockExplorationModelWithDeprecatedFields
         ):
-            # Init Exploration with skill_tags
+            # Init Exploration with skill_tags.
             exp_model1 = exp_models.ExplorationModel(
                 id='exp_id1',
                 category='category',
@@ -174,8 +178,8 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 'title': 'title',
                 'category': 'category',
             }])
-            # Init Exploration with default_skin
-            exp_model2= exp_models.ExplorationModel(
+            # Init Exploration with default_skin.
+            exp_model2 = exp_models.ExplorationModel(
                 id='exp_id2',
                 category='category',
                 title='title',
@@ -196,7 +200,7 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
                 'title': 'title',
                 'category': 'category',
             }])
-            # Init Exploration with skin_customizations
+            # Init Exploration with skin_customizations.
             exp_model3 = exp_models.ExplorationModel(
                 id='exp_id3',
                 category='category',
@@ -1599,31 +1603,9 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1718,7 +1700,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 self.assertTrue(invalid_tag in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
@@ -1904,31 +1886,9 @@ class ExplorationRteMathContentValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -2027,7 +1987,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
                     invalid_tag_info['invalid_tag'] in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 

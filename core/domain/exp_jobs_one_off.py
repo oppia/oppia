@@ -57,15 +57,16 @@ import utils
 ])
 
 
-class RemoveDeprecatedExplorationModelFieldsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class RemoveDeprecatedExplorationModelFieldsOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
     """Job that sets skill_tags, default_skin, skin_customization fields
     in ExplorationModels to None in order to remove it from the datastore.
     """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
-        super(RemoveDeprecatedExplorationModelFieldsOneOffJob, 
-            cls).enqueue(job_id, shard_count=64)
+        super(RemoveDeprecatedExplorationModelFieldsOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -75,7 +76,7 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJob(jobs.BaseMapReduceOneOffJo
     def map(exp_model):
         removed_deprecated_field = False
         for deprecated_field in [
-            'skill_tags', 'default_skin', 'skin_customizations']:
+                'skill_tags', 'default_skin', 'skin_customizations']:
             if deprecated_field in exp_model._properties:  # pylint: disable=protected-access
                 del exp_model._properties[deprecated_field]  # pylint: disable=protected-access
                 if deprecated_field in exp_model._values:  # pylint: disable=protected-access
@@ -235,7 +236,8 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
         while states_schema_version < current_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
-                    versioned_exploration_states, states_schema_version,
+                    versioned_exploration_states,
+                    states_schema_version,
                     item.id)
                 states_schema_version += 1
             except Exception as e:
