@@ -36,13 +36,15 @@ AuthIdUserIdPair = (
 
 
 class AuthClaims(python_utils.OBJECT):
-    """Domain object representing essential Claims (a piece of information about
-    a user, like name, address, phone number, etc.) of an authorized user.
+    """Domain object for holding onto essential Claims about an authorized user.
+
+    A Claim is a piece of information about a user (e.g. name, mailing address,
+    phone number).
 
     Attributes:
-        auth_id: str|None. A unique identifier associated to the user. The ID is
-            only unique with respect to the Identity Provider who produced it.
-        email: str|None. The email address associated to the user.
+        auth_id: str. A unique identifier associated to the user. The ID is only
+            unique with respect to the Identity Provider that produced it.
+        email: str|None. The email address associated to the user, if any.
     """
 
     def __init__(self, auth_id, email):
