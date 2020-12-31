@@ -28,8 +28,6 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -38,12 +36,12 @@ import utils
 
 (
     base_models, collection_models, exp_models,
-    feedback_models, job_models, question_models,
+    feedback_models, question_models,
     skill_models, story_models, subtopic_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
-    models.NAMES.feedback, models.NAMES.job, models.NAMES.question,
+    models.NAMES.feedback, models.NAMES.question,
     models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
@@ -59,15 +57,6 @@ AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
 USER_ID_REGEX = 'uid_[a-z]{32}'
-ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
-    'DashboardRecentUpdatesAggregator',
-    'ExplorationRecommendationsAggregator',
-    'FeedbackAnalyticsAggregator',
-    'InteractionAnswerSummariesAggregator',
-    'SearchRanker',
-    'StatisticsAggregator',
-    'UserImpactAggregator',
-    'UserStatsAggregator']
 TARGET_TYPE_TO_TARGET_MODEL = {
     feconf.ENTITY_TYPE_EXPLORATION: (
         exp_models.ExplorationModel),
@@ -820,267 +809,3 @@ class UnsentFeedbackEmailModelValidator(
     def _get_custom_validation_functions(cls):
         return [cls._validate_entity_type_and_entity_id_feedback_reference]
 
-
-class JobModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating JobModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        # Valid id: [job_type]-[current time]-[random int]
-        regex_string = '^%s-\\d*-\\d*$' % item.job_type
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return []
-
-    @classmethod
-    def _validate_time_fields(cls, item):
-        """Validate the time fields in entity.
-
-        Args:
-            item: datastore_services.Model. JobModel to validate.
-        """
-        if item.time_started_msec and (
-                item.time_queued_msec > item.time_started_msec):
-            cls._add_error(
-                'time queued check',
-                'Entity id %s: time queued %s is greater '
-                'than time started %s' % (
-                    item.id, item.time_queued_msec, item.time_started_msec))
-
-        if item.time_finished_msec and (
-                item.time_started_msec > item.time_finished_msec):
-            cls._add_error(
-                'time started check',
-                'Entity id %s: time started %s is greater '
-                'than time finished %s' % (
-                    item.id, item.time_started_msec, item.time_finished_msec))
-
-        current_time_msec = utils.get_current_time_in_millisecs()
-        if item.time_finished_msec > current_time_msec:
-            cls._add_error(
-                'time finished check',
-                'Entity id %s: time finished %s is greater '
-                'than the current time' % (
-                    item.id, item.time_finished_msec))
-
-    @classmethod
-    def _validate_error(cls, item):
-        """Validate error is not None only if status is not canceled
-        or failed.
-
-        Args:
-            item: datastore_services.Model. JobModel to validate.
-        """
-        if item.error and item.status_code not in [
-                job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
-            cls._add_error(
-                base_model_validators.ERROR_CATEGORY_ERROR_CHECK,
-                'Entity id %s: error: %s for job is not empty but '
-                'job status is %s' % (item.id, item.error, item.status_code))
-
-        if not item.error and item.status_code in [
-                job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
-            cls._add_error(
-                base_model_validators.ERROR_CATEGORY_ERROR_CHECK,
-                'Entity id %s: error for job is empty but '
-                'job status is %s' % (item.id, item.status_code))
-
-    @classmethod
-    def _validate_output(cls, item):
-        """Validate output for entity is present only if status is
-        completed.
-
-        Args:
-            item: datastore_services.Model. JobModel to validate.
-        """
-        if item.output and item.status_code != job_models.STATUS_CODE_COMPLETED:
-            cls._add_error(
-                base_model_validators.ERROR_CATEGORY_OUTPUT_CHECK,
-                'Entity id %s: output: %s for job is not empty but '
-                'job status is %s' % (item.id, item.output, item.status_code))
-
-        if item.output is None and (
-                item.status_code == job_models.STATUS_CODE_COMPLETED):
-            cls._add_error(
-                base_model_validators.ERROR_CATEGORY_OUTPUT_CHECK,
-                'Entity id %s: output for job is empty but '
-                'job status is %s' % (item.id, item.status_code))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_time_fields,
-            cls._validate_error,
-            cls._validate_output]
-
-
-class ContinuousComputationModelValidator(
-        base_model_validators.BaseModelValidator):
-    """Class for validating ContinuousComputationModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        # Valid id: Name of continuous computation manager class.
-        regex_string = '^(%s)$' % ('|').join(
-            ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES)
-        return regex_string
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return []
-
-    @classmethod
-    def _validate_time_fields(cls, item):
-        """Validate the time fields in entity.
-
-        Args:
-            item: datastore_services.Model. ContinuousComputationModel to
-                validate.
-        """
-        if item.last_started_msec > item.last_finished_msec and (
-                item.last_started_msec > item.last_stopped_msec):
-            cls._add_error(
-                'last started check',
-                'Entity id %s: last started %s is greater '
-                'than both last finished %s and last stopped %s' % (
-                    item.id, item.last_started_msec, item.last_finished_msec,
-                    item.last_stopped_msec))
-
-        current_time_msec = utils.get_current_time_in_millisecs()
-        if item.last_finished_msec > current_time_msec:
-            cls._add_error(
-                'last finished check',
-                'Entity id %s: last finished %s is greater '
-                'than the current time' % (
-                    item.id, item.last_finished_msec))
-
-        if item.last_stopped_msec > current_time_msec:
-            cls._add_error(
-                'last stopped check',
-                'Entity id %s: last stopped %s is greater '
-                'than the current time' % (
-                    item.id, item.last_stopped_msec))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_time_fields]
-
-
-class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
-    """Class for validating SubtopicPageModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '^%s-\\d*$' % (item.topic_id)
-
-    @classmethod
-    def _get_model_domain_object_instance(cls, item):
-        return subtopic_page_services.get_subtopic_page_from_model(item)
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in python_utils.RANGE(
-                1, item.version + 1)]
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'subtopic_page_commit_log_entry_ids',
-                subtopic_models.SubtopicPageCommitLogEntryModel,
-                ['subtopicpage-%s-%s'
-                 % (item.id, version) for version in python_utils.RANGE(
-                     1, item.version + 1)]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'snapshot_metadata_ids',
-                subtopic_models.SubtopicPageSnapshotMetadataModel,
-                snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'snapshot_content_ids',
-                subtopic_models.SubtopicPageSnapshotContentModel,
-                snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'topic_ids', topic_models.TopicModel, [item.topic_id])]
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
-
-
-class SubtopicPageSnapshotMetadataModelValidator(
-        base_model_validators.BaseSnapshotMetadataModelValidator):
-    """Class for validating SubtopicPageSnapshotMetadataModel."""
-
-    EXTERNAL_MODEL_NAME = 'subtopic page'
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9]{1,%s}-\\d*-\\d*$' % base_models.ID_LENGTH
-
-    @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return subtopic_page_domain.SubtopicPageChange
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'subtopic_page_ids',
-                subtopic_models.SubtopicPageModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
-
-
-class SubtopicPageSnapshotContentModelValidator(
-        base_model_validators.BaseSnapshotContentModelValidator):
-    """Class for validating SubtopicPageSnapshotContentModel."""
-
-    EXTERNAL_MODEL_NAME = 'subtopic page'
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9]{1,%s}-\\d*-\\d*$' % base_models.ID_LENGTH
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'subtopic_page_ids',
-                subtopic_models.SubtopicPageModel,
-                [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]])]
-
-
-class SubtopicPageCommitLogEntryModelValidator(
-        base_model_validators.BaseCommitLogEntryModelValidator):
-    """Class for validating SubtopicPageCommitLogEntryModel."""
-
-    EXTERNAL_MODEL_NAME = 'subtopic page'
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        # Valid id: [subtopicpage]-[subtopic_id]-[subtopic_version].
-        regex_string = '^(subtopicpage)-%s-\\d*$' % (
-            item.subtopic_page_id)
-
-        return regex_string
-
-    @classmethod
-    def _get_change_domain_class(cls, item):
-        if item.id.startswith('subtopicpage'):
-            return subtopic_page_domain.SubtopicPageChange
-        else:
-            cls._add_error(
-                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
-                'Entity id %s: Entity id does not match regex pattern' % (
-                    item.id))
-            return None
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'subtopic_page_ids',
-                subtopic_models.SubtopicPageModel,
-                [item.subtopic_page_id])]
