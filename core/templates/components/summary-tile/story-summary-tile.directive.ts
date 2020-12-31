@@ -96,7 +96,6 @@ angular.module('oppia').directive('storySummaryTile', [
             let node = this.storySummary.getAllNodes().find(node => {
               return node.getTitle() === nodeTitle;
             });
-            console.log(node)
             if (!node) {
               return '';
             }
