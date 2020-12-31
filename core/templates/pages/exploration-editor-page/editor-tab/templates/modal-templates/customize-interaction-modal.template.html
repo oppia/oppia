@@ -16,7 +16,7 @@
     <uib-tabset>
       <uib-tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
                heading="<[category.name]>" active="category.active"
-               class="protractor-test-interaction-tab-<[category.name]>">
+               class="protractor-test-interaction-tab-<[category.name]> highlight-interaction">
         <br>
         <div ng-repeat="interactionId in category.interaction_ids"
              ng-click="onChangeInteractionId(interactionId)"
@@ -84,9 +84,26 @@
     border-bottom: none;
     border-radius: 5px 5px 0 0;
   }
+  .highlight-interaction {
+    color: #555555;
+  }
+  .highlight-interaction:hover {
+    background-color: #E0F2F1;
+  }
+  .customize-interaction-body-container ul {
+    color: #555555 !important;
+  }
   .customize-interaction-body-container ul .active {
     border-bottom: 2px solid #00609C;
+    background-color: #E0F2F1;
+    color: #00609C;
   }
+  /*.customize-interaction-body-container ul:hover {
+    /*border-bottom: 2px solid #00609C;
+    background-color: white;
+    color: #555555;
+    background-color: #E0F2F1;
+  }*/
    .customize-interaction-modal .modal-dialog {
      margin: 30px auto;
      max-width: none;
