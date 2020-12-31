@@ -29,7 +29,6 @@ import { WrittenTranslation } from
   'domain/exploration/WrittenTranslationObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { AppConstants } from 'app.constants';
 
 export interface StateObjectsDict {
   [state: string]: State;

@@ -67,7 +67,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
   'StateCardObjectFactory', 'StatsReportingService', 'UrlService',
   function(
       $rootScope, AlertsService, AnswerClassificationService,
-      AudioPreloaderService, AudioTranslationLanguageService, 
+      AudioPreloaderService, AudioTranslationLanguageService,
       ContentTranslationLanguageService, ContextService,
       ExplorationFeaturesBackendApiService, ExplorationHtmlFormatterService,
       ExplorationObjectFactory, ExpressionInterpolationService,

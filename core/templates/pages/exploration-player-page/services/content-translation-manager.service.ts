@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
@@ -156,7 +156,8 @@ export class ContentTranslationManagerService {
       );
 
       if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
-        this._swapContent(writtenTranslations, languageCode,
+        this._swapContent(
+          writtenTranslations, languageCode,
           <SubtitledHtml|SubtitledUnicode>value);
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (

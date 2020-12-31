@@ -29,7 +29,7 @@ import { ContentTranslationManagerService } from
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import {ExplorationHtmlFormatterService} from
-  'services/exploration-html-formatter.service'
+  'services/exploration-html-formatter.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
@@ -135,7 +135,7 @@ describe('Content translation manager service', () => {
       }
     });
 
-    const interaction = iof.createFromBackendDict(interactionDict)
+    const interaction = iof.createFromBackendDict(interactionDict);
 
     pts.transcript = [
       scof.createNewCard(

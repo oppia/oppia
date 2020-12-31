@@ -103,7 +103,8 @@ require('pages/interaction-specs.constants.ajs.ts');
 require(
   'pages/exploration-player-page/services/' +
   'content-translation-manager.service.ts');
-require('pages/exploration-player-page/services/' +
+require(
+  'pages/exploration-player-page/services/' +
   'content-translation-language.service.ts');
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
