@@ -33,28 +33,31 @@ class AuthIdUserIdPairTests(test_utils.TestBase):
 
 class AuthClaimsTests(test_utils.TestBase):
 
-    AUTH_ID = 'aid'
-    EMAIL = 'test@test.com'
+    def test_rejects_empty_auth_id(self):
+        with self.assertRaisesRegexp(Exception, 'auth_id must not be empty'):
+            auth_domain.AuthClaims(None, None)
+        with self.assertRaisesRegexp(Exception, 'auth_id must not be empty'):
+            auth_domain.AuthClaims('', None)
 
     def test_attributes(self):
-        auth = auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL)
+        auth = auth_domain.AuthClaims('sub', 'email@test.com')
 
-        self.assertEqual(auth.auth_id, self.AUTH_ID)
-        self.assertEqual(auth.email, self.EMAIL)
+        self.assertEqual(auth.auth_id, 'sub')
+        self.assertEqual(auth.email, 'email@test.com')
 
     def test_repr(self):
         self.assertEqual(
-            repr(auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL)),
-            'AuthClaims(auth_id=%r, email=%r)' % (self.AUTH_ID, self.EMAIL))
+            repr(auth_domain.AuthClaims('sub', 'email@test.com')),
+            'AuthClaims(auth_id=%r, email=%r)' % ('sub', 'email@test.com'))
         self.assertEqual(
-            repr(auth_domain.AuthClaims(None, None)),
-            'AuthClaims(auth_id=None, email=None)')
+            repr(auth_domain.AuthClaims('tub', None)),
+            'AuthClaims(auth_id=%r, email=None)' % ('tub',))
 
     def test_comparison(self):
-        auth = auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL)
+        auth = auth_domain.AuthClaims('sub', 'email@test.com')
 
-        self.assertEqual(auth, auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL))
-        self.assertNotEqual(auth, auth_domain.AuthClaims(None, None))
+        self.assertEqual(auth, auth_domain.AuthClaims('sub', 'email@test.com'))
+        self.assertNotEqual(auth, auth_domain.AuthClaims('tub', None))
 
     def test_hash(self):
         a = auth_domain.AuthClaims('a', 'a@a.com')

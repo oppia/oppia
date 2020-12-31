@@ -130,11 +130,10 @@ def authenticate_request(request):
         logging.exception(e)
         return None
 
-    # We want to convert empty string values to None.
-    auth_id = claims.get('sub', '') or None
-    email = claims.get('email', '') or None
+    auth_id = claims.get('sub', None)
+    email = claims.get('email', None)
     # Auth ID is a required Claim, so return None when it is missing.
-    return None if auth_id is None else auth_domain.AuthClaims(auth_id, email)
+    return None if not auth_id else auth_domain.AuthClaims(auth_id, email)
 
 
 def get_user_id_from_auth_id(auth_id):

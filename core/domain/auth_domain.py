@@ -46,6 +46,8 @@ class AuthClaims(python_utils.OBJECT):
     """
 
     def __init__(self, auth_id, email):
+        if not auth_id:
+            raise Exception('auth_id must not be empty')
         self.auth_id = auth_id
         self.email = email
 
@@ -57,10 +59,12 @@ class AuthClaims(python_utils.OBJECT):
 
     def __eq__(self, other):
         return (
-            # https://docs.python.org/2/library/constants.html#NotImplemented
+            # https://docs.python.org/2/library/constants.html#NotImplemented.
             NotImplemented if not isinstance(other, AuthClaims) else
             self.auth_id == other.auth_id and self.email == other.email)
 
     def __ne__(self, other):
-        # Required in Python 2: https://stackoverflow.com/a/30676267/4859885.
+        # TODO(#11474): Delete this method once we've moved to Python 3 and rely
+        # on auto-generated method. In Python 2, we need to write this method
+        # ourselves: https://stackoverflow.com/a/30676267/4859885.
         return not self == other
