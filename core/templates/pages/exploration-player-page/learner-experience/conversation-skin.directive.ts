@@ -1402,6 +1402,11 @@ angular.module('oppia').directive('conversationSkin', [
                 AlertsService.addSuccessMessage('Rating saved!', 1000);
               })
             );
+            ctrl.directiveSubscriptions.add(
+              ContentTranslationManagerService
+                .onStateCardContentUpdate.subscribe(
+                  () => $rootScope.$applyAsync())
+            );
             $window.addEventListener('beforeunload', function(e) {
               if ($scope.redirectToRefresherExplorationConfirmed) {
                 return;

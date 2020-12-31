@@ -97,6 +97,7 @@ describe('State card object factory', () => {
           }
         }
       }),
+      null,
       'content');
   });
 

@@ -20,10 +20,11 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { ContentTranslationManagerService } from
+  'pages/exploration-player-page/services/content-translation-manager.service';
 import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
-import { ContentTranslationManagerService } from './content-translation-manager.service';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
 
 @Injectable({

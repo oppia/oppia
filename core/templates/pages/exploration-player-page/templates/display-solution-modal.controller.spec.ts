@@ -98,7 +98,7 @@ describe('Display Solution Modal Controller', function() {
     var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,
-      recordedVoiceovers, 'content_id');
+      recordedVoiceovers, null, 'content_id');
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
     testSubscriptions = new Subscription();

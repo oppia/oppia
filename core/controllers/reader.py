@@ -167,17 +167,14 @@ class ExplorationHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
 
         preferred_audio_language_code = None
+        preferred_language_codes = None
+        preferred_site_language_code = None
+
         if user_settings is not None:
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
-
-        preferred_language_codes = None
-        if user_settings is not None:
             preferred_language_codes = (
                 user_settings.preferred_language_codes)
-
-        preferred_site_language_code = None
-        if user_settings is not None:
             preferred_site_language_code = (
                 user_settings.preferred_site_language_code)
 

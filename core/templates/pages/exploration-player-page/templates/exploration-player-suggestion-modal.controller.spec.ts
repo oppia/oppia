@@ -83,7 +83,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
 
     card = stateCardObjectFactory.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,
-      recordedVoiceovers, 'content_id');
+      recordedVoiceovers, null, 'content_id');
 
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Introduction');

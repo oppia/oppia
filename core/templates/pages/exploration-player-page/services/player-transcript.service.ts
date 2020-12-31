@@ -114,10 +114,6 @@ export class PlayerTranscriptService {
     return this.transcript[index];
   }
 
-  getAllCards(): StateCard[] {
-    return this.transcript;
-  }
-
   getLastAnswerOnDisplayedCard(displayedCardIndex: number): string | null {
     if (
       this.isLastCard(displayedCardIndex) ||

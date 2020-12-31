@@ -17,20 +17,28 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
+import { cloneDeep } from 'lodash';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard } from 'domain/state_card/StateCardObjectFactory';
-import { WrittenTranslation } from 'domain/exploration/WrittenTranslationObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { StateCard } from
+  'domain/state_card/StateCardObjectFactory';
+import { WrittenTranslation } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import { Schema } from 'services/schema-default-value.service';
-import { SchemaConstants } from 'components/forms/schema-based-editors/schema-constants';
+import { SchemaConstants } from
+  'components/forms/schema-based-editors/schema-constants';
 import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
-import { cloneDeep } from 'lodash';
+import { WrittenTranslations } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { SubtitledUnicode } from
+  'domain/exploration/SubtitledUnicodeObjectFactory';
+import { ExtensionTagAssemblerService } from
+  'services/extension-tag-assembler.service';
+
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +46,7 @@ import { cloneDeep } from 'lodash';
 export class ContentTranslationManagerService {
   _explorationLanguageCode: string;
   _originalTranscript: StateCard[];
+  _onStateCardContentUpdateEmitter: EventEmitter<void> = new EventEmitter();
 
   constructor(
     private playerTranscriptService: PlayerTranscriptService,
@@ -48,8 +57,12 @@ export class ContentTranslationManagerService {
     this._explorationLanguageCode = explorationLanguageCode;
   }
 
+  get onStateCardContentUpdate(): EventEmitter<void> {
+    return this._onStateCardContentUpdateEmitter;
+  }
+
   displayTranslations(oldLanguageCode: string, newLanguageCode: string) : void {
-    const cards = this.playerTranscriptService.getAllCards();
+    const cards = this.playerTranscriptService.transcript;
 
     if (oldLanguageCode === this._explorationLanguageCode) {
       this._originalTranscript = cloneDeep(
@@ -71,6 +84,8 @@ export class ContentTranslationManagerService {
         card._inputResponsePairs.splice(0, card._inputResponsePairs.length);
       });
     }
+
+    this._onStateCardContentUpdateEmitter.emit();
   }
 
   _swapContent(
