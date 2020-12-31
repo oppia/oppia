@@ -68,7 +68,7 @@ interface ExplorationChangeDeleteState {
 }
 
 interface ExplorationChangeEditStateProperty {
-  cmd: 'cmd_edit_exploration_property',
+  cmd: 'edit_state_property',
   'new_value': SubtitledHtmlBackendDict |
     InteractionBackendDict |
     ParamChangeBackendDict[] |
@@ -81,16 +81,17 @@ interface ExplorationChangeEditStateProperty {
     RecordedVoiceOverBackendDict |
     WrittenTranslationsBackendDict |
     boolean | number | string;
+  'state_name': string;
   'property_name': string;
 }
 
 interface ExplorationChangeEditExplorationProperty {
   cmd: 'edit_exploration_property';
-  'new_value': ParamChangeBackendDict | ParamSpecBackendDict | string;
-  'old_value': ParamChangeBackendDict | ParamSpecBackendDict | string;
+  'new_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
+  'old_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
   'property_name': string;
-
 }
+
 interface CollectionTitleChange {
   'cmd': 'edit_collection_property';
   'property_name': 'title';
