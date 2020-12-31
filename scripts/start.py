@@ -35,7 +35,10 @@ install_third_party_libs.main()
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
+import feconf # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+import contextlib2 # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -98,7 +101,6 @@ def cleanup():
         time.sleep(1)
     build.set_constants_to_default()
     common.stop_redis_server()
-    common.stop_elasticsearch_dev_server()
 
 
 def main(args=None):
@@ -146,7 +148,8 @@ def main(args=None):
         time.sleep(10)
 
     common.start_redis_server()
-    common.start_elasticsearch_dev_server()
+    python_utils.PRINT('Starting ElasticSearch development server.')
+    managed_es_server = common.managed_elasticsearch_dev_server()
 
     python_utils.PRINT('Starting GAE development server')
     managed_dev_appserver = common.managed_dev_appserver(
@@ -156,10 +159,13 @@ def main(args=None):
         automatic_restart=not parsed_args.no_auto_restart,
         skip_sdk_update_check=True, port=PORT_NUMBER_FOR_GAE_SERVER)
 
-    with managed_dev_appserver:
+    with contextlib2.ExitStack() as stack:
+        stack.enter_context(managed_es_server)
+        stack.enter_context(managed_dev_appserver)
+
         # Wait for the servers to come up.
-        while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
-            time.sleep(1)
+        common.wait_for_port_to_be_open(PORT_NUMBER_FOR_GAE_SERVER)
+        common.wait_for_port_to_be_open(feconf.ES_PORT)
 
         # Launch a browser window.
         if common.is_linux_os() and not parsed_args.no_browser:

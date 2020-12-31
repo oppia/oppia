@@ -637,30 +637,28 @@ def wait_for_port_to_be_open(port_number):
         sys.exit(1)
 
 
-def start_elasticsearch_dev_server():
-    """Start the ElasticSearch server for running tests in development mode
-    and running local dev server. This is only required in a development
-    environment.
-    """
+@contextlib.contextmanager
+def managed_elasticsearch_dev_server():
+    """Returns a context manager for ElasticSearch server for running tests
+    in development mode and running a local dev server. This is only required
+    in a development environment.
 
-    python_utils.PRINT('Starting ElasticSearch development server.')
+    Yields:
+        psutil.Process. The ElasticSearch server process.
+    """
 
     # Clear previous data stored in the local cluster.
     if os.path.exists(ES_PATH_DATA_DIR):
         shutil.rmtree(ES_PATH_DATA_DIR)
 
+    # Override the default path to ElasticSearch config files.
     os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
-    subprocess.call(
-        ['%s/bin/elasticsearch' % ES_PATH, '-d', '-p', '%s/pid' % ES_PATH])
-    wait_for_port_to_be_open(feconf.ES_PORT)
-
-
-def stop_elasticsearch_dev_server():
-    """Stops the ElasticSearch server by shutting it down."""
-
-    # Shut down Elasticsearch using the PID.
-    python_utils.PRINT('Shutting down the ElasticSearch cluster.')
-    subprocess.call(['pkill', '-F', '%s/pid' % ES_PATH])
+    es_args = [
+        '%s/bin/elasticsearch' % ES_PATH,
+        '-d'
+    ]
+    with managed_process(es_args, shell=True) as proc:
+        yield proc
 
 
 def start_redis_server():

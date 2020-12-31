@@ -27,11 +27,14 @@ import subprocess
 import sys
 import time
 
+import feconf
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import flake_checker
 from scripts import install_third_party_libs
+
+import contextlib2
 
 MAX_RETRY_COUNT = 3
 RERUN_NON_FLAKY = True
@@ -193,7 +196,6 @@ def cleanup():
 
     build.set_constants_to_default()
     common.stop_redis_server()
-    common.stop_elasticsearch_dev_server()
 
 
 def is_oppia_server_already_running():
@@ -507,7 +509,6 @@ def run_tests(args):
     setup_and_install_dependencies(args.skip_install)
 
     common.start_redis_server()
-    common.start_elasticsearch_dev_server()
     atexit.register(cleanup)
 
     dev_mode = not args.prod_env
@@ -522,13 +523,20 @@ def run_tests(args):
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
+    managed_es_server = common.managed_elasticsearch_dev_server()
+
     managed_dev_appserver = common.managed_dev_appserver(
         'app.yaml' if args.prod_env else 'app_dev.yaml',
         port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
         clear_datastore=True, skip_sdk_update_check=True,
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
 
-    with managed_dev_appserver:
+    with contextlib2.ExitStack() as stack:
+        stack.enter_context(managed_es_server)
+        stack.enter_context(managed_dev_appserver)
+
+        # Wait for the servers to come up.
+        common.wait_for_port_to_be_open(feconf.ES_PORT)
         common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
         python_utils.PRINT(
