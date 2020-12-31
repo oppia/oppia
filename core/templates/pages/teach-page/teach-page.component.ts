@@ -39,12 +39,12 @@ export class TeachPageComponent implements OnInit {
   testimonials = [];
   userIsLoggedIn: boolean | null;
   constructor(
-    private loaderService: LoaderService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private userBackendApiService: UserBackendApiService
+    private userBackendApiService: UserBackendApiService,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {
@@ -56,11 +56,11 @@ export class TeachPageComponent implements OnInit {
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
-    // this.loaderService.showLoadingScreen('Loading');
+    this.loaderService.showLoadingScreen('Loading');
     this.userBackendApiService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
-     });
+    });
   }
 
   // The 2 functions below are to cycle between values:
@@ -69,10 +69,10 @@ export class TeachPageComponent implements OnInit {
   // This makes sure that incrementing from (testimonialCount - 1)
   // returns 0 instead of testimonialCount,since we want the testimonials
   // to cycle through.
-        this.displayedTestimonialId = (
-          this.displayedTestimonialId + 1) % this.testimonialCount;
-      };
-  
+    this.displayedTestimonialId = (
+      this.displayedTestimonialId + 1) % this.testimonialCount;
+  }
+
   decrementDisplayedTestimonialId(): void {
   // This makes sure that decrementing from 0, returns
   // (testimonialCount - 1) instead of -1, since we want the testimonials
@@ -80,9 +80,9 @@ export class TeachPageComponent implements OnInit {
     this.displayedTestimonialId = (
       this.displayedTestimonialId + this.testimonialCount - 1) %
       this.testimonialCount;
-  };
+  }
 
-  getTestimonials(): any {
+  getTestimonials() {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
@@ -105,67 +105,66 @@ export class TeachPageComponent implements OnInit {
       quote: 'I18N_TEACH_TESTIMONIAL_4',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_4',
       imageUrl: this.getStaticImageUrl('/splash/Gaurav_2.png'),
-      imageUrlWebp:this.getStaticImageUrl('/splash/Gaurav_2.webp'),
+      imageUrlWebp: this.getStaticImageUrl('/splash/Gaurav_2.webp'),
       borderPresent: true
     }];
-  };
+  }
 
   isWindowNarrow():boolean {
     return this.windowDimensionService.isWindowNarrow();
-  };
+  }
 
   onClickStartLearningButton(): boolean {
     this.siteAnalyticsService.registerClickStartLearningButtonEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = this.classroomUrl;
-      }, 150);
+    }, 150);
     return false;
-  };
+  }
 
   onClickVisitClassroomButton(): boolean {
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = this.classroomUrl;
-      }, 150);
+    }, 150);
     return false;
-  };
+  }
 
   onClickBrowseLibraryButton(): boolean {
     this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = ('/community-library');
-      }, 150);
+    }, 150);
     return false;
-  };
+  }
 
   onClickGuideParentsButton(): boolean {
     this.siteAnalyticsService.registerClickGuideParentsButtonEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = ('/teach');
-      }, 150);
+    }, 150);
     return false;
-  };
+  }
 
   onClickTipforParentsButton(): boolean {
     this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = ('/teach');
-      }, 150);
+    }, 150);
     return false;
-  };
+  }
 
   onClickExploreLessonsButton(): boolean {
     this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = this.classroomUrl;
-      }, 150);
+    }, 150);
     return false;
-  };
+  }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
-
 }
 
 angular.module('oppia').directive('teachPage',
