@@ -178,8 +178,8 @@ class TopicSnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [item.committer_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]
 
 
@@ -238,8 +238,8 @@ class TopicRightsSnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [item.committer_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]
 
 
@@ -291,8 +291,8 @@ class TopicCommitLogEntryModelValidator(
                 'topic_ids', topic_models.TopicModel, [item.topic_id]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'user_id', [item.user_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]
         if item.id.startswith('rights'):
             external_id_relationships.append(

@@ -151,8 +151,8 @@ class ExplorationSnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [item.committer_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]
 
 
@@ -251,8 +251,8 @@ class ExplorationRightsSnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [item.committer_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]
 
 
@@ -306,8 +306,8 @@ class ExplorationCommitLogEntryModelValidator(
                 exp_models.ExplorationModel, [item.exploration_id]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'user_id', [item.user_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]
         if item.id.startswith('rights'):
             external_id_relationships.append(
@@ -500,7 +500,7 @@ class GeneralFeedbackThreadModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', [item.original_author_id],
-                    pseudonymous_ids_omitted=True
+                    may_contain_pseudonymous_ids=True
                 ))
         if item.has_suggestion:
             field_name_to_external_model_references.append(
@@ -522,7 +522,7 @@ class GeneralFeedbackThreadModelValidator(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'last_nonempty_message_author_ids',
                     [item.last_nonempty_message_author_id],
-                    pseudonymous_ids_omitted=True
+                    may_contain_pseudonymous_ids=True
                 ))
         return field_name_to_external_model_references
 
@@ -633,7 +633,7 @@ class GeneralFeedbackMessageModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', [item.author_id],
-                    pseudonymous_ids_omitted=True
+                    may_contain_pseudonymous_ids=True
                 )
             )
         return field_name_to_external_model_references
@@ -877,8 +877,8 @@ class SubtopicPageSnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [item.committer_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]
 
 
@@ -935,6 +935,6 @@ class SubtopicPageCommitLogEntryModelValidator(
                 [item.subtopic_page_id]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'user_id', [item.user_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]

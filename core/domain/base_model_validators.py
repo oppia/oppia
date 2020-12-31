@@ -109,7 +109,7 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
 
     def __init__(
             self, field_name, model_ids,
-            system_user_ids_omitted=False, pseudonymous_ids_omitted=False):
+            may_contain_system_ids=False, may_contain_pseudonymous_ids=False):
         """Initializes the UserSettingsModelFetcherDetails domain object.
 
         Args:
@@ -120,22 +120,42 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                 UserSettingsModel.
             model_ids: list(str). The list of user settings model ids to fetch
                 the UserSettingsModels.
-            system_user_ids_omitted: bool. Whether to omit the system user IDs
-                from the model_ids before attempting to fetch the corresponding
-                models.
-            pseudonymous_ids_omitted: bool. Whether to omit pseudonymous user
-                IDs from the model_ids before attempting to fetch the
-                corresponding models.
+            may_contain_system_ids: bool. Whether the model ids contain
+                system ids which should be omitted before attempting to fetch
+                the corresponding models.
+            may_contain_pseudonymous_ids: bool. Whether the model ids contain
+                pseudonymous ids which should be omitted before attempting to
+                fetch the corresponding models.
+
+                Note:
+                    Set may_contain_pseudonymous_ids to True if and only if
+                    this field can contain user IDs that are pseudonymized as
+                    part of Wipeout. These fields can only be in models that
+                    have LOCALLY_PSEUDONYMIZE as their DELETION_POLICY. Set
+                    may_contain_system_ids to True if and only if this field
+                    can contain admin or bot IDs.
         """
         filtered_model_ids = model_ids
-        if system_user_ids_omitted:
+        if may_contain_system_ids:
             filtered_model_ids = list(
                 set(filtered_model_ids) - set(feconf.SYSTEM_USERS.values()))
-        if pseudonymous_ids_omitted:
+        else:
+            if set(filtered_model_ids) & set(feconf.SYSTEM_USERS.values()):
+                raise Exception(
+                    'The attribute may_contain_system_ids is set to False' +
+                    'but the model_ids contain system ids.')
+        if may_contain_pseudonymous_ids:
             filtered_model_ids = [
                 model_id for model_id in filtered_model_ids
                 if not utils.is_pseudonymous_id(model_id)
             ]
+        else:
+            if any(
+                    utils.is_pseudonymous_id(model_id)
+                    for model_id in filtered_model_ids):
+                raise Exception(
+                    'The attribute may_contain_pseudonymous_ids is set to' +
+                    'False but the model_ids contain pseudonymous ids.')
         self.field_name = field_name
         self.model_class = user_models.UserSettingsModel
         self.model_ids = filtered_model_ids

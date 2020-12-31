@@ -89,8 +89,8 @@ class StorySnapshotMetadataModelValidator(
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [item.committer_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]
 
 
@@ -140,8 +140,8 @@ class StoryCommitLogEntryModelValidator(
                 'story_ids', story_models.StoryModel, [item.story_id]),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'user_id', [item.user_id],
-                system_user_ids_omitted=True,
-                pseudonymous_ids_omitted=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )]
 
 
