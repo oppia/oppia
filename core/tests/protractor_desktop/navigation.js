@@ -119,7 +119,7 @@ describe('Donation flow', function() {
     await action.click('Credit Card button', creditCardButton);
     expect(await browser.driver.getCurrentUrl()).toContain('www.paypal.com');
   });
-})
+});
 
 describe('Static Pages Tour', function() {
   var getStartedPage = new GetStartedPage.GetStartedPage();
