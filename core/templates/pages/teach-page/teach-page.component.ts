@@ -32,14 +32,12 @@ import { UserBackendApiService } from 'services/user-backend-api.service';
   styleUrls: []
 })
 export class TeachPageComponent implements OnInit {
-
   classroomUrlFragment: string;
   classroomUrl :string;
   displayedTestimonialId: number;
   testimonialCount: number;
-  testimonials: any;
-  userIsLoggedIn: any;
-  
+  testimonials = [];
+  userIsLoggedIn: boolean | null;
   constructor(
     private loaderService: LoaderService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -60,9 +58,9 @@ export class TeachPageComponent implements OnInit {
       });
     // this.loaderService.showLoadingScreen('Loading');
     this.userBackendApiService.getUserInfoAsync().then((userInfo) => {
-       this.userIsLoggedIn = userInfo.isLoggedIn();
-       this.loaderService.hideLoadingScreen();
-      });
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+      this.loaderService.hideLoadingScreen();
+     });
   }
 
   // The 2 functions below are to cycle between values:
