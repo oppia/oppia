@@ -842,6 +842,9 @@ def managed_dev_appserver(
         '--dev_appserver_log_level', log_level,
         app_yaml_path
     ]
+    # OK to use shell=True here because we are not passing anything that came
+    # from an untrusted user, only other callers of the script, so there's no
+    # risk of shell-injection attacks.
     with managed_process(dev_appserver_args, shell=True, env=env) as proc:
         yield proc
 
@@ -867,4 +870,6 @@ def managed_firebase_auth_emulator():
         stack.enter_context(swap_env(
             'FIREBASE_AUTH_EMULATOR_HOST', feconf.FIREBASE_AUTH_EMULATOR_HOST))
 
+        # OK to use shell=True here because we are passing string literals and
+        # constants, so no risk of shell-injection attacks.
         yield stack.enter_context(managed_process(emulator_args, shell=True))
