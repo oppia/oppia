@@ -18,187 +18,191 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { HttpClient } from '@angular/common/http';
+import { TeachPageComponent } from './teach-page.component';
+import { UserBackendApiService } from 'services/user-backend-api.service';
+import { LoaderService } from 'services/loader.service.ts';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
-import { UserService } from 'services/user.service';
-
-require('pages/teach-page/teach-page.component.ts');
-
-describe('Teach Page', function() {
-  var $scope = null, ctrl = null;
-  var $timeout = null;
-  var $q = null;
-  var userService: UserService = null;
-  var LoaderService = null;
-  var loadingMessage = null;
-  var SiteAnalyticsService = null;
+describe('Teach Page', () => {
+  const siteAnalyticsServiceStub = new SiteAnalyticsService(
+    new WindowRef());
+  const windowDimensionServiceStub = new WindowDimensionsService(new WindowRef())
+  var userBackendApiService: UserBackendApiService;
+  var loaderService:LoaderService;
   var subscriptions = [];
-  var WindowDimensionsService = null;
-
+  var loadingMessage = '';
+  beforeEach(async() => {
+    TestBed.configureTestingModule({
+      declarations: [TeachPageComponent],
+      providers: [
+        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
+        UrlInterpolationService,
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              location: {
+                href: ''
+              }
+            }
+          }
+        }
+      ]
+    }).compileComponents();
+  });
   beforeEach(angular.mock.module('oppia'));
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('UserService', TestBed.get(UserService));
-  }));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $timeout = $injector.get('$timeout');
-    $q = $injector.get('$q');
-    userService = $injector.get('UserService');
-    LoaderService = $injector.get('LoaderService');
-    SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
-    subscriptions.push(LoaderService.onLoadingMessageChange.subscribe(
+
+  let component;
+
+  beforeEach(() => {
+    const teachPageComponent = TestBed.createComponent(TeachPageComponent);
+    component = teachPageComponent.componentInstance;
+    subscriptions.push(loaderService.onLoadingMessageChange.subscribe(
       (message: string) => loadingMessage = message
-    ));
-    loadingMessage = '';
-    var $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    ctrl = $componentController('teachPage', {
-      $rootScope: $scope
-    });
-  }));
-
-  afterEach(function() {
-    for (let subscription of subscriptions) {
-      subscription.unsubscribe();
-    }
+    ))
   });
+  
+  it('should successfully instantiate the component from beforeEach block',
+    () => {
+      expect(component).toBeDefined();
+    });
 
   it('should get static image url', function() {
-    expect(ctrl.getStaticImageUrl('/path/to/image')).toBe(
+    expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
+  it('should set component properties when ngOnInit() is called', () => {
+    component.ngOnInit();
 
+    expect(component.windowIsNarrow()).toBe(true);
+    expect(component.donateImgUrl).toBe(
+      '/assets/images/general/opp_donate_text.svg');
+  });
   it('should record analytics when Start Learning is clicked', function() {
-    var clickStartLearningButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickStartLearningButtonEvent')
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickStartLearningButtonEvent')
       .and.callThrough();
-    ctrl.onClickStartLearningButton();
-    $timeout.flush(150);
-
-    expect(clickStartLearningButtonEventSpy).toHaveBeenCalled();
+      component.onClickStartLearningButton();
+      expect(siteAnalyticsServiceStub.registerClickStartLearningButtonEvent)
+      .toHaveBeenCalledWith();
   });
 
   it('should record analytics when Visit Classroom is clicked', function() {
-    var clickVisitClassroomButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
-    ctrl.onClickVisitClassroomButton();
-    $timeout.flush(150);
-
-    expect(clickVisitClassroomButtonEventSpy).toHaveBeenCalled();
+      component.onClickVisitClassroomButton();
+      expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
+      .toHaveBeenCalledWith();
   });
 
-  it('should record analytics when Browse Library is clicked', function() {
-    var clickBrowseLibraryButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
-      .and.callThrough();
-    ctrl.onClickBrowseLibraryButton();
-    $timeout.flush(150);
 
-    expect(clickBrowseLibraryButtonEventSpy).toHaveBeenCalled();
+  it('should record analytics when Browse Library is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
+      .and.callThrough();
+    component.onClickBrowseLibraryButton();
+    expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent).toHaveBeenCalledWith();
   });
 
   it('should record analytics when Guide For Parents is clicked', function() {
-    var clickGuideParentsButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickGuideParentsButtonEvent')
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickGuideParentsButtonEvent')
       .and.callThrough();
-    ctrl.onClickGuideParentsButton();
-    $timeout.flush(150);
-
-    expect(clickGuideParentsButtonEventSpy).toHaveBeenCalled();
+    component.onClickGuideParentsButton();
+    expect(siteAnalyticsServiceStub.registerClickGuideParentsButtonEvent).toHaveBeenCalledWith();
   });
 
   it('should record analytics when Tips For Parents is clicked', function() {
-    var clickTipforParentsButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickTipforParentsButtonEvent')
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
       .and.callThrough();
-    ctrl.onClickTipforParentsButton();
-    $timeout.flush(150);
-
-    expect(clickTipforParentsButtonEventSpy).toHaveBeenCalled();
+    component.onClickTipforParentsButton();
+    expect(siteAnalyticsServiceStub.registerClickTipforParentsButtonEvent).toHaveBeenCalledWith();
   });
 
   it('should record analytics when Explore Lessons is clicked', function() {
-    var clickExploreLessonsButtonEventSpy = spyOn(
-      SiteAnalyticsService, 'registerClickExploreLessonsButtonEvent')
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickExploreLessonsButtonEvent')
       .and.callThrough();
-    ctrl.onClickExploreLessonsButton();
-    $timeout.flush(150);
-
-    expect(clickExploreLessonsButtonEventSpy).toHaveBeenCalled();
+    component.onClickExploreLessonsButton();
+    expect(siteAnalyticsServiceStub.registerClickExploreLessonsButtonEvent).toHaveBeenCalledWith();
   });
 
   it('should check if window is narrow', function() {
     spyOn(
-      WindowDimensionsService, 'isWindowNarrow').and.returnValues(false, true);
-    expect(ctrl.isWindowNarrow()).toBe(false);
-    expect(ctrl.isWindowNarrow()).toBe(true);
+      windowDimensionServiceStub, 'isWindowNarrow').and.returnValues(false, true);
+    expect(component.isWindowNarrow()).toBe(false);
+    expect(component.isWindowNarrow()).toBe(true);
   });
 
   it('should increment and decrement testimonial IDs correctly', function() {
-    ctrl.$onInit();
-    expect(ctrl.displayedTestimonialId).toBe(0);
-    ctrl.incrementDisplayedTestimonialId();
-    expect(ctrl.displayedTestimonialId).toBe(1);
-    ctrl.incrementDisplayedTestimonialId();
-    ctrl.incrementDisplayedTestimonialId();
-    ctrl.incrementDisplayedTestimonialId();
-    expect(ctrl.displayedTestimonialId).toBe(0);
+    component.ngOnInit();
+    expect(component.displayedTestimonialId).toBe(0);
+    component.incrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(1);
+    component.incrementDisplayedTestimonialId();
+    component.incrementDisplayedTestimonialId();
+    component.incrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(0);
 
-    ctrl.decrementDisplayedTestimonialId();
-    expect(ctrl.displayedTestimonialId).toBe(3);
-    ctrl.decrementDisplayedTestimonialId();
-    expect(ctrl.displayedTestimonialId).toBe(2);
+    component.decrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(3);
+    component.decrementDisplayedTestimonialId();
+    expect(component.displayedTestimonialId).toBe(2);
   });
 
   it('should get testimonials correctly', function() {
-    ctrl.$onInit();
-    expect(ctrl.getTestimonials().length).toBe(ctrl.testimonialCount);
+    component.ngOnInit();
+    expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
 
-  it('should evaluate if user is logged in', function() {
-    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve({
-        isLoggedIn: function() {
-          return true;
-        }
-      });
-      return deferred.promise;
-    });
+  // it('should evaluate if user is logged in', function() {
+  //   spyOn(userBackendApiService, 'getUserInfoAsync').and.callFake(function() {
+  //     var deferred = $q.defer();
+  //     deferred.resolve({
+  //       isLoggedIn: function() {
+  //         return true;
+  //       }
+  //     });
+  //     return deferred.promise;
+  //   });
 
-    ctrl.$onInit();
-    expect(ctrl.userIsLoggedIn).toBe(null);
-    expect(ctrl.classroomUrl).toBe('/learn/math');
+    component.ngOnInit();
+    expect(component.userIsLoggedIn).toBe(null);
+    expect(component.classroomUrl).toBe('/learn/math');
     expect(loadingMessage).toBe('Loading');
 
-    $scope.$digest();
-    expect(ctrl.userIsLoggedIn).toBe(true);
-    expect(loadingMessage).toBe('');
-  });
+    // $scope.$digest();
+    // expect(component.userIsLoggedIn).toBe(true);
+    // expect(loadingMessage).toBe('');
+  // });
 
-  it('should evaluate if user is not logged in', function() {
-    spyOn(userService, 'getUserInfoAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve({
-        isLoggedIn: function() {
-          return false;
-        }
-      });
-      return deferred.promise;
-    });
+  // it('should evaluate if user is not logged in', function() {
+  //   spyOn(userBackendApiService, 'getUserInfoAsync').and.callFake(function() {
+  //     var deferred = $q.defer();
+  //     deferred.resolve({
+  //       isLoggedIn: function() {
+  //         return false;
+  //       }
+  //     });
+  //     return deferred.promise;
+  //   });
 
-    ctrl.$onInit();
-    expect(ctrl.userIsLoggedIn).toBe(null);
-    expect(loadingMessage).toBe('Loading');
-
-    $scope.$digest();
-    expect(ctrl.userIsLoggedIn).toBe(false);
-    expect(loadingMessage).toBe('');
-  });
+  //   $scope.$digest();
+  //   expect(component.userIsLoggedIn).toBe(false);
+  //   expect(loadingMessage).toBe('');
+  // });
 });
