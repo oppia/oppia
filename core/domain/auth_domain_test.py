@@ -55,3 +55,13 @@ class AuthClaimsTests(test_utils.TestBase):
 
         self.assertEqual(auth, auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL))
         self.assertNotEqual(auth, auth_domain.AuthClaims(None, None))
+
+    def test_hash(self):
+        a = auth_domain.AuthClaims('a', 'a@a.com')
+        b = auth_domain.AuthClaims('b', 'b@b.com')
+
+        # Should be able to create a set of AuthClaims.
+        auth_set = set([a, b])
+
+        self.assertIn(auth_domain.AuthClaims('a', 'a@a.com'), auth_set)
+        self.assertNotIn(auth_domain.AuthClaims('c', 'c@c.com'), auth_set)

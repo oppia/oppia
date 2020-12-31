@@ -52,6 +52,9 @@ class AuthClaims(python_utils.OBJECT):
     def __repr__(self):
         return 'AuthClaims(auth_id=%r, email=%r)' % (self.auth_id, self.email)
 
+    def __hash__(self):
+        return hash((self.auth_id, self.email))
+
     def __eq__(self, other):
         return (
             # https://docs.python.org/2/library/constants.html#NotImplemented

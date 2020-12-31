@@ -76,6 +76,9 @@ def _acquire_firebase_context(credential=None):
     Args:
         credential: *|None. The credentials used to call the SDK from within the
             context.
+
+    Yields:
+        None. No relevant context expression.
     """
     app = firebase_admin.initialize_app(credential=credential)
     try:
