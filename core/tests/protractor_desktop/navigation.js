@@ -15,6 +15,7 @@
 /**
  * @fileoverview End-to-end tests for general site navigation.
  */
+var action = require('../protractor_utils/action.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
@@ -102,6 +103,23 @@ describe('DEV MODE Test', function() {
       .toBe(general.isInDevMode());
   });
 });
+
+describe('Donation flow', function() {
+  var payPalButton = element(by.css('.protractor-test-paypal-donate-button'));
+  var creditCardButton = element(
+    by.css('.protractor-test-credit-card-donate-button'));
+  it('should be able to donate via PayPal', async function() {
+    await browser.get('/donate');
+    await action.click('PayPal button', payPalButton);
+    expect(await browser.driver.getCurrentUrl()).toContain('www.paypal.com');
+  });
+
+  it('should be able to donate via credit card', async function() {
+    await browser.get('/donate');
+    await action.click('Credit Card button', creditCardButton);
+    expect(await browser.driver.getCurrentUrl()).toContain('www.paypal.com');
+  });
+})
 
 describe('Static Pages Tour', function() {
   var getStartedPage = new GetStartedPage.GetStartedPage();
