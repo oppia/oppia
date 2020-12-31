@@ -21,10 +21,10 @@ import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-on
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AppConstants } from 'app.constants';
 import { ExplorationBackendDict } from './ExplorationObjectFactory';
-import { ExplorationChange } from 'domain/editor/undo_redo/change.model';
 import { tap } from 'rxjs/operators';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { ExplorationChange } from './exploration-draft.model';
 
 @Injectable({
   providedIn: 'root'

@@ -24,8 +24,14 @@ import isEqual from 'lodash/isEqual';
 
 import { Outcome } from
   'domain/exploration/OutcomeObjectFactory';
-import { SubtitledHtml } from
+import { SubtitledHtml, SubtitledHtmlBackendDict } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { ExplorationChange } from './exploration-draft.model';
+import { InteractionBackendDict } from './InteractionObjectFactory';
+import { ParamChangeBackendDict } from './ParamChangeObjectFactory';
+import { ParamSpecBackendDict } from './ParamSpecObjectFactory';
+import { RecordedVoiceOverBackendDict } from './RecordedVoiceoversObjectFactory';
+import { WrittenTranslationsBackendDict } from './WrittenTranslationsObjectFactory';
 
 interface LostChangeValues {
   'outcome'?: Outcome;
@@ -35,11 +41,15 @@ interface LostChangeValues {
   'html'?: string;
 }
 
-type LostChangeValue = string | string[] | LostChangeValues;
+type LostChangeValue = LostChangeValues | SubtitledHtmlBackendDict |
+  InteractionBackendDict | ParamChangeBackendDict[] |
+  RecordedVoiceOverBackendDict | WrittenTranslationsBackendDict |
+  ParamChangeBackendDict[] | ParamSpecBackendDict | boolean | number | string |
+  string[];
 
 // Properties are optional in 'LostChangeBackendDict' because all of them may
 // not be present in the dict and may change according to the cmd.
-interface LostChangeBackendDict {
+export interface LostChangeBackendDict {
   'cmd': string;
   'new_state_name'?: string;
   'old_state_name'?: string;
@@ -185,16 +195,40 @@ export class LostChangeObjectFactory {
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
    */
-  createNew(lostChangeDict: LostChangeBackendDict): LostChange {
+  createNew(lostChangeDict: ExplorationChange): LostChange {
+    let newStateName: string | undefined;
+    let oldStateName: string | undefined;
+    let stateName: string | undefined;
+    let newValue: LostChangeValue | undefined;
+    let oldValue: LostChangeValue | undefined;
+    let propertyName: string | undefined;
+    if ('new_state_name' in lostChangeDict) {
+      newStateName = lostChangeDict.new_state_name;
+    }
+    if ('old_state_name' in lostChangeDict) {
+      oldStateName = lostChangeDict.old_state_name;
+    }
+    if ('state_name' in lostChangeDict) {
+      stateName = lostChangeDict.state_name;
+    }
+    if ('new_value' in lostChangeDict) {
+      newValue = lostChangeDict.new_value;
+    }
+    if ('old_value' in lostChangeDict) {
+      oldValue = lostChangeDict.old_value;
+    }
+    if ('property_name' in lostChangeDict) {
+      propertyName = lostChangeDict.property_name;
+    }
     return new LostChange(
       this.utilsService,
       lostChangeDict.cmd,
-      lostChangeDict.new_state_name,
-      lostChangeDict.old_state_name,
-      lostChangeDict.state_name,
-      lostChangeDict.new_value,
-      lostChangeDict.old_value,
-      lostChangeDict.property_name
+      newStateName,
+      oldStateName,
+      stateName,
+      newValue,
+      oldValue,
+      propertyName
     );
   }
 }
