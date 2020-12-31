@@ -520,6 +520,7 @@ def run_tests(args):
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
+    # TODO(#11549): Move this to top of the file.
     import contextlib2
 
     with contextlib2.ExitStack() as stack:

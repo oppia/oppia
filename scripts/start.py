@@ -146,6 +146,7 @@ def main(args=None):
 
     common.start_redis_server()
 
+    # TODO(#11549): Move this to top of the file.
     import contextlib2
 
     with contextlib2.ExitStack() as stack:
