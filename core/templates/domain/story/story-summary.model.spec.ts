@@ -47,7 +47,7 @@ describe('Story summary model', () => {
       story_is_published: true,
       completed_node_titles: ['Chapter 1'],
       url_fragment: 'story-url-fragment',
-      pending_node_dicts: [nodeDict]
+      all_node_dicts: [nodeDict]
     };
     _sampleStorySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict
@@ -66,7 +66,7 @@ describe('Story summary model', () => {
     expect(_sampleStorySummary.isStoryPublished()).toBe(true);
     expect(_sampleStorySummary.isNodeCompleted('Chapter 1')).toBe(true);
     expect(_sampleStorySummary.isNodeCompleted('Chapter 2')).toBe(false);
-    expect(_sampleStorySummary.getPendingNodes()).toEqual([
+    expect(_sampleStorySummary.getAllNodes()).toEqual([
       StoryNode.createFromBackendDict({
         id: 'node_1',
         thumbnail_filename: 'image.png',

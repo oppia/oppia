@@ -313,6 +313,18 @@ def get_pending_nodes_in_story(user_id, story_id):
 
     return pending_nodes
 
+def get_all_nodes_in_story(story_id):
+    """Returns all the nodes that are in a story
+
+    Args:
+        story_id: str. The id of the story.
+
+    Returns:
+        list(StoryNode). The list of story nodes.
+    """
+    story = get_story_by_id(story_id)
+
+    return story.story_contents.nodes
 
 def get_completed_node_ids(user_id, story_id):
     """Returns the ids of the nodes completed in the story.

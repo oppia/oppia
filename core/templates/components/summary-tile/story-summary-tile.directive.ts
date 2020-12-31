@@ -93,9 +93,10 @@ angular.module('oppia').directive('storySummaryTile', [
 
           // Returns the exploration page URL for the provided chapter title.
           ctrl.getChapterUrl = function(nodeTitle) {
-            let node = this.storySummary.getPendingNodes().find(node => {
+            let node = this.storySummary.getAllNodes().find(node => {
               return node.getTitle() === nodeTitle;
             });
+            console.log(node)
             if (!node) {
               return '';
             }
