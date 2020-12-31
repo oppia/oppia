@@ -771,7 +771,6 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         sys.path.insert(1, PSUTIL_DIR)
     import psutil
 
-    # We're only using these generators to reduce code duplication.
     stripped_args = (('%s' % arg).strip() for arg in command_args)
     non_empty_args = (s for s in stripped_args if s)
 
