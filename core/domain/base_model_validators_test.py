@@ -221,7 +221,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_error_raised_if_model_ids_contain_system_ids(self):
         with self.assertRaisesRegexp(
             Exception,
-            'The attribute may_contain_system_ids is set to False' +
+            'The attribute may_contain_system_ids is set to False ' +
             'but the model_ids contain system ids.'):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [feconf.MIGRATION_BOT_USER_ID, 'User-1']
@@ -240,7 +240,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_error_raised_if_model_ids_contain_pseudonymous_ids(self):
         with self.assertRaisesRegexp(
             Exception,
-            'The attribute may_contain_pseudonymous_ids is set to False' +
+            'The attribute may_contain_pseudonymous_ids is set to False ' +
             'but the model_ids contain pseudonymous ids.'):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [self.PSEUDONYMOUS_ID, 'User-1']

@@ -142,7 +142,7 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
         else:
             if set(filtered_model_ids) & set(feconf.SYSTEM_USERS.values()):
                 raise Exception(
-                    'The attribute may_contain_system_ids is set to False' +
+                    'The attribute may_contain_system_ids is set to False ' +
                     'but the model_ids contain system ids.')
         if may_contain_pseudonymous_ids:
             filtered_model_ids = [
@@ -154,7 +154,7 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                     utils.is_pseudonymous_id(model_id)
                     for model_id in filtered_model_ids):
                 raise Exception(
-                    'The attribute may_contain_pseudonymous_ids is set to' +
+                    'The attribute may_contain_pseudonymous_ids is set to ' +
                     'False but the model_ids contain pseudonymous ids.')
         self.field_name = field_name
         self.model_class = user_models.UserSettingsModel
