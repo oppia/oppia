@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
  * with the exploration editor backend.
  */
 
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
@@ -30,6 +29,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { LocalStorageService } from 'services/local-storage.service';
+import { ExplorationDataBackendApiService } from './exploration-data-backend-api.service';
 
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
@@ -40,7 +40,7 @@ require('services/contextual/url.service.ts');
 
 require('services/services.constants.ajs.ts');
 
-interface DraftAutoSaveResponse {
+export interface DraftAutoSaveResponse {
   'draft_change_list_id': number;
   'is_version_of_draft_valid': boolean;
 }
@@ -58,7 +58,7 @@ export class ExplorationDataService {
     private alertsService: AlertsService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
-    private httpClient: HttpClient,
+    private explorationDataBackendApiService: ExplorationDataBackendApiService,
     private localStorageService:LocalStorageService,
     private loggerService: LoggerService,
     private readOnlyExplorationBackendApiService:
@@ -98,16 +98,17 @@ export class ExplorationDataService {
       changeList: ExplorationChange[]): Promise<DraftAutoSaveResponse> {
     this.localStorageService.saveExplorationDraft(
       this.explorationId, changeList, this.draftChangeListId);
-    return this.httpClient.put<DraftAutoSaveResponse>(
-      this.explorationDraftAutosaveUrl, {
-        change_list: changeList,
-        version: this.data.version
-      }).pipe(tap(response => {
-      this.draftChangeListId = response.draft_change_list_id;
-      // We can safely remove the locally saved draft copy if it was saved
-      // to the backend.
-      this.localStorageService.removeExplorationDraft(this.explorationId);
-    })).toPromise();
+    return this.explorationDataBackendApiService.saveChangeList(
+      this.explorationDraftAutosaveUrl,
+      changeList,
+      this.data.version,
+    ).pipe(
+      tap(response => {
+        this.draftChangeListId = response.draft_change_list_id;
+        // We can safely remove the locally saved draft copy if it was saved
+        // to the backend.
+        this.localStorageService.removeExplorationDraft(this.explorationId);
+      })).toPromise();
   }
 
   // Note that the changeList is the full changeList since the last
@@ -132,8 +133,8 @@ export class ExplorationDataService {
   }
 
   discardDraft(): Promise<void> {
-    return this.httpClient.post<void>(
-      this.explorationDraftAutosaveUrl, {}).toPromise();
+    return this.explorationDataBackendApiService.discardDraft(
+      this.explorationDraftAutosaveUrl).toPromise();
   }
 
   getData(errorCallback: (

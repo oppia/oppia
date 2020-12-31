@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { ExplorationDraft } from 'domain/exploration/exploration-draft.model';
 import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
-
 
 describe('Exploration data service', function() {
   let eds: ExplorationDataService = null;
