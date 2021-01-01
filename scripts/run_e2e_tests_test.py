@@ -890,7 +890,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[
                 (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                (run_e2e_tests.OPPIA_SERVER_PORT,)])
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
@@ -1008,7 +1009,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[
                 (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                (run_e2e_tests.OPPIA_SERVER_PORT,)])
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
@@ -1350,7 +1352,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[
                 (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                (run_e2e_tests.OPPIA_SERVER_PORT,)])
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
@@ -1525,7 +1528,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[
                 (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                (run_e2e_tests.OPPIA_SERVER_PORT,)])
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
@@ -1650,7 +1654,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[
                 (feconf.REDISPORT,),
                 (run_e2e_tests.WEB_DRIVER_PORT,),
-                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
+                (run_e2e_tests.OPPIA_SERVER_PORT,)])
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
