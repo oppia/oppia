@@ -29,6 +29,9 @@ import utils
 class RegistryUnitTest(test_utils.GenericTestBase):
     """Tests the Registry class interface."""
 
+    # Want to test that the correct service is returned.
+    ENABLE_AUTH_SERVICES_STUB = False
+
     def setUp(self):
         super(RegistryUnitTest, self).setUp()
         self.registry_instance = models.Registry()
