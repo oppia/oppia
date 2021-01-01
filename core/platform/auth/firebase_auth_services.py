@@ -71,15 +71,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 @contextlib.contextmanager
 def _acquire_firebase_context():
-    """Returns a context for calling the Firebase Admin SDK.
-
-    Args:
-        credential: *|None. The credentials used to call the SDK from within the
-            context.
-
-    Yields:
-        None. No relevant context expression.
-    """
+    """Returns a context for calling the Firebase Admin SDK."""
     app = firebase_admin.initialize_app()
     try:
         yield

@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import functools
-import json
 import logging
 
 from core.domain import auth_domain
@@ -69,7 +67,6 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 
         Args:
             test: test_utils.TestBase. The test to install the mock on.
-            initial_uids: list(str). The set of uids the mock will begin with.
 
         Returns:
             callable. A function that will uninstall the mock when called.
@@ -83,11 +80,11 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             stack.enter_context(test.swap_to_always_return(
                 firebase_admin.auth, 'verify_id_token'))
             stack.enter_context(test.swap(
-                firebase_admin.auth, 'create_user', mock._create_user))
+                firebase_admin.auth, 'create_user', mock._create_user)) # pylint: disable=protected-access
             stack.enter_context(test.swap(
-                firebase_admin.auth, 'get_user', mock._get_user))
+                firebase_admin.auth, 'get_user', mock._get_user)) # pylint: disable=protected-access
             stack.enter_context(test.swap(
-                firebase_admin.auth, 'delete_user', mock._delete_user))
+                firebase_admin.auth, 'delete_user', mock._delete_user)) # pylint: disable=protected-access
 
             for function_name in cls._YAGNI_FUNCTION_NAMES:
                 stack.enter_context(test.swap_to_always_raise(
@@ -123,7 +120,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def _create_user(self, uid=None, **kwargs):
         """Adds new user to storage."""
         if uid in self._users:
-            raise firebase_admin.auth.UidAlreadyExistsError('%s exists' % uid)
+            raise firebase_admin.auth.UidAlreadyExistsError(
+                '%s exists' % uid, None, None)
         self._users[uid] = firebase_admin.auth.UserRecord(
             # FRAGILE: UserRecord doesn't have a public constructor, so this may
             # break in future versions of the SDK. OK with taking that risk
@@ -446,34 +444,42 @@ class FirebaseAccountWipeoutTests(test_utils.GenericTestBase):
         super(FirebaseAccountWipeoutTests, self).tearDown()
 
     def wipeout(self):
+        """Runs wipeout on the user created by this test."""
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_id))
 
     def assert_wipeout_is_verified(self):
+        """Asserts that the wipeout has been acknowledged as complete."""
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_id))
 
     def assert_wipeout_is_not_verified(self):
+        """Asserts that the wipeout has been acknowledged as incomplete."""
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_id))
 
     def assert_firebase_account_is_deleted(self):
+        """Asserts that the Firebase account has been deleted."""
         self.assertRaisesRegexp(
             firebase_admin.auth.UserNotFoundError, 'not found',
             lambda: firebase_admin.auth.get_user(self.AUTH_ID))
 
     def assert_firebase_account_is_not_deleted(self):
+        """Asserts that the Firebase account still exists."""
         user = firebase_admin.auth.get_user(self.AUTH_ID)
         self.assertIsNotNone(user)
         self.assertEqual(user.uid, self.AUTH_ID)
 
     def swap_initialize_sdk_to_always_fail(self):
+        """Swaps the initialize_app function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_admin, 'initialize_app', error=self.UNKNOWN_ERROR)
 
     def swap_get_user_to_always_fail(self):
+        """Swaps the get_user function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_admin.auth, 'get_user', error=self.UNKNOWN_ERROR)
 
     def swap_delete_user_to_always_fail(self):
+        """Swaps the delete_user function so that it always fails."""
         return self.swap_to_always_raise(
             firebase_admin.auth, 'delete_user', error=self.UNKNOWN_ERROR)
 

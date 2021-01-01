@@ -27,10 +27,7 @@ import inspect
 import itertools
 import json
 import logging
-import operator
 import os
-import re
-import types
 import unittest
 
 from constants import constants
@@ -73,11 +70,9 @@ import schema_utils
 import utils
 
 import contextlib2
-import firebase_admin
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
-import webapp2
 import webtest
 
 (
