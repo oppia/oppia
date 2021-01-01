@@ -24,9 +24,8 @@ import io
 import os
 import sys
 
-_FUTURE_PATH = os.path.join(
-    os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _FUTURE_PATH)
+_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
+sys.path.insert(0, _THIRD_PARTY_PATH)
 
 _YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
 sys.path.insert(0, _YAML_PATH)
@@ -41,6 +40,7 @@ import builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-impo
 import future.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -86,11 +86,14 @@ def get_args_of_function(function_node, args_to_ignore):
     """
     try:
         return [
-            a.arg for a in function_node.args.args if a.arg not in
-            args_to_ignore]
+            a.arg
+            for a in function_node.args.args
+            if a.arg not in args_to_ignore
+        ]
     except AttributeError:
         return [
-            a.id for a in function_node.args.args if a.id not in args_to_ignore]
+            a.id for a in function_node.args.args if a.id not in args_to_ignore
+        ]
 
 
 def open_file(filename, mode, encoding='utf-8', newline=None):
@@ -219,9 +222,11 @@ def urllib_unquote(content):
     """
     try:
         import urllib
+
         return urllib.unquote(content)
     except ImportError:
         import urllib.parse
+
         return urllib.urlparse.unquote(content)
 
 
@@ -255,9 +260,11 @@ def url_unquote_plus(content):
     """
     try:
         import urllib
+
         return urllib.unquote_plus(content)
     except ImportError:
         import urllib.parse
+
         return urllib.parse.unquote_plus(content)
 
 
@@ -296,15 +303,18 @@ def url_retrieve(source_url, filename=None):
     context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib
+
         # Change the User-Agent to prevent servers from blocking requests.
         # See https://support.cloudflare.com/hc/en-us/articles/360029779472-Troubleshooting-Cloudflare-1XXX-errors#error1010. # pylint: disable=line-too-long
         urllib.URLopener.version = (
             'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '
-            'Gecko/20100101 Firefox/47.0')
+            'Gecko/20100101 Firefox/47.0'
+        )
         return urllib.urlretrieve(
             source_url, filename=filename, context=context)
     except ImportError:
         import urllib.request
+
         return urllib.request.urlretrieve(
             source_url, filename=filename, context=context)
 
@@ -323,9 +333,11 @@ def url_open(source_url):
     context = ssl.create_default_context(cafile=certifi.where())
     try:
         import urllib2
+
         return urllib2.urlopen(source_url, context=context)
     except ImportError:
         import urllib.request
+
         return urllib.request.urlopen(source_url, context=context)
 
 
@@ -344,9 +356,11 @@ def url_request(source_url, data, headers):
     """
     try:
         import urllib2
+
         return urllib2.Request(source_url, data, headers)
     except ImportError:
         import urllib.request
+
         return urllib.request.Request(source_url)
 
 
@@ -421,8 +435,9 @@ def _recursively_convert_to_str(value):
         return [_recursively_convert_to_str(e) for e in value]
     elif isinstance(value, dict):
         return {
-            _recursively_convert_to_str(k): _recursively_convert_to_str(
-                v) for k, v in value.items()}
+            _recursively_convert_to_str(k): _recursively_convert_to_str(v)
+            for k, v in value.items()
+        }
     # We are using 'type' here instead of 'isinstance' because we need to
     # clearly distinguish the builtins.str and builtins.bytes strings.
     elif type(value) == future.types.newstr:  # pylint: disable=unidiomatic-typecheck
@@ -450,3 +465,13 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
+
+
+def reraise_exception():
+    """Reraise exception with complete stacktrace."""
+    # TODO(#11547): This method can be replace by 'raise e' after we migrate
+    # to Python 3.
+    # This code is needed in order to reraise the error properly with
+    # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
+    exec_info = sys.exc_info()
+    six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
