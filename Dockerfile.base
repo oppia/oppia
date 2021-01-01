@@ -22,7 +22,7 @@ RUN bash /home/oppia/scripts/install_chrome.sh
 ENV CHROME_BIN /usr/bin/google-chrome
 RUN export CHROME_BIN 
 
-RUN pip install enum34==1.1.10 protobuf==3.13.0 wheel==0.35.0 codecov
+RUN pip install enum34==1.1.10 protobuf==3.13.0 wheel==0.35.0 codecov==2.1.11
 
 # Setup JAVA_HOME
 ENV JAVA_HOME /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64/
