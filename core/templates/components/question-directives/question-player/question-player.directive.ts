@@ -193,12 +193,12 @@ angular.module('oppia').directive('questionPlayer', [
             var iconHtml = '';
             if (actionButtonType === 'BOOST_SCORE') {
               iconHtml = `<picture>
-              <source type="image/webp" 
+              <source type="image/webp"
               srcset="${getStaticImageUrl('/icons/rocket@2x.webp')}">
-              <source type="image/png" 
+              <source type="image/png"
               srcset="${getStaticImageUrl('/icons/rocket@2x.png')}">
               <img alt=""
-                   class="action-button-icon" 
+                   class="action-button-icon"
                    src="${getStaticImageUrl('/icons/rocket@2x.png')}"/>
               </picture>`;
             } else if (actionButtonType === 'RETRY_SESSION') {
@@ -466,7 +466,7 @@ angular.module('oppia').directive('questionPlayer', [
               updateMasteryPerSkillMapping(masteryChangePerQuestion);
             }
 
-            SkillMasteryBackendApiService.updateSkillMasteryDegrees(
+            SkillMasteryBackendApiService.updateSkillMasteryDegreesAsync(
               ctrl.masteryPerSkillMapping);
           };
 

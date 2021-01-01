@@ -18,9 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -119,8 +116,6 @@ describe('Settings Tab Component', function() {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value('WindowDimensionsService', TestBed.get(
       WindowDimensionsService));
-    $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));

@@ -260,7 +260,7 @@ angular.module('oppia').directive('skillsList', [
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
               // Transfer questions from the old skill to the new skill.
-              TopicsAndSkillsDashboardBackendApiService.mergeSkills(
+              TopicsAndSkillsDashboardBackendApiService.mergeSkillsAsync(
                 skill.id, supersedingSkillId).then(function() {
                 // Broadcast will update the skills list in the dashboard so
                 // that the merged skills are not shown anymore.
