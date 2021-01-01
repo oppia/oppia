@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
+from core.domain import prod_validators
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -31,11 +32,6 @@ import python_utils
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.feedback,
     models.NAMES.suggestion, models.NAMES.user
 ])
-
-TARGET_TYPE_TO_TARGET_MODEL = {
-    feconf.ENTITY_TYPE_EXPLORATION: (
-        exp_models.ExplorationModel)
-}
 
 
 class GeneralFeedbackThreadModelValidator(
@@ -71,12 +67,12 @@ class GeneralFeedbackThreadModelValidator(
                 base_model_validators.ExternalModelFetcherDetails(
                     'suggestion_ids', suggestion_models.GeneralSuggestionModel,
                     [item.id]))
-        if item.entity_type in TARGET_TYPE_TO_TARGET_MODEL:
+        if item.entity_type in prod_validators.TARGET_TYPE_TO_TARGET_MODEL:
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     '%s_ids' % item.entity_type,
-                    TARGET_TYPE_TO_TARGET_MODEL[item.entity_type],
-                    [item.entity_id]))
+                    prod_validators.TARGET_TYPE_TO_TARGET_MODEL[
+                        item.entity_type], [item.entity_id]))
         if (
                 item.last_nonempty_message_author_id and
                 user_services.is_user_id_valid(
@@ -97,7 +93,7 @@ class GeneralFeedbackThreadModelValidator(
             item: datastore_services.Model. GeneralFeedbackThreadModel to
                 validate.
         """
-        if item.entity_type not in TARGET_TYPE_TO_TARGET_MODEL:
+        if item.entity_type not in prod_validators.TARGET_TYPE_TO_TARGET_MODEL:
             cls._add_error(
                 'entity %s' % base_model_validators.ERROR_CATEGORY_TYPE_CHECK,
                 'Entity id %s: Entity type %s is not allowed' % (
