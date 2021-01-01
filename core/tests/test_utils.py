@@ -2798,7 +2798,7 @@ tags: []
         """Returns a list of all queue names."""
         return [q['name'] for q in self._taskqueue_stub.GetQueues()]
 
-    def count_jobs_in_taskqueue(self, queue_name=None):
+    def count_jobs_in_taskqueue(self, queue_name):
         """Returns the total number of tasks in a single queue if a queue name
         is specified or the entire taskqueue if no queue name is specified.
 
