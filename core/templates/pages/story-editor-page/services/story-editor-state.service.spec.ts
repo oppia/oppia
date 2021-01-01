@@ -84,8 +84,6 @@ describe('Story editor state service', () => {
   const storyInitializedSpy = jasmine.createSpy('storyInitialized');
   const storyReinitializedSpy = jasmine.createSpy('storyReinitialized');
 
-  importAllAngularServices();
-
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));
 
