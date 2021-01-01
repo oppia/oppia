@@ -589,80 +589,84 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
 
         self.assertIsNone(self.stub.authenticate_request(request))
 
-    def test_get_association_that_exists(self):
-        self.stub.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair('sub', 'uid'))
+    def test_get_association_that_is_present(self):
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-        self.assertEqual(
-            self.stub.get_user_id_from_auth_id('sub'), 'uid')
+        self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
 
-    def test_get_association_that_does_not_exist(self):
-        self.assertIsNone(
-            self.stub.get_user_id_from_auth_id('does_not_exist'))
+    def test_get_association_that_is_missing(self):
+        self.assertIsNone(self.stub.get_user_id_from_auth_id('does_not_exist'))
 
-    def test_get_multi_associations_that_exist(self):
-        self.stub.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair('sub1', 'uid1'))
-        self.stub.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair('sub2', 'uid2'))
-        self.stub.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair('sub3', 'uid3'))
+    def test_get_multi_associations_with_all_present(self):
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid2', 'uid2'))
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
 
         self.assertEqual(
             self.stub.get_multi_user_ids_from_auth_ids(
-                ['sub1', 'sub2', 'sub3']),
+                ['aid1', 'aid2', 'aid3']),
             ['uid1', 'uid2', 'uid3'])
 
-    def test_get_multi_associations_when_one_does_not_exist(self):
-        self.stub.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair('sub1', 'uid1'))
-        # Mapping from sub2 -> uid2 missing.
-        self.stub.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair('sub3', 'uid3'))
+    def test_get_multi_associations_with_one_missing(self):
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+        # The aid2 <-> uid2 association is missing.
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
 
         self.assertEqual(
             self.stub.get_multi_user_ids_from_auth_ids(
-                ['sub1', 'sub2', 'sub3']),
+                ['aid1', 'aid2', 'aid3']),
             ['uid1', None, 'uid3'])
 
-    def test_associate_new_auth_id_to_user_id(self):
-        self.stub.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair('sub', 'uid'))
+    def test_associate_without_collision(self):
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-        self.assertEqual(self.stub.get_user_id_from_auth_id('sub'), 'uid')
+        self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
 
-    def test_associate_existing_auth_id_to_user_id_raises(self):
-        self.stub.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair('sub', 'uid'))
+    def test_associate_with_collision_raises(self):
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-        with self.assertRaisesRegexp(Exception, 'already mapped to user_id'):
-            self.stub.associate_auth_id_to_user_id(
-                auth_domain.AuthIdUserIdPair('sub', 'uid'))
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            self.stub.associate(auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-    def test_associate_multi_new_auth_ids_to_user_ids(self):
-        self.stub.associate_multi_auth_ids_to_user_ids([
-            auth_domain.AuthIdUserIdPair('sub1', 'uid1'),
-            auth_domain.AuthIdUserIdPair('sub2', 'uid2'),
-            auth_domain.AuthIdUserIdPair('sub3', 'uid3'),
-        ])
+    def test_associate_multi_without_collisions(self):
+        self.stub.associate_multi(
+            [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+             auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+             auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
 
         self.assertEqual(
-            [self.stub.get_user_id_from_auth_id('sub1'),
-             self.stub.get_user_id_from_auth_id('sub2'),
-             self.stub.get_user_id_from_auth_id('sub3')],
+            [self.stub.get_user_id_from_auth_id('aid1'),
+             self.stub.get_user_id_from_auth_id('aid2'),
+             self.stub.get_user_id_from_auth_id('aid3')],
             ['uid1', 'uid2', 'uid3'])
 
-    def test_associate_multi_an_existing_auth_id_to_user_id_mapping_raises(
-            self):
-        self.stub.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair('sub1', 'uid1'))
+    def test_associate_multi_with_collision_raises(self):
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
 
-        with self.assertRaisesRegexp(Exception, 'associations already exist'):
-            self.stub.associate_multi_auth_ids_to_user_ids([
-                auth_domain.AuthIdUserIdPair('sub1', 'uid1'),
-                auth_domain.AuthIdUserIdPair('sub2', 'uid2'),
-                auth_domain.AuthIdUserIdPair('sub3', 'uid3'),
-            ])
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            self.stub.associate_multi(
+                [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+                 auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+                 auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
+
+    def test_present_association_is_not_considered_to_be_deleted(self):
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        self.assertFalse(self.stub.are_associations_deleted('uid'))
+
+    def test_missing_association_is_considered_to_be_deleted(self):
+        self.assertTrue(self.stub.are_associations_deleted('does_not_exist'))
+
+    def test_delete_association_when_it_is_present(self):
+        self.stub.associate(auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        self.assertFalse(self.stub.are_associations_deleted('uid'))
+
+        self.stub.delete_associations('uid')
+
+        self.assertTrue(self.stub.are_associations_deleted('uid'))
+
+    def test_delete_association_when_it_is_missing_does_not_raise(self):
+        # Should not raise.
+        self.stub.delete_associations('does_not_exist')
 
 
 class SwapWithCheckTestClass(python_utils.OBJECT):

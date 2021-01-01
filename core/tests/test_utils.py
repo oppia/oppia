@@ -418,13 +418,13 @@ class AuthServicesStub(python_utils.OBJECT):
         email = os.environ.get('USER_EMAIL', '')
         return auth_domain.AuthClaims(auth_id, email) if auth_id else None
 
-    def delete_associated_auth_id(self, user_id):
+    def delete_associations(self, user_id):
         """Deletes associations referring to the given user_id."""
         self._user_id_by_auth_id = {
             a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
         }
 
-    def is_associated_auth_id_deleted(self, user_id):
+    def are_associations_deleted(self, user_id):
         """Returns whether the user's associated auth ID is deleted."""
         return not any(u == user_id for u in self._user_id_by_auth_id.values())
 
@@ -434,24 +434,23 @@ class AuthServicesStub(python_utils.OBJECT):
 
     def get_multi_user_ids_from_auth_ids(self, auth_ids):
         """Returns the user IDs associated with the given auth IDs."""
-        return [self.get_user_id_from_auth_id(a) for a in auth_ids]
+        return [self._user_id_by_auth_id.get(a, None) for a in auth_ids]
 
-    def associate_auth_id_to_user_id(self, auth_id_user_id_pair):
+    def associate(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID."""
         auth_id, user_id = auth_id_user_id_pair
         if auth_id in self._user_id_by_auth_id:
-            raise Exception('auth_id=%r is already mapped to user_id=%r' % (
+            raise Exception('auth_id=%r is already associated to user_id=%r' % (
                 auth_id, self._user_id_by_auth_id[auth_id]))
         self._user_id_by_auth_id[auth_id] = user_id
 
-    def associate_multi_auth_ids_to_user_ids(self, auth_id_user_id_pairs):
+    def associate_multi(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs."""
-        existing_associations = sorted(
-            'auth_id=%r, user_id=%r' % (a, self._user_id_by_auth_id[a])
-            for a, u in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
-        if existing_associations:
-            raise Exception(
-                'associations already exist for: %r' % (existing_associations,))
+        collisions = ', '.join(
+            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a])
+            for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
+        if collisions:
+            raise Exception('already associated: %s' % collisions)
         self._user_id_by_auth_id.update(auth_id_user_id_pairs)
 
 
