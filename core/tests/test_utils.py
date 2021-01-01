@@ -426,7 +426,7 @@ class AuthServicesStub(python_utils.OBJECT):
 
     def is_associated_auth_id_deleted(self, user_id):
         """Returns whether the user's associated auth ID is deleted."""
-        return user_id not in set(self._user_id_by_auth_id.values())
+        return not any(u == user_id for u in self._user_id_by_auth_id.values())
 
     def get_user_id_from_auth_id(self, auth_id):
         """Returns the user ID associated with the given auth ID."""
