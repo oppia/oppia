@@ -29,8 +29,6 @@ describe('Create new topic modal', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
-
   var $scope = null;
   var $uibModalInstance = null;
   var ImageLocalStorageService = null;

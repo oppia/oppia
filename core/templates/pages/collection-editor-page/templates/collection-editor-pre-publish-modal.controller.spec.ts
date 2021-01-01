@@ -32,8 +32,6 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
   var CollectionUpdateService = null;
   importAllAngularServices();
 
-  importAllAngularServices();
-
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

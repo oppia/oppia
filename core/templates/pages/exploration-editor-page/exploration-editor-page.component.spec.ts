@@ -186,8 +186,6 @@ describe('Exploration editor page component', function() {
     }
   };
 
-  importAllAngularServices();
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [

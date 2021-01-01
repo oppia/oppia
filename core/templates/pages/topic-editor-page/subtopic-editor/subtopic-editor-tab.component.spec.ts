@@ -26,7 +26,6 @@ describe('Subtopic editor tab', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
   var ctrl = null;
   var skillSummary = null;
   var TopicEditorStateService = null;
