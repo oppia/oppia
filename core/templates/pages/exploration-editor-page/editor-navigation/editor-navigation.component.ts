@@ -134,7 +134,9 @@ angular.module('oppia').component('editorNavigation', {
           .then(function() {
             $scope.publishIsInProcess = false;
             $scope.loadingDotsAreShown = false;
+            $scope.$applyAsync();
           });
+        $scope.$applyAsync();
       };
 
       $scope.saveChanges = function() {
@@ -146,7 +148,9 @@ angular.module('oppia').component('editorNavigation', {
           .then(function() {
             $scope.saveIsInProcess = false;
             $scope.loadingDotsAreShown = false;
+            $scope.$applyAsync();
           });
+        $scope.$applyAsync();
       };
 
       $scope.toggleMobileNavOptions = function() {
