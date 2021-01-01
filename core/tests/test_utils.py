@@ -416,9 +416,9 @@ class AuthServicesStub(python_utils.OBJECT):
 
     def authenticate_request(self, unused_request):
         """Returns the claims embedded in os.environ."""
-        auth_id = os.environ.get('USER_ID', None)
-        email = os.environ.get('USER_EMAIL', None)
-        if auth_id is not None:
+        auth_id = os.environ.get('USER_ID', '')
+        email = os.environ.get('USER_EMAIL', '')
+        if auth_id:
             return auth_domain.AuthClaims(auth_id, email)
         return None
 
@@ -1355,7 +1355,7 @@ tags: []
                 models.Registry, 'import_search_services',
                 classmethod(lambda _: self._search_services_stub)))
 
-            if not getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
+            if getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
                 auth_services_stub = AuthServicesStub()
                 stack.enter_context(self.swap(
                     models.Registry, 'import_auth_services',

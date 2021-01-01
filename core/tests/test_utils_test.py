@@ -32,6 +32,8 @@ from core.tests import test_utils
 import feconf
 import python_utils
 
+import webapp2
+
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()
 
@@ -567,9 +569,24 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
 
     EMAIL = 'user@test.com'
 
-    def setUp(self):
-        super(AuthServicesStubTests, self).setUp()
-        self.stub = test_utils.AuthServicesStub()
+    @property
+    def stub(self):
+        auth_services = models.Registry.import_auth_services()
+        self.assertIsInstance(auth_services, test_utils.AuthServicesStub)
+        return auth_services
+
+    def test_authenticate_request(self):
+        request = webapp2.Request.blank('/')
+
+        self.assertIsNone(self.stub.authenticate_request(request))
+
+        with self.login_context(self.EMAIL):
+            self.assertEqual(
+                self.stub.authenticate_request(request),
+                auth_domain.AuthClaims(
+                    self.get_gae_id_from_email(self.EMAIL), self.EMAIL))
+
+        self.assertIsNone(self.stub.authenticate_request(request))
 
     def test_get_association_that_exists(self):
         self.stub.associate_auth_id_to_user_id(
