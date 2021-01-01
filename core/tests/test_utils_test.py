@@ -571,6 +571,7 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
 
     @property
     def stub(self):
+        """Acquires auth_services and asserts it is being stubbed."""
         auth_services = models.Registry.import_auth_services()
         self.assertIsInstance(auth_services, test_utils.AuthServicesStub)
         return auth_services
