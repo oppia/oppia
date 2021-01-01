@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
-import random
 
 from core import jobs_registry
 from core.controllers import base
@@ -202,9 +201,6 @@ class DeferredTasksHandler(base.BaseHandler):
             raise Exception(
                 'The function id, %s, is not valid.' %
                 python_utils.convert_to_bytes(payload['fn_identifier']))
-
-        if random.random() > 0.2:
-            raise Exception('Random testing exception.')
 
         deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
             payload['fn_identifier']]
