@@ -688,7 +688,7 @@ angular.module('oppia').directive('conversationSkin', [
             );
             if (explorationLanguageCode !== selectedLanguageCode) {
               ContentTranslationManagerService.displayTranslations(
-                explorationLanguageCode, selectedLanguageCode);
+                selectedLanguageCode);
             }
 
             var totalNumCards = PlayerTranscriptService.getNumCards();

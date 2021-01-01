@@ -24,6 +24,8 @@ import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
 import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
+import { ContentTranslationManagerService } from
+  'pages/exploration-player-page/services/content-translation-manager.service';
 
 @Component({
   selector: 'content-language-selector',
@@ -32,7 +34,9 @@ import { ExplorationLanguageInfo } from
 })
 export class ContentLanguageSelectorComponent implements OnInit {
   constructor(
-    private contentTranslationLanguageService: ContentTranslationLanguageService
+    private contentTranslationLanguageService:
+      ContentTranslationLanguageService,
+    private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
   selectedLanguageCode: string;
@@ -48,6 +52,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
   onSelectLanguage(newLanguageCode: string): void {
     this.contentTranslationLanguageService.setCurrentContentLanguageCode(
       newLanguageCode);
+    this.contentTranslationManagerService.displayTranslations(newLanguageCode);
     this.selectedLanguageCode = newLanguageCode;
   }
 }

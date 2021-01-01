@@ -1013,10 +1013,6 @@ export class UpgradedServices {
       new ContentTranslationLanguageService(
         upgradedServices['LanguageUtilService'],
         upgradedServices['ContentTranslationManagerService']);
-    upgradedServices['ContentTranslationManagerService'] =
-      new ContentTranslationManagerService(
-        upgradedServices['PlayerTranscriptService'],
-        upgradedServices['ExtensionTagAssemblerService']);
     upgradedServices['EmailDashboardBackendApiService'] =
       new EmailDashboardBackendApiService(
         upgradedServices['HttpClient']);
@@ -1264,6 +1260,10 @@ export class UpgradedServices {
         upgradedServices['UrlInterpolationService'],
         upgradedServices['LoaderService'],
         upgradedServices['WindowRef']);
+    upgradedServices['ContentTranslationManagerService'] =
+      new ContentTranslationManagerService(
+        upgradedServices['PlayerTranscriptService'],
+        upgradedServices['ExtensionTagAssemblerService']);
     upgradedServices['EditableCollectionBackendApiService'] =
       new EditableCollectionBackendApiService(
         upgradedServices['HttpClient'],

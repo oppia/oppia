@@ -267,7 +267,8 @@ export class StateCardObjectFactory {
       interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
       writtenTranslations: WrittenTranslations, contentId: string): StateCard {
     return new StateCard(
-      stateName, contentHtml, interactionHtml, interaction, [],
+      stateName, contentHtml, interactionHtml,
+      cloneDeep(interaction), [],
       recordedVoiceovers, writtenTranslations, contentId,
       this.audioTranslationLanguageService);
   }

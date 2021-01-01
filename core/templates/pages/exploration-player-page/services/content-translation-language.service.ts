@@ -37,7 +37,6 @@ export class ContentTranslationLanguageService {
   ) {}
 
   _currentContentLanguageCode: string = null;
-  _allContentLanguageCodesInExploration: string[] = null;
   _explorationLanguageCode: string = null;
   _languagesInExploration: ExplorationLanguageInfo[] = [];
 
@@ -48,8 +47,6 @@ export class ContentTranslationLanguageService {
       explorationLanguageCode: string
   ): void {
     this._currentContentLanguageCode = null;
-    this._allContentLanguageCodesInExploration =
-        allContentLanguageCodesInExploration;
     this._explorationLanguageCode = explorationLanguageCode;
     this._languagesInExploration = [];
     // Set the content language that is chosen initially.
@@ -58,7 +55,7 @@ export class ContentTranslationLanguageService {
     // 2. Preferred site language.
     // 3. Otherwise, the exploration language code.
     if (preferredContentLanguageCodes !== null) {
-      for (const languageCode in preferredContentLanguageCodes) {
+      for (const languageCode of preferredContentLanguageCodes) {
         if (allContentLanguageCodesInExploration.includes(languageCode)) {
           this._currentContentLanguageCode = languageCode;
           break;
@@ -81,8 +78,8 @@ export class ContentTranslationLanguageService {
       this._currentContentLanguageCode = explorationLanguageCode;
     }
 
-    this._allContentLanguageCodesInExploration.push(explorationLanguageCode);
-    this._allContentLanguageCodesInExploration.forEach(
+    allContentLanguageCodesInExploration.push(explorationLanguageCode);
+    allContentLanguageCodesInExploration.forEach(
       (languageCode: string) => {
         let languageDescription =
             this.languageUtilService.getContentLanguageDescription(
@@ -128,7 +125,7 @@ export class ContentTranslationLanguageService {
   setCurrentContentLanguageCode(newLanguageCode: string): void {
     if (this._currentContentLanguageCode !== newLanguageCode) {
       this.contentTranslationManagerService.displayTranslations(
-        this._currentContentLanguageCode, newLanguageCode);
+        newLanguageCode);
       this._currentContentLanguageCode = newLanguageCode;
     }
   }

@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ExplorationObjectFactory } from
+import { Exploration, ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { VoiceoverObjectFactory } from
@@ -31,13 +31,17 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
-  let sof: StateObjectFactory, exploration, vof: VoiceoverObjectFactory;
+  let sof: StateObjectFactory, exploration: Exploration,
+    vof: VoiceoverObjectFactory;
   let ssof: StatesObjectFactory;
   let iof: InteractionObjectFactory;
   let ls: LoggerService;
+  let wtof: WrittenTranslationObjectFactory;
   let loggerErrorSpy;
   let firstState, secondState;
 
@@ -51,6 +55,7 @@ describe('Exploration object factory', () => {
     ssof = TestBed.get(StatesObjectFactory);
     iof = TestBed.get(InteractionObjectFactory);
     ls = TestBed.get(LoggerService);
+    wtof = TestBed.get(WrittenTranslationObjectFactory);
 
     firstState = {
       content: {
@@ -378,5 +383,97 @@ describe('Exploration object factory', () => {
     expect(exploration.isStateTerminal('second state')).toBe(true);
     expect(exploration.getAuthorRecommendedExpIds('second state'))
       .toEqual([]);
+  });
+
+  describe('getWrittenTranslationLanguageCodesReadyForDisplay', () => {
+    beforeEach(() => {
+      spyOn(
+        exploration.states,
+        'getAllWrittenTranslationLanguageCodes'
+      ).and.returnValue(['fr']);
+    });
+
+    it('should return no language codes for an exploration that contains' +
+       'a TextInput interaction', () => {
+      expect(
+        exploration.getWrittenTranslationLanguageCodesReadyForDisplay()
+      ).toEqual([]);
+    });
+
+    it('should return language codes that have more than the required ' +
+       'amount of translations', () => {
+      Object.values(exploration.states.getStateObjects()).forEach(
+        state => state.interaction.id = null);
+
+      spyOn(
+        exploration.states, 'getAllWrittenTranslations'
+      ).and.returnValue({
+        State1: [
+          wtof.createNew('html', '<p>Translation</p>'),
+          wtof.createNew('html', '<p>Translation</p>'),
+          wtof.createNew('html', '<p>Translation</p>'),
+          wtof.createNew('html', '<p>Translation</p>'),
+          wtof.createNew('html', '<p>Translation</p>'),
+          wtof.createNew('html', '<p>Translation</p>')
+        ]
+      });
+
+      spyOn(
+        exploration.states, 'getTotalRequiredWrittenTranslationsCount'
+      ).and.returnValue(6);
+
+      expect(
+        exploration.getWrittenTranslationLanguageCodesReadyForDisplay()
+      ).toEqual(['fr']);
+    });
+
+    it('should return language codes that have the minimum ' +
+       'required amount of translations', () => {
+      Object.values(exploration.states.getStateObjects()).forEach(
+        state => state.interaction.id = null);
+
+      spyOn(
+        exploration.states, 'getAllWrittenTranslations'
+      ).and.returnValue({
+        State1: [
+          wtof.createNew('html', '<p>Translation</p>'),
+          wtof.createNew('html', '<p>Translation</p>')
+        ]
+      });
+
+      spyOn(
+        exploration.states, 'getTotalRequiredWrittenTranslationsCount'
+      ).and.returnValue(6);
+
+      expect(
+        exploration.getWrittenTranslationLanguageCodesReadyForDisplay()
+      ).toEqual(['fr']);
+    });
+
+    it('should not return language codes that have less than the minimum ' +
+       'required amount of translations', () => {
+      Object.values(exploration.states.getStateObjects()).forEach(
+        state => state.interaction.id = null);
+
+      spyOn(
+        exploration.states, 'getAllWrittenTranslations'
+      ).and.returnValue({
+        State1: [
+          wtof.createFromBackendDict({
+            data_format: 'html',
+            translation: '<p>Translation</p>',
+            needs_update: true
+          })
+        ]
+      });
+
+      spyOn(
+        exploration.states, 'getTotalRequiredWrittenTranslationsCount'
+      ).and.returnValue(6);
+
+      expect(
+        exploration.getWrittenTranslationLanguageCodesReadyForDisplay()
+      ).toEqual([]);
+    });
   });
 });

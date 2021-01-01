@@ -101,7 +101,7 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
               'ItemSelectionInput',
               $attrs
             );
-            ctrl.choices = choices.map(choice => choice.getHtml());
+            ctrl.choices = choices.map(choice => choice.html);
             ctrl.maxAllowableSelectionCount = maxAllowableSelectionCount;
             ctrl.minAllowableSelectionCount = minAllowableSelectionCount;
 

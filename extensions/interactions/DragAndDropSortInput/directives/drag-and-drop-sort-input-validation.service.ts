@@ -58,7 +58,7 @@ export class DragAndDropSortInputValidationService {
     }
 
     for (var i = 0; i < numChoices; i++) {
-      var choice = customizationArgs.choices.value[i].getHtml();
+      var choice = customizationArgs.choices.value[i].html;
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }
@@ -145,7 +145,7 @@ export class DragAndDropSortInputValidationService {
         areAnyItemsDuplicated = false;
 
         let choiceValues = (
-          customizationArgs.choices.value.map(x => x.getHtml()));
+          customizationArgs.choices.value.map(x => x.html));
         switch (rule.type) {
           case 'HasElementXAtPositionY':
             if (!choiceValues.includes(<string>inputs.x)) {

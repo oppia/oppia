@@ -159,7 +159,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
     // Evaluate question string.
     var makeQuestion = function(newState, envs) {
       return ExpressionInterpolationService.processHtml(
-        newState.content.getHtml(), envs);
+        newState.content.html, envs);
     };
 
     // This should only be called when 'exploration' is non-null.
@@ -207,7 +207,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
           currentStateName, questionHtml, interactionHtml,
           interaction, initialState.recordedVoiceovers,
           initialState.writtenTranslations,
-          initialState.content.getContentId());
+          initialState.content.contentId);
       successCallback(initialCard, nextFocusLabel);
     };
 
@@ -356,9 +356,10 @@ angular.module('oppia').factory('ExplorationEngineService', [
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
         var recordedVoiceovers = oldState.recordedVoiceovers;
+        var oldStateCard = PlayerTranscriptService.getLastCard();
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
-            oldStateName, oldState.interaction, answer,
+            oldStateName, oldStateCard.getInteraction(), answer,
             interactionRulesService));
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
@@ -399,8 +400,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
         var oldParams = LearnerParamsService.getAllParams();
         oldParams.answer = answer;
         var feedbackHtml =
-          makeFeedback(outcome.feedback.getHtml(), [oldParams]);
-        var feedbackContentId = outcome.feedback.getContentId();
+          makeFeedback(outcome.feedback.html, [oldParams]);
+        var feedbackContentId = outcome.feedback.contentId;
         var feedbackAudioTranslations = (
           recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
         if (feedbackHtml === null) {
@@ -456,7 +457,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
           exploration.getInteraction(nextStateName),
           exploration.getState(nextStateName).recordedVoiceovers,
           exploration.getState(nextStateName).writtenTranslations,
-          exploration.getState(nextStateName).content.getContentId());
+          exploration.getState(nextStateName).content.contentId);
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,

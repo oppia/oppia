@@ -77,7 +77,8 @@ describe('State Object Factory', () => {
       written_translations: {
         translations_mapping: {
           content: {},
-          default_outcome: {}
+          default_outcome: {},
+          hint_1: {}
         }
       }
     });
@@ -129,7 +130,8 @@ describe('State Object Factory', () => {
       written_translations: {
         translations_mapping: {
           content: {},
-          default_outcome: {}
+          default_outcome: {},
+          hint_1: {}
         }
       }
     };
@@ -187,5 +189,31 @@ describe('State Object Factory', () => {
 
     expect(stateObjectDefault).toEqual(otherState);
     expect(stateObjectDefault.name).toEqual('Other state');
+  });
+
+  it('should correctly get total required written translations count', () => {
+    const state = sof.createFromBackendDict('State name', stateObject);
+    state.interaction.id = null;
+    // The required written translations count is 1 (content).
+    // default_outcome and hints do not count because the interaction id is
+    // null.
+    expect(
+      state.getRequiredWrittenTranslationsCount()
+    ).toBe(1);
+
+    state.writtenTranslations.addContentId('feedback_1');
+    state.writtenTranslations.addWrittenTranslation(
+      'feedback_1', 'fr', 'html', '<p>Translation</p>');
+    // The required written translations count is 2 (content, feedback).
+    expect(
+      state.getRequiredWrittenTranslationsCount()
+    ).toBe(2);
+
+    state.interaction.id = 'TextInput';
+    // The required written translations count is 2 (content, feedback, hint,
+    // default_outcome).
+    expect(
+      state.getRequiredWrittenTranslationsCount()
+    ).toBe(4);
   });
 });

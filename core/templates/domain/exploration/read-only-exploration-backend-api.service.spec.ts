@@ -75,6 +75,8 @@ describe('Read only exploration backend API service', () => {
     version: 1,
     can_edit: true,
     preferred_audio_language_code: 'en',
+    preferred_language_codes: [],
+    preferred_site_language_code: null,
     auto_tts_enabled: true,
     correctness_feedback_enabled: true,
     record_playthrough_probability: 1
@@ -204,7 +206,9 @@ describe('Read only exploration backend API service', () => {
       preferred_audio_language_code: 'en',
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
-      record_playthrough_probability: 1
+      record_playthrough_probability: 1,
+      preferred_language_codes: [],
+      preferred_site_language_code: null
     });
 
     // It should now be cached.
@@ -225,7 +229,9 @@ describe('Read only exploration backend API service', () => {
       preferred_audio_language_code: 'en',
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
-      record_playthrough_probability: 1
+      record_playthrough_probability: 1,
+      preferred_language_codes: [],
+      preferred_site_language_code: null
     });
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -243,7 +249,9 @@ describe('Read only exploration backend API service', () => {
       preferred_audio_language_code: 'en',
       auto_tts_enabled: false,
       correctness_feedback_enabled: false,
-      record_playthrough_probability: 1
+      record_playthrough_probability: 1,
+      preferred_language_codes: [],
+      preferred_site_language_code: null
     });
     expect(roebas.isCached('0')).toBe(true);
 

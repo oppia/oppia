@@ -180,7 +180,7 @@ export class Exploration {
   }
 
   getUninterpolatedContentHtml(stateName: string): string {
-    return this.getState(stateName).content.getHtml();
+    return this.getState(stateName).content.html;
   }
 
   getVoiceovers(stateName: string): BindableVoiceovers {
@@ -190,7 +190,7 @@ export class Exploration {
       return null;
     }
     let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.getContentId();
+    let contentId = state.content.contentId;
     return recordedVoiceovers.getBindableVoiceovers(
       contentId);
   }
@@ -203,7 +203,7 @@ export class Exploration {
       return null;
     }
     let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.getContentId();
+    let contentId = state.content.contentId;
     const voiceovers = recordedVoiceovers.getVoiceover(contentId, languageCode);
     return voiceovers || null;
   }
@@ -221,6 +221,17 @@ export class Exploration {
   }
 
   getWrittenTranslationLanguageCodesReadyForDisplay(): string[] {
+    // If there are any TextInput or SetInput interactions, disable switching
+    // languages.
+    if (
+      Object.values(this.states.getStateObjects())
+        .map(state => state.interaction.id)
+        .some(interactionId => ['TextInput', 'SetInput'].includes(
+          interactionId))
+    ) {
+      return [];
+    }
+
     // A language's translations are ready to be displayed if there are less
     // than five missing or update-needed translations.
     const allLanguageCodes = (

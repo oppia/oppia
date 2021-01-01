@@ -81,7 +81,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               SkillEditorStateService.getSkill().getDescription());
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
-                $scope.skill.getConceptCard().getExplanation().getHtml(),
+                $scope.skill.getConceptCard().getExplanation().html,
               displayedWorkedExamples:
                 $scope.skill.getConceptCard().getWorkedExamples()
             };

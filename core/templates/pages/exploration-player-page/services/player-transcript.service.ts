@@ -43,12 +43,23 @@ export class PlayerTranscriptService {
   // they carry on.
   transcript: StateCard[] = [];
   numAnswersSubmitted = 0;
+
+  private originalTranscript: StateCard[] = [];
+
   restore(oldTranscript: StateCard[]): void {
     this.transcript = cloneDeep(oldTranscript);
   }
 
+  restoreImmutably(): void {
+    for (let i = 0; i < this.transcript.length; i++) {
+      // Immutably restore the cards so that Angular can detect changes.
+      this.transcript[i].restoreImmutable(this.originalTranscript[i]);
+    }
+  }
+
   init(): void {
     this.transcript = [];
+    this.originalTranscript = [];
     this.numAnswersSubmitted = 0;
   }
 
@@ -59,6 +70,7 @@ export class PlayerTranscriptService {
   }
   addNewCard(newCard: StateCard): void {
     this.transcript.push(newCard);
+    this.originalTranscript.push(cloneDeep(newCard));
     this.numAnswersSubmitted = 0;
   }
 

@@ -34,22 +34,6 @@ export class SubtitledUnicode {
     private _contentId: string | null
   ) {}
 
-  getUnicode(): string {
-    return this._unicode;
-  }
-
-  getContentId(): string {
-    return this._contentId;
-  }
-
-  setUnicode(newUnicode: string): void {
-    this._unicode = newUnicode;
-  }
-
-  setContentId(newContentId: string): void {
-    this._contentId = newContentId;
-  }
-
   toBackendDict(): SubtitledUnicodeBackendDict {
     return {
       unicode_str: this._unicode,
@@ -63,6 +47,14 @@ export class SubtitledUnicode {
 
   get contentId(): string {
     return this._contentId;
+  }
+
+  set contentId(contentId: string) {
+    this._contentId = contentId;
+  }
+
+  get unicode(): string {
+    return this._unicode;
   }
 
   set unicode(unicode: string) {

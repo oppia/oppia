@@ -20,11 +20,63 @@ import { TestBed } from '@angular/core/testing';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
+import { ContentTranslationManagerService } from
+  'pages/exploration-player-page/services/content-translation-manager.service';
 
 describe('Content translation language service', () => {
   let ctls: ContentTranslationLanguageService;
+  let ctms: ContentTranslationManagerService;
+  let availableLanguageCodes: string[];
 
   beforeEach(() => {
     ctls = TestBed.get(ContentTranslationLanguageService);
+    ctms = TestBed.get(ContentTranslationManagerService);
+    availableLanguageCodes = ['fr', 'zh'];
+  });
+
+  it('should correctly set the language to the first available preferred ' +
+    'exploration language', () => {
+    ctls.init(availableLanguageCodes, ['fr'], null, 'en');
+    expect(ctls.getCurrentContentLanguageCode()).toBe('fr');
+
+    ctls.init(availableLanguageCodes, ['zh'], null, 'en');
+    expect(ctls.getCurrentContentLanguageCode()).toBe('zh');
+  });
+
+  it('should correctly set the language to the preferred site language code ' +
+     'if there are no matches with the preferred exploration languages', () => {
+    ctls.init(availableLanguageCodes, [], 'fr', 'en');
+    expect(ctls.getCurrentContentLanguageCode()).toBe('fr');
+
+    ctls.init(availableLanguageCodes, ['zz'], 'zh', 'en');
+    expect(ctls.getCurrentContentLanguageCode()).toBe('zh');
+  });
+
+  it('should correctly set the language to the exploration language code ' +
+     'if there are no matches with the preferred exploration languages or ' +
+     'the preferred site language code', () => {
+    ctls.init(availableLanguageCodes, [], 'zz', 'fr');
+    expect(ctls.getCurrentContentLanguageCode()).toBe('fr');
+
+    ctls.init(availableLanguageCodes, ['zz'], 'ab', 'zh');
+    expect(ctls.getCurrentContentLanguageCode()).toBe('zh');
+  });
+
+  it('should correctly initialize the dropdown options', () => {
+    ctls.init(availableLanguageCodes, [], null, 'en');
+    expect(ctls.getLanguageOptionsForDropdown()).toEqual([
+      {value: 'fr', displayed: 'français (French)'},
+      {value: 'zh', displayed: '中文 (Chinese)'},
+      {value: 'en', displayed: 'English'}
+    ]);
+  });
+
+  it('should correctly set the current language code and call the content ' +
+     'translation manager service', () => {
+    const displayTranslationsSpy = spyOn(ctms, 'displayTranslations');
+    ctls.init(availableLanguageCodes, [], null, 'en');
+    ctls.setCurrentContentLanguageCode('fr');
+    expect(ctls.getCurrentContentLanguageCode()).toBe('fr');
+    expect(displayTranslationsSpy).toHaveBeenCalledWith('fr');
   });
 });

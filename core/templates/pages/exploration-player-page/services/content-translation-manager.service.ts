@@ -18,7 +18,6 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
-import cloneDeep from 'lodash/cloneDeep';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
@@ -45,7 +44,6 @@ import { ExtensionTagAssemblerService } from
 })
 export class ContentTranslationManagerService {
   _explorationLanguageCode: string;
-  _originalTranscript: StateCard[];
   _onStateCardContentUpdateEmitter: EventEmitter<void> = new EventEmitter();
 
   constructor(
@@ -61,29 +59,26 @@ export class ContentTranslationManagerService {
     return this._onStateCardContentUpdateEmitter;
   }
 
-  displayTranslations(oldLanguageCode: string, newLanguageCode: string) : void {
+  displayTranslations(languageCode: string) : void {
     const cards = this.playerTranscriptService.transcript;
 
-    if (oldLanguageCode === this._explorationLanguageCode) {
-      this._originalTranscript = cloneDeep(
-        this.playerTranscriptService.transcript);
+    if (languageCode === this._explorationLanguageCode) {
+      this.playerTranscriptService.restoreImmutably();
+    } else {
+      cards.forEach(
+        card => this._displayTranslationsForCard(card, languageCode));
     }
 
-    if (newLanguageCode === this._explorationLanguageCode) {
-      for (let i = 0; i < cards.length; i++) {
-        // Immutably restore the cards so that Angular can detect changes.
-        cards[i].restoreImmutable(this._originalTranscript[i]);
-      }
-    } else {
-      cards.forEach(card => {
-        this._displayTranslationsForCard(card, newLanguageCode);
-        // Because we do not have a mapping of the learner's input and Oppia's
-        // response to the content from which it originates from, we cannot
-        // easily swap them with translated values. Instead, we opt to clear
-        // the responses.
-        card._inputResponsePairs.splice(0, card._inputResponsePairs.length);
-      });
-    }
+    cards.forEach(card => {
+      // Because we do not have a mapping of the learner's input and Oppia's
+      // response to the content from which it originates from, we cannot
+      // easily swap them with translated values. Instead, we opt to clear
+      // the responses.
+      card.getInputResponsePairs().splice(
+        0, card.getInputResponsePairs().length);
+      // Mark card as uncompleted because we clear response pairs.
+      card.markAsNotCompleted();
+    });
 
     this._onStateCardContentUpdateEmitter.emit();
   }
@@ -128,14 +123,21 @@ export class ContentTranslationManagerService {
         writtenTranslations, languageCode, solution.explanation);
     }
 
+    this._swapContent(
+      writtenTranslations,
+      languageCode,
+      card.getInteraction().defaultOutcome.feedback);
+
     const answerGroups = card.getInteraction().answerGroups;
     answerGroups.forEach(answerGroup => {
       this._swapContent(
         writtenTranslations, languageCode, answerGroup.outcome.feedback);
     });
 
-    this._swapContentInCustomizationArgs(
-      card, languageCode);
+    if (card.getInteraction().id) {
+      this._swapContentInCustomizationArgs(
+        card, languageCode);
+    }
   }
 
   _swapContentInCustomizationArgs(card: StateCard, languageCode: string): void {
@@ -189,10 +191,10 @@ export class ContentTranslationManagerService {
       }
     }
 
-    const element = $(card._interactionHtml);
+    const element = $(card.getInteractionHtml());
     this.extensionTagAssemblerService.formatCustomizationArgAttrs(
       element, caValues);
-    card._interactionHtml = element.get(0).outerHTML;
+    card.setInteractionHtml(element.get(0).outerHTML);
   }
 
   _isValidTranslation(writtenTranslation: WrittenTranslation): boolean {

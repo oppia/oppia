@@ -66,7 +66,7 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               'DragAndDropSortInput',
               $attrs
             );
-            ctrl.choices = choices.map(choice => choice.getHtml());
+            ctrl.choices = choices.map(choice => choice.html);
 
             ctrl.list = [];
             ctrl.dataMaxDepth = 1;

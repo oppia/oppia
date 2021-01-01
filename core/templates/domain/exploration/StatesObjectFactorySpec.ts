@@ -26,16 +26,19 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
 
 describe('States Object Factory', () => {
   let sof: StateObjectFactory = null;
   let ssof = null;
+  let wtof = null;
   let statesDict = null;
   let newState = null;
   let newState2 = null;
   let secondState = null;
   let statesWithCyclicOutcomeDict = null;
-  let statesWithAudioDict = null;
+  let statesWithAudioAndWrittenTranslationsDict = null;
   let vof = null;
 
   beforeEach(() => {
@@ -45,6 +48,7 @@ describe('States Object Factory', () => {
     ssof = TestBed.get(StatesObjectFactory);
     sof = TestBed.get(StateObjectFactory);
     vof = TestBed.get(VoiceoverObjectFactory);
+    wtof = TestBed.get(WrittenTranslationObjectFactory);
     spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
@@ -375,7 +379,7 @@ describe('States Object Factory', () => {
       },
     };
 
-    statesWithAudioDict = {
+    statesWithAudioAndWrittenTranslationsDict = {
       'first state': {
         content: {
           content_id: 'content',
@@ -497,12 +501,48 @@ describe('States Object Factory', () => {
         solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
-            content: {},
-            ca_placeholder_3: {},
-            default_outcome: {},
-            feedback_1: {},
-            hint_1: {},
-            hint_2: {}
+            content: {
+              en: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            ca_placeholder_3: {
+              'hi-en': {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            default_outcome: {
+              he: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            feedback_1: {
+              zh: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            hint_1: {
+              es: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            },
+            hint_2: {
+              cs: {
+                data_format: 'html',
+                translation: '<p>translation</p>',
+                needs_update: false
+              }
+            }
           }
         }
       },
@@ -538,11 +578,13 @@ describe('States Object Factory', () => {
   });
 
   it('should correctly delete a state', () => {
-    let statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-    statesWithAudio.deleteState('first state');
-    expect(statesWithAudio).toEqual(ssof.createFromBackendDict({
-      'second state': secondState
-    }));
+    let statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+      statesWithAudioAndWrittenTranslationsDict);
+    statesWithAudioAndWrittenTranslations.deleteState('first state');
+    expect(statesWithAudioAndWrittenTranslations).toEqual(
+      ssof.createFromBackendDict({
+        'second state': secondState
+      }));
   });
 
   it('should correctly set any states\' interaction.defaultOutcomes that ' +
@@ -611,14 +653,53 @@ describe('States Object Factory', () => {
   });
 
   it('should correctly get all audio language codes in states', () => {
-    const statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-    expect(statesWithAudio.getAllVoiceoverLanguageCodes())
+    const statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+      statesWithAudioAndWrittenTranslationsDict);
+    expect(statesWithAudioAndWrittenTranslations.getAllVoiceoverLanguageCodes())
       .toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs', 'de']);
   });
 
+  it('should correctly get all written translation language codes in states',
+    () => {
+      const statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+        statesWithAudioAndWrittenTranslationsDict);
+      expect(
+        statesWithAudioAndWrittenTranslations
+          .getAllWrittenTranslationLanguageCodes()
+      ).toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs']);
+    }
+  );
+
+  it('should correctly get all written translations',
+    () => {
+      const statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+        statesWithAudioAndWrittenTranslationsDict);
+      expect(
+        statesWithAudioAndWrittenTranslations.getAllWrittenTranslations('en')
+      ).toEqual({
+        'first state': [wtof.createFromBackendDict({
+          data_format: 'html',
+          translation: '<p>translation</p>',
+          needs_update: false
+        })],
+        'second state': []
+      });
+    }
+  );
+
+  it('should correctly get total required written translations count', () => {
+    const statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+      statesWithAudioAndWrittenTranslationsDict);
+    expect(
+      statesWithAudioAndWrittenTranslations
+        .getTotalRequiredWrittenTranslationsCount()
+    ).toBe(9);
+  });
+
   it('should correctly get all audio translations in states', () => {
-    const statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
-    expect(statesWithAudio.getAllVoiceovers('hi-en'))
+    const statesWithAudioAndWrittenTranslations = ssof.createFromBackendDict(
+      statesWithAudioAndWrittenTranslationsDict);
+    expect(statesWithAudioAndWrittenTranslations.getAllVoiceovers('hi-en'))
       .toEqual({
         'first state': [vof.createFromBackendDict({
           filename: 'myfile3.mp3',
