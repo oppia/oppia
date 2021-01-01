@@ -115,6 +115,10 @@ angular.module('oppia').component('splashPage', {
           // once the controller is migrated to angular.
           $rootScope.$applyAsync();
         });
+
+        $rootScope.$on('$translateChangeSuccess', function() {
+          ctrl.testimonials = ctrl.getTestimonials();
+        });
       };
     }
   ]
