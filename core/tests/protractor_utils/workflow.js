@@ -131,8 +131,11 @@ var createExplorationAsAdmin = async function() {
 var publishExploration = async function() {
   await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
   await element(by.css('.protractor-test-publish-exploration')).click();
-  var prePublicationButtonElem = element(by.css(
+  const prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
+  await waitFor.elementToBeClickable(
+    prePublicationButtonElem,
+    'Save changes button taking too long to be clickable');
   await prePublicationButtonElem.isPresent();
   await prePublicationButtonElem.click();
 
