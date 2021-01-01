@@ -1840,6 +1840,320 @@ class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
             migrated_subscription_model.last_updated)
 
 
+class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
+
+    USER_ID_1 = 'user_id'
+    USER_ID_2 = 'user_id_2'
+    EMAIL_1 = 'test@email.com'
+    EMAIL_2 = 'test2@email.com'
+    SKILL_ID_1 = 'skill_id_1'
+    SKILL_ID_2 = 'skill_id_2'
+    DEGREE_OF_MASTERY = 0.5
+    EXPLORATION_IDS = ['exp_1', 'exp_2', 'exp_3']
+    COLLECTION_IDS = ['col_1', 'col_2', 'col_3']
+    EXP_ID_ONE = 'exp_id_one'
+    EXP_ID_TWO = 'exp_id_two'
+    EXP_ID_THREE = 'exp_id_three'
+
+    def setUp(self):
+
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(FixUserSettingsCreatedOnOneOffJobTests, self).setUp()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob.create_new())
+        user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        sorted_eval_output = []
+        for key, values in eval_output:
+            if key == 'ERROR_NOT_UP_TO_DATE_USER':
+                values.sort()
+            sorted_eval_output.append([key, values])
+        return sorted_eval_output
+
+    def test_update_user_model_with_single_correct_timestamp_value(self):
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        user_settings_model.created_on += datetime.timedelta(hours=10)
+        user_settings_model.put()
+
+        # We did not modify last_updated earlier, and hence it becomes the
+        # minimal timestamp value now.
+        expected_output = [
+            ['UPDATE_USING_UserSettingsModel_last_updated', 1],
+            ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+        ]
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_update_user_model_with_multiple_correct_timestamp_values(self):
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        original_created_on_timestamp = user_settings_model.created_on
+
+        # last_agreed_to_terms is set to have the absolute minimum
+        # timestamp value.
+        user_settings_model.last_agreed_to_terms = (
+            original_created_on_timestamp + datetime.timedelta(hours=2))
+        final_created_on_timestamp = user_settings_model.last_agreed_to_terms
+
+        # The following attributes have timestamps close to the absolute minimum
+        # value.
+        user_settings_model.last_logged_in = (
+            final_created_on_timestamp + datetime.timedelta(minutes=15))
+        user_settings_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(minutes=60))
+
+        # Rest of the attributes lie outside the range of possible correct
+        # timestamp values.
+        user_settings_model.created_on = (
+            final_created_on_timestamp + datetime.timedelta(days=10))
+        user_settings_model.last_started_state_editor_tutorial = (
+            final_created_on_timestamp + datetime.timedelta(minutes=61))
+        user_settings_model.last_started_state_translation_tutorial = (
+            final_created_on_timestamp + datetime.timedelta(hours=11))
+        user_settings_model.last_edited_an_exploration = (
+            final_created_on_timestamp + datetime.timedelta(hours=12))
+        user_settings_model.last_created_an_exploration = (
+            final_created_on_timestamp + datetime.timedelta(hours=13))
+        user_settings_model.first_contribution_msec = (
+            utils.get_time_in_millisecs(
+                final_created_on_timestamp + datetime.timedelta(hours=14))
+        )
+        user_settings_model.put()
+
+        expected_output = [
+            [
+                'UPDATE_USING_UserSettingsModel_last_agreed_to_terms,'
+                'UserSettingsModel_last_logged_in,'
+                'UserSettingsModel_last_updated',
+                1
+            ],
+            ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+        ]
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_update_using_datetime_attributes_of_all_models(self):
+        user_subscriptions_model = user_models.UserSubscriptionsModel(
+            id=self.USER_ID_1)
+        user_subscriptions_model.update_timestamps()
+        # We are sequentially creating the models, so the timestamps will
+        # be in increasing order, and hence created_on attribute for
+        # user_subscriptions_model will have the smallest timestamp value.
+        final_created_on_timestamp = user_subscriptions_model.created_on
+        user_subscriptions_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=2)
+        )
+        user_subscriptions_model.last_checked = (
+            final_created_on_timestamp + datetime.timedelta(hours=3)
+        )
+        user_subscriptions_model.put()
+
+        # No attribute of this model is close to final_created_on_timestamp.
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        user_settings_model.created_on = (
+            final_created_on_timestamp + datetime.timedelta(hours=10)
+        )
+        user_settings_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=10)
+        )
+        user_settings_model.put()
+
+        # Only rated_on attribute from this model is close to the
+        # final_created_on_timestamp.
+        exploration_user_data_model = user_models.ExplorationUserDataModel(
+            id='%s.%s' % (self.USER_ID_1, self.EXP_ID_ONE),
+            user_id=self.USER_ID_1,
+            exploration_id=self.EXP_ID_ONE,
+            rating=2,
+            rated_on=final_created_on_timestamp + datetime.timedelta(hours=1),
+            draft_change_list={'new_content': {}},
+            draft_change_list_last_updated=(
+                final_created_on_timestamp + datetime.timedelta(hours=2)),
+            draft_change_list_exp_version=3,
+            draft_change_list_id=1
+        )
+        exploration_user_data_model.update_timestamps()
+        exploration_user_data_model.created_on = (
+            final_created_on_timestamp + datetime.timedelta(hours=5)
+        )
+        exploration_user_data_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=5)
+        )
+        exploration_user_data_model.put()
+
+        # Only created_on attribute from this model is close to the
+        # final_created_on_timestamp.
+        user_contributions_model = user_models.UserContributionsModel(
+            id=self.USER_ID_1)
+        user_contributions_model.update_timestamps()
+        user_contributions_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=5)
+        )
+        user_contributions_model.put()
+
+        # Only created_on attribute from this model is close to the
+        # final_created_on_timestamp.
+        user_email_preferences_model = user_models.UserEmailPreferencesModel(
+            id=self.USER_ID_1)
+        user_email_preferences_model.update_timestamps()
+        user_email_preferences_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=6)
+        )
+        user_email_preferences_model.put()
+
+        # No attribute of this model is close to final_created_on_timestamp.
+        user_stats_model = user_models.UserStatsModel(
+            id=self.USER_ID_1)
+        user_stats_model.update_timestamps()
+        user_stats_model.created_on = (
+            final_created_on_timestamp + datetime.timedelta(hours=10)
+        )
+        user_stats_model.last_updated = (
+            final_created_on_timestamp + datetime.timedelta(hours=10)
+        )
+        user_stats_model.put()
+
+        self.assertNotEqual(
+            user_settings_model.created_on, final_created_on_timestamp)
+
+        expected_output = [
+            [
+                'UPDATE_USING_UserSubscriptionsModel_created_on,'
+                'UserContributionsModel_created_on,'
+                'UserEmailPreferencesModel_created_on,'
+                'ExplorationUserDataModel_rated_on',
+                1
+            ],
+            ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+        ]
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_time_difference_less_than_time_delta_does_not_update(self):
+        user_auth_details_model = (
+            user_models.UserAuthDetailsModel(
+                id=self.USER_ID_1,
+                gae_id='gae_id'
+            )
+        )
+        user_auth_details_model.update_timestamps()
+        user_auth_details_model.put()
+
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+
+        # UserAuthDetails model was created before UserSettingsModel, but the
+        # time difference is less than the time_delta required, hence created_on
+        # will not be updated.
+        self.assertLess(
+            user_auth_details_model.created_on, user_settings_model.created_on)
+        actual_output = self._run_one_off_job()
+        expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 1]]
+        self.assertItemsEqual(expected_output, actual_output)
+
+    def test_update_for_multiple_users_works_correctly(self):
+        user_settings_model_1 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model_1.update_timestamps()
+        user_settings_model_1.created_on += datetime.timedelta(hours=10)
+        final_created_on_timestamp_1 = user_settings_model_1.last_updated
+        user_settings_model_1.put()
+
+        user_settings_model_2 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_2,
+                email=self.EMAIL_2,
+            )
+        )
+        user_settings_model_2.update_timestamps()
+        original_created_on_timestamp_2 = user_settings_model_2.created_on
+        user_settings_model_2.created_on = (
+            original_created_on_timestamp_2 + datetime.timedelta(hours=5))
+        user_settings_model_2.last_updated = (
+            original_created_on_timestamp_2 + datetime.timedelta(hours=6))
+        user_settings_model_2.last_logged_in = (
+            original_created_on_timestamp_2 + datetime.timedelta(hours=1))
+        final_created_on_timestamp_2 = user_settings_model_2.last_logged_in
+        user_settings_model_2.put()
+
+        self.assertNotEqual(
+            user_settings_model_1.created_on, final_created_on_timestamp_1)
+        self.assertNotEqual(
+            user_settings_model_2.created_on, final_created_on_timestamp_2)
+
+        actual_output = self._run_one_off_job()
+        expected_output = [
+            ['UPDATE_USING_UserSettingsModel_last_updated', 1],
+            ['UPDATE_USING_UserSettingsModel_last_logged_in', 1],
+            ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1, self.USER_ID_2]]
+        ]
+        self.assertItemsEqual(actual_output, expected_output)
+
+    def test_update_user_model_created_after_cutoff_date_yields_error_key(self):
+        user_settings_model = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model.update_timestamps()
+        user_settings_model.created_on += datetime.timedelta(hours=10)
+        user_settings_model.put()
+
+        # We did not modify last_updated earlier, and hence it becomes the
+        # minimal timestamp value now.
+        expected_output = [
+            ['UPDATE_USING_UserSettingsModel_last_updated', 1],
+            ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
+        ]
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(actual_output, expected_output)
+
+
 class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
