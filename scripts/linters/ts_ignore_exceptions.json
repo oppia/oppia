@@ -14,6 +14,7 @@
     "element, [failHardModule, ng1Module.name]));"
   ],
   "core/templates/pages/exploration-player-page/services/content-translation-manager.service.spec.ts": [
-    "INTERACTION_SPECS.DummyInteraction = {"
+    "INTERACTION_SPECS.DummyInteraction = {",
+    "delete INTERACTION_SPECS.DummyInteraction;"
   ]
 }

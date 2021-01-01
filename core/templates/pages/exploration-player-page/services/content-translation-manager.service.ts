@@ -123,10 +123,12 @@ export class ContentTranslationManagerService {
         writtenTranslations, languageCode, solution.explanation);
     }
 
-    this._swapContent(
-      writtenTranslations,
-      languageCode,
-      card.getInteraction().defaultOutcome.feedback);
+    if (card.getInteraction().defaultOutcome) {
+      this._swapContent(
+        writtenTranslations,
+        languageCode,
+        card.getInteraction().defaultOutcome.feedback);
+    }
 
     const answerGroups = card.getInteraction().answerGroups;
     answerGroups.forEach(answerGroup => {

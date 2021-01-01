@@ -132,7 +132,7 @@ angular.module('oppia').config([
       'PageTitleService', 'ParamChangesObjectFactory',
       'ParamMetadataObjectFactory', 'ParamSpecsObjectFactory',
       'PencilCodeEditorRulesService', 'PlayerCorrectnessFeedbackEnabledService',
-      'PlayerPositionService', 'PlaythroughIssuesBackendApiService',
+      'PlaythroughIssuesBackendApiService',
       'PredictionAlgorithmRegistryService', 'PretestQuestionBackendApiService',
       'ProfilePageBackendApiService', 'QuestionBackendApiService',
       'QuestionSummaryForOneSkillObjectFactory', 'QuestionSummaryObjectFactory',

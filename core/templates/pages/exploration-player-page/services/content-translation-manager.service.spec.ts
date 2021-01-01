@@ -274,7 +274,7 @@ describe('Content translation manager service', () => {
   });
 
   describe('with custom INTERACTION_SPECS cases', () => {
-    beforeEach(() => {
+    beforeAll(() => {
       // This throws a type error.
       // @ts-ignore
       INTERACTION_SPECS.DummyInteraction = {
@@ -300,6 +300,12 @@ describe('Content translation manager service', () => {
           }
         }]
       };
+    });
+
+    afterAll(() => {
+      // This throws a type error.
+      // @ts-ignore
+      delete INTERACTION_SPECS.DummyInteraction;
     });
 
     it('should replace translatable customization args', () => {
