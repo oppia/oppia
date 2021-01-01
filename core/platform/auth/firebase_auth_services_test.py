@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import functools
+import json
 import logging
 
 from core.domain import auth_domain
@@ -36,18 +37,117 @@ import webapp2
 auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 
-def mock_successful_firebase_initialization(test_method):
-    """Decorater for tests that mocks a successful Firebase initialization."""
-    @functools.wraps(test_method)
-    def decorated_test_method(test):
-        """The decorated test method."""
-        with test.swap_to_always_return(firebase_admin, 'initialize_app'):
-            test_method(test)
-    return decorated_test_method
+class FirebaseAuthServerStub(python_utils.OBJECT):
+    """Helper class for swapping the Firebase Admin SDK with a stateful mock.
+
+    NOT INTENDED TO BE USED DIRECTLY. Just install and interact with the
+    Firebase Admin SDK as if it were connected to a real server.
+
+    Example:
+        class Test(test_utils.TestBase):
+
+            def setUp(self):
+                self._uninstall_mock = FirebaseAuthServerStub.install(self)
+                firebase_admin.auth.create_user(uid='foo')
+
+            def tearDown(self):
+                self._uninstall_mock()
+
+            def test_sdk(self):
+                user_record = firebase_admin.get_user('uid')
+                self.assertEqual(user_record.uid, 'uid')
+    """
+
+    @classmethod
+    def install(cls, test):
+        """Installs a new instance of the mock on the given test class.
+
+        The mock will emulate an initially-empty Firebase authentication server.
+
+        Args:
+            test: test_utils.TestBase. The test to install the mock on.
+            initial_uids: list(str). The set of uids the mock will begin with.
+
+        Returns:
+            callable. A function that will uninstall the mock when called.
+        """
+        mock = cls()
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(test.swap_to_always_return(
+                firebase_admin, 'initialize_app'))
+            stack.enter_context(test.swap_to_always_return(
+                firebase_admin, 'delete_app'))
+            stack.enter_context(test.swap_to_always_return(
+                firebase_admin.auth, 'verify_id_token'))
+            stack.enter_context(test.swap(
+                firebase_admin.auth, 'create_user', mock._create_user))
+            stack.enter_context(test.swap(
+                firebase_admin.auth, 'get_user', mock._get_user))
+            stack.enter_context(test.swap(
+                firebase_admin.auth, 'delete_user', mock._delete_user))
+
+            for function_name in cls._YAGNI_FUNCTION_NAMES:
+                stack.enter_context(test.swap_to_always_raise(
+                    firebase_admin.auth, function_name, NotImplementedError))
+
+            # Standard usage of ExitStack: enter a bunch of context managers
+            # from the safety of an ExitStack's context. Once they've all been
+            # opened, pop_all() of them off of the original context so they can
+            # *stay* open.
+            # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
+            return stack.pop_all().close
+
+    # YAGNI: https://en.wikipedia.org/wiki/You_aren't_gonna_need_it.
+    _YAGNI_FUNCTION_NAMES = [
+        'create_custom_token',
+        'create_session_cookie',
+        'generate_email_verification_link',
+        'generate_password_reset_link',
+        'generate_sign_in_with_email_link',
+        'get_user_by_email',
+        'get_user_by_phone_number',
+        'import_users',
+        'list_users',
+        'revoke_refresh_tokens',
+        'set_custom_user_claims',
+        'update_user',
+        'verify_session_cookie',
+    ]
+
+    def __init__(self):
+        self._users = {}
+
+    def _create_user(self, uid=None, **kwargs):
+        """Adds new user to storage."""
+        if uid in self._users:
+            raise firebase_admin.auth.UidAlreadyExistsError('%s exists' % uid)
+        self._users[uid] = firebase_admin.auth.UserRecord(
+            # FRAGILE: UserRecord doesn't have a public constructor, so this may
+            # break in future versions of the SDK. OK with taking that risk
+            # because this is only for mocking purposes.
+            firebase_admin.auth.ImportUserRecord(uid, **kwargs).to_dict())
+
+    def _get_user(self, uid):
+        """Returns user with given ID if one exists."""
+        if uid not in self._users:
+            raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
+        return self._users[uid]
+
+    def _delete_user(self, uid):
+        """Removes user from storage."""
+        if uid not in self._users:
+            raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
+        del self._users[uid]
 
 
 class AuthenticateRequestTests(test_utils.TestBase):
     """Test cases for authenticating requests with Firebase Admin SDK."""
+
+    def setUp(self):
+        self._uninstall_stub = FirebaseAuthServerStub.install(self)
+
+    def tearDown(self):
+        self._uninstall_stub()
 
     def make_request(self, auth_header=None):
         """Returns a webapp2.Request with the given authorization claims.
@@ -99,7 +199,6 @@ class AuthenticateRequestTests(test_utils.TestBase):
         self.assertIsNone(auth_claims)
         self.assertEqual(errors, [])
 
-    @mock_successful_firebase_initialization
     def test_returns_auth_claims_from_valid_auth_token(self):
         verify_id_token_swap = self.swap_to_always_return(
             firebase_admin.auth, 'verify_id_token',
@@ -112,7 +211,6 @@ class AuthenticateRequestTests(test_utils.TestBase):
         self.assertEqual(
             auth_claims, auth_domain.AuthClaims('auth_id', 'foo@test.com'))
 
-    @mock_successful_firebase_initialization
     def test_returns_none_when_auth_header_is_missing(self):
         request = self.make_request()
 
@@ -120,7 +218,6 @@ class AuthenticateRequestTests(test_utils.TestBase):
 
         self.assertIsNone(auth_claims)
 
-    @mock_successful_firebase_initialization
     def test_returns_none_when_auth_header_uses_wrong_scheme_type(self):
         request = self.make_request(auth_header='Basic password=123')
 
@@ -128,7 +225,6 @@ class AuthenticateRequestTests(test_utils.TestBase):
 
         self.assertIsNone(auth_claims)
 
-    @mock_successful_firebase_initialization
     def test_returns_none_when_auth_token_is_invalid(self):
         verify_id_token_swap = self.swap_to_always_raise(
             firebase_admin.auth, 'verify_id_token',
@@ -142,7 +238,6 @@ class AuthenticateRequestTests(test_utils.TestBase):
         self.assertEqual(len(errors), 1)
         self.assertIn('invalid token', errors[0])
 
-    @mock_successful_firebase_initialization
     def test_returns_claims_as_none_when_missing_essential_claims(self):
         verify_id_token_swap = self.swap_to_always_return(
             firebase_admin.auth, 'verify_id_token', value={})
@@ -154,74 +249,77 @@ class AuthenticateRequestTests(test_utils.TestBase):
         self.assertIsNone(auth_claims)
 
 
-class DeleteUserTests(test_utils.GenericTestBase):
+class DeleteAssociationsTests(test_utils.GenericTestBase):
 
     USER_ID = 'uid'
     AUTH_ID = 'sub'
 
     def setUp(self):
-        super(DeleteUserTests, self).setUp()
+        super(DeleteAssociationsTests, self).setUp()
+        self._uninstall_stub = FirebaseAuthServerStub.install(self)
+
+        firebase_admin.auth.create_user(uid=self.AUTH_ID)
         auth_services.associate_auth_id_to_user_id(
             auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.USER_ID))
 
-    def assert_association_still_exists(self):
-        """Asserts that the test association still exists."""
-        self.assertIsNotNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get(
-                self.AUTH_ID, strict=False))
-
-    def assert_association_no_longer_exists(self):
-        """Asserts that the test association does not exist."""
-        self.assertIsNone(
-            auth_models.UserIdByFirebaseAuthIdModel.get(
-                self.AUTH_ID, strict=False))
+    def tearDown(self):
+        self._uninstall_stub()
 
     def assert_only_item_is_exception(self, logs, msg):
         """Asserts that only the given message appeared in the logs."""
         self.assertEqual(len(logs), 1)
         self.assertIn(msg, logs[0])
 
-    def test_delete_user_without_an_association_returns_true(self):
-        self.assertTrue(auth_services.delete_user('uid_DOES_NOT_EXIST'))
+    def test_delete_user_without_an_association_does_not_raise(self):
+        # Should not raise.
+        auth_services.delete_associated_auth_id('uid_DOES_NOT_EXIST')
+
+    def test_is_associated_auth_id_deleted_with_unknown_user_returns_false(
+            self):
+        self.assertTrue(
+            auth_services.is_associated_auth_id_deleted('uid_DOES_NOT_EXIST'))
 
     def test_delete_user_without_firebase_initialization_returns_false(self):
         init_swap = self.swap_to_always_raise(
             firebase_admin, 'initialize_app',
             error=firebase_exceptions.UnknownError('could not init'))
 
-        # NDB internals print logging messages as well, so we'll just filter for
-        # ERROR messages.
         with init_swap, self.capture_logging(min_level=logging.ERROR) as logs:
-            self.assertFalse(auth_services.delete_user(self.USER_ID))
+            auth_services.delete_associated_auth_id(self.USER_ID)
 
-        self.assert_association_still_exists()
+        self.assertFalse(
+            auth_services.is_associated_auth_id_deleted(self.USER_ID))
         self.assert_only_item_is_exception(logs, 'could not init')
 
-    @mock_successful_firebase_initialization
+    def test_is_associated_auth_id_deleted_without_init_returns_false(self):
+        init_swap = self.swap_to_always_raise(
+            firebase_admin, 'initialize_app',
+            error=firebase_exceptions.UnknownError('could not init'))
+
+        with init_swap, self.capture_logging(min_level=logging.ERROR) as logs:
+            self.assertFalse(
+                auth_services.is_associated_auth_id_deleted(self.USER_ID))
+
+        self.assert_only_item_is_exception(logs, 'could not init')
+
     def test_delete_user_when_firebase_raises_an_error(self):
         delete_swap = self.swap_to_always_raise(
             firebase_admin.auth, 'delete_user',
             error=firebase_exceptions.InternalError('could not connect'))
 
-        # NDB internals print logging messages as well, so we'll just filter for
-        # ERROR messages.
         with delete_swap, self.capture_logging(min_level=logging.ERROR) as logs:
-            self.assertFalse(auth_services.delete_user(self.USER_ID))
+            auth_services.delete_associated_auth_id(self.USER_ID)
 
-        self.assert_association_still_exists()
+        self.assertFalse(
+            auth_services.is_associated_auth_id_deleted(self.USER_ID))
         self.assert_only_item_is_exception(logs, 'could not connect')
 
-    @mock_successful_firebase_initialization
     def test_delete_user_when_firebase_succeeds(self):
-        delete_swap = (
-            self.swap_to_always_return(firebase_admin.auth, 'delete_user'))
+        with self.capture_logging(min_level=logging.ERROR) as logs:
+            auth_services.delete_associated_auth_id(self.USER_ID)
 
-        # NDB internals print logging messages as well, so we'll just filter for
-        # ERROR messages.
-        with delete_swap, self.capture_logging(min_level=logging.ERROR) as logs:
-            self.assertTrue(auth_services.delete_user(self.USER_ID))
-
-        self.assert_association_no_longer_exists()
+        self.assertTrue(
+            auth_services.is_associated_auth_id_deleted(self.USER_ID))
         self.assertEqual(logs, [])
 
 

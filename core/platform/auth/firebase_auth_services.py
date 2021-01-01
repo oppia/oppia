@@ -70,7 +70,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 @contextlib.contextmanager
-def _acquire_firebase_context(credential=None):
+def _acquire_firebase_context():
     """Returns a context for calling the Firebase Admin SDK.
 
     Args:
@@ -80,7 +80,7 @@ def _acquire_firebase_context(credential=None):
     Yields:
         None. No relevant context expression.
     """
-    app = firebase_admin.initialize_app(credential=credential)
+    app = firebase_admin.initialize_app()
     try:
         yield
     finally:
@@ -136,7 +136,7 @@ def authenticate_request(request):
     return None if not auth_id else auth_domain.AuthClaims(auth_id, email)
 
 
-def delete_user(user_id):
+def delete_associated_auth_id(user_id):
     """Deletes all associations referring to the given user_id.
 
     Args:
@@ -147,19 +147,27 @@ def delete_user(user_id):
     """
     mapping = auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id)
     if mapping is None:
-        return True
-
-    if not _initialize_firebase():
-        return False
-
+        return
     try:
-        firebase_auth.delete_user(mapping.id)
+        with _acquire_firebase_context():
+            firebase_auth.delete_user(mapping.id)
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
-        return False
-    else:
-        mapping.delete()
+
+
+def is_associated_auth_id_deleted(user_id):
+    """Returns whether the Firebase account of the given user ID is deleted."""
+    mapping = auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id)
+    if mapping is None:
         return True
+    try:
+        with _acquire_firebase_context():
+            firebase_auth.get_user(mapping.id)
+    except firebase_auth.UserNotFoundError:
+        return True
+    except (ValueError, firebase_exceptions.FirebaseError) as e:
+        logging.exception(e)
+    return False
 
 
 def get_user_id_from_auth_id(auth_id):
