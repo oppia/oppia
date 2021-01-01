@@ -112,7 +112,7 @@ export class ReadOnlyCollectionBackendApiService {
    * rejection callback function is passed the error that occurred and the
    * collection ID.
    */
-  fetchCollection(collectionId: string): Promise<Collection> {
+  async fetchCollectionAsync(collectionId: string): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this._fetchCollection(collectionId, resolve, reject);
     });
@@ -127,7 +127,7 @@ export class ReadOnlyCollectionBackendApiService {
    * it will store it in the cache to avoid requests from the backend in
    * further function calls.
    */
-  loadCollection(collectionId: string): Promise<Collection> {
+  async loadCollectionAsync(collectionId: string): Promise<Collection> {
     return new Promise((resolve, reject) => {
       if (this._isCached(collectionId)) {
         if (resolve) {
