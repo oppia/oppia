@@ -810,7 +810,7 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
 
         self.augmented_skill_summary = skill_domain.AugmentedSkillSummary(
             'skill_id', 'description', 'en', 1, 1, 1,
-            'topic1', 'math', current_time, current_time)
+            ['topic1'], ['math'], current_time, current_time)
 
     def test_augmented_skill_summary_gets_created(self):
         augmented_skill_summary_dict = {
@@ -820,8 +820,8 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
             'version': 1,
             'misconception_count': 1,
             'worked_examples_count': 1,
-            'topic_name': 'topic1',
-            'classroom_name': 'math',
+            'topic_names': ['topic1'],
+            'classroom_names': ['math'],
             'skill_model_created_on': self.time_in_millisecs,
             'skill_model_last_updated': self.time_in_millisecs
         }
