@@ -629,26 +629,27 @@ def get_moderator_unpublish_exploration_email():
 
     try:
         require_moderator_email_prereqs_are_satisfied()
-        return config_domain.Registry.get_config_property(
-            'unpublish_exploration_email_html_body').value
-    except Exception:
+    except utils.ValidationError:
         return ''
+
+    return config_domain.Registry.get_config_property(
+        'unpublish_exploration_email_html_body').value
 
 
 def require_moderator_email_prereqs_are_satisfied():
     """Raises an exception if, for any reason, moderator emails cannot be sent.
 
     Raises:
-        Exception. The feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
-        Exception. The feconf.CAN_SEND_EMAILS is False.
+        ValidationError. The feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
+        ValidationError. The feconf.CAN_SEND_EMAILS is False.
     """
 
     if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-        raise Exception(
+        raise utils.ValidationError(
             'For moderator emails to be sent, please ensure that '
             'REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to True.')
     if not feconf.CAN_SEND_EMAILS:
-        raise Exception(
+        raise utils.ValidationError(
             'For moderator emails to be sent, please ensure that '
             'CAN_SEND_EMAILS is set to True.')
 
