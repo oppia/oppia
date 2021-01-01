@@ -545,8 +545,6 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_a_subscriptions_model.exploration_ids, [self.EXP_ID_1])
         self.assertEqual(
             user_b_subscriptions_model.exploration_ids, [self.EXP_ID_1])
-        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_two_explorations(self):
@@ -661,8 +659,6 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self.EXP_ID_1, self.EXP_ID_FOR_COLLECTION_1])
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
-        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
-        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_two_collections(self):
@@ -1753,348 +1749,95 @@ class RemoveGaeIdOneOffJobTests(test_utils.GenericTestBase):
             migrated_setting_model.last_updated)
 
 
-class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
+class MockUserSubscriptionsModelWithFeedbackThreadIDs(
+        user_models.UserSubscriptionsModel):
+    """Mock UserSubscriptionsModel so that it allows to set
+    `feedback_thread_ids`.
+    """
 
-    USER_ID_1 = 'user_id'
-    USER_ID_2 = 'user_id_2'
-    EMAIL_1 = 'test@email.com'
-    EMAIL_2 = 'test2@email.com'
-    SKILL_ID_1 = 'skill_id_1'
-    SKILL_ID_2 = 'skill_id_2'
-    DEGREE_OF_MASTERY = 0.5
-    EXPLORATION_IDS = ['exp_1', 'exp_2', 'exp_3']
-    COLLECTION_IDS = ['col_1', 'col_2', 'col_3']
-    EXP_ID_ONE = 'exp_id_one'
-    EXP_ID_TWO = 'exp_id_two'
-    EXP_ID_THREE = 'exp_id_three'
+    feedback_thread_ids = (
+        datastore_services.StringProperty(indexed=True, repeated=True))
 
-    def setUp(self):
 
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to sign up the superadmin user.
-        with self.swap(
-            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
-            super(FixUserSettingsCreatedOnOneOffJobTests, self).setUp()
-
+class RemoveFeedbackThreadIDsOneOffJobTests(test_utils.GenericTestBase):
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
-            user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob.create_new())
-        user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob.enqueue(job_id)
+            user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob.create_new())
+        user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
-            user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob
+            user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob
             .get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
-        sorted_eval_output = []
-        for key, values in eval_output:
-            if key == 'ERROR_NOT_UP_TO_DATE_USER':
-                values.sort()
-            sorted_eval_output.append([key, values])
-        return sorted_eval_output
+        return eval_output
 
-    def test_update_for_user_model_created_before_cutoff_date(self):
-        user_settings_model = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
+    def test_one_subscription_model_with_feedback_thread_ids(self):
+        with self.swap(
+            user_models, 'UserSubscriptionsModel',
+            MockUserSubscriptionsModelWithFeedbackThreadIDs):
+            original_subscription_model = (
+                user_models.UserSubscriptionsModel(
+                    id='id',
+                    feedback_thread_ids=['some_id']
+                )
+            )
+            original_subscription_model.update_timestamps()
+            original_subscription_model.put()
+
+            self.assertIsNotNone(
+                original_subscription_model.feedback_thread_ids)
+            self.assertIn(
+                'feedback_thread_ids', original_subscription_model._values)  # pylint: disable=protected-access
+            self.assertIn(
+                'feedback_thread_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_REMOVED - UserSubscriptionsModel', 1]], output)
+
+            migrated_subscription_model = (
+                user_models.UserSubscriptionsModel.get_by_id('id'))
+
+            self.assertNotIn(
+                'feedback_thread_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+            self.assertNotIn(
+                'feedback_thread_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+            self.assertEqual(
+                original_subscription_model.last_updated,
+                migrated_subscription_model.last_updated)
+
+    def test_one_subscription_model_without_feedback_thread_ids(self):
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='id'
             )
         )
-        user_settings_model.update_timestamps()
-        original_created_on_timestamp = user_settings_model.created_on
-        correction_cutoff_timestamp = datetime.datetime.strptime(
-            'Jul 1 2020', '%b %d %Y')
-        final_created_on_timestamp = (
-            correction_cutoff_timestamp - datetime.timedelta(days=10))
-        user_settings_model.last_updated = final_created_on_timestamp
-        user_settings_model.created_on = (
-            final_created_on_timestamp + datetime.timedelta(hours=10))
-        user_settings_model.put()
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
 
-        self.assertNotEqual(
-            user_settings_model.created_on, original_created_on_timestamp)
-        self.assertNotEqual(
-            user_settings_model.created_on, final_created_on_timestamp)
+        self.assertNotIn(
+            'feedback_thread_ids', original_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'feedback_thread_ids', original_subscription_model._properties)  # pylint: disable=protected-access
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
-            [['UPDATE_USING_UserSettingsModel_last_updated', 1]], output)
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
 
-    def test_update_for_user_model_created_after_cutoff_date(self):
-        user_settings_model = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model.update_timestamps()
-        original_created_on_timestamp = user_settings_model.created_on
-        user_settings_model.created_on += datetime.timedelta(hours=10)
-        user_settings_model.put()
-
-        # We did not modify last_updated earlier, and hence it becomes the
-        # minimal timestamp value now.
-        final_created_on_timestamp = user_settings_model.last_updated
-
-        self.assertNotEqual(
-            user_settings_model.created_on, original_created_on_timestamp)
-        self.assertNotEqual(
-            user_settings_model.created_on, final_created_on_timestamp)
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            [
-                ['UPDATE_USING_UserSettingsModel_last_updated', 1],
-                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
-            ],
-            output
-        )
-
-    def test_update_using_other_attributes_of_user_settings_model(self):
-        user_settings_model = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model.update_timestamps()
-        original_created_on_timestamp = user_settings_model.created_on
-        user_settings_model.created_on += datetime.timedelta(hours=10)
-        user_settings_model.last_updated += datetime.timedelta(hours=10)
-        user_settings_model.last_started_state_editor_tutorial = (
-            original_created_on_timestamp + datetime.timedelta(hours=11))
-        user_settings_model.last_started_state_translation_tutorial = (
-            original_created_on_timestamp + datetime.timedelta(hours=13))
-        user_settings_model.last_logged_in = (
-            original_created_on_timestamp + datetime.timedelta(hours=1))
-        user_settings_model.last_edited_an_exploration = (
-            original_created_on_timestamp + datetime.timedelta(hours=13))
-        user_settings_model.last_created_an_exploration = (
-            original_created_on_timestamp + datetime.timedelta(hours=12))
-        user_settings_model.first_contribution_msec = (
-            utils.get_time_in_millisecs(
-                original_created_on_timestamp + datetime.timedelta(hours=11))
-        )
-        user_settings_model.put()
-
-        # We had set the lowest timestamp for last_logged_in.
-        final_created_on_timestamp = user_settings_model.last_logged_in
-
-        self.assertNotEqual(
-            user_settings_model.created_on, original_created_on_timestamp)
-        self.assertNotEqual(
-            user_settings_model.created_on, final_created_on_timestamp)
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            [
-                ['UPDATE_USING_UserSettingsModel_last_logged_in', 1],
-                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
-            ],
-            output
-        )
-
-    def test_update_using_created_on_and_last_updated_of_other_models(self):
-        user_settings_model = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model.update_timestamps()
-        original_created_on_timestamp = user_settings_model.created_on
-        original_last_updated_timestamp = user_settings_model.last_updated
-        user_settings_model.created_on += datetime.timedelta(hours=10)
-        user_settings_model.last_updated += datetime.timedelta(hours=10)
-        user_settings_model.put()
-
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel(
-                id=self.USER_ID_1,
-                gae_id='gae_id'
-            )
-        )
-        user_auth_details_model.update_timestamps()
-        user_auth_details_model.put()
-
-        learner_playlist_model = user_models.LearnerPlaylistModel(
-            id=self.USER_ID_1,
-            exploration_ids=self.EXPLORATION_IDS,
-            collection_ids=self.COLLECTION_IDS,
-        )
-        learner_playlist_model.update_timestamps()
-        learner_playlist_model.put()
-
-        user_skill_mastery_model = user_models.UserSkillMasteryModel(
-            id=user_models.UserSkillMasteryModel.construct_model_id(
-                self.USER_ID_1, self.SKILL_ID_1),
-            user_id=self.USER_ID_1,
-            skill_id=self.SKILL_ID_1,
-            degree_of_mastery=self.DEGREE_OF_MASTERY
-        )
-        user_skill_mastery_model.update_timestamps()
-        user_skill_mastery_model.put()
-
-        # Since user_auth_details_model was created first, hence it will have
-        # the minimum timestamp value among all created models.
-        final_created_on_timestamp = user_auth_details_model.created_on
-
-        self.assertNotEqual(
-            user_settings_model.created_on, original_created_on_timestamp)
-        self.assertNotEqual(
-            user_settings_model.last_updated, original_last_updated_timestamp)
-        self.assertNotEqual(
-            user_settings_model.created_on, final_created_on_timestamp)
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            [
-                ['UPDATE_USING_UserAuthDetailsModel_created_on', 1],
-                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
-            ],
-            output
-        )
-
-    def test_update_using_other_datetime_attributes_of_other_models(self):
-        user_settings_model = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model.update_timestamps()
-        original_created_on_timestamp = user_settings_model.created_on
-        user_settings_model.created_on += datetime.timedelta(hours=10)
-        user_settings_model.last_updated += datetime.timedelta(hours=10)
-        user_settings_model.put()
-
-        user_subscriptions_model = user_models.UserSubscriptionsModel(
-            id=self.USER_ID_1,
-            last_checked=original_created_on_timestamp + datetime.timedelta(
-                hours=1)
-        )
-        final_created_on_timestamp = user_subscriptions_model.last_checked
-        user_subscriptions_model.update_timestamps()
-        user_subscriptions_model.created_on = (
-            final_created_on_timestamp + datetime.timedelta(hours=1))
-        user_subscriptions_model.last_updated = (
-            final_created_on_timestamp + datetime.timedelta(hours=1))
-        user_subscriptions_model.put()
-
-        exploration_user_data_model = user_models.ExplorationUserDataModel(
-            id='%s.%s' % (self.USER_ID_1, self.EXP_ID_ONE),
-            user_id=self.USER_ID_1,
-            exploration_id=self.EXP_ID_ONE,
-            rating=2,
-            rated_on=final_created_on_timestamp + datetime.timedelta(hours=2),
-            draft_change_list={'new_content': {}},
-            draft_change_list_last_updated=(
-                final_created_on_timestamp + datetime.timedelta(hours=2)),
-            draft_change_list_exp_version=3,
-            draft_change_list_id=1
-        )
-        exploration_user_data_model.update_timestamps()
-        exploration_user_data_model.created_on += datetime.timedelta(hours=5)
-        exploration_user_data_model.last_updated += datetime.timedelta(hours=5)
-        exploration_user_data_model.put()
-
-        self.assertNotEqual(
-            user_settings_model.created_on, original_created_on_timestamp)
-        self.assertNotEqual(
-            user_settings_model.created_on, final_created_on_timestamp)
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            [
-                ['UPDATE_USING_UserSubscriptionsModel_last_checked', 1],
-                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1]]
-            ],
-            output
-        )
-
-    def test_time_difference_less_than_time_delta_does_not_update(self):
-        user_auth_details_model = (
-            user_models.UserAuthDetailsModel(
-                id=self.USER_ID_1,
-                gae_id='gae_id'
-            )
-        )
-        user_auth_details_model.update_timestamps()
-        user_auth_details_model.put()
-
-        user_settings_model = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
-
-        # UserAuthDetails model was created before UserSettingsModel, but the
-        # time difference is less than the time_delta required, hence created_on
-        # will not be updated.
-        self.assertLess(
-            user_auth_details_model.created_on, user_settings_model.created_on)
-        actual_output = self._run_one_off_job()
-        expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 1]]
-        self.assertItemsEqual(expected_output, actual_output)
-
-    def test_update_for_multiple_users_works_correctly(self):
-        user_settings_model_1 = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
-            )
-        )
-        user_settings_model_1.update_timestamps()
-        original_created_on_timestamp_1 = user_settings_model_1.created_on
-        user_settings_model_1.created_on += datetime.timedelta(hours=10)
-        final_created_on_timestamp_1 = user_settings_model_1.last_updated
-        user_settings_model_1.put()
-
-        user_settings_model_2 = (
-            user_models.UserSettingsModel(
-                id=self.USER_ID_2,
-                email=self.EMAIL_2,
-            )
-        )
-        user_settings_model_2.update_timestamps()
-        original_created_on_timestamp_2 = user_settings_model_2.created_on
-        user_settings_model_2.created_on = (
-            original_created_on_timestamp_2 + datetime.timedelta(hours=5))
-        user_settings_model_2.last_updated = (
-            original_created_on_timestamp_2 + datetime.timedelta(hours=6))
-        user_settings_model_2.last_logged_in = (
-            original_created_on_timestamp_2 + datetime.timedelta(hours=1))
-        final_created_on_timestamp_2 = user_settings_model_2.last_logged_in
-        user_settings_model_2.put()
-
-        self.assertNotEqual(
-            user_settings_model_1.created_on, original_created_on_timestamp_1)
-        self.assertNotEqual(
-            user_settings_model_1.created_on, final_created_on_timestamp_1)
-        self.assertNotEqual(
-            user_settings_model_2.created_on, original_created_on_timestamp_2)
-        self.assertNotEqual(
-            user_settings_model_2.created_on, final_created_on_timestamp_2)
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            [
-                ['UPDATE_USING_UserSettingsModel_last_updated', 1],
-                ['UPDATE_USING_UserSettingsModel_last_logged_in', 1],
-                ['ERROR_NOT_UP_TO_DATE_USER', [self.USER_ID_1, self.USER_ID_2]]
-            ],
-            output
-        )
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'feedback_thread_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'feedback_thread_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
 
 
 class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
