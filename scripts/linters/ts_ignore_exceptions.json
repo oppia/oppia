@@ -12,5 +12,8 @@
   ],
   "core/templates/tests/unit-test-utils.ts": [
     "element, [failHardModule, ng1Module.name]));"
+  ],
+  "core/templates/pages/exploration-player-page/services/content-translation-manager.service.spec.ts": [
+    "INTERACTION_SPECS.DummyInteraction = {"
   ]
 }

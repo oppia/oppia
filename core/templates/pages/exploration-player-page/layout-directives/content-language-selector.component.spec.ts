@@ -90,11 +90,7 @@ describe('Content language selector component', () => {
       contentTranslationLanguageService,
       'setCurrentContentLanguageCode');
 
-    // Select french.
-    expect(select.options[0].innerText).toBe('français (French)');
-    select.value = select.options[0].value;
-    select.dispatchEvent(new Event(select.value));
-    fixture.detectChanges();
+    component.onSelectLanguage('fr');
 
     expect(setCurrentContentLanguageCodeSpy).toHaveBeenCalledWith('fr');
     expect(component.selectedLanguageCode).toBe('fr');
