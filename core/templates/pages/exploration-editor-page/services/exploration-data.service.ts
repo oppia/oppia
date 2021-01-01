@@ -31,15 +31,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { ExplorationDataBackendApiService } from './exploration-data-backend-api.service';
 
-require('domain/exploration/editable-exploration-backend-api.service.ts');
-require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-require('services/local-storage.service.ts');
-require('services/contextual/url.service.ts');
-
-require('services/services.constants.ajs.ts');
-
 export interface DraftAutoSaveResponse {
   'draft_change_list_id': number;
   'is_version_of_draft_valid': boolean;
