@@ -203,7 +203,7 @@ def is_oppia_server_already_running():
         bool. Whether there is a running Oppia instance.
     """
     for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
-        if not common.wait_for_port_to_be_closed(port):
+        if common.is_port_open(port):
             python_utils.PRINT(
                 'There is already a server running on localhost:%s.'
                 'Please terminate it before running the end-to-end tests.'
@@ -583,6 +583,8 @@ def main(args=None):
             break
         # Prepare for rerun.
         cleanup()
+        for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
+            common.wait_for_port_to_be_closed(port)
 
     sys.exit(return_code)
 
