@@ -406,9 +406,7 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
 
 
 class AuthServicesStub(python_utils.OBJECT):
-    """The stub class that mocks the API functionality offered by the platform
-    layer, namely the platform.auth auth services API.
-    """
+    """Stubs the public API of the platform.auth services."""
 
     def __init__(self):
         """Initializes a new instance that emulates an empty auth server."""
@@ -418,21 +416,17 @@ class AuthServicesStub(python_utils.OBJECT):
         """Returns the claims embedded in os.environ."""
         auth_id = os.environ.get('USER_ID', '')
         email = os.environ.get('USER_EMAIL', '')
-        if auth_id:
-            return auth_domain.AuthClaims(auth_id, email)
-        return None
+        return auth_domain.AuthClaims(auth_id, email) if auth_id else None
 
-    def delete_associated_auth_id(self, target_user_id):
+    def delete_associated_auth_id(self, user_id):
         """Deletes associations referring to the given user_id."""
         self._user_id_by_auth_id = {
-            auth_id: user_id
-            for auth_id, user_id in self._user_id_by_auth_id.items()
-            if user_id != target_user_id
+            a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
         }
 
     def is_associated_auth_id_deleted(self, user_id):
         """Returns whether the user's associated auth ID is deleted."""
-        return user_id not in self._user_id_by_auth_id
+        return user_id not in set(self._user_id_by_auth_id.values())
 
     def get_user_id_from_auth_id(self, auth_id):
         """Returns the user ID associated with the given auth ID."""
@@ -440,7 +434,7 @@ class AuthServicesStub(python_utils.OBJECT):
 
     def get_multi_user_ids_from_auth_ids(self, auth_ids):
         """Returns the user IDs associated with the given auth IDs."""
-        return [self.get_user_id_from_auth_id(auth_id) for auth_id in auth_ids]
+        return [self.get_user_id_from_auth_id(a) for a in auth_ids]
 
     def associate_auth_id_to_user_id(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID."""
@@ -453,10 +447,8 @@ class AuthServicesStub(python_utils.OBJECT):
     def associate_multi_auth_ids_to_user_ids(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs."""
         existing_associations = sorted(
-            'auth_id=%r, user_id=%r' % (
-                auth_id, self._user_id_by_auth_id[auth_id])
-            for auth_id, user_id in auth_id_user_id_pairs
-            if auth_id in self._user_id_by_auth_id)
+            'auth_id=%r, user_id=%r' % (a, self._user_id_by_auth_id[a])
+            for a, u in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
         if existing_associations:
             raise Exception(
                 'associations already exist for: %r' % (existing_associations,))

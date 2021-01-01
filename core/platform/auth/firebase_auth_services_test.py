@@ -48,6 +48,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             def setUp(self):
                 super(Test, self).setUp()
                 self._uninstall_stub = FirebaseAdminSdkStub.install(self)
+
                 firebase_admin.auth.create_user(uid='foo')
 
             def tearDown(self):
@@ -118,24 +119,24 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._users = {}
 
     def _create_user(self, uid=None, **kwargs):
-        """Adds new user to storage."""
+        """Adds user to storage if new, otherwise raises an error."""
         if uid in self._users:
             raise firebase_admin.auth.UidAlreadyExistsError(
                 '%s exists' % uid, None, None)
+        # FRAGILE: UserRecord doesn't have a public constructor, so this may
+        # break in future versions of the SDK. OK with taking that risk because
+        # this is only for stubbing purposes.
         self._users[uid] = firebase_admin.auth.UserRecord(
-            # FRAGILE: UserRecord doesn't have a public constructor, so this may
-            # break in future versions of the SDK. OK with taking that risk
-            # because this is only for stubbing purposes.
             firebase_admin.auth.ImportUserRecord(uid, **kwargs).to_dict())
 
     def _get_user(self, uid):
-        """Returns user with given ID if one exists."""
+        """Returns user with given ID if exists, otherwise raises an error."""
         if uid not in self._users:
             raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
         return self._users[uid]
 
     def _delete_user(self, uid):
-        """Removes user from storage."""
+        """Removes user from storage if exists, otherwise raises an error."""
         if uid not in self._users:
             raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
         del self._users[uid]
