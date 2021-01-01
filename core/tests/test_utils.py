@@ -27,12 +27,15 @@ import inspect
 import itertools
 import json
 import logging
+import operator
 import os
+import re
 import types
 import unittest
 
 from constants import constants
 from core.controllers import base
+from core.domain import auth_domain
 from core.domain import caching_domain
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -70,9 +73,11 @@ import schema_utils
 import utils
 
 import contextlib2
+import firebase_admin
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
+import webapp2
 import webtest
 
 (
@@ -403,6 +408,64 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
             return result_docs[offset:resulting_offset], resulting_offset
         else:
             return result_docs[offset:], resulting_offset
+
+
+class AuthServicesStub(python_utils.OBJECT):
+    """The stub class that mocks the API functionality offered by the platform
+    layer, namely the platform.auth auth services API.
+    """
+
+    def __init__(self):
+        """Initializes a new instance that emulates an empty auth server."""
+        self._user_id_by_auth_id = {}
+
+    def authenticate_request(self, unused_request):
+        """Returns the claims embedded in os.environ."""
+        auth_id = os.environ.get('USER_ID', None)
+        email = os.environ.get('USER_EMAIL', None)
+        if auth_id is not None:
+            return auth_domain.AuthClaims(auth_id, email)
+        return None
+
+    def delete_associated_auth_id(self, target_user_id):
+        """Deletes associations referring to the given user_id."""
+        self._user_id_by_auth_id = {
+            auth_id: user_id
+            for auth_id, user_id in self._user_id_by_auth_id.items()
+            if user_id != target_user_id
+        }
+
+    def is_associated_auth_id_deleted(self, user_id):
+        """Returns whether the user's associated auth ID is deleted."""
+        return user_id not in self._user_id_by_auth_id
+
+    def get_user_id_from_auth_id(self, auth_id):
+        """Returns the user ID associated with the given auth ID."""
+        return self._user_id_by_auth_id.get(auth_id, None)
+
+    def get_multi_user_ids_from_auth_ids(self, auth_ids):
+        """Returns the user IDs associated with the given auth IDs."""
+        return [self.get_user_id_from_auth_id(auth_id) for auth_id in auth_ids]
+
+    def associate_auth_id_to_user_id(self, auth_id_user_id_pair):
+        """Commits the association between auth ID and user ID."""
+        auth_id, user_id = auth_id_user_id_pair
+        if auth_id in self._user_id_by_auth_id:
+            raise Exception('auth_id=%r is already mapped to user_id=%r' % (
+                auth_id, self._user_id_by_auth_id[auth_id]))
+        self._user_id_by_auth_id[auth_id] = user_id
+
+    def associate_multi_auth_ids_to_user_ids(self, auth_id_user_id_pairs):
+        """Commits the associations between auth IDs and user IDs."""
+        existing_associations = sorted(
+            'auth_id=%r, user_id=%r' % (
+                auth_id, self._user_id_by_auth_id[auth_id])
+            for auth_id, user_id in auth_id_user_id_pairs
+            if auth_id in self._user_id_by_auth_id)
+        if existing_associations:
+            raise Exception(
+                'associations already exist for: %r' % (existing_associations,))
+        self._user_id_by_auth_id.update(auth_id_user_id_pairs)
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -1293,12 +1356,15 @@ tags: []
         memory_cache_services_stub.flush_cache()
 
         with contextlib2.ExitStack() as stack:
-            # Using types.MethodType is necessary because this is a classmethod
-            # (see the documentation for self.swap()).
             stack.enter_context(self.swap(
                 models.Registry, 'import_search_services',
-                types.MethodType(
-                    lambda _: self._search_services_stub, models.Registry)))
+                classmethod(lambda _: self._search_services_stub)))
+
+            if not getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
+                auth_services_stub = AuthServicesStub()
+                stack.enter_context(self.swap(
+                    models.Registry, 'import_auth_services',
+                    classmethod(lambda _: auth_services_stub)))
 
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
@@ -2737,7 +2803,7 @@ tags: []
         """Returns a list of all queue names."""
         return [q['name'] for q in self._taskqueue_stub.GetQueues()]
 
-    def count_jobs_in_taskqueue(self, queue_name):
+    def count_jobs_in_taskqueue(self, queue_name=None):
         """Returns the total number of tasks in a single queue if a queue name
         is specified or the entire taskqueue if no queue name is specified.
 

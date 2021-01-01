@@ -208,8 +208,7 @@ def run_user_deletion(pending_deletion_request):
         return wipeout_domain.USER_DELETION_ALREADY_DONE
     else:
         delete_user(pending_deletion_request)
-        if auth_services.delete_user(pending_deletion_request.user_id):
-            pending_deletion_request.deletion_complete = True
+        pending_deletion_request.deletion_complete = True
         save_pending_deletion_requests([pending_deletion_request])
         return wipeout_domain.USER_DELETION_SUCCESS
 
@@ -270,6 +269,9 @@ def delete_user(pending_deletion_request):
     """
     user_id = pending_deletion_request.user_id
     user_role = pending_deletion_request.role
+
+    auth_services.delete_associated_auth_id(user_id)
+
     _delete_models(user_id, user_role, models.NAMES.user)
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, user_role, models.NAMES.feedback)
@@ -352,6 +354,9 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
+    if not auth_services.is_associated_auth_id_deleted(user_id):
+        return False
+
     policies_not_to_verify = [
         base_models.DELETION_POLICY.KEEP,
         base_models.DELETION_POLICY.NOT_APPLICABLE

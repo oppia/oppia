@@ -137,7 +137,7 @@ def authenticate_request(request):
 
 
 def delete_associated_auth_id(user_id):
-    """Deletes all associations referring to the given user_id.
+    """Deletes associations referring to the given user_id.
 
     Args:
         user_id: str. The ID of the user being deleted.
@@ -201,16 +201,17 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
 
 
 @transaction_services.run_in_transaction_wrapper
-def associate_auth_id_to_user_id(pair):
+def associate_auth_id_to_user_id(auth_id_user_id_pair):
     """Commits the association between auth ID and user ID.
 
     Args:
-        pair: auth_domain.AuthIdUserIdPair. The association to commit.
+        auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association to
+            commit.
 
     Raises:
         Exception. The auth ID is already associated with a user ID.
     """
-    auth_id, user_id = pair
+    auth_id, user_id = auth_id_user_id_pair
 
     claimed_user_id = get_user_id_from_auth_id(auth_id)
     if claimed_user_id is not None:
@@ -225,17 +226,18 @@ def associate_auth_id_to_user_id(pair):
 
 
 @transaction_services.run_in_transaction_wrapper
-def associate_multi_auth_ids_to_user_ids(pairs):
+def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
     """Commits the associations between auth IDs and user IDs.
 
     Args:
-        pairs: list(auth_domain.AuthIdUserIdPair). The associations to commit.
+        auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
+            associations to commit.
 
     Raises:
         Exception. One or more auth ID associations already exist.
     """
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
-    auth_ids, user_ids = python_utils.ZIP(*pairs)
+    auth_ids, user_ids = python_utils.ZIP(*auth_id_user_id_pairs)
 
     claimed_user_ids = get_multi_user_ids_from_auth_ids(auth_ids)
     if any(user_id is not None for user_id in claimed_user_ids):

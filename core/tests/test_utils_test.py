@@ -24,12 +24,15 @@ import os
 
 from constants import constants
 from core import jobs
+from core.domain import auth_domain
 from core.domain import param_domain
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+
+import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()
@@ -560,6 +563,90 @@ class EmailMockTests(test_utils.EmailTestBase):
             messages[0].html,
             'Hi abc,<br> 😂'.encode(encoding='utf-8'))
         self.assertEqual(messages[0].bcc, 'c@c.com')
+
+
+class AuthServicesStubTests(test_utils.GenericTestBase):
+
+    EMAIL = 'user@test.com'
+
+    def setUp(self):
+        super(AuthServicesStubTests, self).setUp()
+        self.stub = test_utils.AuthServicesStub()
+
+    def test_get_association_that_exists(self):
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('sub', 'uid'))
+
+        self.assertEqual(
+            self.stub.get_user_id_from_auth_id('sub'), 'uid')
+
+    def test_get_association_that_does_not_exist(self):
+        self.assertIsNone(
+            self.stub.get_user_id_from_auth_id('does_not_exist'))
+
+    def test_get_multi_associations_that_exist(self):
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('sub1', 'uid1'))
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('sub2', 'uid2'))
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('sub3', 'uid3'))
+
+        self.assertEqual(
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['sub1', 'sub2', 'sub3']),
+            ['uid1', 'uid2', 'uid3'])
+
+    def test_get_multi_associations_when_one_does_not_exist(self):
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('sub1', 'uid1'))
+        # Mapping from sub2 -> uid2 missing.
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('sub3', 'uid3'))
+
+        self.assertEqual(
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['sub1', 'sub2', 'sub3']),
+            ['uid1', None, 'uid3'])
+
+    def test_associate_new_auth_id_to_user_id(self):
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('sub', 'uid'))
+
+        self.assertEqual(self.stub.get_user_id_from_auth_id('sub'), 'uid')
+
+    def test_associate_existing_auth_id_to_user_id_raises(self):
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('sub', 'uid'))
+
+        with self.assertRaisesRegexp(Exception, 'already mapped to user_id'):
+            self.stub.associate_auth_id_to_user_id(
+                auth_domain.AuthIdUserIdPair('sub', 'uid'))
+
+    def test_associate_multi_new_auth_ids_to_user_ids(self):
+        self.stub.associate_multi_auth_ids_to_user_ids([
+            auth_domain.AuthIdUserIdPair('sub1', 'uid1'),
+            auth_domain.AuthIdUserIdPair('sub2', 'uid2'),
+            auth_domain.AuthIdUserIdPair('sub3', 'uid3'),
+        ])
+
+        self.assertEqual(
+            [self.stub.get_user_id_from_auth_id('sub1'),
+             self.stub.get_user_id_from_auth_id('sub2'),
+             self.stub.get_user_id_from_auth_id('sub3')],
+            ['uid1', 'uid2', 'uid3'])
+
+    def test_associate_multi_an_existing_auth_id_to_user_id_mapping_raises(
+            self):
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('sub1', 'uid1'))
+
+        with self.assertRaisesRegexp(Exception, 'associations already exist'):
+            self.stub.associate_multi_auth_ids_to_user_ids([
+                auth_domain.AuthIdUserIdPair('sub1', 'uid1'),
+                auth_domain.AuthIdUserIdPair('sub2', 'uid2'),
+                auth_domain.AuthIdUserIdPair('sub3', 'uid3'),
+            ])
 
 
 class SwapWithCheckTestClass(python_utils.OBJECT):
