@@ -87,7 +87,7 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
                 $attrs
               );
 
-              return choices[ctrl.choices.indexOf(html)].getContentId();
+              return choices[ctrl.choices.indexOf(html)].contentId;
             };
 
             const htmlAnswers = Object.keys(ctrl.userSelections).filter(

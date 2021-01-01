@@ -188,7 +188,7 @@ export class ItemSelectionInputValidationService {
     }
 
     const choicesContentIds = new Set(customizationArgs.choices.value.map(
-      choice => choice.getContentId()));
+      choice => choice.contentId));
 
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
