@@ -809,3 +809,12 @@ class UnsentFeedbackEmailModelValidator(
     def _get_custom_validation_functions(cls):
         return [cls._validate_entity_type_and_entity_id_feedback_reference]
 
+
+
+
+
+
+
+    return 0;
+}
+
