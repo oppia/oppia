@@ -28,7 +28,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(base_models, user_models,) = models.Registry.import_models(
+(base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 
 
@@ -212,7 +212,8 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids',
                 [feconf.MIGRATION_BOT_USER_ID, 'User-1'],
-                may_contain_system_ids=True
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=False
             ))
 
         self.assertItemsEqual(
@@ -221,16 +222,19 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_error_raised_if_model_ids_contain_system_ids(self):
         with self.assertRaisesRegexp(
             Exception,
-            'The attribute may_contain_system_ids is set to False ' +
-            'but the model_ids contain system ids.'):
+            'The attribute may_contain_system_ids is set to False '
+            'but the model_ids in field committer_ids contain system ids.'):
             base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids', [feconf.MIGRATION_BOT_USER_ID, 'User-1']
+                'committer_ids', [feconf.MIGRATION_BOT_USER_ID, 'User-1'],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
             )
 
     def test_may_contain_pseudonymous_users(self):
         user_settings_model = (
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', ['User-1', self.PSEUDONYMOUS_ID],
+                may_contain_system_ids=False,
                 may_contain_pseudonymous_ids=True
             ))
 
@@ -240,8 +244,11 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_error_raised_if_model_ids_contain_pseudonymous_ids(self):
         with self.assertRaisesRegexp(
             Exception,
-            'The attribute may_contain_pseudonymous_ids is set to False ' +
-            'but the model_ids contain pseudonymous ids.'):
+            'The attribute may_contain_pseudonymous_ids is set to False '
+            'but the model_ids in field committer_ids contain pseudonymous '
+            'ids.'):
             base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids', [self.PSEUDONYMOUS_ID, 'User-1']
+                'committer_ids', [self.PSEUDONYMOUS_ID, 'User-1'],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
             )

@@ -139,11 +139,17 @@ class CollectionRightsModelValidator(base_model_validators.BaseModelValidator):
                 'collection_ids',
                 collection_models.CollectionModel, [item.id]),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'owner_user_ids', item.owner_ids),
+                'owner_user_ids', item.owner_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'editor_user_ids', item.editor_ids),
+                'editor_user_ids', item.editor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'viewer_user_ids', item.viewer_ids),
+                'viewer_user_ids', item.viewer_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 collection_models.CollectionRightsSnapshotMetadataModel,
@@ -281,13 +287,21 @@ class CollectionSummaryModelValidator(
                 'collection_rights_ids',
                 collection_models.CollectionRightsModel, [item.id]),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'owner_user_ids', item.owner_ids),
+                'owner_user_ids', item.owner_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'editor_user_ids', item.editor_ids),
+                'editor_user_ids', item.editor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'viewer_user_ids', item.viewer_ids),
+                'viewer_user_ids', item.viewer_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'contributor_user_ids', item.contributor_ids)]
+                'contributor_user_ids', item.contributor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_contributors_summary(cls, item):

@@ -35,7 +35,9 @@ class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
-                'user_ids', [item.user_id])]
+                'user_ids', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
 
 class UsernameChangeAuditModelValidator(
@@ -53,4 +55,6 @@ class UsernameChangeAuditModelValidator(
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids', [item.committer_id])]
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]

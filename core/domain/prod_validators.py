@@ -194,11 +194,17 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
                 exp_models.ExplorationModel,
                 cloned_from_exploration_id),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'owner_user_ids', item.owner_ids),
+                'owner_user_ids', item.owner_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'editor_user_ids', item.editor_ids),
+                'editor_user_ids', item.editor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'viewer_user_ids', item.viewer_ids),
+                'viewer_user_ids', item.viewer_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 exp_models.ExplorationRightsSnapshotMetadataModel,
@@ -334,13 +340,21 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
                 'exploration_rights_ids',
                 exp_models.ExplorationRightsModel, [item.id]),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'owner_user_ids', item.owner_ids),
+                'owner_user_ids', item.owner_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'editor_user_ids', item.editor_ids),
+                'editor_user_ids', item.editor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'viewer_user_ids', item.viewer_ids),
+                'viewer_user_ids', item.viewer_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'contributor_user_ids', item.contributor_ids)]
+                'contributor_user_ids', item.contributor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_contributors_summary(cls, item):
@@ -500,6 +514,7 @@ class GeneralFeedbackThreadModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', [item.original_author_id],
+                    may_contain_system_ids=False,
                     may_contain_pseudonymous_ids=True
                 ))
         if item.has_suggestion:
@@ -522,6 +537,7 @@ class GeneralFeedbackThreadModelValidator(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'last_nonempty_message_author_ids',
                     [item.last_nonempty_message_author_id],
+                    may_contain_system_ids=False,
                     may_contain_pseudonymous_ids=True
                 ))
         return field_name_to_external_model_references
@@ -633,6 +649,7 @@ class GeneralFeedbackMessageModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', [item.author_id],
+                    may_contain_system_ids=False,
                     may_contain_pseudonymous_ids=True
                 )
             )
@@ -742,7 +759,9 @@ class GeneralFeedbackThreadUserModelValidator(
                 'message_ids',
                 feedback_models.GeneralFeedbackMessageModel, message_ids),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'user_ids', user_ids)]
+                'user_ids', user_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
 
 class FeedbackAnalyticsModelValidator(base_model_validators.BaseModelValidator):
@@ -778,7 +797,9 @@ class UnsentFeedbackEmailModelValidator(
                         item.id, reference))
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
-                'user_ids', [item.id]),
+                'user_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'message_ids', feedback_models.GeneralFeedbackMessageModel,
                 message_ids)]

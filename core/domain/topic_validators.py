@@ -209,7 +209,9 @@ class TopicRightsModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel, [item.id]),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'manager_user_ids', item.manager_ids),
+                'manager_user_ids', item.manager_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 topic_models.TopicRightsSnapshotMetadataModel,

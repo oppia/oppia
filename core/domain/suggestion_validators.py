@@ -305,6 +305,7 @@ class GeneralVoiceoverApplicationModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'author_ids', [item.author_id],
+                    may_contain_system_ids=False,
                     may_contain_pseudonymous_ids=True
                 )
             )
@@ -321,6 +322,7 @@ class GeneralVoiceoverApplicationModelValidator(
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'final_reviewer_ids', [item.final_reviewer_id],
+                    may_contain_system_ids=False,
                     may_contain_pseudonymous_ids=True
                 ))
         return field_name_to_external_model_references

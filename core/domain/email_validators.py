@@ -46,11 +46,13 @@ class SentEmailModelValidator(base_model_validators.BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
-                'recipient_id',
-                [item.recipient_id]),
+                'recipient_id', [item.recipient_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
                 'sender_id', [item.sender_id],
-                may_contain_system_ids=True)]
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -129,10 +131,13 @@ class BulkEmailModelValidator(base_model_validators.BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
-                'recipient_id',
-                item.recipient_ids),
+                'recipient_id', item.recipient_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.UserSettingsModelFetcherDetails(
-                'sender_id', [item.sender_id])]
+                'sender_id', [item.sender_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -222,7 +227,9 @@ class GeneralFeedbackEmailReplyToIdModelValidator(
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
                 'item.id.user_id', [
-                    item.id[:item.id.find('.')]]),
+                    item.id[:item.id.find('.')]],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'item.id.thread_id',
                 feedback_models.GeneralFeedbackThreadModel, [

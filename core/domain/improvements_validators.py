@@ -49,7 +49,9 @@ class TaskEntryModelValidator(base_model_validators.BaseModelValidator):
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
                 'resolver_ids',
-                [item.resolver_id] if item.resolver_id is not None else []),
+                [item.resolver_id] if item.resolver_id is not None else [],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'entity_ids', exp_models.ExplorationModel, [item.entity_id])]
 
