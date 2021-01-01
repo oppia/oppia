@@ -543,7 +543,6 @@ def run_tests(args):
 
     common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
     common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
-    common.wait_for_port_to_be_open(OPPIA_SERVER_PORT)
     python_utils.PRINT(
         'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
         'core/tests/protractor.conf.js, you can view screenshots'
