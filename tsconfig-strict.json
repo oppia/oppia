@@ -68,6 +68,8 @@
     "core/templates/pages/admin-page/services/admin-router.service.spec.ts",
     "core/templates/pages/admin-page/services/admin-task-manager.service.ts",
     "core/templates/pages/admin-page/services/admin-task-manager.service.spec.ts",
+    "core/templates/pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts",
+    "core/templates/pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.spec.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/audio-translation-manager.service.ts",

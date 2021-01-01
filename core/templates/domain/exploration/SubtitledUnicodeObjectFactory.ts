@@ -31,7 +31,7 @@ export class SubtitledUnicode {
   // the content_id should be set to a string.
   constructor(
     private _unicode: string,
-    private _contentId: string | null
+    private _contentId: string
   ) {}
 
   getUnicode(): string {
