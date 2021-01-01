@@ -197,39 +197,16 @@ export class LostChangeObjectFactory {
    */
   createNew(
       lostChangeDict: ExplorationChange | LostChangeBackendDict): LostChange {
-    let newStateName: string | undefined;
-    let oldStateName: string | undefined;
-    let stateName: string | undefined;
-    let newValue: LostChangeValue | undefined;
-    let oldValue: LostChangeValue | undefined;
-    let propertyName: string | undefined;
-    if ('new_state_name' in lostChangeDict) {
-      newStateName = lostChangeDict.new_state_name;
-    }
-    if ('old_state_name' in lostChangeDict) {
-      oldStateName = lostChangeDict.old_state_name;
-    }
-    if ('state_name' in lostChangeDict) {
-      stateName = lostChangeDict.state_name;
-    }
-    if ('new_value' in lostChangeDict) {
-      newValue = lostChangeDict.new_value;
-    }
-    if ('old_value' in lostChangeDict) {
-      oldValue = lostChangeDict.old_value;
-    }
-    if ('property_name' in lostChangeDict) {
-      propertyName = lostChangeDict.property_name;
-    }
+    lostChangeDict = lostChangeDict as unknown as LostChangeBackendDict;
     return new LostChange(
       this.utilsService,
       lostChangeDict.cmd,
-      newStateName,
-      oldStateName,
-      stateName,
-      newValue,
-      oldValue,
-      propertyName
+      lostChangeDict.new_state_name,
+      lostChangeDict.old_state_name,
+      lostChangeDict.state_name,
+      lostChangeDict.new_value,
+      lostChangeDict.old_value,
+      lostChangeDict.property_name
     );
   }
 }

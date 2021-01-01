@@ -92,7 +92,7 @@ angular.module('oppia').factory('ChangeListService', [
       ExplorationDataService.autosaveChangeList(
         explorationChangeList,
         function(response) {
-          if (!response.data.is_version_of_draft_valid) {
+          if (!response.is_version_of_draft_valid) {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showVersionMismatchModal(
                 explorationChangeList);
