@@ -90,7 +90,7 @@ def create_http_task(
 
     # Use the CLIENT to build and send the task.
     # Note: retry=retry.Retry() means that the default retry arguments
-    # are used, it cannot be removed since then some failures that occur in
+    # are used. It cannot be removed since then some failures that occur in
     # Taskqueue API are not repeated.
     response = CLIENT.create_task(parent, task, retry=retry.Retry())
 
