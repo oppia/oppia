@@ -12,22 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
- * @fileoverview Unit tests for the list of normalized string editor.
+ * @fileoverview Component for translatable html content id editor.
  */
+angular.module('oppia').component('translatableHtmlContentIdEditor', {
+  bindings: {
+    getInitArgs: '&',
+    value: '='
+  },
+  template: require('./translatable-html-content-id.component.html'),
+  controller: [
+    function() {
+      const ctrl = this;
 
-// TODO(#11014): Add more extensive front end tests for object editors that rely
-// on schema editors.
-describe('SetOfNormalizedStringEditor', function() {
-  var ctrl = null;
+      ctrl.$onInit = function() {
+        ctrl.name = Math.random().toString(36).substring(7);
+        ctrl.initArgs = ctrl.getInitArgs();
+        ctrl.choices = ctrl.initArgs.choices;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($componentController) {
-    ctrl = $componentController('setOfNormalizedStringEditor');
-  }));
-
-  it('should initialize the value with an empty array', function() {
-    ctrl.$onInit();
-    expect(ctrl.value).toEqual([]);
-  });
+        if (!ctrl.value || ctrl.value === '') {
+          ctrl.value = ctrl.choices[0].val;
+        }
+      };
+    }
+  ]
 });
