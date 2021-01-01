@@ -37,7 +37,7 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 
 class FirebaseAdminSdkStub(python_utils.OBJECT):
-    """Helper class for swapping the Firebase Admin SDK with a stateful mock.
+    """Helper class for swapping the Firebase Admin SDK with a stateful stub.
 
     NOT INTENDED TO BE USED DIRECTLY. Just install and interact with the
     Firebase Admin SDK as if it were connected to a real server.
@@ -61,17 +61,17 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 
     @classmethod
     def install(cls, test):
-        """Installs a new instance of the mock on the given test class.
+        """Installs a new instance of the stub on the given test class.
 
-        The mock will emulate an initially-empty Firebase authentication server.
+        The stub will emulate an initially-empty Firebase authentication server.
 
         Args:
-            test: test_utils.TestBase. The test to install the mock on.
+            test: test_utils.TestBase. The test to install the stub on.
 
         Returns:
-            callable. A function that will uninstall the mock when called.
+            callable. A function that will uninstall the stub when called.
         """
-        mock = cls()
+        stub = cls()
         with contextlib2.ExitStack() as stack:
             stack.enter_context(test.swap_to_always_return(
                 firebase_admin, 'initialize_app'))
@@ -80,11 +80,11 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             stack.enter_context(test.swap_to_always_return(
                 firebase_admin.auth, 'verify_id_token'))
             stack.enter_context(test.swap(
-                firebase_admin.auth, 'create_user', mock._create_user)) # pylint: disable=protected-access
+                firebase_admin.auth, 'create_user', stub._create_user)) # pylint: disable=protected-access
             stack.enter_context(test.swap(
-                firebase_admin.auth, 'get_user', mock._get_user)) # pylint: disable=protected-access
+                firebase_admin.auth, 'get_user', stub._get_user)) # pylint: disable=protected-access
             stack.enter_context(test.swap(
-                firebase_admin.auth, 'delete_user', mock._delete_user)) # pylint: disable=protected-access
+                firebase_admin.auth, 'delete_user', stub._delete_user)) # pylint: disable=protected-access
 
             for function_name in cls._YAGNI_FUNCTION_NAMES:
                 stack.enter_context(test.swap_to_always_raise(
@@ -125,7 +125,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         self._users[uid] = firebase_admin.auth.UserRecord(
             # FRAGILE: UserRecord doesn't have a public constructor, so this may
             # break in future versions of the SDK. OK with taking that risk
-            # because this is only for mocking purposes.
+            # because this is only for stubbing purposes.
             firebase_admin.auth.ImportUserRecord(uid, **kwargs).to_dict())
 
     def _get_user(self, uid):
