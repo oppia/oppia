@@ -436,7 +436,7 @@ class AuthServicesStub(python_utils.OBJECT):
         """Returns the user IDs associated with the given auth IDs."""
         return [self._user_id_by_auth_id.get(a, None) for a in auth_ids]
 
-    def associate(self, auth_id_user_id_pair):
+    def associate_auth_id_to_user_id(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID."""
         auth_id, user_id = auth_id_user_id_pair
         if auth_id in self._user_id_by_auth_id:
@@ -444,7 +444,7 @@ class AuthServicesStub(python_utils.OBJECT):
                 auth_id, self._user_id_by_auth_id[auth_id]))
         self._user_id_by_auth_id[auth_id] = user_id
 
-    def associate_multi(self, auth_id_user_id_pairs):
+    def associate_multi_auth_ids_to_user_ids(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs."""
         collisions = ', '.join(
             '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a])
@@ -743,13 +743,13 @@ class TestBase(unittest.TestCase):
                 print math.sqrt(16.0) # prints 42
             print math.sqrt(16.0) # prints 4 as expected.
 
-        Note that this does not work directly for classmethods. In this case,
-        you will need to import the 'types' module, as follows:
+        To mock class methods, pass the function to the classmethod decorator
+        first, for example:
 
             import types
             with self.swap(
                 SomePythonClass, 'some_classmethod',
-                types.MethodType(new_classmethod, SomePythonClass)):
+                classmethod(new_classmethod)):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This
