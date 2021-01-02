@@ -161,6 +161,23 @@ class SkillModel(base_models.VersionedModel):
             'all_questions_merged': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+    @classmethod
+    def get_by_url_fragment(cls, url_fragment):
+        """Gets SkillModel by url_fragment. Returns None if the skill with
+        name url_fragment doesn't exist.
+
+        Args:
+            url_fragment: str. The url fragment of the skill.
+
+        Returns:
+            SkillModel|None. The skill model of the skill or None if not
+            found.
+        """
+        return SkillModel.query().filter(
+            cls.url_fragment == url_fragment).filter(
+                cls.deleted == False).get() # pylint: disable=singleton-comparison
+
+
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to skills.

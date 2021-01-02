@@ -58,6 +58,7 @@ export class SkillEditorStateService {
   private assignedSkillTopicData = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
+  private _skillWithUrlFragmentExists = false;
   private _groupedSkillSummaries: GroupedSkillSummaries = {
     current: [],
     others: []
@@ -113,6 +114,11 @@ export class SkillEditorStateService {
   private _updateSkillRights = (newSkillRightsObject: SkillRights) => {
     this._setSkillRights(newSkillRightsObject);
   };
+
+  private _setSkillWithUrlFragmentExists = function(skillWithUrlFragmentExists) {
+    this._skillWithUrlFragmentExists = skillWithUrlFragmentExists;
+  };
+
 
   /**
    * Loads, or reloads, the skill stored by this service given a
@@ -219,6 +225,24 @@ export class SkillEditorStateService {
     return true;
   }
 
+  updateExistenceOfSkillUrlFragment(
+    skillUrlFragment: string,
+    successCallback: (value?: Object) => void) {
+  this.skillBackendApiService.doesSkillWithUrlFragmentExistAsync(
+    skillUrlFragment).then(
+    function(skillUrlFragmentExists) {
+      this._setSkillWithUrlFragmentExists(skillUrlFragmentExists);
+      if (successCallback) {
+        successCallback();
+      }
+    }, function(error) {
+      this.alertsService.addWarning(
+        error ||
+        'There was an error when checking if the skill url fragment ' +
+        'exists for another skill.');
+    });
+  }
+
   get onSkillChange(): EventEmitter<unknown> {
     return this._skillChangedEventEmitter;
   }
@@ -233,6 +257,10 @@ export class SkillEditorStateService {
 
   setSkillRights(skillRights: SkillRights): void {
     this._setSkillRights(skillRights);
+  }
+
+  getSkillWithUrlFragmentExists(): boolean {
+    return this._skillWithUrlFragmentExists;
   }
 }
 

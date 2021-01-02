@@ -19,18 +19,19 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('CreateNewSkillModalController', [
-  '$scope', '$uibModalInstance', 'AllSkillNames', 'ContextService',
-  'ImageLocalStorageService', 'RubricObjectFactory', 'SkillCreationService',
+  '$scope', '$uibModalInstance', 'ContextService', 'ImageLocalStorageService',
+  'RubricObjectFactory', 'SkillCreationService', 'SkillEditorStateService',
   'SkillObjectFactory', 'SubtitledHtmlObjectFactory',
   'COMPONENT_NAME_EXPLANATION', 'MAX_CHARS_IN_SKILL_DESCRIPTION',
   'SKILL_DESCRIPTION_STATUS_VALUES', 'SKILL_DIFFICULTIES',
   function(
-      $scope, $uibModalInstance, AllSkillNames, ContextService,
-      ImageLocalStorageService, RubricObjectFactory, SkillCreationService,
+      $scope, $uibModalInstance, ContextService, ImageLocalStorageService,
+      RubricObjectFactory, SkillCreationService, SkillEditorStateService,
       SkillObjectFactory, SubtitledHtmlObjectFactory,
       COMPONENT_NAME_EXPLANATION, MAX_CHARS_IN_SKILL_DESCRIPTION,
       SKILL_DESCRIPTION_STATUS_VALUES, SKILL_DIFFICULTIES) {
@@ -40,6 +41,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
     ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newSkillDescription = '';
+    $scope.skillUrlFragmentExists = false;
     $scope.rubrics = rubrics;
     $scope.errorMsg = '';
     $scope.conceptCardExplanationEditorIsShown = false;
@@ -51,20 +53,27 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     };
     $scope.MAX_CHARS_IN_SKILL_DESCRIPTION = (
       MAX_CHARS_IN_SKILL_DESCRIPTION);
-    $scope.AllSkillNames = AllSkillNames;
     $scope.newExplanationObject = null;
 
     $scope.openConceptCardExplanationEditor = function() {
       $scope.conceptCardExplanationEditorIsShown = true;
     };
 
-    $scope.updateSkillDescription = function() {
+    $scope.updateSkillDescriptionAndCheckIfExists = function() {
       $scope.resetErrorMsg();
       if (
         SkillCreationService.getSkillDescriptionStatus() !==
           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
         $scope.rubrics[1].setExplanations([$scope.newSkillDescription]);
         SkillCreationService.markChangeInSkillDescription();
+      }
+      if ($scope.newSkillDescription) {
+        SkillEditorStateService.updateExistenceOfSkillUrlFragment(
+          $scope.newSkillDescription, function() {
+            $scope.skillUrlFragmentExists = (
+              SkillEditorStateService.getSkillWithUrlFragmentExists());
+          }
+        );
       }
     };
 
@@ -90,9 +99,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
             'alphanumeric characters, spaces and/or hyphens.');
         return false;
       }
-      if ($scope.AllSkillNames.includes(
-        $scope.newSkillDescription.toUpperCase()
-      )) {
+      if ($scope.skillUrlFragmentExists) {
         $scope.errorMsg = (
           'This description already exists. Please choose a ' +
             'new name or modify the existing skill.');
@@ -110,9 +117,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
           'alphanumeric characters, spaces and/or hyphens.');
         return;
       }
-      if ($scope.AllSkillNames.includes(
-        $scope.newSkillDescription.toUpperCase()
-      )) {
+      if ($scope.skillUrlFragmentExists) {
         $scope.errorMsg = (
           'This description already exists. Please choose a ' +
             'new name or modify the existing skill.');

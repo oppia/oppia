@@ -148,6 +148,26 @@ def get_skill_from_model(skill_model):
         skill_model.last_updated)
 
 
+def get_skill_by_url_fragment(url_fragment):
+    """Returns a domain object representing a skill.
+
+    Args:
+        url_fragment: str. The url fragment of the skill.
+
+    Returns:
+        Skill or None. The domain object representing a skill with the
+        given url fragment, or None if it does not exist.
+    """
+    skill_model = (
+        skill_models.SkillModel.get_by_url_fragment(url_fragment))
+    if skill_model is None:
+        return None
+
+    skill = get_skill_from_model(skill_model)
+    return skill
+
+
+
 def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the skill contents structure based on the schema version of the input

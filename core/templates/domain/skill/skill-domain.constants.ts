@@ -28,6 +28,9 @@ export const SkillDomainConstants = {
   SKILL_EDITOR_QUESTION_URL_TEMPLATE:
     '/skill_editor_question_handler/<skill_id>?cursor=<cursor>',
 
+  SKILL_URL_FRAGMENT_HANDLER_URL_TEMPLATE: (
+    '/skill_url_fragment_handler/<skill_url_fragment>'),
+
   SKILL_MASTERY_DATA_URL_TEMPLATE:
     '/skill_mastery_handler/data',
 

@@ -57,6 +57,10 @@ interface UpdateSkillBackendResponse {
   skill: SkillBackendDict;
 }
 
+interface DoesSkillWithUrlFragmentExistBackendResponse {
+  'skill_url_fragment_exists': boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -146,6 +150,31 @@ export class SkillBackendApiService {
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
+    });
+  }
+
+  private _doesSkillWithUrlFragmentExist(
+    skillUrlFragment: string,
+    successCallback: (value?: boolean) => void,
+    errorCallback: (reason?: string) => void): void {
+    let skillUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
+      SkillDomainConstants.SKILL_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
+        skill_url_fragment: skillUrlFragment
+      });
+    this.http.get<DoesSkillWithUrlFragmentExistBackendResponse>(
+      skillUrlFragmentUrl).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback(response.skill_url_fragment_exists);
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error);
+    });
+  }
+
+async doesSkillWithUrlFragmentExistAsync(skillUrlFragment: string):
+      Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._doesSkillWithUrlFragmentExist(skillUrlFragment, resolve, reject);
     });
   }
 }

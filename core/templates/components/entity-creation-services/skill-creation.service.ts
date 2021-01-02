@@ -66,19 +66,14 @@ angular.module('oppia').factory('SkillCreationService', [
         skillDescriptionStatusMarker = (
           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
       },
-      createNewSkill: function(topicIds, allSkillNames) {
+      createNewSkill: function(topicIds) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/templates/' +
             'create-new-skill-modal.template.html'),
           backdrop: 'static',
           windowClass: 'create-new-skill-modal',
-          controller: 'CreateNewSkillModalController',
-          resolve: {
-            AllSkillNames: function() {
-              return allSkillNames || [];
-            }
-          }
+          controller: 'CreateNewSkillModalController'
         }).result.then(function(result) {
           if (skillCreationInProgress) {
             return;
