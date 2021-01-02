@@ -42,8 +42,8 @@ implements PipeTransform {
         let result = '';
 
         let inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
-        for (let j:number = 0; j < inputLine.length; j++) {
-          let currentChar:string = inputLine.charAt(j).toLowerCase();
+        for (let j: number = 0; j < inputLine.length; j++) {
+          let currentChar: string = inputLine.charAt(j).toLowerCase();
           if (currentChar === ' ') {
             if (j > 0 && j < inputLine.length - 1 &&
                                 isAlphanumeric(inputLine.charAt(j - 1)) &&
