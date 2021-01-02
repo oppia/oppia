@@ -499,6 +499,7 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
 
     COLLECTION_ID = 'collection_id'
     EXP_ID = 'exp_id'
+
     def setUp(self):
         super(RemoveCollectionModelNodesOneOffJobTests, self).setUp()
 

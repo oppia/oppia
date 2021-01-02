@@ -674,8 +674,8 @@ def apply_change_list(collection_id, change_list):
                 continue
             elif (change.cmd ==
                   collection_domain.CMD_REMOVE_NODE):
-                # no action is needed here
-                continue                
+                # No action is needed here.
+                continue
 
         return collection
 

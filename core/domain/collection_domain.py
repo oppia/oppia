@@ -150,8 +150,7 @@ class CollectionChange(change_domain.BaseChange):
         'required_attribute_names': [],
         'optional_attribute_names': [],
         'user_id_attribute_names': []
-    }, 
-    {
+    }, {
         'name': CMD_ADD_COLLECTION_SKILL,
         'required_attribute_names': ['name'],
         'optional_attribute_names': [],

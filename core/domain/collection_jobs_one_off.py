@@ -169,7 +169,7 @@ class RemoveCollectionModelNodesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             # collection_model.put()
             collection_model.nodes = None
             commit_cmds = [{
-                'cmd' : collection_domain.CMD_REMOVE_NODE
+                'cmd': collection_domain.CMD_REMOVE_NODE
             }]
             collection_services.update_collection(
                 feconf.MIGRATION_BOT_USERNAME, collection_model.id, commit_cmds,
