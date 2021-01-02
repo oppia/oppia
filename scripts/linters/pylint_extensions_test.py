@@ -2940,7 +2940,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
         ):
             self.checker_test_object.checker.visit_functiondef(def_node)
 
-    def test_function_def_without_test_does_not_add_any_message(self):
+    def test_function_def_without_test_only_does_not_add_any_message(self):
         def_node = astroid.extract_node(
             """
             def some_random_function(param1, param2):
