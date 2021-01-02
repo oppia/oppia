@@ -16,49 +16,77 @@
  * @fileoverview Service for managing the authorizations of logged-in users.
  */
 
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { FirebaseOptions } from '@angular/fire';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { firebase, firebaseui } from 'firebaseui-angular';
+import { Observable } from 'rxjs';
 
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService implements OnDestroy {
-  private tokenCache: BehaviorSubject<string | null>;
-  private tokenSubscription: Subscription;
+export class AuthService {
+  constructor(private angularFireAuth: AngularFireAuth) {}
 
-  constructor(private angularFireAuth: AngularFireAuth) {
-    // An Observable (i.e. stream of values) Subject (i.e. producer of values).
-    // BehaviorSubjects are "cold" observables (i.e. lazy streams that only emit
-    // values when prompted by a subscriber), and emits the value it last
-    // produced to new subscribers (or null, the initial value we've given it).
-    this.tokenCache = new BehaviorSubject(null);
-    // Object used to control the lifetime of a subscription. After the
-    // subscription becomes obsolete, we should call ".unsubscribe()" on it to
-    // prevent a memory leak.
-    this.tokenSubscription = (
-      // Given an untrusted source of ID Tokens, prepare to apply a sequence of
-      // transformations on the values it emits using a "pipe".
-      this.angularFireAuth.idToken.pipe(
-        // Catch errors thrown by the untrusted source and change them into a
-        // "cold" Observable that eternally emits "null".
-        catchError(_ => new BehaviorSubject(null)))
-        // Subscribe to the results, forwarding every token (or null) it emits
-        // into our BehaviorSubject.
-        .subscribe(this.tokenCache));
-  }
-
-  ngOnDestroy(): void {
-    this.tokenSubscription.unsubscribe();
+  static get emulatorEnabled(): boolean {
+    return AppConstants.FIREBASE_EMULATOR_ENABLED;
   }
 
   get idToken$(): Observable<string | null> {
-    return this.tokenCache.asObservable();
+    return this.angularFireAuth.idToken;
   }
 
   async signOutAsync(): Promise<void> {
     return this.angularFireAuth.signOut();
   }
+
+  static get firebaseConfig(): FirebaseOptions {
+    return {
+      apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
+      authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
+      projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
+      storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
+      messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+      appId: AppConstants.FIREBASE_CONFIG_APP_ID,
+    } as const;
+  }
+
+  static get firebaseEmulatorConfig(): readonly [string, number] {
+    return AuthService.emulatorEnabled ? ['localhost', 9099] : undefined;
+  }
+
+  static get firebaseUiAuthConfig(): firebaseui.auth.Config {
+    return {
+      signInFlow: 'redirect',
+      signInSuccessUrl: '/signup',
+      queryParameterForSignInSuccessUrl: 'return_url',
+      tosUrl: '/terms',
+      privacyPolicyUrl: '/privacy-policy',
+      signInOptions: AuthService.emulatorEnabled ?
+        [ // EMULATOR SIGN IN OPTIONS: Email Link only for ease of development.
+          {
+            provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+            requireDisplayName: false,
+            signInMethod: (
+              firebase.auth.EmailAuthProvider.EMAIL_LINK_SIGN_IN_METHOD),
+          },
+        ] : [
+          // PRODUCTION SIGN IN OPTIONS: Google Account only for feature parity.
+          {
+            provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            clientId: AppConstants.FIREBASE_CONFIG_GOOGLE_CLIENT_ID,
+            // Only obtain the email address from users' Google Account.
+            scopes: ['https://www.googleapis.com/auth/userinfo.email'],
+            // Force account selection even when only one account is available.
+            customParameters: {prompt: 'select_account'},
+          },
+        ],
+    };
+  }
 }
+
+angular.module('oppia').factory(
+  'AuthService', downgradeInjectable(AuthService));

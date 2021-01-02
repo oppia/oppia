@@ -15,50 +15,53 @@
 /**
  * @fileoverview Module for the shared components.
  */
+
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { FirebaseUIModule } from 'firebaseui-angular';
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { BackgroundBannerComponent } from
-  './common-layout-directives/common-elements/background-banner.component';
-import { AttributionGuideComponent } from
-  './common-layout-directives/common-elements/attribution-guide.component';
-import { LazyLoadingComponent } from
-  './common-layout-directives/common-elements/lazy-loading.component';
-import { LoadingDotsComponent } from
-  './common-layout-directives/common-elements/loading-dots.component';
-import { MaterialModule } from './material.module';
+import { ExplorationEmbedButtonModalComponent } from 'components/button-directives/exploration-embed-button-modal.component';
+import { SocialButtonsComponent } from 'components/button-directives/social-buttons.component';
+import { AttributionGuideComponent } from 'components/common-layout-directives/common-elements/attribution-guide.component';
+import { BackgroundBannerComponent } from 'components/common-layout-directives/common-elements/background-banner.component';
+import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
+import { LoadingDotsComponent } from 'components/common-layout-directives/common-elements/loading-dots.component';
+import { SharingLinksComponent } from 'components/common-layout-directives/common-elements/sharing-links.component';
+import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
+import { MaterialModule } from 'components/material.module';
+import { ProfileLinkImageComponent } from 'components/profile-link-directives/profile-link-image.component';
+import { ProfileLinkTextComponent } from 'components/profile-link-directives/profile-link-text.component';
+import { SkillMasteryViewerComponent } from 'components/skill-mastery/skill-mastery.component';
+import { ExplorationSummaryTileDirective } from 'components/summary-tile/exploration-summary-tile.directive';
+import { StorySummaryTileDirective } from 'components/summary-tile/story-summary-tile.directive';
+import { SubtopicSummaryTileDirective } from 'components/summary-tile/subtopic-summary-tile.directive';
 import { TranslatePipe } from 'filters/translate.pipe';
-import { SkillMasteryViewerComponent } from
-  './skill-mastery/skill-mastery.component';
-import { ExplorationEmbedButtonModalComponent } from
-  './button-directives/exploration-embed-button-modal.component';
-import { KeyboardShortcutHelpModalComponent } from
-  'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
-import { SharingLinksComponent } from
-  './common-layout-directives/common-elements/sharing-links.component';
-import { StorySummaryTileDirective } from
-  './summary-tile/story-summary-tile.directive';
-import { SubtopicSummaryTileDirective } from
-  './summary-tile/subtopic-summary-tile.directive';
-import { SocialButtonsComponent } from
-  'components/button-directives/social-buttons.component';
-import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationSummaryTileDirective } from
-  './summary-tile/exploration-summary-tile.directive';
-import { ProfileLinkImageComponent } from
-  'components/profile-link-directives/profile-link-image.component';
-import { ProfileLinkTextComponent } from
-  'components/profile-link-directives/profile-link-text.component';
-import { TakeBreakModalComponent } from
-  'pages/exploration-player-page/templates/take-break-modal.component';
-
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
+import { AuthService } from 'services/auth.service';
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    NgbModalModule,
+    BrowserModule,
+    FormsModule,
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
+    FirebaseUIModule.forRoot(AuthService.firebaseUiAuthConfig),
+  ],
+
+  providers: [
+    AngularFireAuth,
+    {provide: USE_EMULATOR, useValue: AuthService.firebaseEmulatorConfig},
+  ],
 
   declarations: [
     AttributionGuideComponent,
