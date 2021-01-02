@@ -5663,10 +5663,9 @@ firebaseui-angular@^5.1.1:
   dependencies:
     tslib "^2.0.0"
 
-firebaseui@4.7.1:
-  version "4.7.1"
-  resolved "https://registry.yarnpkg.com/firebaseui/-/firebaseui-4.7.1.tgz#8e0303d9f733e16b0bfbfa24001ab8bd4bc98038"
-  integrity sha512-wDdo3LLnh9sV1dDKyNgn4M7cKecILosvqvtQE1SUum/R+eXLdN1q1ZRKZ2Lp6ZyP0XDAHrotssS4vJNh4OdwuQ==
+"firebaseui@https://github.com/oppia/firebaseui-web/releases/download/v4.7.1-PATCH/firebaseui-4.7.1-PATCH.tgz":
+  version "4.7.1-PATCH"
+  resolved "https://github.com/oppia/firebaseui-web/releases/download/v4.7.1-PATCH/firebaseui-4.7.1-PATCH.tgz#e1c8e5d0c2e84cc9b1293d563fc96dfd77fd817b"
   dependencies:
     dialog-polyfill "^0.4.7"
     material-design-lite "^1.2.0"
