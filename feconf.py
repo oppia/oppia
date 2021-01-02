@@ -1295,7 +1295,3 @@ SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_TRANSLATE_CONTENT,
     SUGGESTION_TYPE_ADD_QUESTION
 ]
-
-# Minimum timestamp difference required between UserSettingsModel's created_on
-# and some other attribute to use it for updating the created_on attribute.
-CREATED_ON_TIME_DELTA_MINUTES = 5

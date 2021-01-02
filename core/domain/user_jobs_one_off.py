@@ -29,7 +29,6 @@ from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-import feconf
 import python_utils
 import utils
 
@@ -669,8 +668,11 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         filtered_user_dates_list.sort(key=lambda x: x[1])
 
         min_date = filtered_user_dates_list[0][1]
-        time_delta_for_update = datetime.timedelta(
-            minutes=feconf.CREATED_ON_TIME_DELTA_MINUTES)
+        time_delta_for_update = datetime.timedelta(minutes=5)
+
+        # This method for converting date_time_string to datettime object has
+        # also been used here:
+        # https://github.com/oppia/oppia/blob/d394b6a186acc74b5ec9c3fecc20cc3f1954f441/utils.py#L479
         correction_cutoff_timestamp = datetime.datetime.strptime(
             'Jul 1 2020', '%b %d %Y')
         if user_settings_model.created_on - min_date > time_delta_for_update:
