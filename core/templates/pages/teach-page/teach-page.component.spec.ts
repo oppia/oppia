@@ -15,10 +15,12 @@
 /**
  * @fileoverview Unit tests for the teach page.
  */
-
+import { Injectable, Pipe, EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 import { LoaderService } from 'services/loader.service.ts';
@@ -28,6 +30,30 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+
+@Pipe({name: 'translate'})
+class MockTranslatePipe {
+  transform(value: string, params: Object | undefined):string {
+    return value;
+  }
+}
+class MockTranslateService {
+  languageCode = 'es';
+  use(newLanguageCode: string): string {
+    this.languageCode = newLanguageCode;
+    return this.languageCode;
+  }
+}
+class MockI18nLanguageCodeService {
+  codeChangeEventEmiiter = new EventEmitter<string>();
+  getCurrentI18nLanguageCode() {
+    return 'en';
+  }
+
+  get onI18nLanguageCodeChange() {
+    return this.codeChangeEventEmiiter;
+  }
+}
 
 describe('Teach Page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
@@ -39,8 +65,13 @@ describe('Teach Page', () => {
   var loadingMessage = '';
   beforeEach(async() => {
     TestBed.configureTestingModule({
-      declarations: [TeachPageComponent],
+      declarations: [TeachPageComponent, MockTranslatePipe],
       providers: [
+        {
+          provide: I18nLanguageCodeService,
+          useClass: MockI18nLanguageCodeService
+        },
+        { provide: TranslateService, useClass: MockTranslateService },
         {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
         UrlInterpolationService,
         {
@@ -57,6 +88,10 @@ describe('Teach Page', () => {
     }).compileComponents();
   });
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector, $componentController) {
+    $timeout = $injector.get('$timeout');
+    $q = $injector.get('$q'); 
+  }));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -169,16 +204,16 @@ describe('Teach Page', () => {
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
 
-  // it('should evaluate if user is logged in', function() {
-  //   spyOn(userBackendApiService, 'getUserInfoAsync').and.callFake(function() {
-  //     var deferred = $q.defer();
-  //     deferred.resolve({
-  //       isLoggedIn: function() {
-  //         return true;
-  //       }
-  //     });
-  //     return deferred.promise;
-  //   });
+  it('should evaluate if user is logged in', function() {
+    spyOn(userBackendApiService, 'getUserInfoAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve({
+        isLoggedIn: function() {
+          return true;
+        }
+      });
+      return deferred.promise;
+    });
 
     component.ngOnInit();
     expect(component.userIsLoggedIn).toBe(null);
@@ -205,4 +240,4 @@ describe('Teach Page', () => {
   //   expect(component.userIsLoggedIn).toBe(false);
   //   expect(loadingMessage).toBe('');
   // });
-});
+})
