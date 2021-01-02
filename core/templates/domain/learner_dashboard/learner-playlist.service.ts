@@ -16,88 +16,105 @@
  * @fileoverview Service related to the learner playlist.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
-require('domain/learner_dashboard/learner-playlist-modal.controller.ts');
 
-angular.module('oppia').factory('LearnerPlaylistService', [
-  '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
-  'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
-  function(
-      $http, $uibModal, AlertsService, UrlInterpolationService,
-      ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION) {
-    var _addToLearnerPlaylist = function(activityId, activityType) {
-      var successfullyAdded = true;
-      var addToLearnerPlaylistUrl = (
-        UrlInterpolationService.interpolateUrl(
-          '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-            activityType: activityType,
-            activityId: activityId
-          }));
-      $http.post(addToLearnerPlaylistUrl, {})
-        .then(function(response) {
-          if (response.data.belongs_to_completed_or_incomplete_list) {
-            successfullyAdded = false;
-            AlertsService.addInfoMessage(
-              'You have already completed or are completing this ' +
-              'activity.');
-          }
-          if (response.data.belongs_to_subscribed_activities) {
-            successfullyAdded = false;
-            AlertsService.addInfoMessage(
-              'This is present in your creator dashboard');
-          }
-          if (response.data.playlist_limit_exceeded) {
-            successfullyAdded = false;
-            AlertsService.addInfoMessage(
-              'Your \'Play Later\' list is full!  Either you can ' +
-              'complete some or you can head to the learner dashboard ' +
-              'and remove some.');
-          }
-          if (successfullyAdded) {
-            AlertsService.addSuccessMessage(
-              'Successfully added to your \'Play Later\' list.');
-          }
-        });
-      return successfullyAdded;
-    };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AlertsService } from 'services/alerts.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LearnerPlaylistModalController } from 'domain/learner_dashboard/learner-playlist-modal.controller';
 
-    var _removeFromLearnerPlaylist = function(
-        activityId, activityTitle, activityType, learnerDashboardActivityIds) {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner-dashboard-page/modal-templates/' +
-          'remove-activity-from-learner-dashboard-modal.template.html'),
-        backdrop: true,
-        resolve: {
-          activityId: function() {
-            return activityId;
-          },
-          activityTitle: function() {
-            return activityTitle;
-          },
-          activityType: function() {
-            return activityType;
-          }
-        },
-        controller: 'LearnerPlaylistModalController'
-      }).result.then(function() {
-        if (activityType === ACTIVITY_TYPE_EXPLORATION) {
-          learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
-            activityId);
-        } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
-          learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
-            activityId);
-        }
-      }, function() {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class LearnerPlaylistService {
+  constructor(private ) {}
+}
 
-    return {
-      addToLearnerPlaylist: _addToLearnerPlaylist,
-      removeFromLearnerPlaylist: _removeFromLearnerPlaylist
-    };
-  }]);
+
+// require('domain/utilities/url-interpolation.service.ts');
+// require('services/alerts.service.ts');
+// require('domain/learner_dashboard/learner-playlist-modal.controller.ts');
+
+// angular.module('oppia').factory('LearnerPlaylistService', [
+//   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
+//   'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
+//   function(
+//       $http, $uibModal, AlertsService, UrlInterpolationService,
+//       ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION) {
+//     var _addToLearnerPlaylist = function(activityId, activityType) {
+//       var successfullyAdded = true;
+//       var addToLearnerPlaylistUrl = (
+//         UrlInterpolationService.interpolateUrl(
+//           '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+//             activityType: activityType,
+//             activityId: activityId
+//           }));
+//       $http.post(addToLearnerPlaylistUrl, {})
+//         .then(function(response) {
+//           if (response.data.belongs_to_completed_or_incomplete_list) {
+//             successfullyAdded = false;
+//             AlertsService.addInfoMessage(
+//               'You have already completed or are completing this ' +
+//               'activity.');
+//           }
+//           if (response.data.belongs_to_subscribed_activities) {
+//             successfullyAdded = false;
+//             AlertsService.addInfoMessage(
+//               'This is present in your creator dashboard');
+//           }
+//           if (response.data.playlist_limit_exceeded) {
+//             successfullyAdded = false;
+//             AlertsService.addInfoMessage(
+//               'Your \'Play Later\' list is full!  Either you can ' +
+//               'complete some or you can head to the learner dashboard ' +
+//               'and remove some.');
+//           }
+//           if (successfullyAdded) {
+//             AlertsService.addSuccessMessage(
+//               'Successfully added to your \'Play Later\' list.');
+//           }
+//         });
+//       return successfullyAdded;
+//     };
+
+//     var _removeFromLearnerPlaylist = function(
+//         activityId, activityTitle, activityType, learnerDashboardActivityIds) {
+//       $uibModal.open({
+//         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+//           '/pages/learner-dashboard-page/modal-templates/' +
+//           'remove-activity-from-learner-dashboard-modal.template.html'),
+//         backdrop: true,
+//         resolve: {
+//           activityId: function() {
+//             return activityId;
+//           },
+//           activityTitle: function() {
+//             return activityTitle;
+//           },
+//           activityType: function() {
+//             return activityType;
+//           }
+//         },
+//         controller: 'LearnerPlaylistModalController'
+//       }).result.then(function() {
+//         if (activityType === ACTIVITY_TYPE_EXPLORATION) {
+//           learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
+//             activityId);
+//         } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
+//           learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
+//             activityId);
+//         }
+//       }, function() {
+//         // Note to developers:
+//         // This callback is triggered when the Cancel button is clicked.
+//         // No further action is needed.
+//       });
+//     };
+
+//     return {
+//       addToLearnerPlaylist: _addToLearnerPlaylist,
+//       removeFromLearnerPlaylist: _removeFromLearnerPlaylist
+//     };
+//   }]);
