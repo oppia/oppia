@@ -22,6 +22,9 @@ import { EventEmitter } from '@angular/core';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 var MockWindow = function() {
   this.location = {
@@ -45,6 +48,7 @@ describe('Search bar component', function() {
   var initTranslationEmitter = new EventEmitter();
   var preferredLanguageCodesLoadedEmitter = new EventEmitter();
   var mockWindow = null;
+  importAllAngularServices();
 
   beforeEach(function() {
     constructTranslationIdsService = TestBed.get(
@@ -156,7 +160,6 @@ describe('Search bar component', function() {
     mockWindow.location.search = (
       '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
     preferredLanguageCodesLoadedEmitter.emit([]);
-    $httpBackend.flush();
 
     expect($location.url()).toBe(
       '/find?q=%22mars%22&category=(%22astronomy%22)&' +
@@ -171,7 +174,6 @@ describe('Search bar component', function() {
     getUrlParamsSpy.and.returnValue({q: 'sun'});
     preferredLanguageCodesLoadedEmitter.emit([]);
     $scope.$digest();
-    $httpBackend.flush();
 
     expect(mockWindow.location.href).toBe(
       '/search/find?q=%22sun%22&category=("astronomy")&language_code=("es")');
@@ -189,7 +191,6 @@ describe('Search bar component', function() {
     mockWindow.location.search = (
       '?q=%22mars%22&language_code=(%22pt%22)&category=(%22astronomy%22)');
     preferredLanguageCodesLoadedEmitter.emit([]);
-    $httpBackend.flush();
 
     expect($location.url()).toBe(
       '/find?q=%22mars%22&category=(%22astronomy%22)&' +
@@ -204,7 +205,6 @@ describe('Search bar component', function() {
     getUrlParamsSpy.and.returnValue({q: 'sun'});
     $rootScope.$broadcast('$locationChangeSuccess');
     $scope.$digest();
-    $httpBackend.flush();
 
     expect(mockWindow.location.href).toBe(
       '/search/find?q=%22sun%22&category=("astronomy")&language_code=("es")');
