@@ -19,7 +19,7 @@
 import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 
 describe('Multiple choice input rules service', () => {
-  let mcirs: MultipleChoiceInputRulesService = null;
+  let mcirs: MultipleChoiceInputRulesService;
   beforeEach(() => {
     mcirs = new MultipleChoiceInputRulesService();
   });
