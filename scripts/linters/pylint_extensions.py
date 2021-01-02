@@ -1908,11 +1908,11 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
             'Please remove disallowed function calls.',
         ),
         'C0032': (
-            'Please replace %s with %s.',
+            'Please replace the call to %s with %s.',
             'replace-disallowed-function-calls',
             (
                 'Please replace disallowed function'
-            'calls with allowed alternative.'),
+                'calls with allowed alternative.'),
         ),
     }
     python_utils_file = b'python_utils.py'
@@ -1923,77 +1923,60 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
         {
             'default': (
                 (
-                    re.compile(r'datetime.datetime.now\(\)'),
+                    b'now',
                     b'datetime.datetime.utcnow()'),
                 (
-                    re.compile(r'self.assertEquals\('),
+                    b'assertEquals',
                     b'self.assertEqual()'),
                 (
-                    re.compile(r'StringIO\('),
+                    b'StringIO',
                     b'python_utils.string_io()'),
                 (
-                    re.compile(r'urllib\..*quote\('),
-                    b'python_utils.url_quote()'),
-                (
-                    re.compile(r'urllib\..*unquote_plus\('),
-                    b'python_utils.url_unquote_plus()'),
-                (
-                    re.compile(r'urllib\..*urlencode\('),
-                    b'python_utils.url_encode()'),
-                (
-                    re.compile(r'urllib\..*urlretrieve\('),
-                    b'python_utils.url_retrieve()'),
-                (
-                    re.compile(r'urllib(2)?\..*urlopen\('),
-                    b'python_utils.url_open()'),
-                (
-                    re.compile(r'urlsplit\('),
+                    b'urlsplit',
                     b'python_utils.url_split()'),
                 (
-                    re.compile(r'urlparse\('),
+                    b'urlparse',
                     b'python_utils.url_parse()'),
                 (
-                    re.compile(r'urlunsplit\('),
+                    b'urlunsplit',
                     b'python_utils.url_unsplit()'),
                 (
-                    re.compile(r'parse_qs\('),
+                    b'parse_qs',
                     b'python_utils.parse_query_string()'),
                 (
-                    re.compile(r'\Wunquote\('),
+                    b'unquote',
                     b'python_utils.urllib_unquote()'),
                 (
-                    re.compile(r'urljoin\('),
+                    b'urljoin',
                     b'python_utils.url_join()'),
                 (
-                    re.compile(r'urllib(2)?\..*Request\('),
-                    b'python_utils.url_request()'),
-                (
-                    re.compile(r'\Wnext\('),
+                    b'next',
                     b'python_utils.NEXT()'),
                 (
-                    re.compile(r'\Wrange\('),
+                    b'range',
                     b'python_utils.RANGE()'),
                 (
-                    re.compile(r'\Wround\('),
+                    b'round',
                     b'python_utils.ROUND()'),
                 (
-                    re.compile(r'\Wstr\('),
-                    b'python_utils.convert_to_bytes() ' +
-                    b'or python_utils.UNICODE()'),
+                    b'str',
+                    (
+                        b'python_utils.convert_to_bytes() '
+                        b'or python_utils.UNICODE()')),
                 (
-                    re.compile(r'\Wzip\('),
+                    b'zip',
                     b'python_utils.ZIP()'),
                 (
-                    re.compile(r'basestring\('),
+                    b'basestring',
                     b'python_utils.BASESTRING()'),
                 (
-                    re.compile(r'iteritems\('),
+                    b'iteritems',
                     b'items()'),
                 (
-                    re.compile(r'itervalues\('),
+                    b'itervalues',
                     b'values()'),
                 (
-                    re.compile(r'iterkeys\('),
+                    b'iterkeys',
                     b'keys()'),
             ),
             'type': 'csv',
@@ -2009,20 +1992,21 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
         Args:
             node: astroid.nodes.Call. Node to access call content.
         """
-        called = node.as_string()
-        
+        func = node.func
         for (
-                func_rgx,
+                func_name,
                 replace_msg) in self.config.disallowed_functions:
-            if func_rgx.search(called):
+            if (
+                    (hasattr(func, 'attrname') and func.attrname == func_name)
+                    or (hasattr(func, 'name') and func.name == func_name)):
                 if replace_msg is None:
                     self.add_message(
                         'remove-disallowed-function-calls',
-                        node=node, args=(called))
+                        node=node, args=(func_name))
                 else:
                     self.add_message(
                         'replace-disallowed-function-calls',
-                        node=node, args=(called, replace_msg))
+                        node=node, args=(func_name, replace_msg))
 
 
 def register(linter):
