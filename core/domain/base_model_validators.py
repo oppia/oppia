@@ -64,6 +64,7 @@ ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
 ERROR_CATEGORY_TYPE_CHECK = 'type check'
 ERROR_CATEGORY_VERSION_CHECK = 'version check'
 ERROR_CATEGORY_STALE_CHECK = 'stale check'
+ERROR_CATEGORY_INVALID_USER_SETTING_IDS = 'invalid user setting ids'
 
 VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
@@ -138,10 +139,9 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                 set(filtered_model_ids) - set(feconf.SYSTEM_USERS.values()))
         else:
             if set(filtered_model_ids) & set(feconf.SYSTEM_USERS.values()):
-                raise Exception(
-                    'The attribute may_contain_system_ids is set to False '
-                    'but the model_ids in field %s contain system '
-                    'ids.' % field_name)
+                raise utils.ValidationError(
+                    'The field %s should not contain system ids but it '
+                    'contains system ids' % field_name)
         if may_contain_pseudonymous_ids:
             filtered_model_ids = [
                 model_id for model_id in filtered_model_ids
@@ -151,10 +151,9 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
             if any(
                     utils.is_pseudonymous_id(model_id)
                     for model_id in filtered_model_ids):
-                raise Exception(
-                    'The attribute may_contain_pseudonymous_ids is set to '
-                    'False but the model_ids in field %s contain pseudonymous '
-                    'ids.' % field_name)
+                raise utils.ValidationError(
+                    'The field %s should not contain pseudonymous ids but it '
+                    'contains pseudonymous ids' % field_name)
         self.field_name = field_name
         self.model_class = user_models.UserSettingsModel
         self.model_ids = filtered_model_ids
@@ -351,26 +350,33 @@ class BaseModelValidator(python_utils.OBJECT):
         """
         multiple_models_ids_to_fetch = {}
 
-        for external_model_fetcher_details in (
-                cls._get_external_id_relationships(item)):
-            multiple_models_ids_to_fetch[
-                external_model_fetcher_details.field_name] = (
-                    external_model_fetcher_details.model_class,
-                    external_model_fetcher_details.model_ids)
+        try:
+            for external_model_fetcher_details in (
+                    cls._get_external_id_relationships(item)):
+                multiple_models_ids_to_fetch[
+                    external_model_fetcher_details.field_name] = (
+                        external_model_fetcher_details.model_class,
+                        external_model_fetcher_details.model_ids)
 
-        fetched_model_instances_for_all_ids = (
-            datastore_services.fetch_multiple_entities_by_ids_and_models(
-                list(multiple_models_ids_to_fetch.values())))
+            fetched_model_instances_for_all_ids = (
+                datastore_services.fetch_multiple_entities_by_ids_and_models(
+                    list(multiple_models_ids_to_fetch.values())))
 
-        for index, field_name in enumerate(multiple_models_ids_to_fetch):
-            (model_class, model_ids) = multiple_models_ids_to_fetch[field_name]
-            fetched_model_instances = fetched_model_instances_for_all_ids[index]
+            for index, field_name in enumerate(multiple_models_ids_to_fetch):
+                (model_class, model_ids) = (
+                    multiple_models_ids_to_fetch[field_name])
+                fetched_model_instances = fetched_model_instances_for_all_ids[
+                    index]
 
-            for (model_id, model_instance) in python_utils.ZIP(
-                    model_ids, fetched_model_instances):
-                cls.field_name_to_external_model_references[field_name].append(
-                    ExternalModelReference(
-                        model_class, model_id, model_instance))
+                for (model_id, model_instance) in python_utils.ZIP(
+                        model_ids, fetched_model_instances):
+                    cls.field_name_to_external_model_references[
+                        field_name].append(
+                            ExternalModelReference(
+                                model_class, model_id, model_instance))
+
+        except utils.ValidationError as err:
+            cls._add_error(ERROR_CATEGORY_INVALID_USER_SETTING_IDS, err)
 
     @classmethod
     def _validate_model_time_fields(cls, item):
