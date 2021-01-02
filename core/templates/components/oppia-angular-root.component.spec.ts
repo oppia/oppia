@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { MockAngularFireAuth } from 'tests/unit-test-utils';
 import { OppiaAngularRootComponent } from './oppia-angular-root.component';
@@ -28,8 +28,8 @@ let fixture: ComponentFixture<OppiaAngularRootComponent>;
 describe('OppiaAngularRootComponent', function() {
   let emitSpy: jasmine.Spy;
 
-  beforeEach(async() => {
-    await TestBed.configureTestingModule({
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         {provide: AngularFireAuth, useValue: new MockAngularFireAuth()},
@@ -41,11 +41,13 @@ describe('OppiaAngularRootComponent', function() {
     component = fixture.componentInstance;
 
     emitSpy = spyOn(component.initialized, 'emit');
-  });
+  }));
 
-  it('should emit once ngAfterViewInit is called', () => {
-    component.ngAfterViewInit();
+  describe('.initialized', () => {
+    it('should emit once ngAfterViewInit is called', () => {
+      component.ngAfterViewInit();
 
-    expect(emitSpy).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
+    });
   });
 });
