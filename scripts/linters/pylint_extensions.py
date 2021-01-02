@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0031.
+presubmit checks. Next message id would be C0033.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
