@@ -38,7 +38,7 @@ implements PipeTransform {
       input = input.trim();
       let inputLines = input.split('\n');
       let resultLines = [];
-      for (let i:number = 0; i < inputLines.length; i++) {
+      for (let i: number = 0; i < inputLines.length; i++) {
         let result = '';
 
         let inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
