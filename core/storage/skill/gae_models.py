@@ -69,6 +69,9 @@ class SkillModel(base_models.VersionedModel):
     # The ISO 639-1 code for the language this skill is written in.
     language_code = (
         datastore_services.StringProperty(required=True, indexed=True))
+    # The url fragment of the skill.
+    url_fragment = (
+        datastore_services.StringProperty(required=True, indexed=True))
     # The schema version for the skill_contents.
     skill_contents_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)

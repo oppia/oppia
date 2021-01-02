@@ -324,6 +324,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
         topic_editor.TopicUrlFragmentHandler),
     get_redirect_route(
+        r'%s/<skill_url_fragment>' % feconf.SKILL_URL_FRAGMENT_HANDLER,
+        skill_editor.SkillUrlFragmentHandler),
+    get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
