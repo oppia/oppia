@@ -65,11 +65,12 @@ var ExplorationEditorSettingsTab = function() {
   this.deleteExploration = async function() {
     await waitFor.elementToBeClickable(
       deleteExplorationButton, 'Delete Exploration button is not clickable');
-    await deleteExplorationButton.click();
+    await action.click('delete Exploration Button',deleteExplorationButton);
+
     await waitFor.elementToBeClickable(
       confirmDeleteExplorationButton,
       'Confirm Delete Exploration button is not clickable');
-    await confirmDeleteExplorationButton.click();
+    await action.click('confirm Delete ExplorationButton',confirmDeleteExplorationButton);
     await waitFor.invisibilityOf(
       confirmDeleteExplorationButton,
       'Delete Exploration modal takes too long to disappear');
@@ -97,7 +98,7 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.visibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to appear');
     expect(await explorationSummaryTile.isPresent()).toBeTruthy();
-    await closePreviewSummaryButton.click();
+    await action.click('close Preview Summary Button',closePreviewSummaryButton);
     await waitFor.invisibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
     expect(await explorationSummaryTile.isPresent()).toBeFalsy();
