@@ -835,6 +835,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -946,6 +949,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 run_e2e_tests, 'start_webdriver_manager',
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
+            self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
@@ -1288,6 +1294,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -1455,6 +1464,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -1572,6 +1584,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 run_e2e_tests, 'start_webdriver_manager',
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
+            self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
