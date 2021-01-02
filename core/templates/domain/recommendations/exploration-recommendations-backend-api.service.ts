@@ -49,7 +49,7 @@ export class ExplorationRecommendationsBackendApiService {
   constructor(
     private http: HttpClient) { }
 
-  getRecommendedSummaryDicts(
+  async getRecommendedSummaryDictsAsync(
       authorRecommendedExpIds: string[],
       includeSystemRecommendations: string,
       collectionId: string, storyId: string, currentNodeId: string,
