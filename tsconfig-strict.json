@@ -119,7 +119,8 @@
     "extensions/interactions/InteractiveMap/directives/interactive-map-rules.service.ts",
     "extensions/interactions/InteractiveMap/directives/interactive-map-rules.service.spec.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.ts",
-    "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts"
+    "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts",
+    "extensions/interactions/GraphInput/directives/graph-detail.service.ts"
   ],
   "include": ["typings/*.ts"]
 }
