@@ -94,7 +94,7 @@
     float: right;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     padding: 10px 10px 35px 10px;
-    width: 340px;
+    width: 50%;
   }
   .donate-page .btn.oppia-donate-options-button {
     background-color: rgba(0,0,0,0.2);
@@ -114,10 +114,7 @@
   .donate-page .oppia-donate-info {
     float: left;
     padding-bottom: 30px;
-    width: -webkit-calc(100% - 340px);
-    width: -moz-calc(100% - 340px);
-    width: -o-calc(100% - 340px);
-    width: calc(100% - 340px);
+    width: 50%;
   }
   .donate-page .oppia-gift-funds-text {
     color: #fff;
@@ -145,18 +142,21 @@
   .donate-page .oppia-vision-text {
     font-size: 0.825em;
   }
-  @media only screen and (max-width: 1140px) {
-    .oppia-donation-card-content-wide {
-      margin-bottom: 90px;
+
+  @media only screen and (max-width: 1160px) {
+      .oppia-donation-card-content-wide {
+      display: flex;
+      width: 100%;
     }
+
     .oppia-donate-info {
-      display: block;
-      position: inherit;
-      width: 100%;
+      flex: 1;
+      justify-content: flex-end;
     }
+
     .oppia-donate-options {
-      float: clear;
-      width: 100%;
+      flex: 1;
+      justify-content: flex-start;
     }
   }
 </style>
