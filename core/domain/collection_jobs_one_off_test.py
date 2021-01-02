@@ -373,9 +373,9 @@ class RemoveCollectionRightsTranslatorIdsOneOffJobTests(
             collection_jobs_one_off
             .RemoveCollectionRightsTranslatorIdsOneOffJob.enqueue(job_id))
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             collection_jobs_one_off.RemoveCollectionRightsTranslatorIdsOneOffJob
             .get_output(job_id))
@@ -498,7 +498,7 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
     ALBERT_NAME = 'albert'
 
     COLLECTION_ID = 'collection_id'
-
+    EXP_ID = 'exp_id'
     def setUp(self):
         super(RemoveCollectionModelNodesOneOffJobTests, self).setUp()
 
@@ -516,9 +516,9 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
             collection_jobs_one_off
             .RemoveCollectionModelNodesOneOffJob.enqueue(job_id))
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
+            self.count_jobs_in_mapreduce_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_mapreduce_tasks()
         stringified_output = (
             collection_jobs_one_off.RemoveCollectionModelNodesOneOffJob
             .get_output(job_id))
@@ -529,6 +529,9 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
     def test_one_collection_model_with_nodes(self):
         with self.swap(
             collection_models, 'CollectionModel', MockCollectionModel):
+            self.save_new_default_exploration(self.EXP_ID, self.albert_id)
+            rights_manager.create_new_collection_rights(
+                self.COLLECTION_ID, self.albert_id)
             original_collection_model = (
                 collection_models.CollectionModel(
                     id=self.COLLECTION_ID,
@@ -539,7 +542,8 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
                     schema_version=2,
                     nodes=[{
                         'prerequisite_skills': [],
-                        'acquired_skills': []
+                        'acquired_skills': [],
+                        'exploration_id': self.EXP_ID,
                     }],
                     )
             )
@@ -558,7 +562,7 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
                 [['SUCCESS_REMOVED - CollectionModel', 1]], output)
 
             migrated_collection_model = (
-                collection_models.CollectionModel.get_by_id('id'))
+                collection_models.CollectionModel.get_by_id(self.COLLECTION_ID))
 
             self.assertNotIn('nodes', migrated_collection_model._values)  # pylint: disable=protected-access
             self.assertNotIn(
@@ -594,7 +598,7 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
             [['SUCCESS_ALREADY_REMOVED - CollectionModel', 1]], output)
 
         migrated_collection_model = (
-            collection_models.CollectionModel.get_by_id('id'))
+            collection_models.CollectionModel.get_by_id(self.COLLECTION_ID))
         self.assertNotIn('nodes', migrated_collection_model._values)  # pylint: disable=protected-access
         self.assertNotIn('nodes', migrated_collection_model._properties)  # pylint: disable=protected-access
         self.assertEqual(

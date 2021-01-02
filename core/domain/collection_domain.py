@@ -66,6 +66,7 @@ CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
 CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
+CMD_REMOVE_NODE = 'collection_remove_node'
 # This takes an additional 'name' parameter.
 CMD_ADD_COLLECTION_SKILL = 'add_collection_skill'
 # This takes an additional 'skill_id' parameter.
@@ -145,6 +146,12 @@ class CollectionChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': []
     }, {
+        'name': CMD_REMOVE_NODE,
+        'required_attribute_names': [],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': []
+    }, 
+    {
         'name': CMD_ADD_COLLECTION_SKILL,
         'required_attribute_names': ['name'],
         'optional_attribute_names': [],

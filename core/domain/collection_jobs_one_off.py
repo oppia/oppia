@@ -126,7 +126,6 @@ class RemoveCollectionRightsTranslatorIdsOneOffJob(
                 del collection_rights_model._values['translator_ids']  # pylint: disable=protected-access
             collection_rights_model.update_timestamps(
                 update_last_updated_time=False)
-            collection_rights_model.put()
             yield (
                 'SUCCESS_REMOVED - CollectionRightsModel',
                 collection_rights_model.id)
@@ -166,8 +165,15 @@ class RemoveCollectionModelNodesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             del collection_model._properties['nodes']  # pylint: disable=protected-access
             if 'nodes' in collection_model._values:  # pylint: disable=protected-access
                 del collection_model._values['nodes']  # pylint: disable=protected-access
-            collection_model.update_timestamps(update_last_updated_time=False)
-            collection_model.put()
+            # collection_model.update_timestamps(update_last_updated_time=False)
+            # collection_model.put()
+            collection_model.nodes = None
+            commit_cmds = [{
+                'cmd' : collection_domain.CMD_REMOVE_NODE
+            }]
+            collection_services.update_collection(
+                feconf.MIGRATION_BOT_USERNAME, collection_model.id, commit_cmds,
+                'remove nodes from collection')
             yield ('SUCCESS_REMOVED - CollectionModel', collection_model.id)
         else:
             yield (
