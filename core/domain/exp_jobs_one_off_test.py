@@ -111,21 +111,6 @@ class MockExplorationModelWithDeprecatedFields(exp_models.ExplorationModel):
 
         base_models.VersionedModel._trusted_commit( # pylint: disable=protected-access
             self, committer_id, commit_type, commit_message, commit_cmds)
-        exp_rights = exp_models.ExplorationRightsModel.get_by_id(self.id)
-
-        # TODO(msl): Test if put_async() leads to any problems (make
-        # sure summary dicts get updated correctly when explorations
-        # are changed).
-        exploration_commit_log = (
-            exp_models.ExplorationCommitLogEntryModel.create(
-                self.id, self.version, committer_id,
-                commit_type, commit_message,
-                commit_cmds, exp_rights.status,
-                exp_rights.community_owned
-            ))
-        exploration_commit_log.exploration_id = self.id
-        exploration_commit_log.update_timestamps()
-        exploration_commit_log.put()
 
 
 class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
@@ -262,6 +247,11 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
             self.assertNotIn(
                 'skin_customizations', migrated_exp_model3._properties)  # pylint: disable=protected-access
 
+            # Run job twice.
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_ALREADY_REMOVED - ExplorationModel', 3]], output)
+
     def test_one_exploration_model_without_deprecated_fields(self):
         original_exploration_model = exp_models.ExplorationModel(
             id='exp_id4',
@@ -290,6 +280,7 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJobTests(
         self.assertNotIn(
             'skill_tags', original_exploration_model._properties)  # pylint: disable=protected-access
 
+        # Fields were never there to begin with, so already removed.
         output = self._run_one_off_job()
         self.assertItemsEqual(
             [['SUCCESS_ALREADY_REMOVED - ExplorationModel', 1]], output)

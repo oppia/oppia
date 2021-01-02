@@ -61,6 +61,7 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that sets skill_tags, default_skin, skin_customization fields
     in ExplorationModels to None in order to remove it from the datastore.
+    Job is necessary only for January 2021 release and can be removed after.
     """
 
     @classmethod
@@ -83,7 +84,7 @@ class RemoveDeprecatedExplorationModelFieldsOneOffJob(
                     del exp_model._values[deprecated_field]  # pylint: disable=protected-access
                 removed_deprecated_field = True
         if removed_deprecated_field:
-            exp_model.commit('cid', 'Remove field', [])
+            exp_model.commit(feconf.SYSTEM_COMMITTER_ID, 'Remove field', [])
             yield ('SUCCESS_REMOVED - ExplorationModel', exp_model.id)
         else:
             yield ('SUCCESS_ALREADY_REMOVED - ExplorationModel', exp_model.id)
