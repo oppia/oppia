@@ -146,15 +146,21 @@ def main(args=None):
 
     common.start_redis_server()
 
-    python_utils.PRINT('Starting GAE development server')
-    managed_dev_appserver = common.managed_dev_appserver(
-        app_yaml_filepath, clear_datastore=not parsed_args.save_datastore,
-        enable_console=parsed_args.enable_console,
-        enable_host_checking=not parsed_args.disable_host_checking,
-        automatic_restart=not parsed_args.no_auto_restart,
-        skip_sdk_update_check=True, port=PORT_NUMBER_FOR_GAE_SERVER)
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
 
-    with managed_dev_appserver:
+    with contextlib2.ExitStack() as stack:
+        python_utils.PRINT('Starting Firebase emulators')
+        stack.enter_context(common.managed_firebase_auth_emulator())
+
+        python_utils.PRINT('Starting GAE development server')
+        stack.enter_context(common.managed_dev_appserver(
+            app_yaml_filepath, clear_datastore=not parsed_args.save_datastore,
+            enable_console=parsed_args.enable_console,
+            enable_host_checking=not parsed_args.disable_host_checking,
+            automatic_restart=not parsed_args.no_auto_restart,
+            skip_sdk_update_check=True, port=PORT_NUMBER_FOR_GAE_SERVER))
+
         # Wait for the servers to come up.
         while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
             time.sleep(1)

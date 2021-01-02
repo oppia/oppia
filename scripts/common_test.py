@@ -35,6 +35,7 @@ import time
 
 import constants
 from core.tests import test_utils
+import feconf
 import python_utils
 
 import contextlib2
@@ -852,6 +853,20 @@ class CommonTests(test_utils.GenericTestBase):
         from google.cloud import tasks_v2 # pylint: disable=unused-variable
         from google.appengine.api import app_identity # pylint: disable=unused-variable
 
+    def test_swap_env_when_var_had_a_value(self):
+        os.environ['ABC'] = 'Hard as Rocket Science'
+        with common.swap_env('ABC', 'Easy as 123') as old_value:
+            self.assertEqual(old_value, 'Hard as Rocket Science')
+            self.assertEqual(os.environ['ABC'], 'Easy as 123')
+        self.assertEqual(os.environ['ABC'], 'Hard as Rocket Science')
+
+    def test_swap_env_when_var_did_not_exist(self):
+        self.assertNotIn('DEF', os.environ)
+        with common.swap_env('DEF', 'Easy as 123') as old_value:
+            self.assertIsNone(old_value)
+            self.assertEqual(os.environ['DEF'], 'Easy as 123')
+        self.assertNotIn('DEF', os.environ)
+
 
 class ManagedProcessTests(test_utils.TestBase):
 
@@ -995,6 +1010,25 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(pids), 4)
         self.assertItemsEqual(
             logs, ['Process killed (pid=%d)' % p for p in pids])
+
+    def test_managed_firebase_emulator(self):
+        os.environ['GCLOUD_PROJECT'] = 'foo'
+        os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = ''
+        with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(common.managed_firebase_auth_emulator())
+            self.assertEqual(
+                os.environ['GCLOUD_PROJECT'], feconf.OPPIA_PROJECT_ID)
+            self.assertEqual(
+                os.environ['FIREBASE_AUTH_EMULATOR_HOST'],
+                feconf.FIREBASE_AUTH_EMULATOR_HOST)
+
+        self.assertEqual(os.environ['GCLOUD_PROJECT'], 'foo')
+        self.assertEqual(os.environ['FIREBASE_AUTH_EMULATOR_HOST'], '')
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn('firebase', popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
 
     def test_managed_dev_appserver(self):
         with contextlib2.ExitStack() as stack:
