@@ -901,7 +901,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             id=self.get_user_id_from_email(self.EDITOR_EMAIL),
             creator_ids=[],
             collection_ids=[],
-            activity_ids=[],
+            exploration_ids=[],
             general_feedback_thread_ids=[]).put()
 
     def test_export_account_handler(self):

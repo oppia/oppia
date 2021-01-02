@@ -268,7 +268,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/pages/exploration-editor-page/translation-tab/'
             'audio-translation-bar/audio-translation-bar.directive.spec.ts',
             'core/templates/pages/library-page/search-bar/'
-            'search-bar.component.spec.ts'),
+            'search-bar.component.spec.ts',
+            'core/templates/pages/splash-page/splash-page.component.spec.ts'),
         'excluded_dirs': ()
     },
     {
@@ -287,6 +288,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'api services.'),
         'excluded_files': (
             'backend-api.service.ts',
+            'core/templates/services/auth-interceptor.service.spec.ts',
             'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()
     }
