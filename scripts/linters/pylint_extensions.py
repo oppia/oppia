@@ -1893,6 +1893,39 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
                 self.add_message('inequality-with-none', node=node)
 
 
+class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
+    """Custom pylint checker prohibiting use of "test_only" in function names
+    of non-test files.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'non-test-files-function-name-checker'
+    priority = -1
+    msgs = {
+        'C0031': (
+            'Please refrain from using test_only in function names '
+            'in non-test files.',
+            'non-test-files-function-name-checker',
+            'Try using a different name for the function, not having test_only'
+            'as its prefix.'
+        )
+    }
+
+    def visit_functiondef(self, node):
+        """Visit every function definition and ensure their name doesn't have
+        test_only as its prefix.
+
+        Args:
+            node: astroid.nodes.FunctionDef. A node for a function or method
+                definition in the AST.
+        """
+
+        function_name = node.name
+        if function_name.startswith('test_only'):
+            self.add_message('non-test-files-function-name-checker', node=node)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1913,3 +1946,4 @@ def register(linter):
     linter.register_checker(SingleLinePragmaChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
     linter.register_checker(InequalityWithNoneChecker(linter))
+    linter.register_checker(NonTestFilesFunctionNameChecker(linter))
