@@ -410,27 +410,6 @@ def get_e2e_test_parameters(
     return commands
 
 
-def start_google_app_engine_server(dev_mode_setting, log_level):
-    """Start the Google App Engine server.
-
-    Args:
-        dev_mode_setting: bool. Represents whether to run the related commands
-            in dev mode.
-        log_level: str. The log level for the google app engine server.
-    """
-    app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
-
-    p = subprocess.Popen(
-        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=yes --dev_appserver_log_level=%s '
-        '--log_level=%s --skip_sdk_update_check=true %s' % (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
-            GOOGLE_APP_ENGINE_PORT, log_level, log_level, app_yaml_filepath),
-        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH},
-        shell=True)
-    SUBPROCESSES.append(p)
-
-
 def get_chrome_driver_version():
     """Fetches the latest supported version of chromedriver depending on the
     Chrome version.
@@ -541,38 +520,43 @@ def run_tests(args):
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
-    start_google_app_engine_server(dev_mode, args.server_log_level)
+    managed_dev_appserver = common.managed_dev_appserver(
+        'app.yaml' if args.prod_env else 'app_dev.yaml',
+        port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
+        clear_datastore=True, skip_sdk_update_check=True,
+        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
 
-    common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
-    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
-    python_utils.PRINT(
-        'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
-        'core/tests/protractor.conf.js, you can view screenshots'
-        'of the failed tests in ../protractor-screenshots/')
-    commands = [common.NODE_BIN_PATH]
-    if args.debug_mode:
-        commands.append('--inspect-brk')
-    # This flag ensures tests fail if waitFor calls time out.
-    commands.append('--unhandled-rejections=strict')
-    commands.append(PROTRACTOR_BIN_PATH)
-    commands.extend(get_e2e_test_parameters(
-        args.sharding_instances, args.suite, dev_mode))
+    with managed_dev_appserver:
+        common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
+        common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+        python_utils.PRINT(
+            'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
+            'core/tests/protractor.conf.js, you can view screenshots'
+            'of the failed tests in ../protractor-screenshots/')
+        commands = [common.NODE_BIN_PATH]
+        if args.debug_mode:
+            commands.append('--inspect-brk')
+        # This flag ensures tests fail if waitFor calls time out.
+        commands.append('--unhandled-rejections=strict')
+        commands.append(PROTRACTOR_BIN_PATH)
+        commands.extend(get_e2e_test_parameters(
+            args.sharding_instances, args.suite, dev_mode))
 
-    p = subprocess.Popen(commands, stdout=subprocess.PIPE)
-    output_lines = []
-    while True:
-        nextline = p.stdout.readline()
-        if len(nextline) == 0 and p.poll() is not None:
-            break
-        if isinstance(nextline, str):
-            # This is a failsafe line in case we get non-unicode input,
-            # but the tests provide all strings as unicode.
-            nextline = nextline.decode('utf-8')  # pragma: nocover
-        output_lines.append(nextline.rstrip())
-        # Replaces non-ASCII characters with '?'.
-        sys.stdout.write(nextline.encode('ascii', errors='replace'))
+        p = subprocess.Popen(commands, stdout=subprocess.PIPE)
+        output_lines = []
+        while True:
+            nextline = p.stdout.readline()
+            if len(nextline) == 0 and p.poll() is not None:
+                break
+            if isinstance(nextline, str):
+                # This is a failsafe line in case we get non-unicode input,
+                # but the tests provide all strings as unicode.
+                nextline = nextline.decode('utf-8')  # pragma: nocover
+            output_lines.append(nextline.rstrip())
+            # Replaces non-ASCII characters with '?'.
+            sys.stdout.write(nextline.encode('ascii', errors='replace'))
 
-    return output_lines, p.returncode
+        return output_lines, p.returncode
 
 
 def main(args=None):

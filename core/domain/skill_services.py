@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import logging
 
 from constants import constants
@@ -173,7 +174,10 @@ def _get_augmented_skill_summaries_in_batches(
         _get_skill_summaries_in_batches(
             num_skills_to_fetch, urlsafe_start_cursor, sort_by))
 
-    assigned_skill_ids = {}
+    assigned_skill_ids = collections.defaultdict(lambda: {
+        'topic_names': [],
+        'classroom_names': []
+    })
 
     all_topic_models = topic_models.TopicModel.get_all()
     all_topics = [topic_fetchers.get_topic_from_model(topic_model)
@@ -189,19 +193,18 @@ def _get_augmented_skill_summaries_in_batches(
 
     for topic in all_topics:
         for skill_id in topic.get_all_skill_ids():
-            assigned_skill_ids[skill_id] = {
-                'topic_name': topic.name,
-                'classroom_name': topic_classroom_dict.get(topic.id, None)
-            }
+            assigned_skill_ids[skill_id]['topic_names'].append(topic.name)
+            assigned_skill_ids[skill_id]['classroom_names'].append(
+                topic_classroom_dict.get(topic.id, None))
 
     augmented_skill_summaries = []
     for skill_summary in skill_summaries:
-        topic_name = None
-        classroom_name = None
+        topic_names = []
+        classroom_names = []
         if skill_summary.id in assigned_skill_ids:
-            topic_name = assigned_skill_ids[skill_summary.id]['topic_name']
-            classroom_name = (
-                assigned_skill_ids[skill_summary.id]['classroom_name'])
+            topic_names = assigned_skill_ids[skill_summary.id]['topic_names']
+            classroom_names = (
+                assigned_skill_ids[skill_summary.id]['classroom_names'])
 
         augmented_skill_summary = skill_domain.AugmentedSkillSummary(
             skill_summary.id,
@@ -210,8 +213,8 @@ def _get_augmented_skill_summaries_in_batches(
             skill_summary.version,
             skill_summary.misconception_count,
             skill_summary.worked_examples_count,
-            topic_name,
-            classroom_name,
+            topic_names,
+            classroom_names,
             skill_summary.skill_model_created_on,
             skill_summary.skill_model_last_updated)
         augmented_skill_summaries.append(augmented_skill_summary)
@@ -238,7 +241,7 @@ def _filter_skills_by_status(augmented_skill_summaries, status):
     elif status == constants.SKILL_STATUS_OPTIONS['UNASSIGNED']:
         unassigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
-            if augmented_skill_summary.topic_name is None:
+            if not augmented_skill_summary.topic_names:
                 unassigned_augmented_skill_summaries.append(
                     augmented_skill_summary)
 
@@ -247,7 +250,7 @@ def _filter_skills_by_status(augmented_skill_summaries, status):
     elif status == constants.SKILL_STATUS_OPTIONS['ASSIGNED']:
         assigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
-            if augmented_skill_summary.topic_name is not None:
+            if augmented_skill_summary.topic_names:
                 assigned_augmented_skill_summaries.append(
                     augmented_skill_summary)
         return assigned_augmented_skill_summaries
@@ -272,7 +275,7 @@ def _filter_skills_by_classroom(augmented_skill_summaries, classroom_name):
 
     augmented_skill_summaries_with_classroom_name = []
     for augmented_skill_summary in augmented_skill_summaries:
-        if augmented_skill_summary.classroom_name == classroom_name:
+        if classroom_name in augmented_skill_summary.classroom_names:
             augmented_skill_summaries_with_classroom_name.append(
                 augmented_skill_summary)
 
@@ -658,7 +661,7 @@ def apply_change_list(skill_id, change_list, committer_id):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, skill_id, change_list)
         )
-        raise
+        python_utils.reraise_exception()
 
 
 def _save_skill(committer_id, skill, commit_message, change_list):
