@@ -71,7 +71,7 @@ require('services/stateful/focus-manager.service.ts');
 require('services/external-save.service.ts');
 
 angular.module('oppia').factory('ExplorationSaveService', [
-  '$log', '$q', '$timeout', '$uibModal', '$window',
+  '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
   'ExplorationCategoryService', 'ExplorationDataService',
   'ExplorationDiffService', 'ExplorationInitStateNameService',
@@ -83,7 +83,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
   'DEFAULT_LANGUAGE_CODE',
   function(
-      $log, $q, $timeout, $uibModal, $window,
+      $log, $q, $rootScope, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
       ExplorationCategoryService, ExplorationDataService,
       ExplorationDiffService, ExplorationInitStateNameService,
@@ -204,9 +204,11 @@ angular.module('oppia').factory('ExplorationSaveService', [
           AlertsService.addSuccessMessage('Changes saved.');
           saveIsInProgress = false;
           whenSavingDone.resolve();
+          $rootScope.$applyAsync();
         }, function() {
           saveIsInProgress = false;
           whenSavingDone.resolve();
+          $rootScope.$applyAsync();
         }
       );
       return whenSavingDone.promise;
