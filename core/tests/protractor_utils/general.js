@@ -22,6 +22,7 @@ var ExplorationEditorPage = require(
 var waitFor = require('./waitFor.js');
 var dragAndDropScript = require('html-dnd').code;
 var action = require('../protractor_utils/action.js');
+const { browser } = require('protractor');
 
 var dragAndDrop = async function(fromElement, toElement) {
   await browser.executeScript(dragAndDropScript, fromElement, toElement);
@@ -81,11 +82,13 @@ var EXPLORATION_ID_LENGTH = 12;
 var FIRST_STATE_DEFAULT_NAME = 'Introduction';
 
 var _getExplorationId = async function(currentUrlPrefix) {
+  await browser.waitForAngularEnabled(false);
   var url = await browser.getCurrentUrl();
   expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
   var explorationId = url.slice(
     currentUrlPrefix.length,
     currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
+  await browser.waitForAngularEnabled(true);
   return explorationId;
 };
 

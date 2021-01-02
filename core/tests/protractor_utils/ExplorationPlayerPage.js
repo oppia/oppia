@@ -117,7 +117,9 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickThroughToNextCard = async function() {
+    await browser.waitForAngularEnabled(false);
     await action.click('Next Card button', nextCardButton);
+    await browser.waitForAngularEnabled(true);
   };
 
   this.clickSuggestChangesButton = async function() {
@@ -243,11 +245,13 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationToBeOver = async function() {
+    await browser.waitForAngularEnabled(false);
     await waitFor.visibilityOf(
       conversationContent.last(), 'Ending message not visible');
     expect(
       await (conversationContent.last()).getText()
     ).toEqual('Congratulations, you have finished!');
+    await browser.waitForAngularEnabled(true);
   };
 
   this.expectExplorationToNotBeOver = async function() {
@@ -261,6 +265,7 @@ var ExplorationPlayerPage = function() {
   // Additional arguments may be sent to this function, and they will be
   // passed on to the relevant interaction's detail checker.
   this.expectInteractionToMatch = async function(interactionId) {
+    await browser.waitForAngularEnabled(false);
     await waitFor.visibilityOf(
       conversationSkinCardsContainer,
       'Conversation skill cards take too long to appear.');
@@ -271,14 +276,17 @@ var ExplorationPlayerPage = function() {
     }
     var interaction = await interactions.getInteraction(interactionId);
     await interaction.expectInteractionDetailsToMatch.apply(null, args);
+    await browser.waitForAngularEnabled(true);
   };
 
   // Note that the 'latest' feedback may be on either the current or a
   // previous card.
   this.expectLatestFeedbackToMatch = async function(richTextInstructions) {
+    await browser.waitForAngularEnabled(false);
     await forms.expectRichText(
       await conversationFeedback.last()
     ).toMatch(richTextInstructions);
+    await browser.waitForAngularEnabled(true);
   };
 
   this.expectExplorationNameToBe = async function(name) {
@@ -310,6 +318,7 @@ var ExplorationPlayerPage = function() {
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
   this.submitAnswer = async function(interactionId, answerData) {
+    await browser.waitForAngularEnabled(false);
     await waitFor.visibilityOf(
       conversationInput, 'Conversation input takes too long to appear.');
     // The .first() targets the inline interaction, if it exists. Otherwise,
@@ -318,6 +327,7 @@ var ExplorationPlayerPage = function() {
       conversationInput, answerData);
     await waitFor.invisibilityOf(
       waitingForResponseElem, 'Response takes too long to appear');
+    await browser.waitForAngularEnabled(true);
   };
 
   this.submitFeedback = async function(feedback) {
