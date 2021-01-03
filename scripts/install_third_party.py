@@ -348,7 +348,7 @@ def install_elasticsearch_dev_server():
 
     try:
         subprocess.call(
-            [common.ES_PATH, '--version'],
+            ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
