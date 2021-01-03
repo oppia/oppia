@@ -1040,3 +1040,14 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('dev_appserver.py', popen_calls[0].program_args)
         self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'env': None})
+
+    def test_managed_elasticsearch_dev_server(self):
+        with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(common.managed_elasticsearch_dev_server())
+
+        self.assertIn(
+            '%s/bin/elasticsearch' % common.ES_PATH,
+            popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
