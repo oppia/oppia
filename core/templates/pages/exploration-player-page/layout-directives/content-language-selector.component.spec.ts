@@ -71,7 +71,7 @@ describe('Content language selector component', () => {
   it('should correctly initialize selectedLanguageCode and ' +
      'languagesInExploration', () => {
     expect(component.selectedLanguageCode).toBe('en');
-    expect(component.languagesInExploration).toEqual([
+    expect(component.languageOptions).toEqual([
       {value: 'fr', displayed: 'français (French)'},
       {value: 'zh', displayed: '中文 (Chinese)'},
       {value: 'en', displayed: 'English'}

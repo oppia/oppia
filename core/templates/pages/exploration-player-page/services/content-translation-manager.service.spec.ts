@@ -282,7 +282,6 @@ describe('Content translation manager service', () => {
       // This throws a "Property 'DummyInteraction' does not exist on type"
       // error.
       // @ts-expect-error
-      delete INTERACTION_SPECS.DummyInteraction;
       INTERACTION_SPECS.DummyInteraction = {
         customization_arg_specs: [{
           name: 'dummyCustArg',
