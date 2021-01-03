@@ -59,7 +59,7 @@ var PreferencesPage = function() {
     by.css('.protractor-test-export-account-button'));
 
   var saveNewChanges = async function(fieldName) {
-    await navBar.click();
+    await action.click('Navbar Button', navBar);
     await waitFor.visibilityOfInfoToast(
       `Info toast for saving ${fieldName} takes too long to appear.`);
     await waitFor.invisibilityOfInfoToast(
@@ -126,9 +126,10 @@ var PreferencesPage = function() {
   };
 
   this.setUserInterests = async function(interests) {
-    await userInterestsInput.click();
+    await action.click('User Interest Input', userInterestsInput);
     for (var i = 0; i < interests.length; i++) {
-      await userInterestsInput.sendKeys(interests[i], protractor.Key.RETURN);
+      await action.sendKeys(
+      	'User Interest Input', userInterestsInput, interests[i]);
       await saveNewChanges('User Interests');
     }
   };
