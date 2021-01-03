@@ -16,16 +16,18 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed} from '@angular/core/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA, Pipe }
   from '@angular/core';
+import { HttpClientTestingModule } from
+  '@angular/common/http/testing';
 
 import { AboutPageComponent } from './about-page.component';
-import { AboutPageConstants } from './about-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateService } from 'services/translate.service';
 import { UtilsService } from 'services/utils.service';
 
@@ -92,6 +94,7 @@ let fixture: ComponentFixture<AboutPageComponent>;
 
 describe('About Page', function() {
   let windowRef: MockWindowRef;
+  let siteAnalyticsServiceStub: SiteAnalyticsService;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -102,6 +105,7 @@ describe('About Page', function() {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService
         },
+        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
         { provide: TranslateService, useClass: MockTranslateService },
         UtilsService,
         UrlInterpolationService,
@@ -111,109 +115,69 @@ describe('About Page', function() {
     }).compileComponents();
     fixture = TestBed.createComponent(AboutPageComponent);
     component = fixture.componentInstance;
+
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    })
+      .compileComponents();
   });
 
-  it('should click on about tab', () => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('about');
-
-    component.onTabClick('about');
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#about');
-    expect(component.activeTabName).toBe('about');
+  afterEach(() => {
+    TestBed.resetTestingModule();
   });
 
-  it('should click on license tab', fakeAsync(() => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('about');
-
-    component.onTabClick('license');
-    fixture.detectChanges();
-    expect(windowRef.nativeWindow.location.hash).toBe('#license');
-    expect(component.activeTabName).toBe('foundation');
+  beforeEach(() => TestBed.configureTestingModule({
+    imports: [HttpClientTestingModule],
+    providers: [AboutPageComponent]
   }));
-
-  it('should click on foundation tab', () => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('about');
-
-    component.onTabClick('foundation');
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#foundation');
-    expect(component.activeTabName).toBe('foundation');
-  });
-
-  it('should click on credits tab', () => {
-    component.ngOnInit();
-    expect(component.activeTabName).toBe('about');
-
-    component.onTabClick('credits');
-
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#credits');
-    expect(component.activeTabName).toBe('credits');
-  });
-
-  it('should activate about tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#about';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#about');
-    expect(component.activeTabName).toBe('about');
-  });
-
-  it('should activate about license on init', () => {
-    windowRef.nativeWindow.location.hash = '#license';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#license');
-    expect(component.activeTabName).toBe('foundation');
-  });
-
-  it('should activate foundation tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#foundation';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#foundation');
-    expect(component.activeTabName).toBe('foundation');
-  });
-
-  it('should activate credits tab on init', () => {
-    windowRef.nativeWindow.location.hash = '#credits';
-
-    component.ngOnInit();
-
-    expect(windowRef.nativeWindow.location.hash).toBe('#credits');
-    expect(component.activeTabName).toBe('credits');
-  });
 
   it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
 
-  it('should initialize listOfNames and aboutPageMascotImgUrl variables' +
-    ' when onInit is called', () => {
-    component.ngOnInit();
-
-    expect(component.listOfNames).toBe(
-      'Alex Kauffmann, Allison Barros, Amy Latten, Brett Barros,' +
-      ' Crystal Kwok, Daniel Hernandez, Divya Siddarth, Ilwon Yoon,' +
-      ' Jennifer Chen, John Cox, John Orr, Katie Berlent, Michael Wawszczak,' +
-      ' Mike Gainer, Neil Fraser, Noah Falstein, Nupur Jain, Peter Norvig,' +
-      ' Philip Guo, Piotr Mitros, Rachel Chen, Rahim Nathwani, Robyn Choo,' +
-      ' Tricia Ngoon, Vikrant Nanda, Vinamrata Singal & Yarin Feigenbaum');
-    expect(component.aboutPageMascotImgUrl).toBe(
-      '/assets/images/general/about_page_mascot.webp');
+  it('should activate when Visit Classroom is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
+      .and.callThrough();
+    component.onClickVisitClassroomButton();
+    expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
+      .toHaveBeenCalledWith();
   });
 
-  it('should obtain developer names with a letter', () => {
-    const namesWithV = AboutPageConstants.CREDITS_CONSTANTS.filter(
-      (credit) => credit.startsWith('V')).sort();
-    expect(component.getCredits('V')).toEqual(namesWithV);
-    expect(component.getCredits('8')).toEqual([]);
+  it('should activate when Browse Library is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
+      .and.callThrough();
+    component.onClickBrowseLibraryButton();
+    expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent)
+      .toHaveBeenCalledWith();
+  });
+
+  it('should activate when Create Lesson is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerCreateLessonButtonEvent')
+      .and.callThrough();
+    component.onClickCreateLessonButton();
+    expect(siteAnalyticsServiceStub.registerCreateLessonButtonEvent)
+      .toHaveBeenCalledWith();
+  });
+
+  it('should activate when Guide For Teacher is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickGuideForTeacherButtonEvent')
+      .and.callThrough();
+    component.onClickGuideForTeacherButton();
+    expect(siteAnalyticsServiceStub.registerClickGuideForTeacherButtonEvent)
+      .toHaveBeenCalledWith();
+  });
+
+  it('should activate when Tip For Parent is clicked', function() {
+    spyOn(
+      siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
+      .and.callThrough();
+    component.onClickTipsForParentsButton();
+    expect(siteAnalyticsServiceStub.registerClickTipforParentsButtonEvent)
+      .toHaveBeenCalledWith();
   });
 });

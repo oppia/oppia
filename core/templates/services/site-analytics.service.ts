@@ -78,6 +78,31 @@ export class SiteAnalyticsService {
     this._sendEventToGoogleAnalytics(
       'GoToDonationSite', 'click', donationSiteName);
   }
+  registerClickGuideForTeacherButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'GuideTeachersButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickTipforParentsButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'TipforParentsButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickVisitClassroomButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'ClassroomButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerClickBrowseLibraryButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'BrowseLibraryButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
+  registerCreateLessonButtonEvent(): void {
+    this._sendEventToGoogleAnalytics(
+      'CreateLessonButton', 'click',
+      this.windowRef.nativeWindow.location.pathname);
+  }
   registerApplyToTeachWithOppiaEvent(): void {
     this._sendEventToGoogleAnalytics('ApplyToTeachWithOppia', 'click', '');
   }

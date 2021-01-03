@@ -66,6 +66,41 @@ describe('Site Analytics Service', () => {
       'send', 'event', 'GoToDonationSite', 'click', donationSite);
   });
 
+  it('should register click classroom button event', () => {
+    sas.registerClickVisitClassroomButtonEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ClassroomButton', 'click', '/context.html');
+  });
+
+  it('should register click browse library button event', () => {
+    sas.registerClickBrowseLibraryButtonEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'BrowseLibraryButton', 'click', '/context.html');
+  });
+
+  it('should register click create lesson button event', () => {
+    sas.registerCreateLessonButtonEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'CreateLessonButton', 'click', '/context.html');
+  });
+
+  it('should register click guide for teacher button event', () => {
+    sas.registerClickGuideForTeacherButtonEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'GuideTeachersButton', 'click', '/context.html');
+  });
+
+  it('should register click tip for parent button event', () => {
+    sas.registerClickTipforParentsButtonEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'TipforParentsButton', 'click', '/context.html');
+  });
+
   it('should register apply to teach with oppia event', () => {
     sas.registerApplyToTeachWithOppiaEvent();
 

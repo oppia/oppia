@@ -19,17 +19,12 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { AboutPageConstants } from './about-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
-import { UserService } from 'services/user.service';
 import { WindowRef } from
   'services/contextual/window-ref.service.ts';
-
-interface CreditNames {
-  letter: string;
-  names: string[];
-}
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
 
 @Component({
   selector: 'about-page',
@@ -37,106 +32,74 @@ interface CreditNames {
 })
 export class AboutPageComponent implements OnInit {
   aboutPageMascotImgUrl: string;
-  activeTabName: string;
-  allCredits: CreditNames[] = [];
   canCreateCollections: null;
-  listOfNames: string;
-  listOfNamesToThank = [
-    'Alex Kauffmann', 'Allison Barros',
-    'Amy Latten', 'Brett Barros',
-    'Crystal Kwok', 'Daniel Hernandez',
-    'Divya Siddarth', 'Ilwon Yoon',
-    'Jennifer Chen', 'John Cox',
-    'John Orr', 'Katie Berlent',
-    'Michael Wawszczak', 'Mike Gainer',
-    'Neil Fraser', 'Noah Falstein',
-    'Nupur Jain', 'Peter Norvig',
-    'Philip Guo', 'Piotr Mitros',
-    'Rachel Chen', 'Rahim Nathwani',
-    'Robyn Choo', 'Tricia Ngoon',
-    'Vikrant Nanda', 'Vinamrata Singal',
-    'Yarin Feigenbaum'];
-  // Define constant for each tab on the page.
-  TAB_ID_ABOUT = 'about';
-  TAB_ID_FOUNDATION = 'foundation';
-  TAB_ID_CREDITS = 'credits';
-  userIsLoggedIn: null;
-  ALLOWED_TABS = [
-    this.TAB_ID_ABOUT, this.TAB_ID_FOUNDATION, this.TAB_ID_CREDITS];
+  classroomUrlFragment: string;
+  classroomUrl :string;
+  userIsLoggedIn: boolean | null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private UserService: UserService) {
-  }
-
-  getCredits(startLetter: string): string[] {
-    const results = AboutPageConstants.CREDITS_CONSTANTS.filter(
-      (credit) => credit.startsWith(startLetter)).sort();
-    return results;
-  }
-
-  onTabClick(tabName: string): Window {
-    this.windowRef.nativeWindow.location.hash = '#' + tabName;
-    this.activeTabName = tabName;
-    return this.windowRef.nativeWindow;
+    private siteAnalyticsService: SiteAnalyticsService,
+    private userBackendApiService: UserBackendApiService,) {
   }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  goToClassroomPage(): void {
-    window.location.pathname = '/learn/math';
+  onClickVisitClassroomButton(): boolean {
+    this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    }, 150);
+    return false;
   }
 
-  goToCreatePage(): void {
-    window.location.pathname = '/creator-dashboard?mode=create';
+  onClickBrowseLibraryButton(): boolean {
+    this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    }, 150);
+    return false;
+  }
+
+  onClickCreateLessonButton(): boolean {
+    this.siteAnalyticsService.registerCreateLessonButtonEvent();
     this.userIsLoggedIn = null;
-    /*UserService.getUserInfoAsync().then(function(userInfo) {
+    this.userBackendApiService.getUserInfoAsync().then(function(userInfo) {
       this.canCreateCollections = userInfo.canCreateCollections();
       this.userIsLoggedIn = userInfo.isLoggedIn();
-    });*/
+    });
+    if (this.userIsLoggedIn === null) {
+      window.location.replace('/_ah/login');
+    } else {
+      window.location.replace('/creator-dashboard?mode=create');
+    }
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    }, 150);
+    return false;
+  }
+
+  onClickGuideForTeacherButton(): boolean {
+    this.siteAnalyticsService.registerClickGuideForTeacherButtonEvent();
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    }, 150);
+    return false;
+  }
+
+  onClickTipsForParentsButton(): boolean {
+    this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
+    setTimeout(() => {
+      this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    }, 150);
+    return false;
   }
 
   ngOnInit(): void {
-    this.activeTabName = this.TAB_ID_ABOUT;
-    this.allCredits = [];
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    for (const letter of letters) {
-      const names = this.getCredits(letter);
-      if (names.length > 0) {
-        this.allCredits.push({letter, names});
-      }
-    }
-    const hash = this.windowRef.nativeWindow.location.hash.slice(1);
-    if (hash === 'license') {
-      this.activeTabName = this.TAB_ID_FOUNDATION;
-    } else if (this.ALLOWED_TABS.includes(hash)) {
-      this.activeTabName = hash;
-    }
-
-    this.listOfNames = this.listOfNamesToThank
-      .slice(0, this.listOfNamesToThank.length - 1).join(', ') +
-      ' & ' + this.listOfNamesToThank[this.listOfNamesToThank.length - 1];
     this.aboutPageMascotImgUrl = this.urlInterpolationService
       .getStaticImageUrl('/general/about_page_mascot.webp');
-
-      this.canCreateCollections = null;
-      this.userIsLoggedIn = null;
-      UserService.getUserInfoAsync().then((userInfo: any) => {
-        this.canCreateCollections = userInfo.canCreateCollections();
-        this.userIsLoggedIn = userInfo.isLoggedIn();
-      });
-
-    this.windowRef.nativeWindow.onhashchange = () => {
-      const hashChange = this.windowRef.nativeWindow.location.hash.slice(1);
-      if (hashChange === 'license') {
-        this.activeTabName = this.TAB_ID_FOUNDATION;
-        this.windowRef.nativeWindow.location.reload(true);
-      } else if (this.ALLOWED_TABS.includes(hashChange)) {
-        this.activeTabName = hashChange;
-      }
-    };
   }
 }
 angular.module('oppia').directive(

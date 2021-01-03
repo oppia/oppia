@@ -1,8 +1,8 @@
 <div class="about-page">
   <div class="oppia-about-page-section-one" dir="auto">
     <div class="oppia-about-section-one-image">
-      <source type="image/webp" [src]="getStaticImageUrl('/about/study.webp')">
-      <source type="image/jpeg" [src]="getStaticImageUrl('/about/study.jpg')">
+      <source type="image/webp" [srcset]="getStaticImageUrl('/about/study.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl('/about/study.png')">
       <img [src]="getStaticImageUrl('/about/study.jpg')" class="about-study-image" alt="">
     </div>
     <div class="oppia-about-page-section-one-left">
@@ -10,7 +10,7 @@
       <p class="oppia-about-content" [innerHTML]="'I18N_ABOUT_PAGE_SEC_ONE_CONTENT' | translate"></p>
       <div class="oppia-about-button-container">
         <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" (click)="goToClassroomPage()"
+          <button type="submit" (click)="onClickVisitClassroomButton()"
                   class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
                   [innerHTML]="'I18N_ACTION_VISIT_CLASSROOM' | translate" >
           </button>
@@ -26,30 +26,30 @@
     <div class="oppia-about-icons">
       <div class="oppia-about-icon-1-container">
         <img [src]="getStaticImageUrl('/about/cc.svg')" alt="" class="oppia-splash-icon-1">
-        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_ICON_ONE_TEXT' | translate"></span>
+        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_PAGE_ICON_ONE_TEXT' | translate"></span>
       </div>
       <div class="oppia-about-icon-2-container">
         <img [src]="getStaticImageUrl('/about/lessonIcon.svg')" alt="" class="oppia-splash-icon-2">
-        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_ICON_TWO_TEXT' | translate"></span>
+        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_PAGE_ICON_TWO_TEXT' | translate"></span>
       </div>
       <div class="oppia-about-icon-3-container">
         <img [src]="getStaticImageUrl('/about/mobile-alt-solid.svg')" alt="" class="oppia-splash-icon-3">
-        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_ICON_THREE_TEXT' | translate"></span>
+        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_PAGE_ICON_THREE_TEXT' | translate"></span>
       </div>
       <div class="oppia-about-icon-4-container">
         <img [src]="getStaticImageUrl('/about/wifi-solid.svg')" alt="" class="oppia-splash-icon-4">
-        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_ICON_FOUR_TEXT' | translate"></span>
+        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_PAGE_ICON_FOUR_TEXT' | translate"></span>
       </div>
       <div class="oppia-about-icon-5-container">
         <img [src]="getStaticImageUrl('/about/languageIcon.svg')" alt="" class="oppia-splash-icon-5">
-        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_ICON_FIVE_TEXT' | translate"></span>
+        <span class="about-icon-text" [innerHTML]="'I18N_ABOUT_PAGE_ICON_FIVE_TEXT' | translate"></span>
       </div>
     </div>
   </div>
   <div class="oppia-about-page-section-three">
     <div class="oppia-about-section-three-image">
-      <source type="image/webp" [src]="getStaticImageUrl('/about/graph1.webp')">
-      <source type="image/jpeg" [src]="getStaticImageUrl('/about/graph1.jpeg')">
+      <source type="image/webp" [srcset]="getStaticImageUrl('/about/graph1.webp')">
+      <source type="image/jpeg" [srcset]="getStaticImageUrl('/about/graph1.jpeg')">
       <img [src]="getStaticImageUrl('/about/graph1.png')" class="about-graph-image" alt="">
     </div>
     <div class="oppia-about-section-three-left">
@@ -59,8 +59,8 @@
   </div>
   <div class="oppia-about-page-section-four" ng-style="{'background-image': '<[$ctrl.getCommunityBackgroundUrl()]>'}">
     <div class="about-page-image-container">
-      <source type="image/webp" [src]="getStaticImageUrl('/about/testimg.webp')">
-      <source type="image/jpeg" [src]="getStaticImageUrl('/about/testimg.jpeg')">
+      <source type="image/webp" [srcset]="getStaticImageUrl('/about/testimg.webp')">
+      <source type="image/jpeg" [srcset]="getStaticImageUrl('/about/testimg.jpeg')">
       <img [src]="getStaticImageUrl('/about/testimg.png')" class="about-study-image" alt="">
     </div>
     <div class="oppia-about-section-four-left">
@@ -68,7 +68,7 @@
       <p class="oppia-about-learn-content" [innerHTML]="'I18N_ABOUT_PAGE_LEARN_FROM_CONTENT' | translate"></p>
       <div class="oppia-about-classroom-button-container">
         <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" (click)="goToClassroomPage()"
+          <button type="submit" (click)="onClickVisitClassroomButton()"
                   class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
                   [innerHTML]="'I18N_ACTION_VISIT_CLASSROOM' | translate">
           </button>
@@ -78,8 +78,8 @@
   </div>
   <div class="oppia-about-page-section-five">
     <div class="about-page-image-container">
-      <source type="image/webp" [src]="getStaticImageUrl('/about/lesson.webp')">
-      <source type="image/jpeg" [src]="getStaticImageUrl('/about/lesson.jpeg')">
+      <source type="image/webp" [srcset]="getStaticImageUrl('/about/lesson.webp')">
+      <source type="image/jpeg" [srcset]="getStaticImageUrl('/about/lesson.jpeg')">
       <img [src]="getStaticImageUrl('/about/lesson.png')" class="about-lesson-image" alt="">
     </div>
     <div class="oppia-about-section-five-left">
@@ -87,7 +87,7 @@
       <p class="oppia-about-explore-lesson-content" [innerHTML]="'I18N_ABOUT_PAGE_EXPLORE_LESSONS_CONTENT' | translate"></p>
       <div class="oppia-about-classroom-button-container">
         <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" (click)="goToClassroomPage()"
+          <button type="submit" (click)="onClickBrowseLibraryButton()"
                   class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
                   [innerHTML]="'I18N_ACTION_BROWSE_LIBRARY' | translate">
           </button>
@@ -97,8 +97,8 @@
   </div>
   <div class="oppia-about-page-section-six" ng-style="{'background-image': '<[$ctrl.getCommunityBackgroundUrl()]>'}">
     <div class="oppia-about-section-six-image-left">
-      <source type="image/webp" [src]="getStaticImageUrl('/about/books_dsk.webp')">
-      <source type="image/jpeg" [src]="getStaticImageUrl('/about/books_dsk.jpeg')">
+      <source type="image/webp" [srcset]="getStaticImageUrl('/about/books_dsk.webp')">
+      <source type="image/jpeg" [srcset]="getStaticImageUrl('/about/books_dsk.jpeg')">
       <img [src]="getStaticImageUrl('/about/books_dsk.png')" class="about-study-image" alt="">
     </div>
     <div class="oppia-about-section-six-right">
@@ -106,15 +106,10 @@
       <p class="oppia-about-outcome-content" [innerHTML]="'I18N_ABOUT_PAGE_CREATE_LESSON_CONTENT' | translate"></p>
       <div class="oppia-about-classroom-button-container">
         <form action="<[$ctrl.classroomUrl]>">
-          <button type="submit" (click)="goToCreatePage()"
-                  ng-click="$ctrl.onRedirectToLogin('/creator-dashboard?mode=create')" ng-if="$ctrl.userIsLoggedIn === false"
+          <button type="submit" (click)="onClickCreateLessonButton()"
                   class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
                   [innerHTML]="'I18N_ACTION_CREATE_LESSON_BUTTON' | translate">
           </button>
-          <!--<button class="btn nav-link oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
-            ng-click="$ctrl.initCreationProcess()" ng-disabled="$ctrl.creationInProgress" ng-if="$ctrl.userIsLoggedIn">
-            <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_CREATE"></span>
-          </button>-->
         </form>
       </div>
     </div>
@@ -122,16 +117,16 @@
   <div class="oppia-about-page-section-seven">
     <h2 class="get-started-title" [innerHTML]="'I18N_ABOUT_PAGE_SEC_SEVEN_TITLE' | translate"></h2>
     <div class="oppia-about-classroom-button-container-one">
-      <form action="https://www.oppiafoundation.org/volunteer">
-        <button type="submit"
+      <form action="<[$ctrl.classroomUrl]>">
+        <button type="submit" (click)="onClickGuideForTeacherButton()"
                 class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
                 [innerHTML]="'I18N_ACTION_GUIDE_FOR_TECHERS' | translate">
         </button>
       </form>
     </div>
     <div class="oppia-about-classroom-button-container-two">
-      <form action="https://www.oppiafoundation.org/volunteer">
-        <button type="submit"
+      <form action="<[$ctrl.classroomUrl]>">
+        <button type="submit" (click)="onClickTipsForParentsButton()"
                 class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
                 [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
         </button>
@@ -139,7 +134,7 @@
     </div>
     <div class="oppia-about-classroom-button-container-three">
       <form action="<[$ctrl.classroomUrl]>">
-        <button type="submit" (click)="goToClassroomPage()"
+        <button type="submit" (click)="onClickVisitClassroomButton()"
                 class="btn oppia-about-button oppia-about-button-browse oppia-about-browse-button-position oppia-transition-200"
                 [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
         </button>
@@ -160,20 +155,20 @@
     padding-top: 0;
   }
   .oppia-about-page-section-one .oppia-about-page-section-one-right {
-    background-color: #F4F4F4;
+    background-color: #f9f9f9;
     float: right;
     margin-right: auto;
   }
   .oppia-about-page-section-one .oppia-about-title {
     color: #094142;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 30px;
+    font-family: "Capriola", Arial, sans-serif;
+    font-size: 35px;
     margin-left: 10vh;
     padding-top: 20vh;
   }
   .oppia-about-page-section-one .oppia-about-content {
     color: #010808;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
     font-size: 15px;
     margin-left: 10vh;
     max-width: 30vw;
@@ -199,14 +194,14 @@
   }
   .oppia-about-page-section-two .oppia-about-title {
     color: black;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Capriola", Arial, sans-serif;
     font-size: 30px;
     padding-top: 10vh;
     text-align: center;
   }
   .oppia-about-page-section-two .oppia-about-content {
     color: #010808;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
     font-size: 15px;
     margin-bottom: 5vw;
     margin-left: 10vh;
@@ -224,30 +219,31 @@
 }
 .oppia-about-page-section-two .oppia-about-icon-1-container {
     float: left;
-    margin-left: auto;
-    width: 10vw;
+    margin-left: 5vw;
+    width: 8vw;
   }
   .oppia-about-page-section-two .oppia-about-icon-2-container {
     float: left;
     margin-left: 12vw;
-    width: 10vw;
+    width: 8vw;
   }
   .oppia-about-page-section-two .oppia-about-icon-3-container {
     float: left;
     margin-left: 12vw;
-    width: 10vw;
+    width: 8vw;
   }
   .oppia-about-page-section-two .oppia-about-icon-4-container {
     float: left;
     margin-left: 12vw;
-    width: 10vw;
+    width: 8vw;
   }
   .oppia-about-page-section-two .oppia-about-icon-5-container {
     display: block;
     float: right;
     margin-left: 10vw;
+    margin-right: 5vw;
     padding-right: auto;
-    width: 10vw;
+    width: 8vw;
   }
   .oppia-about-page-section-two .oppia-splash-icon-1,
   .oppia-about-page-section-two .oppia-splash-icon-3,
@@ -256,7 +252,7 @@
     width: 3vh;
   }
   .oppia-about-page-section-three {
-    background-color: #00645C;
+    background-color: #048a7f;
     clear: both;
     height: 50vh;
     margin: 0 auto;
@@ -264,14 +260,14 @@
   }
   .oppia-about-page-section-three .oppia-about-outcome-title {
     color: #eaf3f3;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Capriola", Arial, sans-serif;
     font-size: 2.1em;
     margin-left: 10vh;
-    padding-top: 20vh;
+    padding-top: 15vh;
   }
   .oppia-about-page-section-three .oppia-about-outcome-content {
     color: #eaf3f3;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
     font-size: 1em;
     margin-left: 10vh;
     padding-top: 2vh;
@@ -285,28 +281,28 @@
   .oppia-about-page-section-three .about-graph-image {
     float: right;
     height: 50vh;
-    padding: 10vh;
-    width: 40%;
+    padding: 5vh 10vh;
+    width: 45%;
   }
   .oppia-about-page-section-four {
     clear: both;
-    height: 50vh;
+    height: 60vh;
     margin: 0 auto;
     max-width: 100%;
   }
   .oppia-about-page-section-four .oppia-about-learn-title {
     color: #0f0f0f;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Capriola", Arial, sans-serif;
     font-size: 30px;
     margin-left: 10vh;
-    padding-top: 20vh;
+    padding-top: 23vh;
   }
   .oppia-about-page-section-four .oppia-about-page-section-four-left {
     width: 45vw;
   }
   .oppia-about-page-section-four .oppia-about-learn-content {
     color: #121313;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
     font-size: 15px;
     margin-left: 10vh;
     padding-top: 2vh;
@@ -319,9 +315,10 @@
   }
   .oppia-about-page-section-four .about-study-image {
     float: right;
-    height: 50vh;
+    height: 60vh;
     padding: 5vh;
-    width: 40%;
+    padding-top: 20vh;
+    width: 45%;
   }
   .oppia-about-page-section-four .oppia-about-classroom-button-container {
     float: left;
@@ -341,14 +338,14 @@
   }
   .oppia-about-page-section-five .oppia-about-explore-lesson-title {
     color: #0f0f0f;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Capriola", Arial, sans-serif;
     font-size: 30px;
     margin-left: 10vh;
-    padding-top: 20vh;
+    padding-top: 15vh;
   }
   .oppia-about-page-section-five .oppia-about-explore-lesson-content {
     color: #121313;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
     font-size: 15px;
     margin-left: 10vh;
     padding-top: 2vh;
@@ -363,7 +360,7 @@
     float: right;
     height: 50vh;
     padding: 5vw;
-    width: 40%;
+    width: 45%;
   }
   .oppia-about-page-section-five .oppia-about-classroom-button-container {
     float: left;
@@ -374,7 +371,7 @@
     background-color: white;
     clear: both;
     margin: 0 auto;
-    max-height: 50vh;
+    max-height: 60vh;
     max-width: 100%;
   }
   .oppia-about-page-section-six .oppia-about-section-six-left {
@@ -382,14 +379,14 @@
   }
   .oppia-about-page-section-six .oppia-about-outcome-title {
     color: #0f0f0f;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Capriola", Arial, sans-serif;
     font-size: 30px;
     margin-left: 50vw;
-    padding-top: 20vh;
+    padding-top: 22vh;
   }
   .oppia-about-page-section-six .oppia-about-outcome-content {
     color: #121313;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
     font-size: 15px;
     margin-left: 50vw;
     padding-top: 2vh;
@@ -403,8 +400,9 @@
   }
   .oppia-about-page-section-six .about-study-image {
     float: left;
-    height: 50vh;
+    height: 60vh;
     padding: 5vh;
+    padding-top: 15vh;
   }
   .oppia-about-section-six-right .oppia-about-classroom-button-container {
     margin-left: 50vw;
@@ -491,16 +489,20 @@
       height: auto;
       max-height: fit-content;
     }
-    .oppia-about-page-section-three,
-    .oppia-about-page-section-four,
+    .oppia-about-page-section-three {
+      height: 70vh;
+    }
     .oppia-about-page-section-five,
     .oppia-about-page-section-six,
     .oppia-about-page-section-seven {
       display: inherit;
-      height: 85vh;
+      height: 75vh;
       max-height: fit-content;
     }
     .oppia-about-page-section-five {
+      height: 85vh;
+    }
+    .oppia-about-page-section-four {
       height: 90vh;
     }
     .oppia-about-page-section-two {
@@ -535,10 +537,14 @@
       width: 100%;
     }
     .oppia-about-page-section-one .oppia-about-title {
+      font-size: 30px;
+      margin-left: 0vh;
+      max-width: 100%;
       padding-top: 2vh;
       text-align: center;
     }
     .oppia-about-page-section-one .oppia-about-content {
+      font-size: 15px;
       margin-left: 0vh;
       max-width: 100%;
       text-align: center;
@@ -553,20 +559,30 @@
       width: 100%;
     }
     .oppia-about-page-section-two .oppia-about-title {
+      font-size: 25px;
       padding-top: 5vh;
     }
     .oppia-about-page-section-two .oppia-about-content {
+      font-size: 15px;
       margin-left: 2vh;
       margin-right: 2vh;
     }
-    .oppia-about-page-section-two .oppia-about-icon-5-container {
-      margin-right: 2vw;
+    .about-page .about-icon-text {
+      font-size: 12px;
+    }
+    .oppia-about-icon-2-container .about-icon-text,
+    .oppia-about-icon-3-container .about-icon-text,
+    .oppia-about-icon-4-container .about-icon-text {
+      margin-left: -1vw;
     }
     .oppia-about-icon-5-container .about-icon-text {
-      margin-left: -3vw;
+      margin-left: -6vw;
     }
     .oppia-about-page-section-two .oppia-about-icon-1-container {
-      margin-left: 1vw;
+      margin-left: 4vw;
+    }
+    .oppia-about-page-section-two .oppia-about-icon-5-container {
+      margin-right: 5vw;
     }
     .oppia-about-page-section-two .oppia-splash-icon-1,
     .oppia-about-page-section-two .oppia-splash-icon-3,
@@ -578,7 +594,7 @@
       background-color: #00645C;
     }
     .oppia-about-page-section-three .about-graph-image {
-      height: 50vh;
+      height: 40vh;
       padding-bottom: 6vh;
       padding-left: 6vh;
       padding-right: 6vh;
@@ -586,12 +602,14 @@
       width: 100%;
     }
     .oppia-about-section-three-left .oppia-about-outcome-title {
+      font-size: 25px;
       margin-left: auto;
       padding-top: -10vh;
       text-align: center;
       width: 100%;
     }
     .oppia-about-section-three-left .oppia-about-outcome-content {
+      font-size: 15px;
       margin-left: 0;
       padding: 2vh 10vh 10vh;
       width: 100%;
@@ -603,18 +621,24 @@
     .about-page .about-background {
       background-image: url(/assets/images/splash/m_community_background.png);
     }
+    .oppia-about-section-four-left .oppia-about-classroom-button-container {
+      padding-bottom: 4vh;
+      text-align: center;
+    }
     .oppia-about-section-four-left .oppia-about-classroom-button-container,
     .oppia-about-section-five-left .oppia-about-classroom-button-container,
     .oppia-about-section-six-right .oppia-about-classroom-button-container {
       align-content: center;
       margin: 0px;
       padding-bottom: 20px;
-      padding-left: 100px;
+      /*padding-left: 100px;*/
       padding-top: 2vw;
+      text-align: center;
       width: 100%;
     }
     .oppia-about-page-section-four .about-study-image {
       height: 45vh;
+      margin-top: 6vh;
       padding-bottom: 2vh;
       padding-left: 10vw;
       padding-right: 10vw;
@@ -632,13 +656,14 @@
       width: 100%;
     }
     .oppia-about-page-section-five .about-lesson-image {
-      height: 40vh;
+      height: 35vh;
       padding-bottom: 2vh;
-      padding-left: 10vh;
-      padding-right: 10vh;
+      padding-left: 5vh;
+      padding-right: 5vh;
       width: 100%;
     }
     .oppia-about-section-five-left .oppia-about-explore-lesson-title {
+      font-size: 25px;
       margin-left: auto;
       padding-top: -10vh;
       text-align: center;
@@ -655,11 +680,12 @@
     .oppia-about-page-section-six .about-study-image {
       height: 45vh;
       padding-bottom: 2vh;
-      padding-left: 10vh;
-      padding-right: 10vh;
+      padding-left: 5vh;
+      padding-right: 5vh;
       width: 100%;
     }
     .oppia-about-section-six-right .oppia-about-outcome-title {
+      font-size: 25px;
       margin-left: 0;
       padding-top: -10vh;
       text-align: center;
