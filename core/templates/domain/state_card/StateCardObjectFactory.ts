@@ -74,6 +74,7 @@ export class StateCard {
     this.audioTranslationLanguageService = audioTranslationLanguageService;
   }
 
+  // Restore everything immutably so that Angular can detect changes.
   restoreImmutable(stateCard: StateCard): void {
     Object.assign(this, stateCard);
   }

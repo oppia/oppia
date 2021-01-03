@@ -20,6 +20,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -41,6 +43,7 @@ describe('Content translation manager service', () => {
   let pts: PlayerTranscriptService;
   let scof: StateCardObjectFactory;
   let suof: SubtitledUnicodeObjectFactory;
+  let rvof: RecordedVoiceoversObjectFactory;
   let wtof: WrittenTranslationsObjectFactory;
 
   beforeEach(() => {
@@ -50,6 +53,7 @@ describe('Content translation manager service', () => {
     pts = TestBed.get(PlayerTranscriptService);
     scof = TestBed.get(StateCardObjectFactory);
     suof = TestBed.get(SubtitledUnicodeObjectFactory);
+    rvof = TestBed.get(RecordedVoiceoversObjectFactory);
     wtof = TestBed.get(WrittenTranslationsObjectFactory);
 
     let defaultOutcomeDict = {
@@ -171,7 +175,7 @@ describe('Content translation manager service', () => {
         ehfs.getInteractionHtml(
           interaction.id, interaction.customizationArgs, true, null),
         interaction,
-        null,
+        rvof.createEmpty(),
         writtenTranslations,
         'content'
       )
@@ -275,8 +279,10 @@ describe('Content translation manager service', () => {
 
   describe('with custom INTERACTION_SPECS cases', () => {
     beforeAll(() => {
-      // This throws a type error.
-      // @ts-ignore
+      // This throws a "Property 'DummyInteraction' does not exist on type"
+      // error.
+      // @ts-expect-error
+      delete INTERACTION_SPECS.DummyInteraction;
       INTERACTION_SPECS.DummyInteraction = {
         customization_arg_specs: [{
           name: 'dummyCustArg',
@@ -303,8 +309,9 @@ describe('Content translation manager service', () => {
     });
 
     afterAll(() => {
-      // This throws a type error.
-      // @ts-ignore
+      // This throws a "Property 'DummyInteraction' does not exist on type"
+      // error.
+      // @ts-expect-error
       delete INTERACTION_SPECS.DummyInteraction;
     });
 

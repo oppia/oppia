@@ -47,7 +47,7 @@ export class RecordedVoiceovers {
     this._voiceoverObjectFactory = voiceoverObjectFactory;
   }
 
-  getAllContentId(): string[] {
+  getAllContentIds(): string[] {
     return Object.keys(this.voiceoversMapping);
   }
 

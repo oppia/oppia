@@ -38,7 +38,7 @@ export class ContentTranslationLanguageService {
 
   _currentContentLanguageCode: string = null;
   _explorationLanguageCode: string = null;
-  _languagesInExploration: ExplorationLanguageInfo[] = [];
+  _languageOptions: ExplorationLanguageInfo[] = [];
 
   _init(
       allContentLanguageCodesInExploration: string[],
@@ -48,7 +48,7 @@ export class ContentTranslationLanguageService {
   ): void {
     this._currentContentLanguageCode = null;
     this._explorationLanguageCode = explorationLanguageCode;
-    this._languagesInExploration = [];
+    this._languageOptions = [];
     // Set the content language that is chosen initially.
     // Use the following priority (highest to lowest):
     // 1. Preferred content languages.
@@ -84,7 +84,7 @@ export class ContentTranslationLanguageService {
         let languageDescription =
             this.languageUtilService.getContentLanguageDescription(
               languageCode);
-        this._languagesInExploration.push({
+        this._languageOptions.push({
           value: languageCode,
           displayed: languageDescription
         });
@@ -116,7 +116,7 @@ export class ContentTranslationLanguageService {
    * the exploration.
    */
   getLanguageOptionsForDropdown(): ExplorationLanguageInfo[] {
-    return this._languagesInExploration;
+    return this._languageOptions;
   }
 
   /**

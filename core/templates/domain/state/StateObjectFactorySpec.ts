@@ -78,7 +78,8 @@ describe('State Object Factory', () => {
         translations_mapping: {
           content: {},
           default_outcome: {},
-          hint_1: {}
+          hint_1: {},
+          rule_input_2: {}
         }
       }
     });
@@ -131,7 +132,8 @@ describe('State Object Factory', () => {
         translations_mapping: {
           content: {},
           default_outcome: {},
-          hint_1: {}
+          hint_1: {},
+          rule_input_2: {}
         }
       }
     };
@@ -191,29 +193,23 @@ describe('State Object Factory', () => {
     expect(stateObjectDefault.name).toEqual('Other state');
   });
 
-  it('should correctly get total required written translations count', () => {
+  it('should correctly get required written translation content ids', () => {
     const state = sof.createFromBackendDict('State name', stateObject);
     state.interaction.id = null;
-    // The required written translations count is 1 (content).
-    // default_outcome and hints do not count because the interaction id is
-    // null.
     expect(
-      state.getRequiredWrittenTranslationsCount()
-    ).toBe(1);
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content']));
 
     state.writtenTranslations.addContentId('feedback_1');
     state.writtenTranslations.addWrittenTranslation(
       'feedback_1', 'fr', 'html', '<p>Translation</p>');
-    // The required written translations count is 2 (content, feedback).
     expect(
-      state.getRequiredWrittenTranslationsCount()
-    ).toBe(2);
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content', 'feedback_1']));
 
     state.interaction.id = 'TextInput';
-    // The required written translations count is 2 (content, feedback, hint,
-    // default_outcome).
     expect(
-      state.getRequiredWrittenTranslationsCount()
-    ).toBe(4);
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content', 'feedback_1', 'hint_1', 'default_outcome']));
   });
 });

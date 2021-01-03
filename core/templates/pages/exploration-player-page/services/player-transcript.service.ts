@@ -44,6 +44,9 @@ export class PlayerTranscriptService {
   transcript: StateCard[] = [];
   numAnswersSubmitted = 0;
 
+  // The 'originalTranscript' represents the transcript in the exploration
+  // language, while the 'transcript' represents the displayed transcript, which
+  // will be in the currently selected language.
   private originalTranscript: StateCard[] = [];
 
   restore(oldTranscript: StateCard[]): void {

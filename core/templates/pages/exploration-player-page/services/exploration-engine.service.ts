@@ -281,7 +281,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
           explorationDict);
         answerIsBeingProcessed = false;
         ContentTranslationLanguageService.init(
-          exploration.getWrittenTranslationLanguageCodesReadyForDisplay(),
+          exploration.getDisplayableWrittenTranslationLanguageCodes(),
           preferredContentLanguageCodes,
           preferredSiteLanguageCode,
           exploration.getLanguageCode()

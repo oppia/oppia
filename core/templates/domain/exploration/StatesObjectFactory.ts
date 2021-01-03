@@ -46,6 +46,18 @@ export interface WrittenTranslationObjectsDict {
   [state: string]: WrittenTranslation[];
 }
 
+const MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5;
+
+// TODO(#11581) Add rule translation support for TextInput and SetInput
+// interactions. The array below should be emptied or removed afterwards.
+const INTERACTIONS_THAT_ARE_CURRENTLY_UNTRANSLATABLE = [
+  'TextInput', 'SetInput'];
+
+const WRITTEN_TRANSLATIONS_KEY = 'writtenTranslations';
+const RECORDED_VOICEOVERS_KEY = 'recordedVoiceovers';
+type TranslationType = (
+  typeof WRITTEN_TRANSLATIONS_KEY | typeof RECORDED_VOICEOVERS_KEY);
+
 export class States {
   constructor(
     private _stateObject: StateObjectFactory,
@@ -126,12 +138,10 @@ export class States {
     return finalStateNames;
   }
 
-  _getAllLanguageCodesFor(
-      translationType: 'recordedVoiceovers' | 'writtenTranslations'
-  ) : string[] {
+  _getAllLanguageCodesFor(translationType: TranslationType) : string[] {
     const allLanguageCodes = new Set<string>();
     Object.values(this._states).forEach(state => {
-      state[translationType].getAllContentId().forEach(contentId => {
+      state[translationType].getAllContentIds().forEach(contentId => {
         const contentLanguageCodes = (
           state[translationType].getLanguageCodes(contentId));
         contentLanguageCodes.forEach(
@@ -143,11 +153,11 @@ export class States {
   }
 
   getAllVoiceoverLanguageCodes(): string[] {
-    return this._getAllLanguageCodesFor('recordedVoiceovers');
+    return this._getAllLanguageCodesFor(RECORDED_VOICEOVERS_KEY);
   }
 
   getAllWrittenTranslationLanguageCodes(): string[] {
-    return this._getAllLanguageCodesFor('writtenTranslations');
+    return this._getAllLanguageCodesFor(WRITTEN_TRANSLATIONS_KEY);
   }
 
   getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
@@ -155,7 +165,7 @@ export class States {
     for (var stateName in this._states) {
       var state = this._states[stateName];
       allAudioTranslations[stateName] = [];
-      var contentIdsList = state.recordedVoiceovers.getAllContentId();
+      var contentIdsList = state.recordedVoiceovers.getAllContentIds();
       contentIdsList.forEach(function(contentId) {
         var audioTranslations = (
           state.recordedVoiceovers.getBindableVoiceovers(contentId));
@@ -168,31 +178,52 @@ export class States {
     return allAudioTranslations;
   }
 
-  getTotalRequiredWrittenTranslationsCount(): number {
-    let total = 0;
-    Object.values(this._states).forEach(
-      state => total += state.getRequiredWrittenTranslationsCount());
-    return total;
-  }
+  getIsReadyToDisplayWrittenTranslations(languageCode: string): boolean {
+    // A language's translations are ready to be displayed if there are less
+    // than five missing or update-needed translations.
+    let translationsNeedingUpdate = 0;
+    let translationsMissing = 0;
 
-  getAllWrittenTranslations(
-      languageCode: string
-  ): WrittenTranslationObjectsDict {
-    const allWrittenTranslations = {};
     for (const stateName in this._states) {
       const state = this._states[stateName];
-      allWrittenTranslations[stateName] = [];
-      const contentIdsList = state.writtenTranslations.getAllContentId();
-      contentIdsList.forEach(contentId => {
+
+      // If there are any TextInput or SetInput interactions, disable switching
+      // languages.
+      if (
+        INTERACTIONS_THAT_ARE_CURRENTLY_UNTRANSLATABLE.includes(
+          state.interaction.id)
+      ) {
+        return false;
+      }
+
+      const requiredContentIds = (
+        state.getRequiredWrittenTranslationContentIds());
+
+      const contentIds = state.writtenTranslations.getAllContentIds();
+      for (const contentId of contentIds) {
+        if (!requiredContentIds.has(contentId)) {
+          continue;
+        }
+
         const writtenTranslation = (
           state.writtenTranslations.getWrittenTranslation(
             contentId, languageCode));
-        if (writtenTranslation !== undefined) {
-          allWrittenTranslations[stateName].push(writtenTranslation);
+        if (writtenTranslation === undefined) {
+          translationsMissing += 1;
+        } else if (writtenTranslation.needsUpdate) {
+          translationsNeedingUpdate += 1;
         }
-      });
+
+        if (
+          translationsMissing + translationsNeedingUpdate >
+          MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS
+        ) {
+          return false;
+        }
+      }
     }
-    return allWrittenTranslations;
+
+    return true;
   }
 }
 

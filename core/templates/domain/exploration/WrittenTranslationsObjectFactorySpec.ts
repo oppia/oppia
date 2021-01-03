@@ -65,29 +65,29 @@ describe('Written Translations Object Factory', () => {
   it('should create an empty written translations object', () => {
     const emptyWrittenTranslationsObject = (
       writtenTranslationsObjectFactory.createEmpty());
-    expect(emptyWrittenTranslationsObject.getAllContentId()).toEqual([]);
+    expect(emptyWrittenTranslationsObject.getAllContentIds()).toEqual([]);
   });
 
   it('should add and delete contents from a written translations object',
     () => {
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      expect(writtenTranslationsBackendDict.getAllContentIds()).toEqual([
         'content_1']);
       writtenTranslationsBackendDict.addContentId('content_2');
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      expect(writtenTranslationsBackendDict.getAllContentIds()).toEqual([
         'content_1', 'content_2']);
       expect(() => {
         writtenTranslationsBackendDict.addContentId('content_2');
       }).toThrowError('Trying to add duplicate content id.');
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      expect(writtenTranslationsBackendDict.getAllContentIds()).toEqual([
         'content_1', 'content_2']);
 
       writtenTranslationsBackendDict.deleteContentId('content_2');
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      expect(writtenTranslationsBackendDict.getAllContentIds()).toEqual([
         'content_1']);
       expect(() => {
         writtenTranslationsBackendDict.deleteContentId('content_2');
       }).toThrowError('Unable to find the given content id.');
-      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+      expect(writtenTranslationsBackendDict.getAllContentIds()).toEqual([
         'content_1']);
     });
 

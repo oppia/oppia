@@ -143,13 +143,13 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                   result.workedExampleQuestionHtml,
                   GenerateContentIdService.getNextId(
                     $scope.skill.getConceptCard().getRecordedVoiceovers(
-                    ).getAllContentId(),
+                    ).getAllContentIds(),
                     COMPONENT_NAME_WORKED_EXAMPLE.QUESTION)),
                 SubtitledHtmlObjectFactory.createDefault(
                   result.workedExampleExplanationHtml,
                   GenerateContentIdService.getNextId(
                     $scope.skill.getConceptCard().getRecordedVoiceovers(
-                    ).getAllContentId(),
+                    ).getAllContentIds(),
                     COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION))
               );
               SkillUpdateService.addWorkedExample(

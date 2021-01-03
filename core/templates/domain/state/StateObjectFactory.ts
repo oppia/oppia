@@ -112,38 +112,40 @@ export class State {
     this.nextContentIdIndex = otherState.nextContentIdIndex;
   }
 
-  getRequiredWrittenTranslationsCount(): number {
+  getRequiredWrittenTranslationContentIds(): Set<string> {
     let interactionId = this.interaction.id;
-    const contentIdsToRemove = [];
 
-    let allContentIds = this.writtenTranslations.getAllContentId();
+    let allContentIds = new Set(this.writtenTranslations.getAllContentIds());
 
     // As of now we do not delete interaction.hints when a user deletes
-    // interaction, so these hints audio are not counted in checking
-    // status of a state.
+    // interaction, so these hints written translations are not counted in
+    // checking status of a state.
     if (!interactionId ||
       INTERACTION_SPECS[interactionId].is_linear ||
       INTERACTION_SPECS[interactionId].is_terminal) {
-      const hintContentIds = allContentIds.filter(
-        contentId => contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0);
-      contentIdsToRemove.push(...hintContentIds);
+      allContentIds.forEach(contentId => {
+        if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {
+          // eslint-disable-next-line dot-notation
+          allContentIds.delete(contentId);
+        }
+      });
       // Excluding default_outcome content status as default outcome's
       // content is left empty so the translation or voiceover is not
       // required.
-      contentIdsToRemove.push('default_outcome');
+      // eslint-disable-next-line dot-notation
+      allContentIds.delete('default_outcome');
     }
 
-    // As of now, there are no ways of contributing rule input
-    // translations.
-    const ruleContentIds = allContentIds.filter(
-      contentId => contentId.indexOf(
-        AppConstants.COMPONENT_NAME_RULE_INPUT) === 0);
-    contentIdsToRemove.push(...ruleContentIds);
+    // TODO(#11581) Add rule translation support for TextInput and SetInput
+    // interactions. Delete below when completed.
+    allContentIds.forEach(contentId => {
+      if (contentId.indexOf(AppConstants.COMPONENT_NAME_RULE_INPUT) === 0) {
+        // eslint-disable-next-line dot-notation
+        allContentIds.delete(contentId);
+      }
+    });
 
-    allContentIds = allContentIds.filter(
-      contentId => !contentIdsToRemove.includes(contentId));
-
-    return allContentIds.length;
+    return allContentIds;
   }
 }
 

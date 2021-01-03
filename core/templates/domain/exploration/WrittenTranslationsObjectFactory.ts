@@ -51,7 +51,7 @@ export class WrittenTranslations {
     this._writtenTranslationObjectFactory = writtenTranslationObjectFactory;
   }
 
-  getAllContentId(): string[] {
+  getAllContentIds(): string[] {
     return Object.keys(this.translationsMapping);
   }
 

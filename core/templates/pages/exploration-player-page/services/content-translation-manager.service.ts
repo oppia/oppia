@@ -59,6 +59,14 @@ export class ContentTranslationManagerService {
     return this._onStateCardContentUpdateEmitter;
   }
 
+  /**
+   * This method replaces the translatable content inside the player transcript
+   * service's StateCards. If the language code is set back to the original
+   * exploration language, the original transcript in the exploration language
+   * is restored, since it was previously modified from switching to another
+   * language previously.
+   * @param {string} languageCode The language code to display translations for.
+   */
   displayTranslations(languageCode: string) : void {
     const cards = this.playerTranscriptService.transcript;
 
@@ -68,17 +76,6 @@ export class ContentTranslationManagerService {
       cards.forEach(
         card => this._displayTranslationsForCard(card, languageCode));
     }
-
-    cards.forEach(card => {
-      // Because we do not have a mapping of the learner's input and Oppia's
-      // response to the content from which it originates from, we cannot
-      // easily swap them with translated values. Instead, we opt to clear
-      // the responses.
-      card.getInputResponsePairs().splice(
-        0, card.getInputResponsePairs().length);
-      // Mark card as uncompleted because we clear response pairs.
-      card.markAsNotCompleted();
-    });
 
     this._onStateCardContentUpdateEmitter.emit();
   }

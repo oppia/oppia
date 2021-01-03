@@ -220,52 +220,15 @@ export class Exploration {
     return this.states.getAllVoiceoverLanguageCodes();
   }
 
-  getWrittenTranslationLanguageCodesReadyForDisplay(): string[] {
-    // If there are any TextInput or SetInput interactions, disable switching
-    // languages.
-    if (
-      Object.values(this.states.getStateObjects())
-        .map(state => state.interaction.id)
-        .some(interactionId => ['TextInput', 'SetInput'].includes(
-          interactionId))
-    ) {
-      return [];
-    }
-
+  getDisplayableWrittenTranslationLanguageCodes(): string[] {
     // A language's translations are ready to be displayed if there are less
     // than five missing or update-needed translations.
     const allLanguageCodes = (
       this.states.getAllWrittenTranslationLanguageCodes());
-    const languageCodesReadyForDisplay = [];
 
-    allLanguageCodes.forEach(languageCode => {
-      // Count how many translations are missing or needing update.
-      let translationsNeedingUpdate = 0;
-      let translationsMissing = 0;
-      const stateToWrittenTranslations = this.states.getAllWrittenTranslations(
-        languageCode);
-
-      const numOfWrittenTranslationsNeeded = (
-        this.states.getTotalRequiredWrittenTranslationsCount());
-
-      let availableWrittenTranslations = 0;
-      Object.values(stateToWrittenTranslations).forEach(
-        writtenTranslations => {
-          writtenTranslations.forEach(writtenTranslation => {
-            availableWrittenTranslations += 1;
-            if (writtenTranslation.needsUpdate) {
-              translationsNeedingUpdate += 1;
-            }
-          });
-        });
-
-      translationsMissing = (
-        numOfWrittenTranslationsNeeded - availableWrittenTranslations);
-
-      if (translationsMissing + translationsNeedingUpdate < 5) {
-        languageCodesReadyForDisplay.push(languageCode);
-      }
-    });
+    const languageCodesReadyForDisplay = allLanguageCodes.filter(
+      languageCode => this.states.getIsReadyToDisplayWrittenTranslations(
+        languageCode));
 
     return languageCodesReadyForDisplay;
   }
