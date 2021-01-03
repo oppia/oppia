@@ -66,8 +66,8 @@ export class SkillEditorStateService {
 
   private _setSkill = (skill: Skill) => {
     this._skill.copyFromSkill(skill);
-    this._skillChangedEventEmitter.emit();
     this._skillIsInitialized = true;
+    this._skillChangedEventEmitter.emit();
   };
 
   private _updateSkill = (skill: Skill) => {
