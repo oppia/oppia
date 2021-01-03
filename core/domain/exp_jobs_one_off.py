@@ -199,7 +199,8 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
         while states_schema_version < current_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
-                    versioned_exploration_states, states_schema_version,
+                    versioned_exploration_states,
+                    states_schema_version,
                     item.id)
                 states_schema_version += 1
             except Exception as e:
