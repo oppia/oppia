@@ -1925,7 +1925,8 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
         if not modnode.name.endswith('_test'):
             function_name = node.name
             if function_name.startswith('test_only'):
-                self.add_message('non-test-files-function-name-checker', node=node)
+                self.add_message(
+                    'non-test-files-function-name-checker', node=node)
 
 
 def register(linter):
