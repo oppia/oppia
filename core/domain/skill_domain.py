@@ -534,7 +534,7 @@ class Skill(python_utils.OBJECT):
             skill_contents, misconceptions_schema_version,
             rubric_schema_version, skill_contents_schema_version,
             language_code, version, next_misconception_id, superseding_skill_id,
-            all_questions_merged, prerequisite_skill_ids, url_fragment,
+            all_questions_merged, prerequisite_skill_ids,
             created_on=None, last_updated=None):
         """Constructs a Skill domain object.
 
@@ -587,7 +587,6 @@ class Skill(python_utils.OBJECT):
         self.superseding_skill_id = superseding_skill_id
         self.all_questions_merged = all_questions_merged
         self.prerequisite_skill_ids = prerequisite_skill_ids
-        self.url_fragment = url_fragment
 
     @classmethod
     def require_valid_skill_id(cls, skill_id):
@@ -781,8 +780,7 @@ class Skill(python_utils.OBJECT):
             'next_misconception_id': self.next_misconception_id,
             'superseding_skill_id': self.superseding_skill_id,
             'all_questions_merged': self.all_questions_merged,
-            'prerequisite_skill_ids': self.prerequisite_skill_ids,
-            'url_fragment': self.url_fragment
+            'prerequisite_skill_ids': self.prerequisite_skill_ids
         }
 
     def serialize(self):
@@ -882,13 +880,12 @@ class Skill(python_utils.OBJECT):
             skill_dict['all_questions_merged'],
             skill_dict['prerequisite_skill_ids'],
             skill_created_on,
-            skill_last_updated,
-            skill_dict['url_fragment'])
+            skill_last_updated)
 
         return skill
 
     @classmethod
-    def create_default_skill(cls, skill_id, description, rubrics, url_fragment):
+    def create_default_skill(cls, skill_id, description, rubrics):
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
         when the skill is created for the first time.
@@ -897,7 +894,6 @@ class Skill(python_utils.OBJECT):
             skill_id: str. The unique id of the skill.
             description: str. The initial description for the skill.
             rubrics: list(Rubric). The list of rubrics for the skill.
-            url_fragment: str. The url fragment for the skill.
 
         Returns:
             Skill. The Skill domain object with the default values.
@@ -922,8 +918,7 @@ class Skill(python_utils.OBJECT):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False, [],
-            url_fragment)
+            constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False, [])
 
     def generate_skill_misconception_id(self, misconception_id):
         """Given a misconception id, it returns the skill-misconception-id.

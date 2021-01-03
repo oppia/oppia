@@ -69,9 +69,6 @@ class SkillModel(base_models.VersionedModel):
     # The ISO 639-1 code for the language this skill is written in.
     language_code = (
         datastore_services.StringProperty(required=True, indexed=True))
-    # The url fragment of the skill.
-    url_fragment = (
-        datastore_services.StringProperty(required=True, indexed=True))
     # The schema version for the skill_contents.
     skill_contents_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True)
@@ -165,19 +162,19 @@ class SkillModel(base_models.VersionedModel):
         })
 
     @classmethod
-    def get_by_url_fragment(cls, url_fragment):
-        """Gets SkillModel by url_fragment. Returns None if the skill with
-        name url_fragment doesn't exist.
+    def get_by_description(cls, description):
+        """Gets SkillModel by description. Returns None if the skill with
+        description doesn't exist.
 
         Args:
-            url_fragment: str. The url fragment of the skill.
+            description: str. The description of the skill.
 
         Returns:
             SkillModel|None. The skill model of the skill or None if not
             found.
         """
         return SkillModel.query().filter(
-            cls.url_fragment == url_fragment).filter(
+            cls.description == description).filter(
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
 
 

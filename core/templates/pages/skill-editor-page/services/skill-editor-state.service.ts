@@ -58,7 +58,7 @@ export class SkillEditorStateService {
   private assignedSkillTopicData = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
-  private _skillWithUrlFragmentExists = false;
+  private _skillDescriptionExists: boolean = false;
   private _groupedSkillSummaries: GroupedSkillSummaries = {
     current: [],
     others: []
@@ -113,10 +113,6 @@ export class SkillEditorStateService {
 
   private _updateSkillRights = (newSkillRightsObject: SkillRights) => {
     this._setSkillRights(newSkillRightsObject);
-  };
-
-  private _setSkillWithUrlFragmentExists = function(skillWithUrlFragmentExists) {
-    this._skillWithUrlFragmentExists = skillWithUrlFragmentExists;
   };
 
 
@@ -225,20 +221,20 @@ export class SkillEditorStateService {
     return true;
   }
 
-  updateExistenceOfSkillUrlFragment(
-    skillUrlFragment: string,
+  updateExistenceOfSkillDescription(
+    description: string,
     successCallback: (value?: Object) => void) {
-  this.skillBackendApiService.doesSkillWithUrlFragmentExistAsync(
-    skillUrlFragment).then(
-    function(skillUrlFragmentExists) {
-      this._setSkillWithUrlFragmentExists(skillUrlFragmentExists);
-      if (successCallback) {
+  this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
+    description).then(
+    function(skillDescriptionExists) {
+      this._skillDescriptionExists = skillDescriptionExists;
+    if (successCallback) {
         successCallback();
       }
     }, function(error) {
       this.alertsService.addWarning(
         error ||
-        'There was an error when checking if the skill url fragment ' +
+        'There was an error when checking if the skill description ' +
         'exists for another skill.');
     });
   }
@@ -259,8 +255,9 @@ export class SkillEditorStateService {
     this._setSkillRights(skillRights);
   }
 
-  getSkillWithUrlFragmentExists(): boolean {
-    return this._skillWithUrlFragmentExists;
+  getSkillDescriptionExists(): boolean {
+    console.log(this._skillDescriptionExists);
+    return this._skillDescriptionExists;
   }
 }
 

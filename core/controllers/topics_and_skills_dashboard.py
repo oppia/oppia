@@ -306,7 +306,6 @@ class NewSkillHandler(base.BaseHandler):
     @acl_decorators.can_create_skill
     def post(self):
         description = self.payload.get('description')
-        url_fragment = self.payload.get('url_fragment')
         linked_topic_ids = self.payload.get('linked_topic_ids')
         explanation_dict = self.payload.get('explanation_dict')
         rubrics = self.payload.get('rubrics')
@@ -344,7 +343,7 @@ class NewSkillHandler(base.BaseHandler):
                 'Description should not be a duplicate.')
 
         skill = skill_domain.Skill.create_default_skill(
-            new_skill_id, description, rubrics, url_fragment)
+            new_skill_id, description, rubrics)
 
         skill.update_explanation(
             state_domain.SubtitledHtml.from_dict(explanation_dict))

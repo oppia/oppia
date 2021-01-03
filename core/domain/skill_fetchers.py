@@ -148,18 +148,18 @@ def get_skill_from_model(skill_model):
         skill_model.last_updated)
 
 
-def get_skill_by_url_fragment(url_fragment):
+def get_skill_by_description(description):
     """Returns a domain object representing a skill.
 
     Args:
-        url_fragment: str. The url fragment of the skill.
+        description: str. The description of the skill.
 
     Returns:
         Skill or None. The domain object representing a skill with the
-        given url fragment, or None if it does not exist.
+        given description, or None if it does not exist.
     """
     skill_model = (
-        skill_models.SkillModel.get_by_url_fragment(url_fragment))
+        skill_models.SkillModel.get_by_description(description))
     if skill_model is None:
         return None
 

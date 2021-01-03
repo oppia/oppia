@@ -57,8 +57,8 @@ interface UpdateSkillBackendResponse {
   skill: SkillBackendDict;
 }
 
-interface DoesSkillWithUrlFragmentExistBackendResponse {
-  'skill_url_fragment_exists': boolean;
+interface DoesSkillWithDescriptionExistBackendResponse {
+  'skill_description_exists': boolean;
 }
 
 @Injectable({
@@ -153,28 +153,28 @@ export class SkillBackendApiService {
     });
   }
 
-  private _doesSkillWithUrlFragmentExist(
-    skillUrlFragment: string,
+  private _doesSkillWithDescriptionExist(
+    description: string,
     successCallback: (value?: boolean) => void,
     errorCallback: (reason?: string) => void): void {
-    let skillUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
-      SkillDomainConstants.SKILL_URL_FRAGMENT_HANDLER_URL_TEMPLATE, {
-        skill_url_fragment: skillUrlFragment
+    let skillDescriptionUrl = this.urlInterpolationService.interpolateUrl(
+      SkillDomainConstants.SKILL_DESCRIPTION_HANDLER_URL_TEMPLATE, {
+        skill_description: description
       });
-    this.http.get<DoesSkillWithUrlFragmentExistBackendResponse>(
-      skillUrlFragmentUrl).toPromise().then((response) => {
+    this.http.get<DoesSkillWithDescriptionExistBackendResponse>(
+      skillDescriptionUrl).toPromise().then((response) => {
       if (successCallback) {
-        successCallback(response.skill_url_fragment_exists);
+        successCallback(response.skill_description_exists);
       }
     }, (errorResponse) => {
       errorCallback(errorResponse.error);
     });
   }
 
-async doesSkillWithUrlFragmentExistAsync(skillUrlFragment: string):
+async doesSkillWithDescriptionExistAsync(description: string):
       Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._doesSkillWithUrlFragmentExist(skillUrlFragment, resolve, reject);
+      this._doesSkillWithDescriptionExist(description, resolve, reject);
     });
   }
 }

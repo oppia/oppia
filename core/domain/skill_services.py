@@ -541,22 +541,22 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         skill.description)
 
 
-def does_skill_with_url_fragment_exist(url_fragment):
-    """Checks if skill with provided url fragment exists.
+def does_skill_with_description_exist(description):
+    """Checks if skill with provided description exists.
 
     Args:
-        url_fragment: str. The url fragment for the skill.
+        description: str. The description for the skill.
 
     Returns:
-        bool. Whether the the url fragment for the skill exists.
+        bool. Whether the the description for the skill exists.
 
     Raises:
-        Exception. Skill URL fragment is not a string.
+        Exception. Skill description is not a string.
     """
-    if not isinstance(url_fragment, python_utils.BASESTRING):
-        raise utils.ValidationError('Skill URL fragment should be a string.')
+    if not isinstance(description, python_utils.BASESTRING):
+        raise utils.ValidationError('Skill description should be a string.')
     existing_skill = (
-        skill_fetchers.get_skill_by_url_fragment(url_fragment))
+        skill_fetchers.get_skill_by_description(description))
     return existing_skill is not None
 
 

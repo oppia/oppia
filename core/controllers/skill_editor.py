@@ -272,19 +272,19 @@ class FetchSkillsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SkillUrlFragmentHandler(base.BaseHandler):
-    """A data handler for checking if a skill with given url fragment exists."""
+class SkillDescriptionHandler(base.BaseHandler):
+    """A data handler for checking if a skill with given description exists."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, skill_url_fragment):
-        """Handler that receives a skill url fragment and checks whether
-        a skill with the same url fragment exists.
+    def get(self, skill_description):
+        """Handler that receives a skill description and checks whether
+        a skill with the same description exists.
         """
         self.values.update({
-            'skill_url_fragment_exists': (
-                skill_services.does_skill_with_url_fragment_exist(
-                    skill_url_fragment))
+            'skill_description_exists': (
+                skill_services.does_skill_with_description_exist(
+                    skill_description))
         })
         self.render_json(self.values)

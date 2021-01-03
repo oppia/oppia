@@ -41,8 +41,8 @@ angular.module('oppia').constant(
   SkillDomainConstants.SKILL_EDITOR_QUESTION_URL_TEMPLATE);
 
 angular.module('oppia').constant(
-  'SKILL_URL_FRAGMENT_HANDLER_URL_TEMPLATE',
-  SkillDomainConstants.SKILL_URL_FRAGMENT_HANDLER_URL_TEMPLATE);
+  'SKILL_DESCRIPTION_HANDLER_URL_TEMPLATE',
+  SkillDomainConstants.SKILL_DESCRIPTION_HANDLER_URL_TEMPLATE);
 
 angular.module('oppia').constant(
   'SKILL_MASTERY_DATA_URL_TEMPLATE',

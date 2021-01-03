@@ -41,7 +41,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
       RubricObjectFactory.create(SKILL_DIFFICULTIES[2], [])];
     ContextService.setImageSaveDestinationToLocalStorage();
     $scope.newSkillDescription = '';
-    $scope.skillUrlFragmentExists = false;
+    $scope.skillDescriptionExists = false;
     $scope.rubrics = rubrics;
     $scope.errorMsg = '';
     $scope.conceptCardExplanationEditorIsShown = false;
@@ -68,11 +68,11 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
         SkillCreationService.markChangeInSkillDescription();
       }
       if ($scope.newSkillDescription) {
-        SkillEditorStateService.updateExistenceOfSkillUrlFragment(
+        SkillEditorStateService.updateExistenceOfSkillDescription(
           $scope.newSkillDescription, function() {
-            $scope.skillUrlFragmentExists = (
-              SkillEditorStateService.getSkillWithUrlFragmentExists());
-          }
+            $scope.skillDescriptionExists = (
+              SkillEditorStateService.getSkillDescriptionExists());
+            }
         );
       }
     };
@@ -99,7 +99,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
             'alphanumeric characters, spaces and/or hyphens.');
         return false;
       }
-      if ($scope.skillUrlFragmentExists) {
+      if ($scope.skillDescriptionExists) {
         $scope.errorMsg = (
           'This description already exists. Please choose a ' +
             'new name or modify the existing skill.');
@@ -117,7 +117,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
           'alphanumeric characters, spaces and/or hyphens.');
         return;
       }
-      if ($scope.skillUrlFragmentExists) {
+      if ($scope.skillDescriptionExists) {
         $scope.errorMsg = (
           'This description already exists. Please choose a ' +
             'new name or modify the existing skill.');
