@@ -77,6 +77,17 @@ export class ContentTranslationManagerService {
         card => this._displayTranslationsForCard(card, languageCode));
     }
 
+    cards.forEach(card => {
+      // Because we do not have a mapping of the learner's input and Oppia's
+      // response to the content from which it originates from, we cannot
+      // easily swap them with translated values. Instead, we opt to clear
+      // the responses.
+      card.getInputResponsePairs().splice(
+        0, card.getInputResponsePairs().length);
+      // Mark card as uncompleted because we clear response pairs.
+      card.markAsNotCompleted();
+    });
+
     this._onStateCardContentUpdateEmitter.emit();
   }
 
