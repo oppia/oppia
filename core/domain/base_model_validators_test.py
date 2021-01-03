@@ -119,6 +119,17 @@ class MockCommitLogEntryModelValidator(
     EXTERNAL_MODEL_NAME = 'mockmodel'
 
     @classmethod
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('mock'):
+            return MockCommitLogEntryModel
+        else:
+            cls._add_error(
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
+                'Entity id %s: Entity id does not match regex pattern' % (
+                    item.id))
+            return None
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         return [
             base_model_validators.UserSettingsModelFetcherDetails(
@@ -213,7 +224,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             }
         )
 
-    def test_external_model_fetcher_with_user_settings(self):
+    def test_external_model_fetcher_with_user_settings_raise_error(self):
         with self.assertRaisesRegexp(
             Exception,
             'When fetching instances of UserSettingsModel, please use ' +
@@ -227,7 +238,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
                 ]
             )
 
-    def test_may_contain_system_users(self):
+    def test_may_contain_system_users_filters_system_ids(self):
         user_settings_model = (
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids',
@@ -242,15 +253,14 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_error_raised_if_model_ids_contain_system_ids(self):
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'The field committer_ids should not contain system ids but it '
-            'contains system ids'):
+            'The field \'committer_ids\' should not contain system IDs'):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [feconf.MIGRATION_BOT_USER_ID, 'User-1'],
                 may_contain_system_ids=False,
                 may_contain_pseudonymous_ids=False
             )
 
-    def test_may_contain_pseudonymous_users(self):
+    def test_may_contain_pseudonymous_users_filters_pseudonymous_users(self):
         user_settings_model = (
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', ['User-1', self.PSEUDONYMOUS_ID],
@@ -264,8 +274,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_error_raised_if_model_ids_contain_pseudonymous_ids(self):
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'The field committer_ids should not contain pseudonymous ids but '
-            'it contains pseudonymous ids'):
+            'The field \'committer_ids\' should not contain pseudonymous IDs'):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [self.PSEUDONYMOUS_ID, 'User-1'],
                 may_contain_system_ids=False,
@@ -274,22 +283,26 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
     def test_error_raised_when_fetching_external_model_with_system_ids(self):
         model = MockCommitLogEntryModel(
-            id='12345', user_id=feconf.MIGRATION_BOT_USER_ID)
+            id='mock-12345',
+            user_id=feconf.MIGRATION_BOT_USER_ID,
+            commit_cmds=[])
+        model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
-        mock_validator._fetch_field_name_to_external_model_references(model) # pylint: disable=protected-access
+        mock_validator.validate(model)
         self.assertEqual(
             mock_validator.errors['invalid user setting ids'][0].message,
-            'The field user_id should not contain system ids but it contains '
-            'system ids')
+            'The field \'user_id\' should not contain system IDs')
 
     def test_error_raised_when_fetching_external_model_with_pseudo_ids(self):
         model = MockCommitLogEntryModel(
-            id='12345', user_id=self.PSEUDONYMOUS_ID)
+            id='mock-12345',
+            user_id=self.PSEUDONYMOUS_ID,
+            commit_cmds=[])
+        model.update_timestamps()
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
-        mock_validator._fetch_field_name_to_external_model_references(model) # pylint: disable=protected-access
+        mock_validator.validate(model)
         self.assertEqual(
             mock_validator.errors['invalid user setting ids'][0].message,
-            'The field user_id should not contain pseudonymous ids but it '
-            'contains pseudonymous ids')
+            'The field \'user_id\' should not contain pseudonymous IDs')

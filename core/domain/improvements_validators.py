@@ -25,11 +25,8 @@ from core.domain import base_model_validators
 from core.platform import models
 
 
-(
-    exp_models, improvements_models
-) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.improvements
-])
+(exp_models, improvements_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.improvements])
 
 
 class TaskEntryModelValidator(base_model_validators.BaseModelValidator):

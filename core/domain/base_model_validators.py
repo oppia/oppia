@@ -30,7 +30,7 @@ import feconf
 import python_utils
 import utils
 
-(base_models, user_models,) = models.Registry.import_models(
+(base_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
@@ -77,8 +77,7 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
     UserSettingsModelFetcherDetails class instead of this one.
     """
 
-    def __init__(
-            self, field_name, model_class, model_ids):
+    def __init__(self, field_name, model_class, model_ids):
         """Initializes an ExternalModelFetcherDetails domain object.
 
         Args:
@@ -119,15 +118,15 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                 reference. For example: 'committer_id': UserSettingsModel,
                 committer_id is the field name to identify the external model
                 UserSettingsModel.
-            model_ids: list(str). The list of user settings model ids to fetch
+            model_ids: list(str). The list of user settings model IDs to fetch
                 the UserSettingsModels.
-            may_contain_system_ids: bool. Whether the model ids contain
-                system ids which should be omitted before attempting to fetch
+            may_contain_system_ids: bool. Whether the model IDs contain
+                system IDs which should be omitted before attempting to fetch
                 the corresponding models. Set may_contain_system_ids to True if
                 and only if this field can contain admin or bot IDs.
             may_contain_pseudonymous_ids: bool. Whether the model ids contain
-                pseudonymous ids which should be omitted before attempting to
-                fetch the corresponding models.Set may_contain_pseudonymous_ids
+                pseudonymous IDs which should be omitted before attempting to
+                fetch the corresponding models. Set may_contain_pseudonymous_ids
                 to True if and only if this field can contain user IDs that
                 are pseudonymized as part of Wipeout. These fields can only be
                 in models that have LOCALLY_PSEUDONYMIZE as their
@@ -140,8 +139,8 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
         else:
             if set(filtered_model_ids) & set(feconf.SYSTEM_USERS.values()):
                 raise utils.ValidationError(
-                    'The field %s should not contain system ids but it '
-                    'contains system ids' % field_name)
+                    'The field \'%s\' should not contain '
+                    'system IDs' % field_name)
         if may_contain_pseudonymous_ids:
             filtered_model_ids = [
                 model_id for model_id in filtered_model_ids
@@ -152,8 +151,8 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                     utils.is_pseudonymous_id(model_id)
                     for model_id in filtered_model_ids):
                 raise utils.ValidationError(
-                    'The field %s should not contain pseudonymous ids but it '
-                    'contains pseudonymous ids' % field_name)
+                    'The field \'%s\' should not contain '
+                    'pseudonymous IDs' % field_name)
         self.field_name = field_name
         self.model_class = user_models.UserSettingsModel
         self.model_ids = filtered_model_ids
@@ -357,7 +356,9 @@ class BaseModelValidator(python_utils.OBJECT):
                     external_model_fetcher_details.field_name] = (
                         external_model_fetcher_details.model_class,
                         external_model_fetcher_details.model_ids)
-
+        except utils.ValidationError as err:
+            cls._add_error(ERROR_CATEGORY_INVALID_USER_SETTING_IDS, err)
+        else:
             fetched_model_instances_for_all_ids = (
                 datastore_services.fetch_multiple_entities_by_ids_and_models(
                     list(multiple_models_ids_to_fetch.values())))
@@ -374,9 +375,6 @@ class BaseModelValidator(python_utils.OBJECT):
                         field_name].append(
                             ExternalModelReference(
                                 model_class, model_id, model_instance))
-
-        except utils.ValidationError as err:
-            cls._add_error(ERROR_CATEGORY_INVALID_USER_SETTING_IDS, err)
 
     @classmethod
     def _validate_model_time_fields(cls, item):
