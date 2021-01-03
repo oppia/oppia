@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0031.
+presubmit checks. Next message id would be C0032.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -1907,8 +1907,8 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
             'Please refrain from using test_only in function names '
             'in case of non-test files.',
             'non-test-files-function-name-checker',
-            'Try using a different name for the function, not having test_only'
-            'as its prefix.'
+            'Try using a different name for the function that does not have'
+            'test_only as its prefix.'
         )
     }
 
@@ -1921,9 +1921,11 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
                 definition in the AST.
         """
 
-        function_name = node.name
-        if function_name.startswith('test_only'):
-            self.add_message('non-test-files-function-name-checker', node=node)
+        modnode = node.root()
+        if not modnode.name.endswith('_test'):
+            function_name = node.name
+            if function_name.startswith('test_only'):
+                self.add_message('non-test-files-function-name-checker', node=node)
 
 
 def register(linter):
