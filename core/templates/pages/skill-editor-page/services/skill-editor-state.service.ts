@@ -228,7 +228,7 @@ export class SkillEditorStateService {
       description).then(
       function(skillDescriptionExists) {
         this._skillDescriptionExists = skillDescriptionExists;
-      if (successCallback) {
+        if (successCallback) {
           successCallback();
         }
       }, function(error) {
@@ -256,7 +256,6 @@ export class SkillEditorStateService {
   }
 
   getSkillDescriptionExists(): boolean {
-    console.log(this._skillDescriptionExists);
     return this._skillDescriptionExists;
   }
 }
