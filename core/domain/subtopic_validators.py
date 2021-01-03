@@ -18,12 +18,21 @@
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
-from core.domain import base_model_validators
 
+from core.domain import base_model_validators
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.platform import models
-subtopic_models = models.Registry.import_models([models.NAMES.subtopic])
+
+import python_utils
+
+(
+    base_models, exp_models, subtopic_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.subtopic, models.NAMES.user
+])
+
+
 class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SubtopicPageModel."""
 
@@ -54,16 +63,15 @@ class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 subtopic_models.SubtopicPageSnapshotContentModel,
-                snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'topic_ids', topic_models.TopicModel, [item.topic_id])]
+                snapshot_model_ids)]
 
     @classmethod
     def _get_custom_validation_functions(cls):
         return []
 
 
-class SubtopicPageSnapshotMetadataModelValidator(base_model_validators.BaseSnapshotMetadataModelValidator):
+class SubtopicPageSnapshotMetadataModelValidator(
+        base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""
 
     EXTERNAL_MODEL_NAME = 'subtopic page'
