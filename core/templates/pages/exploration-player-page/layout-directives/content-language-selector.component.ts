@@ -40,12 +40,12 @@ export class ContentLanguageSelectorComponent implements OnInit {
   ) {}
 
   selectedLanguageCode: string;
-  languagesInExploration: ExplorationLanguageInfo[];
+  languageOptions: ExplorationLanguageInfo[];
 
   ngOnInit(): void {
     this.selectedLanguageCode = (
       this.contentTranslationLanguageService.getCurrentContentLanguageCode());
-    this.languagesInExploration = (
+    this.languageOptions = (
       this.contentTranslationLanguageService.getLanguageOptionsForDropdown());
   }
 
