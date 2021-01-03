@@ -32,7 +32,6 @@ import unittest
 
 from constants import constants
 from core.controllers import base
-from core.domain import auth_domain
 from core.domain import caching_domain
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -403,55 +402,6 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
             return result_docs[offset:resulting_offset], resulting_offset
         else:
             return result_docs[offset:], resulting_offset
-
-
-class AuthServicesStub(python_utils.OBJECT):
-    """Stubs the public API of the platform.auth services."""
-
-    def __init__(self):
-        """Initializes a new instance that emulates an empty auth server."""
-        self._user_id_by_auth_id = {}
-
-    def authenticate_request(self, unused_request):
-        """Returns the claims embedded in os.environ."""
-        auth_id = os.environ.get('USER_ID', '')
-        email = os.environ.get('USER_EMAIL', '')
-        return auth_domain.AuthClaims(auth_id, email) if auth_id else None
-
-    def delete_associations(self, user_id):
-        """Deletes associations referring to the given user_id."""
-        self._user_id_by_auth_id = {
-            a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
-        }
-
-    def are_associations_deleted(self, user_id):
-        """Returns whether the user's associated auth ID is deleted."""
-        return not any(u == user_id for u in self._user_id_by_auth_id.values())
-
-    def get_user_id_from_auth_id(self, auth_id):
-        """Returns the user ID associated with the given auth ID."""
-        return self._user_id_by_auth_id.get(auth_id, None)
-
-    def get_multi_user_ids_from_auth_ids(self, auth_ids):
-        """Returns the user IDs associated with the given auth IDs."""
-        return [self._user_id_by_auth_id.get(a, None) for a in auth_ids]
-
-    def associate_auth_id_to_user_id(self, auth_id_user_id_pair):
-        """Commits the association between auth ID and user ID."""
-        auth_id, user_id = auth_id_user_id_pair
-        if auth_id in self._user_id_by_auth_id:
-            raise Exception('auth_id=%r is already associated to user_id=%r' % (
-                auth_id, self._user_id_by_auth_id[auth_id]))
-        self._user_id_by_auth_id[auth_id] = user_id
-
-    def associate_multi_auth_ids_to_user_ids(self, auth_id_user_id_pairs):
-        """Commits the associations between auth IDs and user IDs."""
-        collisions = ', '.join(
-            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a])
-            for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
-        if collisions:
-            raise Exception('already associated: %s' % collisions)
-        self._user_id_by_auth_id.update(auth_id_user_id_pairs)
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -1345,12 +1295,6 @@ tags: []
             stack.enter_context(self.swap(
                 models.Registry, 'import_search_services',
                 classmethod(lambda _: self._search_services_stub)))
-
-            if getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
-                auth_services_stub = AuthServicesStub()
-                stack.enter_context(self.swap(
-                    models.Registry, 'import_auth_services',
-                    classmethod(lambda _: auth_services_stub)))
 
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',

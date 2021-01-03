@@ -435,9 +435,6 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
 class FirebaseAccountWipeoutTests(test_utils.GenericTestBase):
     """Tests for wipeout_service that is specific to Firebase authentication."""
 
-    # We want wipeout_services to use the real Firebase authentication services.
-    ENABLE_AUTH_SERVICES_STUB = False
-
     EMAIL = 'some@email.com'
     USERNAME = 'username'
     AUTH_ID = 'authid'
