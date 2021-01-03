@@ -154,8 +154,7 @@ describe('Collection playthrough model', () => {
       .toEqual(false);
   });
 
-  it(
-    'should return collection is not finished when a next' +
+  it('should return collection is not finished when a next' +
     'exploration is not available', () => {
     const collectionPlaythroughBackendDict = {
       next_exploration_id: null,
