@@ -113,6 +113,8 @@ PYLINT_QUOTES_PATH = os.path.join(
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
+FIREBASE_PATH = os.path.join(
+    NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
@@ -719,6 +721,29 @@ class CD(python_utils.OBJECT):
 
 
 @contextlib.contextmanager
+def swap_env(key, value):
+    """Context manager that temporarily changes the value of os.environ[key].
+
+    Args:
+        key: str. The name of the environment variable to change.
+        value: str. The value to give the environment variable.
+
+    Yields:
+        str|None. The old value of the environment variable, or None if it did
+        not exist.
+    """
+    old_value = os.environ.get(key, None)
+    os.environ[key] = value
+    try:
+        yield old_value
+    finally:
+        if old_value is None:
+            del os.environ[key]
+        else:
+            os.environ[key] = old_value
+
+
+@contextlib.contextmanager
 def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
@@ -746,7 +771,6 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         sys.path.insert(1, PSUTIL_DIR)
     import psutil
 
-    # We're only using these generators to reduce code duplication.
     stripped_args = (('%s' % arg).strip() for arg in command_args)
     non_empty_args = (s for s in stripped_args if s)
 
@@ -818,5 +842,34 @@ def managed_dev_appserver(
         '--dev_appserver_log_level', log_level,
         app_yaml_path
     ]
+    # OK to use shell=True here because we are not passing anything that came
+    # from an untrusted user, only other callers of the script, so there's no
+    # risk of shell-injection attacks.
     with managed_process(dev_appserver_args, shell=True, env=env) as proc:
         yield proc
+
+
+@contextlib.contextmanager
+def managed_firebase_auth_emulator():
+    """Returns a context manager to manage the Firebase auth emulator.
+
+    Yields:
+        psutil.Process. The Firebase emulator process.
+    """
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+
+    emulator_args = [
+        FIREBASE_PATH, 'emulators:start', '--only', 'auth',
+        '--project', feconf.OPPIA_PROJECT_ID
+    ]
+    with contextlib2.ExitStack() as stack:
+        # These two environment values allow the Firebase SDKs to acknowledge
+        # the existence of the Firebase emulator.
+        stack.enter_context(swap_env('GCLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
+        stack.enter_context(swap_env(
+            'FIREBASE_AUTH_EMULATOR_HOST', feconf.FIREBASE_AUTH_EMULATOR_HOST))
+
+        # OK to use shell=True here because we are passing string literals and
+        # constants, so no risk of shell-injection attacks.
+        yield stack.enter_context(managed_process(emulator_args, shell=True))
