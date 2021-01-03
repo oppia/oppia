@@ -121,7 +121,6 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UsernameLengthAuditOneOffJob,
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    user_jobs_one_off.RemoveGaeIdOneOffJob,
     user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob,
     user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob,
     user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
