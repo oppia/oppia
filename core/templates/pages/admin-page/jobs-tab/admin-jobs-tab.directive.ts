@@ -43,7 +43,7 @@ angular.module('oppia').directive('adminJobsTab', [
           AdminBackendApiService.fetchJobOutputAsync(jobId)
             .then(function(jobOutput) {
               ctrl.showingJobOutput = true;
-              ctrl.jobOutput = jobOutput.sort();
+              ctrl.jobOutput = jobOutput;
               $timeout(function() {
                 document.querySelector('#job-output').scrollIntoView();
               });
