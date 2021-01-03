@@ -43,7 +43,7 @@ describe('Delete Skill Modal Controller', function() {
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchTopicAssignmentsForSkill: () => {
+        fetchTopicAssignmentsForSkillAsync: () => {
           var deferred = $q.defer();
           deferred.resolve([]);
           return deferred.promise;
@@ -81,7 +81,7 @@ describe('Delete Skill Modal Controller', function() {
       $uibModalInstance = jasmine.createSpyObj(
         '$uibModalInstance', ['close', 'dismiss']);
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchTopicAssignmentsForSkill: () => {
+        fetchTopicAssignmentsForSkillAsync: () => {
           var deferred = $q.defer();
           deferred.resolve(assignedTopicDicts);
           return deferred.promise;

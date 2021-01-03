@@ -21,7 +21,8 @@
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 import { HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/local-storage.service');
@@ -30,6 +31,7 @@ require('services/contextual/logger.service');
 
 describe('Exploration data service', function() {
   var eds = null;
+  var eebas: EditableExplorationBackendApiService = null;
   var lss = null;
   var ls = null;
   var als = null;
@@ -37,6 +39,7 @@ describe('Exploration data service', function() {
   var $httpBackend = null;
   var CsrfService = null;
   let httpTestingController: HttpTestingController;
+  let $rootScope = null;
   var sampleDataResults = {
     draft_change_list_id: 3,
     version: 1,
@@ -75,7 +78,6 @@ describe('Exploration data service', function() {
       }
     }
   };
-
   beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -93,12 +95,14 @@ describe('Exploration data service', function() {
     ls = $injector.get('LoggerService');
     als = $injector.get('AlertsService');
     $q = $injector.get('$q');
+    $rootScope = $injector.get('$rootScope');
     $httpBackend = $injector.get('$httpBackend');
+    eebas = TestBed.inject(EditableExplorationBackendApiService);
     CsrfService = $injector.get('CsrfTokenService');
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
+      const deferred = $q.defer();
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
     });
@@ -108,8 +112,9 @@ describe('Exploration data service', function() {
     httpTestingController.verify();
   });
 
-  it('should autosave draft changes when draft ids match', function() {
+  it('should autosave draft changes when draft ids match', fakeAsync(() => {
     var errorCallback = jasmine.createSpy('error');
+    const successCallback = jasmine.createSpy('success');
     spyOn(lss, 'getExplorationDraft').and.returnValue({
       isValid: function() {
         return true;
@@ -118,17 +123,20 @@ describe('Exploration data service', function() {
         return [];
       }
     });
-    $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-      .respond(sampleDataResults);
+    spyOn(eebas, 'fetchApplyDraftExploration').and.callFake(
+      () => {
+        const deferred = $q.defer();
+        deferred.resolve(sampleDataResults);
+        return deferred.promise;
+      }
+    );
+    eds.getData(errorCallback).then(successCallback);
     $httpBackend.expectPUT('/createhandler/autosave_draft/0').respond({
       sampleDataResults
     });
-    eds.getData(errorCallback).then(function(data) {
-      expect(data).toEqual(sampleDataResults);
-      expect(errorCallback).not.toHaveBeenCalled();
-    });
-    $httpBackend.flush(2);
-  });
+    $httpBackend.flush();
+    expect(successCallback).toHaveBeenCalledWith(sampleDataResults);
+  }));
 
   it('should not autosave draft changes when draft is already cached',
     function() {
@@ -142,8 +150,13 @@ describe('Exploration data service', function() {
         }
       });
 
-      $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-        .respond(sampleDataResults);
+      spyOn(eebas, 'fetchApplyDraftExploration').and.callFake(
+        () => {
+          const deferred = $q.defer();
+          deferred.resolve(sampleDataResults);
+          return deferred.promise;
+        }
+      );
       $httpBackend.expectPUT('/createhandler/autosave_draft/0').respond({
         sampleDataResults
       });
@@ -152,7 +165,7 @@ describe('Exploration data service', function() {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });
-      $httpBackend.flush(2);
+      $httpBackend.flush();
       $httpBackend.verifyNoOutstandingExpectation();
 
       var logInfoSpy = spyOn(ls, 'info').and.callThrough();
@@ -178,8 +191,13 @@ describe('Exploration data service', function() {
     });
     var windowRefSpy = spyOn(windowMock.nativeWindow.location, 'reload')
       .and.callThrough();
-    $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-      .respond(sampleDataResults);
+    spyOn(eebas, 'fetchApplyDraftExploration').and.callFake(
+      () => {
+        const deferred = $q.defer();
+        deferred.resolve(sampleDataResults);
+        return deferred.promise;
+      }
+    );
     $httpBackend.expectPUT('/createhandler/autosave_draft/0')
       .respond(500);
     eds.getData(errorCallback).then(function(data) {
@@ -187,7 +205,7 @@ describe('Exploration data service', function() {
       expect(errorCallback).not.toHaveBeenCalled();
       expect(windowRefSpy).not.toHaveBeenCalled();
     });
-    $httpBackend.flush(2);
+    $httpBackend.flush();
   });
 
   it('should call error callback when draft ids do not match', function() {
@@ -199,15 +217,19 @@ describe('Exploration data service', function() {
         return [];
       }
     });
-    $httpBackend.expect(
-      'GET', '/createhandler/data/0?apply_draft=true').respond(
-      sampleDataResults);
+    spyOn(eebas, 'fetchApplyDraftExploration').and.callFake(
+      () => {
+        const deferred = $q.defer();
+        deferred.resolve(sampleDataResults);
+        return deferred.promise;
+      }
+    );
     var errorCallback = jasmine.createSpy('error');
     eds.getData(errorCallback).then(function(data) {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).toHaveBeenCalled();
     });
-    $httpBackend.flush();
+    $rootScope.$apply();
   });
 
   it('should discard draft', function() {
@@ -287,8 +309,13 @@ describe('Exploration data service', function() {
       draft_changes: ''
     };
 
-    $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-      .respond(sampleDataResults);
+    spyOn(eebas, 'fetchApplyDraftExploration').and.callFake(
+      () => {
+        const deferred = $q.defer();
+        deferred.resolve(sampleDataResults);
+        return deferred.promise;
+      }
+    );
     $httpBackend.expectPUT('/createhandler/autosave_draft/0').respond({
       sampleDataResults
     });
@@ -296,19 +323,23 @@ describe('Exploration data service', function() {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).not.toHaveBeenCalled();
     });
-    $httpBackend.flush(2);
-
-    $httpBackend.expectPUT('/createhandler/data/0').respond(response);
-    eds.save(changeList, 'Commit Message', successHandler, failHandler);
     $httpBackend.flush();
-
+    spyOn(eebas, 'updateExploration').and.callFake(
+      () => {
+        const deferred = $q.defer();
+        deferred.resolve(response);
+        return deferred.promise;
+      }
+    );
+    eds.save(changeList, 'Commit Message', successHandler, failHandler);
+    $rootScope.$apply();
     expect(successHandler).toHaveBeenCalledWith(
       response.is_version_of_draft_valid, response.draft_changes);
     expect(failHandler).not.toHaveBeenCalled();
   });
 
   it('should save an exploration to the backend even when ' +
-    'data.exploration is not defined', function() {
+    'data.exploration is not defined', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
@@ -319,27 +350,35 @@ describe('Exploration data service', function() {
       }
     });
     var changeList = [];
-    var response = {
+
+    // The data.exploration won't receive a value.
+    spyOn(eebas, 'fetchApplyDraftExploration').and.callFake(
+      () => {
+        const deferred = $q.defer();
+        deferred.reject();
+        return deferred.promise;
+      }
+    );
+    eds.getData(errorCallback);
+    $rootScope.$apply();
+    expect(errorCallback).toHaveBeenCalled();
+    let response = {
       is_version_of_draft_valid: true,
       draft_changes: ''
     };
-
-    // The data.exploration won't receive a value.
-    $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-      .respond(500);
-    eds.getData(errorCallback).then(function() {
-      expect(errorCallback).toHaveBeenCalled();
-    });
-    $httpBackend.flush();
-
-    $httpBackend.expectPUT('/createhandler/data/0').respond(response);
+    spyOn(eebas, 'updateExploration').and.callFake(
+      () => {
+        const deferred = $q.defer();
+        deferred.resolve(response);
+        return deferred.promise;
+      }
+    );
     eds.save(changeList, 'Commit Message', successHandler, failHandler);
-    $httpBackend.flush();
-
+    $rootScope.$apply();
     expect(successHandler).toHaveBeenCalledWith(
       response.is_version_of_draft_valid, response.draft_changes);
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should use reject handler when save an exploration to the backend fails',
     function() {
@@ -357,8 +396,13 @@ describe('Exploration data service', function() {
       });
       var changeList = [];
 
-      $httpBackend.expect('GET', '/createhandler/data/0?apply_draft=true')
-        .respond(sampleDataResults);
+      spyOn(eebas, 'fetchApplyDraftExploration').and.callFake(
+        () => {
+          const deferred = $q.defer();
+          deferred.resolve(sampleDataResults);
+          return deferred.promise;
+        }
+      );
       $httpBackend.expectPUT('/createhandler/autosave_draft/0').respond({
         sampleDataResults
       });
@@ -366,12 +410,17 @@ describe('Exploration data service', function() {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
       });
-      $httpBackend.flush(2);
-
-      $httpBackend.expectPUT('/createhandler/data/0').respond(500);
-      eds.save(changeList, 'Commit Message', successHandler, failHandler);
       $httpBackend.flush();
 
+      spyOn(eebas, 'updateExploration').and.callFake(
+        () => {
+          const deferred = $q.defer();
+          deferred.reject();
+          return deferred.promise;
+        }
+      );
+      eds.save(changeList, 'Commit Message', successHandler, failHandler);
+      $rootScope.$apply();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
     });

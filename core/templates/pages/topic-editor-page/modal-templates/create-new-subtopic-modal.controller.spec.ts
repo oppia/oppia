@@ -26,8 +26,6 @@ describe('Create new subtopic modal', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
-
   var $scope = null;
   var ctrl = null;
   var $uibModalInstance = null;

@@ -236,7 +236,7 @@ class RecentUpdatesMRJobManager(
         job_queued_msec = RecentUpdatesMRJobManager._get_job_queued_msec()
         reducer_key = '%s@%s' % (user_id, job_queued_msec)
 
-        exploration_ids_list = item.activity_ids
+        exploration_ids_list = item.exploration_ids
         collection_ids_list = item.collection_ids
         feedback_thread_ids_list = item.general_feedback_thread_ids
 

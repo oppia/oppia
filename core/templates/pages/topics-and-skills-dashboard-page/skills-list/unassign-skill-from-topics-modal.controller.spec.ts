@@ -47,7 +47,7 @@ describe('Unassign Skill from Topics Modal', function() {
     $rootScope = $injector.get('$rootScope');
     $q = $injector.get('$q');
     var MockTopicsAndSkillsDashboardBackendApiService = {
-      fetchTopicAssignmentsForSkill: () => {
+      fetchTopicAssignmentsForSkillAsync: () => {
         var deferred = $q.defer();
         deferred.resolve(assignedTopicDicts);
         return deferred.promise;
