@@ -204,13 +204,14 @@ def main(args=None):
             'from \'accessibility\' or \'performance\'' % lighthouse_mode)
 
     common.start_redis_server()
-    managed_es_server = common.managed_elasticsearch_dev_server()
+
     managed_dev_appserver = common.managed_dev_appserver(
         APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
         clear_datastore=True, log_level='critical', skip_sdk_update_check=True)
 
     with contextlib2.ExitStack() as stack:
-        stack.enter_context(managed_es_server)
+        stack.enter_context(common.managed_elasticsearch_dev_server())
+        stack.enter_context(common.managed_firebase_auth_emulator())
         stack.enter_context(managed_dev_appserver)
 
         # Wait for the servers to come up.

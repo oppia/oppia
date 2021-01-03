@@ -523,8 +523,6 @@ def run_tests(args):
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
-    managed_es_server = common.managed_elasticsearch_dev_server()
-
     managed_dev_appserver = common.managed_dev_appserver(
         'app.yaml' if args.prod_env else 'app_dev.yaml',
         port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
@@ -532,7 +530,8 @@ def run_tests(args):
         env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
 
     with contextlib2.ExitStack() as stack:
-        stack.enter_context(managed_es_server)
+        stack.enter_context(common.managed_elasticsearch_dev_server())
+        stack.enter_context(common.managed_firebase_auth_emulator())
         stack.enter_context(managed_dev_appserver)
 
         # Wait for the servers to come up.

@@ -148,10 +148,7 @@ def main(args=None):
         time.sleep(10)
 
     common.start_redis_server()
-    python_utils.PRINT('Starting ElasticSearch development server.')
-    managed_es_server = common.managed_elasticsearch_dev_server()
 
-    python_utils.PRINT('Starting GAE development server')
     managed_dev_appserver = common.managed_dev_appserver(
         app_yaml_filepath, clear_datastore=not parsed_args.save_datastore,
         enable_console=parsed_args.enable_console,
@@ -160,7 +157,11 @@ def main(args=None):
         skip_sdk_update_check=True, port=PORT_NUMBER_FOR_GAE_SERVER)
 
     with contextlib2.ExitStack() as stack:
-        stack.enter_context(managed_es_server)
+        python_utils.PRINT('Starting ElasticSearch development server.')
+        stack.enter_context(common.managed_elasticsearch_dev_server())
+        python_utils.PRINT('Starting Firebase emulators')
+        stack.enter_context(common.managed_firebase_auth_emulator())
+        python_utils.PRINT('Starting GAE development server')
         stack.enter_context(managed_dev_appserver)
 
         # Wait for the servers to come up.
