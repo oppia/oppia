@@ -222,21 +222,21 @@ export class SkillEditorStateService {
   }
 
   updateExistenceOfSkillDescription(
-    description: string,
-    successCallback: (value?: Object) => void) {
-  this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
-    description).then(
-    function(skillDescriptionExists) {
-      this._skillDescriptionExists = skillDescriptionExists;
-    if (successCallback) {
-        successCallback();
-      }
-    }, function(error) {
-      this.alertsService.addWarning(
-        error ||
-        'There was an error when checking if the skill description ' +
-        'exists for another skill.');
-    });
+      description: string,
+      successCallback: (value?: Object) => void): void {
+    this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
+      description).then(
+      function(skillDescriptionExists) {
+        this._skillDescriptionExists = skillDescriptionExists;
+      if (successCallback) {
+          successCallback();
+        }
+      }, function(error) {
+        this.alertsService.addWarning(
+          error ||
+          'There was an error when checking if the skill description ' +
+          'exists for another skill.');
+      });
   }
 
   get onSkillChange(): EventEmitter<unknown> {

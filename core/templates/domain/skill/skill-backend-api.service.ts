@@ -154,9 +154,9 @@ export class SkillBackendApiService {
   }
 
   private _doesSkillWithDescriptionExist(
-    description: string,
-    successCallback: (value?: boolean) => void,
-    errorCallback: (reason?: string) => void): void {
+      description: string,
+      successCallback: (value?: boolean) => void,
+      errorCallback: (reason?: string) => void): void {
     let skillDescriptionUrl = this.urlInterpolationService.interpolateUrl(
       SkillDomainConstants.SKILL_DESCRIPTION_HANDLER_URL_TEMPLATE, {
         skill_description: description
@@ -171,7 +171,7 @@ export class SkillBackendApiService {
     });
   }
 
-async doesSkillWithDescriptionExistAsync(description: string):
+  async doesSkillWithDescriptionExistAsync(description: string):
       Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesSkillWithDescriptionExist(description, resolve, reject);

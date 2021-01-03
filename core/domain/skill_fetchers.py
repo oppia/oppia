@@ -167,7 +167,6 @@ def get_skill_by_description(description):
     return skill
 
 
-
 def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the skill contents structure based on the schema version of the input

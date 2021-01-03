@@ -72,7 +72,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
           $scope.newSkillDescription, function() {
             $scope.skillDescriptionExists = (
               SkillEditorStateService.getSkillDescriptionExists());
-            }
+          }
         );
       }
     };

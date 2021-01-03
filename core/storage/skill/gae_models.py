@@ -178,7 +178,6 @@ class SkillModel(base_models.VersionedModel):
                 cls.deleted == False).get() # pylint: disable=singleton-comparison
 
 
-
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to skills.
 

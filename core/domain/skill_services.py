@@ -549,12 +549,7 @@ def does_skill_with_description_exist(description):
 
     Returns:
         bool. Whether the the description for the skill exists.
-
-    Raises:
-        Exception. Skill description is not a string.
     """
-    if not isinstance(description, python_utils.BASESTRING):
-        raise utils.ValidationError('Skill description should be a string.')
     existing_skill = (
         skill_fetchers.get_skill_by_description(description))
     return existing_skill is not None
