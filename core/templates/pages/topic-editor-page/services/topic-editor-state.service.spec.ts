@@ -33,7 +33,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 require('domain/topic/topic-update.service.ts');
 
 
-describe('Topic editor state service', () => {
+fdescribe('Topic editor state service', () => {
   let topicEditorStateService : TopicEditorStateService;
   let topicObjectFactory : TopicObjectFactory;
   let subtopicPageObjectFactory : SubtopicPageObjectFactory;
@@ -571,17 +571,24 @@ describe('Topic editor state service', () => {
   it('should fail to save the topic without first loading one',
     () => {
       expect(() => {
-        topicEditorStateService.saveTopic('Commit message', ()=> {});
+        const successHandler = jasmine.createSpy('success');
+        const failHandler = jasmine.createSpy('fail');
+        topicEditorStateService.saveTopic(
+          'Commit message').then(successHandler, failHandler);
       }).toThrowError('Cannot save a topic before one is loaded.');
     }
   );
 
   it('should not save the topic if there are no pending changes',
     fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
       topicEditorStateService.loadTopic('5');
       tick(1000);
       expect(topicEditorStateService.saveTopic(
-        'Commit message', ()=> {})).toBe(false);
+        'Commit message').then(successHandler, failHandler));
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
     }
     ));
 
@@ -589,14 +596,19 @@ describe('Topic editor state service', () => {
     spyOn(
       mockEditableTopicBackendApiService,
       'updateTopic').and.callThrough();
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
     topicEditorStateService.loadTopic('0');
     topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
+
     tick(1000);
 
     expect(topicEditorStateService.saveTopic(
-      'Commit message', ()=> {})).toBe(true);
+      'Commit message').then(successHandler, failHandler));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
     tick(1000);
 
     let expectedId = '0';
@@ -614,7 +626,7 @@ describe('Topic editor state service', () => {
       topicEditorStateService.getTopic(), 'New name');
     tick(1000);
 
-    topicEditorStateService.saveTopic('Commit message', ()=> {});
+    topicEditorStateService.saveTopic('Commit message');
     tick(1000);
 
     expect(topicReinitializedSpy).toHaveBeenCalled();
@@ -626,7 +638,7 @@ describe('Topic editor state service', () => {
       topicEditorStateService.getTopic(), 'New name');
     tick(1000);
     expect(topicEditorStateService.isSavingTopic()).toBe(false);
-    topicEditorStateService.saveTopic('Commit message', ()=> {});
+    topicEditorStateService.saveTopic('Commit message');
     expect(topicEditorStateService.isSavingTopic()).toBe(true);
 
     tick(1000);
@@ -643,7 +655,7 @@ describe('Topic editor state service', () => {
       expect(topicEditorStateService.isSavingTopic()).toBe(false);
       mockEditableTopicBackendApiService.failure = 'Internal 500 error';
 
-      topicEditorStateService.saveTopic('Commit message', ()=> {});
+      topicEditorStateService.saveTopic('Commit message');
       expect(topicEditorStateService.isSavingTopic()).toBe(true);
 
       tick(1000);

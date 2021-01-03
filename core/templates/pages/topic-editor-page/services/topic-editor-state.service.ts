@@ -30,7 +30,7 @@ import { TopicRights } from 'domain/topic/topic-rights.model';
 import { SubtopicPageObjectFactory, SubtopicPage, SubtopicPageBackendDict } from 'domain/topic/SubtopicPageObjectFactory.ts';
 import { TopicObjectFactory, Topic, TopicBackendDict } from 'domain/topic/TopicObjectFactory.ts';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service.ts';
-import { RubricObjectFactory, RubricBackendDict } from 'domain/skill/RubricObjectFactory.ts';
+import { RubricObjectFactory, RubricBackendDict, Rubric } from 'domain/skill/RubricObjectFactory.ts';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service.ts';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service.ts';
 import { AlertsService } from 'services/alerts.service';
@@ -67,9 +67,9 @@ export class TopicEditorStateService {
   private _topicWithNameExists: boolean = false;
   private _topicWithUrlFragmentExists: boolean = false;
   private _canonicalStorySummaries: StorySummary[] = [];
-  private _skillIdToRubricsObject : RubricBackendDict[] = [];
+  private _skillIdToRubricsObject: Record<string, Rubric[]> = {} ;
   private _skillQuestionCountDict:
-  { [skillId: string]: number; } | undefined[] = [];
+  { [skillId: string]: number; } | undefined[] = {};
   private _groupedSkillSummaries = {
     current: [],
     others: []
@@ -145,7 +145,7 @@ export class TopicEditorStateService {
       {[skillId: string]: RubricBackendDict[]}): void {
     for (let skillId in skillIdToRubricsObject) {
       let rubrics = skillIdToRubricsObject[skillId].map((
-          rubric: RubricBackendDict) => {
+          rubric) => {
         return this.rubricObjectFactory.createFromBackendDict(rubric);
       });
       this._skillIdToRubricsObject[skillId] = rubrics;
@@ -295,7 +295,7 @@ export class TopicEditorStateService {
     return this._topicIsInitialized;
   }
 
-  getSkillIdToRubricsObject(): RubricBackendDict[] {
+  getSkillIdToRubricsObject(): Record<string, Rubric[]> {
     return this._skillIdToRubricsObject;
   }
 
@@ -432,15 +432,17 @@ export class TopicEditorStateService {
    * will clear the UndoRedoService of pending changes. This function also
    * shares behavior with setTopic(), when it succeeds.
    */
-  saveTopic(commitMessage: string, successCallback: Function): boolean {
+  async saveTopic(
+      commitMessage: string) : Promise<void> {
     if (!this._topicIsInitialized) {
       this.alertService.fatalWarning(
         'Cannot save a topic before one is loaded.');
+      Promise.reject();
     }
 
     // Don't attempt to save the topic if there are no changes pending.
     if (!this.undoRedoService.hasChanges()) {
-      return false;
+      Promise.reject();
     }
     this._topicIsBeingSaved = true;
     this.editableTopicBackendApiService.updateTopic(
@@ -455,24 +457,22 @@ export class TopicEditorStateService {
           topicBackendObject.skillIdToRubricsDict);
         let changeList =
          this.undoRedoService.getCommittableChangeList();
-        for (let i = 0; i < changeList.length; i++) {
-          if (changeList[i].cmd === 'delete_canonical_story' ||
-                  changeList[i].cmd === 'delete_additional_story') {
+        for (let change of changeList) {
+          if ((change.cmd === 'delete_canonical_story' ||
+                  change.cmd === 'delete_additional_story') &&
+                  'story_id' in change) {
             this.editableStoryBackendApiService.deleteStory(
-              changeList[i].story_id);
+              change.story_id);
           }
         }
         this.undoRedoService.clearChanges();
         this._topicIsBeingSaved = false;
-        if (successCallback) {
-          successCallback();
-        }
+        Promise.resolve();
       }, (error: string) => {
         this.alertService.addWarning(
           error || 'There was an error when saving the topic.');
         this._topicIsBeingSaved = false;
       });
-    return true;
   }
 
   /**
