@@ -82,8 +82,8 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
        * @param {Boolean} stayInSameTab - To stay in the same tab or not.
       */
       ctrl._initDashboard = function(stayInSameTab) {
-        TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-          function(response) {
+        TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+          .then(function(response) {
             ctrl.totalTopicSummaries = response.topicSummaries;
             ctrl.topicSummaries = ctrl.totalTopicSummaries;
             ctrl.totalEntityCountToDisplay = ctrl.topicSummaries.length;
@@ -142,7 +142,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
                 'Unexpected error code from the server.');
             }
           }
-        );
+          );
       };
 
       /**
@@ -218,7 +218,7 @@ angular.module('oppia').component('topicsAndSkillsDashboardPage', {
       ctrl.fetchSkills = function() {
         if (ctrl.moreSkillsPresent) {
           TopicsAndSkillsDashboardBackendApiService
-            .fetchSkillsDashboardData(
+            .fetchSkillsDashboardDataAsync(
               ctrl.filterObject, ctrl.itemsPerPage, ctrl.nextCursor).then(
               (response) => {
                 ctrl.moreSkillsPresent = response.more;

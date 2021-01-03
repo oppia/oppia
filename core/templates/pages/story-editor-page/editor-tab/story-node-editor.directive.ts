@@ -118,8 +118,8 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.allowedBgColors = (
               storyNodeConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
             var skillSummaries = StoryEditorStateService.getSkillSummaries();
-            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-              function(response) {
+            TopicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
+              .then(function(response) {
                 categorizedSkills = response.categorizedSkillsDict;
                 untriagedSkillSummaries = response.untriagedSkillSummaries;
                 $scope.skillInfoHasLoaded = true;
@@ -263,7 +263,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
@@ -301,7 +301,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillsInSameTopicCount: () => skillsInSameTopicCount,
                 sortedSkillSummaries: () => sortedSkillSummaries,
