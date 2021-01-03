@@ -118,8 +118,7 @@ describe('Collection playthrough model', () => {
   });
 
   it('should return collection is not started when no exploration is' +
-    'completed',
-  () => {
+    'completed', () => {
     const collectionPlaythroughBackendDict = {
       next_exploration_id: 'exp_id0',
       completed_exploration_ids: []
@@ -131,43 +130,40 @@ describe('Collection playthrough model', () => {
   }
   );
 
-  it(
-    'should return collection is started when any exploration is' +
-      'completed',
-    () => {
-      const collectionPlaythroughBackendDict = {
-        next_exploration_id: 'exp_id0',
-        completed_exploration_ids: ['exp_id1']
-      };
-      const collectionPlaythroughObject = CollectionPlaythrough
-        .createFromBackendObject(collectionPlaythroughBackendDict);
-      expect(collectionPlaythroughObject.hasStartedCollection())
-        .toEqual(true);
-    });
+  it('should return collection is started when any exploration is' +
+    'completed', () => {
+    const collectionPlaythroughBackendDict = {
+      next_exploration_id: 'exp_id0',
+      completed_exploration_ids: ['exp_id1']
+    };
+    const collectionPlaythroughObject = CollectionPlaythrough
+      .createFromBackendObject(collectionPlaythroughBackendDict);
+    expect(collectionPlaythroughObject.hasStartedCollection())
+      .toEqual(true);
+  });
 
-  it(
-    'should return collection is finished when a next' +
-      'exploration is available', () => {
-      const collectionPlaythroughBackendDict = {
-        next_exploration_id: 'exp_id0',
-        completed_exploration_ids: ['exp_id1']
-      };
-      const collectionPlaythroughObject = CollectionPlaythrough
-        .createFromBackendObject(collectionPlaythroughBackendDict);
-      expect(collectionPlaythroughObject.hasFinishedCollection())
-        .toEqual(false);
-    });
+  it('should return collection is finished when a next' +
+    'exploration is available', () => {
+    const collectionPlaythroughBackendDict = {
+      next_exploration_id: 'exp_id0',
+      completed_exploration_ids: ['exp_id1']
+    };
+    const collectionPlaythroughObject = CollectionPlaythrough
+      .createFromBackendObject(collectionPlaythroughBackendDict);
+    expect(collectionPlaythroughObject.hasFinishedCollection())
+      .toEqual(false);
+  });
 
   it(
     'should return collection is not finished when a next' +
     'exploration is not available', () => {
-      const collectionPlaythroughBackendDict = {
-        next_exploration_id: null,
-        completed_exploration_ids: ['exp_id1']
-      };
-      const collectionPlaythroughObject = CollectionPlaythrough
-        .createFromBackendObject(collectionPlaythroughBackendDict);
-      expect(collectionPlaythroughObject.hasFinishedCollection())
-        .toEqual(true);
-    });
+    const collectionPlaythroughBackendDict = {
+      next_exploration_id: null,
+      completed_exploration_ids: ['exp_id1']
+    };
+    const collectionPlaythroughObject = CollectionPlaythrough
+      .createFromBackendObject(collectionPlaythroughBackendDict);
+    expect(collectionPlaythroughObject.hasFinishedCollection())
+      .toEqual(true);
+  });
 });
