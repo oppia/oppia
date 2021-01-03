@@ -17,7 +17,7 @@
  */
 import { Pipe, EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed,fakeAsync } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
@@ -58,8 +58,8 @@ describe('Teach Page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
-  let userBackendApiService  : UserBackendApiService = null;
-  
+  let userBackendApiService: UserBackendApiService = null;
+
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
@@ -125,24 +125,24 @@ describe('Teach Page', () => {
     expect(component.classroomUrl).toBe('/learn/math');
     expect(component.isWindowNarrow).toBe(true);
   });
-  
-  it('should check loader screen is working', () => { 
+
+  it('should check loader screen is working', () => {
     component.ngOnInit();
     fakeAsync(() => {
       spyOn(loaderService, 'showLoadingScreen').and.callThrough();
       expect(loaderService.showLoadingScreen)
         .toHaveBeenCalledWith('Loading');
-      spyOn(userBackendApiService,'getUserInfoAsync')
+      spyOn(userBackendApiService, 'getUserInfoAsync')
         .and.callThrough();
       expect(userBackendApiService.getUserInfoAsync)
         .toHaveBeenCalled();
-      expect(component.userIsLoggedIn).toBe(!null)
+      expect(component.userIsLoggedIn).toBe(!null);
       spyOn(loaderService, 'hideLoadingScreen')
         .and.callThrough();
       expect(loaderService.hideLoadingScreen)
-        .toHaveBeenCalled()
-      })
-  })
+        .toHaveBeenCalled();
+    });
+  });
 
   it('should record analytics when Start Learning is clicked', function() {
     spyOn(
