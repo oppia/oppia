@@ -585,8 +585,14 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'\.put_async\('),
         'message': (
-            'Please use put_async_for_human() or put_async_for_bot() '
-            'instead.'),
+            'Please use put() instead.'),
+        'excluded_files': (),
+        'excluded_dirs': ('core/storage/base_model/',)
+    },
+    {
+        'regexp': re.compile(r'\.put_multi_async\('),
+        'message': (
+            'Please use put_multi() instead.'),
         'excluded_files': (),
         'excluded_dirs': ('core/storage/base_model/',)
     }

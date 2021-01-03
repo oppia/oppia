@@ -88,6 +88,8 @@ INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
 # PY filepaths.
 INVALID_PUT_ASYNC_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_put_async.py')
+INVALID_PUT_MULTI_ASYNC_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_put_multi_async.py')
 INVALID_ITERKEY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iterkeys.py')
 INVALID_ITERVALUES_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_itervalues.py')
@@ -755,8 +757,19 @@ class PythonLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             [
-                'Line 39: Please use put_async_for_human() or ' +
-                'put_async_for_bot() instead.'
+                'Line 39: Please use put() instead.'
+            ],
+            lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_use_of_put_multi_async(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_PUT_MULTI_ASYNC_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements(
+            [
+                'Line 39: Please use put_multi() instead.'
             ],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)

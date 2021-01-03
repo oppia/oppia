@@ -414,26 +414,6 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             previous_last_updated_by_human,
             self.model_instance.last_updated_by_human)
 
-    def test_put_async_for_human(self):
-        previous_last_updated_by_human = (
-            self.model_instance.last_updated_by_human)
-        self.model_instance.update_timestamps()
-        self.model_instance.put_async_for_human()
-
-        self.assertNotEqual(
-            previous_last_updated_by_human,
-            self.model_instance.last_updated_by_human)
-
-    def test_put_async_for_bot(self):
-        previous_last_updated_by_human = (
-            self.model_instance.last_updated_by_human)
-        self.model_instance.update_timestamps()
-        self.model_instance.put_async_for_bot()
-
-        self.assertEqual(
-            previous_last_updated_by_human,
-            self.model_instance.last_updated_by_human)
-
     def test_put_multi(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
@@ -458,36 +438,6 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
 
         self.model_instance.update_timestamps()
         TestBaseHumanMaintainedModel.put_multi_for_bot(
-            [self.model_instance])
-
-        self.assertEqual(
-            previous_last_updated_by_human,
-            self.model_instance.last_updated_by_human)
-
-    def test_put_multi_async(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            'Use put_multi_async_for_human or put_multi_async_for_bot instead'):
-            self.model_instance.put_multi_async([])
-
-    def test_put_multi_async_for_human(self):
-        previous_last_updated_by_human = (
-            self.model_instance.last_updated_by_human)
-
-        self.model_instance.update_timestamps()
-        TestBaseHumanMaintainedModel.put_multi_async_for_human(
-            [self.model_instance])
-
-        self.assertNotEqual(
-            previous_last_updated_by_human,
-            self.model_instance.last_updated_by_human)
-
-    def test_put_multi_async_for_bot(self):
-        previous_last_updated_by_human = (
-            self.model_instance.last_updated_by_human)
-
-        self.model_instance.update_timestamps()
-        TestBaseHumanMaintainedModel.put_multi_async_for_bot(
             [self.model_instance])
 
         self.assertEqual(

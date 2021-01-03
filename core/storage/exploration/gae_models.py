@@ -223,7 +223,7 @@ class ExplorationModel(base_models.VersionedModel):
                 commit_log_models.append(exploration_commit_log)
             ExplorationCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
-            datastore_services.put_multi_async(commit_log_models)
+            datastore_services.put_multi(commit_log_models)
 
 
 class ExplorationContextModel(base_models.BaseModel):
@@ -520,9 +520,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # Create and delete events will already be recorded in the
         # ExplorationModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when explorations
-            # are changed).
             ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,

@@ -461,15 +461,6 @@ class BaseHumanMaintainedModel(BaseModel):
         """Stores the model instance on behalf of a non-human."""
         return super(BaseHumanMaintainedModel, self).put()
 
-    def put_async_for_human(self):
-        """Stores the model instance asynchronously on behalf of a human."""
-        self.last_updated_by_human = datetime.datetime.utcnow()
-        return super(BaseHumanMaintainedModel, self).put_async()
-
-    def put_async_for_bot(self):
-        """Stores the model instance asynchronously on behalf of a non-human."""
-        return super(BaseHumanMaintainedModel, self).put_async()
-
     @classmethod
     def put_multi(cls, unused_instances):
         """Unsupported operation on human-maintained models."""
@@ -502,40 +493,6 @@ class BaseHumanMaintainedModel(BaseModel):
             list(future). A list of futures.
         """
         return super(BaseHumanMaintainedModel, cls).put_multi(instances)
-
-    @classmethod
-    def put_multi_async(cls, unused_instances):
-        """Unsupported operation on human-maintained models."""
-        raise NotImplementedError(
-            'Use put_multi_async_for_human or put_multi_async_for_bot instead')
-
-    @classmethod
-    def put_multi_async_for_human(cls, instances):
-        """Stores the given model instances asynchronously on behalf of a human.
-
-        Args:
-            instances: list(HumanMaintainedModel). The instances to store.
-
-        Returns:
-            list(future). A list of futures.
-        """
-        now = datetime.datetime.utcnow()
-        for instance in instances:
-            instance.last_updated_by_human = now
-        return super(BaseHumanMaintainedModel, cls).put_multi_async(instances)
-
-    @classmethod
-    def put_multi_async_for_bot(cls, instances):
-        """Stores the given model instances asynchronously on behalf of a
-        non-human.
-
-        Args:
-            instances: list(HumanMaintainedModel). The instances to store.
-
-        Returns:
-            list(future). A list of futures.
-        """
-        return super(BaseHumanMaintainedModel, cls).put_multi_async(instances)
 
 
 class BaseCommitLogEntryModel(BaseModel):
