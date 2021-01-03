@@ -15,10 +15,9 @@
 /**
  * @fileoverview Unit tests for the teach page.
  */
-import { Injectable, Pipe, EventEmitter } from '@angular/core';
+import { Pipe, EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { HttpClient } from '@angular/common/http';
+import { TestBed,fakeAsync } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
@@ -58,11 +57,9 @@ class MockI18nLanguageCodeService {
 describe('Teach Page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
-  const windowDimensionServiceStub = new WindowDimensionsService(new WindowRef())
-  var userBackendApiService: UserBackendApiService;
-  var loaderService:LoaderService;
-  var subscriptions = [];
-  var loadingMessage = '';
+  let loaderService: LoaderService = null;
+  let userBackendApiService  : UserBackendApiService = null;
+  
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
@@ -70,6 +67,12 @@ describe('Teach Page', () => {
         {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService
+        },
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true
+          }
         },
         { provide: TranslateService, useClass: MockTranslateService },
         {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
@@ -88,15 +91,13 @@ describe('Teach Page', () => {
     }).compileComponents();
   });
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $timeout = $injector.get('$timeout');
-    $q = $injector.get('$q'); 
-  }));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
+    loaderService = TestBed.get(LoaderService);
+    userBackendApiService = TestBed.get(SiteAnalyticsService);
   });
 
   let component;
@@ -104,11 +105,8 @@ describe('Teach Page', () => {
   beforeEach(() => {
     const teachPageComponent = TestBed.createComponent(TeachPageComponent);
     component = teachPageComponent.componentInstance;
-    subscriptions.push(loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => loadingMessage = message
-    ))
   });
-  
+
   it('should successfully instantiate the component from beforeEach block',
     () => {
       expect(component).toBeDefined();
@@ -118,29 +116,50 @@ describe('Teach Page', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
   });
+
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
-
-    expect(component.windowIsNarrow()).toBe(true);
-    expect(component.donateImgUrl).toBe(
-      '/assets/images/general/opp_donate_text.svg');
+    expect(component.userIsLoggedIn).toBe(null);
+    expect(component.displayedTestimonialId).toBe(0);
+    expect(component.testimonialCount).toBe(4);
+    expect(component.classroomUrl).toBe('/learn/math');
+    expect(component.isWindowNarrow).toBe(true);
   });
+  
+  it('should check loader screen is working', () => { 
+    component.ngOnInit();
+    fakeAsync(() => {
+      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+      expect(loaderService.showLoadingScreen)
+        .toHaveBeenCalledWith('Loading');
+      spyOn(userBackendApiService,'getUserInfoAsync')
+        .and.callThrough();
+      expect(userBackendApiService.getUserInfoAsync)
+        .toHaveBeenCalled();
+      expect(component.userIsLoggedIn).toBe(!null)
+      spyOn(loaderService, 'hideLoadingScreen')
+        .and.callThrough();
+      expect(loaderService.hideLoadingScreen)
+        .toHaveBeenCalled()
+      })
+  })
+
   it('should record analytics when Start Learning is clicked', function() {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickStartLearningButtonEvent')
       .and.callThrough();
-      component.onClickStartLearningButton();
-      expect(siteAnalyticsServiceStub.registerClickStartLearningButtonEvent)
-      .toHaveBeenCalledWith();
+    component.onClickStartLearningButton();
+    expect(siteAnalyticsServiceStub.registerClickStartLearningButtonEvent)
+      .toHaveBeenCalled();
   });
 
   it('should record analytics when Visit Classroom is clicked', function() {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
       .and.callThrough();
-      component.onClickVisitClassroomButton();
-      expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
-      .toHaveBeenCalledWith();
+    component.onClickVisitClassroomButton();
+    expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
+      .toHaveBeenCalled();
   });
 
 
@@ -149,7 +168,8 @@ describe('Teach Page', () => {
       siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
       .and.callThrough();
     component.onClickBrowseLibraryButton();
-    expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent).toHaveBeenCalledWith();
+    expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent)
+      .toHaveBeenCalled();
   });
 
   it('should record analytics when Guide For Parents is clicked', function() {
@@ -157,7 +177,8 @@ describe('Teach Page', () => {
       siteAnalyticsServiceStub, 'registerClickGuideParentsButtonEvent')
       .and.callThrough();
     component.onClickGuideParentsButton();
-    expect(siteAnalyticsServiceStub.registerClickGuideParentsButtonEvent).toHaveBeenCalledWith();
+    expect(siteAnalyticsServiceStub.registerClickGuideParentsButtonEvent)
+      .toHaveBeenCalled();
   });
 
   it('should record analytics when Tips For Parents is clicked', function() {
@@ -165,7 +186,8 @@ describe('Teach Page', () => {
       siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
       .and.callThrough();
     component.onClickTipforParentsButton();
-    expect(siteAnalyticsServiceStub.registerClickTipforParentsButtonEvent).toHaveBeenCalledWith();
+    expect(siteAnalyticsServiceStub.registerClickTipforParentsButtonEvent)
+      .toHaveBeenCalled();
   });
 
   it('should record analytics when Explore Lessons is clicked', function() {
@@ -173,14 +195,8 @@ describe('Teach Page', () => {
       siteAnalyticsServiceStub, 'registerClickExploreLessonsButtonEvent')
       .and.callThrough();
     component.onClickExploreLessonsButton();
-    expect(siteAnalyticsServiceStub.registerClickExploreLessonsButtonEvent).toHaveBeenCalledWith();
-  });
-
-  it('should check if window is narrow', function() {
-    spyOn(
-      windowDimensionServiceStub, 'isWindowNarrow').and.returnValues(false, true);
-    expect(component.isWindowNarrow()).toBe(false);
-    expect(component.isWindowNarrow()).toBe(true);
+    expect(siteAnalyticsServiceStub.registerClickExploreLessonsButtonEvent)
+      .toHaveBeenCalled();
   });
 
   it('should increment and decrement testimonial IDs correctly', function() {
@@ -203,41 +219,4 @@ describe('Teach Page', () => {
     component.ngOnInit();
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
-
-  it('should evaluate if user is logged in', function() {
-    spyOn(userBackendApiService, 'getUserInfoAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve({
-        isLoggedIn: function() {
-          return true;
-        }
-      });
-      return deferred.promise;
-    });
-
-    component.ngOnInit();
-    expect(component.userIsLoggedIn).toBe(null);
-    expect(component.classroomUrl).toBe('/learn/math');
-    expect(loadingMessage).toBe('Loading');
-
-    // $scope.$digest();
-    // expect(component.userIsLoggedIn).toBe(true);
-    // expect(loadingMessage).toBe('');
-  // });
-
-  // it('should evaluate if user is not logged in', function() {
-  //   spyOn(userBackendApiService, 'getUserInfoAsync').and.callFake(function() {
-  //     var deferred = $q.defer();
-  //     deferred.resolve({
-  //       isLoggedIn: function() {
-  //         return false;
-  //       }
-  //     });
-  //     return deferred.promise;
-  //   });
-
-  //   $scope.$digest();
-  //   expect(component.userIsLoggedIn).toBe(false);
-  //   expect(loadingMessage).toBe('');
-  // });
-})
+});

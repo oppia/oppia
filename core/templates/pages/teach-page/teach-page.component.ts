@@ -26,12 +26,14 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
 import { LoaderService } from 'services/loader.service.ts';
 import { UserBackendApiService } from 'services/user-backend-api.service';
+
 @Component({
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
   styleUrls: []
 })
 export class TeachPageComponent implements OnInit {
+  isWindowNarrow: boolean = false;
   classroomUrlFragment: string;
   classroomUrl :string;
   displayedTestimonialId: number;
@@ -48,6 +50,7 @@ export class TeachPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.userIsLoggedIn = null;
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;
@@ -108,10 +111,6 @@ export class TeachPageComponent implements OnInit {
       imageUrlWebp: this.getStaticImageUrl('/splash/Gaurav_2.webp'),
       borderPresent: true
     }];
-  }
-
-  isWindowNarrow():boolean {
-    return this.windowDimensionService.isWindowNarrow();
   }
 
   onClickStartLearningButton(): boolean {

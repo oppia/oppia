@@ -1,10 +1,10 @@
 <div class="teach-page">
   <div class="oppia-teach-section-one" dir="auto">
 
-    <div class="oppia-teach-section-one-left"  *ngIf="!isWindowNarrow()">
+    <div class="oppia-teach-section-one-left"  *ngIf="!isWindowNarrow">
       <h1 class="oppia-teach-h1" [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate"></h1>
       <div class="oppia-teach-h2-container">
-        <h2 *ngIf="!isWindowNarrow()" class="oppia-teach-h2 oppia-teach-h2-text" [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate"></h2>
+        <h2 *ngIf="!isWindowNarrow" class="oppia-teach-h2 oppia-teach-h2-text" [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate"></h2>
       </div>
       <div class="oppia-teach-button-container">
         <form action="classroomUrl">
@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <div class="oppia-teach-section-one-left" *ngIf="isWindowNarrow()">
+    <div class="oppia-teach-section-one-left" *ngIf="isWindowNarrow">
       <h1 class="oppia-teach-h1 mobile-heading" [innerHTML]="'I18N_TEACH_PAGE_HEADING' | translate"></h1>
       <h2  class="oppia-teach-h2 oppia-teach-h2-text mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_CONTENT' | translate"></h2>
       <div class="oppia-teach-button-container mobile-button">
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div *ngIf="!isWindowNarrow()" class="oppia-teach-section-one-right">
+    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-one-right">
       <picture class="oppia-teach-main-image image-desktop">
         <source type="image/webp" [src]="getStaticImageUrl('/teach/student.webp')">
         <source type="image/png" [src]="getStaticImageUrl('/teach/student.png')">
@@ -37,7 +37,7 @@
       </picture>
     </div>
 
-    <div *ngIf="isWindowNarrow()">
+    <div *ngIf="isWindowNarrow">
       <picture class="oppia-teach-main-image image-mobile">
         <source type="image/webp" [src]="getStaticImageUrl('/teach/student.webp')">
         <source type="image/png" [src]="getStaticImageUrl('/teach/student.png')">
@@ -47,7 +47,7 @@
   </div>
 
   <div class="oppia-teach-section-two">
-    <div  *ngIf="!isWindowNarrow()" class="oppia-teach-section-two-left" >
+    <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-two-left" >
       <picture class="teach-matthew-image">
         <source type="image/webp" [src]="getStaticImageUrl('/splash/matthew_fractions.webp')">
         <source type="image/png" [src]="getStaticImageUrl('/splash/matthew_fractions.png')">
@@ -55,7 +55,7 @@
       </picture>
     </div>
 
-    <div *ngIf="isWindowNarrow()" class="oppia-teach-section-two-left">
+    <div *ngIf="isWindowNarrow" class="oppia-teach-section-two-left">
       <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       <picture class="teach-matthew-image">
         <source type="image/webp" [src]="getStaticImageUrl('/splash/matthew_fractions.webp')">
@@ -64,7 +64,7 @@
       </picture>
     </div>
 
-    <div class="oppia-teach-section-two-right" *ngIf="!isWindowNarrow()" >
+    <div class="oppia-teach-section-two-right" *ngIf="!isWindowNarrow" >
       <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       <div class="teach-benefits-section">
         <img [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
@@ -80,7 +80,7 @@
       </div>
     </div>
 
-    <div class="oppia-teach-section-two-right" *ngIf="isWindowNarrow()">
+    <div class="oppia-teach-section-two-right" *ngIf="isWindowNarrow">
       <div class="teach-benefits-section">
         <img [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
         <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
@@ -97,7 +97,7 @@
   </div>
 
   <div class="oppia-teach-section-three">
-    <div *ngIf="!isWindowNarrow()" class="oppia-teach-section-three-left">
+    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-three-left">
       <h2 [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_TITLE' | translate"></h2>
       <p [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_CONTENT' | translate"></p>
       <div class="oppia-teach-button-container">
@@ -109,21 +109,21 @@
         </form>
       </div>
     </div>
-    <div *ngIf="!isWindowNarrow()" class="oppia-teach-section-three-right">
+    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
         <source type="image/webp" [src]="getStaticImageUrl('/teach/oppia3.webp')">
         <source type="image/png" [src]="getStaticImageUrl('/teach/oppia3.png')">
         <img [src]="getStaticImageUrl('/teach/oppia3.png')" alt="">
       </picture>
     </div>
-    <div *ngIf="isWindowNarrow()" class="oppia-teach-section-three-right">
+    <div *ngIf="isWindowNarrow" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
         <source type="image/webp" [src]="getStaticImageUrl('/teach/oppia3.webp')">
         <source type="image/png" [src]="getStaticImageUrl('/teach/oppia3.png')">
         <img [src]="getStaticImageUrl('/teach/oppia3.png')" alt="">
       </picture>
     </div>
-    <div *ngIf="isWindowNarrow()" class="oppia-teach-section-three-left mobile">
+    <div *ngIf="isWindowNarrow" class="oppia-teach-section-three-left mobile">
       <h2 class="mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_TITLE' | translate"></h2>
       <p class="mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_CLASSROOM_CONTENT' | translate"></p>
       <div class="oppia-teach-button-container">
@@ -138,7 +138,7 @@
   </div>
 
   <div class="oppia-teach-section-four">
-    <div *ngIf="!isWindowNarrow()" class="oppia-teach-section-four-left">
+    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-four-left">
       <h2 [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_TITLE' | translate"></h2>
       <p [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_CONTENT' | translate"></p>
       <div class="oppia-teach-button-container">
@@ -150,21 +150,21 @@
         </form>
       </div>
     </div>
-    <div class="oppia-teach-section-four-right" *ngIf="!isWindowNarrow()">
+    <div class="oppia-teach-section-four-right" *ngIf="!isWindowNarrow">
       <picture class="teach-with-oppia-image">
         <source type="image/webp" [src]="getStaticImageUrl('/teach/oppia1.webp')">
         <source type="image/png" [src]="getStaticImageUrl('/teach/oppia1.png')">
         <img [src]="getStaticImageUrl('/teach/oppia1.png')" alt="">
       </picture>
     </div>
-    <div class="oppia-teach-section-four-right" *ngIf="isWindowNarrow()">
+    <div class="oppia-teach-section-four-right" *ngIf="isWindowNarrow">
       <picture class="teach-with-oppia-image">
         <source type="image/webp" [src]="getStaticImageUrl('/teach/oppia1.webp')">
         <source type="image/png" [src]="getStaticImageUrl('/teach/oppia1.png')">
         <img [src]="getStaticImageUrl('/teach/oppia1.png')" alt="">
       </picture>
     </div>
-    <div *ngIf="isWindowNarrow()" class="oppia-teach-section-four-left mobile">
+    <div *ngIf="isWindowNarrow" class="oppia-teach-section-four-left mobile">
       <h2 class="mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_TITLE' | translate"></h2>
       <p class="mobile-h2" [innerHTML]="'I18N_TEACH_PAGE_LIBRARY_CONTENT' | translate"></p>
       <div class="oppia-teach-button-container">
@@ -179,7 +179,7 @@
   </div>
 
   <div class="oppia-teach-section-five" [ngStyle]="{'background-image': 'getTestimonialBackgroundUrl()'}">
-    <div *ngIf="!isWindowNarrow()">
+    <div *ngIf="!isWindowNarrow">
       <div class="oppia-teach-section-five-left">
         <h2 [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
         <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
@@ -201,7 +201,7 @@
       </div>
     </div>
 
-    <div *ngIf="isWindowNarrow()">
+    <div *ngIf="isWindowNarrow">
       <!--<div class="oppia-teach-section-five-image">
         <picture class="teach-student-image">
           <source type="image/webp" [src]="testimonials[displayedTestimonialId].imageUrlWebp">
@@ -225,7 +225,7 @@
   </div>
 
   <div class="oppia-teach-section-six">
-    <div *ngIf="!isWindowNarrow()">
+    <div *ngIf="!isWindowNarrow">
       <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
       <div class="oppia-teach-button-container-button-one">
         <form action="/teach">
@@ -253,7 +253,7 @@
       </div>
     </div>
 
-    <div *ngIf="isWindowNarrow()">
+    <div *ngIf="isWindowNarrow">
       <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
       <div class="oppia-teach-button-container-button-one">
         <form action="/teach">
