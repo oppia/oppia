@@ -125,7 +125,6 @@ def get_provider_id():
     return feconf.FIREBASE_AUTH_PROVIDER_ID
 
 
-@contextlib.contextmanager
 def authenticate_request(request):
     """Authenticates request and returns claims about it's authorizer, if any.
 
