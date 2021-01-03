@@ -38,7 +38,6 @@ from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-
 import feconf # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-import contextlib2 # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -149,6 +148,8 @@ def main(args=None):
 
     common.start_redis_server()
 
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
     managed_dev_appserver = common.managed_dev_appserver(
         app_yaml_filepath, clear_datastore=not parsed_args.save_datastore,
         enable_console=parsed_args.enable_console,

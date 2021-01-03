@@ -30,7 +30,6 @@ import python_utils
 from scripts import build
 from scripts import common
 
-import contextlib2
 
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
@@ -205,6 +204,8 @@ def main(args=None):
 
     common.start_redis_server()
 
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
     managed_dev_appserver = common.managed_dev_appserver(
         APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
         clear_datastore=True, log_level='critical', skip_sdk_update_check=True)

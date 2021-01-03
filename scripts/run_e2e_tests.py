@@ -34,7 +34,6 @@ from scripts import common
 from scripts import flake_checker
 from scripts import install_third_party_libs
 
-import contextlib2
 
 MAX_RETRY_COUNT = 3
 RERUN_NON_FLAKY = True
@@ -523,6 +522,8 @@ def run_tests(args):
     python_utils.PRINT('\n\nCHROMEDRIVER VERSION: %s\n\n' % version)
     start_webdriver_manager(version)
 
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
     managed_dev_appserver = common.managed_dev_appserver(
         'app.yaml' if args.prod_env else 'app_dev.yaml',
         port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
