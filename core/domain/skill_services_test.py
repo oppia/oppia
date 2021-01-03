@@ -428,7 +428,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, 'Assigned', None,
                 None, None, None))
-        self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
+        self.assertEqual(augmented_skill_summaries[0].topic_names, ['topic1'])
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
@@ -482,10 +482,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_filtered_skill_summaries(
                 self.num_queries_to_fetch, None, 'math', None,
                 None, None))
-        self.assertEqual(augmented_skill_summaries[0].topic_name, 'topic1')
+        self.assertEqual(augmented_skill_summaries[0].topic_names, ['topic1'])
         self.assertEqual(augmented_skill_summaries[0].id, self.SKILL_ID2)
         self.assertEqual(
-            augmented_skill_summaries[0].classroom_name, 'math')
+            augmented_skill_summaries[0].classroom_names, ['math'])
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
@@ -826,8 +826,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
         suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, self.SKILL_ID, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, self.SKILL_ID, 1,
             self.user_id_a, suggestion_change, 'test description'
         )
         skill_services.delete_skill(

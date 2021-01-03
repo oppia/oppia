@@ -35,7 +35,6 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import suggestion_jobs_one_off
-from core.domain import takeout_domain_jobs_one_off
 from core.domain import topic_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
@@ -62,7 +61,6 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationRteMathContentValidationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.HintsAuditOneOffJob,
-    exp_jobs_one_off.PopulateXmlnsAttributeInExplorationMathSvgImagesJob,
     exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
@@ -81,13 +79,13 @@ ONE_OFF_JOB_MANAGERS = [
         .InteractionCustomizationArgsValidationOneOffJob),
     interaction_jobs_one_off.ItemSelectionInteractionOneOffJob,
     interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob,
+    interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     (
         opportunity_jobs_one_off.
         RenameExplorationOpportunitySummaryModelPropertiesJob),
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
-    question_jobs_one_off.RegenerateQuestionSummaryOneOffJob,
     question_jobs_one_off.MissingQuestionMigrationOneOffJob,
     recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
@@ -106,22 +104,18 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAudit,
     stats_jobs_one_off.StatisticsCustomizationArgsAudit,
     stats_jobs_one_off.WipeExplorationIssuesOneOffJob,
-    story_jobs_one_off.DeleteOrphanStoriesOneOffJob,
     story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
-    story_jobs_one_off.OrphanStoriesAuditJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
     suggestion_jobs_one_off.PopulateFinalReviewerIdOneOffJob,
-    suggestion_jobs_one_off.PopulateSuggestionLanguageCodeMigrationOneOffJob,
     suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
-    suggestion_jobs_one_off.SuggestionMathMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
-    takeout_domain_jobs_one_off.SnapshotMetadataCommitMsgMigrationOneOffJob,
     suggestion_jobs_one_off.SuggestionSvgFilenameValidationOneOffJob,
     topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
     topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
-    user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
+    user_jobs_one_off.FillExplorationIdsInUserSubscriptionsModelOneOffJob,
+    user_jobs_one_off.CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,
@@ -131,6 +125,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     user_jobs_one_off.RemoveGaeUserIdOneOffJob,
     user_jobs_one_off.RemoveGaeIdOneOffJob,
+    user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob,
     user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob,
     user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
     user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
@@ -268,6 +263,7 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserContributionProficiencyModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserContributionsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserEmailPreferencesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserIdByFirebaseAuthIdModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob,
     prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserRecentChangesBatchModelAuditOneOffJob,

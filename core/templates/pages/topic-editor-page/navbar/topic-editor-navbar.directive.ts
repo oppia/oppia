@@ -194,7 +194,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                 'topic-editor-save-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 topicIsPublished: () => topicIsPublished
               },
