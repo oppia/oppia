@@ -37,33 +37,3 @@ def create_login_url(slug):
     return users.create_login_url(
         dest_url=utils.set_url_query_parameter(
             feconf.SIGNUP_URL, 'return_url', slug))
-
-
-def get_current_user():
-    """Returns the current user."""
-    return users.get_current_user()
-
-
-def is_current_user_super_admin():
-    """Checks whether the current user owns this app."""
-    return users.is_current_user_admin()
-
-
-def get_current_gae_id():
-    """Gets the user_id of current user.
-
-    Returns:
-        str or None. User id for the current user.
-    """
-    user = get_current_user()
-    return user and user.user_id()
-
-
-def get_current_user_email():
-    """Get the email for current user.
-
-    Returns:
-        str or None. Email for the current user.
-    """
-    user = get_current_user()
-    return user and user.email()

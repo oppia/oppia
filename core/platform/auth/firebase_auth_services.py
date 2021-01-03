@@ -59,6 +59,7 @@ import logging
 
 from core.domain import auth_domain
 from core.platform import models
+import feconf
 import python_utils
 
 import firebase_admin
@@ -80,10 +81,10 @@ def _acquire_firebase_context():
             firebase_admin.delete_app(app)
 
 
-def authenticate_request(request):
-    """Authenticates the request and returns the user who authorized it, if any.
+def _verify_id_token(auth_header):
+    """Verifies whether auth_header has a valid Firebase-provided ID token.
 
-    Oppia follows the OAuth Bearer authentication scheme.
+    Oppia's authorization headers use OAuth 2.0's Bearer authentication scheme.
 
     Bearer authentication (a.k.a. token authentication) is an HTTP
     authentication scheme based on "bearer tokens", an encrypted JWT generated
@@ -92,9 +93,6 @@ def authenticate_request(request):
     The name "Bearer authentication" can be understood as: "give access to the
     bearer of this token." These tokens _must_ be sent in the `Authorization`
     header of HTTP requests, and _must_ have the format: `Bearer <token>`.
-
-    Oppia specifically expects the token to have a Subject Identifier for the
-    user (Claim Name: 'sub').
 
     Learn more about:
         HTTP authentication schemes:
@@ -105,27 +103,60 @@ def authenticate_request(request):
             https://openid.net/specs/openid-connect-core-1_0.html#IDToken
 
     Args:
-        request: webapp2.Request. The HTTP request to inspect.
+        auth_header: str. The Authorization header taken from the request.
 
     Returns:
-        AuthClaims|None. Claims of the user who authorized the request, or None
-        if the request could not be authenticated.
+        dict(str: *). The Claims embedded into the Authorization header if
+        valid. Otherwise, returns an empty dict.
     """
-    scheme, _, token = request.headers.get('Authorization', '').partition(' ')
+    scheme, _, token = auth_header.partition(' ')
     if scheme != 'Bearer':
-        return None
-
+        return {}
     try:
         with _acquire_firebase_context():
-            claims = firebase_auth.verify_id_token(token)
+            return firebase_auth.verify_id_token(token)
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
-        return None
+        return {}
 
+
+def get_provider_id():
+    """Returns the name of the provider for these services."""
+    return feconf.FIREBASE_AUTH_PROVIDER_ID
+
+
+@contextlib.contextmanager
+def authenticate_request(request):
+    """Authenticates request and returns claims about it's authorizer, if any.
+
+    Oppia specifically expects the request to have a Subject Identifier for the
+    user (Claim Name: 'sub'), and an optional custom claim for super-admin users
+    (Claim Name: 'role').
+
+    Args:
+        request: webapp2.Request. The HTTP request to authenticate.
+
+    Returns:
+        AuthClaims|None. Claims about the user who authorized the request, or
+        None if the request could not be authenticated.
+    """
+    claims = _verify_id_token(request.headers.get('Authorization', ''))
     auth_id = claims.get('sub', None)
     email = claims.get('email', None)
-    # Auth ID is a required Claim, so return None when it is missing.
-    return None if not auth_id else auth_domain.AuthClaims(auth_id, email)
+    is_admin = claims.get('role', None) == 'admin'
+    if auth_id:
+        return auth_domain.AuthClaims(auth_id, email, is_admin)
+    return None
+
+
+def disable_auth_associations(user_id):
+    """Disable the auth associations of the given user so they can't be used."""
+    assoc_model = (
+        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
+    if assoc_model is not None:
+        assoc_model.deleted = True
+        assoc_model.update_timestamps()
+        assoc_model.put()
 
 
 def delete_auth_associations(user_id):

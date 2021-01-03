@@ -26,6 +26,7 @@ from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
+import feconf
 import python_utils
 
 import contextlib2
@@ -213,7 +214,21 @@ class AuthenticateRequestTests(test_utils.TestBase):
             auth_claims = firebase_auth_services.authenticate_request(request)
 
         self.assertEqual(
-            auth_claims, auth_domain.AuthClaims('auth_id', 'foo@test.com'))
+            auth_claims,
+            auth_domain.AuthClaims('auth_id', 'foo@test.com', False))
+
+    def test_identifies_user_with_admin_privileges(self):
+        verify_id_token_swap = self.swap_to_always_return(
+            firebase_admin.auth, 'verify_id_token',
+            value={'sub': 'auth_id', 'email': 'foo@test.com', 'role': 'admin'})
+        request = self.make_request(auth_header='Bearer DUMMY_JWT')
+
+        with verify_id_token_swap:
+            auth_claims = firebase_auth_services.authenticate_request(request)
+
+        self.assertEqual(
+            auth_claims,
+            auth_domain.AuthClaims('auth_id', 'foo@test.com', True))
 
     def test_returns_none_when_auth_header_is_missing(self):
         request = self.make_request()
@@ -364,6 +379,13 @@ class GenericAssociationTests(test_utils.GenericTestBase):
         # Should not raise.
         firebase_auth_services.delete_auth_associations('does_not_exist')
 
+    def test_disable_association_marks_model_for_deletion(self):
+        firebase_auth_services.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        firebase_auth_services.disable_auth_associations('uid')
+        self.assertIsNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
+
 
 class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
 
@@ -386,6 +408,11 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
         """Asserts that only the given message appeared in the logs."""
         self.assertEqual(len(logs), 1)
         self.assertIn(msg, logs[0])
+
+    def test_provider_id_is_firebase(self):
+        self.assertEqual(
+            firebase_auth_services.get_provider_id(),
+            feconf.FIREBASE_AUTH_PROVIDER_ID)
 
     def test_delete_user_without_firebase_initialization_returns_false(self):
         init_swap = self.swap_to_always_raise(
@@ -442,8 +469,20 @@ class FirebaseAccountWipeoutTests(test_utils.GenericTestBase):
     UNKNOWN_ERROR = firebase_exceptions.UnknownError('error')
 
     def setUp(self):
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self.swap(
+                models.Registry, 'import_auth_services',
+                classmethod(lambda _: firebase_auth_services)))
+            stack.callback(FirebaseAdminSdkStub.install(self))
+
+            # Reload wipeout_service so it uses our firebase_auth_services swap.
+            python_utils.reload_module(wipeout_service)
+
+            # Set-up has succeeded, so now we defer closing the ExitStack until
+            # tearDown() so that the tests can stay inside our opened contexts.
+            self._close_stack = stack.pop_all().close
+
         super(FirebaseAccountWipeoutTests, self).setUp()
-        self._uninstall_stub = FirebaseAdminSdkStub.install(self)
 
         firebase_admin.auth.create_user(uid=self.AUTH_ID)
         self.signup(self.EMAIL, self.USERNAME)
@@ -453,7 +492,7 @@ class FirebaseAccountWipeoutTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_id)
 
     def tearDown(self):
-        self._uninstall_stub()
+        self._close_stack()
         super(FirebaseAccountWipeoutTests, self).tearDown()
 
     def wipeout(self):

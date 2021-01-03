@@ -1368,7 +1368,7 @@ tags: []
         """
         self.testbed.setup_env(
             overwrite=True,
-            user_email=email, user_id=self.get_gae_id_from_email(email),
+            user_email=email, user_id=self.get_auth_id_from_email(email),
             user_is_admin=('1' if is_super_admin else '0'))
 
     def logout(self):
@@ -1435,7 +1435,7 @@ tags: []
             email: str. Email of the given user.
             username: str. Username of the given user.
         """
-        user_services.create_new_user(self.get_gae_id_from_email(email), email)
+        user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
         with self.login_context(email), requests_mock.Mocker() as m:
             # We mock out all HTTP requests while trying to signup to avoid
@@ -1536,11 +1536,11 @@ tags: []
             str or None. ID of the user possessing the given email, or None if
             the user does not exist.
         """
-        user_settings = user_services.get_user_settings_by_gae_id(
-            self.get_gae_id_from_email(email))
+        user_settings = user_services.get_user_settings_by_auth_id(
+            self.get_auth_id_from_email(email))
         return user_settings and user_settings.user_id
 
-    def get_gae_id_from_email(self, email):
+    def get_auth_id_from_email(self, email):
         """Returns a mock GAE user ID corresponding to the given email.
 
         This method can use any algorithm to produce results as long as, during

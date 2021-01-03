@@ -2709,6 +2709,9 @@ class UserAuthDetailsModel(base_models.BaseModel):
     # Authentication detail for sign-in using google id (GAE). Exists only
     # for full users. None for profile users.
     gae_id = datastore_services.StringProperty(indexed=True)
+    # Authentication detail for sign-in using Firebase authentication.
+    # TODO(#11462): Exists for all users.
+    firebase_auth_id = datastore_services.StringProperty(indexed=True)
     # For profile users, the user ID of the full user associated with that
     # profile. None for full users. Required for profiles because gae_id
     # attribute is None for them, hence this attribute stores their association
@@ -2754,6 +2757,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'firebase_auth_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'parent_user_id': base_models.EXPORT_POLICY.EXPORTED
         })
 
@@ -2792,22 +2796,24 @@ class UserAuthDetailsModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @classmethod
-    def get_by_auth_id(cls, auth_service, auth_id):
+    def get_by_auth_id(cls, provider_id, auth_id):
         """Fetch a user entry by auth_id of a particular auth service.
 
         Args:
-            auth_service: str. Name of the auth service.
+            provider_id: str. Name of the provider of the auth ID.
             auth_id: str. Authentication detail corresponding to the
-                authentication service.
+                authentication provider.
 
         Returns:
             UserAuthDetailsModel. The UserAuthDetailsModel instance having a
-            particular user mapped to the given auth_id and the auth service
+            particular user mapped to the given auth_id and the auth provider
             if there exists one, else None.
         """
 
-        if auth_service == feconf.AUTH_METHOD_GAE:
+        if provider_id == feconf.GAE_AUTH_PROVIDER_ID:
             return cls.query(cls.gae_id == auth_id).get()
+        elif provider_id == feconf.FIREBASE_AUTH_PROVIDER_ID:
+            return cls.query(cls.firebase_auth_id == auth_id).get()
         return None
 
     @classmethod

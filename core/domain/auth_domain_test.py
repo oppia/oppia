@@ -35,36 +35,42 @@ class AuthClaimsTests(test_utils.TestBase):
 
     def test_rejects_empty_auth_id(self):
         with self.assertRaisesRegexp(Exception, 'auth_id must not be empty'):
-            auth_domain.AuthClaims(None, None)
+            auth_domain.AuthClaims(None, None, False)
         with self.assertRaisesRegexp(Exception, 'auth_id must not be empty'):
-            auth_domain.AuthClaims('', None)
+            auth_domain.AuthClaims('', None, True)
 
     def test_attributes(self):
-        auth = auth_domain.AuthClaims('sub', 'email@test.com')
+        auth = auth_domain.AuthClaims('sub', 'email@test.com', True)
 
         self.assertEqual(auth.auth_id, 'sub')
         self.assertEqual(auth.email, 'email@test.com')
+        self.assertTrue(auth.is_admin)
 
     def test_repr(self):
         self.assertEqual(
-            repr(auth_domain.AuthClaims('sub', 'email@test.com')),
-            'AuthClaims(auth_id=%r, email=%r)' % ('sub', 'email@test.com'))
+            repr(auth_domain.AuthClaims('sub', 'email@test.com', False)),
+            'AuthClaims(auth_id=%r, email=%r, is_admin=%r)' % (
+                'sub', 'email@test.com', False))
         self.assertEqual(
-            repr(auth_domain.AuthClaims('tub', None)),
-            'AuthClaims(auth_id=%r, email=None)' % ('tub',))
+            repr(auth_domain.AuthClaims('tub', None, True)),
+            'AuthClaims(auth_id=%r, email=%r, is_admin=%r)' % (
+                'tub', None, True))
 
     def test_comparison(self):
-        auth = auth_domain.AuthClaims('sub', 'email@test.com')
+        auth = auth_domain.AuthClaims('sub', 'email@test.com', False)
 
-        self.assertEqual(auth, auth_domain.AuthClaims('sub', 'email@test.com'))
-        self.assertNotEqual(auth, auth_domain.AuthClaims('tub', None))
+        self.assertEqual(
+            auth, auth_domain.AuthClaims('sub', 'email@test.com', False))
+        self.assertNotEqual(auth, auth_domain.AuthClaims('tub', None, False))
 
     def test_hash(self):
-        a = auth_domain.AuthClaims('a', 'a@a.com')
-        b = auth_domain.AuthClaims('b', 'b@b.com')
+        a = auth_domain.AuthClaims('a', 'a@a.com', False)
+        b = auth_domain.AuthClaims('b', 'b@b.com', True)
 
         # Should be able to create a set of AuthClaims.
         auth_set = set([a, b])
 
-        self.assertIn(auth_domain.AuthClaims('a', 'a@a.com'), auth_set)
-        self.assertNotIn(auth_domain.AuthClaims('c', 'c@c.com'), auth_set)
+        self.assertIn(auth_domain.AuthClaims('a', 'a@a.com', False), auth_set)
+        self.assertIn(auth_domain.AuthClaims('b', 'b@b.com', True), auth_set)
+        self.assertNotIn(auth_domain.AuthClaims('a', 'a@a.com', True), auth_set)
+        self.assertNotIn(auth_domain.AuthClaims('c', 'c@c.com', True), auth_set)

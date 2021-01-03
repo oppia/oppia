@@ -2526,20 +2526,20 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     def test_get_by_auth_id_for_unregistered_auth_id_is_none(self):
         self.assertIsNone(
             user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.NONREGISTERED_GAE_ID))
+                feconf.GAE_AUTH_PROVIDER_ID, self.NONREGISTERED_GAE_ID))
 
     def test_get_by_auth_id_for_correct_user_id_auth_id_mapping(self):
         self.assertEqual(
             user_models.UserAuthDetailsModel.get_by_id(self.USER_ID),
             user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
+                feconf.GAE_AUTH_PROVIDER_ID, self.USER_GAE_ID)
         )
 
     def test_get_by_auth_id_registered_auth_id_returns_no_profile_user(self):
         self.assertNotEqual(
             user_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
             user_models.UserAuthDetailsModel.get_by_auth_id(
-                feconf.AUTH_METHOD_GAE, self.USER_GAE_ID)
+                feconf.GAE_AUTH_PROVIDER_ID, self.USER_GAE_ID)
         )
 
     def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):

@@ -568,7 +568,7 @@ def can_access_admin_page(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not user_services.is_current_user_super_admin():
+        if not self.is_super_admin:
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application' % self.user_id)
         return handler(self, **kwargs)
@@ -605,7 +605,7 @@ def can_upload_exploration(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not user_services.is_current_user_super_admin():
+        if not self.is_super_admin:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to upload explorations.')
         return handler(self, **kwargs)

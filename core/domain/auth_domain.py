@@ -45,25 +45,28 @@ class AuthClaims(python_utils.OBJECT):
         auth_id: str. A unique identifier associated to the user. The ID is only
             unique with respect to the Identity Provider that produced it.
         email: str|None. The email address associated to the user, if any.
+        is_admin: bool. Whether the user has intrinsic administrator privileges.
     """
 
-    def __init__(self, auth_id, email):
+    def __init__(self, auth_id, email, is_admin):
         if not auth_id:
             raise Exception('auth_id must not be empty')
         self.auth_id = auth_id
         self.email = email
+        self.is_admin = is_admin
 
     def __repr__(self):
-        return 'AuthClaims(auth_id=%r, email=%r)' % (self.auth_id, self.email)
+        return 'AuthClaims(auth_id=%r, email=%r, is_admin=%r)' % (
+            self.auth_id, self.email, self.is_admin)
 
     def __hash__(self):
-        return hash((self.auth_id, self.email))
+        return hash((self.auth_id, self.email, self.is_admin))
 
     def __eq__(self, other):
-        return (
-            # https://docs.python.org/2/library/constants.html#NotImplemented.
-            NotImplemented if not isinstance(other, AuthClaims) else
-            self.auth_id == other.auth_id and self.email == other.email)
+        # https://docs.python.org/2/library/constants.html#NotImplemented.
+        return NotImplemented if not isinstance(other, AuthClaims) else (
+            self.auth_id == other.auth_id and self.email == other.email and
+            self.is_admin == other.is_admin)
 
     def __ne__(self, other):
         # TODO(#11474): Delete this method once we've moved to Python 3 and rely

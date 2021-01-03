@@ -464,3 +464,18 @@ def reraise_exception():
     # the stacktrace. See https://stackoverflow.com/a/18188660/3688189.
     exec_info = sys.exc_info()
     six.reraise(exec_info[0], exec_info[1], tb=exec_info[2])
+
+
+def reload_module(mod):
+    """Returns the reloaded module. It must already be successfully loaded."""
+    try:
+        # In Python 3, reload has moved into the importlib module.
+        import importlib
+        return importlib.reload(mod)
+    except (ImportError, AttributeError):
+        pass
+    try:
+        # Before that, reload was a built-in function.
+        return builtins.reload(mod)
+    except (ImportError, AttributeError):
+        pass

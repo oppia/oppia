@@ -184,12 +184,12 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
 
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -218,7 +218,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.modifiable_user_data.display_alias = 'name'
         self.modifiable_user_data.pin = '123'
         self.profile_user_id = user_services.create_new_profiles(
-            self.user_1_gae_id, self.USER_1_EMAIL,
+            self.user_1_auth_id, self.USER_1_EMAIL,
             [self.modifiable_new_user_data]
         )[0].user_id
 
@@ -294,8 +294,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
-        user_settings = user_services.get_user_settings_by_gae_id(
-            self.user_1_gae_id)
+        user_settings = user_services.get_user_settings_by_auth_id(
+            self.user_1_auth_id)
         self.assertTrue(user_settings.deleted)
         user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
             self.user_1_id)
@@ -321,8 +321,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
-        user_settings = user_services.get_user_settings_by_gae_id(
-            self.user_1_gae_id)
+        user_settings = user_services.get_user_settings_by_auth_id(
+            self.user_1_auth_id)
         self.assertTrue(user_settings.deleted)
         user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
             self.user_1_id)
@@ -4028,7 +4028,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         user_models.LearnerPlaylistModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
         ).put()
-        self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -4058,7 +4058,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.display_alias = 'name'
         self.modifiable_new_user_data.pin = '123'
         self.profile_user_id = user_services.create_new_profiles(
-            self.user_1_gae_id, self.USER_1_EMAIL,
+            self.user_1_auth_id, self.USER_1_EMAIL,
             [self.modifiable_new_user_data]
         )[0].user_id
 
@@ -4321,7 +4321,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -4351,7 +4351,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.display_alias = 'name'
         self.modifiable_new_user_data.pin = '123'
         self.profile_user_id = user_services.create_new_profiles(
-            self.user_1_gae_id, self.USER_1_EMAIL,
+            self.user_1_auth_id, self.USER_1_EMAIL,
             [self.modifiable_new_user_data]
         )[0].user_id
         wipeout_service.pre_delete_user(self.user_2_id)
