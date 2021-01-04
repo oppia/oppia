@@ -212,7 +212,7 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
     def _validate_first_published_msec(cls, item):
         """Validate that first published time of model is less than current
         time.
-        
+
         Args:
             item: datastore_services.Model. ExplorationRightsModel to validate.
         """
@@ -343,6 +343,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
     def _validate_contributors_summary(cls, item):
         """Validate that contributor ids match the contributor ids obtained
         from contributors summary.
+
         Args:
             item: datastore_services.Model. ExpSummaryModel to validate.
         """
@@ -362,6 +363,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
     def _validate_first_published_msec(cls, item):
         """Validate that first published time of model is less than current
         time.
+
         Args:
             item: datastore_services.Model. ExpSummaryModel to validate.
         """
@@ -381,6 +383,7 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
             cls, item, field_name_to_external_model_references):
         """Validate that item.exploration_model_last_updated matches the
         time when a last commit was made by a human contributor.
+
         Args:
             item: datastore_services.Model. ExpSummaryModel to validate.
             field_name_to_external_model_references:
