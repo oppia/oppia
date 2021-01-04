@@ -115,7 +115,7 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
         Args:
             field_name: str. A specific name used as an identifier by the
                 storage model which is used to identify the user settings model
-                reference. For example: 'committer_id': UserSettingsModel,
+                reference. For example: `'committer_id': UserSettingsModel`
                 means that committer_id is a field which contains a user_id
                 used to identify the external model UserSettingsModel.
             model_ids: list(str). The list of user settings model IDs for which
