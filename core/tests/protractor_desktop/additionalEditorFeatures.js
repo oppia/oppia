@@ -237,6 +237,7 @@ describe('Full exploration editor', function() {
     await explorationPlayerPage.expectLatestFeedbackToMatch(
       await forms.toRichText('Farewell'));
     await explorationPlayerPage.clickThroughToNextCard();
+    await waitFor.pageToFullyLoad();
     await explorationPlayerPage.expectExplorationToBeOver();
     await explorationEditorPage.discardChanges();
     await users.logout();
@@ -352,6 +353,7 @@ describe('Full exploration editor', function() {
     await explorationPlayerPage.expectLatestFeedbackToMatch(
       await forms.toRichText('Okay, now this is just becoming annoying.'));
     await explorationPlayerPage.clickThroughToNextCard();
+    await waitFor.pageToFullyLoad();
     await explorationPlayerPage.expectExplorationToBeOver();
     await users.logout();
   });
