@@ -1625,9 +1625,9 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
             self.assertIsNotNone(
                 original_subscription_model.activity_ids)
             self.assertIn(
-                'activity_ids', original_subscription_model._values)
+                'activity_ids', original_subscription_model._values)  # pylint: disable=protected-access
             self.assertIn(
-                'activity_ids', original_subscription_model._properties)
+                'activity_ids', original_subscription_model._properties)  # pylint: disable=protected-access
 
             output = self._run_one_off_job()
             self.assertItemsEqual(
@@ -1637,9 +1637,9 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
                 user_models.UserSubscriptionsModel.get_by_id('id'))
 
             self.assertNotIn(
-                'activity_ids', migrated_subscription_model._values)
+                'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
             self.assertNotIn(
-                'activity_ids', migrated_subscription_model._properties)
+                'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
             self.assertEqual(
                 original_subscription_model.last_updated,
                 migrated_subscription_model.last_updated)
@@ -1654,9 +1654,9 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
         original_subscription_model.put()
 
         self.assertNotIn(
-            'activity_ids', original_subscription_model._values)
+            'activity_ids', original_subscription_model._values)  # pylint: disable=protected-access
         self.assertNotIn(
-            'activity_ids', original_subscription_model._properties)
+            'activity_ids', original_subscription_model._properties)  # pylint: disable=protected-access
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -1665,9 +1665,9 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
         migrated_subscription_model = (
             user_models.UserSubscriptionsModel.get_by_id('id'))
         self.assertNotIn(
-            'activity_ids', migrated_subscription_model._values)
+            'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
         self.assertNotIn(
-            'activity_ids', migrated_subscription_model._properties)
+            'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
         self.assertEqual(
             original_subscription_model.last_updated,
             migrated_subscription_model.last_updated)

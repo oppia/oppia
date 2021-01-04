@@ -485,10 +485,10 @@ class RemoveActivityIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         # This is the only way to remove the field from the model,
         # see https://stackoverflow.com/a/15116016/3688189 and
         # https://stackoverflow.com/a/12701172/3688189.
-        if 'activity_ids' in user_subscriptions_model._properties:
-            del user_subscriptions_model._properties['activity_ids']
-            if 'activity_ids' in user_subscriptions_model._values:
-                del user_subscriptions_model._values['activity_ids']
+        if 'activity_ids' in user_subscriptions_model._properties:  # pylint: disable=protected-access
+            del user_subscriptions_model._properties['activity_ids']  # pylint: disable=protected-access
+            if 'activity_ids' in user_subscriptions_model._values:  # pylint: disable=protected-access
+                del user_subscriptions_model._values['activity_ids']  # pylint: disable=protected-access
             user_subscriptions_model.update_timestamps(
                 update_last_updated_time=False)
             user_subscriptions_model.put()
