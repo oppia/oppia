@@ -27,16 +27,16 @@ import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/s
 })
 export class StateTutorialFirstTimeService {
   // Whether this is the first time the tutorial has been seen by this user.
-  _currentlyInEditorFirstVisit: boolean = true;
-  _currentlyInTranslationFirstVisit: boolean = true;
-  _translationTutorialNotSeenBefore: boolean = false;
+  private _currentlyInEditorFirstVisit: boolean = true;
+  private _currentlyInTranslationFirstVisit: boolean = true;
+  private _translationTutorialNotSeenBefore: boolean = false;
 
   private enterEditorForTheFirstTimeEventEmitter = new EventEmitter();
   private enterTranslationForTheFirstTimeEventEmitter = new EventEmitter();
 
-  _openEditorTutorialEventEmitter = new EventEmitter();
-  _openPostTutorialHelpPopoverEventEmitter = new EventEmitter();
-  _openTranslationTutorialEventEmitter = new EventEmitter();
+  private _openEditorTutorialEventEmitter = new EventEmitter();
+  private _openPostTutorialHelpPopoverEventEmitter = new EventEmitter();
+  private _openTranslationTutorialEventEmitter = new EventEmitter();
 
   constructor(
     private editorFirstTimeEventsService : EditorFirstTimeEventsService,
