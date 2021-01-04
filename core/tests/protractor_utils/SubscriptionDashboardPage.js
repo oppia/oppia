@@ -56,7 +56,7 @@ var SubscriptionDashboardPage = function() {
     await waitFor.elementToBeClickable(
       subscriptionButton, 'Subscription button is not clickable');
     var subscribeButtonStatusBeforeClick = await subscriptionButton.getText();
-    await subscriptionButton.click();
+    await action.click('Subscription Button', subscriptionButton);
     if (subscribeButtonStatusBeforeClick === 'SUBSCRIBE') {
       await waitFor.visibilityOf(
         unsubscribeLabel,
