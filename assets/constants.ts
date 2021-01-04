@@ -4770,9 +4770,6 @@ export default {
     "code": "da",
     "description": "dansk (Danish)"
   }, {
-    "code": "prs",
-    "description": "دری (Dari)"
-  }, {
     "code": "nl",
     "description": "Nederlands (Dutch)"
   }, {
@@ -4964,6 +4961,10 @@ export default {
     "description": "Danish",
     "relatedLanguages": ["da"]
   }, {
+    "id": "prs",
+    "description": "Dari",
+    "relatedLanguages": ["prs"]
+  }, {
     "id": "nl",
     "description": "Dutch",
     "relatedLanguages": ["nl"]
@@ -5083,6 +5084,10 @@ export default {
     "id": "sv",
     "description": "Swedish",
     "relatedLanguages": ["sw"]
+  }, {
+    "id": "te",
+    "description": "Telugu",
+    "relatedLanguages": ["te"]
   }, {
     "id": "th",
     "description": "Thai",
@@ -5331,6 +5336,19 @@ export default {
   // Data required for Google Analytics.
   "ANALYTICS_ID": "",
   "SITE_NAME_FOR_ANALYTICS": "",
+
+  // Data required for Firebase authentication.
+  //
+  // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
+  // and change useEmulator to be false, before deploying to production.
+  "FIREBASE_CONFIG_API_KEY": "",
+  "FIREBASE_CONFIG_APP_ID": "",
+  "FIREBASE_CONFIG_AUTH_DOMAIN": "",
+  "FIREBASE_CONFIG_DATABASE_URL": "",
+  "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
+  "FIREBASE_CONFIG_PROJECT_ID": "",
+  "FIREBASE_CONFIG_STORAGE_BUCKET": "",
+  "FIREBASE_EMULATOR_ENABLED": true,
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 

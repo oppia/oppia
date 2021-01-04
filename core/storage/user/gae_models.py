@@ -926,9 +926,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # When the user last checked notifications. May be None.
     last_checked = datastore_services.DateTimeProperty(default=None)
 
-    # DEPRECATED in v2.6.8. Do not use. Use general_feedback_thread_ids instead.
-    feedback_thread_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
     # DEPRECATED in v3.0.7. Do not use. Use exploration_ids instead.
     activity_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
@@ -953,8 +950,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
             'general_feedback_thread_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
             'creator_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'last_checked': base_models.EXPORT_POLICY.EXPORTED,
-            'feedback_thread_ids': base_models.EXPORT_POLICY.EXPORTED
+            'last_checked': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -1022,8 +1018,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
-            'feedback_thread_ids': (
-                user_model.feedback_thread_ids),
             'creator_usernames': creator_usernames,
             'last_checked_msec':
                 None if user_model.last_checked is None else

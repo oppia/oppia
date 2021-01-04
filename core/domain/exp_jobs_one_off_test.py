@@ -1393,31 +1393,9 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1512,7 +1490,7 @@ class ExplorationMathSvgFilenameValidationOneOffJobTests(
                 self.assertTrue(invalid_tag in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
@@ -1698,31 +1676,9 @@ class ExplorationRteMathContentValidationOneOffJobTests(
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': [[invalid_html_content1]]
+                    'x': [['ca_choices_0']]
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }, {
-                'rule_type': 'HasElementXAtPositionY',
-                'inputs': {
-                    'x': invalid_html_content2,
-                    'y': 2
-                }
-            }, {
-                'rule_type': 'IsEqualToOrdering',
-                'inputs': {
-                    'x': [[invalid_html_content2]]
-                }
-            }, {
-                'rule_type': 'HasElementXBeforeElementY',
-                'inputs': {
-                    'x': invalid_html_content1,
-                    'y': invalid_html_content1
-                }
-            }, {
-                'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-                'inputs': {
-                    'x': [[invalid_html_content1]]
-                }
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -1821,7 +1777,7 @@ class ExplorationRteMathContentValidationOneOffJobTests(
                     invalid_tag_info['invalid_tag'] in expected_invalid_tags)
 
         overall_result = ast.literal_eval(actual_output[0])
-        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 12)
+        self.assertEqual(overall_result[1]['no_of_invalid_tags'], 6)
         self.assertEqual(
             overall_result[1]['no_of_explorations_with_no_svgs'], 1)
 
@@ -2351,90 +2307,6 @@ class MockExpSummaryModel(exp_models.ExpSummaryModel):
 
     translator_ids = datastore_services.StringProperty(
         indexed=True, repeated=True, required=False)
-
-
-class RemoveTranslatorIdsOneOffJobTests(test_utils.GenericTestBase):
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.create_new())
-        exp_jobs_one_off.RemoveTranslatorIdsOneOffJob.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_mapreduce_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_mapreduce_tasks()
-        stringified_output = (
-            exp_jobs_one_off.RemoveTranslatorIdsOneOffJob
-            .get_output(job_id))
-        eval_output = [ast.literal_eval(stringified_item) for
-                       stringified_item in stringified_output]
-        return eval_output
-
-    def test_one_summary_model_with_translator_id(self):
-        with self.swap(exp_models, 'ExpSummaryModel', MockExpSummaryModel):
-            original_summary_model = (
-                exp_models.ExpSummaryModel(
-                    id='id',
-                    title='title',
-                    category='category',
-                    objective='Objective',
-                    language_code='en',
-                    tags=[],
-                    ratings=feconf.get_empty_ratings(),
-                    scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-                    community_owned=False,
-                    translator_ids=['translator_id']
-                )
-            )
-            original_summary_model.put()
-
-            self.assertIsNotNone(original_summary_model.translator_ids)
-            self.assertIn('translator_ids', original_summary_model._values)  # pylint: disable=protected-access
-            self.assertIn('translator_ids', original_summary_model._properties)  # pylint: disable=protected-access
-
-            output = self._run_one_off_job()
-            self.assertItemsEqual(
-                [['SUCCESS_REMOVED - ExpSummaryModel', 1]], output)
-
-            migrated_summary_model = exp_models.ExpSummaryModel.get_by_id('id')
-
-            self.assertNotIn('translator_ids', migrated_summary_model._values)  # pylint: disable=protected-access
-            self.assertNotIn(
-                'translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
-            self.assertEqual(
-                original_summary_model.last_updated,
-                migrated_summary_model.last_updated)
-
-    def test_one_summary_model_without_username(self):
-        original_summary_model = (
-            exp_models.ExpSummaryModel(
-                id='id',
-                title='title',
-                category='category',
-                objective='Objective',
-                language_code='en',
-                tags=[],
-                ratings=feconf.get_empty_ratings(),
-                scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
-                community_owned=False,
-            )
-        )
-        original_summary_model.put()
-
-        self.assertNotIn('translator_ids', original_summary_model._values)  # pylint: disable=protected-access
-        self.assertNotIn('translator_ids', original_summary_model._properties)  # pylint: disable=protected-access
-
-        output = self._run_one_off_job()
-        self.assertItemsEqual(
-            [['SUCCESS_ALREADY_REMOVED - ExpSummaryModel', 1]], output)
-
-        migrated_summary_model = exp_models.ExpSummaryModel.get_by_id('id')
-        self.assertNotIn('translator_ids', migrated_summary_model._values)  # pylint: disable=protected-access
-        self.assertNotIn('translator_ids', migrated_summary_model._properties)  # pylint: disable=protected-access
-        self.assertEqual(
-            original_summary_model.last_updated,
-            migrated_summary_model.last_updated)
 
 
 class RegenerateStringPropertyIndexOneOffJobTests(test_utils.GenericTestBase):
