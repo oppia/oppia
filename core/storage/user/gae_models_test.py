@@ -2441,6 +2441,8 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
     NONREGISTERED_GAE_ID = 'gae_id_x'
     USER_ID = 'user_id'
     USER_GAE_ID = 'gae_id'
+    FIREBASE_USER_ID = 'firebase_user_id'
+    FIREBASE_AUTH_ID = 'firebase_auth_id'
     PROFILE_ID = 'profile_id'
     PROFILE_2_ID = 'profile_2_id'
 
@@ -2451,6 +2453,10 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         user_models.UserAuthDetailsModel(
             id=self.USER_ID,
             gae_id=self.USER_GAE_ID,
+        ).put()
+        user_models.UserAuthDetailsModel(
+            id=self.FIREBASE_USER_ID,
+            firebase_auth_id=self.FIREBASE_AUTH_ID,
         ).put()
         user_models.UserAuthDetailsModel(
             id=self.PROFILE_ID,
@@ -2541,6 +2547,12 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             user_models.UserAuthDetailsModel.get_by_auth_id(
                 feconf.GAE_AUTH_PROVIDER_ID, self.USER_GAE_ID)
         )
+
+    def test_get_by_firebase_auth_id_returns_correct_profile_user(self):
+        self.assertEqual(
+            user_models.UserAuthDetailsModel.get_by_id(self.FIREBASE_USER_ID),
+            user_models.UserAuthDetailsModel.get_by_auth_id(
+                feconf.FIREBASE_AUTH_PROVIDER_ID, self.FIREBASE_AUTH_ID))
 
     def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):
         user_auth_details_models = [

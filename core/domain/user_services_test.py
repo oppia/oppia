@@ -2099,12 +2099,17 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         )
         self.user_auth_details.validate()
 
-    def test_from_provider_id(self):
+    def test_from_firebase_auth_provider_id(self):
         user_auth_details = user_services.UserAuthDetails.from_provider(
             feconf.FIREBASE_AUTH_PROVIDER_ID, self.owner_id, 'authid')
 
         self.assertIsNone(user_auth_details.gae_id)
         self.assertEqual(user_auth_details.firebase_auth_id, 'authid')
+
+    def test_from_unknown_auth_provider_id(self):
+        with self.assertRaisesRegexp(utils.ValidationError, 'Unknown provider'):
+            user_services.UserAuthDetails.from_provider(
+                None, self.owner_id, 'authid')
 
     def test_validate_non_str_user_id(self):
         self.user_auth_details.user_id = 0
