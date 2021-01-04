@@ -353,28 +353,30 @@ def install_elasticsearch_dev_server():
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         python_utils.PRINT('ElasticSearch is already installed.')
+        return
     except OSError:
         python_utils.PRINT('Installing ElasticSearch...')
 
-        if common.is_mac_os() or common.is_linux_os():
-            download_and_untar_files(
-                'https://artifacts.elastic.co/downloads/elasticsearch/' +
-                'elasticsearch-%s-%s-x86_64.tar.gz' %
-                (common.ELASTICSEARCH_VERSION, common.OS_NAME.lower()),
-                TARGET_DOWNLOAD_DIRS['oppiaTools'],
-                'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
-                'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
-            )
-        elif common.is_windows_os():
-            download_and_unzip_files(
-                'https://artifacts.elastic.co/downloads/elasticsearch/' +
-                'elasticsearch-%s-windows-x86_64.zip' %
-                common.ELASTICSEARCH_VERSION,
-                TARGET_DOWNLOAD_DIRS['oppiaTools'],
-                'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
-                'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
-            )
-        python_utils.PRINT('ElasticSearch installed successfully.')
+    if common.is_mac_os() or common.is_linux_os():
+        def download_and_extract(*args):
+            """This downloads and extracts the elasticsearch files."""
+            download_and_untar_files(*args)
+    elif common.is_windows_os():
+        def download_and_extract(*args):
+            """This downloads and extracts the elasticsearch files."""
+            download_and_unzip_files(*args)
+    else:
+        raise Exception('Unrecognized or unsupported operating system.')
+
+    download_and_extract(
+        'https://artifacts.elastic.co/downloads/elasticsearch/' +
+        'elasticsearch-%s-windows-x86_64.zip' %
+        common.ELASTICSEARCH_VERSION,
+        TARGET_DOWNLOAD_DIRS['oppiaTools'],
+        'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
+        'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
+    )
+    python_utils.PRINT('ElasticSearch installed successfully.')
 
 
 def install_redis_cli():
