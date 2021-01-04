@@ -194,6 +194,12 @@ def cleanup():
     build.set_constants_to_default()
     common.stop_redis_server()
 
+    for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
+        if not common.wait_for_port_to_be_closed(port):
+            raise RuntimeError(
+                'Port {} failed to close after {} seconds.'.format(
+                    port, common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))
+
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -583,8 +589,6 @@ def main(args=None):
             break
         # Prepare for rerun.
         cleanup()
-        for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
-            common.wait_for_port_to_be_closed(port)
 
     sys.exit(return_code)
 
