@@ -302,6 +302,18 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
         self.assertEqual(logs, ['1', '2', '3', '4'])
 
+    def test_capture_logging_with_min_level(self):
+        logging.info('0')
+        with self.capture_logging(min_level=logging.WARN) as logs:
+            logging.info('1')
+            logging.debug('2')
+            logging.warn('3')
+            logging.error('4')
+            python_utils.PRINT('5')
+        logging.info('6')
+
+        self.assertEqual(logs, ['3', '4'])
+
     def test_swap_to_always_return_uses_none_by_default(self):
         class MockClass(python_utils.OBJECT):
             """Test-only class."""
