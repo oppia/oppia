@@ -2168,7 +2168,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
     def test_validate_non_str_firebase_auth_id(self):
         self.user_auth_details.firebase_auth_id = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected gae_id to be a string'
+            utils.ValidationError, 'Expected firebase_auth_id to be a string'
         ):
             self.user_auth_details.validate()
 
