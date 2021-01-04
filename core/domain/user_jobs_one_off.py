@@ -467,6 +467,7 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the reduce function for this job."""
         yield (key, len(values))
 
+
 class RemoveActivityIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes the activity_ids from the UserSubscriptionsModel. """
 
@@ -491,11 +492,11 @@ class RemoveActivityIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_subscriptions_model.update_timestamps(
                 update_last_updated_time=False)
             user_subscriptions_model.put()
-            yield(
+            yield (
                 'SUCCESS_REMOVED - UserSubscriptionsModel',
                 user_subscriptions_model.id)
         else:
-            yield(
+            yield (
                 'SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel',
                 user_subscriptions_model.id)
 
@@ -503,6 +504,7 @@ class RemoveActivityIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
+
 
 class RemoveFeedbackThreadIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes the feedback_thread_ids from the UserSubscriptionsModel.

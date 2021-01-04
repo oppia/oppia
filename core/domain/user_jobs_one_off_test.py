@@ -1584,7 +1584,8 @@ class RemoveGaeIdOneOffJobTests(test_utils.GenericTestBase):
             migrated_setting_model.last_updated)
 
 
-class MockUserSubscriptionsModelWithActivityIDs(user_models.UserSubscriptionsModel):
+class MockUserSubscriptionsModelWithActivityIDs(
+    user_models.UserSubscriptionsModel):
     """Mock UserSubscriptionsModel so that it allows to set 'activity_ids'. """
 
     activity_ids = (
@@ -1641,7 +1642,7 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
                 'activity_ids', migrated_subscription_model._properties)
             self.assertEqual(
                 original_subscription_model.last_updated,
-                migrated_subscription_model.last_updated)   
+                migrated_subscription_model.last_updated)
 
     def test_one_subscription_model_without_activity_ids(self):
         original_subscription_model = (
@@ -1669,7 +1670,7 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
             'activity_ids', migrated_subscription_model._properties)
         self.assertEqual(
             original_subscription_model.last_updated,
-            migrated_subscription_model.last_updated)     
+            migrated_subscription_model.last_updated)
 
 
 class MockUserSubscriptionsModelWithFeedbackThreadIDs(
