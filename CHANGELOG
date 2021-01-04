@@ -1,5 +1,121 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.0.6 (04 Jan 2021)
+------------------------
+Contributor Pages
+* Add config to disallow contributors to suggest questions (#11442)
+* Fix ck-editor lagging issue on contributor dashboard (#11349)
+* Removes run_in_transactions for suggestion and stats models and fixes translation issue in contributor dashboard page (#11320)
+* Fix #11300: Revert "Add job to delete invalid suggestion models on server" (#11319)
+* Adds Dari language for contents and translations. (#11307)
+* Fix translation count issue for the exploration opportunity models (#11290)
+* Fix #10715: Admin page UI issues (#11172)
+* Fix part of #9004: Record event measurements for Contributor Dashboard analytics  (#11238)
+* Add one-off job for question suggestion migration (#11169)
+* Fix part of #10415: Refactor suggestion validators (#11345)
+* Fix part of #10720: Hide in review translation texts in contributor dashboard translation modal (#11356)
+* Fix part of #10720: Add check for loading data in translation modal. (#11401)
+
+Answer Classification
+* Milestone 2 of ML pipeline migration (#11052)
+
+QA Team
+* Drop ClassroomPage e2e test from Circle CI because it is present in Actions (#11358)
+* Fix part of #4057: Adds frontend test cases for ExplorationRecommendationsService (#11348)
+* Rewrite additional editor features (#11324)
+* Fix #11309: Minor changes to the failing test (#11310)
+* Fix common e2e flakes (#11279)
+* Store protractor screenshots as artifacts (#11266)
+* Rewrite Play Voiceovers E2E Test (#11265)
+* Fixes common e2e errors in e2e_learner_flow_skill_editor_and_embedding (#11259)
+* Fix issue #10798 : Fixed End-to-End Tests with action.js and waitFor.js in ExplorationEditorFeedbackTab.js (#11166)
+* Fix part of #10798:Fixing End-to-End Tests for CollectionEditor.js (#11126)
+* Update e2e workflow names (#11223)
+
+Server Errors
+* Adds more info to the logs for #7951 server error (#11357)
+
+Developer UX
+* Fix part of #10474: Make typescript checks strict for service CreatorDashboardStatsObjectFactory (#11332)
+* Fix #11163: Fix installation output to output correct error message. (#11282)
+* Remove travis from the codebase (#11275)
+* Removed Hudda as codeowner (#11240)
+* Increase taskqueue http request timeout (#11195)
+* Upgrade libraries (#11147)
+* Fix part of #10306: Added async keyword to asynchronous functions that return a promise. (#11068)
+* Fix part of #10474: Add strict checks to files (#11028)
+* Ubuntu docker (#11278)
+* Add auto retry functionality to e2e script (#11277)
+* Fix part of #8668: Document the service file with jsdoc (#11239)
+* Add Travis CI tests to Github actions (#11205)
+* Fix part of #10415: Refactor user validators (#11117)
+* Fix part of #8423: Forbid use of "if x != None" (#11108)
+* Fix part of #10306: Added async keyword to asynchronous functions that return a promise. (#10886)
+
+Data handling
+* Fix part of #5914: Takeout E2E testing (#11311)
+* Wipeout 8.17: Fix remaining stuff from the audit (#11281)
+* Fix #11142 and #11150: Update Takeout Docstrings and Clean Up (#11261)
+* Wipeout 8.16: Save the username of deleted user so it cannot be reused (#11168)
+* Fix part of #10415: Extract collection model validators from prod_validators to a new file (#11152)
+* Fix part of #10415: Extract config validators from prod_validator (#11148)
+* Add missing commit logs (#11146)
+* Fix part of #10415: Refactor classifier validators (#11116)
+* Fix interaction customization args validation issues in LogicProof, AlgebraicExpressionInput, MathEquation (#11019)
+* Fix part of #10415: Topic validator refractor  (#10967)
+
+Translations
+* Localisation updates from https://translatewiki.net. (#11110)
+
+Learner/Creator Pages
+* Fix #11536: pencil code editor inside interaction box (#11538)
+* Show all topics that a skill has been assigned to in the dashboard page (#11525)
+* Fix blocking bugs #11399 and #11416 (#11517)
+* Fix #11418 & #11415 and minor SEO improvements (#11436)
+* Fix #11334: Changes index -> version number in the history tab (#11346)
+* Fix part of #10667: make alt text in image editor into paragraph text (#11298)
+* Add page title field for Topics and minor changes to page titles (#11294)
+* Fix #11155, #11156: Removed redundant rule for simplified value (#11251)
+* Fixing Lesson info modal card (#11224)
+* Fix part of #10415: Refactor question validators (#11222)
+* Fix #11157 and #10758: Adress comments from PRs (#11210)
+* Fix #11096 and rest of classroom page issues (#11196)
+* Adds licence metadata to HTML (#11167)
+* Fix #3341: Added confirmation modal in the customization args editing. (#11164)
+* Fix of #10905 for not showing negative numbers in feedback notification (#11132)
+
+Bug fixes
+* Fix promo bar breakage in production. (#11326)
+* Fix #11200: fix browser detection mismatch between frontend and backend (#11211)
+* Fix issue #9992: Fixing the fin shaped portion of the blockquote element in the topic and skills dashboard and about page. (#11271)
+* Fix param editor: c.isCurrentlyInSettingsTab is not a function (#11335)
+* Move margin-bottom to conversation-skin-tutor-card-container (#11336)
+* Fix #11073: Fixes evaluation context in feature gating (#11218)
+* Add one-off job to wipe all ExplorationIssuesModel instances (#11323)
+* Fix to #10798 Refactor ExplorationPlayerPage.js (#11301)
+* Fix #11133: display '+1' icon and "Nowhere yet..." text (#11252)
+* Fix part of #9749 Remove circular image directive (#11201)
+* Fix part of #8472 Migrate response-service.ts to Angular 8 (#11194)
+* Fix issue #9041:  Maxlength in the input box when renaming a state (#11175)
+
+Python Migration
+* Change Cloud Tasks from HTTP tasks to AppEngine tasks (#11246)
+* Fix part of #9827: Implement search platfrom API (#11295)
+
+Angular Migration
+* Fix Part of #8472: Migrate Question Player Enginer Service to Angular 8 (#11285)
+* Fix part of #8472 : Migrate TopicUpdateService to Angular8 (#11276)
+* Fix part of #8472: Migrate story-editor-state.service.ts (#11268)
+* Fix Part of #8472: Remove unused expression-type-parser service file and connected functions  (#11262)
+* Fix Part of #8472: Migrate User Service to Angular 8 (#11191)
+* Fix part of #8472: Migrate translation language service to Angular (#11178)
+* Fix Part of #8472: Migrate Topic Rights Backend API Service (#11177)
+* Migrate ReadOnlyExplorationBackendApiService to angular (#11060)
+* Fix part of #8472: Migrate thread-data.service.ts to Angular 8 (#10941)
+* Fix Part of #8472: Migrate HintsAndSolutionManagerService to Angular 8 (#10900)
+* Fix part of #10474:Make typescript checks strict for service "CreatorExplorationSummaryObjectFactory" (#11327)
+* Fix part of #10474: Set strict checks for LearnerParamsService (#11302)
+
 v3.0.5 (02 Dec 2020)
 ------------------------
 Contributor Pages
