@@ -1484,6 +1484,16 @@ class RestrictedImportChecker(checkers.BaseChecker):
             'domain layer and controller layer respectively.'),
     }
 
+    # Mapping between modules and imports that are forbidden in these modules.
+    # The key part needs to be absolute path to the module for which we want to
+    # forbid the imports. Both import formats ('import xyz [as klm]' and
+    # 'from xyz import abc [as klm]') are checked.
+    module_to_forbidden_imports = {
+        'oppia.core.storage': ['core.domain'],
+        'oppia.core.domain': ['core.controllers'],
+        'oppia.core.controllers': ['core.platform', 'core.storage']
+    }
+
     def visit_import(self, node):
         """Visits every import statement in the file.
 
@@ -1494,22 +1504,21 @@ class RestrictedImportChecker(checkers.BaseChecker):
 
         modnode = node.root()
         names = [name for name, _ in node.names]
-        # Checks import of domain layer in storage layer.
-        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
-            if any('core.domain' in name for name in names):
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=('domain', 'storage'),
-                )
-        # Checks import of controller layer in domain layer.
-        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
-            if any('core.controllers' in name for name in names):
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=('controller', 'domain'),
-                )
+
+        for module_name, forbidden_imports in (
+                self.module_to_forbidden_imports.items()
+        ):
+            for forbidden_import in forbidden_imports:
+                if module_name in modnode.name and not '_test' in modnode.name:
+                    if any(forbidden_import in name for name in names):
+                        self.add_message(
+                            'invalid-import',
+                            node=node,
+                            args=(
+                                forbidden_import.split('.')[-1],
+                                module_name.split('.')[-1]
+                            ),
+                        )
 
     def visit_importfrom(self, node):
         """Visits all import-from statements in a python file and checks that
@@ -1521,20 +1530,20 @@ class RestrictedImportChecker(checkers.BaseChecker):
         """
 
         modnode = node.root()
-        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
-            if 'core.domain' in node.modname:
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=('domain', 'storage'),
-                )
-        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
-            if 'core.controllers' in node.modname:
-                self.add_message(
-                    'invalid-import',
-                    node=node,
-                    args=('controller', 'domain'),
-                )
+        for module_name, forbidden_imports in (
+                self.module_to_forbidden_imports.items()
+        ):
+            for forbidden_import in forbidden_imports:
+                if module_name in modnode.name and not '_test' in modnode.name:
+                    if forbidden_import in node.modname:
+                        self.add_message(
+                            'invalid-import',
+                            node=node,
+                            args=(
+                                forbidden_import.split('.')[-1],
+                                module_name.split('.')[-1]
+                            ),
+                        )
 
 
 class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
