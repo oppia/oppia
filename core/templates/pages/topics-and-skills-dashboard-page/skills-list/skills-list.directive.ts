@@ -147,7 +147,7 @@ angular.module('oppia').directive('skillsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                   'unassign-skill-from-topics-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillId: () => skillId
               },
@@ -196,7 +196,7 @@ angular.module('oppia').directive('skillsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'assign-skill-to-topic-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               windowClass: 'assign-skill-to-topic-modal',
               resolve: {
                 topicSummaries: () => topicSummaries
@@ -244,7 +244,7 @@ angular.module('oppia').directive('skillsList', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skill: () => skill,
                 skillSummaries: () => skillSummaries,
@@ -260,7 +260,7 @@ angular.module('oppia').directive('skillsList', [
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
               // Transfer questions from the old skill to the new skill.
-              TopicsAndSkillsDashboardBackendApiService.mergeSkills(
+              TopicsAndSkillsDashboardBackendApiService.mergeSkillsAsync(
                 skill.id, supersedingSkillId).then(function() {
                 // Broadcast will update the skills list in the dashboard so
                 // that the merged skills are not shown anymore.

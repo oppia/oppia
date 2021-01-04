@@ -156,8 +156,8 @@ states:
         rule_specs:
         - inputs:
             x:
-            - - Choice 2
-            - - Choice 1
+            - - <p>Choice 2</p>
+            - - <p>Choice 1</p>
           rule_type: IsEqualToOrdering
         tagged_misconception_id: null
         training_data: []

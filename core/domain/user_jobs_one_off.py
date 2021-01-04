@@ -362,9 +362,32 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_model.put()
 
 
-class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
+class FillExplorationIdsInUserSubscriptionsModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One off job that removes nonexisting activity ids from
+    """One off job that copies from activity_ids to exploration_ids
+    in UserSubscriptionsModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSubscriptionsModel]
+
+    @staticmethod
+    def map(model_instance):
+        model_instance.exploration_ids = model_instance.activity_ids
+        model_instance.update_timestamps(update_last_updated_time=False)
+        model_instance.put()
+        yield ('SUCCESS', model_instance.exploration_ids)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One off job that removes nonexisting exploration ids from
     UserSubscriptionsModel.
     """
 
@@ -379,15 +402,15 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
         if not model_instance.deleted:
             fetched_exploration_model_instances = (
                 datastore_services.fetch_multiple_entities_by_ids_and_models(
-                    [('ExplorationModel', model_instance.activity_ids)]))[0]
+                    [('ExplorationModel', model_instance.exploration_ids)]))[0]
 
             exp_ids_removed = []
             for exp_id, exp_instance in list(python_utils.ZIP(
-                    model_instance.activity_ids,
+                    model_instance.exploration_ids,
                     fetched_exploration_model_instances)):
                 if exp_instance is None or exp_instance.deleted:
                     exp_ids_removed.append(exp_id)
-                    model_instance.activity_ids.remove(exp_id)
+                    model_instance.exploration_ids.remove(exp_id)
             if exp_ids_removed:
                 model_instance.update_timestamps()
                 model_instance.put()
@@ -403,64 +426,41 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
         yield (key, len(values))
 
 
-class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the gae_user_id from the UserSettingsModel."""
+class RemoveFeedbackThreadIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes the feedback_thread_ids from the UserSubscriptionsModel.
 
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(user_settings_model):
-        # This is the only way to remove the field from the model,
-        # see https://stackoverflow.com/a/15116016/3688189 and
-        # https://stackoverflow.com/a/12701172/3688189.
-        if 'gae_user_id' in user_settings_model._properties:  # pylint: disable=protected-access
-            del user_settings_model._properties['gae_user_id']  # pylint: disable=protected-access
-            if 'gae_user_id' in user_settings_model._values:  # pylint: disable=protected-access
-                del user_settings_model._values['gae_user_id']  # pylint: disable=protected-access
-            user_settings_model.update_timestamps(
-                update_last_updated_time=False)
-            user_settings_model.put()
-            yield (
-                'SUCCESS_REMOVED - UserSettingsModel', user_settings_model.id)
-        else:
-            yield (
-                'SUCCESS_ALREADY_REMOVED - UserSettingsModel',
-                user_settings_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        """Implements the reduce function for this job."""
-        yield (key, len(values))
-
-
-class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the gae_id from the UserSettingsModel.
+    NOTE TO DEVELOPERS: This job can be deleted after it is run in January
+    2021 release.
     """
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveFeedbackThreadIDsOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
+        return [user_models.UserSubscriptionsModel]
 
     @staticmethod
-    def map(user_settings_model):
+    def map(user_subscriptions_model):
         # This is the only way to remove the field from the model,
         # see https://stackoverflow.com/a/15116016/3688189 and
         # https://stackoverflow.com/a/12701172/3688189.
-        if 'gae_id' in user_settings_model._properties:  # pylint: disable=protected-access
-            del user_settings_model._properties['gae_id']  # pylint: disable=protected-access
-            if 'gae_id' in user_settings_model._values:  # pylint: disable=protected-access
-                del user_settings_model._values['gae_id']  # pylint: disable=protected-access
-            user_settings_model.update_timestamps(
+        if 'feedback_thread_ids' in user_subscriptions_model._properties:  # pylint: disable=protected-access
+            del user_subscriptions_model._properties['feedback_thread_ids']  # pylint: disable=protected-access
+            if 'feedback_thread_ids' in user_subscriptions_model._values:  # pylint: disable=protected-access
+                del user_subscriptions_model._values['feedback_thread_ids']  # pylint: disable=protected-access
+            user_subscriptions_model.update_timestamps(
                 update_last_updated_time=False)
-            user_settings_model.put()
+            user_subscriptions_model.put()
             yield (
-                'SUCCESS_REMOVED - UserSettingsModel', user_settings_model.id)
+                'SUCCESS_REMOVED - UserSubscriptionsModel',
+                user_subscriptions_model.id)
         else:
             yield (
-                'SUCCESS_ALREADY_REMOVED - UserSettingsModel',
-                user_settings_model.id)
+                'SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel',
+                user_subscriptions_model.id)
 
     @staticmethod
     def reduce(key, values):
@@ -696,71 +696,6 @@ class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
-
-
-class UserAuthDetailsModelAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that audits whether there are UserAuthDetailsModels with the same
-    gae_id field.
-    """
-
-    @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        # We can raise the number of shards for this job, since it goes only
-        # over one type of entity class.
-        super(UserAuthDetailsModelAuditOneOffJob, cls).enqueue(
-            job_id, shard_count=32)
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserAuthDetailsModel]
-
-    @staticmethod
-    def map(model):
-        number_of_models_with_same_gae_id = (
-            user_models.UserAuthDetailsModel.query(
-                user_models.UserAuthDetailsModel.gae_id == model.gae_id
-            ).count()
-        )
-
-        if number_of_models_with_same_gae_id > 1:
-            yield ('FAILURE', model.id)
-        else:
-            yield ('SUCCESS', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key.startswith('SUCCESS'):
-            yield (key, len(values))
-        else:
-            yield (key, values)
-
-
-class GenerateUserIdentifiersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that creates UserIdentifiersModel for each UserAuthDetailsModel."""
-
-    @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        # We can raise the number of shards for this job, since it goes only
-        # over one type of entity class.
-        super(GenerateUserIdentifiersModelOneOffJob, cls).enqueue(
-            job_id, shard_count=32)
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserAuthDetailsModel]
-
-    @staticmethod
-    def map(model):
-        user_models.UserIdentifiersModel(
-            id=model.gae_id,
-            user_id=model.id,
-            deleted=model.deleted
-        ).put()
-        yield ('SUCCESS', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
 
 
 class UniqueHashedNormalizedUsernameAuditJob(
