@@ -39,6 +39,58 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 import { Story } from 'domain/story/StoryObjectFactory';
 import { Topic } from 'domain/topic/TopicObjectFactory';
 import { SubtopicPage } from 'domain/topic/SubtopicPageObjectFactory';
+import { ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamSpecBackendDict } from 'domain/exploration/ParamSpecObjectFactory';
+import { InteractionBackendDict } from 'domain/exploration/InteractionObjectFactory';
+import { WrittenTranslationsBackendDict } from 'domain/exploration/WrittenTranslationsObjectFactory';
+
+export type ExplorationChange = (
+  ExplorationChangeAddState |
+  ExplorationChangeRenameState |
+  ExplorationChangeDeleteState |
+  ExplorationChangeEditStateProperty |
+  ExplorationChangeEditExplorationProperty);
+
+interface ExplorationChangeAddState {
+  cmd: 'add_state';
+  'state_name': string;
+}
+
+interface ExplorationChangeRenameState {
+  cmd: 'rename_state',
+  'new_state_name': string;
+  'old_state_name': string;
+}
+
+interface ExplorationChangeDeleteState {
+  cmd: 'delete_state';
+  'state_name': string;
+}
+
+interface ExplorationChangeEditStateProperty {
+  cmd: 'edit_state_property',
+  'new_value': SubtitledHtmlBackendDict |
+    InteractionBackendDict |
+    ParamChangeBackendDict[] |
+    RecordedVoiceOverBackendDict |
+    WrittenTranslationsBackendDict |
+    boolean | number | string;
+  'old_value': SubtitledHtmlBackendDict |
+    InteractionBackendDict |
+    ParamChangeBackendDict[] |
+    RecordedVoiceOverBackendDict |
+    WrittenTranslationsBackendDict |
+    boolean | number | string;
+  'state_name': string;
+  'property_name': string;
+}
+
+interface ExplorationChangeEditExplorationProperty {
+  cmd: 'edit_exploration_property';
+  'new_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
+  'old_value': ParamChangeBackendDict[] | ParamSpecBackendDict | string;
+  'property_name': string;
+}
 
 interface CollectionTitleChange {
   'cmd': 'edit_collection_property';
