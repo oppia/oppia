@@ -345,7 +345,6 @@ def install_elasticsearch_dev_server():
     """This installs a local ElasticSearch server to the oppia_tools
     directory to be used by development servers and backend tests.
     """
-
     try:
         subprocess.call(
             ['%s/bin/elasticsearch' % common.ES_PATH, '--version'],

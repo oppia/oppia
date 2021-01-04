@@ -648,7 +648,6 @@ def managed_elasticsearch_dev_server():
     Yields:
         psutil.Process. The ElasticSearch server process.
     """
-
     # Clear previous data stored in the local cluster.
     if os.path.exists(ES_PATH_DATA_DIR):
         shutil.rmtree(ES_PATH_DATA_DIR)
