@@ -59,7 +59,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     }
   ]
 })
-export class SplashPageModule {
+export class TeachPageModule {
   constructor(private upgrade: UpgradeModule) { }
   ngDoBootstrap(): void {
     this.upgrade.bootstrap(document.body, ['oppia'], { strictDi: true });

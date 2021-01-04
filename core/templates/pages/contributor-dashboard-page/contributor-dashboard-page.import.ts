@@ -18,8 +18,7 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
-import 'core-js/es7/reflect';
-import 'zone.js';
+import 'angular';
 
 import 'angular-ui-sortable';
 import 'third-party-imports/guppy.import';
@@ -28,7 +27,7 @@ import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ng-joy-ride.import';
 import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
-import 'angular';
+
 import 'headroom.js/dist/headroom';
 import 'headroom.js/dist/angular.headroom';
 import 'angular-animate';
@@ -51,6 +50,7 @@ import uiValidate from 'angular-ui-validate';
 import ngInfiniteScroll from 'ng-infinite-scroll';
 import 'third-party-imports/ui-tree.import';
 
+declare var angular: ng.IAngularStatic;
 angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate', ngInfiniteScroll,
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',

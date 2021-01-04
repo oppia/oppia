@@ -18,6 +18,7 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
+import 'angular';
 
 import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
@@ -27,7 +28,7 @@ import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ng-joy-ride.import';
 import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
-import 'angular';
+
 import 'headroom.js/dist/headroom';
 import 'headroom.js/dist/angular.headroom';
 import 'angular-animate';
@@ -44,6 +45,7 @@ require('static/ui-bootstrap-2.5.0/ui-bootstrap-tpls-2.5.0.js');
 require(
   'static/bower-angular-translate-storage-cookie-2.18.1/' +
   'angular-translate-storage-cookie.min.js');
+declare var angular: ng.IAngularStatic;
 angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
   'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
