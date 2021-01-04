@@ -30,7 +30,7 @@ import python_utils
     base_models, exp_models, subtopic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.subtopic,
-    models.NAMES.user,models.NAMES.exploration
+    models.NAMES.user, models.NAMES.exploration
 ])
 
 

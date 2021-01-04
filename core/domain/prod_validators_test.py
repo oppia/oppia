@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import random
 
 from constants import constants
 from core.domain import exp_domain
@@ -44,7 +43,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
 
 datastore_services = models.Registry.import_datastore_services()
 
