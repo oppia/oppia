@@ -118,8 +118,8 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                 reference. For example: 'committer_id': UserSettingsModel,
                 committer_id is the field name to identify the external model
                 UserSettingsModel.
-            model_ids: list(str). The list of user settings model IDs to fetch
-                the UserSettingsModels.
+            model_ids: list(str). The list of user settings model IDs for which
+                to fetch the UserSettingsModels.
             may_contain_system_ids: bool. Whether the model IDs contain
                 system IDs which should be omitted before attempting to fetch
                 the corresponding models. Set may_contain_system_ids to True if
