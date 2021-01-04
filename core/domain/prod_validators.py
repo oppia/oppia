@@ -212,6 +212,7 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
     def _validate_first_published_msec(cls, item):
         """Validate that first published time of model is less than current
         time.
+        
         Args:
             item: datastore_services.Model. ExplorationRightsModel to validate.
         """

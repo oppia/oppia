@@ -29,13 +29,9 @@ from core.domain import prod_validation_jobs_one_off
 from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
-
-
 from core.domain import story_domain
 from core.domain import story_services
-
 from core.domain import taskqueue_services
-
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
