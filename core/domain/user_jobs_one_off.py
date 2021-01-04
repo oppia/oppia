@@ -362,29 +362,6 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_model.put()
 
 
-class FillExplorationIdsInUserSubscriptionsModelOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One off job that copies from activity_ids to exploration_ids
-    in UserSubscriptionsModel.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSubscriptionsModel]
-
-    @staticmethod
-    def map(model_instance):
-        model_instance.exploration_ids = model_instance.activity_ids
-        model_instance.update_timestamps(update_last_updated_time=False)
-        model_instance.put()
-        yield ('SUCCESS', model_instance.exploration_ids)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
 class CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One off job that removes nonexisting exploration ids from
@@ -490,6 +467,42 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the reduce function for this job."""
         yield (key, len(values))
 
+class RemoveActivityIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes the activity_ids from the UserSubscriptionsModel. """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveActivityIDsOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSubscriptionsModel]
+
+    @staticmethod
+    def map(user_subscriptions_model):
+        # This is the only way to remove the field from the model,
+        # see https://stackoverflow.com/a/15116016/3688189 and
+        # https://stackoverflow.com/a/12701172/3688189.
+        if 'activity_ids' in user_subscriptions_model._properties:
+            del user_subscriptions_model._properties['activity_ids']
+            if 'activity_ids' in user_subscriptions_model._values:
+                del user_subscriptions_model._values['activity_ids']
+            user_subscriptions_model.update_timestamps(
+                update_last_updated_time=False)
+            user_subscriptions_model.put()
+            yield(
+                'SUCCESS_REMOVED - UserSubscriptionsModel',
+                user_subscriptions_model.id)
+        else:
+            yield(
+                'SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel',
+                user_subscriptions_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        yield (key, len(values))
 
 class RemoveFeedbackThreadIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes the feedback_thread_ids from the UserSubscriptionsModel.
