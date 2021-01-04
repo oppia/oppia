@@ -1585,7 +1585,7 @@ class RemoveGaeIdOneOffJobTests(test_utils.GenericTestBase):
 
 
 class MockUserSubscriptionsModelWithActivityIDs(
-    user_models.UserSubscriptionsModel):
+        user_models.UserSubscriptionsModel):
     """Mock UserSubscriptionsModel so that it allows to set 'activity_ids'. """
 
     activity_ids = (
