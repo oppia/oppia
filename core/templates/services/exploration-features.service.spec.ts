@@ -21,13 +21,14 @@ import { TestBed } from '@angular/core/testing';
 
 import { ExplorationFeaturesService, ExplorationDataDict, ParamChanges } from
   'services/exploration-features.service';
+import { ExplorationFeatures } from './exploration-features-backend-api.service';
 
 describe('ExplorationFeatureService', () => {
-  let explorationFeatureService: ExplorationFeaturesService = null;
-  let featureData = null;
-  let explorationData: ExplorationDataDict = null;
-  let explorationData2: ExplorationDataDict = null;
-  let testParamChanges: ParamChanges = null;
+  let explorationFeatureService: ExplorationFeaturesService;
+  let featureData: ExplorationFeatures;
+  let explorationData: ExplorationDataDict;
+  let explorationData2: ExplorationDataDict;
+  let testParamChanges: ParamChanges;
 
   beforeEach(() => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
@@ -37,6 +38,7 @@ describe('ExplorationFeatureService', () => {
 
     featureData = {
       isExplorationWhitelisted: true,
+      alwaysAskLearnersForAnswerDetails: true,
     };
     explorationData = {
       param_changes: [testParamChanges],
