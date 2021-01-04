@@ -16,12 +16,7 @@
  * @fileoverview Module for the profile page.
  */
 
-import {
-  APP_INITIALIZER,
-  Injector,
-  NgModule,
-  StaticProvider
-} from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
@@ -65,12 +60,10 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   ]
 })
 export class ProfilePageModule {
-  static injector: Injector;
-  constructor(injector: Injector) {
-    ProfilePageModule.injector = injector;
+  constructor(private upgrade: UpgradeModule) { }
+  ngDoBootstrap(): void {
+    this.upgrade.bootstrap(document.body, ['oppia'], { strictDi: true });
   }
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap(): void {}
 }
 
 angular.module('oppia').directive(
