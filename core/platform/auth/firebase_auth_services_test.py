@@ -22,7 +22,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from core.domain import auth_domain
-from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
@@ -176,7 +175,8 @@ class AuthenticateRequestTests(test_utils.TestBase):
         request = self.make_request(auth_header='Bearer DUMMY_JWT')
 
         with initialize_app_swap, self.capture_logging() as errors:
-            auth_claims = firebase_auth_services.authenticate_request(request)
+            auth_claims = (
+                firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertIsNone(auth_claims)
         self.assertEqual(len(errors), 1)
@@ -199,7 +199,8 @@ class AuthenticateRequestTests(test_utils.TestBase):
             stack.enter_context(delete_app_swap)
             errors = stack.enter_context(self.capture_logging())
 
-            auth_claims = firebase_auth_services.authenticate_request(request)
+            auth_claims = (
+                firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertIsNone(auth_claims)
         self.assertEqual(errors, [])
@@ -211,7 +212,8 @@ class AuthenticateRequestTests(test_utils.TestBase):
         request = self.make_request(auth_header='Bearer DUMMY_JWT')
 
         with verify_id_token_swap:
-            auth_claims = firebase_auth_services.authenticate_request(request)
+            auth_claims = (
+                firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertEqual(
             auth_claims,
@@ -224,7 +226,8 @@ class AuthenticateRequestTests(test_utils.TestBase):
         request = self.make_request(auth_header='Bearer DUMMY_JWT')
 
         with verify_id_token_swap:
-            auth_claims = firebase_auth_services.authenticate_request(request)
+            auth_claims = (
+                firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertEqual(
             auth_claims,
@@ -233,14 +236,16 @@ class AuthenticateRequestTests(test_utils.TestBase):
     def test_returns_none_when_auth_header_is_missing(self):
         request = self.make_request()
 
-        auth_claims = firebase_auth_services.authenticate_request(request)
+        auth_claims = (
+            firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertIsNone(auth_claims)
 
     def test_returns_none_when_auth_header_uses_wrong_scheme_type(self):
         request = self.make_request(auth_header='Basic password=123')
 
-        auth_claims = firebase_auth_services.authenticate_request(request)
+        auth_claims = (
+            firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertIsNone(auth_claims)
 
@@ -251,7 +256,8 @@ class AuthenticateRequestTests(test_utils.TestBase):
         request = self.make_request(auth_header='Bearer DUMMY_JWT')
 
         with verify_id_token_swap, self.capture_logging() as errors:
-            auth_claims = firebase_auth_services.authenticate_request(request)
+            auth_claims = (
+                firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertIsNone(auth_claims)
         self.assertEqual(len(errors), 1)
@@ -263,7 +269,8 @@ class AuthenticateRequestTests(test_utils.TestBase):
         request = self.make_request(auth_header='Bearer DUMMY_JWT')
 
         with verify_id_token_swap:
-            auth_claims = firebase_auth_services.authenticate_request(request)
+            auth_claims = (
+                firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertIsNone(auth_claims)
 
@@ -457,146 +464,3 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
         self.assertTrue(
             firebase_auth_services.are_auth_associations_deleted(self.USER_ID))
         self.assertEqual(logs, [])
-
-
-class FirebaseAccountWipeoutTests(test_utils.GenericTestBase):
-    """Tests for wipeout_service that is specific to Firebase authentication."""
-
-    EMAIL = 'some@email.com'
-    USERNAME = 'username'
-    AUTH_ID = 'authid'
-
-    UNKNOWN_ERROR = firebase_exceptions.UnknownError('error')
-
-    def setUp(self):
-        with contextlib2.ExitStack() as stack:
-            stack.enter_context(self.swap(
-                models.Registry, 'import_auth_services',
-                classmethod(lambda _: firebase_auth_services)))
-            stack.callback(FirebaseAdminSdkStub.install(self))
-
-            # Reload wipeout_service so it uses our firebase_auth_services swap.
-            python_utils.reload_module(wipeout_service)
-
-            # Set-up has succeeded, so now we defer closing the ExitStack until
-            # tearDown() so that the tests can stay inside our opened contexts.
-            self._close_stack = stack.pop_all().close
-
-        super(FirebaseAccountWipeoutTests, self).setUp()
-
-        firebase_admin.auth.create_user(uid=self.AUTH_ID)
-        self.signup(self.EMAIL, self.USERNAME)
-        self.user_id = self.get_user_id_from_email(self.EMAIL)
-        firebase_auth_services.associate_auth_id_to_user_id(
-            auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.user_id))
-        wipeout_service.pre_delete_user(self.user_id)
-
-    def tearDown(self):
-        self._close_stack()
-        super(FirebaseAccountWipeoutTests, self).tearDown()
-
-    def wipeout(self):
-        """Runs wipeout on the user created by this test."""
-        wipeout_service.delete_user(
-            wipeout_service.get_pending_deletion_request(self.user_id))
-
-    def assert_wipeout_is_verified(self):
-        """Asserts that the wipeout has been acknowledged as complete."""
-        self.assertTrue(wipeout_service.verify_user_deleted(self.user_id))
-
-    def assert_wipeout_is_not_verified(self):
-        """Asserts that the wipeout has been acknowledged as incomplete."""
-        self.assertFalse(wipeout_service.verify_user_deleted(self.user_id))
-
-    def assert_firebase_account_is_deleted(self):
-        """Asserts that the Firebase account has been deleted."""
-        self.assertRaisesRegexp(
-            firebase_admin.auth.UserNotFoundError, 'not found',
-            lambda: firebase_admin.auth.get_user(self.AUTH_ID))
-
-    def assert_firebase_account_is_not_deleted(self):
-        """Asserts that the Firebase account still exists."""
-        user = firebase_admin.auth.get_user(self.AUTH_ID)
-        self.assertIsNotNone(user)
-        self.assertEqual(user.uid, self.AUTH_ID)
-
-    def swap_initialize_sdk_to_always_fail(self):
-        """Swaps the initialize_app function so that it always fails."""
-        return self.swap_to_always_raise(
-            firebase_admin, 'initialize_app', error=self.UNKNOWN_ERROR)
-
-    def swap_get_user_to_always_fail(self):
-        """Swaps the get_user function so that it always fails."""
-        return self.swap_to_always_raise(
-            firebase_admin.auth, 'get_user', error=self.UNKNOWN_ERROR)
-
-    def swap_delete_user_to_always_fail(self):
-        """Swaps the delete_user function so that it always fails."""
-        return self.swap_to_always_raise(
-            firebase_admin.auth, 'delete_user', error=self.UNKNOWN_ERROR)
-
-    def test_wipeout_happy_path(self):
-        self.wipeout()
-
-        self.assert_firebase_account_is_deleted()
-        self.assert_wipeout_is_verified()
-
-    def test_wipeout_retry_after_failed_attempt(self):
-        with self.swap_initialize_sdk_to_always_fail():
-            self.wipeout()
-
-        self.assert_firebase_account_is_not_deleted()
-        self.assert_wipeout_is_not_verified()
-
-        self.wipeout()
-
-        self.assert_firebase_account_is_deleted()
-        self.assert_wipeout_is_verified()
-
-    def test_wipeout_retry_after_unverified_successful_attempt(self):
-        self.wipeout()
-
-        self.assert_firebase_account_is_deleted()
-
-        with self.swap_initialize_sdk_to_always_fail():
-            self.assert_wipeout_is_not_verified()
-
-        self.wipeout()
-
-        self.assert_wipeout_is_verified()
-
-    def test_wipeout_when_delete_user_fails(self):
-        with self.swap_delete_user_to_always_fail():
-            self.wipeout()
-
-        self.assert_firebase_account_is_not_deleted()
-
-        self.assert_wipeout_is_not_verified()
-
-    def test_wipeout_when_get_user_fails(self):
-        self.wipeout()
-
-        self.assert_firebase_account_is_deleted()
-
-        with self.swap_get_user_to_always_fail():
-            self.assert_wipeout_is_not_verified()
-
-        self.assert_wipeout_is_verified()
-
-    def test_wipeout_when_init_fails_during_delete(self):
-        with self.swap_initialize_sdk_to_always_fail():
-            self.wipeout()
-
-        self.assert_firebase_account_is_not_deleted()
-
-        self.assert_wipeout_is_not_verified()
-
-    def test_wipeout_when_init_fails_during_verify(self):
-        self.wipeout()
-
-        self.assert_firebase_account_is_deleted()
-
-        with self.swap_initialize_sdk_to_always_fail():
-            self.assert_wipeout_is_not_verified()
-
-        self.assert_wipeout_is_verified()

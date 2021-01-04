@@ -44,16 +44,16 @@ class AuthClaimsTests(test_utils.TestBase):
 
         self.assertEqual(auth.auth_id, 'sub')
         self.assertEqual(auth.email, 'email@test.com')
-        self.assertTrue(auth.is_admin)
+        self.assertTrue(auth.role_is_super_admin)
 
     def test_repr(self):
         self.assertEqual(
             repr(auth_domain.AuthClaims('sub', 'email@test.com', False)),
-            'AuthClaims(auth_id=%r, email=%r, is_admin=%r)' % (
+            'AuthClaims(auth_id=%r, email=%r, role_is_super_admin=%r)' % (
                 'sub', 'email@test.com', False))
         self.assertEqual(
             repr(auth_domain.AuthClaims('tub', None, True)),
-            'AuthClaims(auth_id=%r, email=%r, is_admin=%r)' % (
+            'AuthClaims(auth_id=%r, email=%r, role_is_super_admin=%r)' % (
                 'tub', None, True))
 
     def test_comparison(self):

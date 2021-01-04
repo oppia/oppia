@@ -36,34 +36,36 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             gae_auth_services.get_provider_id(), feconf.GAE_AUTH_PROVIDER_ID)
 
-    def test_authenticate_request_returns_none_if_not_logged_in(self):
+    def test_get_auth_claims_from_request_returns_none_if_not_logged_in(self):
         request = webapp2.Request.blank('/')
 
-        self.assertIsNone(gae_auth_services.authenticate_request(request))
+        self.assertIsNone(
+            gae_auth_services.get_auth_claims_from_request(request))
 
-    def test_authenticate_request_returns_claims_about_logged_in_user(self):
+    def test_get_auth_claims_from_request_returns_claims_about_logged_in_user(
+            self):
         request = webapp2.Request.blank('/')
         email = 'user@test.com'
 
         with self.login_context('user@test.com'):
-            claims = gae_auth_services.authenticate_request(request)
+            claims = gae_auth_services.get_auth_claims_from_request(request)
 
         self.assertIsNotNone(claims)
         self.assertEqual(claims.auth_id, self.get_auth_id_from_email(email))
         self.assertEqual(claims.email, email)
-        self.assertFalse(claims.is_admin)
+        self.assertFalse(claims.role_is_super_admin)
 
-    def test_authenticate_request_returns_admin_privileges(self):
+    def test_get_auth_claims_from_request_returns_admin_privileges(self):
         request = webapp2.Request.blank('/')
         email = 'admin@test.com'
 
         with self.login_context(email, is_super_admin=True):
-            claims = gae_auth_services.authenticate_request(request)
+            claims = gae_auth_services.get_auth_claims_from_request(request)
 
         self.assertIsNotNone(claims)
         self.assertEqual(claims.auth_id, self.get_auth_id_from_email(email))
         self.assertEqual(claims.email, email)
-        self.assertTrue(claims.is_admin)
+        self.assertTrue(claims.role_is_super_admin)
 
     def test_get_association_that_is_present(self):
         gae_auth_services.associate_auth_id_to_user_id(

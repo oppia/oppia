@@ -125,7 +125,7 @@ def get_provider_id():
     return feconf.FIREBASE_AUTH_PROVIDER_ID
 
 
-def authenticate_request(request):
+def get_auth_claims_from_request(request):
     """Authenticates request and returns claims about it's authorizer, if any.
 
     Oppia specifically expects the request to have a Subject Identifier for the
@@ -142,9 +142,9 @@ def authenticate_request(request):
     claims = _verify_id_token(request.headers.get('Authorization', ''))
     auth_id = claims.get('sub', None)
     email = claims.get('email', None)
-    is_admin = claims.get('role', None) == 'admin'
+    role_is_super_admin = claims.get('role', None) == 'admin'
     if auth_id:
-        return auth_domain.AuthClaims(auth_id, email, is_admin)
+        return auth_domain.AuthClaims(auth_id, email, role_is_super_admin)
     return None
 
 

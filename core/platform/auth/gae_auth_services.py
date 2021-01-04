@@ -34,8 +34,17 @@ def get_provider_id():
     return feconf.GAE_AUTH_PROVIDER_ID
 
 
-def authenticate_request(unused_request):
-    """Returns Claims for the user currently signed-in and sending requests."""
+def get_auth_claims_from_request(unused_request):
+    """Returns Claims for the user currently signed-in and sending requests.
+
+    Args:
+        unused_request: webapp2.Request. Unused because Google AppEngine handles
+            user authentication internally.
+
+    Returns:
+        AuthClaims|None. Claims about the currently signed in user. If no user
+        is signed in, then returns None.
+    """
     gae_user = users.get_current_user()
     if gae_user is not None:
         return auth_domain.AuthClaims(

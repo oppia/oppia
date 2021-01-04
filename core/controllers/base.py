@@ -167,9 +167,11 @@ class BaseHandler(webapp2.RequestHandler):
         self.iframed = False
 
         auth_claims = user_services.get_auth_claims_from_request(request)
-        self.is_super_admin = auth_claims is not None and auth_claims.is_admin
+        self.current_user_is_super_admin = (
+            auth_claims is not None and auth_claims.role_is_super_admin)
 
-        if feconf.ENABLE_MAINTENANCE_MODE and not self.is_super_admin:
+        if feconf.ENABLE_MAINTENANCE_MODE and not (
+                self.current_user_is_super_admin):
             return
 
         self.user_id = None
@@ -225,7 +227,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.values['is_admin'] = user_services.is_admin(self.user_id)
         self.values['is_topic_manager'] = (
             user_services.is_topic_manager(self.user_id))
-        self.values['is_super_admin'] = self.is_super_admin
+        self.values['is_super_admin'] = self.current_user_is_super_admin
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass.
@@ -241,7 +243,8 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if feconf.ENABLE_MAINTENANCE_MODE and not self.is_super_admin:
+        if feconf.ENABLE_MAINTENANCE_MODE and not (
+                self.current_user_is_super_admin):
             self.handle_exception(
                 self.TemporaryMaintenanceException(
                     'Oppia is currently being upgraded, and the site should '

@@ -568,7 +568,7 @@ def can_access_admin_page(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not self.is_super_admin:
+        if not self.current_user_is_super_admin:
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application' % self.user_id)
         return handler(self, **kwargs)
@@ -605,7 +605,7 @@ def can_upload_exploration(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not self.is_super_admin:
+        if not self.current_user_is_super_admin:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to upload explorations.')
         return handler(self, **kwargs)
@@ -1468,7 +1468,7 @@ def can_perform_cron_tasks(handler):
                 credentials to access the page.
         """
         if (self.request.headers.get('X-AppEngine-Cron') is None and
-                not self.is_super_admin):
+                not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
         else:
