@@ -175,40 +175,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # OK, update_timestamps called before put.
         model.put()
 
-    def test_put_async(self):
-        model = base_models.BaseModel()
-        self.assertIsNone(model.created_on)
-        self.assertIsNone(model.last_updated)
-
-        # Field last_updated will get updated anyway because it is None.
-        model.update_timestamps(update_last_updated_time=False)
-        future = model.put_async()
-        future.get_result()
-        model_id = model.id
-        self.assertIsNotNone(
-            base_models.BaseModel.get_by_id(model_id).created_on)
-        self.assertIsNotNone(
-            base_models.BaseModel.get_by_id(model_id).last_updated)
-        last_updated = model.last_updated
-
-        # Field last_updated won't get updated because update_last_updated_time
-        # is set to False and last_updated already has some value.
-        model.update_timestamps(update_last_updated_time=False)
-        future = model.put_async()
-        future.get_result()
-        self.assertEqual(
-            base_models.BaseModel.get_by_id(model_id).last_updated,
-            last_updated)
-
-        # Field last_updated will get updated because update_last_updated_time
-        # is set to True (by default).
-        model.update_timestamps()
-        future = model.put_async()
-        future.get_result()
-        self.assertNotEqual(
-            base_models.BaseModel.get_by_id(model_id).last_updated,
-            last_updated)
-
     def test_put_multi(self):
         models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
         for model in models_1:
@@ -243,51 +209,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         models_3 = base_models.BaseModel.get_multi(model_ids)
         base_models.BaseModel.update_timestamps_multi(models_3)
         base_models.BaseModel.put_multi(models_3)
-        for model_id, last_updated in python_utils.ZIP(
-                model_ids, last_updated_values):
-            model = base_models.BaseModel.get_by_id(model_id)
-            self.assertNotEqual(model.last_updated, last_updated)
-
-    def test_put_multi_async(self):
-        models_1 = [base_models.BaseModel() for _ in python_utils.RANGE(3)]
-        for model in models_1:
-            self.assertIsNone(model.created_on)
-            self.assertIsNone(model.last_updated)
-
-        # Field last_updated will get updated anyway because it is None.
-        base_models.BaseModel.update_timestamps_multi(
-            models_1, update_last_updated_time=False)
-        futures = base_models.BaseModel.put_multi_async(models_1)
-        for future in futures:
-            future.get_result()
-        model_ids = [model.id for model in models_1]
-        last_updated_values = []
-        for model_id in model_ids:
-            model = base_models.BaseModel.get_by_id(model_id)
-            self.assertIsNotNone(model.created_on)
-            self.assertIsNotNone(model.last_updated)
-            last_updated_values.append(model.last_updated)
-
-        # Field last_updated won't get updated because update_last_updated_time
-        # is set to False and last_updated already has some value.
-        models_2 = base_models.BaseModel.get_multi(model_ids)
-        base_models.BaseModel.update_timestamps_multi(
-            models_1, update_last_updated_time=False)
-        futures = base_models.BaseModel.put_multi_async(models_2)
-        for future in futures:
-            future.get_result()
-        for model_id, last_updated in python_utils.ZIP(
-                model_ids, last_updated_values):
-            model = base_models.BaseModel.get_by_id(model_id)
-            self.assertEqual(model.last_updated, last_updated)
-
-        # Field last_updated will get updated because update_last_updated_time
-        # is set to True (by default).
-        models_3 = base_models.BaseModel.get_multi(model_ids)
-        base_models.BaseModel.update_timestamps_multi(models_1)
-        futures = base_models.BaseModel.put_multi_async(models_3)
-        for future in futures:
-            future.get_result()
         for model_id, last_updated in python_utils.ZIP(
                 model_ids, last_updated_values):
             model = base_models.BaseModel.get_by_id(model_id)

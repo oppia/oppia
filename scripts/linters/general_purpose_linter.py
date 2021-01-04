@@ -596,9 +596,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': (
             'Please use put_multi() instead.'),
         'excluded_files': (),
-        'excluded_dirs': (
-            'core/storage/base_model/',
-            'core/platform/datastore/')
+        'excluded_dirs': ()
     }
 ]
 

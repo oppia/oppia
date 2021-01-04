@@ -315,19 +315,6 @@ class BaseModel(datastore_services.Model):
         datastore_services.put_multi(entities)
 
     @classmethod
-    def put_multi_async(cls, entities):
-        """Stores the given datastore_services.Model instances asynchronously.
-
-        Args:
-            entities: list(datastore_services.Model). The list of model
-                instances to be stored.
-
-        Returns:
-            list(future). A list of futures.
-        """
-        return datastore_services.put_multi_async(entities)
-
-    @classmethod
     def delete_multi(cls, entities):
         """Deletes the given datastore_services.Model instances.
 
