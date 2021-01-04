@@ -17,21 +17,89 @@
  */
 
 
+import constants from 'assets/constants';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AlertsService } from 'services/alerts.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { LearnerPlaylistModalController } from 'domain/learner_dashboard/learner-playlist-modal.controller';
+import { LearnerDashboardActivityIds } from
+  'domain/learner_dashboard/learner-dashboard-activity-ids.model';
+import { LearnerPlaylistModalController } from './learner-playlist-modal.controller';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LearnerPlaylistService {
-  constructor(private ) {}
+  constructor(
+    private ngbModal: NgbModal,
+    private http: HttpClient,
+    private alertsService: AlertsService,
+    private urlInterpolationService: UrlInterpolationService) {}
+
+  addToLearnerPlaylist(activityId: string, activityType: string): boolean {
+    var successfullyAdded = true;
+    var addToLearnerPlaylistUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+          activityType: activityType,
+          activityId: activityId
+        }));
+    this.http.post(addToLearnerPlaylistUrl,{}).toPromise().then(
+      (response) => {
+        if (response.data.belongs_to_completed_or_incomplete_list) {
+          successfullyAdded = false;
+          this.alertsService.addInfoMessage(
+            'You have already completed or are completing this ' +
+            'activity.');
+        }
+        if (response.data.belongs_to_subscribed_activities) {
+          successfullyAdded = false;
+          this.alertsService.addInfoMessage(
+            'This is present in your creator dashboard');
+        }
+        if (response.data.playlist_limit_exceeded) {
+          successfullyAdded = false;
+          this.alertsService.addInfoMessage(
+            'Your \'Play Later\' list is full!  Either you can ' +
+              'complete some or you can head to the learner dashboard ' +
+              'and remove some.');
+        }
+        if (successfullyAdded) {
+          this.alertsService.addSuccessMessage(
+            'Successfully added to your \'Play Later\' list.');
+        }
+      });
+    return successfullyAdded;
+  }
+
+  removeFromLearnerPlaylist(
+      activityId: string, activityTitle: string, activityType: string,
+      learnerDashboardActivityIds: LearnerDashboardActivityIds):void {
+    this.ngbModal.open(
+      LearnerPlaylistModalController,
+      {
+        backdrop: true,
+      }).result.then(function() {
+      if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
+        learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
+          activityId);
+      } else if (activityType === constants.ACTIVITY_TYPE_COLLECTION) {
+        learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
+          activityId);
+      }
+    }, function() {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
 }
 
+angular.module('oppia').factory(
+  'LearnerPlaylistService',
+  downgradeInjectable(LearnerPlaylistService));
 
 // require('domain/utilities/url-interpolation.service.ts');
 // require('services/alerts.service.ts');
@@ -117,4 +185,4 @@ export class LearnerPlaylistService {
 //       addToLearnerPlaylist: _addToLearnerPlaylist,
 //       removeFromLearnerPlaylist: _removeFromLearnerPlaylist
 //     };
-//   }]);
+// //   }]);
