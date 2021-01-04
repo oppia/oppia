@@ -16,10 +16,10 @@
  * @fileoverview Module for the admin page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -60,23 +60,12 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
     }
   ]
 })
-class AdminPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+export class AdminPageModule {
+  constructor(private upgrade: UpgradeModule) { }
+  ngDoBootstrap(): void {
+    this.upgrade.bootstrap(document.body, ['oppia'], { strictDi: true });
+  }
 }
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(AdminPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFn);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
 
 angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to

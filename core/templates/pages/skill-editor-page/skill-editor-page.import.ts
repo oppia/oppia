@@ -21,10 +21,30 @@ import 'zone.js';
 
 import 'angular-ui-sortable';
 import uiValidate from 'angular-ui-validate';
+import 'third-party-imports/guppy.import';
+import 'third-party-imports/midi-js.import';
 import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ui-codemirror.import';
+import 'third-party-imports/ng-joy-ride.import';
+import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
+import 'angular';
+import 'headroom.js/dist/headroom';
+import 'headroom.js/dist/angular.headroom';
+import 'angular-animate';
+import 'messageformat';
+import 'angular-translate';
+import 'angular-translate-interpolation-messageformat';
 
+require('static/angularjs-1.8.2/angular-aria.js');
+require('static/bower-material-1.1.19/angular-material.js');
+require('static/angularjs-1.8.2/angular-sanitize.min.js');
+require('static/angularjs-1.8.2/angular-touch.min.js');
+require('static/angular-toastr-1.7.0/dist/angular-toastr.tpls.min.js');
+require('static/ui-bootstrap-2.5.0/ui-bootstrap-tpls-2.5.0.js');
+require(
+  'static/bower-angular-translate-storage-cookie-2.18.1/' +
+  'angular-translate-storage-cookie.min.js');
 angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
   'ngAudio', 'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
@@ -34,7 +54,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/skill-editor-page/skill-editor-page.module.ts');
+const { SkillEditorPageModule } = require(
+  'pages/skill-editor-page/skill-editor-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
@@ -42,3 +63,6 @@ require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
 require('pages/skill-editor-page/skill-editor-page.component.ts');
+// Bootstrap the application.
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+platformBrowserDynamic().bootstrapModule(SkillEditorPageModule);

@@ -28,7 +28,23 @@ import 'third-party-imports/ng-audio.import';
 import 'third-party-imports/ng-joy-ride.import';
 import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
+import 'angular';
+import 'headroom.js/dist/headroom';
+import 'headroom.js/dist/angular.headroom';
+import 'angular-animate';
+import 'messageformat';
+import 'angular-translate';
+import 'angular-translate-interpolation-messageformat';
 
+require('static/angularjs-1.8.2/angular-aria.js');
+require('static/bower-material-1.1.19/angular-material.js');
+require('static/angularjs-1.8.2/angular-sanitize.min.js');
+require('static/angularjs-1.8.2/angular-touch.min.js');
+require('static/angular-toastr-1.7.0/dist/angular-toastr.tpls.min.js');
+require('static/ui-bootstrap-2.5.0/ui-bootstrap-tpls-2.5.0.js');
+require(
+  'static/bower-angular-translate-storage-cookie-2.18.1/' +
+  'angular-translate-storage-cookie.min.js');
 angular.module('oppia', [
   require('angular-cookies'), 'headroom', 'ngAnimate',
   'ngAudio', 'ngJoyRide', 'ngMaterial',
@@ -39,7 +55,8 @@ angular.module('oppia', [
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require('pages/exploration-editor-page/exploration-editor-page.module.ts');
+const { ExplorationEditorPageModule } = require(
+  'pages/exploration-editor-page/exploration-editor-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
@@ -53,3 +70,6 @@ require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.component.ts');
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
+// Bootstrap the application.
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+platformBrowserDynamic().bootstrapModule(ExplorationEditorPageModule);

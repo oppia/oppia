@@ -16,9 +16,9 @@
  * @fileoverview Module for the topic viewer page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { platformFeatureInitFactory, PlatformFeatureService } from
@@ -44,7 +44,8 @@ import { TopicViewerPageComponent } from
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    UpgradeModule
   ],
   declarations: [
     OppiaAngularRootComponent,
@@ -76,23 +77,12 @@ import { TopicViewerPageComponent } from
     }
   ]
 })
-class TopicViewerPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+export class TopicViewerPageModule {
+  constructor(private upgrade: UpgradeModule) { }
+  ngDoBootstrap(): void {
+    this.upgrade.bootstrap(document.body, ['oppia'], { strictDi: true });
+  }
 }
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(TopicViewerPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFn);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
 
 angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to

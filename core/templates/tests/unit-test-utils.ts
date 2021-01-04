@@ -27,7 +27,6 @@ import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { Observable, of } from 'rxjs';
 import { angularServices } from 'services/angular-services.index';
 
-
 declare var angular: ng.IAngularStatic;
 
 // AngularFireAuth is an Angular-only service (i.e., _not_ AngularJS) that Oppia

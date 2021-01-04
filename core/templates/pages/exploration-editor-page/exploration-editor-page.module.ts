@@ -16,9 +16,9 @@
  * @fileoverview Module for the exploration editor page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -35,7 +35,8 @@ import { ParamChangesEditorDirective } from './param-changes-editor/param-change
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule
+    SharedComponentsModule,
+    UpgradeModule
   ],
   declarations: [
     CkEditorCopyToolbarComponent,
@@ -62,23 +63,12 @@ import { ParamChangesEditorDirective } from './param-changes-editor/param-change
     }
   ]
 })
-class ExplorationEditorPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
+export class ExplorationEditorPageModule {
+  constructor(private upgrade: UpgradeModule) { }
+  ngDoBootstrap(): void {
+    this.upgrade.bootstrap(document.body, ['oppia'], { strictDi: true });
+  }
 }
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFn = (extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ExplorationEditorPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFn);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
 
 angular.module('oppia').directive(
   // This directive is the downgraded version of the Angular component to
