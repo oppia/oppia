@@ -21,10 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
-
 from constants import constants
-
-
 from core.domain import prod_validation_jobs_one_off
 from core.domain import subtopic_page_domain
 from core.domain import topic_domain

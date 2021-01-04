@@ -468,11 +468,6 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
     def _get_external_instance_custom_validation_functions(cls):
         return [cls._validate_exploration_model_last_updated]
 
-
-class GeneralFeedbackThreadModelValidator(
-        base_model_validators.BaseModelValidator):
-    """Class for validating GeneralFeedbackThreadModels."""
-
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING].
