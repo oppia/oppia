@@ -281,7 +281,7 @@ var RichTextEditor = async function(elem) {
 
 // Used to edit entries of a set of HTML strings, specifically used in the item
 // selection interaction test to customize interaction details.
-var SetOfHtmlStringEditor = function(elem) {
+var SetOfTranslatableHtmlContentIdsEditor = function(elem) {
   return {
     editEntry: async function(index, objectType) {
       var entry = elem.element(
@@ -713,7 +713,7 @@ var FORM_EDITORS = {
   List: ListEditor,
   Real: RealEditor,
   RichText: RichTextEditor,
-  SetOfHtmlString: SetOfHtmlStringEditor,
+  SetOfTranslatableHtmlContentIds: SetOfTranslatableHtmlContentIdsEditor,
   Unicode: UnicodeEditor
 };
 
@@ -732,7 +732,8 @@ exports.DictionaryEditor = DictionaryEditor;
 exports.ListEditor = ListEditor;
 exports.RealEditor = RealEditor;
 exports.RichTextEditor = RichTextEditor;
-exports.SetOfHtmlStringEditor = SetOfHtmlStringEditor;
+exports.SetOfTranslatableHtmlContentIdsEditor = (
+  SetOfTranslatableHtmlContentIdsEditor);
 exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;

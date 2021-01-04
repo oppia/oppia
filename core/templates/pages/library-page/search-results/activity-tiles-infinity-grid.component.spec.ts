@@ -37,7 +37,6 @@ describe('Activity tiles infinity grid component', function() {
   };
   var loadingMessageChangeEventEmitter = new EventEmitter();
   var initialSearchResultsLoadedEmitter = new EventEmitter();
-
   importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
