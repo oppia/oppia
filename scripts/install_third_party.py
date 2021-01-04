@@ -358,10 +358,12 @@ def install_elasticsearch_dev_server():
         python_utils.PRINT('Installing ElasticSearch...')
 
     if common.is_mac_os() or common.is_linux_os():
+        file_ext = 'tar'
         def download_and_extract(*args):
             """This downloads and extracts the elasticsearch files."""
             download_and_untar_files(*args)
     elif common.is_windows_os():
+        file_ext = 'zip'
         def download_and_extract(*args):
             """This downloads and extracts the elasticsearch files."""
             download_and_unzip_files(*args)
@@ -370,8 +372,12 @@ def install_elasticsearch_dev_server():
 
     download_and_extract(
         'https://artifacts.elastic.co/downloads/elasticsearch/' +
-        'elasticsearch-%s-windows-x86_64.zip' %
-        common.ELASTICSEARCH_VERSION,
+        'elasticsearch-%s-%s-x86_64.%s' %
+        (
+            common.ELASTICSEARCH_VERSION,
+            common.OS_NAME.lower(),
+            file_ext
+        ),
         TARGET_DOWNLOAD_DIRS['oppiaTools'],
         'elasticsearch-%s' % common.ELASTICSEARCH_VERSION,
         'elasticsearch-%s' % common.ELASTICSEARCH_VERSION
