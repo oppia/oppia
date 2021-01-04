@@ -28,7 +28,6 @@ import itertools
 import json
 import logging
 import os
-import types
 import unittest
 
 from constants import constants
@@ -640,12 +639,18 @@ class TestBase(unittest.TestCase):
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
-    def capture_logging(self):
+    def capture_logging(self, min_level=logging.NOTSET):
         """Context manager that captures logs into a list.
 
         Strips whitespace from messages for convenience.
 
         https://docs.python.org/3/howto/logging-cookbook.html#using-a-context-manager-for-selective-logging
+
+        Args:
+            min_level: int. The minimum logging level captured by the context
+                manager. By default, all logging levels are captured. Values
+                should be one of the following values from the logging module:
+                NOTSET, DEBUG, INFO, WARNING, ERROR, CRITICAL.
 
         Yields:
             list(str). A live-feed of the logging messages captured so-far.
@@ -668,7 +673,7 @@ class TestBase(unittest.TestCase):
         logger = logging.getLogger()
         old_level = logger.level
         logger.addHandler(list_stream_handler)
-        logger.setLevel(logging.NOTSET)
+        logger.setLevel(min_level)
         try:
             yield captured_logs
         finally:
@@ -688,13 +693,13 @@ class TestBase(unittest.TestCase):
                 print math.sqrt(16.0) # prints 42
             print math.sqrt(16.0) # prints 4 as expected.
 
-        Note that this does not work directly for classmethods. In this case,
-        you will need to import the 'types' module, as follows:
+        To mock class methods, pass the function to the classmethod decorator
+        first, for example:
 
             import types
             with self.swap(
                 SomePythonClass, 'some_classmethod',
-                types.MethodType(new_classmethod, SomePythonClass)):
+                classmethod(new_classmethod)):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This
@@ -1287,12 +1292,9 @@ tags: []
         memory_cache_services_stub.flush_cache()
 
         with contextlib2.ExitStack() as stack:
-            # Using types.MethodType is necessary because this is a classmethod
-            # (see the documentation for self.swap()).
             stack.enter_context(self.swap(
                 models.Registry, 'import_search_services',
-                types.MethodType(
-                    lambda _: self._search_services_stub, models.Registry)))
+                classmethod(lambda _: self._search_services_stub)))
 
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
