@@ -129,7 +129,7 @@ var PreferencesPage = function() {
     await action.click('User Interest Input', userInterestsInput);
     for (var i = 0; i < interests.length; i++) {
       await action.sendKeys(
-        'User Interest Input', userInterestsInput, interests[i], 
+        'User Interest Input', userInterestsInput, interests[i],
         protractor.Key.RETURN);
       await saveNewChanges('User Interests');
     }
