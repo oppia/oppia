@@ -230,7 +230,7 @@ class CronJobTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'warning', _mock_logging_function)
         recency_msec_swap = self.swap(
-            cron, 'MAX_MAPREDUCE_METADATA_RETENTION_MSECS', 0)
+            jobs, 'MAX_MAPREDUCE_METADATA_RETENTION_MSECS', 0)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 

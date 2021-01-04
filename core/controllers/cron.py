@@ -31,16 +31,9 @@ from core.domain import suggestion_services
 from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.domain import wipeout_jobs_one_off
-from core.platform import models
 import feconf
 import utils
 
-from pipeline import pipeline
-
-(job_models,) = models.Registry.import_models([models.NAMES.job])
-
-# The default retention time is 2 days.
-MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
 TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
 MAX_JOBS_TO_REPORT_ON = 50
 
@@ -153,62 +146,16 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         However, after a few days, this information is less relevant, and
         should be cleaned up.
         """
-        recency_msec = MAX_MAPREDUCE_METADATA_RETENTION_MSECS
-
-        num_cleaned = 0
-
-        min_age_msec = recency_msec
         # Only consider jobs that started at most 1 week before recency_msec.
-        max_age_msec = recency_msec + 7 * 24 * 60 * 60 * 1000
         # The latest start time that a job scheduled for cleanup may have.
         max_start_time_msec = (
-            utils.get_current_time_in_millisecs() - min_age_msec)
+            utils.get_current_time_in_millisecs() -
+            jobs.MAX_MAPREDUCE_METADATA_RETENTION_MSECS
+        )
 
-        # Get all pipeline ids from jobs that started between max_age_msecs
-        # and max_age_msecs + 1 week, before now.
-        pipeline_id_to_job_instance = {}
+        jobs.cleanup_old_jobs_pipelines()
 
-        job_instances = job_models.JobModel.get_recent_jobs(1000, max_age_msec)
-        for job_instance in job_instances:
-            if (job_instance.time_started_msec < max_start_time_msec and not
-                    job_instance.has_been_cleaned_up):
-                if 'root_pipeline_id' in job_instance.metadata:
-                    pipeline_id = job_instance.metadata['root_pipeline_id']
-                    pipeline_id_to_job_instance[pipeline_id] = job_instance
-
-        # Clean up pipelines.
-        for pline in pipeline.get_root_list()['pipelines']:
-            pipeline_id = pline['pipelineId']
-            job_definitely_terminated = (
-                pline['status'] == 'done' or
-                pline['status'] == 'aborted' or
-                pline['currentAttempt'] > pline['maxAttempts'])
-            have_start_time = 'startTimeMs' in pline
-            job_started_too_long_ago = (
-                have_start_time and
-                pline['startTimeMs'] < max_start_time_msec)
-
-            if (job_started_too_long_ago or
-                    (not have_start_time and job_definitely_terminated)):
-                # At this point, the map/reduce pipeline is either in a
-                # terminal state, or has taken so long that there's no
-                # realistic possibility that there might be a race condition
-                # between this and the job actually completing.
-                if pipeline_id in pipeline_id_to_job_instance:
-                    job_instance = pipeline_id_to_job_instance[pipeline_id]
-                    job_instance.has_been_cleaned_up = True
-                    job_instance.update_timestamps()
-                    job_instance.put()
-
-                # This enqueues a deferred cleanup item.
-                p = pipeline.Pipeline.from_id(pipeline_id)
-                if p:
-                    p.cleanup()
-                    num_cleaned += 1
-
-        logging.warning('%s MR jobs cleaned up.' % num_cleaned)
-
-        if job_models.JobModel.do_unfinished_jobs_exist(
+        if jobs.do_unfinished_jobs_exist(
                 cron_services.MapReduceStateModelsCleanupManager.__name__):
             logging.warning('A previous cleanup job is still running.')
         else:
@@ -220,7 +167,7 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
             logging.warning(
                 'Deletion jobs for auxiliary MapReduce entities kicked off.')
 
-        if job_models.JobModel.do_unfinished_jobs_exist(
+        if jobs.do_unfinished_jobs_exist(
                 cron_services.JobModelsCleanupManager.__name__):
             logging.warning(
                 'A previous JobModels cleanup job is still running.')
