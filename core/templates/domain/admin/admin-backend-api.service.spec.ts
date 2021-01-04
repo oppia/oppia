@@ -319,7 +319,7 @@ describe('Admin backend api service', () => {
     let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
     let adminJobOutputUrl = '/adminjoboutput?job_id=' +
       'UserSettingsModelAuditOneOffJob-1609088541992-314';
-    let jobOutput = {output: "[u'fully-validated UserSettingsModel', 1]"};
+    let jobOutput = {output: ["[u'fully-validated UserSettingsModel', 1]"]};
     abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(adminJobOutputUrl);
