@@ -358,7 +358,7 @@ def install_elasticsearch_dev_server():
         python_utils.PRINT('Installing ElasticSearch...')
 
     if common.is_mac_os() or common.is_linux_os():
-        file_ext = 'tar'
+        file_ext = 'tar.gz'
         def download_and_extract(*args):
             """This downloads and extracts the elasticsearch files."""
             download_and_untar_files(*args)
@@ -372,8 +372,7 @@ def install_elasticsearch_dev_server():
 
     download_and_extract(
         'https://artifacts.elastic.co/downloads/elasticsearch/' +
-        'elasticsearch-%s-%s-x86_64.%s' %
-        (
+        'elasticsearch-%s-%s-x86_64.%s' % (
             common.ELASTICSEARCH_VERSION,
             common.OS_NAME.lower(),
             file_ext
