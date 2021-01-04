@@ -116,8 +116,8 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
             field_name: str. A specific name used as an identifier by the
                 storage model which is used to identify the user settings model
                 reference. For example: 'committer_id': UserSettingsModel,
-                committer_id is the field name to identify the external model
-                UserSettingsModel.
+                means that committer_id is a field which contains a user_id
+                used to identify the external model UserSettingsModel.
             model_ids: list(str). The list of user settings model IDs for which
                 to fetch the UserSettingsModels.
             may_contain_system_ids: bool. Whether the model IDs contain
@@ -128,9 +128,9 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                 pseudonymous IDs which should be omitted before attempting to
                 fetch the corresponding models. Set may_contain_pseudonymous_ids
                 to True if and only if this field can contain user IDs that
-                are pseudonymized as part of Wipeout. These fields can only be
-                in models that have LOCALLY_PSEUDONYMIZE as their
-                DELETION_POLICY.
+                are pseudonymized as part of Wipeout. In other words, these
+                fields can only be in models that have LOCALLY_PSEUDONYMIZE as
+                their DELETION_POLICY.
         """
         filtered_model_ids = model_ids
         if may_contain_system_ids:
