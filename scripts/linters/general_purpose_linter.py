@@ -589,7 +589,7 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': (
             'Please use put() instead.'),
         'excluded_files': (),
-        'excluded_dirs': ('core/storage/base_model/',)
+        'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'\.put_multi_async\('),
