@@ -181,6 +181,9 @@ class JobModel(base_models.BaseModel):
     def do_unfinished_jobs_exist(cls, job_type):
         """Checks if unfinished jobs exist.
 
+        Args:
+            job_type: str. Type of job for which to check.
+
         Returns:
             bool. True if unfinished jobs exist, otherwise false.
         """
