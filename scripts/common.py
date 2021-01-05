@@ -142,6 +142,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 FECONF_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
 # used by the Redis server.
@@ -621,7 +622,7 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
 
 def wait_for_port_to_be_open(port_number):
     """Wait until the port is open and exit if port isn't open after
-    1000 seconds.
+    MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
 
     Args:
         port_number: int. The port number to wait.
@@ -660,6 +661,24 @@ def managed_elasticsearch_dev_server():
     ]
     with managed_process(es_args, shell=True) as proc:
         yield proc
+
+
+def wait_for_port_to_be_closed(port_number):
+    """Wait until the port is closed or
+    MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+
+    Returns:
+        bool. Whether the port closed in time.
+    """
+    waited_seconds = 0
+    while (is_port_open(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    return not is_port_open(port_number)
 
 
 def start_redis_server():
