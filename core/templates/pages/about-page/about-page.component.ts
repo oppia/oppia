@@ -18,6 +18,10 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { HttpClientModule } from '@angular/common/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
@@ -25,10 +29,22 @@ import { WindowRef } from
   'services/contextual/window-ref.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
+import { LoaderService } from 'services/loader.service.ts';
+import splashConstants from 'assets/constants';
 
 @Component({
   selector: 'about-page',
   templateUrl: './about-page.component.html'
+})
+@NgModule({
+  declarations: [
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule
+  ],
+  providers: [],
 })
 export class AboutPageComponent implements OnInit {
   aboutPageMascotImgUrl: string;
@@ -40,7 +56,8 @@ export class AboutPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService,
-    private userBackendApiService: UserBackendApiService,) {
+    private userBackendApiService: UserBackendApiService,
+    private loaderService: LoaderService) {
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -56,28 +73,22 @@ export class AboutPageComponent implements OnInit {
   }
 
   onClickBrowseLibraryButton(): boolean {
-    this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.classroomUrl;
-    }, 150);
+    this.siteAnalyticsService.
+      registerClickBrowseLibraryButtonEvent();
+    setTimeout(
+      () => this.windowRef.nativeWindow.location.href =
+       'community-library', 150);
     return false;
   }
 
   onClickCreateLessonButton(): boolean {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
-    this.userIsLoggedIn = null;
-    this.userBackendApiService.getUserInfoAsync().then(function(userInfo) {
-      this.canCreateCollections = userInfo.canCreateCollections();
-      this.userIsLoggedIn = userInfo.isLoggedIn();
-    });
     if (this.userIsLoggedIn === null) {
-      window.location.replace('/_ah/login');
+      setTimeout(() => window.location.replace('/_ah/login'), 150);
     } else {
-      window.location.replace('/creator-dashboard?mode=create');
+      setTimeout(() => window.location.replace(
+        '/creator-dashboard?mode=create'), 150);
     }
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.classroomUrl;
-    }, 150);
     return false;
   }
 
@@ -100,6 +111,17 @@ export class AboutPageComponent implements OnInit {
   ngOnInit(): void {
     this.aboutPageMascotImgUrl = this.urlInterpolationService
       .getStaticImageUrl('/general/about_page_mascot.webp');
+    this.userIsLoggedIn = null;
+    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
+      '/learn/<classroomUrlFragment>', {
+        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+      });
+    this.classroomUrl = '/learn/math';
+    this.loaderService.showLoadingScreen('Loading');
+    this.userBackendApiService.getUserInfoAsync().then((userInfo) => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+      this.loaderService.hideLoadingScreen();
+    });
   }
 }
 angular.module('oppia').directive(

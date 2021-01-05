@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { ComponentFixture, TestBed} from '@angular/core/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA, Pipe }
+import { TestBed, fakeAsync } from '@angular/core/testing';
+import { EventEmitter, Pipe }
   from '@angular/core';
 import { HttpClientTestingModule } from
   '@angular/common/http/testing';
@@ -29,7 +29,10 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateService } from 'services/translate.service';
-import { UtilsService } from 'services/utils.service';
+import { WindowDimensionsService } from
+  'services/contextual/window-dimensions.service';
+import { UserBackendApiService } from 'services/user-backend-api.service';
+import { LoaderService } from 'services/loader.service.ts';
 
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
@@ -57,47 +60,12 @@ class MockI18nLanguageCodeService {
   }
 }
 
-// Mocking window object here because changing location.href causes the
-// full page to reload. Page reloads raise an error in karma.
-class MockWindowRef {
-  _window = {
-    location: {
-      _hash: '',
-      _hashChange: null,
-      get hash() {
-        return this._hash;
-      },
-      set hash(val) {
-        this._hash = val;
-        if (this._hashChange === null) {
-          return;
-        }
-        this._hashChange();
-      },
-      reload: (val) => val
-    },
-    get onhashchange() {
-      return this.location._hashChange;
-    },
-
-    set onhashchange(val) {
-      this.location._hashChange = val;
-    }
-  };
-  get nativeWindow() {
-    return this._window;
-  }
-}
-
-let component: AboutPageComponent;
-let fixture: ComponentFixture<AboutPageComponent>;
-
-describe('About Page', function() {
-  let windowRef: MockWindowRef;
-  let siteAnalyticsServiceStub: SiteAnalyticsService;
-
-  beforeEach(() => {
-    windowRef = new MockWindowRef();
+describe('About Page', () => {
+  const siteAnalyticsServiceStub = new SiteAnalyticsService(
+    new WindowRef());
+  let loaderService: LoaderService = null;
+  let userBackendApiService: UserBackendApiService = null;
+  beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [AboutPageComponent, MockTranslatePipe],
       providers: [
@@ -105,35 +73,75 @@ describe('About Page', function() {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService
         },
-        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true
+          }
+        },
         { provide: TranslateService, useClass: MockTranslateService },
-        UtilsService,
+        {provide: SiteAnalyticsService, useValue: siteAnalyticsServiceStub},
         UrlInterpolationService,
-        { provide: WindowRef, useValue: windowRef }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              location: {
+                href: ''
+              }
+            }
+          }
+        }
+      ]
     }).compileComponents();
-    fixture = TestBed.createComponent(AboutPageComponent);
-    component = fixture.componentInstance;
+  });
+  beforeEach(angular.mock.module('oppia'));
 
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-    })
-      .compileComponents();
+      imports: [HttpClientTestingModule]
+    });
+    loaderService = TestBed.get(LoaderService);
+    userBackendApiService = TestBed.get(SiteAnalyticsService);
+  });
+  let component;
+  beforeEach(() => {
+    const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
+    component = aboutPageComponent.componentInstance;
   });
 
-  afterEach(() => {
-    TestBed.resetTestingModule();
-  });
-
-  beforeEach(() => TestBed.configureTestingModule({
-    imports: [HttpClientTestingModule],
-    providers: [AboutPageComponent]
-  }));
+  it('should successfully instantiate the component from beforeEach block',
+    () => {
+      expect(component).toBeDefined();
+    });
 
   it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
+  });
+
+  it('should set component properties when ngOnInit() is called', () => {
+    component.ngOnInit();
+    expect(component.userIsLoggedIn).toBe(null);
+    expect(component.classroomUrl).toBe('/learn/math');
+  });
+
+  it('should check loader screen is working', () => {
+    component.ngOnInit();
+    fakeAsync(() => {
+      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+      expect(loaderService.showLoadingScreen)
+        .toHaveBeenCalledWith('Loading');
+      spyOn(userBackendApiService, 'getUserInfoAsync')
+        .and.callThrough();
+      expect(userBackendApiService.getUserInfoAsync)
+        .toHaveBeenCalled();
+      expect(component.userIsLoggedIn).toBe(!null);
+      spyOn(loaderService, 'hideLoadingScreen')
+        .and.callThrough();
+      expect(loaderService.hideLoadingScreen)
+        .toHaveBeenCalled();
+    });
   });
 
   it('should activate when Visit Classroom is clicked', function() {
@@ -149,6 +157,7 @@ describe('About Page', function() {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickBrowseLibraryButtonEvent')
       .and.callThrough();
+    spyOn(global, 'setTimeout');
     component.onClickBrowseLibraryButton();
     expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent)
       .toHaveBeenCalledWith();
@@ -158,6 +167,7 @@ describe('About Page', function() {
     spyOn(
       siteAnalyticsServiceStub, 'registerCreateLessonButtonEvent')
       .and.callThrough();
+    spyOn(global, 'setTimeout');
     component.onClickCreateLessonButton();
     expect(siteAnalyticsServiceStub.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
