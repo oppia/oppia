@@ -179,8 +179,8 @@
   </div>
 
   <div class="oppia-teach-section-five" [ngStyle]="{'background-image': 'getTestimonialBackgroundUrl()'}">
-    <div *ngIf="!isWindowNarrow">
-      <div class="oppia-teach-section-five-left">
+    
+      <div *ngIf="!isWindowNarrow" class="oppia-teach-section-five-left">
         <h2 [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
         <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
         <div class="teach-arrows-container">
@@ -192,23 +192,23 @@
           </span>
         </div>
       </div>
-      <div class="oppia-teach-section-five-right">
-        <!--<picture class="teach-student-image">
-          <source type="image/webp" [src]="testimonials[displayedTestimonialId].imageUrlWebp">
-          <source type="image/png" [src]="testimonials[displayedTestimonialId].imageUrl">
-          <img [src]="testimonials[displayedTestimonialId].imageUrlPng" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
-        </picture>-->
-      </div>
-    </div>
-
-    <div *ngIf="isWindowNarrow">
-      <!--<div class="oppia-teach-section-five-image">
+      <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-five-right">
         <picture class="teach-student-image">
           <source type="image/webp" [src]="testimonials[displayedTestimonialId].imageUrlWebp">
           <source type="image/png" [src]="testimonials[displayedTestimonialId].imageUrl">
-          <img [src]="testimonials[displayedTestimonialId].imageUrlPng" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
+          <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
         </picture>
-      </div>-->
+      </div>
+    
+
+    <div *ngIf="isWindowNarrow">
+      <div class="oppia-teach-section-five-image">
+        <picture class="teach-student-image">
+          <source type="image/webp" [src]="testimonials[displayedTestimonialId].imageUrlWebp">
+          <source type="image/png" [src]="testimonials[displayedTestimonialId].imageUrl">
+          <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
+        </picture>
+      </div>
       <div class="oppia-teach-section-five-left mobile">
         <h2 class="mobile-h2" [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
         <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
@@ -627,7 +627,6 @@
     font-size: 2.1em;
     line-height: 1.5em;
     max-width: 650px;
-    min-width: 105vh;
     width: 50vw ;
   }
 

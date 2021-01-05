@@ -21,7 +21,6 @@ import { TestBed, fakeAsync } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
-import { UserBackendApiService } from 'services/user-backend-api.service';
 import { LoaderService } from 'services/loader.service.ts';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -58,7 +57,6 @@ describe('Teach Page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
-  let userBackendApiService: UserBackendApiService = null;
 
   beforeEach(async() => {
     TestBed.configureTestingModule({
@@ -97,7 +95,6 @@ describe('Teach Page', () => {
       imports: [HttpClientTestingModule]
     });
     loaderService = TestBed.get(LoaderService);
-    userBackendApiService = TestBed.get(SiteAnalyticsService);
   });
 
   let component;
@@ -117,19 +114,19 @@ describe('Teach Page', () => {
       '/assets/images/path/to/image');
   });
 
-  fit('should set component properties when ngOnInit() is called', () => {
+  it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
-    expect(component.userIsLoggedIn).toBe(null);
     expect(component.displayedTestimonialId).toBe(0);
     expect(component.testimonialCount).toBe(4);
     expect(component.classroomUrl).toBe('/learn/math');
     expect(component.isWindowNarrow).toBe(true);
-    fakeAsync(() => {
-      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
-      expect(loaderService.showLoadingScreen)
-        .toHaveBeenCalledWith('Loading');   
-    });
   });
+
+  it('should check if loader screen is working', fakeAsync(() => {
+    spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+    expect(loaderService.showLoadingScreen)
+      .toHaveBeenCalledWith('Loading');
+  }));
 
   it('should record analytics when Start Learning is clicked', function() {
     spyOn(
@@ -207,4 +204,3 @@ describe('Teach Page', () => {
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
 });
-

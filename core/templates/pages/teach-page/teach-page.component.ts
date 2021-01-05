@@ -26,8 +26,6 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
 import { LoaderService } from 'services/loader.service.ts';
 import { UserBackendApiService } from 'services/user-backend-api.service';
-import { UserInfo } from 'domain/user/user-info.model.ts'
-
 @Component({
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
@@ -40,7 +38,7 @@ export class TeachPageComponent implements OnInit {
   displayedTestimonialId: number;
   testimonialCount: number;
   testimonials = [];
-  userIsLoggedIn: boolean | null;
+  userIsLoggedIn: boolean = null;
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
@@ -52,7 +50,6 @@ export class TeachPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
-    this.userIsLoggedIn = null;
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;
     this.testimonials = this.getTestimonials();
@@ -61,7 +58,7 @@ export class TeachPageComponent implements OnInit {
         classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.loaderService.showLoadingScreen('Loading');
-    this.userBackendApiService.getUserInfoAsync().then((userInfo:  UserInfo) => {
+    this.userBackendApiService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
     });
@@ -90,26 +87,26 @@ export class TeachPageComponent implements OnInit {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
-      imageUrl: this.getStaticImageUrl('/splash/mira.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/mira.webp'),
+      imageUrl: '/splash/mira.png',
+      imageUrlWebp: '/splash/mira.webp',
       borderPresent: false
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_2',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
-      imageUrl: this.getStaticImageUrl('/splash/Dheeraj_3.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/Dheeraj_3.webp'),
+      imageUrl: '/splash/Dheeraj_3.png',
+      imageUrlWebp: '/splash/Dheeraj_3.webp',
       borderPresent: true
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_3',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
-      imageUrl: this.getStaticImageUrl('/splash/sama.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/sama.webp'),
+      imageUrl: '/splash/sama.png',
+      imageUrlWebp: '/splash/sama.webp',
       borderPresent: false
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_4',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_4',
-      imageUrl: this.getStaticImageUrl('/splash/Gaurav_2.png'),
-      imageUrlWebp: this.getStaticImageUrl('/splash/Gaurav_2.webp'),
+      imageUrl: '/splash/Gaurav_2.png',
+      imageUrlWebp: '/splash/Gaurav_2.webp',
       borderPresent: true
     }];
   }
