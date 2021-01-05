@@ -27,12 +27,12 @@ require('services/contextual/url.service.ts');
 require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationDataService', [
-  '$http', '$q', '$rootScope', 'AlertsService',
+  '$http', '$q', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
   'LoggerService', 'ReadOnlyExplorationBackendApiService',
   'UrlService', 'WindowRef',
   function(
-      $http, $q, $rootScope, AlertsService,
+      $http, $q, AlertsService,
       EditableExplorationBackendApiService, LocalStorageService,
       LoggerService, ReadOnlyExplorationBackendApiService,
       UrlService, WindowRef) {
@@ -138,7 +138,6 @@ angular.module('oppia').factory('ExplorationDataService', [
                   }
                 }
               }
-              $rootScope.$applyAsync();
               return response;
             })['catch'](function(error) {
               errorCallback(error);
@@ -197,7 +196,7 @@ angular.module('oppia').factory('ExplorationDataService', [
         );
       }
     };
-    $rootScope.$applyAsync();
+
     return explorationData;
   }
 ]);
