@@ -28,6 +28,9 @@ import { of } from 'rxjs';
 import { ClassroomBackendApiService } from
   'domain/classroom/classroom-backend-api.service';
 import { UserService } from 'services/user.service';
+// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
+// Angular 8.
+import { importAllAngularServices } from 'tests/unit-test-utils';
 
 
 describe('Library controller', function() {
@@ -44,6 +47,7 @@ describe('Library controller', function() {
 
   var logErrorSpy = null;
   var mockWindow = null;
+  importAllAngularServices();
 
   beforeEach(function() {
     TestBed.configureTestingModule({
