@@ -29,7 +29,6 @@ describe('Topic editor tab directive', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
   var $scope = null;
   var $uibModalInstance = null;
   var ctrl = null;
