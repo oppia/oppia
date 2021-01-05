@@ -73,7 +73,7 @@ describe('Exploration recommendations backend api service', () => {
     let expectedObject = backendResponse.summaries.map(
       LearnerExplorationSummary.createFromBackendDict);
 
-    erbas.getRecommendedSummaryDicts(
+    erbas.getRecommendedSummaryDictsAsync(
       ['0'], 'false', 'collectionId', 'storyId', 'nodeId', 'expId').then((
         expSummaries) => {
       expect(expSummaries).toEqual(expectedObject);
