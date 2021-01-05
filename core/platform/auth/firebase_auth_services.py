@@ -54,8 +54,10 @@ Terminology:
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import contextlib
 import logging
 
+from core.domain import auth_domain
 from core.platform import models
 import python_utils
 
@@ -67,17 +69,15 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 transaction_services = models.Registry.import_transaction_services()
 
 
-def _initialize_firebase():
-    """Initializes the Firebase Admin SDK, returns True when successful.
-    Otherwise, logs the failure reason and returns False.
-    """
+@contextlib.contextmanager
+def _acquire_firebase_context():
+    """Returns a context for calling the Firebase Admin SDK."""
+    app = firebase_admin.initialize_app()
     try:
-        firebase_admin.initialize_app()
-    except (ValueError, firebase_exceptions.FirebaseError) as e:
-        logging.exception(e)
-        return False
-    else:
-        return True
+        yield
+    finally:
+        if app is not None:
+            firebase_admin.delete_app(app)
 
 
 def authenticate_request(request):
@@ -108,23 +108,57 @@ def authenticate_request(request):
         request: webapp2.Request. The HTTP request to inspect.
 
     Returns:
-        str|None. The ID of the user that authorized the request. If the request
-        could not be authenticated, then returns None instead.
+        AuthClaims|None. Claims of the user who authorized the request, or None
+        if the request could not be authenticated.
     """
-    if not _initialize_firebase():
-        return None
-
     scheme, _, token = request.headers.get('Authorization', '').partition(' ')
     if scheme != 'Bearer':
         return None
 
     try:
-        claims = firebase_auth.verify_id_token(token)
+        with _acquire_firebase_context():
+            claims = firebase_auth.verify_id_token(token)
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
         return None
-    else:
-        return claims.get('sub', None)
+
+    auth_id = claims.get('sub', None)
+    email = claims.get('email', None)
+    # Auth ID is a required Claim, so return None when it is missing.
+    return None if not auth_id else auth_domain.AuthClaims(auth_id, email)
+
+
+def delete_auth_associations(user_id):
+    """Deletes associations referring to the given user_id.
+
+    Args:
+        user_id: str. The ID of the user being deleted.
+    """
+    assoc_model = (
+        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
+    if assoc_model is None:
+        return
+    try:
+        with _acquire_firebase_context():
+            firebase_auth.delete_user(assoc_model.id)
+    except (ValueError, firebase_exceptions.FirebaseError) as e:
+        logging.exception(e)
+
+
+def are_auth_associations_deleted(user_id):
+    """Returns whether the Firebase account of the given user ID is deleted."""
+    assoc_model = (
+        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
+    if assoc_model is None:
+        return True
+    try:
+        with _acquire_firebase_context():
+            firebase_auth.get_user(assoc_model.id)
+    except firebase_auth.UserNotFoundError:
+        return True
+    except (ValueError, firebase_exceptions.FirebaseError) as e:
+        logging.exception(e)
+    return False
 
 
 def get_user_id_from_auth_id(auth_id):
@@ -137,8 +171,9 @@ def get_user_id_from_auth_id(auth_id):
         str|None. The user ID associated with the given auth ID, or None if no
         association exists.
     """
-    model = auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False)
-    return None if model is None else model.user_id
+    assoc_model = (
+        auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False))
+    return None if assoc_model is None else assoc_model.user_id
 
 
 def get_multi_user_ids_from_auth_ids(auth_ids):
@@ -158,54 +193,55 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
 
 
 @transaction_services.run_in_transaction_wrapper
-def associate_auth_id_to_user_id(pair):
+def associate_auth_id_to_user_id(auth_id_user_id_pair):
     """Commits the association between auth ID and user ID.
 
     Args:
-        pair: auth_domain.AuthIdUserIdPair. The association to commit.
+        auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association to
+            commit.
 
     Raises:
         Exception. The auth ID is already associated with a user ID.
     """
-    auth_id, user_id = pair
+    auth_id, user_id = auth_id_user_id_pair
 
-    claimed_user_id = get_user_id_from_auth_id(auth_id)
-    if claimed_user_id is not None:
-        raise Exception(
-            'auth_id=%r is already mapped to user_id=%r' % (
-                auth_id, claimed_user_id))
+    collision = get_user_id_from_auth_id(auth_id)
+    if collision is not None:
+        raise Exception('auth_id=%r is already associated to user_id=%r' % (
+            auth_id, collision))
 
-    mapping = (
+    assoc_model = (
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id))
-    mapping.update_timestamps()
-    mapping.put()
+    assoc_model.update_timestamps()
+    assoc_model.put()
 
 
 @transaction_services.run_in_transaction_wrapper
-def associate_multi_auth_ids_to_user_ids(pairs):
+def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
     """Commits the associations between auth IDs and user IDs.
 
     Args:
-        pairs: list(auth_domain.AuthIdUserIdPair). The associations to commit.
+        auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
+            associations to commit.
 
     Raises:
         Exception. One or more auth ID associations already exist.
     """
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
-    auth_ids, user_ids = python_utils.ZIP(*pairs)
+    auth_ids, user_ids = python_utils.ZIP(*auth_id_user_id_pairs)
 
-    claimed_user_ids = get_multi_user_ids_from_auth_ids(auth_ids)
-    if any(user_id is not None for user_id in claimed_user_ids):
-        existing_associations = sorted(
-            'auth_id=%r, user_id=%r' % (auth_id, user_id)
-            for auth_id, user_id in python_utils.ZIP(auth_ids, claimed_user_ids)
+    collisions = get_multi_user_ids_from_auth_ids(auth_ids)
+    if any(user_id is not None for user_id in collisions):
+        collisions = ', '.join(
+            '{auth_id=%r: user_id=%r}' % (auth_id, user_id)
+            for auth_id, user_id in python_utils.ZIP(auth_ids, collisions)
             if user_id is not None)
-        raise Exception(
-            'associations already exist for: %r' % (existing_associations,))
+        raise Exception('already associated: %s' % collisions)
 
-    mappings = [
+    assoc_models = [
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
         for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
     ]
-    auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(mappings)
-    auth_models.UserIdByFirebaseAuthIdModel.put_multi(mappings)
+    auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(
+        assoc_models)
+    auth_models.UserIdByFirebaseAuthIdModel.put_multi(assoc_models)
