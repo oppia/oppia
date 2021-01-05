@@ -1961,6 +1961,46 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             migrated_user_model_2.created_on, final_created_on_timestamp_2)
 
+    def test_multiple_runs_of_one_off_job_works_correctly(self):
+        user_settings_model_1 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_1,
+                email=self.EMAIL_1,
+            )
+        )
+        user_settings_model_1.update_timestamps()
+        user_settings_model_1.created_on += datetime.timedelta(hours=10)
+        final_created_on_timestamp_1 = user_settings_model_1.last_updated
+        user_settings_model_1.put()
+
+        user_settings_model_2 = (
+            user_models.UserSettingsModel(
+                id=self.USER_ID_2,
+                email=self.EMAIL_2,
+            )
+        )
+        user_settings_model_2.update_timestamps()
+        user_settings_model_2.created_on += datetime.timedelta(hours=5)
+        final_created_on_timestamp_2 = user_settings_model_2.last_updated
+        user_settings_model_2.put()
+
+        expected_output = [['SUCCESS_ALREADY_UP_TO_DATE', 2]]
+        self.assertLess(
+            final_created_on_timestamp_1, user_settings_model_1.created_on)
+        self.assertLess(
+            final_created_on_timestamp_2, user_settings_model_2.created_on)
+        actual_output = self._run_one_off_job()
+        actual_output = self._run_one_off_job()
+        self.assertItemsEqual(actual_output, expected_output)
+        migrated_user_model_1 = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+        migrated_user_model_2 = (
+            user_models.UserSettingsModel.get_by_id(self.USER_ID_2))
+        self.assertEqual(
+            migrated_user_model_1.created_on, final_created_on_timestamp_1)
+        self.assertEqual(
+            migrated_user_model_2.created_on, final_created_on_timestamp_2)
+
 
 class CleanUpUserSubscribersModelOneOffJobTests(test_utils.GenericTestBase):
 

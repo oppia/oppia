@@ -471,8 +471,9 @@ class RemoveFeedbackThreadIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that fixes the invalid values of created_on attribute in the
-    UserSettingsModel. It is a one-off job and can be removed from the codebase
-    after we resolve this issue by running the job once.
+    UserSettingsModel.
+    It is a one-off job and can be removed from the codebase after we resolve
+    this issue by running the job once in the January 2021 release.
     """
 
     @classmethod
@@ -551,10 +552,9 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 model_names_and_ids_to_be_fetched_in_batch)
         )
 
-        for model_name_tuple, model_list in python_utils.ZIP(
+        for model_name_tuple, model_list in list(python_utils.ZIP(
                 model_names_and_ids_to_be_fetched_in_batch,
-                fetched_batch_models
-            ):
+                fetched_batch_models)):
             model_name = model_name_tuple[0]
             actual_model = model_list[0]
             all_models_linked_with_user_settings_model.append(
@@ -610,7 +610,8 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         correction_cutoff_timestamp = datetime.datetime.strptime(
             'Jul 1 2020', '%b %d %Y')
         if user_settings_model.created_on - min_date > time_delta_for_update:
-            user_settings_model.update_timestamps()
+            user_settings_model.update_timestamps(
+                update_last_updated_time=False)
             user_settings_model.created_on = min_date
             user_settings_model.put()
             yield (
