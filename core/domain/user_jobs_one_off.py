@@ -535,8 +535,9 @@ class RemoveFeedbackThreadIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that audits timestamp attributes of user models to fix the invalid
-    values of created_on attribute in the UserSettingsModel.
+    """Job that fixes the invalid values of created_on attribute in the
+    UserSettingsModel. It is a one-off job and can be removed from the codebase
+    after we resolve this issue by running the job once.
     """
 
     @classmethod
@@ -665,9 +666,7 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             (attribute_name, date) for attribute_name, date in user_dates_list
             if date is not None
         ]
-        filtered_user_dates_list.sort(key=lambda x: x[1])
-
-        min_date = filtered_user_dates_list[0][1]
+        model_name, min_date = min(filtered_user_dates_list, key=lambda x: x[1])
         time_delta_for_update = datetime.timedelta(minutes=5)
 
         # This method for converting date_time_string to datettime object has
@@ -676,13 +675,11 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         correction_cutoff_timestamp = datetime.datetime.strptime(
             'Jul 1 2020', '%b %d %Y')
         if user_settings_model.created_on - min_date > time_delta_for_update:
-            time_delta_window = datetime.timedelta(minutes=60)
-            attribute_names = ','.join([
-                attribute for attribute, timestamp in filtered_user_dates_list
-                if timestamp - min_date <= time_delta_window
-            ])
+            user_settings_model.update_timestamps()
+            user_settings_model.created_on = min_date
+            user_settings_model.put()
             yield (
-                'UPDATE_USING_' + python_utils.UNICODE(attribute_names), 1)
+                'SUCCESS_UPDATED_USING_' + python_utils.UNICODE(model_name), 1)
 
             # Yield an additional error key for user_models created after
             # cutoff date July 1, 2020 and having a discrepancy in their
