@@ -67,7 +67,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
        * specified collection ID. See setCollection() for more information on
        * additional behavior of this function.
        */
-      loadCollection: function(collectionId) {
+      loadCollectionAsync: function(collectionId) {
         _collectionIsLoading = true;
         EditableCollectionBackendApiService.fetchCollectionAsync(
           collectionId).then(
@@ -107,7 +107,7 @@ angular.module('oppia').factory('CollectionEditorStateService', [
 
       /**
        * Returns whether a collection has yet been loaded using either
-       * loadCollection() or setCollection().
+       * loadCollectionAsync() or setCollection().
        */
       hasLoadedCollection: function() {
         return _collectionIsInitialized;

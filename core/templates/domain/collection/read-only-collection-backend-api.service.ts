@@ -119,7 +119,7 @@ export class ReadOnlyCollectionBackendApiService {
   }
 
   /**
-   * Behaves in the exact same way as fetchCollection (including callback
+   * Behaves in the exact same way as fetchCollectionAsync (including callback
    * behavior and returning a promise object), except this function will
    * attempt to see whether the given collection has already been loaded. If
    * it has not yet been loaded, it will fetch the collection from the

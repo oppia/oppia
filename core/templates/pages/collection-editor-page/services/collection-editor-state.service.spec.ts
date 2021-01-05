@@ -207,7 +207,7 @@ describe('Collection editor state service', function() {
       fakeEditableCollectionBackendApiService,
       'fetchCollectionAsync').and.callThrough();
 
-    CollectionEditorStateService.loadCollection(5);
+    CollectionEditorStateService.loadCollectionAsync(5);
     expect(fakeEditableCollectionBackendApiService.fetchCollectionAsync)
       .toHaveBeenCalled();
   });
@@ -217,7 +217,7 @@ describe('Collection editor state service', function() {
       spyOn(fakeCollectionRightsBackendApiService, 'fetchCollectionRightsAsync')
         .and.callThrough();
 
-      CollectionEditorStateService.loadCollection(5);
+      CollectionEditorStateService.loadCollectionAsync(5);
       expect(fakeCollectionRightsBackendApiService.fetchCollectionRightsAsync)
         .toHaveBeenCalled();
     }
@@ -225,7 +225,7 @@ describe('Collection editor state service', function() {
 
   it('should fire an init event after loading the first collection',
     function() {
-      CollectionEditorStateService.loadCollection(5);
+      CollectionEditorStateService.loadCollectionAsync(5);
       $rootScope.$apply();
 
       expect(collectionInitializedSpy).toHaveBeenCalled();
@@ -234,11 +234,11 @@ describe('Collection editor state service', function() {
 
   it('should fire an update event after loading more collections', function() {
     // Load initial collection.
-    CollectionEditorStateService.loadCollection(5);
+    CollectionEditorStateService.loadCollectionAsync(5);
     $rootScope.$apply();
 
     // Load a second collection.
-    CollectionEditorStateService.loadCollection(1);
+    CollectionEditorStateService.loadCollectionAsync(1);
     $rootScope.$apply();
 
     expect(collectionInitializedSpy).toHaveBeenCalled();
@@ -247,7 +247,7 @@ describe('Collection editor state service', function() {
   it('should track whether it is currently loading the collection', function() {
     expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
 
-    CollectionEditorStateService.loadCollection(5);
+    CollectionEditorStateService.loadCollectionAsync(5);
     expect(CollectionEditorStateService.isLoadingCollection()).toBe(true);
 
     $rootScope.$apply();
@@ -259,7 +259,7 @@ describe('Collection editor state service', function() {
       expect(CollectionEditorStateService.isLoadingCollection()).toBe(false);
       fakeEditableCollectionBackendApiService.failure = 'Internal 500 error';
 
-      CollectionEditorStateService.loadCollection(5);
+      CollectionEditorStateService.loadCollectionAsync(5);
       expect(CollectionEditorStateService.isLoadingCollection()).toBe(true);
 
       $rootScope.$apply();
@@ -267,11 +267,11 @@ describe('Collection editor state service', function() {
     }
   );
 
-  it('should report that a collection has loaded through loadCollection()',
+  it('should report that a collection has loaded through loadCollectionAsync()',
     function() {
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
-      CollectionEditorStateService.loadCollection(5);
+      CollectionEditorStateService.loadCollectionAsync(5);
       expect(CollectionEditorStateService.hasLoadedCollection()).toBe(false);
 
       $rootScope.$apply();
@@ -314,7 +314,7 @@ describe('Collection editor state service', function() {
       fakeEditableCollectionBackendApiService.newBackendCollectionObject);
     expect(previousCollection).not.toEqual(expectedCollection);
 
-    CollectionEditorStateService.loadCollection(5);
+    CollectionEditorStateService.loadCollectionAsync(5);
     $rootScope.$apply();
 
     var actualCollection = CollectionEditorStateService.getCollection();
@@ -335,7 +335,7 @@ describe('Collection editor state service', function() {
         fakeCollectionRightsBackendApiService.backendCollectionRightsObject);
       expect(previousCollectionRights).not.toEqual(expectedCollectionRights);
 
-      CollectionEditorStateService.loadCollection(5);
+      CollectionEditorStateService.loadCollectionAsync(5);
       $rootScope.$apply();
 
       var actualCollectionRights = (
@@ -396,7 +396,7 @@ describe('Collection editor state service', function() {
   it('should fire an update event after setting the new collection',
     function() {
       // Load initial collection.
-      CollectionEditorStateService.loadCollection(5);
+      CollectionEditorStateService.loadCollectionAsync(5);
       $rootScope.$apply();
 
       var newCollection = Collection.create(
@@ -417,7 +417,7 @@ describe('Collection editor state service', function() {
 
   it('should not save the collection if there are no pending changes',
     function() {
-      CollectionEditorStateService.loadCollection(5);
+      CollectionEditorStateService.loadCollectionAsync(5);
       $rootScope.$apply();
 
       expect(CollectionEditorStateService.saveCollection(
@@ -430,7 +430,7 @@ describe('Collection editor state service', function() {
       fakeEditableCollectionBackendApiService,
       'updateCollectionAsync').and.callThrough();
 
-    CollectionEditorStateService.loadCollection(0);
+    CollectionEditorStateService.loadCollectionAsync(0);
     CollectionUpdateService.setCollectionTitle(
       CollectionEditorStateService.getCollection(), 'New title');
     $rootScope.$apply();
@@ -449,7 +449,7 @@ describe('Collection editor state service', function() {
   });
 
   it('should fire an update event after saving the collection', function() {
-    CollectionEditorStateService.loadCollection(5);
+    CollectionEditorStateService.loadCollectionAsync(5);
     CollectionUpdateService.setCollectionTitle(
       CollectionEditorStateService.getCollection(), 'New title');
     $rootScope.$apply();
@@ -461,7 +461,7 @@ describe('Collection editor state service', function() {
   });
 
   it('should track whether it is currently saving the collection', function() {
-    CollectionEditorStateService.loadCollection(5);
+    CollectionEditorStateService.loadCollectionAsync(5);
     CollectionUpdateService.setCollectionTitle(
       CollectionEditorStateService.getCollection(), 'New title');
     $rootScope.$apply();
@@ -476,7 +476,7 @@ describe('Collection editor state service', function() {
 
   it('should indicate a collection is no longer saving after an error',
     function() {
-      CollectionEditorStateService.loadCollection(5);
+      CollectionEditorStateService.loadCollectionAsync(5);
       CollectionUpdateService.setCollectionTitle(
         CollectionEditorStateService.getCollection(), 'New title');
       $rootScope.$apply();
