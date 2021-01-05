@@ -647,9 +647,7 @@ def wait_for_port_to_be_closed(port_number):
            and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
         time.sleep(1)
         waited_seconds += 1
-    if is_port_open(port_number):
-        return False
-    return True
+    return not is_port_open(port_number)
 
 
 def start_redis_server():

@@ -197,7 +197,7 @@ def cleanup():
     for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
         if not common.wait_for_port_to_be_closed(port):
             raise RuntimeError(
-                'Port {} failed to close after {} seconds.'.format(
+                'Port {} failed to close within {} seconds.'.format(
                     port, common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))
 
 
