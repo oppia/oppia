@@ -213,7 +213,7 @@ def dict_from_yaml(yaml_str):
         retrieved_dict = yaml.safe_load(yaml_str)
         assert isinstance(retrieved_dict, dict)
         return retrieved_dict
-    except yaml.YAMLError as e:
+    except (AssertionError, yaml.YAMLError) as e:
         raise InvalidInputException(e)
 
 
@@ -727,6 +727,28 @@ def require_valid_meta_tag_content(meta_tag_content):
         raise ValidationError(
             'Meta tag content should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_META_TAG_CONTENT)
+
+
+def require_valid_page_title_fragment_for_web(page_title_fragment_for_web):
+    """Generic page title fragment validation.
+
+    Args:
+        page_title_fragment_for_web: str. The page title fragment to validate.
+
+    Raises:
+        Exception. Page title fragment is not a string.
+        Exception. Page title fragment is too lengthy.
+    """
+    max_chars_in_page_title_frag_for_web = (
+        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    if not isinstance(page_title_fragment_for_web, python_utils.BASESTRING):
+        raise ValidationError(
+            'Expected page title fragment to be a string, received %s'
+            % page_title_fragment_for_web)
+    if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
+        raise ValidationError(
+            'Page title fragment should not be longer than %s characters.'
+            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
 
 
 def capitalize_string(input_string):
