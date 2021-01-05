@@ -20,10 +20,35 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import email_manager
+from core.domain import user_query_domain
 from core.platform import models
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
+
+def _get_user_query_from_model(query_model):
+    return user_query_domain.UserQuery(
+        query_model.id,
+        query_model.query_status,
+        query_model.user_ids,
+        query_model.submitter_id
+    )
+
+
+def get_recent_queries(num_queries_to_fetch, cursor):
+    query_models, next_cursor, _ = (
+        user_models.UserQueryModel.fetch_page(
+            int(num_queries_to_fetch), cursor))
+    return (
+        [_get_user_query_from_model(model) for model in query_models],
+        next_cursor
+    )
+
+
+def get_query(query_id, strict=True):
+    return _get_user_query_from_model(
+        user_models.UserQueryModel.get(query_id, strict=strict))
 
 
 def save_new_query_model(

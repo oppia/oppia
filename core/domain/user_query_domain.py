@@ -1,6 +1,4 @@
-# coding: utf-8
-#
-# Copyright 2016 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,97 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain object for a parameters of a query."""
+"""Domain objects for a parameters of a query."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from core.domain import email_manager
-from core.platform import models
-import feconf
-
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+import python_utils
 
 
-def get_recent_queries(num_queries_to_fetch, cursor):
-    query_models, next_cursor, more = (
-        user_models.UserQueryModel.fetch_page(
-            int(num_queries_to_fetch), cursor))
+class UserQuery(python_utils.OBJECT):
+    """Domain object for user query."""
+
+    def __init__(self, id, query_status, user_ids, submitter_id):
+        self._id = id
+        self._status = query_status
+        self._user_ids = user_ids
+        self._submitter_id = submitter_id
+
+    def to_dict(self):
+        """Returns a dict representation of the PlatformParameter domain
+        object.
+
+        Returns:
+            dict. A dict mapping of all fields of PlatformParameter object.
+        """
+        return {
+            'id': self._id,
+            'submitter_id': self._submitter_id,
+            'created_on': self.created_on.strftime('%d-%m-%y %H:%M:%S'),
+            'status': self._status,
+            'num_qualified_users': len(self.user_ids)
+        }
 
 
-def save_new_query_model(
-        submitter_id, inactive_in_last_n_days=None,
-        has_not_logged_in_for_n_days=None, created_at_least_n_exps=None,
-        created_fewer_than_n_exps=None, edited_at_least_n_exps=None,
-        edited_fewer_than_n_exps=None):
-    """Saves a new UserQueryModel instance in user_models.
-
-    Args:
-        submitter_id: str. ID of the UserQueryModel instance.
-        inactive_in_last_n_days: int. Number of days user is inactive.
-        has_not_logged_in_for_n_days: int. Number of days user hasn't logged in.
-        created_at_least_n_exps: int. Minimum number of explorations created
-            by user.
-        created_fewer_than_n_exps: int. Maximum number of explorations created
-            by user.
-        edited_at_least_n_exps: int|None. Minimum number of
-            explorations edited by user.
-        edited_fewer_than_n_exps: int|None. Maximum number of
-            explorations edited by user.
-
-    Returns:
-        query_id: str. ID of the UserQueryModel instance.
-    """
-    query_id = user_models.UserQueryModel.get_new_id('')
-    user_models.UserQueryModel(
-        id=query_id, inactive_in_last_n_days=inactive_in_last_n_days,
-        has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
-        created_at_least_n_exps=created_at_least_n_exps,
-        created_fewer_than_n_exps=created_fewer_than_n_exps,
-        edited_at_least_n_exps=edited_at_least_n_exps,
-        edited_fewer_than_n_exps=edited_fewer_than_n_exps,
-        submitter_id=submitter_id,
-        query_status=feconf.USER_QUERY_STATUS_PROCESSING,
-        user_ids=[]).put()
-    return query_id
 
 
-def send_email_to_qualified_users(
-        query_id, email_subject, email_body, email_intent, max_recipients):
-    """Send email to maximum 'max_recipients' qualified users.
-
-    Args:
-        query_id: str. ID of the UserQueryModel instance.
-        email_subject: str. Subject of the email to be sent.
-        email_body: str. Body of the email to be sent.
-        email_intent: str. Intent of the email.
-        max_recipients: int. Maximum number of recipients send emails to.
-    """
-    query_model = user_models.UserQueryModel.get(query_id)
-    query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
-    recipient_ids = query_model.user_ids
-
-    if max_recipients:
-        recipient_ids = recipient_ids[:max_recipients]
-
-    bulk_email_model_id = email_manager.send_user_query_email(
-        query_model.submitter_id, recipient_ids, email_subject,
-        email_body, email_intent)
-    query_model.sent_email_model_id = bulk_email_model_id
-    query_model.deleted = True
-    query_model.update_timestamps()
-    query_model.put()
-
-    # Store BulkEmailModel in UserBulkEmailsModel of each recipient.
-    for recipient_id in recipient_ids:
-        recipient_bulk_email_model = (
-            user_models.UserBulkEmailsModel.get(recipient_id, strict=False))
-
-        if recipient_bulk_email_model is None:
-            recipient_bulk_email_model = user_models.UserBulkEmailsModel(
-                id=recipient_id, sent_email_model_ids=[])
-
-        recipient_bulk_email_model.sent_email_model_ids.append(
-            bulk_email_model_id)
-        recipient_bulk_email_model.update_timestamps()
-        recipient_bulk_email_model.put()

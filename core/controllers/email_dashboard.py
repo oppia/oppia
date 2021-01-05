@@ -23,10 +23,7 @@ from core.domain import email_manager
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.domain import user_services
-from core.platform import models
 import feconf
-
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class EmailDashboardPage(base.BaseHandler):
@@ -53,31 +50,27 @@ class EmailDashboardDataHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 '400 Invalid input for query results.')
 
-        query_models, next_cursor, more = (
-            user_models.UserQueryModel.fetch_page(
-                int(num_queries_to_fetch), cursor))
+        user_queries, next_cursor = user_query_services.get_recent_queries(
+            num_queries_to_fetch, cursor)
 
         submitters_settings = user_services.get_users_settings(
-            list(set([model.submitter_id for model in query_models])))
-
-        submitter_details = {
+            list(set([user_query.submitter_id for user_query in user_queries])))
+        user_id_to_username = {
             submitter.user_id: submitter.username
             for submitter in submitters_settings
         }
 
-        queries_list = [{
-            'id': model.id,
-            'submitter_username': submitter_details[model.submitter_id],
-            'created_on': model.created_on.strftime('%d-%m-%y %H:%M:%S'),
-            'status': model.query_status,
-            'num_qualified_users': len(model.user_ids)
-        } for model in query_models]
+        user_query_dict_list = [
+            user_query.to_dict() for user_query in user_queries]
+        for user_query_dict in user_query_dict_list:
+            user_query_dict['submitter_username'] = (
+                user_id_to_username[user_query_dict['submitter_id']])
+            del user_query_dict['submitter_id']
 
         data = {
-            'recent_queries': queries_list,
-            'cursor': next_cursor if (next_cursor and more) else None
+            'recent_queries': user_query_dict_list,
+            'cursor': next_cursor
         }
-
         self.render_json(data)
 
     @acl_decorators.can_manage_email_dashboard
@@ -96,23 +89,19 @@ class EmailDashboardDataHandler(base.BaseHandler):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params=params)
 
-        query_model = user_models.UserQueryModel.get(query_id)
-        query_data = {
-            'id': query_model.id,
-            'submitter_username': (
-                user_services.get_username(query_model.submitter_id)),
-            'created_on': query_model.created_on.strftime('%d-%m-%y %H:%M:%S'),
-            'status': query_model.query_status,
-            'num_qualified_users': len(query_model.user_ids)
-        }
+        user_query = user_query_services.get_query(query_id)
+        user_query_dict = user_query.to_dict()
+        user_query_dict['submitter_username'] = (
+            user_services.get_username(user_query.submitter_id))
+        del user_query_dict['submitter_id']
 
         data = {
-            'query': query_data
+            'query': user_query_dict
         }
         self.render_json(data)
 
     def _validate(self, data):
-        """Validator for data obtained from fontend."""
+        """Validator for data obtained from frontend."""
         possible_keys = [
             'has_not_logged_in_for_n_days', 'inactive_in_last_n_days',
             'created_at_least_n_exps', 'created_fewer_than_n_exps',
@@ -135,23 +124,18 @@ class QueryStatusCheckHandler(base.BaseHandler):
     def get(self):
         query_id = self.request.get('query_id')
 
-        query_model = user_models.UserQueryModel.get(query_id, strict=False)
-        if query_model is None:
+        user_query = user_query_services.get_query(query_id, strict=False)
+        if user_query is None:
             raise self.InvalidInputException('Invalid query id.')
 
-        query_data = {
-            'id': query_model.id,
-            'submitter_username': (
-                user_services.get_username(query_model.submitter_id)),
-            'created_on': query_model.created_on.strftime('%d-%m-%y %H:%M:%S'),
-            'status': query_model.query_status,
-            'num_qualified_users': len(query_model.user_ids)
-        }
+        user_query_dict = user_query.to_dict()
+        user_query_dict['submitter_username'] = (
+            user_services.get_username(user_query.submitter_id))
+        del user_query_dict['submitter_id']
 
         data = {
-            'query': query_data
+            'query': user_query_dict
         }
-
         self.render_json(data)
 
 
@@ -160,12 +144,14 @@ class EmailDashboardResultPage(base.BaseHandler):
 
     @acl_decorators.can_manage_email_dashboard
     def get(self, query_id):
-        query_model = user_models.UserQueryModel.get(query_id, strict=False)
-        if (query_model is None or
-                query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED):
+        user_query = user_query_services.get_query(query_id, strict=False)
+        if (
+                user_query is None or
+                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
+        ):
             raise self.InvalidInputException('400 Invalid query id.')
 
-        if query_model.submitter_id != self.user_id:
+        if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.' % self.user_id)
 
@@ -173,12 +159,14 @@ class EmailDashboardResultPage(base.BaseHandler):
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
-        query_model = user_models.UserQueryModel.get(query_id, strict=False)
-        if (query_model is None or
-                query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED):
+        user_query = user_query_services.get_query(query_id, strict=False)
+        if (
+                user_query is None or
+                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
+        ):
             raise self.InvalidInputException('400 Invalid query id.')
 
-        if query_model.submitter_id != self.user_id:
+        if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.' % self.user_id)
 
@@ -197,12 +185,14 @@ class EmailDashboardCancelEmailHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
-        query_model = user_models.UserQueryModel.get(query_id, strict=False)
-        if (query_model is None or
-                query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED):
+        user_query = user_query_services.get_query(query_id, strict=False)
+        if (
+                user_query is None or
+                user_query.query_status != feconf.USER_QUERY_STATUS_COMPLETED
+        ):
             raise self.InvalidInputException('400 Invalid query id.')
 
-        if query_model.submitter_id != self.user_id:
+        if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.' % self.user_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
@@ -221,12 +211,14 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
-        query_model = user_models.UserQueryModel.get(query_id, strict=False)
-        if (query_model is None or
-                query_model.query_status != feconf.USER_QUERY_STATUS_COMPLETED):
+        user_query = user_query_services.get_query(query_id, strict=False)
+        if (
+                user_query is None or
+                user_query.query_status != feconf.USER_QUERY_STATUS_COMPLETED
+        ):
             raise self.InvalidInputException('400 Invalid query id.')
 
-        if query_model.submitter_id != self.user_id:
+        if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.' % self.user_id)
 
@@ -234,5 +226,5 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
         email_body = self.payload['email_body']
         test_email_body = '[This is a test email.]<br><br> %s' % email_body
         email_manager.send_test_email_for_bulk_emails(
-            query_model.submitter_id, email_subject, test_email_body)
+            user_query.submitter_id, email_subject, test_email_body)
         self.render_json({})
