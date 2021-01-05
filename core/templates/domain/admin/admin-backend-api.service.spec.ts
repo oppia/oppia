@@ -332,6 +332,25 @@ describe('Admin backend api service', () => {
   }
   ));
 
+  it('should request to show the sorted output of valid' +
+    'jobs when calling showJobOutputAsync', fakeAsync(() => {
+    let jobId = 'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let adminJobOutputUrl = '/adminjoboutput?job_id=' +
+      'UserSettingsModelAuditOneOffJob-1609088541992-314';
+    let jobOutput = {output: ["[u'SUCCESS_KEPT', 1]",
+      "[u'SUCCESS_DELETED', 1]"]};
+    abas.fetchJobOutputAsync(jobId).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(adminJobOutputUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(jobOutput);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(jobOutput.output.sort());
+    expect(failHandler).not.toHaveBeenCalled();
+  }
+  ));
+
   it('should fail to show the output of valid' +
     'jobs when calling showJobOutputAsync', fakeAsync(() => {
     let jobId = 'Invalid jobId';

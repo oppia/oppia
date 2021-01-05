@@ -199,7 +199,7 @@ export class AdminBackendApiService {
     return new Promise((resolve, reject) => {
       this.http.get<JobOutput>(
         adminJobOutputUrl).toPromise().then(response => {
-        resolve(response.output.sort() || []);
+        resolve(Array.isArray(response.output) ? response.output.sort() : []);
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
