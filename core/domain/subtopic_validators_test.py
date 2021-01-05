@@ -98,6 +98,10 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance_2 = (
             subtopic_models.SubtopicPageModel.get_by_id('2-1'))
 
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SubtopicPageSnapshotContentModelAuditOneOffJob)
+
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
             self.owner_id, '0', [subtopic_page_domain.SubtopicPageChange({
@@ -305,6 +309,10 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         self.model_instance_2 = (
             subtopic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '2-1-1'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SubtopicPageSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -646,6 +654,10 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
         self.model_instance_2 = (
             subtopic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-2-1-1'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SubtopicPageSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
