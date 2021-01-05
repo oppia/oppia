@@ -471,8 +471,9 @@ class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class RemoveActivityIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that deletes the activity_ids from the UserSubscriptionsModel.
 
-    NOTE TO DEVELOPERS: This job can be deleted after it is run in Februrary 2021 release.
-    """    
+    NOTE TO DEVELOPERS: This job can be deleted after it is run in Februrary
+    2021 release.
+    """
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
