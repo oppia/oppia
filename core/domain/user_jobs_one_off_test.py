@@ -1672,6 +1672,48 @@ class RemoveActivityIDsOneOffJobTests(test_utils.GenericTestBase):
             original_subscription_model.last_updated,
             migrated_subscription_model.last_updated)
 
+    def test_rerun(self):
+        original_subscription_model = (
+            user_models.UserSubscriptionsModel(
+                id='id'
+            )
+        )
+        original_subscription_model.update_timestamps()
+        original_subscription_model.put()
+
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', original_subscription_model._properties)  # pylint: disable=protected-access
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
+
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
+
+        output = self._run_one_off_job()
+        self.assertItemsEqual(
+            [['SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel', 1]], output)
+
+        migrated_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('id'))
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._values)  # pylint: disable=protected-access
+        self.assertNotIn(
+            'activity_ids', migrated_subscription_model._properties)  # pylint: disable=protected-access
+        self.assertEqual(
+            original_subscription_model.last_updated,
+            migrated_subscription_model.last_updated)
+
 
 class MockUserSubscriptionsModelWithFeedbackThreadIDs(
         user_models.UserSubscriptionsModel):
