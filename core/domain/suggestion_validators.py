@@ -84,10 +84,10 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         ]
         if user_services.is_user_id_valid(item.author_id):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'author_ids',
-                    user_models.UserSettingsModel,
-                    [item.author_id]
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'author_ids', [item.author_id],
+                    may_contain_system_ids=True,
+                    may_contain_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -104,9 +104,11 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
             # for their user_id. Exclude external model validation for bot.
             if item.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID:
                 field_name_to_external_model_references.append(
-                    base_model_validators.ExternalModelFetcherDetails(
-                        'reviewer_ids', user_models.UserSettingsModel,
-                        [item.final_reviewer_id]))
+                    base_model_validators.UserSettingsModelFetcherDetails(
+                        'reviewer_ids', [item.final_reviewer_id],
+                        may_contain_system_ids=True,
+                        may_contain_pseudonymous_ids=True
+                    ))
         return field_name_to_external_model_references
 
     @classmethod
@@ -301,10 +303,10 @@ class GeneralVoiceoverApplicationModelValidator(
         field_name_to_external_model_references = []
         if user_services.is_user_id_valid(item.author_id):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'author_ids',
-                    user_models.UserSettingsModel,
-                    [item.author_id]
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'author_ids', [item.author_id],
+                    may_contain_system_ids=False,
+                    may_contain_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -318,9 +320,11 @@ class GeneralVoiceoverApplicationModelValidator(
                 user_services.is_user_id_valid(item.final_reviewer_id)
         ):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'final_reviewer_ids', user_models.UserSettingsModel,
-                    [item.final_reviewer_id]))
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'final_reviewer_ids', [item.final_reviewer_id],
+                    may_contain_system_ids=False,
+                    may_contain_pseudonymous_ids=True
+                ))
         return field_name_to_external_model_references
 
     @classmethod

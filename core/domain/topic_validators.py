@@ -27,12 +27,10 @@ from core.platform import models
 import python_utils
 
 (
-    base_models, skill_models, story_models, subtopic_models, topic_models,
-    user_models
+    base_models, skill_models, story_models, subtopic_models, topic_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.topic,
-    models.NAMES.user
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.topic
 ])
 
 
@@ -178,9 +176,11 @@ class TopicSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class TopicSnapshotContentModelValidator(
@@ -208,9 +208,10 @@ class TopicRightsModelValidator(base_model_validators.BaseModelValidator):
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'topic_ids', topic_models.TopicModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'manager_user_ids', user_models.UserSettingsModel,
-                item.manager_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'manager_user_ids', item.manager_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 topic_models.TopicRightsSnapshotMetadataModel,
@@ -237,9 +238,11 @@ class TopicRightsSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'topic_rights_ids', topic_models.TopicRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class TopicRightsSnapshotContentModelValidator(
@@ -287,7 +290,12 @@ class TopicCommitLogEntryModelValidator(
     def _get_external_id_relationships(cls, item):
         external_id_relationships = [
             base_model_validators.ExternalModelFetcherDetails(
-                'topic_ids', topic_models.TopicModel, [item.topic_id])]
+                'topic_ids', topic_models.TopicModel, [item.topic_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
         if item.id.startswith('rights'):
             external_id_relationships.append(
                 base_model_validators.ExternalModelFetcherDetails(

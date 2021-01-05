@@ -29,10 +29,9 @@ import python_utils
 import utils
 
 (
-    base_models, collection_models, exp_models, user_models
+    base_models, collection_models, exp_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
-    models.NAMES.user
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration
 ])
 
 
@@ -105,9 +104,11 @@ class CollectionSnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids', collection_models.CollectionModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class CollectionSnapshotContentModelValidator(
@@ -137,15 +138,18 @@ class CollectionRightsModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids',
                 collection_models.CollectionModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'owner_user_ids',
-                user_models.UserSettingsModel, item.owner_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'editor_user_ids',
-                user_models.UserSettingsModel, item.editor_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'viewer_user_ids',
-                user_models.UserSettingsModel, item.viewer_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'owner_user_ids', item.owner_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'editor_user_ids', item.editor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'viewer_user_ids', item.viewer_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 collection_models.CollectionRightsSnapshotMetadataModel,
@@ -196,9 +200,11 @@ class CollectionRightsSnapshotMetadataModelValidator(
                 'collection_rights_ids',
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids',
-                user_models.UserSettingsModel, [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class CollectionRightsSnapshotContentModelValidator(
@@ -248,7 +254,12 @@ class CollectionCommitLogEntryModelValidator(
         external_id_relationships = [
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_ids',
-                collection_models.CollectionModel, [item.collection_id])]
+                collection_models.CollectionModel, [item.collection_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
         if item.id.startswith('rights'):
             external_id_relationships.append(
                 base_model_validators.ExternalModelFetcherDetails(
@@ -275,18 +286,22 @@ class CollectionSummaryModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'collection_rights_ids',
                 collection_models.CollectionRightsModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'owner_user_ids',
-                user_models.UserSettingsModel, item.owner_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'editor_user_ids',
-                user_models.UserSettingsModel, item.editor_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'viewer_user_ids',
-                user_models.UserSettingsModel, item.viewer_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'contributor_user_ids',
-                user_models.UserSettingsModel, item.contributor_ids)]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'owner_user_ids', item.owner_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'editor_user_ids', item.editor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'viewer_user_ids', item.viewer_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'contributor_user_ids', item.contributor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_contributors_summary(cls, item):

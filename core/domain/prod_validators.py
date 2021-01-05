@@ -148,9 +148,11 @@ class ExplorationSnapshotMetadataModelValidator(
                 'exploration_ids',
                 exp_models.ExplorationModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids',
-                user_models.UserSettingsModel, [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class ExplorationSnapshotContentModelValidator(
@@ -190,15 +192,18 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
                 'cloned_from_exploration_ids',
                 exp_models.ExplorationModel,
                 cloned_from_exploration_id),
-            base_model_validators.ExternalModelFetcherDetails(
-                'owner_user_ids',
-                user_models.UserSettingsModel, item.owner_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'editor_user_ids',
-                user_models.UserSettingsModel, item.editor_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'viewer_user_ids',
-                user_models.UserSettingsModel, item.viewer_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'owner_user_ids', item.owner_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'editor_user_ids', item.editor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'viewer_user_ids', item.viewer_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 exp_models.ExplorationRightsSnapshotMetadataModel,
@@ -249,9 +254,11 @@ class ExplorationRightsSnapshotMetadataModelValidator(
                 'exploration_rights_ids',
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids',
-                user_models.UserSettingsModel, [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class ExplorationRightsSnapshotContentModelValidator(
@@ -301,7 +308,12 @@ class ExplorationCommitLogEntryModelValidator(
         external_id_relationships = [
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
-                exp_models.ExplorationModel, [item.exploration_id])]
+                exp_models.ExplorationModel, [item.exploration_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
         if item.id.startswith('rights'):
             external_id_relationships.append(
                 base_model_validators.ExternalModelFetcherDetails(
@@ -326,18 +338,22 @@ class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_rights_ids',
                 exp_models.ExplorationRightsModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'owner_user_ids',
-                user_models.UserSettingsModel, item.owner_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'editor_user_ids',
-                user_models.UserSettingsModel, item.editor_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'viewer_user_ids',
-                user_models.UserSettingsModel, item.viewer_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'contributor_user_ids',
-                user_models.UserSettingsModel, item.contributor_ids)]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'owner_user_ids', item.owner_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'editor_user_ids', item.editor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'viewer_user_ids', item.viewer_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'contributor_user_ids', item.contributor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
     @classmethod
     def _validate_contributors_summary(cls, item):
@@ -530,9 +546,11 @@ class SubtopicPageSnapshotMetadataModelValidator(
                 'subtopic_page_ids',
                 subtopic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class SubtopicPageSnapshotContentModelValidator(
@@ -585,4 +603,9 @@ class SubtopicPageCommitLogEntryModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_ids',
                 subtopic_models.SubtopicPageModel,
-                [item.subtopic_page_id])]
+                [item.subtopic_page_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
