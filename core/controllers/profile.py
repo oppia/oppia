@@ -382,6 +382,9 @@ class ExportAccountHandler(base.BaseHandler):
             temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
             zfile.writestr('oppia_takeout_data.json', json.dumps(user_data))
             for image in user_images:
+                # Remove the 'image/png' prefixing the base64 string, replace
+                # url-encoded characters, and replace whitespace with the +
+                # character.
                 b64_png_no_header = re.sub(
                     r'\s', b'+',
                     python_utils.url_unquote_plus(
