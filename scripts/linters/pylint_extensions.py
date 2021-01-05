@@ -1921,64 +1921,7 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
     options = ((
         'disallowed-functions',
         {
-            'default': (
-                (
-                    b'now',
-                    b'datetime.datetime.utcnow()'),
-                (
-                    b'assertEquals',
-                    b'self.assertEqual()'),
-                (
-                    b'StringIO',
-                    b'python_utils.string_io()'),
-                (
-                    b'urlsplit',
-                    b'python_utils.url_split()'),
-                (
-                    b'urlparse',
-                    b'python_utils.url_parse()'),
-                (
-                    b'urlunsplit',
-                    b'python_utils.url_unsplit()'),
-                (
-                    b'parse_qs',
-                    b'python_utils.parse_query_string()'),
-                (
-                    b'unquote',
-                    b'python_utils.urllib_unquote()'),
-                (
-                    b'urljoin',
-                    b'python_utils.url_join()'),
-                (
-                    b'next',
-                    b'python_utils.NEXT()'),
-                (
-                    b'range',
-                    b'python_utils.RANGE()'),
-                (
-                    b'round',
-                    b'python_utils.ROUND()'),
-                (
-                    b'str',
-                    (
-                        b'python_utils.convert_to_bytes() '
-                        b'or python_utils.UNICODE()')),
-                (
-                    b'zip',
-                    b'python_utils.ZIP()'),
-                (
-                    b'basestring',
-                    b'python_utils.BASESTRING()'),
-                (
-                    b'iteritems',
-                    b'items()'),
-                (
-                    b'itervalues',
-                    b'values()'),
-                (
-                    b'iterkeys',
-                    b'keys()'),
-            ),
+            'default': (),
             'type': 'csv',
             'metavar': '<comma separated list>',
             'help': 'List of tuples of disallowed functions '
@@ -1993,6 +1936,7 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
             node: astroid.nodes.Call. Node to access call content.
         """
         func = node.func
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@: %s\n%s\n" % (type(self.config.disallowed_functions), self.config.disallowed_functions))
         for (
                 func_name,
                 replace_msg) in self.config.disallowed_functions:
