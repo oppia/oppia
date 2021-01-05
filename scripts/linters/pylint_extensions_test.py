@@ -2917,40 +2917,91 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_compare(compare_node)
 
 
-class DisallowedFunctionCallsCheckerTest(unittest.TestCase):
-    """Unit tests for DisallowedFunctionCallsChecker
+class RemoveDisallowedFunctionsCheckerTests(unittest.TestCase):
+    """Unit tests for RemoveDisallowedFunctionsChecker
     """
 
     def setUp(self):
-        super(DisallowedFunctionCallsCheckerTest, self).setUp()
+        super(RemoveDisallowedFunctionsCheckerTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.DisallowedFunctionCallsChecker)
+            pylint_extensions.RemoveDisallowedFunctionsChecker)
         self.checker_test_object.setup_method()
 
-    def test_disallowed_basic_rgx(self):
-        self.checker_test_object.checker.config.disallowed_functions = (
-            ('(\'now\',\'datetime.datetime.utcnow()\')'),
-            ('(\'assertEquals\',\'self.assertEqual()\')'),
-            ('(\'StringIO\',\'python_utils.string_io()\')'),
-            ('(\'urlsplit\',\'python_utils.url_split()\')'),
-            ('(\'urlparse\',\'python_utils.url_parse()\')'),
-            ('(\'urlunsplit\',\'python_utils.url_unsplit()\')'),
-            ('(\'parse_qs\',\'python_utils.parse_query_string()\')'),
-            ('(\'unquote\',\'python_utils.urllib_unquote()\')'),
-            ('(\'urljoin\',\'python_utils.url_join()\')'),
-            ('(\'next\',\'python_utils.NEXT()\')'),
-            ('(\'range\',\'python_utils.RANGE()\')'),
-            ('(\'round\',\'python_utils.ROUND()\')'),
-            (
-                '(\'str\', \'python_utils.convert_to_bytes()'
-                ' or python_utils.UNICODE()\')'),
-            ('(\'zip\',\'python_utils.ZIP()\')'),
-            ('(\'basestring\',\'python_utils.BASESTRING()\')'),
-            ('(\'iteritems\',\'items()\')'),
-            ('(\'itervalues\',\'values()\')'),
-            ('(\'iterkeys\',\'keys()\')'),
+    def test_disallowed_removals(self):
+        self.checker_test_object.checker.config.disallowed_func_remove = [
+            b'example_func'
+        ]
+
+        call1 = astroid.extract_node(
+            """
+        example_func() #@
+        """)
+
+        message_remove_example = testutils.Message(
+            msg_id='remove-disallowed-function-calls',
+            node=call1,
+            args=b'example_func'
         )
+
+        with self.checker_test_object.assertAddsMessages(
+            message_remove_example):
+            self.checker_test_object.checker.visit_call(call1)
+
+
+class ReplaceDisallowedFunctionsCheckerTests(unittest.TestCase):
+    """Unit tests for ReplaceDisallowedFunctionsChecker
+    """
+
+    def setUp(self):
+        super(ReplaceDisallowedFunctionsCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.ReplaceDisallowedFunctionsChecker)
+        self.checker_test_object.setup_method()
+
+    def test_disallowed_replacements(self):
+        self.checker_test_object.checker.config.disallowed_func_replace = [
+            b'now',
+            b'assertEquals',
+            b'StringIO',
+            b'urlsplit',
+            b'urlparse',
+            b'urlunsplit',
+            b'parse_qs',
+            b'unquote',
+            b'urljoin',
+            b'next',
+            b'range',
+            b'round',
+            b'str',
+            b'zip',
+            b'basestring',
+            b'iteritems',
+            b'itervalues',
+            b'iterkeys',
+        ]
+
+        self.checker_test_object.checker.config.disallowed_func_replacements = [
+            b'datetime.datetime.utcnow()',
+            b'self.assertEqual()',
+            b'python_utils.string_io()',
+            b'python_utils.url_split()',
+            b'python_utils.url_parse()',
+            b'python_utils.url_unsplit()',
+            b'python_utils.parse_query_string()',
+            b'python_utils.urllib_unquote()',
+            b'python_utils.url_join()',
+            b'python_utils.NEXT()',
+            b'python_utils.RANGE()',
+            b'python_utils.ROUND()',
+            b'python_utils.convert_to_bytes() or python_utils.UNICODE()',
+            b'python_utils.ZIP()',
+            b'python_utils.BASESTRING()',
+            b'items()',
+            b'values()',
+            b'keys()',
+        ]
 
         (
             call1, call2, call3,

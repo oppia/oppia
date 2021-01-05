@@ -63,7 +63,9 @@ indent-string='    '
 
 allowed-comment-prefixes=int,str,float,bool,v
 
-disallowed-functions=('now','datetime.datetime.utcnow()'),('assertEquals','self.assertEqual()'),('StringIO','python_utils.string_io()'),('urlsplit','python_utils.url_split()'),('urlparse','python_utils.url_parse()'),('urlunsplit','python_utils.url_unsplit()'),('parse_qs','python_utils.parse_query_string()'),('unquote','python_utils.urllib_unquote()'),('urljoin','python_utils.url_join()'),('next','python_utils.NEXT()'),('range','python_utils.RANGE()'),('round','python_utils.ROUND()'),('str','python_utils.convert_to_bytes() or python_utils.UNICODE()'),('zip','python_utils.ZIP()'),('basestring','python_utils.BASESTRING()'),('iteritems','items()'),('itervalues','values()'),('iterkeys','keys()')
+disallowed-func-replace=now,assertEquals,StringIO,urlsplit,urlparse,urlunsplit,parse_qs,unquote,urljoin,next,range,round,str,zip,basestring,iteritems,itervalues,iterkeys
+
+disallowed-func-replacements=datetime.datetime.utcnow(),self.assertEqual(),python_utils.string_io(),python_utils.url_split(),python_utils.url_parse(),python_utils.url_unsplit(),python_utils.parse_query_string(),python_utils.urllib_unquote(),python_utils.url_join(),python_utils.NEXT(),python_utils.RANGE(),python_utils.ROUND(),python_utils.convert_to_bytes() or python_utils.UNICODE(),python_utils.ZIP(),python_utils.BASESTRING(),items(),values(),keys()
 
 [SIMILARITIES]
 

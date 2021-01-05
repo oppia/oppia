@@ -21,7 +21,6 @@ presubmit checks. Next message id would be C0033.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
 import linecache
 import os
 import re
@@ -1894,13 +1893,13 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
                 self.add_message('inequality-with-none', node=node)
 
 
-class DisallowedFunctionCallsChecker(checkers.BaseChecker):
+class RemoveDisallowedFunctionsChecker(checkers.BaseChecker):
     """Custom pylint checker for language specific general purpose
-    regex checks of functions calls to be removed or replaced.
+    regex checks of functions calls to be removed.
     """
 
     __implements__ = interfaces.IAstroidChecker
-    name = 'disallowed-function-calls'
+    name = 'remove-disallowed-function-calls'
     priority = -1
     msgs = {
         'C0031': (
@@ -1908,6 +1907,49 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
             'remove-disallowed-function-calls',
             'Please remove disallowed function calls.',
         ),
+    }
+    python_utils_file = b'python_utils.py'
+    python_utils_test_file = b'python_utils_test.py'
+
+    options = ((
+        'disallowed-func-remove',
+        {
+            'default': (),
+            'type': 'csv',
+            'metavar': '<comma separated list>',
+            'help': (
+                'List of strings of disallowed function names '
+                'to be removed.')
+        }),)
+
+    def visit_call(self, node):
+        """Visit a function call to ensure that the call is
+        not using any disallowed functions.
+
+        Args:
+            node: astroid.nodes.Call. Node to access call content.
+        """
+        names = self.config.disallowed_func_remove
+
+        func = node.func
+        for func_name in names:
+            if (
+                    (hasattr(func, 'attrname') and func.attrname == func_name)
+                    or (hasattr(func, 'name') and func.name == func_name)):
+                self.add_message(
+                    'remove-disallowed-function-calls',
+                    node=node, args=(func_name))
+
+
+class ReplaceDisallowedFunctionsChecker(checkers.BaseChecker):
+    """Custom pylint checker for language specific general purpose
+    regex checks of functions calls to be replaced.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+    name = 'replace-disallowed-function-calls'
+    priority = -1
+    msgs = {
         'C0032': (
             'Please replace the call to %s with %s.',
             'replace-disallowed-function-calls',
@@ -1919,15 +1961,31 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
     python_utils_file = b'python_utils.py'
     python_utils_test_file = b'python_utils_test.py'
 
-    options = ((
-        'disallowed-functions',
-        {
-            'default': (),
-            'type': 'csv',
-            'metavar': '<comma separated list>',
-            'help': 'List of string-encoded tuples of disallowed functions '
-                    'and optionally their allowed alternatives.'
-        }),)
+    options = (
+        (
+            'disallowed-func-replace',
+            {
+                'default': (),
+                'type': 'csv',
+                'metavar': '<comma separated list>',
+                'help': (
+                    'List of strings of disallowed function names. '
+                    'Alternatives must be specified and should have a 1 '
+                    'to 1 correspondence with '
+                    'disallowed-func-replacements')
+            }
+        ),
+        (
+            'disallowed-func-replacements',
+            {
+                'default': (),
+                'type': 'csv',
+                'metavar': '<comma separated list>',
+                'help': (
+                    'List of strings of replacements for functions in '
+                    'disallowed-func-names.')
+            }
+        ),)
 
     def visit_call(self, node):
         """Visit a function call to ensure that the call is
@@ -1936,21 +1994,20 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
         Args:
             node: astroid.nodes.Call. Node to access call content.
         """
+        names = self.config.disallowed_func_replace
+        replacements = self.config.disallowed_func_replacements
+
+        assert len(names) == len(replacements)
+
         func = node.func
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@: %s\n%s\n" % (type(self.config.disallowed_functions), self.config.disallowed_functions))
-        for entry in self.config.disallowed_functions:
-            func_name, replace_msg = ast.literal_eval(entry)
+        for i, func_name in enumerate(names):
+            replace_msg = replacements[i]
             if (
                     (hasattr(func, 'attrname') and func.attrname == func_name)
                     or (hasattr(func, 'name') and func.name == func_name)):
-                if replace_msg is None:
-                    self.add_message(
-                        'remove-disallowed-function-calls',
-                        node=node, args=(func_name))
-                else:
-                    self.add_message(
-                        'replace-disallowed-function-calls',
-                        node=node, args=(func_name, replace_msg))
+                self.add_message(
+                    'replace-disallowed-function-calls',
+                    node=node, args=(func_name, replace_msg))
 
 
 def register(linter):
@@ -1973,4 +2030,5 @@ def register(linter):
     linter.register_checker(SingleLinePragmaChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
     linter.register_checker(InequalityWithNoneChecker(linter))
-    linter.register_checker(DisallowedFunctionCallsChecker(linter))
+    linter.register_checker(RemoveDisallowedFunctionsChecker(linter))
+    linter.register_checker(ReplaceDisallowedFunctionsChecker(linter))
