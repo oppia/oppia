@@ -77,7 +77,7 @@
     </div>
 
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
-         class="conversation-skin-supplemental-card-container" style="margin-bottom: 200px;">
+         class="conversation-skin-supplemental-card-container">
       <div class="supplemental-card-parent-container">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            displayed-card="displayedCard"
@@ -276,6 +276,9 @@ otherwise they will interfere with the iframed conversation skin directive.
     z-index: 3;
   }
 
+  .conversation-skin-supplemental-card-container {
+    margin-bottom: 200px;
+  }
   /* Some mobile devices have CSS width below 360px, use a responsive min-width
      when under 360px to prevent pushing things offscreen. */
   @media(max-width: 360px) {
