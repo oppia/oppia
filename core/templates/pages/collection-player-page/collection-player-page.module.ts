@@ -27,9 +27,7 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { CollectionFooterComponent } from
   'pages/collection-player-page/collection-footer/collection-footer.component';
-import { CollectionLocalNavComponent } from
-  // eslint-disable-next-line max-len
-  'pages/collection-player-page/collection-local-nav/collection-local-nav.component';
+import { CollectionLocalNavComponent } from 'pages/collection-player-page/collection-local-nav/collection-local-nav.component';
 import { CollectionNavbarComponent } from
   'pages/collection-player-page/collection-navbar/collection-navbar.component';
 import { CollectionNodeListComponent } from
