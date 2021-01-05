@@ -781,14 +781,18 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         yield popen_proc
     finally:
         if popen_proc.is_running():
-            procs = popen_proc.children(recursive=True) + [popen_proc]
-            for proc in procs:
-                proc.terminate()
+            procs_to_kill = popen_proc.children(recursive=True) + [popen_proc]
+            survivors = []
+            for proc in procs_to_kill:
+                if proc.is_running():
+                    survivors.append(proc)
+                    proc.terminate()
 
-            _, still_running = psutil.wait_procs(procs, timeout=timeout_secs)
-            for proc in still_running:
-                proc.kill()
-                logging.warn('Process killed (pid=%d)' % proc.pid)
+            _, survivors = psutil.wait_procs(survivors, timeout=timeout_secs)
+            for proc in survivors:
+                if proc.is_running():
+                    proc.kill()
+                    logging.warn('Process killed (pid=%d)' % proc.pid)
 
 
 @contextlib.contextmanager
