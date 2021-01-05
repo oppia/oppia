@@ -21,6 +21,7 @@ presubmit checks. Next message id would be C0033.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import linecache
 import os
 import re
@@ -1924,7 +1925,7 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
             'default': (),
             'type': 'csv',
             'metavar': '<comma separated list>',
-            'help': 'List of tuples of disallowed functions '
+            'help': 'List of string-encoded tuples of disallowed functions '
                     'and optionally their allowed alternatives.'
         }),)
 
@@ -1937,9 +1938,8 @@ class DisallowedFunctionCallsChecker(checkers.BaseChecker):
         """
         func = node.func
         print("@@@@@@@@@@@@@@@@@@@@@@@@@@@: %s\n%s\n" % (type(self.config.disallowed_functions), self.config.disallowed_functions))
-        for (
-                func_name,
-                replace_msg) in self.config.disallowed_functions:
+        for entry in self.config.disallowed_functions:
+            func_name, replace_msg = ast.literal_eval(entry)
             if (
                     (hasattr(func, 'attrname') and func.attrname == func_name)
                     or (hasattr(func, 'name') and func.name == func_name)):

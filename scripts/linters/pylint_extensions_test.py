@@ -2930,62 +2930,26 @@ class DisallowedFunctionCallsCheckerTest(unittest.TestCase):
 
     def test_disallowed_basic_rgx(self):
         self.checker_test_object.checker.config.disallowed_functions = (
+            ('(\'now\',\'datetime.datetime.utcnow()\')'),
+            ('(\'assertEquals\',\'self.assertEqual()\')'),
+            ('(\'StringIO\',\'python_utils.string_io()\')'),
+            ('(\'urlsplit\',\'python_utils.url_split()\')'),
+            ('(\'urlparse\',\'python_utils.url_parse()\')'),
+            ('(\'urlunsplit\',\'python_utils.url_unsplit()\')'),
+            ('(\'parse_qs\',\'python_utils.parse_query_string()\')'),
+            ('(\'unquote\',\'python_utils.urllib_unquote()\')'),
+            ('(\'urljoin\',\'python_utils.url_join()\')'),
+            ('(\'next\',\'python_utils.NEXT()\')'),
+            ('(\'range\',\'python_utils.RANGE()\')'),
+            ('(\'round\',\'python_utils.ROUND()\')'),
             (
-                b'now',
-                b'datetime.datetime.utcnow()'),
-            (
-                b'assertEquals',
-                b'self.assertEqual()'),
-            (
-                b'StringIO',
-                b'python_utils.string_io()'),
-            (
-                b'urlsplit',
-                b'python_utils.url_split()'),
-            (
-                b'urlparse',
-                b'python_utils.url_parse()'),
-            (
-                b'urlunsplit',
-                b'python_utils.url_unsplit()'),
-            (
-                b'parse_qs',
-                b'python_utils.parse_query_string()'),
-            (
-                b'unquote',
-                b'python_utils.urllib_unquote()'),
-            (
-                b'urljoin',
-                b'python_utils.url_join()'),
-            (
-                b'next',
-                b'python_utils.NEXT()'),
-            (
-                b'range',
-                b'python_utils.RANGE()'),
-            (
-                b'round',
-                b'python_utils.ROUND()'),
-            (
-                b'str',
-                (
-                    b'python_utils.convert_to_bytes() '
-                    b'or python_utils.UNICODE()')),
-            (
-                b'zip',
-                b'python_utils.ZIP()'),
-            (
-                b'basestring',
-                b'python_utils.BASESTRING()'),
-            (
-                b'iteritems',
-                b'items()'),
-            (
-                b'itervalues',
-                b'values()'),
-            (
-                b'iterkeys',
-                b'keys()'),
+                '(\'str\', \'python_utils.convert_to_bytes()'
+                ' or python_utils.UNICODE()\')'),
+            ('(\'zip\',\'python_utils.ZIP()\')'),
+            ('(\'basestring\',\'python_utils.BASESTRING()\')'),
+            ('(\'iteritems\',\'items()\')'),
+            ('(\'itervalues\',\'values()\')'),
+            ('(\'iterkeys\',\'keys()\')'),
         )
 
         (
