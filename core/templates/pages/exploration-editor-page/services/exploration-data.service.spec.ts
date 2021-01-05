@@ -349,7 +349,7 @@ describe('Exploration data service', function() {
       sampleDataResults.is_version_of_draft_valid,
       sampleDataResults.draft_changes);
     expect(failHandler).not.toHaveBeenCalled();
-  }));
+  });
 
   it('should use reject handler when save an exploration to the backend fails',
     fakeAsync(() => {
