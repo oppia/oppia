@@ -26,6 +26,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
 import { LoaderService } from 'services/loader.service.ts';
 import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserInfo } from 'domain/user/user-info.model.ts'
 
 @Component({
   selector: 'teach-page',
@@ -60,7 +61,7 @@ export class TeachPageComponent implements OnInit {
         classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.loaderService.showLoadingScreen('Loading');
-    this.userBackendApiService.getUserInfoAsync().then((userInfo) => {
+    this.userBackendApiService.getUserInfoAsync().then((userInfo:  UserInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
     });
