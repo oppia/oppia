@@ -20,7 +20,6 @@ import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
@@ -41,7 +40,6 @@ import {
 describe('Responses Service', () => {
   let alertsService: AlertsService = null;
   let answerGroupObjectFactory: AnswerGroupObjectFactory = null;
-  let answerGroupsCacheService: AnswerGroupsCacheService = null;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService = null;
   let interactionData = null;
   let interactionDataWithRules = null;
@@ -57,7 +55,6 @@ describe('Responses Service', () => {
 
   beforeEach(() => {
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
-    answerGroupsCacheService = TestBed.get(AnswerGroupsCacheService);
     alertsService = TestBed.get(AlertsService);
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService
@@ -157,7 +154,7 @@ describe('Responses Service', () => {
           },
           rule_specs: [
             {
-              rule_type: '',
+              rule_type: 'Equals',
               inputs: {
                 x: ['c', 'd', 'e'],
                 y: ['a', 'b', 'c'],
@@ -269,8 +266,12 @@ describe('Responses Service', () => {
         {
           type: 'Contains',
           inputs: {
-            x: 'correct',
+            x: {
+              contentId: 'rule_input_Contains',
+              normalizedStrSet: ['correct']
+            },
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -324,6 +325,7 @@ describe('Responses Service', () => {
           inputs: {
             x: 'correct',
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -390,6 +392,7 @@ describe('Responses Service', () => {
           inputs: {
             x: 'correct',
           },
+          inputTypes: {},
           toBackendDict: jasmine.createSpy('toBackendDict'),
         },
       ],
@@ -799,7 +802,6 @@ describe('Responses Service', () => {
 
   it('should change interaction when id does not exist in any answer group',
     () => {
-      const cacheSpy = spyOn(answerGroupsCacheService, 'set').and.callThrough();
       responsesService.init(interactionData);
       stateEditorService.setInteraction(interactionData);
 
@@ -807,7 +809,6 @@ describe('Responses Service', () => {
       const callbackSpy = jasmine.createSpy('callback');
       responsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
 
-      expect(cacheSpy).toHaveBeenCalledWith(newInteractionId, []);
       expect(callbackSpy).toHaveBeenCalledWith(
         [],
         interactionData.defaultOutcome
@@ -815,7 +816,6 @@ describe('Responses Service', () => {
     });
 
   it('should change interaction', () => {
-    const cacheSpy = spyOn(answerGroupsCacheService, 'set').and.callThrough();
     stateInteractionIdService.init('stateName', 'TextInput');
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
@@ -824,18 +824,13 @@ describe('Responses Service', () => {
     const callbackSpy = jasmine.createSpy('callback');
     responsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
 
-    expect(cacheSpy).toHaveBeenCalledWith(
-      newInteractionId,
-      interactionData.answerGroups
-    );
     expect(callbackSpy).toHaveBeenCalledWith(
-      interactionData.answerGroups,
+      [],
       interactionData.defaultOutcome
     );
   });
 
   it('should change interaction id when default outcome is not set', () => {
-    const cacheSpy = spyOn(answerGroupsCacheService, 'set').and.callThrough();
     stateEditorService.setActiveStateName('State');
 
     const newInteractionId = 'Continue';
@@ -848,7 +843,6 @@ describe('Responses Service', () => {
       '',
       []
     );
-    expect(cacheSpy).toHaveBeenCalledWith(newInteractionId, []);
     expect(callbackSpy).toHaveBeenCalledWith([], expectedDefaultOutcomeCreated);
   });
 
@@ -856,7 +850,6 @@ describe('Responses Service', () => {
     "should change interaction id when interaction is terminal and it's" +
       ' not cached',
     () => {
-      const cacheSpy = spyOn(answerGroupsCacheService, 'set').and.callThrough();
       responsesService.init(interactionData);
       stateEditorService.setInteraction(interactionData);
 
@@ -864,7 +857,6 @@ describe('Responses Service', () => {
       const callbackSpy = jasmine.createSpy('callback');
       responsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
 
-      expect(cacheSpy).toHaveBeenCalledWith(newInteractionId, []);
       expect(callbackSpy).toHaveBeenCalledWith([], null);
     }
   );

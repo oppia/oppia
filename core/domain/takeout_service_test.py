@@ -275,7 +275,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     CREATOR_USERNAMES = ['username4', 'username8', 'username16']
     COLLECTION_IDS = ['23', '42', '4']
     COLLECTION_IDS_2 = ['32', '44', '6']
-    ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
     MESSAGE_IDS_READ_BY_USER = [0, 1]
     SKILL_ID_1 = 'skill_id_1'
@@ -373,7 +372,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         user_models.UserSubscriptionsModel(
             id=self.USER_ID_1, creator_ids=self.CREATOR_IDS,
             collection_ids=self.COLLECTION_IDS,
-            activity_ids=self.ACTIVITY_IDS,
+            exploration_ids=self.EXPLORATION_IDS,
             general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
             last_checked=self.GENERIC_DATE).put()
 
@@ -474,8 +473,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         # Setup for GeneralSuggestionModel.
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.EXPLORATION_IDS[0], 1,
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
@@ -794,10 +793,9 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         stats_data = {}
         story_progress_data = {}
         subscriptions_data = {
-            'activity_ids': [],
+            'exploration_ids': [],
             'collection_ids': [],
             'creator_usernames': [],
-            'feedback_thread_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked_msec': None
         }
@@ -1218,8 +1216,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_general_suggestion_data = {
             'exploration.exp1.thread_1': {
                 'suggestion_type': (
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+                    feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXPLORATION_IDS[0],
                 'target_version_at_submission': 1,
                 'status': suggestion_models.STATUS_IN_REVIEW,
@@ -1270,7 +1268,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_subscriptions_data = {
             'creator_usernames': self.CREATOR_USERNAMES,
             'collection_ids': self.COLLECTION_IDS,
-            'activity_ids': self.ACTIVITY_IDS + self.EXPLORATION_IDS,
+            'exploration_ids': self.EXPLORATION_IDS,
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
                                            [thread_id],
             'last_checked_msec': self.GENERIC_EPOCH

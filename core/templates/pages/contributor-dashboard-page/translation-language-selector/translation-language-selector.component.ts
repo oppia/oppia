@@ -62,7 +62,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
       });
 
     this.contributionOpportunitiesBackendApiService
-      .fetchFeaturedTranslationLanguages()
+      .fetchFeaturedTranslationLanguagesAsync()
       .then((featuredLanguages: FeaturedTranslationLanguage[]) => {
         this.featuredLanguages = featuredLanguages;
       });
