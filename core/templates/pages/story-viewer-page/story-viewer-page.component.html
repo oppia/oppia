@@ -29,14 +29,14 @@
                     </path>
                   </svg>
 
-                  <img class="oppia-lesson-icon-completed"
+                  <img class="oppia-lesson-icon-completed protractor-test-lesson-icon-completed"
                        ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>"
                        ng-if="node.isCompleted()">
                   <div ng-if="!node.isCompleted() && (node.getId() === $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted">
+                       class="oppia-lesson-icon-uncompleted protractor-test-lesson-icon-uncompleted">
                   </div>
                   <div ng-if="!node.isCompleted() && (node.getId() !== $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable">
+                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable protractor-test-lesson-icon-uncompleted">
                   </div>
                 </div>
 
