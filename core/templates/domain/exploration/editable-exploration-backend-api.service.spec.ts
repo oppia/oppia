@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,43 +16,44 @@
  * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
-import { EditableExplorationBackendApiService } from
-  'domain/exploration/editable-exploration-backend-api.service';
-import { ReadOnlyExplorationBackendApiService } from
-  'domain/exploration/read-only-exploration-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service.ts';
+require('domain/exploration/editable-exploration-backend-api.service.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('services/csrf-token.service.ts');
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { HttpTestingController, HttpClientTestingModule } from
-  '@angular/common/http/testing';
+// ^^^ This block is to be removed.
+import { HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { HttpErrorResponse } from '@angular/common/http';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Editable exploration backend API service', function() {
-  let editableExplorationBackendApiService:
-  EditableExplorationBackendApiService = null;
-  let readOnlyExplorationBackendApiService:
-  ReadOnlyExplorationBackendApiService = null;
+  var EditableExplorationBackendApiService = null;
+  var ReadOnlyExplorationBackendApiService = null;
   let httpTestingController: HttpTestingController;
-  let sampleDataResults = null;
-  let csrfService = null;
+  var sampleDataResults = null;
+  var $httpBackend = null;
+  var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(
+    'oppia', TranslatorProviderForTests));
   importAllAngularServices();
 
-  beforeEach(()=> {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-    editableExplorationBackendApiService = TestBed.inject(
-      EditableExplorationBackendApiService);
-    readOnlyExplorationBackendApiService = TestBed.inject(
-      ReadOnlyExplorationBackendApiService);
-    csrfService = TestBed.inject(CsrfTokenService);
-    httpTestingController = TestBed.inject(HttpTestingController);
+  beforeEach(angular.mock.inject(function($injector, $q) {
+    EditableExplorationBackendApiService = $injector.get(
+      'EditableExplorationBackendApiService');
+    ReadOnlyExplorationBackendApiService = $injector.get(
+      'ReadOnlyExplorationBackendApiService');
+    $httpBackend = $injector.get('$httpBackend');
+    CsrfService = $injector.get('CsrfTokenService');
+    httpTestingController = TestBed.get(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-      return Promise.resolve('sample-csrf-token');
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
     });
 
     // Sample exploration object returnable from the backend.
@@ -88,236 +89,206 @@ describe('Editable exploration backend API service', function() {
       user_email: 'test@example.com',
       version: 1
     };
-  });
+  }));
 
-  afterEach(() => {
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
     httpTestingController.verify();
   });
 
   it('should successfully fetch an existing exploration from ' +
-    'the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    'the backend', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-    editableExplorationBackendApiService.fetchExploration('0').then(
+    $httpBackend.expect('GET', '/createhandler/data/0').respond(
+      sampleDataResults);
+    EditableExplorationBackendApiService.fetchExploration('0').then(
       successHandler, failHandler);
-
-    const req = httpTestingController.expectOne('/createhandler/data/0');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleDataResults);
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
-  })
+  }
   );
 
-  it('should fetch and apply the draft of an exploration', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it('should fetch and apply the draft of an exploration', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
     // Loading a exploration the first time should fetch it from the backend.
-    editableExplorationBackendApiService.fetchApplyDraftExploration(
+    $httpBackend.expect(
+      'GET', '/createhandler/data/0?apply_draft=true').respond(
+      sampleDataResults);
+
+    EditableExplorationBackendApiService.fetchApplyDraftExploration(
       '0').then(successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      '/createhandler/data/0?apply_draft=true');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleDataResults);
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
     expect(failHandler).not.toHaveBeenCalled();
-  }));
+  }
+  );
 
   it('should use the rejection handler if the backend ' +
-    'request failed', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+    'request failed', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
     // Loading a exploration the first time should fetch it from the backend.
-    editableExplorationBackendApiService.fetchExploration('1').then(
+    $httpBackend.expect('GET', '/createhandler/data/1').respond(
+      500, 'Error loading exploration 1.');
+    EditableExplorationBackendApiService.fetchExploration('1').then(
       successHandler, failHandler);
-
-    const req = httpTestingController.expectOne('/createhandler/data/1');
-    const errorResponse = new HttpErrorResponse({
-      error: 'Error loading exploration 1.',
-      status: 500,
-      statusText: 'Internal Server Error'
-    });
-    expect(req.request.method).toEqual('GET');
-    req.error(new ErrorEvent('Error'), errorResponse);
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
+    expect(failHandler).toHaveBeenCalledWith('Error loading exploration 1.');
+  }
+  );
 
   it('should update a exploration after fetching it from ' +
-    'the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    let exploration = null;
+    'the backend', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+    var exploration = null;
 
     // Loading a exploration the first time should fetch it from the backend.
-    editableExplorationBackendApiService.fetchExploration('0').then(
+    $httpBackend.expect('GET', '/createhandler/data/0').respond(
+      sampleDataResults);
+
+    EditableExplorationBackendApiService.fetchExploration('0').then(
       function(data) {
         exploration = data;
       });
-
-    let req = httpTestingController.expectOne('/createhandler/data/0');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleDataResults);
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    editableExplorationBackendApiService.updateExploration(
+    $httpBackend.expect('PUT', '/createhandler/data/0').respond(
+      exploration);
+
+    // Send a request to update exploration.
+    EditableExplorationBackendApiService.updateExploration(
       exploration.exploration_id, exploration.version,
       exploration.title, []
     ).then(successHandler, failHandler);
-
-    req = httpTestingController.expectOne('/createhandler/data/0');
-    expect(req.request.method).toEqual('PUT');
-    // Send a request to update exploration.
-    req.flush(exploration);
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(exploration);
     expect(failHandler).not.toHaveBeenCalled();
-  }));
+  }
+  );
 
   it('should not cache exploration from backend into ' +
     'read only service', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    let exploration = null;
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+    var exploration = null;
 
-    readOnlyExplorationBackendApiService.loadLatestExploration('0').then(
-      (data) => {
+    ReadOnlyExplorationBackendApiService.loadLatestExploration('0', null)
+      .then(function(data) {
         exploration = data;
       });
-
     let req = httpTestingController.expectOne('/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
-
     flushMicrotasks();
 
-    expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(true);
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(true);
 
     exploration.title = 'New Title';
     exploration.version = '2';
 
-    editableExplorationBackendApiService.updateExploration(
+    $httpBackend.expect('PUT', '/createhandler/data/0')
+      .respond(exploration);
+
+    // Send a request to update exploration.
+    EditableExplorationBackendApiService.updateExploration(
       exploration.exploration_id,
       exploration.version,
       exploration.title, []
     ).then(successHandler, failHandler);
-
-    req = httpTestingController.expectOne('/createhandler/data/0');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(exploration);
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(exploration);
     expect(failHandler).not.toHaveBeenCalled();
-    expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
   }));
 
-  it('should delete exploration from the backend', fakeAsync(()=> {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    let exploration = null;
+  it('should delete exploration from the backend', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+    var exploration = null;
 
-    editableExplorationBackendApiService.fetchExploration('0')
-      .then(data => {
+    $httpBackend.expect('GET', '/createhandler/data/0')
+      .respond(sampleDataResults);
+
+    EditableExplorationBackendApiService.fetchExploration('0')
+      .then(function(data) {
         exploration = data;
       });
-
-    let req = httpTestingController.expectOne(
-      '/createhandler/data/0');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleDataResults);
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     exploration.title = 'New Title';
     exploration.version = '2';
 
+    $httpBackend.expect('PUT', '/createhandler/data/0')
+      .respond(exploration);
+
     // Send a request to update exploration.
-    editableExplorationBackendApiService.updateExploration(
+    EditableExplorationBackendApiService.updateExploration(
       exploration.exploration_id,
       exploration.version,
       'Minor edits', []
     ).then(successHandler, failHandler);
-
-    req = httpTestingController.expectOne(
-      '/createhandler/data/0');
-    expect(req.request.method).toEqual('PUT');
-    req.flush(exploration);
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(exploration);
     expect(failHandler).not.toHaveBeenCalled();
 
-    editableExplorationBackendApiService
+    $httpBackend.expect('DELETE', '/createhandler/data/0')
+      .respond({});
+    EditableExplorationBackendApiService
       .deleteExploration(exploration.exploration_id)
       .then(successHandler, failHandler);
-
-    req = httpTestingController.expectOne(
-      '/createhandler/data/0');
-    expect(req.request.method).toEqual('DELETE');
-    req.flush({});
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith({});
     expect(failHandler).not.toHaveBeenCalled();
-    expect(readOnlyExplorationBackendApiService.isCached('0')).toBe(false);
-  }));
+
+    expect(ReadOnlyExplorationBackendApiService.isCached('0')).toBe(false);
+  }
+  );
 
   it('should use the rejection handler if the backend ' +
-    'request failed', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
+    'request failed', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-    let exploration = null;
+    var exploration = null;
 
-    editableExplorationBackendApiService.fetchExploration('0')
-      .then(data => {
+    $httpBackend.expect('GET', '/createhandler/data/0')
+      .respond(sampleDataResults);
+
+    EditableExplorationBackendApiService.fetchExploration('0')
+      .then(function(data) {
         exploration = data;
       });
+    $httpBackend.flush();
 
-    let req = httpTestingController.expectOne(
-      '/createhandler/data/0');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleDataResults);
-
-    flushMicrotasks();
-
-    editableExplorationBackendApiService
+    $httpBackend.expect('DELETE', '/createhandler/data/0').respond(
+      500, 'Error deleting exploration 1.');
+    EditableExplorationBackendApiService
       .deleteExploration(exploration.exploration_id)
       .then(successHandler, failHandler);
-
-    req = httpTestingController.expectOne(
-      '/createhandler/data/0');
-    expect(req.request.method).toEqual('DELETE');
-    req.flush(
-      {error: 'Error deleting exploration 1.'},
-      {status: 500, statusText: 'Internal Server Error'});
-
-    flushMicrotasks();
+    $httpBackend.flush();
 
     expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
+    expect(failHandler).toHaveBeenCalledWith('Error deleting exploration 1.');
+  }
+  );
 });
