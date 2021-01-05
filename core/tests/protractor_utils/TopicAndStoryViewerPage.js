@@ -45,11 +45,11 @@ var TopicAndStoryViewerPage = function() {
 
   this.expectCompletedLessonCountToBe = async function(count) {
     expect(await lessonCompletedIcons.count()).toEqual(count);
-  }
+  };
 
   this.expectUncompletedLessonCountToBe = async function(count) {
     expect(await lessonUncompletedIcons.count()).toEqual(count);
-  }
+  };
 
   this.login = async function(email, username) {
     await action.click('Login button', loginButton);
