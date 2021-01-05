@@ -423,9 +423,11 @@ class RemoveCollectionRightsTranslatorIdsOneOffJobTests(
                 'translator_ids', migrated_collection_rights_model._values)  # pylint: disable=protected-access
             self.assertNotIn(
                 'translator_ids', migrated_collection_rights_model._properties)  # pylint: disable=protected-access
-            self.assertEqual(
-                original_collection_rights_model.last_updated,
-                migrated_collection_rights_model.last_updated)
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_ALREADY_REMOVED - CollectionRightsModel', 1]],
+                output)
 
     def test_one_collection_rights_model_without_translator_id(self):
         original_collection_rights_model = (
@@ -568,9 +570,10 @@ class RemoveCollectionModelNodesOneOffJobTests(test_utils.GenericTestBase):
             self.assertNotIn('nodes', migrated_collection_model._values)  # pylint: disable=protected-access
             self.assertNotIn(
                 'nodes', migrated_collection_model._properties)  # pylint: disable=protected-access
-            self.assertEqual(
-                original_collection_model.last_updated,
-                migrated_collection_model.last_updated)
+
+            output = self._run_one_off_job()
+            self.assertItemsEqual(
+                [['SUCCESS_ALREADY_REMOVED - CollectionModel', 1]], output)
 
     def test_one_collection_model_without_nodes(self):
         rights_manager.create_new_collection_rights(
