@@ -798,14 +798,14 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         identifier_message = (
             '%s with id %s. Message: %s' % (
                 model_name, model_id, item.commit_message))
-        if not item.commit_message or len(item.commit_message) <= 1000:
-            yield ('LESS_OR_EQUAL_TO_1000', 1)
+        if not item.commit_message or len(item.commit_message) <= 375:
+            yield ('LESS_OR_EQUAL_TO_375', 1)
         else:
-            yield ('GREATER_THAN_1000', identifier_message)
+            yield ('GREATER_THAN_375', identifier_message.encode('utf-8'))
 
     @staticmethod
     def reduce(key, values):
-        if key == 'LESS_OR_EQUAL_TO_1000':
+        if key == 'LESS_OR_EQUAL_TO_375':
             yield (key, len(values))
         else:
             yield (key, values)
@@ -846,11 +846,11 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
         identifier_message = (
             '%s with id %s. Message: %s' % (
                 model_name, model_id, item.commit_message))
-        if item.commit_message and len(item.commit_message) > 1000:
-            item.commit_message = item.commit_message[:1000]
+        if item.commit_message and len(item.commit_message) > 375:
+            item.commit_message = item.commit_message[:375]
             item.update_timestamps(update_last_updated_time=False)
             item.put()
-            yield ('TRUNCATED', identifier_message)
+            yield ('TRUNCATED', identifier_message.encode('utf-8'))
         else:
             yield ('NOT_TRUNCATED', 1)
 

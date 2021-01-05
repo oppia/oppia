@@ -2585,48 +2585,38 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         varying lengths.
         """
 
-        value_less_than_1000 = 100
-        value_equal_to_1000 = 1000
-        value_between_1000_and_1500 = 1200
-        value_equal_to_1500 = 1500
+        value_less_than_375 = 100
+        value_equal_to_375 = 375
+        value_greater_than_375 = 400
         num_models_per_category = 2
 
         model_class = config_models.ConfigPropertySnapshotMetadataModel
         for i in python_utils.RANGE(num_models_per_category):
             model_class(
-                id='model_id-%d-%d' % (i, value_less_than_1000),
+                id='model_id-%d-%d' % (i, value_less_than_375),
                 committer_id='committer_id',
                 commit_type='create',
-                commit_message='a' * value_less_than_1000).put()
+                commit_message='a' * value_less_than_375).put()
             model_class(
-                id='model_id-%d-%d' % (i, value_equal_to_1000),
+                id='model_id-%d-%d' % (i, value_equal_to_375),
                 committer_id='committer_id',
                 commit_type='create',
-                commit_message='a' * value_equal_to_1000).put()
+                commit_message='a' * value_equal_to_375).put()
             model_class(
-                id='model_id-%d-%d' % (i, value_between_1000_and_1500),
+                id='model_id-%d-%d' % (i, value_greater_than_375),
                 committer_id='committer_id',
                 commit_type='create',
-                commit_message='a' * value_between_1000_and_1500).put()
-            model_class(
-                id='model_id-%d-%d' % (i, value_equal_to_1500),
-                committer_id='committer_id',
-                commit_type='create',
-                commit_message='a' * value_equal_to_1500).put()
+                commit_message='a' * value_greater_than_375).put()
         self.maxDiff = None
         one_off_results = self._run_one_off_job()
         expected_results = [
-            ['GREATER_THAN_1000', [
-                'ConfigPropertySnapshotMetadataModel with id model_id-1-1500.' +
-                ' Message: %s' % ('a' * value_equal_to_1500),
-                'ConfigPropertySnapshotMetadataModel with id model_id-0-1200.' +
-                ' Message: %s' % ('a' * value_between_1000_and_1500),
-                'ConfigPropertySnapshotMetadataModel with id model_id-0-1500.' +
-                ' Message: %s' % ('a' * value_equal_to_1500),
-                'ConfigPropertySnapshotMetadataModel with id model_id-1-1200.' +
-                ' Message: %s' % ('a' * value_between_1000_and_1500)
+            ['GREATER_THAN_375', [
+                'ConfigPropertySnapshotMetadataModel with id model_id-0-400.' +
+                ' Message: %s' % ('a' * value_greater_than_375),
+                'ConfigPropertySnapshotMetadataModel with id model_id-1-400.' +
+                ' Message: %s' % ('a' * value_greater_than_375),
             ]],
-            ['LESS_OR_EQUAL_TO_1000', 2 * num_models_per_category + 1]]
+            ['LESS_OR_EQUAL_TO_375', 2 * num_models_per_category + 1]]
 
         # Ensure results have same length.
         self.assertEqual(len(one_off_results), len(expected_results))
@@ -2640,11 +2630,11 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
                 expected_results[i][0]] = expected_results[i][1]
 
         one_off_results_dict[
-            'GREATER_THAN_1000'
-        ] = sorted(one_off_results_dict['GREATER_THAN_1000'])
+            'GREATER_THAN_375'
+        ] = sorted(one_off_results_dict['GREATER_THAN_375'])
         expected_results_dict[
-            'GREATER_THAN_1000'
-        ] = sorted(expected_results_dict['GREATER_THAN_1000'])
+            'GREATER_THAN_375'
+        ] = sorted(expected_results_dict['GREATER_THAN_375'])
         self.assertDictEqual(one_off_results_dict, expected_results_dict)
 
 
@@ -2682,8 +2672,8 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
             id='model_id-0',
             committer_id='committer_id',
             commit_type='create',
-            commit_message='a' * 1200).put()
+            commit_message='a' * 400).put()
         self._run_one_off_job()
         self.assertEqual(
             len(model_class.get_by_id('model_id-0').commit_message),
-            1000)
+            375)

@@ -497,7 +497,7 @@ ENABLE_RECORDING_OF_SCORES = False
 NUM_PRETEST_QUESTIONS = 3
 
 # Maximum allowed commit message length for SnapshotMetadata models.
-MAX_COMMIT_MESSAGE_LENGTH = 1000
+MAX_COMMIT_MESSAGE_LENGTH = 375
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
