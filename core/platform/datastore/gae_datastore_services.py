@@ -96,18 +96,6 @@ def put_multi(models):
     return ndb.put_multi(models)
 
 
-def put_multi_async(models):
-    """Stores a sequence of Model instances asynchronously.
-
-    Args:
-        models: list(datastore_services.Model). A list of Model instances.
-
-    Returns:
-        list(future). A list of futures.
-    """
-    return ndb.put_multi_async(models)
-
-
 def delete_multi(keys):
     """Deletes models corresponding to a sequence of keys.
 

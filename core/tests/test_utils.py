@@ -98,6 +98,7 @@ LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 # base classes for the other models.
 BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES = (
     'BaseCommitLogEntryModel',
+    'BaseHumanMaintainedModel',
     'BaseMapReduceBatchResultsModel',
     'BaseModel',
     'BaseSnapshotContentModel',
