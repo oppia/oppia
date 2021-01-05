@@ -201,10 +201,18 @@ def main(args=None):
             'from \'accessibility\' or \'performance\'' % lighthouse_mode)
 
     common.start_redis_server()
-    managed_dev_appserver = common.managed_dev_appserver(
-        APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
-        clear_datastore=True, log_level='critical', skip_sdk_update_check=True)
-    with managed_dev_appserver:
+
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+
+    with contextlib2.ExitStack() as stack:
+        stack.enter_context(common.managed_firebase_auth_emulator())
+
+        stack.enter_context(common.managed_dev_appserver(
+            APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
+            clear_datastore=True, log_level='critical',
+            skip_sdk_update_check=True))
+
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
         run_lighthouse_puppeteer_script()
         run_lighthouse_checks(lighthouse_mode)
