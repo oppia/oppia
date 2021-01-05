@@ -362,7 +362,7 @@ describe('Admin backend api service', () => {
     req.flush({
       error: 'Internal Server Error'
     }, {
-      status: 500, statusText: 'Internal Server Error'
+      status: 500, statusText: 'NoneType object has no attribute output'
     });
     flushMicrotasks();
 
