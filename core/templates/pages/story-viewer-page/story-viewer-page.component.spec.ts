@@ -22,8 +22,6 @@ import { OppiaAngularRootComponent } from
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ReadOnlyStoryNode } from
-  'domain/story_viewer/read-only-story-node.model';
 import { StoryNode } from 'domain/story/story-node.model';
 import { PageTitleService } from 'services/page-title.service';
 import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
