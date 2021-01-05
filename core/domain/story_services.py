@@ -38,6 +38,7 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
@@ -219,7 +220,7 @@ def apply_change_list(story_id, change_list):
             '%s %s %s %s' % (
                 e.__class__.__name__, e, story_id, change_list)
         )
-        raise
+        python_utils.reraise_exception()
 
 
 def does_story_exist_with_url_fragment(url_fragment):

@@ -29,8 +29,6 @@ from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 
 CLIENT = tasks_v2.CloudTasksClient()
-# This is needed so that we can see whether the create_task is retried.
-retry._LOGGER.setLevel(logging.DEBUG)  # pylint: disable=protected-access
 
 
 def create_http_task(
@@ -91,7 +89,9 @@ def create_http_task(
         task['name'] = task_name
 
     # Use the CLIENT to build and send the task.
-    # Note: retry=retry.Retry() means that the default retry arguments are used.
+    # Note: retry=retry.Retry() means that the default retry arguments
+    # are used. It cannot be removed since then some failures that occur in
+    # Taskqueue API are not repeated.
     response = CLIENT.create_task(parent, task, retry=retry.Retry())
 
     logging.info('Created task %s' % response.name)
