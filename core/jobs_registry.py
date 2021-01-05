@@ -45,7 +45,6 @@ import python_utils
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
     activity_jobs_one_off.AddContentUserIdsContentJob,
-    activity_jobs_one_off.AddCommitCmdsUserIdsMetadataJob,
     activity_jobs_one_off.AddMissingCommitLogsOneOffJob,
     activity_jobs_one_off.AuditContributorsOneOffJob,
     activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
@@ -64,7 +63,6 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
-    exp_jobs_one_off.RemoveTranslatorIdsOneOffJob,
     exp_jobs_one_off.XmlnsAttributeInExplorationMathSvgImagesAuditJob,
     exp_jobs_one_off.RegenerateMissingExpCommitLogModels,
     exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
@@ -130,8 +128,6 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
     user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
-    user_jobs_one_off.UserAuthDetailsModelAuditOneOffJob,
-    user_jobs_one_off.GenerateUserIdentifiersModelOneOffJob,
     user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
 ]
 
