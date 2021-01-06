@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // topic-editor-state.service.ts is upgraded to Angular 8.
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { SubtopicPageObjectFactory, SubtopicPageBackendDict, SubtopicPage } from
   'domain/topic/SubtopicPageObjectFactory';
 import { TopicRights } from 'domain/topic/topic-rights.model';
@@ -30,15 +30,13 @@ import { Subscription } from 'rxjs';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-require('domain/topic/topic-update.service.ts');
 
 
-fdescribe('Topic editor state service', () => {
+describe('Topic editor state service', () => {
   let topicEditorStateService : TopicEditorStateService;
   let topicObjectFactory : TopicObjectFactory;
   let subtopicPageObjectFactory : SubtopicPageObjectFactory;
   let topicUpdateService :TopicUpdateService;
-  // Let secondSubtopicPageObject = null;
   let secondBackendTopicObject = null;
   let secondTopicRightsObject = null;
   let mockEditableTopicBackendApiService = null;
@@ -57,12 +55,6 @@ fdescribe('Topic editor state service', () => {
     newBackendTopicObject = {};
     backendStorySummariesObject = [];
     failure: null;
-
-
-    // FetchTopic: null;
-    // fetchSubtopicPage: null;
-    // updateTopic: null;
-    // fetchStories: null;
 
     fetchTopic():Promise<unknown> {
       return new Promise((resolve, reject) => {
@@ -569,26 +561,30 @@ fdescribe('Topic editor state service', () => {
   );
 
   it('should fail to save the topic without first loading one',
-    () => {
-      expect(() => {
-        const successHandler = jasmine.createSpy('success');
-        const failHandler = jasmine.createSpy('fail');
-        topicEditorStateService.saveTopic(
-          'Commit message').then(successHandler, failHandler);
-      }).toThrowError('Cannot save a topic before one is loaded.');
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      topicEditorStateService.saveTopic(
+        'Commit message').then(successHandler, failHandler);
+      flushMicrotasks();
+      expect(failHandler).toHaveBeenCalledWith(
+        Error('Cannot save a topic before one is loaded.'));
     }
-  );
+    ));
 
   it('should not save the topic if there are no pending changes',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
       topicEditorStateService.loadTopic('5');
+
       tick(1000);
-      expect(topicEditorStateService.saveTopic(
-        'Commit message').then(successHandler, failHandler));
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
+
+      topicEditorStateService.saveTopic(
+        'Commit message').then(successHandler, failHandler);
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
     }
     ));
 
@@ -605,11 +601,13 @@ fdescribe('Topic editor state service', () => {
 
     tick(1000);
 
-    expect(topicEditorStateService.saveTopic(
-      'Commit message').then(successHandler, failHandler));
+    topicEditorStateService.saveTopic(
+      'Commit message').then(successHandler, failHandler);
+    flushMicrotasks();
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
     tick(1000);
+
 
     let expectedId = '0';
     let expectedVersion = '1';

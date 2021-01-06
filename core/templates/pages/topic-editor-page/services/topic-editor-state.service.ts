@@ -18,8 +18,6 @@
  * retrieving the topic, saving it, and listening for changes.
  */
 
-require('services/questions-list.service.ts');
-require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 import { EventEmitter } from '@angular/core';
 import { Injectable } from '@angular/core';
@@ -432,47 +430,49 @@ export class TopicEditorStateService {
    * will clear the UndoRedoService of pending changes. This function also
    * shares behavior with setTopic(), when it succeeds.
    */
-  async saveTopic(
+  saveTopic(
       commitMessage: string) : Promise<void> {
-    if (!this._topicIsInitialized) {
-      this.alertService.fatalWarning(
-        'Cannot save a topic before one is loaded.');
-      Promise.reject();
-    }
+    return new Promise((resolve, reject) => {
+      if (!this._topicIsInitialized) {
+        this.alertService.fatalWarning(
+          'Cannot save a topic before one is loaded.');
+        reject();
+      }
 
-    // Don't attempt to save the topic if there are no changes pending.
-    if (!this.undoRedoService.hasChanges()) {
-      Promise.reject();
-    }
-    this._topicIsBeingSaved = true;
-    this.editableTopicBackendApiService.updateTopic(
-      this._topic.getId(), this._topic.getVersion(),
-      commitMessage, this.undoRedoService.getCommittableChangeList()).then(
-      (topicBackendObject) => {
-        this._updateTopic(
-          topicBackendObject.topicDict,
-          topicBackendObject.skillIdToDescriptionDict
-        );
-        this._updateSkillIdToRubricsObject(
-          topicBackendObject.skillIdToRubricsDict);
-        let changeList =
+      // Don't attempt to save the topic if there are no changes pending.
+      if (!this.undoRedoService.hasChanges()) {
+        reject();
+      }
+      this._topicIsBeingSaved = true;
+      this.editableTopicBackendApiService.updateTopic(
+        this._topic.getId(), this._topic.getVersion(),
+        commitMessage, this.undoRedoService.getCommittableChangeList()).then(
+        (topicBackendObject) => {
+          this._updateTopic(
+            topicBackendObject.topicDict,
+            topicBackendObject.skillIdToDescriptionDict
+          );
+          this._updateSkillIdToRubricsObject(
+            topicBackendObject.skillIdToRubricsDict);
+          let changeList =
          this.undoRedoService.getCommittableChangeList();
-        for (let change of changeList) {
-          if ((change.cmd === 'delete_canonical_story' ||
+          for (let change of changeList) {
+            if ((change.cmd === 'delete_canonical_story' ||
                   change.cmd === 'delete_additional_story') &&
                   'story_id' in change) {
-            this.editableStoryBackendApiService.deleteStory(
-              change.story_id);
+              this.editableStoryBackendApiService.deleteStory(
+                change.story_id);
+            }
           }
-        }
-        this.undoRedoService.clearChanges();
-        this._topicIsBeingSaved = false;
-        Promise.resolve();
-      }, (error: string) => {
-        this.alertService.addWarning(
-          error || 'There was an error when saving the topic.');
-        this._topicIsBeingSaved = false;
-      });
+          this.undoRedoService.clearChanges();
+          this._topicIsBeingSaved = false;
+          resolve();
+        }, (error: string) => {
+          this.alertService.addWarning(
+            error || 'There was an error when saving the topic.');
+          this._topicIsBeingSaved = false;
+        });
+    });
   }
 
   /**
