@@ -28,6 +28,7 @@ import itertools
 import json
 import logging
 import os
+import re
 import unittest
 
 from constants import constants
@@ -838,6 +839,29 @@ class TestBase(unittest.TestCase):
         return super(TestBase, self).assertRaisesRegexp(
             expected_exception, expected_regexp,
             callable_obj=callable_obj, *args, **kwargs)
+
+    def assert_matches_regexps(self, regexps, items):
+        """Asserts each item in the list matches the corresponding regexp."""
+        differences = []
+
+        for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items)):
+            if re.match(regexp, item) is None:
+                differences.append(
+                    '~ [i=%d]:\t%r does not match: %s' % (i, item, regexp))
+        if len(items) < len(regexps):
+            extra_regexps = regexps[len(items):]
+            differences.extend(
+                '- [i=%d]:\tmissing item expected to match: %s' % (i, regexp)
+                for i, regexp in enumerate(extra_regexps, start=len(items)))
+        if len(regexps) < len(items):
+            extra_items = items[len(regexps):]
+            differences.extend(
+                '+ [i=%d]:\textra item %r' % (i, item)
+                for i, item in enumerate(extra_items, start=len(regexps)))
+
+        if differences:
+            error_message = 'Lists differ:\n\t%s' % '\n\t'.join(differences)
+            raise AssertionError(error_message)
 
 
 class AppEngineTestBase(TestBase):
