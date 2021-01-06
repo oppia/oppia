@@ -149,7 +149,7 @@ var ExplorationEditorPage = function() {
     await action.sendKeys(
       'Dropdown Search Input', select2Dropdown2SearchInput, category + '\n');
 
-    var testExplorationLanguageSelectButton = 
+    var testExplorationLanguageSelectButton =
     element(by.css('.protractor-test-exploration-language-select'));
     await action.click(
       'Test Exploration Language Select Button',
