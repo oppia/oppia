@@ -142,16 +142,17 @@ var ExplorationEditorPage = function() {
     var selectContainerButton = element(by.css('.select2-container'));
     await action.click(' Select Container Button', selectContainerButton);
 
-    var select2Dropdown2SearchInput = 
+    var select2Dropdown2SearchInput =
     element(by.css('.select2-dropdown'))
-    .element(by.css('.select2-search input'));
+      .element(by.css('.select2-search input'));
 
     await action.sendKeys(
       'Dropdown Search Input', select2Dropdown2SearchInput, category + '\n');
 
-    var testExplorationLanguageSelectButton = element(by.css('.protractor-test-exploration-language-select'));
+    var testExplorationLanguageSelectButton = 
+    element(by.css('.protractor-test-exploration-language-select'));
     await action.click(
-      'Test Exploration Language Select Button', 
+      'Test Exploration Language Select Button',
       testExplorationLanguageSelectButton);
 
     await action.sendKeys(
