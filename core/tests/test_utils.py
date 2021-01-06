@@ -841,13 +841,31 @@ class TestBase(unittest.TestCase):
             callable_obj=callable_obj, *args, **kwargs)
 
     def assert_matches_regexps(self, regexps, items):
-        """Asserts each item in the list matches the corresponding regexp."""
+        """Asserts that each item is a full match of the corresponding regexp.
+
+        Every regexp in the list must be a full match, substring matches are
+        still treated as errors.
+
+        If there are any missing or extra items that do not correspond to a
+        regexp element, then that is also an error.
+
+        Args:
+            regexps: list(str|RegexObject). The patterns that each item is
+                expected to match.
+            items: list(str). The string elements being matched.
+
+        Raises:
+            AssertionError. At least one item does not match its corresponding
+                pattern, or the number of items does not match the number of
+                regexp patterns.
+        """
         differences = []
 
         for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items)):
             if re.match(regexp, item) is None:
-                differences.append(
-                    '~ [i=%d]:\t%r does not match: %s' % (i, item, regexp))
+                continue
+            differences.append(
+                '~ [i=%d]:\t%r does not match: %s' % (i, item, regexp))
         if len(items) < len(regexps):
             extra_regexps = regexps[len(items):]
             differences.extend(
