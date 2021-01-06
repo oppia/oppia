@@ -57,8 +57,7 @@ describe('Library index page', function() {
     await users.logout();
   });
 
-  fit('should display private and published explorations', async function() {
-    console.log(0);
+  it('should display private and published explorations', async function() {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
     var CATEGORY_ARCHITECTURE = 'Architecture';
@@ -77,13 +76,13 @@ describe('Library index page', function() {
       'earendil@publicationAndLibrary.com', 'earendilPublicationAndLibrary');
 
     await users.login('feanor@publicationAndLibrary.com');
-    console.log(1);
+
     await workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS, CATEGORY_ARCHITECTURE,
       'hold the light of the two trees', LANGUAGE_DEUTSCH);
-    console.log(2);
+
     await users.logout();
-    console.log(3);
+
     await users.login('earendil@publicationAndLibrary.com');
     await workflow.createAndPublishExploration(
       EXPLORATION_VINGILOT, CATEGORY_BUSINESS, 'seek the aid of the Valar');
@@ -99,7 +98,7 @@ describe('Library index page', function() {
     await explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
     await explorationEditorPage.saveChanges('change language');
     await users.logout();
-    console.log(4);
+
     await users.login('celebrimor@publicationAndLibrary.com');
     await workflow.createExploration();
     await explorationEditorMainTab.setContent(
@@ -108,9 +107,9 @@ describe('Library index page', function() {
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setObjective(
       'preserve the works of the elves');
-    console.log(5);
+
     await explorationEditorPage.saveChanges();
-    console.log(6);
+
     // There are now two non-private explorations whose titles, categories
     // and languages are, respectively:
     // - silmarils, gems, Deutsch
@@ -147,7 +146,7 @@ describe('Library index page', function() {
       languages: [LANGUAGE_FRANCAIS],
       expectVisible: []
     }];
-    console.log(7);
+
     // We now check explorations are visible under the right conditions.
     await browser.get('/search/find?q=&language_code=("en")');
     // The initial language selection should be just English.
@@ -157,10 +156,8 @@ describe('Library index page', function() {
 
     // Reset the language selector.
     await libraryPage.deselectLanguages([LANGUAGE_ENGLISH]);
-    console.log(8);
-    let i = 9;
+
     for (var testCase of testCases) {
-      console.log(i++);
       await libraryPage.selectLanguages(testCase.languages);
       await libraryPage.selectCategories(testCase.categories);
 
