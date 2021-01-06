@@ -34,8 +34,6 @@ import utils
     [models.NAMES.base_model, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 
-USER_ID_REGEX = 'uid_[a-z]{32}'
-
 ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
 ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'
 ERROR_CATEGORY_COUNT_CHECK = 'count check'
@@ -846,7 +844,7 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return r'^%s$' % USER_ID_REGEX
+        return r'^%s$' % feconf.USER_ID_REGEX
 
     @classmethod
     def _validate_explorations_are_public(

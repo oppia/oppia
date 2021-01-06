@@ -57,7 +57,6 @@ IMAGE_PATH_REGEX = (
 AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
-USER_ID_REGEX = 'uid_[a-z]{32}'
 TARGET_TYPE_TO_TARGET_MODEL = {
     feconf.ENTITY_TYPE_EXPLORATION: (
         exp_models.ExplorationModel),
