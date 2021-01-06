@@ -672,10 +672,6 @@ def apply_change_list(collection_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
                 continue
-            elif (change.cmd ==
-                  collection_domain.CMD_REMOVE_NODE):
-                # No action is needed here.
-                continue
 
         return collection
 

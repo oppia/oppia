@@ -61,6 +61,18 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionModel.get_collection_count())
         self.assertEqual(num_collections, 1)
 
+    def test_reconstitute(self):
+        collection = collection_domain.Collection.create_default_collection(
+            'id', title='A title',
+            category='A Category', objective='An Objective')
+        collection_services.save_new_collection('id', collection)
+        collection_model = collection_models.CollectionModel.get_by_id('id')
+        snapshot_dict = collection_model.compute_snapshot()
+        snapshot_dict['nodes'] = ['node0', 'node1']
+        collection_model = collection_model._reconstitute(snapshot_dict) # pylint: disable=protected-access
+        self.assertNotIn('nodes', collection_model._properties) # pylint: disable=protected-access
+        self.assertNotIn('nodes', collection_model._values) # pylint: disable=protected-access
+
 
 class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
 
