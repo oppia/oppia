@@ -387,6 +387,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
           // If the modal is open, do not open another one.
           if (modalIsOpen) {
+            $rootScope.$applyAsync();
             return;
           }
 
@@ -418,6 +419,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             $timeout(function() {
               FocusManagerService.setFocus('saveChangesModalOpened');
             });
+            $rootScope.$applyAsync();
           });
 
           modalInstance.result.then(function(commitMessage) {
@@ -430,13 +432,17 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
             saveDraftToBackend(commitMessage).then(function() {
               whenModalClosed.resolve();
+              $rootScope.$applyAsync();
             });
+            $rootScope.$applyAsync();
           }, function() {
             AlertsService.clearWarnings();
             modalIsOpen = false;
             whenModalClosed.resolve();
+            $rootScope.$applyAsync();
           });
         });
+        $rootScope.$applyAsync();
         return whenModalClosed.promise;
       },
 

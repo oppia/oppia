@@ -154,6 +154,7 @@ angular.module('oppia').component('previewTab', {
             PlayerCorrectnessFeedbackEnabledService.init(
               returnDict.correctness_feedback_enabled);
             NumberAttemptsService.reset();
+            $rootScope.$applyAsync();
           });
         }, 200);
       };

@@ -23,10 +23,10 @@ require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('ChangeListService', [
-  '$log', 'AlertsService', 'AutosaveInfoModalsService',
+  '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',
   'ExplorationDataService', 'LoaderService',
   function(
-      $log, AlertsService, AutosaveInfoModalsService,
+      $log, $rootScope, AlertsService, AutosaveInfoModalsService,
       ExplorationDataService, LoaderService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
@@ -98,6 +98,7 @@ angular.module('oppia').factory('ChangeListService', [
                 explorationChangeList);
             }
           }
+          $rootScope.$applyAsync();
         },
         function() {
           AlertsService.clearWarnings();
@@ -107,6 +108,7 @@ angular.module('oppia').factory('ChangeListService', [
           if (!AutosaveInfoModalsService.isModalOpen()) {
             AutosaveInfoModalsService.showNonStrictValidationFailModal();
           }
+          $rootScope.$applyAsync();
         }
       );
     };
@@ -150,6 +152,7 @@ angular.module('oppia').factory('ChangeListService', [
         explorationChangeList = [];
         undoneChangeStack = [];
         ExplorationDataService.discardDraft();
+        $rootScope.$applyAsync();
       },
       /**
        * Saves a change dict that represents a change to an exploration
