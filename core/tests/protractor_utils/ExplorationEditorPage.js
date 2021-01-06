@@ -119,7 +119,8 @@ var ExplorationEditorPage = function() {
     await waitFor.elementToBeClickable(
       publishExplorationButton,
       'Publish button taking too long to be clickable.');
-    await publishExplorationButton.click();
+    
+    await action.click('Publish Exploration Button', publishExplorationButton);
 
     var expTitle = element(by.css(
       '.protractor-test-exploration-title-input'));
@@ -135,31 +136,37 @@ var ExplorationEditorPage = function() {
         '.protractor-test-exploration-title-input'))
     );
 
-    await expTitle.sendKeys(title);
-    await expObjective.sendKeys(objective);
+    await action.sendKeys('Exp Title', expTitle, title);
+    await action.sendKeys('Exp Objective', expObjective, objective);
+    
+    var selectContainerButton = element(by.css('.select2-container'));
+    await action.click(' Select Container Button', selectContainerButton);
+    
+    
+    var select2Dropdown2SearchInput = element(by.css('.select2-dropdown')).element(
+      by.css('.select2-search input'));
+    
+    await action.sendKeys('Dropdown Search Input', select2Dropdown2SearchInput, category + '\n');
+    
 
-    await element(by.css('.select2-container')).click();
-    await element(by.css('.select2-dropdown')).element(
-      by.css('.select2-search input')).sendKeys(category + '\n');
 
-    await element(by.css('.protractor-test-exploration-language-select'))
-      .click();
-    await element(by.css('.protractor-test-exploration-language-select'))
-      .sendKeys(language + '\n');
+    var testExplorationLanguageSelectButton = element(by.css('.protractor-test-exploration-language-select'));
+    await action.click('Test Exploration Language Select Button',testExplorationLanguageSelectButton);
+   
+    await action.sendKeys('Test Exploration Language Select Button',testExplorationLanguageSelectButton, language + '\n');
 
-
-    await expTags.click();
-    await expInput.click();
+    await action.click('Exp Tags',expTags);
+    await action.click('Exp Input',expInput);
 
     for (var elem of tags) {
-      await expInput.sendKeys(elem, protractor.Key.ENTER);
+      await action.sendKeys('Exp Input', expInput, (elem, protractor.Key.ENTER));
     }
 
     const saveChangesButton = element(by.css(
       '.protractor-test-confirm-pre-publication'));
     await waitFor.elementToBeClickable(
       saveChangesButton, 'Save changes button taking too long to be clickable');
-    await saveChangesButton.click();
+    await action.click('Save Changes Button', saveChangesButton);
 
     await waitFor.visibilityOf(
       element(by.css('.modal-content')),
@@ -168,7 +175,7 @@ var ExplorationEditorPage = function() {
     const confirmPublish = element(by.css('.protractor-test-confirm-publish'));
     await waitFor.elementToBeClickable(
       confirmPublish, 'Confirm publish button taking too long to appear');
-    await confirmPublish.click();
+    await action.click('Confirm Publish Button', confirmPublish);
 
     await waitFor.visibilityOf(element(by.css(
       '.protractor-test-share-publish-modal')),
@@ -177,7 +184,7 @@ var ExplorationEditorPage = function() {
     const closeButton = element(by.css('.protractor-test-share-publish-close'));
     await waitFor.elementToBeClickable(
       closeButton, 'Close button taking too long to be clickable');
-    await closeButton.click();
+    await action.click('Close Button', closeButton);
     await waitFor.invisibilityOf(
       closeButton, 'Close button taking too long to disappear');
   };
@@ -200,8 +207,14 @@ var ExplorationEditorPage = function() {
     await waitFor.visibilityOf(
       explorationTitle, 'Exploration Goal taking too long to appear');
     expect(await explorationTitle.getAttribute('value')).toMatch(title);
+    await waitFor.visibilityOf(
+      explorationCategory, 'Exploration Category taking too long to appear');
     expect(explorationCategory).toMatch(category);
+    await waitFor.visibilityOf(
+      explorationObjective, 'Exploration objective taking too long to appear');
     expect(await explorationObjective.getAttribute('value')).toMatch(objective);
+    await waitFor.visibilityOf(
+      explorationLanguage, 'Exploration Language taking too long to appear');
     expect(explorationLanguage).toMatch(language);
     for (var i = 0; i < await explorationTags.count(); i++) {
       expect(
@@ -241,14 +254,20 @@ var ExplorationEditorPage = function() {
   };
 
   this.expectCannotSaveChanges = async function() {
+    await waitFor.visibilityOf(
+      saveChangesButton, 'Save changes button taking too long to appear');
     expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
   this.expectCanPublishChanges = async function() {
+    await waitFor.visibilityOf(
+      publishExplorationButton, 'Publish exploration button taking too long to appear');
     expect(await publishExplorationButton.isEnabled()).toBeTrue();
   };
 
   this.expectCannotPublishChanges = async function() {
+    await waitFor.visibilityOf(
+      publishExplorationButton, 'Publish exploration button taking too long to appear');
     expect(await publishExplorationButton.isEnabled()).toBeFalsy();
   };
 
