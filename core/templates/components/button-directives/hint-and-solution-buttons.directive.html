@@ -5,7 +5,7 @@
       <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-hint"
               popover-trigger="'none'"
               popover-is-open="$ctrl.isTooltipVisible()"
-              uib-popover="Click here for a hint!"
+              uib-popover="Need help? View a hint for this problem! &nbsp; &times;"
               ng-if="hintIndex === 0 && $ctrl.isHintButtonVisible(hintIndex)"
               ng-class="{'viewed': $ctrl.isHintConsumed(hintIndex)}"
               ng-click="$ctrl.displayHintModal(hintIndex)">
@@ -39,7 +39,40 @@
   }
 
   .oppia-hint-and-solution-buttons .popover-content {
-    color: #000000;
+    color: #2d4a9d;
+    background-color: #f0ffff;
+    display: inline-block;
+    box-shadow: 0px 0px 6px #2d4a9d;
+    font-size: 16px;
+    padding: 10px;
+    position: relative;
+    z-index: 2;
+    border: 1px solid #2d4a9d;
+    border-radius: 5px;
+    -webkit-animation: bounce 4s infinite ease-out;
+    animation: bounce 4s infinite ease-out;
+  }
+
+  .oppia-hint-and-solution-buttons .popover-content::after,
+  .oppia-hint-and-solution-buttons .popover-content::before {
+    content: " ";
+    top: 100%;
+    left: 50%;
+    border: solid transparent;
+    position: absolute;
+  }
+
+  .oppia-hint-and-solution-buttons .popover-content::after {
+    border-width: 4px;
+    border-top: 23px solid #f0ffff;
+    margin-left: 130px;
+  }
+
+  .oppia-hint-and-solution-buttons .popover-content::before {
+    border-color: rgba(0, 0, 51, 0);
+    border-width: 6px;
+    border-top: 29px solid #2d4a9d;
+    margin-left: 128px;
   }
 
   .oppia-hint-and-solution-buttons .list-inline > li {
@@ -50,10 +83,41 @@
     visibility: visible !important;
   }
 
+  @keyframes bounce {
+    0% {
+          -webkit-transform: translateY(0);
+        }
+    8% {
+          -webkit-transform: translateY(-60px);
+        }
+    10% {
+          -webkit-transform: translateY(0);
+        }
+    15% {
+          -webkit-transform: translateY(-13px);
+        }
+    20% {
+          -webkit-transform: translateY(0);
+        }
+    25% {
+          -webkit-transform: translateY(-5px);
+        }
+    30% {
+          -webkit-transform: translateY(0);
+        }
+    35% {
+          -webkit-transform: translateY(-2px);
+        }
+    40% {
+          -webkit-transform: translateY(0);
+        }
+  }
+
   @media screen and (min-width: 769px) {
     .oppia-hint-and-solution-buttons .popover.top.fade.in {
-      right: 25px !important;
-      top: -40px !important;
+      top: -73px !important;
+      left: 749px !important;
+      max-width: 500px;
     }
 
     .oppia-hint-and-solution-buttons .popover.top > .arrow {

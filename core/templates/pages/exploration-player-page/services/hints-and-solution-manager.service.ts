@@ -31,7 +31,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 export class HintsAndSolutionManagerService {
   timeout = null;
   ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
-  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 60000;
+  WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 20000;
 
   _solutionViewedEventEmitter = new EventEmitter();
   private _timeoutElapsedEventEmitter = new EventEmitter();
