@@ -927,7 +927,7 @@ class ManagedProcessTests(test_utils.TestBase):
         if manager_should_have_sent_kill_signal:
             expected_patterns.append(r'Forced to kill %s!' % proc_pattern)
         else:
-            expected_patterns.append('%s has ended\\.' % proc_pattern)
+            expected_patterns.append(r'%s has ended\.' % proc_pattern)
 
         logs_with_pid = [msg for msg in logs if re.search(proc_pattern, msg)]
         if expected_patterns and not logs_with_pid:
