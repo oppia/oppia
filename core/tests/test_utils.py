@@ -860,13 +860,11 @@ class TestBase(unittest.TestCase):
                 pattern, or the number of items does not match the number of
                 regexp patterns.
         """
-        differences = []
-
-        for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items)):
-            if re.match(regexp, item) is not None:
-                continue
-            differences.append(
-                '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp))
+        differences = [
+            '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
+            for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
+            if re.match(regexp, item) is None
+        ]
         if len(items) < len(regexps):
             extra_regexps = regexps[len(items):]
             differences.extend(
