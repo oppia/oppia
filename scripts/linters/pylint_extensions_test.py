@@ -2926,6 +2926,8 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
             pylint_extensions.NonTestFilesFunctionNameChecker)
         self.checker_test_object.setup_method()
 
+    # TODO(#11617): Refactor all the tests in this class using the same approach
+    # used to fix this issue.
     def test_function_def_for_test_file_with_test_only_adds_no_msg(self):
         def_node = astroid.extract_node(
             """
@@ -2933,16 +2935,9 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
                 pass
             """
         )
-        temp_file = tempfile.NamedTemporaryFile(suffix='_test')
-        filename = temp_file.name
-        def_node.file = filename
-        def_node.path = filename
-        def_node.root().name = filename
-        self.assertTrue(filename.endswith('_test'))
-
-        self.checker_test_object.checker.visit_functiondef(def_node)
+        def_node.root().name = 'random_module_test'
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_functiondef(def_node)
 
     def test_function_def_for_test_file_without_test_only_adds_no_msg(self):
         def_node = astroid.extract_node(
@@ -2951,16 +2946,9 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
                 pass
             """
         )
-        temp_file = tempfile.NamedTemporaryFile(suffix='_test')
-        filename = temp_file.name
-        def_node.file = filename
-        def_node.path = filename
-        def_node.root().name = filename
-        self.assertTrue(filename.endswith('_test'))
-
-        self.checker_test_object.checker.visit_functiondef(def_node)
+        def_node.root().name = 'random_module_test'
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_functiondef(def_node)
 
     def test_function_def_for_non_test_file_with_test_only_adds_msg(self):
         def_node = astroid.extract_node(
@@ -2969,19 +2957,13 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
                 pass
             """
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        def_node.file = filename
-        def_node.path = filename
-        def_node.root().name = filename
-
-        self.checker_test_object.checker.visit_functiondef(def_node)
+        def_node.root().name = 'random_module_file'
         non_test_function_name_message = testutils.Message(
             msg_id='non-test-files-function-name-checker', node=def_node)
         with self.checker_test_object.assertAddsMessages(
             non_test_function_name_message
         ):
-            temp_file.close()
+            self.checker_test_object.checker.visit_functiondef(def_node)
 
     def test_function_def_for_non_test_file_without_test_only_adds_no_msg(self):
         def_node = astroid.extract_node(
@@ -2990,12 +2972,6 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
                 pass
             """
         )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-        def_node.file = filename
-        def_node.path = filename
-        def_node.root().name = filename
-
-        self.checker_test_object.checker.visit_functiondef(def_node)
+        def_node.root().name = 'random_module_file'
         with self.checker_test_object.assertNoMessages():
-            temp_file.close()
+            self.checker_test_object.checker.visit_functiondef(def_node)

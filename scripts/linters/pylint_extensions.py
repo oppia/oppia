@@ -1519,7 +1519,6 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
-
         modnode = node.root()
         if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
             if 'core.domain' in node.modname:
@@ -1894,8 +1893,8 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
 
 
 class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
-    """Custom pylint checker prohibiting use of "test_only" in function names
-    of non-test files.
+    """Custom pylint checker prohibiting use of "test_only" prefix in function
+    names of non-test files.
     """
 
     __implements__ = interfaces.IAstroidChecker
@@ -1922,11 +1921,12 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
         """
 
         modnode = node.root()
-        if not modnode.name.endswith('_test'):
-            function_name = node.name
-            if function_name.startswith('test_only'):
-                self.add_message(
-                    'non-test-files-function-name-checker', node=node)
+        if modnode.name.endswith('_test'):
+            return
+        function_name = node.name
+        if function_name.startswith('test_only'):
+            self.add_message(
+                'non-test-files-function-name-checker', node=node)
 
 
 def register(linter):

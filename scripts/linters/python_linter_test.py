@@ -29,12 +29,9 @@ from . import python_linter
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
-VALID_TEST_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid_test_file_test.py')
 PYTHON_UTILS_FILEPATH = os.path.join(os.getcwd(), 'python_utils.py')
 INVALID_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_import_order.py')
-INVALID_TEST_ONLY_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_test_only.py')
 INVALID_PYCODESTYLE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_pycodestyle_error.py')
 INVALID_PYTHON3_FILEPATH = os.path.join(
