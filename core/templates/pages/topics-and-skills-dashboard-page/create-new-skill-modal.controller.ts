@@ -69,14 +69,12 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
         $scope.rubrics[1].setExplanations([$scope.newSkillDescription]);
         SkillCreationService.markChangeInSkillDescription();
       }
-      if ($scope.newSkillDescription) {
-        SkillEditorStateService.updateExistenceOfSkillDescription(
-          $scope.newSkillDescription, function() {
-            $scope.skillDescriptionExists = (
-              SkillEditorStateService.getSkillDescriptionExists());
-          }
-        );
-      }
+      SkillEditorStateService.updateExistenceOfSkillDescription(
+        $scope.newSkillDescription, function() {
+          $scope.skillDescriptionExists = (
+            SkillEditorStateService.getSkillDescriptionExists());
+        }
+      );
     };
 
     $scope.resetErrorMsg = function() {

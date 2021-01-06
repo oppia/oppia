@@ -426,3 +426,19 @@ class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
         self.logout()
+
+
+class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for SkillDescriptionHandler."""
+
+    def setUp(self):
+        super(SkillDescriptionHandlerTest, self).setUp()
+        self.url = '%s/%s' % (
+            feconf.SKILL_DESCRIPTION_HANDLER, self.skill_id)
+
+    def test_skill_description_handler(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check that admins can access two skills data at the same time.
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['skill_description_exists'], False)
+        self.logout()

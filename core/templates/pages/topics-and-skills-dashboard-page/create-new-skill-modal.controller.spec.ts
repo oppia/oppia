@@ -19,12 +19,11 @@
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('Create new skill modal', function() {
+describe('Create new skill modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDifficulties = null;
   var RubricObjectFactory = null;
-  var SkillEditorStateService = null;
   var COMPONENT_NAME_EXPLANATION = null;
   var SubtitledHtmlObjectFactory = null;
 
@@ -44,7 +43,6 @@ fdescribe('Create new skill modal', function() {
     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
     COMPONENT_NAME_EXPLANATION = $injector.get('COMPONENT_NAME_EXPLANATION');
     RubricObjectFactory = $injector.get('RubricObjectFactory');
-    SkillEditorStateService = $injector.get('SkillEditorStateService');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     $scope = $rootScope.$new();
     $controller('CreateNewSkillModalController', {
@@ -112,6 +110,24 @@ fdescribe('Create new skill modal', function() {
 
       $scope.newSkillDescription = 'invalidvalid>>';
       $scope.createNewSkill();
+      expect($scope.errorMsg).toEqual(errorString);
+    });
+
+  it('should add error message text when skill description is duplicate',
+    function() {
+      var errorString = (
+        'This description already exists. Please choose a ' +
+        'new name or modify the existing skill.');
+
+      $scope.newSkillDescription = 'Adding';
+      $scope.skillDescriptionExists = false;
+      $scope.createNewSkill();
+      expect($scope.isSkillDescriptionValid()).toBe(true);
+
+      $scope.newSkillDescription = 'Adding';
+      $scope.skillDescriptionExists = true;
+      $scope.createNewSkill();
+      expect($scope.isSkillDescriptionValid()).toBe(false);
       expect($scope.errorMsg).toEqual(errorString);
     });
 
