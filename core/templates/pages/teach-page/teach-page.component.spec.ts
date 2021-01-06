@@ -124,21 +124,32 @@ describe('Teach Page', () => {
     expect(component.isWindowNarrow).toBe(true);
   });
 
-  it('should check if loader screen is working', fakeAsync(() => {
-    component.ngOnInit();
-    spyOn(loaderService, 'showLoadingScreen').and.callThrough();
-    expect(loaderService.showLoadingScreen)
-      .toHaveBeenCalledWith('Loading');
-  }));
-  it('should check if user is looged in or not', () => {
+  it('should check if loader screen is working', () =>
+    fakeAsync(() => {
+      component.ngOnInit();
+      spyOn(loaderService, 'showLoadingScreen').and.callThrough();
+      expect(loaderService.showLoadingScreen)
+        .toHaveBeenCalledWith('Loading');
+    }));
+
+  it('should check if user is logged in or not', () => {
+    const UserInfoObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createDefault())
+      UserInfo.createFromBackendDict(UserInfoObject))
     );
-    component.ngOnInit,
-    component.userService.getUserInfoAsync().then((userInfo) => {
-      expect(userInfo.userIsLoggedIn).toBe(false);
-      expect(component.userIsLoggedIn).toBe(false);
-    });
+
+    component.ngOnInit();
+    expect(component.userIsLoggedIn).toBe(true);
   });
   it('should record analytics when Start Learning is clicked', function() {
     spyOn(
