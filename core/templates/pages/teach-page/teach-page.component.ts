@@ -25,7 +25,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
 import { LoaderService } from 'services/loader.service.ts';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
 @Component({
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
@@ -44,7 +44,7 @@ export class TeachPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private userBackendApiService: UserBackendApiService,
+    private userService: UserService,
     private loaderService: LoaderService
   ) {}
 
@@ -58,7 +58,7 @@ export class TeachPageComponent implements OnInit {
         classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.loaderService.showLoadingScreen('Loading');
-    this.userBackendApiService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
     });

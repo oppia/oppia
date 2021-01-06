@@ -28,7 +28,8 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-
+import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserService } from 'services/user.service';
 @Pipe({name: 'translate'})
 class MockTranslatePipe {
   transform(value: string, params: Object | undefined):string {
@@ -57,7 +58,7 @@ describe('Teach Page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
-
+  let userService: UserService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
@@ -95,6 +96,7 @@ describe('Teach Page', () => {
       imports: [HttpClientTestingModule]
     });
     loaderService = TestBed.get(LoaderService);
+    userService = TestBed.get(UserService);
   });
 
   let component;
@@ -123,11 +125,21 @@ describe('Teach Page', () => {
   });
 
   it('should check if loader screen is working', fakeAsync(() => {
+    component.ngOnInit();
     spyOn(loaderService, 'showLoadingScreen').and.callThrough();
     expect(loaderService.showLoadingScreen)
       .toHaveBeenCalledWith('Loading');
   }));
-
+  it('should check if user is looged in or not', () => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createDefault())
+    );
+    component.ngOnInit,
+    component.userService.getUserInfoAsync().then((userInfo) => {
+      expect(userInfo.userIsLoggedIn).toBe(false);
+      expect(component.userIsLoggedIn).toBe(false);
+    });
+  });
   it('should record analytics when Start Learning is clicked', function() {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickStartLearningButtonEvent')

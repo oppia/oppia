@@ -179,27 +179,25 @@
   </div>
 
   <div class="oppia-teach-section-five" [ngStyle]="{'background-image': 'getTestimonialBackgroundUrl()'}">
-    
-      <div *ngIf="!isWindowNarrow" class="oppia-teach-section-five-left">
-        <h2 [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
-        <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
-        <div class="teach-arrows-container">
-          <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
-            arrow_back_ios
-          </span>
-          <span (click)="incrementDisplayedTestimonialId()" class="material-icons">
-            arrow_forward_ios
-          </span>
-        </div>
+    <div *ngIf="!isWindowNarrow" class="oppia-teach-section-five-left">
+      <h2 [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
+      <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
+      <div class="teach-arrows-container">
+        <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
+          arrow_back_ios
+        </span>
+        <span (click)="incrementDisplayedTestimonialId()" class="material-icons">
+          arrow_forward_ios
+        </span>
       </div>
-      <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-five-right">
-        <picture class="teach-student-image">
-          <source type="image/webp" [src]="testimonials[displayedTestimonialId].imageUrlWebp">
-          <source type="image/png" [src]="testimonials[displayedTestimonialId].imageUrl">
-          <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
-        </picture>
-      </div>
-    
+    </div>
+    <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-five-right">
+      <picture class="teach-student-image">
+        <source type="image/webp" [src]="testimonials[displayedTestimonialId].imageUrlWebp">
+        <source type="image/png" [src]="testimonials[displayedTestimonialId].imageUrl">
+        <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
+      </picture>
+    </div>
 
     <div *ngIf="isWindowNarrow">
       <div class="oppia-teach-section-five-image">
