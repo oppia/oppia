@@ -841,7 +841,7 @@ class TestBase(unittest.TestCase):
             expected_exception, expected_regexp,
             callable_obj=callable_obj, *args, **kwargs)
 
-    def assert_matches_regexps(self, regexps, items):
+    def assert_matches_regexps(self, items, regexps):
         """Asserts that each item is a full match of the corresponding regexp.
 
         Every regexp in the list must be a full match, substring matches are
@@ -851,9 +851,9 @@ class TestBase(unittest.TestCase):
         regexp element, then that is also an error.
 
         Args:
+            items: list(str). The string elements being matched.
             regexps: list(str|RegexObject). The patterns that each item is
                 expected to match.
-            items: list(str). The string elements being matched.
 
         Raises:
             AssertionError. At least one item does not match its corresponding

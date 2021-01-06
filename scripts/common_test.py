@@ -933,7 +933,7 @@ class ManagedProcessTests(test_utils.TestBase):
         if expected_patterns and not logs_with_pid:
             self.fail(msg='%r has no match in logs=%r' % (proc_pattern, logs))
 
-        self.assert_matches_regexps(expected_patterns, logs_with_pid)
+        self.assert_matches_regexps(logs_with_pid, expected_patterns)
 
     @contextlib.contextmanager
     def _swap_popen(
