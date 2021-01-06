@@ -1,4 +1,4 @@
-timeout: 3600s # 1 hour
+timeout: 9000s # 2.5 hours
 logsBucket: 'gs://$_LOGS_BUCKET_NAME'
 steps:
   - id: build-oppia-base
