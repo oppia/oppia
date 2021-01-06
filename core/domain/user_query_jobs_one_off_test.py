@@ -170,7 +170,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self.set_admins(['tmpsuperadm1n'])
 
     def test_user_has_not_logged_in_last_n_days(self):
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, has_not_logged_in_for_n_days=6)
         self._run_one_off_job(query_id)
 
@@ -179,7 +179,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         # List of users who has not logged_in in last 6 days.
         self.assertItemsEqual(query.user_ids, [self.user_e_id])
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, has_not_logged_in_for_n_days=2)
         self._run_one_off_job(query_id)
 
@@ -193,7 +193,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         user_settings = user_services.get_user_settings(self.user_a_id)
         user_services.update_last_logged_in(user_settings, None)
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, has_not_logged_in_for_n_days=6)
         self._run_one_off_job(query_id)
 
@@ -203,7 +203,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self.assertItemsEqual(query.user_ids, [self.user_a_id, self.user_e_id])
 
     def test_user_is_inactive_in_last_n_days(self):
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=3)
         self._run_one_off_job(query_id)
 
@@ -213,7 +213,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self.assertItemsEqual(query.user_ids, [self.user_e_id])
 
     def test_user_has_created_at_least_n_exps(self):
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, created_at_least_n_exps=1)
         self._run_one_off_job(query_id)
 
@@ -222,7 +222,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             query.user_ids, [self.user_b_id, self.user_d_id, self.user_e_id])
 
     def test_user_has_created_fewer_than_n_exps(self):
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, created_fewer_than_n_exps=1)
         self._run_one_off_job(query_id)
 
@@ -230,7 +230,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self.assertItemsEqual(query.user_ids, [self.user_a_id, self.user_c_id])
 
     def test_user_has_edited_at_least_n_exps(self):
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, edited_at_least_n_exps=1)
         self._run_one_off_job(query_id)
 
@@ -240,7 +240,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self.assertItemsEqual(query.user_ids, qualifying_user_ids)
 
     def test_user_has_edited_fewer_than_n_exps(self):
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, edited_fewer_than_n_exps=1)
         self._run_one_off_job(query_id)
 
@@ -248,15 +248,15 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
         self.assertItemsEqual(query.user_ids, [self.user_a_id])
 
     def test_combination_of_query_params(self):
-        query_a_id = user_query_services.save_new_query_model(
+        query_a_id = user_query_services.save_new_user_query(
             self.submitter_id, created_at_least_n_exps=1)
         self._run_one_off_job(query_a_id)
 
-        query_b_id = user_query_services.save_new_query_model(
+        query_b_id = user_query_services.save_new_user_query(
             self.submitter_id, edited_at_least_n_exps=1)
         self._run_one_off_job(query_b_id)
 
-        query_combined_id = user_query_services.save_new_query_model(
+        query_combined_id = user_query_services.save_new_user_query(
             self.submitter_id, created_at_least_n_exps=1,
             edited_at_least_n_exps=1)
         self._run_one_off_job(query_combined_id)
@@ -285,7 +285,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             sorted(qualifying_user_ids_combined))
 
     def test_that_correct_email_is_sent_upon_completion(self):
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, edited_fewer_than_n_exps=1)
 
         self._run_one_off_job(query_id)
@@ -331,7 +331,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             messages[0].body.decode(), expected_email_text_body)
 
     def test_that_correct_email_is_sent_upon_failure(self):
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, edited_fewer_than_n_exps=1)
 
         self._run_one_off_job_resulting_in_failure(query_id)
@@ -375,7 +375,7 @@ class UserQueryJobOneOffTests(test_utils.EmailTestBase):
             messages[0].body.decode(), expected_email_text_body)
 
     def test_that_user_unsubscribed_from_emails_is_skipped(self):
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, created_at_least_n_exps=1)
         self._run_one_off_job(query_id)
 

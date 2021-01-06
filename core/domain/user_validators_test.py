@@ -2577,7 +2577,7 @@ class UserQueryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.query_id = user_query_services.save_new_query_model(
+        self.query_id = user_query_services.save_new_user_query(
             self.admin_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
@@ -2746,7 +2746,7 @@ class UserBulkEmailsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.query_id = user_query_services.save_new_query_model(
+        self.query_id = user_query_services.save_new_user_query(
             self.admin_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)

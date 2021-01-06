@@ -102,7 +102,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     def test_query_status_check_handler(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
@@ -252,7 +252,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             params={'num_queries_to_fetch': 1})
         self.assertEqual(response['recent_queries'], [])
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
@@ -274,7 +274,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_email_dashboard_result_page_with_invalid_query_id_raises_400(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
@@ -308,12 +308,12 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self):
         self.login(self.SUBMITTER_EMAIL)
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
-        query_id_1 = user_query_services.save_new_query_model(
+        query_id_1 = user_query_services.save_new_user_query(
             self.new_submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
@@ -355,7 +355,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_cancel_email_handler_with_invalid_query_id_raises_400(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
@@ -388,12 +388,12 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_cancel_email_handler_with_mismatch_of_query_id_raises_401(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
-        query_id_1 = user_query_services.save_new_query_model(
+        query_id_1 = user_query_services.save_new_user_query(
             self.new_submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
@@ -434,7 +434,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_bulk_email_handler_with_invalid_query_id_raises_400(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
@@ -467,12 +467,12 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_bulk_email_handler_with_mismatch_of_query_id_raises_401(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
-        query_id_1 = user_query_services.save_new_query_model(
+        query_id_1 = user_query_services.save_new_user_query(
             self.new_submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)

@@ -32,7 +32,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
         inactive_in_last_n_days = 10
         created_at_least_n_exps = 5
         has_not_logged_in_for_n_days = 30
-        query_id = user_query_services.save_new_query_model(
+        query_id = user_query_services.save_new_user_query(
             submitter_id, inactive_in_last_n_days=inactive_in_last_n_days,
             created_at_least_n_exps=created_at_least_n_exps,
             has_not_logged_in_for_n_days=has_not_logged_in_for_n_days)
