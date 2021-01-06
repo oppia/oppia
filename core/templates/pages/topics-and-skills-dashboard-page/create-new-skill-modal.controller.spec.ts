@@ -16,15 +16,19 @@
  * @fileoverview Unit tests for the Create new skill modal controller.
  */
 
+import { importAllAngularServices } from 'tests/unit-test-utils';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Create new skill modal', function() {
+fdescribe('Create new skill modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDifficulties = null;
   var RubricObjectFactory = null;
+  var SkillEditorStateService = null;
   var COMPONENT_NAME_EXPLANATION = null;
   var SubtitledHtmlObjectFactory = null;
+
+  importAllAngularServices();
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -40,6 +44,7 @@ describe('Create new skill modal', function() {
     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
     COMPONENT_NAME_EXPLANATION = $injector.get('COMPONENT_NAME_EXPLANATION');
     RubricObjectFactory = $injector.get('RubricObjectFactory');
+    SkillEditorStateService = $injector.get('SkillEditorStateService');
     SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
     $scope = $rootScope.$new();
     $controller('CreateNewSkillModalController', {
@@ -79,7 +84,7 @@ describe('Create new skill modal', function() {
     expect($scope.rubrics[1].getExplanations()).toEqual(['']);
     expect($scope.errorMsg).toEqual('Please enter a valid description');
 
-    $scope.updateSkillDescription();
+    $scope.updateSkillDescriptionAndCheckIfExists();
     expect($scope.rubrics[1].getExplanations()).toEqual(['Addition']);
     expect($scope.errorMsg).toEqual('');
   });
@@ -131,7 +136,7 @@ describe('Create new skill modal', function() {
 
     $scope.newSkillDescription = 'Large addition';
     expect($scope.rubrics[1].getExplanations()).toEqual(['']);
-    $scope.updateSkillDescription();
+    $scope.updateSkillDescriptionAndCheckIfExists();
     $scope.createNewSkill();
     expect($scope.rubrics[1].getExplanations()).toEqual(['Large addition']);
     expect($uibModalInstance.close).toHaveBeenCalledWith({

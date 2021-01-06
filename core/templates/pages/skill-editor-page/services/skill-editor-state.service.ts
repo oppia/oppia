@@ -115,6 +115,9 @@ export class SkillEditorStateService {
     this._setSkillRights(newSkillRightsObject);
   };
 
+  private _updateSkillDescriptionExists = (skillDescriptionExists: boolean) => {
+    this._skillDescriptionExists = skillDescriptionExists;
+  }
 
   /**
    * Loads, or reloads, the skill stored by this service given a
@@ -226,12 +229,12 @@ export class SkillEditorStateService {
       successCallback: (value?: Object) => void): void {
     this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
       description).then(
-      function(skillDescriptionExists) {
-        this._skillDescriptionExists = skillDescriptionExists;
+        (skillDescriptionExists) => {
+        this._updateSkillDescriptionExists(skillDescriptionExists);
         if (successCallback) {
           successCallback();
         }
-      }, function(error) {
+      }, (error) => {
         this.alertsService.addWarning(
           error ||
           'There was an error when checking if the skill description ' +
