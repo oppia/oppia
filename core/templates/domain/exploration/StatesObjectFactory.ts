@@ -48,7 +48,7 @@ export interface WrittenTranslationObjectsDict {
 
 const MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5;
 
-// TODO(#11581) Add rule translation support for TextInput and SetInput
+// TODO(#11581): Add rule translation support for TextInput and SetInput
 // interactions. The array below should be emptied or removed afterwards.
 const INTERACTIONS_THAT_ARE_CURRENTLY_UNTRANSLATABLE = [
   'TextInput', 'SetInput'];

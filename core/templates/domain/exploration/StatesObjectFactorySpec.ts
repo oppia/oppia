@@ -692,7 +692,7 @@ describe('States Object Factory', () => {
   });
 
   describe('getIsReadyToDisplayWrittenTranslations', () => {
-    // TODO(#11581) Add rule translation support for TextInput and SetInput
+    // TODO(#11581): Add rule translation support for TextInput and SetInput
     // interactions. Remove this test case afterwards.
     it('should return false for states that contains a state with' +
        'a TextInput interaction', () => {

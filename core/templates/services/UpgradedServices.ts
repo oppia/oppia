@@ -96,10 +96,6 @@ import { ConceptCardBackendApiService } from
   'domain/skill/concept-card-backend-api.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
-import { ContentTranslationLanguageService } from
-  'pages/exploration-player-page/services/content-translation-language.service';
-import { ContentTranslationManagerService } from
-  'pages/exploration-player-page/services/content-translation-manager.service';
 import { ContextService } from 'services/context.service';
 import { ContinueRulesService } from
   'interactions/Continue/directives/continue-rules.service';
