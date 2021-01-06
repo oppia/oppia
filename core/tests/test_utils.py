@@ -862,14 +862,14 @@ class TestBase(unittest.TestCase):
         differences = []
 
         for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items)):
-            if re.match(regexp, item) is None:
+            if re.match(regexp, item) is not None:
                 continue
             differences.append(
-                '~ [i=%d]:\t%r does not match: %s' % (i, item, regexp))
+                '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp))
         if len(items) < len(regexps):
             extra_regexps = regexps[len(items):]
             differences.extend(
-                '- [i=%d]:\tmissing item expected to match: %s' % (i, regexp)
+                '- [i=%d]:\tmissing item expected to match: %r' % (i, regexp)
                 for i, regexp in enumerate(extra_regexps, start=len(items)))
         if len(regexps) < len(items):
             extra_items = items[len(regexps):]
