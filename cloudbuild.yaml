@@ -1,18 +1,18 @@
 timeout: 3600s # 1 hour
-logsBucket: 'gs://$LOGS_BUCKET_NAME'
+logsBucket: 'gs://$_LOGS_BUCKET_NAME'
 steps:
   - id: build-oppia-base
     name: gcr.io/kaniko-project/executor:latest
     wait_for: ["-"]
     args: 
     - --dockerfile=Dockerfile.base
-    - --destination=gcr.io/$PROJECT_NAME/oppia-base:$SHORT_SHA
+    - --destination=gcr.io/$_PROJECT_NAME/oppia-base:$SHORT_SHA
     - --cache=true
     - --cache-ttl=24h
 
   - id: install-dependencies
     wait_for: ["build-oppia-base"]
-    name: gcr.io/$PROJECT_NAME/oppia-base:$SHORT_SHA
+    name: gcr.io/$_PROJECT_NAME/oppia-base:$SHORT_SHA
     volumes:
       - name: 'test'
         path: '/test'
@@ -29,7 +29,7 @@ steps:
 
   - id: third-party-size-check
     wait_for: ["install-dependencies"]
-    name: gcr.io/$PROJECT_NAME/oppia-base:$SHORT_SHA
+    name: gcr.io/$_PROJECT_NAME/oppia-base:$SHORT_SHA
     volumes:
       - name: 'test'
         path: '/test'
@@ -37,25 +37,9 @@ steps:
     entrypoint: python
     args: ["-m", "scripts.third_party_size_check"]
 
-  - id: setup-and-typescript-tests
-    name: gcr.io/$PROJECT_NAME/oppia-base:$SHORT_SHA
-    wait_for: ["install-dependencies"]
-    volumes:
-      - name: 'test'
-        path: '/test'
-    dir: /test/oppia
-    entrypoint: bash
-    args: 
-      - "-c"
-      - |
-          set -e
-          python -m scripts.check_e2e_tests_are_captured_in_ci
-          python -m scripts.typescript_checks
-          python -m scripts.typescript_checks --strict_checks
- 
   - id: backend-tests
-    name: gcr.io/$PROJECT_NAME/oppia-base:$SHORT_SHA
-    wait_for: ["setup-and-typescript-tests"]
+    name: gcr.io/$_PROJECT_NAME/oppia-base:$SHORT_SHA
+    wait_for: ["install-dependencies"]
     volumes:
       - name: 'test'
         path: '/test'
