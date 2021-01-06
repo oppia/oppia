@@ -28,12 +28,12 @@
         <a ng-href="<[$ctrl.getSkillEditorUrl(skill.id)]>" class="list-summary">
           <div class="skill-description protractor-test-skill-description"><[skill.description]></div>
           <div class="skill-topic">
-            <span ng-if="!skill.topicName">
+            <span ng-if="!skill.topicNames.length">
               Unassigned
               <i class="fa fa-exclamation-triangle"></i>
             </span>
-            <span ng-if="skill.topicName">
-              <[skill.topicName]>
+            <span ng-if="skill.topicNames.length">
+              <[skill.topicNames.join(', ')]>
             </span>
           </div>
         </a>
@@ -50,10 +50,10 @@
       </td>
       <td class="text-right">
         <span>
-          <span ng-if="skill.topicName">
+          <span ng-if="skill.topicNames.length">
             Assigned
           </span>
-          <span ng-if="!skill.topicName" class="skill-topic-unassigned protractor-test-assign-skill-to-topic-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
+          <span ng-if="!skill.topicNames.length" class="skill-topic-unassigned protractor-test-assign-skill-to-topic-button" ng-click="$ctrl.assignSkillToTopic(skill.id)">
             UNASSIGNED
           </span>
         </span>
@@ -72,7 +72,7 @@
                 <span>Merge Skill</span>
               </div>
             </div>
-            <div class="unassign-skill-box protractor-test-unassign-skill-button" ng-if="skill.topicName" ng-click="$ctrl.unassignSkill(skill.id)">
+            <div class="unassign-skill-box protractor-test-unassign-skill-button" ng-if="skill.topicNames.length" ng-click="$ctrl.unassignSkill(skill.id)">
               <div>
                 <i class="fa fa-minus"></i>
                 <span>Unassign Skill</span>
@@ -124,12 +124,12 @@
               </div>
             </div>
             <div class="skill-topic">
-              <span ng-if="!skill.topicName">
+              <span ng-if="!skill.topicNames.length">
                 Unassigned
                 <i class="fa fa-exclamation-triangle"></i>
               </span>
-              <span ng-if="skill.topicName">
-              <[skill.topicName]>
+              <span ng-if="skill.topicNames.length">
+                <[skill.topicNames.join(', ')]>
               </span>
             </div>
           </div>
@@ -146,8 +146,8 @@
         </div>
         <div class="skill-item-entity">
           <div class="skill-item-key"><span>Status</span></div>
-          <div ng-if="skill.topicName" class="skill-item-value"><span> <[skill.topicName]></span></div>
-          <div ng-if="!skill.topicName" class="skill-item-value"><span>Not Assigned</span></div>
+          <div ng-if="skill.topicNames.length" class="skill-item-value"><span> <[skill.topicNames.join(', ')]></span></div>
+          <div ng-if="!skill.topicNames.length" class="skill-item-value"><span>Not Assigned</span></div>
         </div>
       </div>
     </div>

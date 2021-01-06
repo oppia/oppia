@@ -17,13 +17,13 @@
 
         <div class="oppia-custom-editor-container">
           <span ng-if="item.type == 'checkboxes'" class="text-dark">
-            <object-editor obj-type="SetOfHtmlString" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+            <object-editor obj-type="SetOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type == 'dropdown'" class="text-dark">
-            <object-editor obj-type="ListOfSetsOfHtmlStrings" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+            <object-editor obj-type="ListOfSetsOfTranslatableHtmlContentIds" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type == 'dragAndDropHtmlStringSelect'" class="text-dark">
-            <object-editor obj-type="DragAndDropHtmlString" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
+            <object-editor obj-type="TranslatableHtmlContentId" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
           </span>
           <span ng-if="item.type == 'dragAndDropPositiveIntSelect'" class="text-dark">
             <object-editor obj-type="DragAndDropPositiveInt" init-args="{choices: $ctrl.ruleDescriptionChoices}" value="$ctrl.rule.inputs[item.varName]"></object-editor>
