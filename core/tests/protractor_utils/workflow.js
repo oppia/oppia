@@ -135,7 +135,7 @@ var publishExploration = async function() {
     '.protractor-test-confirm-pre-publication'));
   await waitFor.elementToBeClickable(
     prePublicationButtonElem,
-    'Save changes button taking too long to be clickable');
+    'prePublicationButtonElem taking too long to be clickable');
   await prePublicationButtonElem.isPresent();
   await prePublicationButtonElem.click();
 
