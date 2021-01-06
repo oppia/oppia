@@ -114,9 +114,6 @@
   .donate-page .oppia-donate-info {
     float: left;
     padding-bottom: 30px;
-    width: -webkit-calc(100% - 340px);
-    width: -moz-calc(100% - 340px);
-    width: -o-calc(100% - 340px);
     width: calc(100% - 340px);
   }
   .donate-page .oppia-gift-funds-text {
@@ -145,18 +142,16 @@
   .donate-page .oppia-vision-text {
     font-size: 0.825em;
   }
-  @media only screen and (max-width: 1140px) {
+
+  @media only screen and (max-width: 1160px) {
     .oppia-donation-card-content-wide {
-      margin-bottom: 90px;
-    }
-    .oppia-donate-info {
-      display: block;
-      position: inherit;
+      display: flex;
+      flex-direction: row-reverse;
       width: 100%;
     }
-    .oppia-donate-options {
-      float: clear;
-      width: 100%;
+
+    .oppia-donate-info, .oppia-donate-options {
+      flex: 1;
     }
   }
 </style>
