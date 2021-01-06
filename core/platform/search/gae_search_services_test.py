@@ -473,18 +473,6 @@ class SearchQueryTests(test_utils.GenericTestBase):
             search_counter.times_called, 1)
 
 
-class SearchGetFromIndexTests(test_utils.GenericTestBase):
-    def test_get_document_from_index(self):
-        document = search.Document(doc_id='my_doc', fields=[
-            search.TextField(name='my_field', value='value')
-        ])
-        search.Index('my_index').put(document)
-        result = gae_search_services.get_document_from_index(
-            'my_doc', 'my_index')
-        self.assertEqual(result.get('id'), 'my_doc')
-        self.assertEqual(result.get('my_field'), 'value')
-
-
 class ClearIndexTests(test_utils.GenericTestBase):
     def test_clear_index(self):
         doc = {

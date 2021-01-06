@@ -39,8 +39,22 @@ ES = elasticsearch.Elasticsearch([{
 }])
 
 
+def _create_index(index_name):
+    """Creates a new index.
+
+    Args:
+        index_name: str. The name of the index to create.
+
+    Raises:
+        elasticsearch.RequestError. The index already exists.
+    """
+    assert isinstance(index_name, python_utils.BASESTRING)
+    ES.indices.create(index_name)
+
+
 def add_documents_to_index(documents, index_name):
-    """Adds a document to an index.
+    """Adds a document to an index. This function also creates the index if it
+    does not exist yet.
 
     Args:
         documents: list(dict). Each document should be a dictionary. Every key
@@ -57,8 +71,13 @@ def add_documents_to_index(documents, index_name):
     for document in documents:
         assert 'id' in document
     for document in documents:
-        response = ES.index(
-            index_name, document, id=document['id'])
+        try:
+            response = ES.index(index_name, document, id=document['id'])
+        except elasticsearch.NotFoundError as e:
+            # The index does not exist yet. Create it and repeat the operation.
+            _create_index(index_name)
+            response = ES.index(index_name, document, id=document['id'])
+
         if response is None or response['_shards']['failed'] > 0:
             raise Exception(
                 'Failed to add document to index.')
@@ -114,6 +133,8 @@ def search(
     NOTE: We cannot search through more than 10,000 results from a search by
     paginating using size and offset. If the number of items to search through
     is greater that 10,000, use the elasticsearch scroll API instead.
+
+    This function also creates the index if it does not exist yet.
 
     TODO(#11314): Get rid of the cursor argument completely once the dependency
     on gae_search_services.py is removed from the codebase.
@@ -178,12 +199,18 @@ def search(
             {'match': {'language_code': language_code_string}}
         )
 
-    response = ES.search(
-        body=query_definition, index=index_name,
-        params={
-            'size': size,
-            'from': offset
-        })
+    try:
+        response = ES.search(
+            body=query_definition, index=index_name,
+            params={
+                'size': size,
+                'from': offset
+            })
+    except elasticsearch.NotFoundError as e:
+        # The index does not exist yet. Create it and return an empty result.
+        _create_index(index_name)
+        return [], None
+
     resulting_offset = None
     if len(response['hits']['hits']) != 0:
         resulting_offset = offset + size
@@ -194,20 +221,3 @@ def search(
         # attribute '_id' which contains the document id.
         result_docs = [doc['_source'] for doc in response['hits']['hits']]
     return result_docs, resulting_offset
-
-
-def get_document_from_index(doc_id, index_name):
-    """Get the document with the given ID from the given index.
-
-    Args:
-        doc_id: str. The document id.
-        index_name: str. The name of the index to clear.
-
-    Returns:
-        dict. The document in a dictionary format.
-    """
-    assert isinstance(index_name, python_utils.BASESTRING)
-
-    res = ES.get(index_name, doc_id)
-    # The actual document is stored in the '_source' field.
-    return res['_source']
