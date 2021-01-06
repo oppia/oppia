@@ -315,18 +315,3 @@ def search(
             _search_document_to_dict(doc) for doc in results.results]
 
     return result_docs, result_cursor
-
-
-def get_document_from_index(doc_id, index_name):
-    """Returns a document with a give doc_id(s) from the index.
-
-    Args:
-        doc_id: str. A doc_id as a string.
-        index_name: str. The name of an index.
-
-    Returns:
-        dict. The requested document as a dict.
-    """
-    assert isinstance(index_name, python_utils.BASESTRING)
-    index = gae_search.Index(index_name)
-    return _search_document_to_dict(index.get(doc_id))

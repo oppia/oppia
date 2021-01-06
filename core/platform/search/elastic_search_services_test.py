@@ -151,30 +151,6 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         with swap_delete_by_query:
             elastic_search_services.clear_index(correct_index_name)
 
-    def test_get_document_from_index(self):
-        correct_index_name = 'index1'
-        correct_id = 'id'
-        document = {
-            'item1': 'a',
-            'item2': 'b',
-            'item3': 'c'
-        }
-        def mock_get(index, id): # pylint: disable=redefined-builtin
-            self.assertEqual(index, correct_index_name)
-            self.assertEqual(id, correct_id)
-
-            return {
-                '_source': document
-            }
-
-        swap_get = self.swap(
-            elastic_search_services.ES, 'get', mock_get)
-        with swap_get:
-            response = elastic_search_services.get_document_from_index(
-                correct_id, correct_index_name)
-
-        self.assertEqual(response, document)
-
     def test_search_returns_ids_only(self):
         correct_index_name = 'index1'
         offset = 30

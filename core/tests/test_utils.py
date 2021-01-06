@@ -258,21 +258,6 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         assert isinstance(index_name, python_utils.BASESTRING)
         del self._DB[index_name][:]
 
-    def get_document_from_index(self, doc_id, index_name):
-        """Get the document with the given ID from the given index.
-
-        Args:
-            doc_id: str. The document id.
-            index_name: str. The name of the index to get the document from.
-
-        Returns:
-            dict or None. The document in a dict format or None if not found.
-        """
-        assert isinstance(index_name, python_utils.BASESTRING)
-        for document in self._DB[index_name]:
-            if document['id'] == doc_id:
-                return document
-
     def _filter_search(self, query, result_docs):
         """Helper method that returns filtered search results.
 
