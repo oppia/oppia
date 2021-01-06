@@ -261,13 +261,15 @@ var ExplorationEditorPage = function() {
 
   this.expectCanPublishChanges = async function() {
     await waitFor.visibilityOf(
-      publishExplorationButton, 'Publish exploration button taking too long to appear');
+      publishExplorationButton,
+      'Publish exploration button taking too long to appear');
     expect(await publishExplorationButton.isEnabled()).toBeTrue();
   };
 
   this.expectCannotPublishChanges = async function() {
     await waitFor.visibilityOf(
-      publishExplorationButton, 'Publish exploration button taking too long to appear');
+      publishExplorationButton,
+      'Publish exploration button taking too long to appear');
     expect(await publishExplorationButton.isEnabled()).toBeFalsy();
   };
 
