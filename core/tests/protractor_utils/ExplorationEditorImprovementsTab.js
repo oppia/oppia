@@ -17,36 +17,36 @@
  * in the exploration editor.
  */
 
-var ExplorationEditorImprovementsTab = function () {
+var ExplorationEditorImprovementsTab = function() {
   /*
    * Interactive elements
    */
-  const explorationHealth = $(".protractor-test-improvements-tab-health");
+  const explorationHealth = $('.protractor-test-improvements-tab-health');
 
-  this.expectToBeHidden = async function () {
-    expect(await $$(".protractor-test-improvements-tab").count()).toEqual(0);
+  this.expectToBeHidden = async function() {
+    expect(await $$('.protractor-test-improvements-tab').count()).toEqual(0);
   };
 
-  this.expectHealthyExploration = async function () {
+  this.expectHealthyExploration = async function() {
     await waitFor.visibilityOf(
       this.explorationHealth,
-      "Exploration health taking too long to appear"
+      'Exploration health taking too long to appear'
     );
-    expect(await explorationHealth.getText()).toEqual("HEALTHY");
+    expect(await explorationHealth.getText()).toEqual('HEALTHY');
   };
-  this.expectWarningExploration = async function () {
+  this.expectWarningExploration = async function() {
     await waitFor.visibilityOf(
       this.expectWarningExploration,
-      "Exploration health too long to appear"
+      'Exploration health too long to appear'
     );
     expect(await explorationHealth.getText()).toEqual("WARNING");
   };
-  this.expectCriticalExploration = async function () {
+  this.expectCriticalExploration = async function() {
     await waitFor.visibilityOf(
       this.expectCriticalExploration,
-      "Exploration health taking too long to appear"
+      'Exploration health taking too long to appear'
     );
-    expect(await explorationHealth.getText()).toEqual("CRITICAL");
+    expect(await explorationHealth.getText()).toEqual('CRITICAL');
   };
 };
 
