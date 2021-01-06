@@ -39,7 +39,7 @@ var ExplorationEditorImprovementsTab = function() {
       this.expectWarningExploration,
       'Exploration health too long to appear'
     );
-    expect(await explorationHealth.getText()).toEqual("WARNING");
+    expect(await explorationHealth.getText()).toEqual('WARNING');
   };
   this.expectCriticalExploration = async function() {
     await waitFor.visibilityOf(
