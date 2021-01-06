@@ -194,6 +194,12 @@ def cleanup():
     build.set_constants_to_default()
     common.stop_redis_server()
 
+    for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
+        if not common.wait_for_port_to_be_closed(port):
+            raise RuntimeError(
+                'Port {} failed to close within {} seconds.'.format(
+                    port, common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))
+
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -202,16 +208,14 @@ def is_oppia_server_already_running():
     Returns:
         bool. Whether there is a running Oppia instance.
     """
-    running = False
     for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
         if common.is_port_open(port):
             python_utils.PRINT(
                 'There is already a server running on localhost:%s.'
                 'Please terminate it before running the end-to-end tests.'
                 'Exiting.' % port)
-            running = True
-            break
-    return running
+            return True
+    return False
 
 
 def run_webpack_compilation(source_maps=False):
