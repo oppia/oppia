@@ -119,7 +119,7 @@ var ExplorationEditorPage = function() {
     await waitFor.elementToBeClickable(
       publishExplorationButton,
       'Publish button taking too long to be clickable.');
-    
+
     await action.click('Publish Exploration Button', publishExplorationButton);
 
     var expTitle = element(by.css(
@@ -138,28 +138,29 @@ var ExplorationEditorPage = function() {
 
     await action.sendKeys('Exp Title', expTitle, title);
     await action.sendKeys('Exp Objective', expObjective, objective);
-    
+
     var selectContainerButton = element(by.css('.select2-container'));
     await action.click(' Select Container Button', selectContainerButton);
-    
-    
-    var select2Dropdown2SearchInput = element(by.css('.select2-dropdown')).element(
-      by.css('.select2-search input'));
-    
-    await action.sendKeys('Dropdown Search Input', select2Dropdown2SearchInput, category + '\n');
-    
 
+    var select2Dropdown2SearchInput = 
+    element(by.css('.select2-dropdown')).element(by.css('.select2-search input'));
 
-    var testExplorationLanguageSelectButton = element(by.css('.protractor-test-exploration-language-select'));
-    await action.click('Test Exploration Language Select Button',testExplorationLanguageSelectButton);
-   
-    await action.sendKeys('Test Exploration Language Select Button',testExplorationLanguageSelectButton, language + '\n');
+    await action.sendKeys(
+      'Dropdown Search Input', select2Dropdown2SearchInput, category + '\n');
 
-    await action.click('Exp Tags',expTags);
-    await action.click('Exp Input',expInput);
+    var testExplorationLanguageSelectButton = 
+    element(by.css('.protractor-test-exploration-language-select'));
+    await action.click(
+      'Test Exploration Language Select Button', testExplorationLanguageSelectButton);
+
+    await action.sendKeys('Test Exploration Language Select Button', testExplorationLanguageSelectButton, language + '\n');
+
+    await action.click('Exp Tags', expTags);
+    await action.click('Exp Input', expInput);
 
     for (var elem of tags) {
-      await action.sendKeys('Exp Input', expInput, (elem, protractor.Key.ENTER));
+      await action.sendKeys(
+        'Exp Input', expInput, (elem, protractor.Key.ENTER));
     }
 
     const saveChangesButton = element(by.css(
