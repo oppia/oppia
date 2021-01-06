@@ -28,12 +28,18 @@ var ExplorationEditorImprovementsTab = function() {
   };
 
   this.expectHealthyExploration = async function() {
+  await waitFor.visibilityOf(this.explorationHealth, 
+    'Exploration health taking too long to appear');
     expect(await explorationHealth.getText()).toEqual('HEALTHY');
   };
   this.expectWarningExploration = async function() {
+  await waitFor.visibilityOf(this.expectWarningExploration, 
+    'Exploration health too long to appear');
     expect(await explorationHealth.getText()).toEqual('WARNING');
   };
   this.expectCriticalExploration = async function() {
+  await waitFor.visibilityOf(this.expectCriticalExploration, 
+    'Exploration health taking too long to appear');
     expect(await explorationHealth.getText()).toEqual('CRITICAL');
   };
 };
