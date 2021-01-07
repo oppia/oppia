@@ -34,7 +34,10 @@ interface CkeditorCustomScope extends ng.IScope {
 
 angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
-  function(CkEditorCopyContentService, ContextService, RteHelperService) {
+  'TranslationLanguageService',
+  function(
+      CkEditorCopyContentService, ContextService, RteHelperService,
+      TranslationLanguageService) {
     return {
       restrict: 'E',
       scope: {
@@ -129,8 +132,16 @@ angular.module('oppia').directive('ckEditor4Rte', [
           scope.uiConfig().startupFocusEnabled !== undefined) {
           startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
         }
+        const activeLanguageCode = (
+          TranslationLanguageService.getActiveLanguageCode());
+        const activeLanguageDirection = (
+          TranslationLanguageService.getActiveLanguageDirection()
+        );
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(<HTMLElement>(el[0].children[0].children[1]), {
+          language: activeLanguageCode,
+          contentsLanguage: activeLanguageCode,
+          contentsLangDirection: activeLanguageDirection,
           extraPlugins: 'pre,sharedspace,' + pluginNames,
           startupFocus: startupFocusEnabled,
           removePlugins: 'indentblock',
@@ -170,7 +181,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
             }
           ]
         });
-
         // A RegExp for matching rich text components.
         var componentRe = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
