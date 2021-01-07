@@ -407,19 +407,38 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
 
 
 class AuthServicesStub(python_utils.OBJECT):
-    """Minimal implementation of core.platform.auth services public API."""
+    """Test-only implementation of the public API in core.platform.auth."""
 
     def __init__(self):
         """Initializes a new instance that emulates an empty auth server."""
         self._user_id_by_auth_id = {}
 
     def create_user_auth_details(self, user_id, auth_id):
-        """Returns a UserAuthDetails object configured with GAE properties."""
-        # TODO(#11462): Use firebase_auth_id after the Firebase auth migration.
-        return auth_domain.UserAuthDetails(user_id, gae_id=auth_id)
+        """Returns a UserAuthDetails object configured with Firebase properties.
+
+        The stub pretends to use Firebase auth IDs.
+
+        Args:
+            user_id: str. The unique ID of the user.
+            auth_id: str|None. The ID of the user retrieved from Firebase.
+
+        Returns:
+            UserAuthDetails. A UserAuthDetails domain object.
+        """
+        return auth_domain.UserAuthDetails(user_id, firebase_auth_id=auth_id)
 
     def get_auth_claims_from_request(self, unused_request):
-        """Returns claims embedded into os.environ."""
+        """Authenticates request and returns claims about the authorizer.
+
+        This stub obtains authorization information from os.environ.
+
+        Args:
+            unused_request: webapp2.Request. The HTTP request to authenticate.
+
+        Returns:
+            AuthClaims|None. Claims about the user who authorized the request,
+            or None if a user could not be authenticated.
+        """
         auth_id = os.environ.get('USER_ID', '')
         email = os.environ.get('USER_EMAIL', '')
         role_is_super_admin = os.environ.get('USER_IS_ADMIN', '0') == '1'
@@ -427,30 +446,82 @@ class AuthServicesStub(python_utils.OBJECT):
             return auth_domain.AuthClaims(auth_id, email, role_is_super_admin)
         return None
 
-    def disable_auth_associations(self, user_id):
-        """Disable auth associations for given user so they can't be used."""
+    def mark_user_for_deletion(self, unused_user_id):
+        """Set the 'deleted' property of the user with given user_id to True.
+
+        Models aren't used by the stub, so this function is a no-op.
+
+        Args:
+            unused_user_id: str. The unique ID of the user who should be
+                deleted.
+        """
         pass
 
     def delete_auth_associations(self, user_id):
-        """Deletes associations referring to the given user_id."""
+        """Deletes associations outside of Oppia that refer to the given user.
+
+        This stub emulates "outside associations" with the _user_id_by_auth_id
+        dict.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
+        """
         self._user_id_by_auth_id = {
             a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
         }
 
     def are_auth_associations_deleted(self, user_id):
-        """Returns whether the user's associated auth ID is deleted."""
+        """Returns whether all associations outside of Oppia referring to the
+        given user have been deleted.
+
+        This stub emulates "outside associations" with the _user_id_by_auth_id
+        dict.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
+
+        Returns:
+            bool. Whether all associations outside of Oppia referring to the
+            given user have been deleted.
+        """
         return not any(u == user_id for u in self._user_id_by_auth_id.values())
 
     def get_user_id_from_auth_id(self, auth_id):
-        """Returns the user ID associated with the given auth ID."""
+        """Returns the user ID associated with the given auth ID.
+
+        Args:
+            auth_id: str. The auth ID.
+
+        Returns:
+            str|None. The user ID associated with the given auth ID, or None if
+            no association exists.
+        """
         return self._user_id_by_auth_id.get(auth_id, None)
 
     def get_multi_user_ids_from_auth_ids(self, auth_ids):
-        """Returns the user IDs associated with the given auth IDs."""
+        """Returns the user IDs associated with the given auth IDs.
+
+        Args:
+            auth_ids: list(str). The auth IDs.
+
+        Returns:
+            list(str|None). The user IDs associated with each of the given auth
+            IDs, or None for associations which don't exist.
+        """
         return [self._user_id_by_auth_id.get(a, None) for a in auth_ids]
 
     def associate_auth_id_to_user_id(self, auth_id_user_id_pair):
-        """Commits the association between auth ID and user ID."""
+        """Commits the association between auth ID and user ID.
+
+        Args:
+            auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association
+                to commit.
+
+        Raises:
+            Exception. The auth ID is already associated with a user ID.
+        """
         auth_id, user_id = auth_id_user_id_pair
         if auth_id in self._user_id_by_auth_id:
             raise Exception('auth_id=%r is already associated to user_id=%r' % (
@@ -458,7 +529,15 @@ class AuthServicesStub(python_utils.OBJECT):
         self._user_id_by_auth_id[auth_id] = user_id
 
     def associate_multi_auth_ids_to_user_ids(self, auth_id_user_id_pairs):
-        """Commits the associations between auth IDs and user IDs."""
+        """Commits the associations between auth IDs and user IDs.
+
+        Args:
+            auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
+                associations to commit.
+
+        Raises:
+            Exception. One or more auth ID associations already exist.
+        """
         collisions = ', '.join(
             '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a])
             for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
@@ -1602,7 +1681,7 @@ tags: []
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            str or None. ID of the user possessing the given email, or None if
+            str|None. ID of the user possessing the given email, or None if
             the user does not exist.
         """
         user_settings = user_services.get_user_settings_by_auth_id(

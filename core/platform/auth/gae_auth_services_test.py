@@ -149,6 +149,6 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
     def test_disable_association_marks_model_for_deletion(self):
         gae_auth_services.associate_auth_id_to_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
-        gae_auth_services.disable_auth_associations('uid')
+        gae_auth_services.mark_user_for_deletion('uid')
         self.assertIsNone(
             auth_models.UserIdentifiersModel.get('aid', strict=False))

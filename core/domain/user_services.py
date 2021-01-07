@@ -1100,7 +1100,7 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
         raise Exception('Parent user not found.')
 
     return [
-        auth_domain.UserAuthDetails.from_model(model) for model in
+        _get_user_auth_details_from_model(model) for model in
         auth_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
             parent_user_id) if not model.deleted
     ]
@@ -1324,7 +1324,7 @@ def get_multiple_user_auth_details(user_ids):
     """
     user_settings_models = auth_models.UserAuthDetailsModel.get_multi(user_ids)
     return [
-        auth_domain.UserAuthDetails.from_model(model)
+        _get_user_auth_details_from_model(model)
         if model is not None else None for model in user_settings_models
     ]
 
@@ -1348,12 +1348,30 @@ def get_auth_details_by_user_id(user_id, strict=False):
     user_auth_details_model = (
         auth_models.UserAuthDetailsModel.get_by_id(user_id))
     if user_auth_details_model and not user_auth_details_model.deleted:
-        return auth_domain.UserAuthDetails.from_model(user_auth_details_model)
+        return _get_user_auth_details_from_model(user_auth_details_model)
     elif strict:
         logging.error('Could not find user with id %s' % user_id)
         raise Exception('User not found.')
     else:
         return None
+
+
+def _get_user_auth_details_from_model(user_auth_details_model):
+    """Transform user auth details storage model to domain object.
+
+    Args:
+        user_auth_details_model: UserAuthDetailsModel. The model to be
+            converted.
+
+    Returns:
+        UserAuthDetails. Domain object for user auth details.
+    """
+    return auth_domain.UserAuthDetails(
+        user_id=user_auth_details_model.id,
+        gae_id=user_auth_details_model.gae_id,
+        firebase_auth_id=user_auth_details_model.firebase_auth_id,
+        parent_user_id=user_auth_details_model.parent_user_id,
+        deleted=user_auth_details_model.deleted)
 
 
 def get_pseudonymous_username(pseudonymous_id):
@@ -1635,12 +1653,12 @@ def mark_user_for_deletion(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-    user_auth_details = auth_domain.UserAuthDetails.from_model(
+    user_auth_details = _get_user_auth_details_from_model(
         auth_models.UserAuthDetailsModel.get_by_id(user_id))
     user_auth_details.deleted = True
     _save_user_auth_details(user_auth_details)
     if user_auth_details.is_full_user():
-        auth_services.disable_auth_associations(user_id)
+        auth_services.mark_user_for_deletion(user_id)
 
 
 def save_deleted_username(normalized_username):

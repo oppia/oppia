@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides a seam for user-related services."""
+"""Provides a seam for user-related services.
+
+TODO(#11462): Remove this file and it's users once we've migrated to Firebase.
+"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules

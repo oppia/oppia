@@ -181,7 +181,7 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
     def test_create_user_auth_details(self):
         user_auth_details = self.stub.create_user_auth_details('uid', 'aid')
         self.assertEqual(user_auth_details.user_id, 'uid')
-        self.assertEqual(user_auth_details.gae_id, 'aid')
+        self.assertEqual(user_auth_details.firebase_auth_id, 'aid')
 
     def test_get_auth_claims_from_request(self):
         request = webapp2.Request.blank('/')

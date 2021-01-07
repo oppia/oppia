@@ -88,87 +88,99 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_auth_details_model = (
-            auth_models.UserAuthDetailsModel.get_by_id(self.owner_id))
+            auth_models.UserAuthDetailsModel.get(self.owner_id))
         self.user_auth_details = auth_domain.UserAuthDetails(
             self.user_auth_details_model.id,
-            self.user_auth_details_model.gae_id
-        )
+            gae_id=self.user_auth_details_model.gae_id,
+            firebase_auth_id=self.user_auth_details_model.firebase_auth_id)
+        self.auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)
         self.user_auth_details.validate()
 
     def test_validate_non_str_user_id(self):
-        self.user_auth_details.user_id = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected user_id to be a string'
-        ):
-            self.user_auth_details.validate()
+        self.user_auth_details.user_id = 123
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'user_id must be a string',
+            self.user_auth_details.validate)
 
-    def test_validate_user_id(self):
-        self.user_auth_details.user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegexp(utils.ValidationError, 'wrong format'):
-            self.user_auth_details.validate()
+    def test_validate_user_id_enforces_all_lowercase_letters(self):
+        self.user_auth_details.user_id = 'uid_%s%s' % ('a' * 31, 'A')
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'wrong format',
+            self.user_auth_details.validate)
 
+    def test_validate_user_id_enforces_length_to_be_at_least_36(self):
         self.user_auth_details.user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegexp(utils.ValidationError, 'wrong format'):
-            self.user_auth_details.validate()
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'wrong format',
+            self.user_auth_details.validate)
 
+    def test_validate_user_id_enforces_uid_prefix(self):
         self.user_auth_details.user_id = 'a' * 36
-        with self.assertRaisesRegexp(utils.ValidationError, 'wrong format'):
-            self.user_auth_details.validate()
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'wrong format',
+            self.user_auth_details.validate)
 
     def test_validate_empty_user_id(self):
         self.user_auth_details.user_id = ''
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'No user id specified.'
-        ):
-            self.user_auth_details.validate()
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'No user_id specified',
+            self.user_auth_details.validate)
 
-    def test_validate_parent_user_id(self):
-        self.user_auth_details.parent_user_id = 'uid_%sA' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID is in a wrong format.'
-        ):
-            self.user_auth_details.validate()
+    def test_validate_parent_user_id_enforces_all_lowercase_letters(self):
+        self.user_auth_details.parent_user_id = 'uid_%s%s' % ('a' * 31, 'A')
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'wrong format',
+            self.user_auth_details.validate)
 
+    def test_validate_parent_user_id_enforces_length_to_be_at_least_36(self):
         self.user_auth_details.parent_user_id = 'uid_%s' % ('a' * 31)
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID is in a wrong format.'
-        ):
-            self.user_auth_details.validate()
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'wrong format',
+            self.user_auth_details.validate)
 
+    def test_validate_parent_user_id_enforces_uid_prefix(self):
         self.user_auth_details.parent_user_id = 'a' * 36
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID is in a wrong format.'
-        ):
-            self.user_auth_details.validate()
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'wrong format',
+            self.user_auth_details.validate)
 
     def test_validate_non_str_gae_id(self):
-        self.user_auth_details.gae_id = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected gae_id to be a string'
-        ):
-            self.user_auth_details.validate()
+        self.user_auth_details.gae_id = 123
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'gae_id must be a string',
+            self.user_auth_details.validate)
 
     def test_validate_non_str_firebase_auth_id(self):
-        self.user_auth_details.firebase_auth_id = 0
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected firebase_auth_id to be a string'
-        ):
-            self.user_auth_details.validate()
+        self.user_auth_details.firebase_auth_id = 123
+        self.assertRaisesRegexp(
+            utils.ValidationError, 'firebase_auth_id must be a string',
+            self.user_auth_details.validate)
 
-    def test_parent_user_id_auth_id_together_raises_error(self):
+    def test_parent_user_id_and_gae_id_together_raises_error(self):
         self.user_auth_details.parent_user_id = (
             user_models.UserSettingsModel.get_new_id(''))
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID and auth_id cannot be '
-            'present together for a user.'
-        ):
-            self.user_auth_details.validate()
+        self.user_auth_details.gae_id = self.auth_id
+        self.user_auth_details.firebase_auth_id = None
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'parent_user_id must not be set for a full user',
+            self.user_auth_details.validate)
+
+    def test_parent_user_id_and_firebase_auth_id_together_raises_error(self):
+        self.user_auth_details.parent_user_id = (
+            user_models.UserSettingsModel.get_new_id(''))
+        self.user_auth_details.gae_id = None
+        self.user_auth_details.firebase_auth_id = self.auth_id
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'parent_user_id must not be set for a full user',
+            self.user_auth_details.validate)
 
     def test_both_parent_user_id_and_auth_id_none_raises_error(self):
         self.user_auth_details.parent_user_id = None
         self.user_auth_details.gae_id = None
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'The parent user ID and auth_id cannot be '
-            'None together for a user.'
-        ):
-            self.user_auth_details.validate()
+        self.user_auth_details.firebase_auth_id = None
+        self.assertRaisesRegexp(
+            utils.ValidationError,
+            'parent_user_id must be set for a profile user',
+            self.user_auth_details.validate)

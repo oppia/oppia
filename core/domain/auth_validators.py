@@ -39,8 +39,7 @@ class UserAuthDetailsModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'user_identifiers_ids',
                 auth_models.UserIdentifiersModel,
-                [item.gae_id]
-            )
+                [item.gae_id]),
         ]
 
 
@@ -67,13 +66,11 @@ class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'user_settings_ids', [item.user_id],
                 may_contain_system_ids=False,
-                may_contain_pseudonymous_ids=False
-            ),
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'user_auth_details_ids',
                 auth_models.UserAuthDetailsModel,
-                [item.user_id]
-            )
+                [item.user_id]),
         ]
 
 

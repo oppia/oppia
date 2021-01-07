@@ -120,12 +120,20 @@ def _verify_id_token(auth_header):
 
 
 def create_user_auth_details(user_id, auth_id):
-    """Returns a UserAuthDetails object configured with Firebase properties."""
+    """Returns a UserAuthDetails object configured with GAE properties.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        auth_id: str|None. The ID of the user retrieved from Firebase.
+
+    Returns:
+        UserAuthDetails. A UserAuthDetails domain object.
+    """
     return auth_domain.UserAuthDetails(user_id, firebase_auth_id=auth_id)
 
 
 def get_auth_claims_from_request(request):
-    """Authenticates request and returns claims about it's authorizer, if any.
+    """Authenticates request and returns claims about it's authorizer.
 
     Oppia specifically expects the request to have a Subject Identifier for the
     user (Claim Name: 'sub'), and an optional custom claim for super-admin users
@@ -147,8 +155,12 @@ def get_auth_claims_from_request(request):
     return None
 
 
-def disable_auth_associations(user_id):
-    """Disable the auth associations of the given user so they can't be used."""
+def mark_user_for_deletion(user_id):
+    """Set the 'deleted' property of the user with given user_id to True.
+
+    Args:
+        user_id: str. The unique ID of the user who should be deleted.
+    """
     assoc_model = (
         auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
     if assoc_model is not None:
@@ -158,10 +170,11 @@ def disable_auth_associations(user_id):
 
 
 def delete_auth_associations(user_id):
-    """Deletes associations referring to the given user_id.
+    """Deletes associations outside of Oppia that refer to the given user.
 
     Args:
-        user_id: str. The ID of the user being deleted.
+        user_id: str. The unique ID of the user whose associations should be
+            deleted.
     """
     assoc_model = (
         auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
@@ -175,7 +188,17 @@ def delete_auth_associations(user_id):
 
 
 def are_auth_associations_deleted(user_id):
-    """Returns whether the Firebase account of the given user ID is deleted."""
+    """Returns whether all associations outside of Oppia referring to the given
+    user have been deleted.
+
+    Args:
+        user_id: str. The unique ID of the user whose associations should be
+            deleted.
+
+    Returns:
+        bool. Whether all associations outside of Oppia referring to the given
+        user have been deleted.
+    """
     assoc_model = (
         auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
     if assoc_model is None:
