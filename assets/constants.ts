@@ -5598,5 +5598,5 @@ export default {
   "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
     "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
 
-  "DEV_MODE": true
+  "DEV_MODE": false
 } as const;

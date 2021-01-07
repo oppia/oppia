@@ -132,13 +132,19 @@ angular.module('oppia').directive('ckEditor4Rte', [
           scope.uiConfig().startupFocusEnabled !== undefined) {
           startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
         }
+        let activeLanguage;
+        let activeLanguageDirection;
+        if (scope.uiConfig()) {
+          activeLanguage = scope.uiConfig().activeLanguage;
+          activeLanguageDirection = scope.uiConfig().activeLanguageDirection;
+        }
 
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(<HTMLElement>(el[0].children[0].children[1]), {
           // Language configs use default language when undefined.
-          language: scope.uiConfig().activeLanguage,
-          contentsLanguage: scope.uiConfig().activeLanguage,
-          contentsLangDirection: scope.uiConfig().activeLanguageDirection,
+          language: activeLanguage,
+          contentsLanguage: activeLanguage,
+          contentsLangDirection: activeLanguageDirection,
           extraPlugins: 'pre,sharedspace,' + pluginNames,
           startupFocus: startupFocusEnabled,
           removePlugins: 'indentblock',
