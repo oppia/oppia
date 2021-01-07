@@ -33,11 +33,10 @@ import elasticsearch
 # needed, we will have to change this to use the search_after parameter or
 # scrolling option as mentioned in the link above.
 MAXIMUM_NUMBER_OF_RESULTS = 10000
-ES = elasticsearch.Elasticsearch([{
-    'host': feconf.ES_HOST,
-    'port': feconf.ES_PORT
-}])
-
+ES = elasticsearch.Elasticsearch(
+    '%s:%s' % (feconf.ES_HOST, feconf.ES_PORT),
+    use_ssl=(False if feconf.ES_HOST == 'localhost' else True)
+)
 
 def _create_index(index_name):
     """Creates a new index.
@@ -73,7 +72,7 @@ def add_documents_to_index(documents, index_name):
     for document in documents:
         try:
             response = ES.index(index_name, document, id=document['id'])
-        except elasticsearch.NotFoundError as e:
+        except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and repeat the operation.
             _create_index(index_name)
             response = ES.index(index_name, document, id=document['id'])
@@ -210,7 +209,7 @@ def search(
                 'size': num_docs_to_fetch,
                 'from': int(offset)
             })
-    except elasticsearch.NotFoundError as e:
+    except elasticsearch.NotFoundError:
         # The index does not exist yet. Create it and return an empty result.
         _create_index(index_name)
         return [], '0'
@@ -221,7 +220,8 @@ def search(
     # elasticsearch migration is fully complete.
     resulting_offset = None
     if 0 < len(matched_search_docs) < num_docs_to_fetch:
-        resulting_offset = str(int(offset) + len(matched_search_docs))
+        resulting_offset = python_utils.UNICODE(
+            int(offset) + len(matched_search_docs))
     elif len(matched_search_docs) == num_docs_to_fetch:
         # There is at least one more page of results to fetch. Trim the results
         # in this call to the desired size.
