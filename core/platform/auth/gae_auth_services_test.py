@@ -26,7 +26,7 @@ from core.tests import test_utils
 
 import webapp2
 
-user_models, = models.Registry.import_models([models.NAMES.user])
+auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 
 class GaeAuthServicesTests(test_utils.GenericTestBase):
@@ -151,4 +151,4 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         gae_auth_services.disable_auth_associations('uid')
         self.assertIsNone(
-            user_models.UserIdentifiersModel.get('aid', strict=False))
+            auth_models.UserIdentifiersModel.get('aid', strict=False))

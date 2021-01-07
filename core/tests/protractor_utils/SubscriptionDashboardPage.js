@@ -16,7 +16,6 @@
  * @fileoverview Page object for the subscription dashboard,
  * for use in Protractor tests.
  */
-var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
 var SubscriptionDashboardPage = function() {
@@ -57,7 +56,7 @@ var SubscriptionDashboardPage = function() {
     await waitFor.elementToBeClickable(
       subscriptionButton, 'Subscription button is not clickable');
     var subscribeButtonStatusBeforeClick = await subscriptionButton.getText();
-    await action.click('Subscription Button', subscriptionButton);
+    await subscriptionButton.click();
     if (subscribeButtonStatusBeforeClick === 'SUBSCRIBE') {
       await waitFor.visibilityOf(
         unsubscribeLabel,

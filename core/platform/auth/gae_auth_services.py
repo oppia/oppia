@@ -25,7 +25,7 @@ import python_utils
 
 from google.appengine.api import users
 
-user_models, = models.Registry.import_models([models.NAMES.user])
+auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 
 def create_user_auth_details(user_id, auth_id):
@@ -53,7 +53,7 @@ def get_auth_claims_from_request(unused_request):
 
 def disable_auth_associations(user_id):
     """Disable the auth associations of the given user so they can't be used."""
-    assoc_model = user_models.UserIdentifiersModel.get_by_user_id(user_id)
+    assoc_model = auth_models.UserIdentifiersModel.get_by_user_id(user_id)
     if assoc_model is not None:
         assoc_model.deleted = True
         assoc_model.update_timestamps()
@@ -72,13 +72,13 @@ def are_auth_associations_deleted(unused_user_id):
 
 def get_user_id_from_auth_id(auth_id):
     """Returns the user ID associated with the given auth ID."""
-    assoc_model = user_models.UserIdentifiersModel.get_by_gae_id(auth_id)
+    assoc_model = auth_models.UserIdentifiersModel.get_by_gae_id(auth_id)
     return None if assoc_model is None else assoc_model.user_id
 
 
 def get_multi_user_ids_from_auth_ids(auth_ids):
     """Returns the user IDs associated with the given auth IDs."""
-    assoc_models = user_models.UserIdentifiersModel.get_multi(
+    assoc_models = auth_models.UserIdentifiersModel.get_multi(
         auth_ids, include_deleted=True)
     return [None if m is None else m.user_id for m in assoc_models]
 
@@ -92,7 +92,7 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
         raise Exception('auth_id=%r is already associated to user_id=%r' % (
             auth_id, collision))
 
-    assoc_model = user_models.UserIdentifiersModel(id=auth_id, user_id=user_id)
+    assoc_model = auth_models.UserIdentifiersModel(id=auth_id, user_id=user_id)
     assoc_model.update_timestamps()
     assoc_model.put()
 
@@ -111,8 +111,8 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
         raise Exception('already associated: %s' % collisions)
 
     assoc_models = [
-        user_models.UserIdentifiersModel(id=auth_id, user_id=user_id)
+        auth_models.UserIdentifiersModel(id=auth_id, user_id=user_id)
         for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
     ]
-    user_models.UserIdentifiersModel.update_timestamps_multi(assoc_models)
-    user_models.UserIdentifiersModel.put_multi(assoc_models)
+    auth_models.UserIdentifiersModel.update_timestamps_multi(assoc_models)
+    auth_models.UserIdentifiersModel.put_multi(assoc_models)

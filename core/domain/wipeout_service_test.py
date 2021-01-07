@@ -21,7 +21,6 @@ import datetime
 import logging
 
 from constants import constants
-from core.domain import auth_domain
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import question_domain
@@ -41,15 +40,9 @@ from core.domain import user_services
 from core.domain import wipeout_domain
 from core.domain import wipeout_service
 from core.platform import models
-from core.platform.auth import firebase_auth_services
-from core.platform.auth import firebase_auth_services_test
 from core.tests import test_utils
 import feconf
 import python_utils
-
-import contextlib2
-import firebase_admin
-from firebase_admin import exceptions as firebase_exceptions
 
 (
     auth_models, collection_models, config_models,

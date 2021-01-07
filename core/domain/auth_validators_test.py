@@ -106,7 +106,7 @@ class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
             expected_output, sort=True, literal_eval=False)
 
     def test_audit_with_missing_user_identifiers_model_fails(self):
-        user_models.UserIdentifiersModel.get_by_user_id(self.user_id).delete()
+        auth_models.UserIdentifiersModel.get_by_user_id(self.user_id).delete()
         expected_output = [
             (
                 u'[u\'failed validation check for user_identifiers_ids '
@@ -117,6 +117,98 @@ class UserAuthDetailsModelValidatorTests(test_utils.AuditJobsTestBase):
                 'with id %s but it doesn\'t exist"]]') % (
                     self.user_id, self.auth_id, self.auth_id),
             u'[u\'fully-validated UserAuthDetailsModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+
+class UserIdentifiersModelValidatorTests(test_utils.AuditJobsTestBase):
+
+    USER_EMAIL = 'useremail@example.com'
+    USER_NAME = 'username'
+
+    def setUp(self):
+        super(UserIdentifiersModelValidatorTests, self).setUp()
+
+        self.signup(self.USER_EMAIL, self.USER_NAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.auth_id = self.get_auth_id_from_email(self.USER_EMAIL)
+
+        # Note: There will be a total of 2 UserSettingsModels (hence 2
+        # UserAuthDetailsModels too) even though only one user signs up in the
+        # test since superadmin signup is also done in
+        # test_utils.AuditJobsTestBase.
+        self.model_instance = (
+            auth_models.UserIdentifiersModel.get_by_id(self.auth_id))
+        self.job_class = (
+            prod_validation_jobs_one_off.UserIdentifiersModelAuditOneOffJob)
+
+    def test_audit_standard_operation_passes(self):
+        expected_output = [
+            u'[u\'fully-validated UserIdentifiersModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_audit_with_created_on_greater_than_last_updated_fails(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.update_timestamps()
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of UserIdentifiersModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.auth_id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            ), u'[u\'fully-validated UserIdentifiersModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_audit_with_last_updated_greater_than_current_time_fails(self):
+        auth_models.UserIdentifiersModel.get_by_id(
+            self.get_auth_id_from_email('tmpsuperadmin@example.com')
+        ).delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'UserIdentifiersModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.auth_id, self.model_instance.last_updated)]
+
+        mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
+            hours=13)
+        with datastore_services.mock_datetime_for_datastore(mocked_datetime):
+            self.run_job_and_check_output(
+                expected_output, sort=False, literal_eval=False)
+
+    def test_audit_with_missing_user_settings_model_fails(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_settings_ids '
+                'field check of UserIdentifiersModel\', '
+                '[u"Entity id %s: based on '
+                'field user_settings_ids having value '
+                '%s, expected model UserSettingsModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.auth_id, self.user_id, self.user_id),
+            u'[u\'fully-validated UserIdentifiersModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_audit_with_missing_user_auth_details_model_fails(self):
+        auth_models.UserAuthDetailsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_auth_details_ids '
+                'field check of UserIdentifiersModel\', '
+                '[u"Entity id %s: based on '
+                'field user_auth_details_ids having value '
+                '%s, expected model UserAuthDetailsModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.auth_id, self.user_id, self.user_id),
+            u'[u\'fully-validated UserIdentifiersModel\', 1]']
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 

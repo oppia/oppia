@@ -353,7 +353,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email=email,
             username=username,
         ).put()
-        user_models.UserIdentifiersModel(
+        auth_models.UserIdentifiersModel(
             id=auth_id,
             user_id=user_id
         ).put()
@@ -377,7 +377,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             email=email,
             username=username,
         ).put()
-        user_models.UserIdentifiersModel(
+        auth_models.UserIdentifiersModel(
             id=auth_id,
             user_id=user_id
         ).put()
@@ -727,12 +727,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         new_email = 'new@example.com'
 
         self.assertIsNone(
-            user_models.UserIdentifiersModel.get_by_id(new_auth_id))
+            auth_models.UserIdentifiersModel.get_by_id(new_auth_id))
 
         user_services.create_new_user(new_auth_id, new_email)
         user_settings = user_services.get_user_settings_by_auth_id(new_auth_id)
         user_identifiers = (
-            user_models.UserIdentifiersModel.get_by_id(new_auth_id))
+            auth_models.UserIdentifiersModel.get_by_id(new_auth_id))
         self.assertEqual(user_settings.user_id, user_identifiers.user_id)
 
     def test_get_auth_details_by_user_id_for_existing_user_works_fine(self):
@@ -1116,12 +1116,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_id = user_services.create_new_user(auth_id, user_email).user_id
         user_services.set_username(user_id, username)
 
-        user_identifiers = user_models.UserIdentifiersModel.get_by_id(auth_id)
+        user_identifiers = auth_models.UserIdentifiersModel.get_by_id(auth_id)
         self.assertFalse(user_identifiers.deleted)
 
         user_services.mark_user_for_deletion(user_id)
 
-        user_identifiers = user_models.UserIdentifiersModel.get_by_id(auth_id)
+        user_identifiers = auth_models.UserIdentifiersModel.get_by_id(auth_id)
         self.assertTrue(user_identifiers.deleted)
 
     def test_get_current_date_as_string(self):

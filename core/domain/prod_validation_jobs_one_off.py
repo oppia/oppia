@@ -990,7 +990,7 @@ class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserIdentifiersModel]
+        return [auth_models.UserIdentifiersModel]
 
 
 class UserIdByFirebaseAuthIdModelAuditOneOffJob(ProdValidationAuditOneOffJob):
