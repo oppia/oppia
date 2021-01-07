@@ -216,7 +216,7 @@ var ExplorationEditorPage = function() {
       explorationCategory, 'Exploration Category taking too long to appear');
     expect(explorationCategory).toMatch(category);
     await waitFor.visibilityOf(
-      explorationObjective, 'Exploration objective taking too long to appear');
+      explorationObjective, 'Exploration objective takes too long to appear');
     expect(await explorationObjective.getAttribute('value')).toMatch(objective);
     await waitFor.visibilityOf(
       explorationLanguage, 'Exploration Language takes too long to appear');
