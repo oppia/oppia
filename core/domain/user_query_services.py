@@ -27,12 +27,23 @@ from core.platform import models
 
 
 def _get_user_query_from_model(user_query_model):
+    user_query_params = user_query_domain.UserQueryParams(
+        user_query_model.inactive_in_last_n_days,
+        user_query_model.has_not_logged_in_for_n_days,
+        user_query_model.created_at_least_n_exps,
+        user_query_model.created_fewer_than_n_exps,
+        user_query_model.edited_at_least_n_exps,
+        user_query_model.edited_fewer_than_n_exps
+    )
     return user_query_domain.UserQuery(
         user_query_model.id,
+        user_query_params,
         user_query_model.submitter_id,
         user_query_model.query_status,
         user_query_model.user_ids,
+        user_query_model.sent_email_model_id,
         user_query_model.created_on,
+        user_query_model.deleted,
     )
 
 
@@ -73,7 +84,8 @@ def _save_user_query(user_query):
         'deleted': user_query.deleted
     }
 
-    user_query_model = user_models.UserQueryModel.get(user_query.id)
+    user_query_model = (
+        user_models.UserQueryModel.get(user_query.id, strict=False))
     if user_query_model is not None:
         user_query_model.populate(**user_query_dict)
     else:
@@ -82,6 +94,8 @@ def _save_user_query(user_query):
 
     user_query_model.update_timestamps()
     user_query_model.put()
+
+    return _get_user_query_from_model(user_query_model)
 
 
 def save_new_user_query(
@@ -118,8 +132,7 @@ def save_new_user_query(
     user_query = (
         user_query_domain.UserQuery.create_default(
             query_id, user_query_params, submitter_id))
-    _save_user_query(user_query)
-    return user_query
+    return _save_user_query(user_query)
 
 
 def archive_user_query(user_query):

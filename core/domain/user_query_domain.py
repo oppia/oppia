@@ -78,6 +78,10 @@ class UserQuery(python_utils.OBJECT):
     def sent_email_model_id(self):
         return self._sent_email_model_id
 
+    @property
+    def deleted(self):
+        return self._deleted
+
     def validate(self):
         """Validates various properties of the ExplorationSummary.
 
@@ -92,138 +96,46 @@ class UserQuery(python_utils.OBJECT):
         if not isinstance(self._params, UserQueryParams):
             raise utils.ValidationError(
                 'Expected params to be of type UserQueryParams, received %s'
-                % self._params)
+                % type(self._params))
 
         if not isinstance(self._submitter_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self._submitter_id)
-        if not utils.is_user_id_valid
+        if not utils.is_user_id_valid(self._submitter_id):
+            raise utils.ValidationError(
+                'Expected submitter ID to be a valid user ID, received %s' %
+                self._submitter_id)
 
-        if not isinstance(self.language_code, python_utils.BASESTRING):
+        if not isinstance(self._status, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected language_code to be a string, received %s' %
-                self.language_code)
-        if not utils.is_valid_language_code(self.language_code):
+                'Expected status to be a string, received %s' %
+                self._status)
+        if self._status not in feconf.ALLOWED_USER_QUERY_STATUSES:
             raise utils.ValidationError(
-                'Invalid language_code: %s' % self.language_code)
+                'Invalid status: %s' % self._status)
 
-        if not isinstance(self.tags, list):
+        if not isinstance(self._user_ids, list):
             raise utils.ValidationError(
-                'Expected \'tags\' to be a list, received %s' % self.tags)
-        for tag in self.tags:
-            if not isinstance(tag, python_utils.BASESTRING):
+                'Expected \'user_ids\' to be a list, received %s' %
+                type(self._user_ids))
+        for user_id in self._user_ids:
+            if not isinstance(user_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
-                    'Expected each tag in \'tags\' to be a string, received '
-                    '\'%s\'' % tag)
+                    'Expected each user ID in \'user_ids\' to be a string, '
+                    'received \'%s\'' % user_id)
 
-            if not tag:
-                raise utils.ValidationError('Tags should be non-empty.')
-
-            if not re.match(constants.TAG_REGEX, tag):
+            if not utils.is_user_id_valid(user_id):
                 raise utils.ValidationError(
-                    'Tags should only contain lowercase letters and spaces, '
-                    'received \'%s\'' % tag)
+                    'Expected user ID in \'user_ids\' to be a valid user ID, '
+                    'received %s' % user_id)
 
-            if (tag[0] not in string.ascii_lowercase or
-                    tag[-1] not in string.ascii_lowercase):
+        if self._sent_email_model_id:
+            if not isinstance(
+                    self._sent_email_model_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
-                    'Tags should not start or end with whitespace, received '
-                    '\'%s\'' % tag)
-
-            if re.search(r'\s\s+', tag):
-                raise utils.ValidationError(
-                    'Adjacent whitespace in tags should be collapsed, '
-                    'received \'%s\'' % tag)
-        if len(set(self.tags)) != len(self.tags):
-            raise utils.ValidationError('Some tags duplicate each other')
-
-        if not isinstance(self.ratings, dict):
-            raise utils.ValidationError(
-                'Expected ratings to be a dict, received %s' % self.ratings)
-
-        valid_rating_keys = ['1', '2', '3', '4', '5']
-        actual_rating_keys = sorted(self.ratings.keys())
-        if valid_rating_keys != actual_rating_keys:
-            raise utils.ValidationError(
-                'Expected ratings to have keys: %s, received %s' % (
-                    (', ').join(valid_rating_keys),
-                    (', ').join(actual_rating_keys)))
-        for value in self.ratings.values():
-            if not isinstance(value, int):
-                raise utils.ValidationError(
-                    'Expected value to be int, received %s' % value)
-            if value < 0:
-                raise utils.ValidationError(
-                    'Expected value to be non-negative, received %s' % (
-                        value))
-
-        if not isinstance(self.scaled_average_rating, float):
-            raise utils.ValidationError(
-                'Expected scaled_average_rating to be float, received %s' % (
-                    self.scaled_average_rating))
-
-        if not isinstance(self.status, python_utils.BASESTRING):
-            raise utils.ValidationError(
-                'Expected status to be string, received %s' % self.status)
-
-        if not isinstance(self.community_owned, bool):
-            raise utils.ValidationError(
-                'Expected community_owned to be bool, received %s' % (
-                    self.community_owned))
-
-        if not isinstance(self.owner_ids, list):
-            raise utils.ValidationError(
-                'Expected owner_ids to be list, received %s' % self.owner_ids)
-        for owner_id in self.owner_ids:
-            if not isinstance(owner_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each id in owner_ids to '
-                    'be string, received %s' % owner_id)
-
-        if not isinstance(self.editor_ids, list):
-            raise utils.ValidationError(
-                'Expected editor_ids to be list, received %s' % self.editor_ids)
-        for editor_id in self.editor_ids:
-            if not isinstance(editor_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each id in editor_ids to '
-                    'be string, received %s' % editor_id)
-
-        if not isinstance(self.voice_artist_ids, list):
-            raise utils.ValidationError(
-                'Expected voice_artist_ids to be list, received %s' % (
-                    self.voice_artist_ids))
-        for voice_artist_id in self.voice_artist_ids:
-            if not isinstance(voice_artist_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each id in voice_artist_ids to '
-                    'be string, received %s' % voice_artist_id)
-
-        if not isinstance(self.viewer_ids, list):
-            raise utils.ValidationError(
-                'Expected viewer_ids to be list, received %s' % self.viewer_ids)
-        for viewer_id in self.viewer_ids:
-            if not isinstance(viewer_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each id in viewer_ids to '
-                    'be string, received %s' % viewer_id)
-
-        if not isinstance(self.contributor_ids, list):
-            raise utils.ValidationError(
-                'Expected contributor_ids to be list, received %s' % (
-                    self.contributor_ids))
-        for contributor_id in self.contributor_ids:
-            if not isinstance(contributor_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected each id in contributor_ids to '
-                    'be string, received %s' % contributor_id)
-
-        if not isinstance(self.contributors_summary, dict):
-            raise utils.ValidationError(
-                'Expected contributors_summary to be dict, received %s' % (
-                    self.contributors_summary))
-
+                    'Expected sent_email_model_id to be a string, received %s'
+                    % self._sent_email_model_id)
 
     def to_dict(self):
         return {

@@ -185,7 +185,8 @@ class BaseSuggestion(python_utils.OBJECT):
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
 
-        if not user_services.is_user_or_pseudonymous_id(self.author_id):
+        if not utils.is_user_id_valid(
+                self.author_id, allow_pseudonymous_id=True):
             raise utils.ValidationError(
                 'Expected author_id to be in a valid user ID format, '
                 'received %s' % self.author_id)
@@ -195,10 +196,10 @@ class BaseSuggestion(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
-            if (
-                    not user_services.is_user_or_pseudonymous_id(
-                        self.final_reviewer_id) and
-                    self.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID
+            if not utils.is_user_id_valid(
+                    self.author_id,
+                    allow_system_user_id=True,
+                    allow_pseudonymous_id=True
             ):
                 raise utils.ValidationError(
                     'Expected final_reviewer_id to be in a valid user ID '

@@ -148,7 +148,7 @@ class EmailDashboardResultPage(base.BaseHandler):
         user_query = user_query_services.get_user_query(query_id)
         if (
             user_query is None or
-            user_query.query_status != feconf.USER_QUERY_STATUS_COMPLETED
+            user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
         ):
             raise self.InvalidInputException('400 Invalid query id.')
 
@@ -163,7 +163,7 @@ class EmailDashboardResultPage(base.BaseHandler):
         user_query = user_query_services.get_user_query(query_id)
         if (
             user_query is None or
-            user_query.query_status != feconf.USER_QUERY_STATUS_COMPLETED
+            user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
         ):
             raise self.InvalidInputException('400 Invalid query id.')
 
@@ -189,7 +189,7 @@ class EmailDashboardCancelEmailHandler(base.BaseHandler):
         user_query = user_query_services.get_user_query(query_id)
         if (
                 user_query is None or
-                user_query.query_status != feconf.USER_QUERY_STATUS_COMPLETED
+                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
         ):
             raise self.InvalidInputException('400 Invalid query id.')
 
@@ -212,7 +212,7 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
         user_query = user_query_services.get_user_query(query_id)
         if (
                 user_query is None or
-                user_query.query_status != feconf.USER_QUERY_STATUS_COMPLETED
+                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
         ):
             raise self.InvalidInputException('400 Invalid query id.')
 
