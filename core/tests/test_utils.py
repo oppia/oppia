@@ -84,6 +84,7 @@ import webtest
             models.NAMES.question, models.NAMES.skill, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic]))
 
+auth_services = models.Registry.import_auth_services()
 current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
@@ -413,6 +414,49 @@ class AuthServicesStub(python_utils.OBJECT):
     def __init__(self):
         """Initializes a new instance that emulates an empty auth server."""
         self._user_id_by_auth_id = {}
+
+    @classmethod
+    def install_stub(cls, test):
+        """Installs a new instance of the stub onto the given test instance.
+
+        Args:
+            test: AppEngineTestBase. The test instance to install the stub on.
+
+        Returns:
+            callable. A function that will uninstall the stub when called.
+        """
+        with contextlib2.ExitStack() as stack:
+            stub = cls()
+
+            stack.enter_context(test.swap(
+                auth_services, 'create_user_auth_details',
+                stub.create_user_auth_details))
+            stack.enter_context(test.swap(
+                auth_services, 'get_auth_claims_from_request',
+                stub.get_auth_claims_from_request))
+            stack.enter_context(test.swap(
+                auth_services, 'mark_user_for_deletion',
+                stub.mark_user_for_deletion))
+            stack.enter_context(test.swap(
+                auth_services, 'delete_auth_associations',
+                stub.delete_auth_associations))
+            stack.enter_context(test.swap(
+                auth_services, 'are_auth_associations_deleted',
+                stub.are_auth_associations_deleted))
+            stack.enter_context(test.swap(
+                auth_services, 'get_user_id_from_auth_id',
+                stub.get_user_id_from_auth_id))
+            stack.enter_context(test.swap(
+                auth_services, 'get_multi_user_ids_from_auth_ids',
+                stub.get_multi_user_ids_from_auth_ids))
+            stack.enter_context(test.swap(
+                auth_services, 'associate_auth_id_to_user_id',
+                stub.associate_auth_id_to_user_id))
+            stack.enter_context(test.swap(
+                auth_services, 'associate_multi_auth_ids_to_user_ids',
+                stub.associate_multi_auth_ids_to_user_ids))
+
+            return stack.pop_all().close
 
     def create_user_auth_details(self, user_id, auth_id):
         """Returns a UserAuthDetails object configured with Firebase properties.
@@ -1479,10 +1523,7 @@ tags: []
                 classmethod(lambda _: self._search_services_stub)))
 
             if getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
-                auth_services_stub = AuthServicesStub()
-                stack.enter_context(self.swap(
-                    models.Registry, 'import_auth_services',
-                    classmethod(lambda _: auth_services_stub)))
+                stack.callback(AuthServicesStub.install_stub(self))
 
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
