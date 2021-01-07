@@ -149,8 +149,8 @@ var PreferencesPage = function() {
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedFirstSubscriptionToBe = async function(name) {
-  	await waitFor.visibilityOf(subscriptions,
-        'subscriptions taking too long to appear.');
+    await waitFor.visibilityOf(
+      subscriptions, 'subscriptions taking too long to appear.');
     expect(await subscriptions.first().getText()).toMatch(name);
   };
 
@@ -158,34 +158,37 @@ var PreferencesPage = function() {
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedLastSubscriptionToBe = async function(name) {
-  	await waitFor.visibilityOf(subscriptions,
-        'subscriptions taking too long to appear.');
+    await waitFor.visibilityOf(
+      subscriptions, 'subscriptions taking too long to appear.');
     expect(await subscriptions.last().getText()).toMatch(name);
   };
 
   this.expectPageHeaderToBe = async function(text) {
-  	await waitFor.visibilityOf(pageHeader,
-        'pageHeader taking too long to appear.');
+    await waitFor.visibilityOf(
+      pageHeader, 'pageHeader taking too long to appear.');
     expect(await pageHeader.getText()).toEqual(text);
   };
 
   this.expectPreferredSiteLanguageToBe = async function(language) {
     var selectedLanguageElement = systemLanguageSelector.element(
       by.css('.select2-selection__rendered'));
-    await waitFor.visibilityOf(selectedLanguageElement,
-        'selectedLanguageElement taking too long to appear.');
+    await waitFor.visibilityOf(
+      selectedLanguageElement, 
+      'selectedLanguageElement taking too long to appear.');
     expect(await selectedLanguageElement.getText()).toEqual(language);
   };
 
   this.expectPreferredAudioLanguageToBe = async function(language) {
-  	await waitFor.visibilityOf(selectedAudioLanguageElement,
-        'selectedAudioLanguageElement taking too long to appear.');
+    await waitFor.visibilityOf(
+      selectedAudioLanguageElement,
+      'selectedAudioLanguageElement taking too long to appear.');
     expect(await selectedAudioLanguageElement.getText()).toEqual(language);
   };
 
   this.expectPreferredAudioLanguageNotToBe = async function(language) {
-  	await waitFor.visibilityOf(selectedAudioLanguageElement,
-        'selectedAudioLanguageElement taking too long to appear.');
+    await waitFor.visibilityOf(
+      selectedAudioLanguageElement,
+      'selectedAudioLanguageElement taking too long to appear.');
     expect(await selectedAudioLanguageElement.getText()).not.toEqual(language);
   };
 
