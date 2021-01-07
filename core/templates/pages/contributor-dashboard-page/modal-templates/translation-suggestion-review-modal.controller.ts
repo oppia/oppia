@@ -52,6 +52,7 @@ angular.module('oppia').controller(
       };
 
       var init = function() {
+        $scope.resolvingSuggestion = false;
         $scope.lastSuggestionToReview = remainingSuggestions.length <= 0;
         $scope.translationHtml = (
           $scope.activeSuggestion.change.translation_html);
@@ -76,6 +77,7 @@ angular.module('oppia').controller(
       };
 
       $scope.acceptAndReviewNext = function() {
+        $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardAcceptSuggestion(
           'Translation');
 
@@ -87,6 +89,7 @@ angular.module('oppia').controller(
       };
 
       $scope.rejectAndReviewNext = function() {
+        $scope.resolvingSuggestion = true;
         SiteAnalyticsService.registerContributorDashboardRejectSuggestion(
           'Translation');
 
