@@ -69,7 +69,8 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         collection_model = collection_models.CollectionModel.get_by_id('id')
         snapshot_dict = collection_model.compute_snapshot()
         snapshot_dict['nodes'] = ['node0', 'node1']
-        collection_model = collection_model._reconstitute(snapshot_dict) # pylint: disable=protected-access
+        snapshot_dict = collection_model.convert_to_valid_dict(snapshot_dict)
+        collection_model = collection_models.CollectionModel(**snapshot_dict)
         self.assertNotIn('nodes', collection_model._properties) # pylint: disable=protected-access
         self.assertNotIn('nodes', collection_model._values) # pylint: disable=protected-access
 
@@ -307,6 +308,36 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             'viewable_collection_ids': []
         }
         self.assertEqual(expected_collection_ids, collection_ids)
+
+    def test_reconstitute(self):
+        collection_models.CollectionRightsModel(
+            id='id',
+            owner_ids=['owner_ids'],
+            editor_ids=['editor_ids'],
+            voice_artist_ids=['voice_artist_ids'],
+            viewer_ids=['viewer_ids'],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+            ).save(
+                self.USER_ID_COMMITTER, 'Created new collection',
+                [{'cmd': rights_domain.CMD_CREATE_NEW}])
+        collection_rights_model = (
+            collection_models.CollectionRightsModel.get('id')
+            )
+        snapshot_dict = collection_rights_model.compute_snapshot()
+        snapshot_dict['translator_ids'] = ['tid1', 'tid2']
+        snapshot_dict = collection_rights_model.convert_to_valid_dict(
+            snapshot_dict)
+        collection_rights_model = collection_models.CollectionRightsModel(
+            **snapshot_dict)
+        self.assertNotIn(
+            'translator_ids',
+            collection_rights_model._properties) # pylint: disable=protected-access
+        self.assertNotIn(
+            'translator_ids',
+            collection_rights_model._values) # pylint: disable=protected-access
 
 
 class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
