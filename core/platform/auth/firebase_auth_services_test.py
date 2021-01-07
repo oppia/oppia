@@ -95,8 +95,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             # Standard usage of ExitStack: enter a bunch of context managers
             # from the safety of an ExitStack's context. Once they've all been
             # opened, pop_all() of them off of the original context so they can
-            # *stay* open. Calling the function returned will all of exit the
-            # opened contexts.
+            # *stay* open. Calling the function returned will exit all of them
+            # in reverse order.
             # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             return stack.pop_all().close
 
@@ -126,8 +126,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             uid: str. The unique Firebase account ID for the user. The uid
                 argument cannot be made into a positional argument because the
                 Firebase Admin SDK generates a value when it is None. Generating
-                a value is too complicated for tests, so we force test writers
-                to provide their own instead by raising an Exception when None.
+                a value is too complicated for tests, however, so we require
+                test writers to provide their own.
             disabled: bool. Whether the user account is to be disabled.
 
         Raises:
@@ -235,8 +235,7 @@ class AuthenticateRequestTests(test_utils.TestBase):
                 firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertIsNone(auth_claims)
-        self.assertEqual(len(errors), 1)
-        self.assertIn('could not init', errors[0])
+        self.assert_matches_regexps(errors, ['could not init'])
 
     def test_cleans_up_firebase_app(self):
         mock_app = python_utils.OBJECT()
@@ -316,8 +315,7 @@ class AuthenticateRequestTests(test_utils.TestBase):
                 firebase_auth_services.get_auth_claims_from_request(request))
 
         self.assertIsNone(auth_claims)
-        self.assertEqual(len(errors), 1)
-        self.assertIn('invalid token', errors[0])
+        self.assert_matches_regexps(errors, ['invalid token'])
 
     def test_returns_claims_as_none_when_missing_essential_claims(self):
         verify_id_token_swap = self.swap_to_always_return(

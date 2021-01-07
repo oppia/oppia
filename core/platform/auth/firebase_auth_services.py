@@ -156,7 +156,8 @@ def get_auth_claims_from_request(request):
 
 
 def mark_user_for_deletion(user_id):
-    """Set the 'deleted' property of the user with given user_id to True.
+    """Set the 'deleted' property of the user with given user_id to True, and
+    disables the user's Firebase account so that they cannot use it to sign-in.
 
     Args:
         user_id: str. The unique ID of the user who should be deleted.
