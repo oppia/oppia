@@ -26,6 +26,8 @@ interface UiConfig {
   (): UiConfig;
   'hide_complex_extensions': boolean;
   'startupFocusEnabled'?: boolean;
+  'activeLanguage'?: string;
+  'activeLanguageDirection'?: string;
 }
 
 interface CkeditorCustomScope extends ng.IScope {
@@ -34,10 +36,8 @@ interface CkeditorCustomScope extends ng.IScope {
 
 angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
-  'TranslationLanguageService',
   function(
-      CkEditorCopyContentService, ContextService, RteHelperService,
-      TranslationLanguageService) {
+      CkEditorCopyContentService, ContextService, RteHelperService) {
     return {
       restrict: 'E',
       scope: {
@@ -132,16 +132,13 @@ angular.module('oppia').directive('ckEditor4Rte', [
           scope.uiConfig().startupFocusEnabled !== undefined) {
           startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
         }
-        const activeLanguageCode = (
-          TranslationLanguageService.getActiveLanguageCode());
-        const activeLanguageDirection = (
-          TranslationLanguageService.getActiveLanguageDirection()
-        );
+
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(<HTMLElement>(el[0].children[0].children[1]), {
-          language: activeLanguageCode,
-          contentsLanguage: activeLanguageCode,
-          contentsLangDirection: activeLanguageDirection,
+          // Language configs use default language when undefined.
+          language: scope.uiConfig().activeLanguage,
+          contentsLanguage: scope.uiConfig().activeLanguage,
+          contentsLangDirection: scope.uiConfig().activeLanguageDirection,
           extraPlugins: 'pre,sharedspace,' + pluginNames,
           startupFocus: startupFocusEnabled,
           removePlugins: 'indentblock',
