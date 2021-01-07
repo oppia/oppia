@@ -42,7 +42,7 @@ def create_user_auth_details(user_id, auth_id):
 
 
 def get_auth_claims_from_request(unused_request):
-    """Authenticates request and returns claims about the authorizer.
+    """Authenticates request and returns claims about its authorizer.
 
     Args:
         unused_request: webapp2.Request. Unused because Google AppEngine handles

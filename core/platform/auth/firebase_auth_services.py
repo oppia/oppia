@@ -120,7 +120,7 @@ def _verify_id_token(auth_header):
 
 
 def create_user_auth_details(user_id, auth_id):
-    """Returns a UserAuthDetails object configured with GAE properties.
+    """Returns a UserAuthDetails object configured with Firebase properties.
 
     Args:
         user_id: str. The unique ID of the user.
@@ -133,7 +133,7 @@ def create_user_auth_details(user_id, auth_id):
 
 
 def get_auth_claims_from_request(request):
-    """Authenticates request and returns claims about it's authorizer.
+    """Authenticates request and returns claims about its authorizer.
 
     Oppia specifically expects the request to have a Subject Identifier for the
     user (Claim Name: 'sub'), and an optional custom claim for super-admin users

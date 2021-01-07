@@ -16,7 +16,7 @@
 
 """Provides a seam for user-related services.
 
-TODO(#11462): Remove this file and it's users once we've migrated to Firebase.
+TODO(#11462): Remove this file and its users once we've migrated to Firebase.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
