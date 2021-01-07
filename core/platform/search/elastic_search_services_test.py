@@ -45,10 +45,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 'id': correct_id
             }
         ]
-        with self.swap(
-            elastic_search_services.ES, 'index', mock_index):
-            elastic_search_services.add_documents_to_index(
-                documents, correct_index_name)
+        with self.swap(elastic_search_services.ES, 'index', mock_index):
+            elastic_search_services.add_documents_to_index([{
+                'id': correct_id
+            }], correct_index_name)
 
     def test_create_index_raises_exception_when_insertion_fails(self):
         correct_index_name = 'index1'
@@ -77,63 +77,27 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             elastic_search_services.add_documents_to_index(
                 documents, correct_index_name)
 
-    def test_delete_index_using_correct_params(self):
-        correct_index_name = 'index1'
-        correct_id = 'id'
-        def mock_delete(index, id): # pylint: disable=redefined-builtin
-            self.assertEqual(index, correct_index_name)
-            self.assertEqual(id, correct_id)
-            return {
-                '_shards': {
-                    'failed': 0
-                }
-            }
+    def test_delete_succeeds_when_document_exists(self):
+        elastic_search_services.add_documents_to_index([{
+            'id': 'doc_id',
+            'title': 'hello'
+        }], 'index1')
+        results, _ = elastic_search_services.search('hello', 'index1', [], [])
+        self.assertEqual(len(results), 1)
 
-        ids = [correct_id]
+        # Successful deletion.
+        elastic_search_services.delete_documents_from_index(
+            ['doc_id'], 'index1')
+        results, _ = elastic_search_services.search('hello', 'index1', [], [])
+        self.assertEqual(len(results), 0)
 
-        def mock_exists(index, id): # pylint: disable=redefined-builtin
-            self.assertEqual(index, correct_index_name)
-            self.assertEqual(id, correct_id)
-            return True
-
-        swap_delete = self.swap(
-            elastic_search_services.ES, 'delete', mock_delete)
-        swap_exists = self.swap(
-            elastic_search_services.ES, 'exists', mock_exists)
-        with swap_delete, swap_exists:
-            elastic_search_services.delete_documents_from_index(
-                ids, correct_index_name)
-
-    def test_delete_index_raises_exception_when_index_does_not_exist(self):
-        correct_index_name = 'index1'
-        correct_id = 'id'
-        def mock_delete(index, id): # pylint: disable=redefined-builtin
-            self.assertEqual(index, correct_index_name)
-            self.assertEqual(id, correct_id)
-            return {
-                '_shards': {
-                    'failed': 0
-                }
-            }
-
-        ids = [correct_id]
-
-        def mock_exists(index, id): # pylint: disable=redefined-builtin
-            self.assertEqual(index, correct_index_name)
-            self.assertEqual(id, correct_id)
-            return False
-
-        swap_delete = self.swap(
-            elastic_search_services.ES, 'delete', mock_delete)
-        swap_exists = self.swap(
-            elastic_search_services.ES, 'exists', mock_exists)
-        assert_raises_ctx = self.assertRaisesRegexp(
-            Exception,
-            'Document id does not exist: %s' % correct_id)
-
-        with assert_raises_ctx, swap_delete, swap_exists:
-            elastic_search_services.delete_documents_from_index(
-                ids, correct_index_name)
+    def test_delete_ignores_documents_that_do_not_exist(self):
+        elastic_search_services.add_documents_to_index([{
+            'id': 'doc_id'
+        }], 'index1')
+        # The doc does not exist, but no exception is thrown.
+        elastic_search_services.delete_documents_from_index(
+            ['not_a_real_id'], 'index1')
 
     def test_clear_index(self):
         correct_index_name = 'index1'
@@ -175,8 +139,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             self.assertEqual(body, {
                 'query': {
                     'bool': {
-                        'filter': []
-                    }
+                        'filter': [],
+                        'must': [],
+                    },
+
                 }
             })
             self.assertEqual(index, correct_index_name)
@@ -222,8 +188,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             self.assertEqual(body, {
                 'query': {
                     'bool': {
-                        'filter': []
-                    }
+                        'filter': [],
+                        'must': [],
+                    },
                 }
             })
             self.assertEqual(index, correct_index_name)
@@ -254,8 +221,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             self.assertEqual(body, {
                 'query': {
                     'bool': {
-                        'filter': []
-                    }
+                        'filter': [],
+                        'must': [],
+                    },
                 }
             })
             self.assertEqual(index, correct_index_name)
@@ -292,7 +260,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                             'match': {
                                 'language_code': '"en" "es"'
                             }
-                        }]
+                        }],
+                        'must': [],
                     }
                 }
             })

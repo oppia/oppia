@@ -77,26 +77,29 @@ def add_documents_to_index(documents, index_name):
 
 
 def delete_documents_from_index(doc_ids, index_name):
-    """Deletes documents from an index.
+    """Deletes documents from an index. Any documents which do not already
+    exist in the index are ignored.
 
     Args:
         doc_ids: list(str). A list of document ids of documents to be deleted
             from the index.
         index_name: str. The name of the index to delete the document from.
-
-    Raises:
-        Exception. Document id does not exist.
     """
     assert isinstance(index_name, python_utils.BASESTRING)
     for doc_id in doc_ids:
         assert isinstance(doc_id, python_utils.BASESTRING)
 
     for doc_id in doc_ids:
-        if ES.exists(index_name, doc_id):
+        try:
+            document_exists_in_index = ES.exists(index_name, doc_id)
+        except elasticsearch.NotFoundError:
+            # The index does not exist yet. Create it and set
+            # document_exists_in_index to False.
+            _create_index(index_name)
+            document_exists_in_index = False
+
+        if document_exists_in_index:
             ES.delete(index_name, doc_id)
-        else:
-            raise Exception(
-                'Document id does not exist: %s' % doc_id)
 
 
 def clear_index(index_name):
