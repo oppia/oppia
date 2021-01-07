@@ -219,7 +219,7 @@ var ExplorationEditorPage = function() {
       explorationObjective, 'Exploration objective taking too long to appear');
     expect(await explorationObjective.getAttribute('value')).toMatch(objective);
     await waitFor.visibilityOf(
-      explorationLanguage, 'Exploration Language taking too long to appear');
+      explorationLanguage, 'Exploration Language takes too long to appear');
     expect(explorationLanguage).toMatch(language);
     for (var i = 0; i < await explorationTags.count(); i++) {
       expect(
