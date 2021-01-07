@@ -31,16 +31,16 @@
 
     <div *ngIf="!isWindowNarrow" class="oppia-teach-section-one-right">
       <picture class="oppia-teach-main-image image-desktop">
-        <source type="image/webp" [src]="getStaticImageUrl('/teach/student.webp')">
-        <source type="image/png" [src]="getStaticImageUrl('/teach/student.png')">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/student.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/teach/student.png')">
         <img [src]="getStaticImageUrl('/teach/student.png')" alt="">
       </picture>
     </div>
 
     <div *ngIf="isWindowNarrow">
       <picture class="oppia-teach-main-image image-mobile">
-        <source type="image/webp" [src]="getStaticImageUrl('/teach/student.webp')">
-        <source type="image/png" [src]="getStaticImageUrl('/teach/student.png')">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/student.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/teach/student.png')">
         <img [src]="getStaticImageUrl('/teach/student.png')" alt="">
       </picture>
     </div>
@@ -49,8 +49,8 @@
   <div class="oppia-teach-section-two">
     <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-two-left" >
       <picture class="teach-matthew-image">
-        <source type="image/webp" [src]="getStaticImageUrl('/splash/matthew_fractions.webp')">
-        <source type="image/png" [src]="getStaticImageUrl('/splash/matthew_fractions.png')">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
         <img [src]="getStaticImageUrl('/splash/matthew_fractions.png')" alt="">
       </picture>
     </div>
@@ -58,8 +58,8 @@
     <div *ngIf="isWindowNarrow" class="oppia-teach-section-two-left">
       <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       <picture class="teach-matthew-image">
-        <source type="image/webp" [src]="getStaticImageUrl('/splash/matthew_fractions.webp')">
-        <source type="image/png" [src]="getStaticImageUrl('/splash/matthew_fractions.png')">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
         <img [src]="getStaticImageUrl('/splash/matthew_fractions.png')" alt="">
       </picture>
     </div>
@@ -111,15 +111,15 @@
     </div>
     <div *ngIf="!isWindowNarrow" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" [src]="getStaticImageUrl('/teach/oppia3.webp')">
-        <source type="image/png" [src]="getStaticImageUrl('/teach/oppia3.png')">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/oppia3.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/teach/oppia3.png')">
         <img [src]="getStaticImageUrl('/teach/oppia3.png')" alt="">
       </picture>
     </div>
     <div *ngIf="isWindowNarrow" class="oppia-teach-section-three-right">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" [src]="getStaticImageUrl('/teach/oppia3.webp')">
-        <source type="image/png" [src]="getStaticImageUrl('/teach/oppia3.png')">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/oppia3.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/teach/oppia3.png')">
         <img [src]="getStaticImageUrl('/teach/oppia3.png')" alt="">
       </picture>
     </div>
@@ -152,15 +152,15 @@
     </div>
     <div class="oppia-teach-section-four-right" *ngIf="!isWindowNarrow">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" [src]="getStaticImageUrl('/teach/oppia1.webp')">
-        <source type="image/png" [src]="getStaticImageUrl('/teach/oppia1.png')">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/oppia1.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/teach/oppia1.png')">
         <img [src]="getStaticImageUrl('/teach/oppia1.png')" alt="">
       </picture>
     </div>
     <div class="oppia-teach-section-four-right" *ngIf="isWindowNarrow">
       <picture class="teach-with-oppia-image">
-        <source type="image/webp" [src]="getStaticImageUrl('/teach/oppia1.webp')">
-        <source type="image/png" [src]="getStaticImageUrl('/teach/oppia1.png')">
+        <source type="image/webp" [srcset]="getStaticImageUrl('/teach/oppia1.webp')">
+        <source type="image/png" [srcset]="getStaticImageUrl('/teach/oppia1.png')">
         <img [src]="getStaticImageUrl('/teach/oppia1.png')" alt="">
       </picture>
     </div>
@@ -193,8 +193,8 @@
     </div>
     <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-five-right">
       <picture class="teach-student-image">
-        <source type="image/webp" [src]="testimonials[displayedTestimonialId].imageUrlWebp">
-        <source type="image/png" [src]="testimonials[displayedTestimonialId].imageUrl">
+        <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
+        <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
         <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
@@ -202,8 +202,8 @@
     <div *ngIf="isWindowNarrow">
       <div class="oppia-teach-section-five-image">
         <picture class="teach-student-image">
-          <source type="image/webp" [src]="testimonials[displayedTestimonialId].imageUrlWebp">
-          <source type="image/png" [src]="testimonials[displayedTestimonialId].imageUrl">
+          <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
+          <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
           <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
         </picture>
       </div>

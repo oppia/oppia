@@ -111,52 +111,39 @@ export class TeachPageComponent implements OnInit {
     }];
   }
 
-  onClickStartLearningButton(): boolean {
+  onClickStartLearningButton(): void {
     this.siteAnalyticsService.registerClickStartLearningButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.classroomUrl;
-    }, 150);
-    return false;
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    return;
   }
 
-  onClickVisitClassroomButton(): boolean {
+  onClickVisitClassroomButton(): void {
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.classroomUrl;
-    }, 150);
-    return false;
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    return;
   }
 
-  onClickBrowseLibraryButton(): boolean {
+  onClickBrowseLibraryButton(): void {
     this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = ('/community-library');
-    }, 150);
-    return false;
+    return;
   }
 
-  onClickGuideParentsButton(): boolean {
+  onClickGuideParentsButton(): void {
     this.siteAnalyticsService.registerClickGuideParentsButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = ('/teach');
-    }, 150);
-    return false;
+    this.windowRef.nativeWindow.location.href = ('/teach');
+    return;
   }
 
-  onClickTipforParentsButton(): boolean {
+  onClickTipforParentsButton(): void {
     this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = ('/teach');
-    }, 150);
-    return false;
+    this.windowRef.nativeWindow.location.href = ('/teach');
+    return;
   }
 
-  onClickExploreLessonsButton(): boolean {
+  onClickExploreLessonsButton(): void {
     this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.classroomUrl;
-    }, 150);
-    return false;
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    return;
   }
 
   getStaticImageUrl(imagePath: string): string {
