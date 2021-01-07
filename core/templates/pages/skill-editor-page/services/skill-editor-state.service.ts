@@ -121,31 +121,25 @@ export class SkillEditorStateService {
    */
   loadSkill(skillId: string): void {
     this._skillIsBeingLoaded = true;
-    this.skillBackendApiService.fetchSkill(
-      skillId).then(newBackendSkillObject => {
-      this.assignedSkillTopicData = (
-        newBackendSkillObject.assignedSkillTopicData);
-      this._updateSkill(newBackendSkillObject.skill);
-      this._updateGroupedSkillSummaries(
-        newBackendSkillObject.groupedSkillSummaries);
-      this.questionsListService.getQuestionSummariesAsync(
-        skillId, true, false
-      );
-      this._skillIsBeingLoaded = false;
-    }, (error) => {
-      this.alertsService.addWarning(error);
-      this._skillIsBeingLoaded = false;
-    });
-    this.skillRightsBackendApiService.fetchSkillRightsAsync(
-      skillId).then((newSkillRightsObject) => {
-      this._updateSkillRights(newSkillRightsObject);
-      this._skillIsBeingLoaded = false;
-    }, (error) => {
-      this.alertsService.addWarning(
-        error ||
-          'There was an error when loading the skill rights.');
-      this._skillIsBeingLoaded = false;
-    });
+    let fetchSkillPromise = this.skillBackendApiService.fetchSkill(skillId);
+    let fetchSkillRightsPromise = (
+      this.skillRightsBackendApiService.fetchSkillRightsAsync(skillId));
+    Promise.all([fetchSkillPromise, fetchSkillRightsPromise]).then(
+      ([newBackendSkillObject, newSkillRightsObject]) => {
+        this._updateSkillRights(newSkillRightsObject);
+        this.assignedSkillTopicData = (
+          newBackendSkillObject.assignedSkillTopicData);
+        this._updateSkill(newBackendSkillObject.skill);
+        this._updateGroupedSkillSummaries(
+          newBackendSkillObject.groupedSkillSummaries);
+        this.questionsListService.getQuestionSummariesAsync(
+          skillId, true, false
+        );
+        this._skillIsBeingLoaded = false;
+      }, (error) => {
+        this.alertsService.addWarning(error);
+        this._skillIsBeingLoaded = false;
+      });
   }
   /**
    * Returns whether this service is currently attempting to load the
