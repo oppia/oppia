@@ -159,7 +159,7 @@ var ExplorationEditorPage = function() {
       'Exploration Language Select',
       testExplorationLanguageSelectButton, language + '\n');
 
-    await action.click('Exp Tags', expTags);
+    await action.click('Exploration Tags', expTags);
     await action.click('Exp Input', expInput);
 
     for (var elem of tags) {
