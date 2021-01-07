@@ -58,6 +58,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
@@ -86,7 +87,6 @@ import webtest
 
 current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
-from core.platform.search import elastic_search_services
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
@@ -230,7 +230,7 @@ class ElasticSearchStub(python_utils.OBJECT):
 
         Returns:
             elasticsearch.NotFoundError. A manually-constructed error
-                indicating that the index was not found.
+            indicating that the index was not found.
         """
         raise elasticsearch.NotFoundError(
             404, 'index_not_found_exception', {
@@ -278,13 +278,18 @@ class ElasticSearchStub(python_utils.OBJECT):
             'shards_acknowledged': True
         }
 
-    def mock_index(self, index_name, document, id=None):
-        """Creates an index with the given name.
+    def mock_index(self, index_name, document, id=None):  # pylint: disable=redefined-builtin
+        """Adds a document with the given ID to the index.
+
+        Note that, unfortunately, we have to keep the name of "id" for the
+        last kwarg, although it conflicts with a Python builtin. This is
+        because the name is an existing part of the API defined at
+        https://elasticsearch-py.readthedocs.io/en/v7.10.1/api.html
 
         Args:
             index_name: str. The name of the index to create.
             document: dict. The document to store.
-        id: str. The unique identifier of the document.
+            id: str. The unique identifier of the document.
 
         Returns:
             dict. A dict representing the ElasticSearch API response.
@@ -296,7 +301,7 @@ class ElasticSearchStub(python_utils.OBJECT):
         if index_name not in self._DB:
             raise self._generate_index_not_found_error(index_name)
         self._DB[index_name] = [
-            d for d in self._DB[index_name] if d['id'] != document['id']]
+            d for d in self._DB[index_name] if d['id'] != id]
         self._DB[index_name].append(document)
         return {
             '_index': index_name,
@@ -308,7 +313,7 @@ class ElasticSearchStub(python_utils.OBJECT):
             '_seq_no': 96,
             '_primary_term': 1,
             'result': 'created',
-            '_id': document['id'],
+            '_id': id,
             '_version': 1,
             '_type': '_doc',
         }
@@ -343,8 +348,8 @@ class ElasticSearchStub(python_utils.OBJECT):
             dict. A dict representing the ElasticSearch API response.
 
         Raises:
-            Exception: The document does not exist in the index.
-            elasticsearch.NotFoundError: The given index name was not found, or
+            Exception. The document does not exist in the index.
+            elasticsearch.NotFoundError. The given index name was not found, or
                 the given doc_id was not found in the given index.
         """
         if index_name not in self._DB:
@@ -398,8 +403,8 @@ class ElasticSearchStub(python_utils.OBJECT):
             dict. A dict representing the ElasticSearch response.
 
         Raises:
-            AssertionError: The query is not in the correct form.
-            elasticsearch.NotFoundError: The given index name was not found.
+            AssertionError. The query is not in the correct form.
+            elasticsearch.NotFoundError. The given index name was not found.
         """
         assert query.keys() == ['query']
         assert query['query'] == {
@@ -429,7 +434,7 @@ class ElasticSearchStub(python_utils.OBJECT):
 
         Args:
             body: dict. A dictionary search definition that uses Query DSL.
-            index_name: str. The name of the index to search.
+            index: str. The name of the index to search.
             params: dict. A dict with two keys: `size` and `from`. The
                 corresponding values are ints which represent the number of
                 results to fetch, and the offset from which to fetch them,
@@ -439,8 +444,8 @@ class ElasticSearchStub(python_utils.OBJECT):
             dict. A dict representing the ElasticSearch response.
 
         Raises:
-            AssertionError: The given arguments are not supported by this mock.
-            elasticsearch.NotFoundError: The given index name was not found.
+            AssertionError. The given arguments are not supported by this mock.
+            elasticsearch.NotFoundError. The given index name was not found.
         """
         assert body is not None
         # "_all" and "" are special index names that are used to search across
@@ -487,7 +492,7 @@ class ElasticSearchStub(python_utils.OBJECT):
             '_index': index,
             '_source': doc
         } for doc in result_docs[
-            params['from'] : params['from'] + params['size']
+            params['from']: params['from'] + params['size']
         ]]
 
         return {

@@ -40,11 +40,6 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'failed': 0
                 }
             }
-        documents = [
-            {
-                'id': correct_id
-            }
-        ]
         with self.swap(elastic_search_services.ES, 'index', mock_index):
             elastic_search_services.add_documents_to_index([{
                 'id': correct_id
