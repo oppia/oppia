@@ -21,6 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
+import core.domain.utils
+import utils
 from constants import constants
 from core.domain import base_model_validators
 from core.domain import suggestion_services
@@ -82,7 +84,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                 'feedback_thread_ids',
                 feedback_models.GeneralFeedbackThreadModel, [item.id])
         ]
-        if user_services.is_user_id_valid(item.author_id):
+        if utils.is_user_id_valid(item.author_id):
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids',
@@ -96,7 +98,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                     '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                     [item.target_id]))
-        if item.final_reviewer_id and user_services.is_user_id_valid(
+        if item.final_reviewer_id and utils.is_user_id_valid(
                 item.final_reviewer_id):
 
             # Bot rejects suggestions when the suggestion's targeted entity gets
@@ -299,7 +301,7 @@ class GeneralVoiceoverApplicationModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         field_name_to_external_model_references = []
-        if user_services.is_user_id_valid(item.author_id):
+        if utils.is_user_id_valid(item.author_id):
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     'author_ids',
@@ -315,7 +317,7 @@ class GeneralVoiceoverApplicationModelValidator(
                     [item.target_id]))
         if (
                 item.final_reviewer_id and
-                user_services.is_user_id_valid(item.final_reviewer_id)
+                utils.is_user_id_valid(item.final_reviewer_id)
         ):
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(

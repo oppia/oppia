@@ -28,6 +28,7 @@ import re
 from constants import constants
 from core.domain import role_services
 from core.domain import user_domain
+from utils import is_user_id_valid
 from core.platform import models
 import feconf
 import python_utils
@@ -528,23 +529,6 @@ class UserIdentifiers(python_utils.OBJECT):
             )
 
 
-def is_user_id_valid(user_id):
-    """Verify that the user ID is in a correct format or that it belongs to
-    a system user.
-
-    Args:
-        user_id: str. The user ID to be checked.
-
-    Returns:
-        bool. True when the ID is in a correct format or if the ID belongs to
-        a system user, False otherwise.
-    """
-    if user_id in feconf.SYSTEM_USERS.keys():
-        return True
-
-    return bool(re.match(feconf.USER_ID_REGEX, user_id))
-
-
 def is_user_or_pseudonymous_id(user_or_pseudonymous_id):
     """Verify that the user ID is in a correct format or it is in correct
     pseudonymous ID format.
@@ -557,8 +541,8 @@ def is_user_or_pseudonymous_id(user_or_pseudonymous_id):
         format, False otherwise.
     """
     return (
-        is_user_id_valid(user_or_pseudonymous_id) or
-        utils.is_pseudonymous_id(user_or_pseudonymous_id)
+            is_user_id_valid(user_or_pseudonymous_id) or
+            utils.is_pseudonymous_id(user_or_pseudonymous_id)
     )
 
 

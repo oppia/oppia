@@ -847,6 +847,23 @@ def get_supported_audio_language_description(language_code):
     raise Exception('Unsupported audio language code: %s' % language_code)
 
 
+def is_user_id_valid(user_id, allow_system_user_id):
+    """Verify that the user ID is in a correct format or that it belongs to
+    a system user.
+
+    Args:
+        user_id: str. The user ID to be checked.
+
+    Returns:
+        bool. True when the ID is in a correct format or if the ID belongs to
+        a system user, False otherwise.
+    """
+    if allow_system_user_id and user_id in feconf.SYSTEM_USERS.keys():
+        return True
+
+    return bool(re.match(feconf.USER_ID_REGEX, user_id))
+
+
 def is_pseudonymous_id(user_id):
     """Check that the ID is a pseudonymous one.
 

@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import core.domain.utils
+import utils
 from core.domain import base_model_validators
 from core.domain import prod_validators
 from core.domain import user_services
@@ -56,7 +58,8 @@ class GeneralFeedbackThreadModelValidator(
         ]
         if (
                 item.original_author_id and
-                user_services.is_user_id_valid(item.original_author_id)
+                utils.is_user_id_valid(
+                    item.original_author_id, allow_system_user_id=False)
         ):
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
@@ -75,7 +78,7 @@ class GeneralFeedbackThreadModelValidator(
                         item.entity_type], [item.entity_id]))
         if (
                 item.last_nonempty_message_author_id and
-                user_services.is_user_id_valid(
+                utils.is_user_id_valid(
                     item.last_nonempty_message_author_id)
         ):
             field_name_to_external_model_references.append(
@@ -187,7 +190,7 @@ class GeneralFeedbackMessageModelValidator(
         ]
         if (
                 item.author_id and
-                user_services.is_user_id_valid(item.author_id)
+                utils.is_user_id_valid(item.author_id)
         ):
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(

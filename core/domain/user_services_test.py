@@ -94,19 +94,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data = (
             user_domain.ModifiableUserData.from_raw_dict(new_user_data_dict))
 
-    def test_is_user_id_valid(self):
-        self.assertTrue(
-            user_services.is_user_id_valid(feconf.SYSTEM_COMMITTER_ID))
-        self.assertTrue(
-            user_services.is_user_id_valid(feconf.MIGRATION_BOT_USER_ID))
-        self.assertTrue(
-            user_services.is_user_id_valid(feconf.SUGGESTION_BOT_USER_ID))
-        self.assertTrue(user_services.is_user_id_valid('uid_%s' % ('a' * 32)))
-        self.assertFalse(
-            user_services.is_user_id_valid('uid_%s%s' % ('a' * 31, 'A')))
-        self.assertFalse(user_services.is_user_id_valid('uid_%s' % ('a' * 31)))
-        self.assertFalse(user_services.is_user_id_valid('a' * 36))
-
     def test_is_user_or_pseudonymous_id(self):
         self.assertTrue(
             user_services.is_user_or_pseudonymous_id('uid_%s' % ('a' * 32)))
