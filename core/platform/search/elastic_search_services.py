@@ -127,8 +127,8 @@ def clear_index(index_name):
 
 
 def search(
-        query_string, index_name, categories, language_codes, cursor=None,
-        offset=0, size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
+        query_string, index_name, categories, language_codes, offset=None,
+        size=feconf.SEARCH_RESULTS_PAGE_SIZE, ids_only=False):
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 results from a search by
     paginating using size and offset. If the number of items to search through
@@ -136,7 +136,7 @@ def search(
 
     This function also creates the index if it does not exist yet.
 
-    TODO(#11314): Get rid of the cursor argument completely once the dependency
+    TODO(#11314): Change the offset argument to an int once the dependency
     on gae_search_services.py is removed from the codebase.
 
     Args:
@@ -151,9 +151,8 @@ def search(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        cursor: str|None. Not used in this implementation.
-        offset: int. The offset into the index. Pass this in to start at the
-            'offset' when searching through a list of results of max length
+        offset: str|None. The offset into the index. Pass this in to start at
+            the 'offset' when searching through a list of results of max length
             'size'. Leave as None to start at the beginning.
         size: int. The maximum number of documents to return.
         ids_only: bool. Whether to only return document ids.
@@ -166,12 +165,12 @@ def search(
                 dictionaries representing each document retrieved from the
                 elastic search instance will be returned. The document id will
                 be contained as the '_id' attribute in each document.
-            resulting_offset: int. The resulting offset to start at for the next
+            resulting_offset: str. The resulting offset to start at for the next
                 section of the results. Returns None if there are no more
                 results.
     """
-    assert cursor is None
-    assert offset + size < MAXIMUM_NUMBER_OF_RESULTS
+    if offset is None:
+        offset = '0'
 
     # Convert the query into a Query DSL object. See
     # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
@@ -179,15 +178,16 @@ def search(
     query_definition = {
         'query': {
             'bool': {
-                'must': [{
-                    'multi_match': {
-                        'query': query_string,
-                    }
-                }],
                 'filter': [],
             }
         }
     }
+    if query_string:
+        query_definition['query']['bool']['must'] = [{
+            'multi_match': {
+                'query': query_string,
+            }
+        }]
     if categories:
         category_string = ' '.join(['"%s"' % cat for cat in categories])
         query_definition['query']['bool']['filter'].append(
@@ -199,25 +199,38 @@ def search(
             {'match': {'language_code': language_code_string}}
         )
 
+    # Fetch (size + 1) results in order to decide whether a "next
+    # page" offset needs to be returned.
+    num_docs_to_fetch = size + 1
+
     try:
         response = ES.search(
             body=query_definition, index=index_name,
             params={
-                'size': size,
-                'from': offset
+                'size': num_docs_to_fetch,
+                'from': int(offset)
             })
     except elasticsearch.NotFoundError as e:
         # The index does not exist yet. Create it and return an empty result.
         _create_index(index_name)
-        return [], None
+        return [], '0'
 
+    matched_search_docs = response['hits']['hits']
+
+    # TODO(#11314): Convert all offsets in this function to ints once the
+    # elasticsearch migration is fully complete.
     resulting_offset = None
-    if len(response['hits']['hits']) != 0:
-        resulting_offset = offset + size
+    if 0 < len(matched_search_docs) < num_docs_to_fetch:
+        resulting_offset = str(int(offset) + len(matched_search_docs))
+    elif len(matched_search_docs) == num_docs_to_fetch:
+        # There is at least one more page of results to fetch. Trim the results
+        # in this call to the desired size.
+        matched_search_docs = matched_search_docs[size:]
+
     if ids_only:
-        result_docs = [doc['_id'] for doc in response['hits']['hits']]
+        result_docs = [doc['_id'] for doc in matched_search_docs]
     else:
         # Each dictionary(document) stored in doc['_source'] also contains an
         # attribute '_id' which contains the document id.
-        result_docs = [doc['_source'] for doc in response['hits']['hits']]
+        result_docs = [doc['_source'] for doc in matched_search_docs]
     return result_docs, resulting_offset

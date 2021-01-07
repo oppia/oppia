@@ -175,17 +175,12 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             self.assertEqual(body, {
                 'query': {
                     'bool': {
-                        'filter': [],
-                        'must': [{
-                            'multi_match': {
-                                'query': ''
-                            }
-                        }]
+                        'filter': []
                     }
                 }
             })
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params['size'], size)
+            self.assertEqual(params['size'], 51)
             self.assertEqual(params['from'], offset)
             return {
                 'hits': {
@@ -200,7 +195,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 elastic_search_services.search(
                     '', correct_index_name, [], [], offset=offset,
                     size=size, ids_only=True))
-        self.assertEqual(new_offset, size + offset)
+        self.assertEqual(new_offset, '32')
         self.assertEqual(result, [1, 12])
 
     def test_search_returns_full_response(self):
@@ -227,17 +222,12 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             self.assertEqual(body, {
                 'query': {
                     'bool': {
-                        'filter': [],
-                        'must': [{
-                            'multi_match': {
-                                'query': ''
-                            }
-                        }]
+                        'filter': []
                     }
                 }
             })
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params['size'], size)
+            self.assertEqual(params['size'], 51)
             self.assertEqual(params['from'], offset)
             return {
                 'hits': {
@@ -252,7 +242,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 elastic_search_services.search(
                     '', correct_index_name, [], [], offset=offset,
                     size=size, ids_only=False))
-        self.assertEqual(new_offset, offset + size)
+        self.assertEqual(new_offset, '32')
         self.assertEqual(
             result, [document['_source'] for document in documents])
 
@@ -264,17 +254,12 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             self.assertEqual(body, {
                 'query': {
                     'bool': {
-                        'filter': [],
-                        'must': [{
-                            'multi_match': {
-                                'query': ''
-                            }
-                        }]
+                        'filter': []
                     }
                 }
             })
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params['size'], size)
+            self.assertEqual(params['size'], 51)
             self.assertEqual(params['from'], offset)
             return {
                 'hits': {
@@ -307,11 +292,6 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                             'match': {
                                 'language_code': '"en" "es"'
                             }
-                        }],
-                        'must': [{
-                            'multi_match': {
-                                'query': ''
-                            }
                         }]
                     }
                 }
@@ -319,7 +299,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             self.assertEqual(index, correct_index_name)
             self.assertEqual(params, {
                 'from': 0,
-                'size': 20
+                'size': 21
             })
             return {
                 'hits': {
@@ -333,5 +313,49 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             result, new_offset = (
                 elastic_search_services.search(
                     '', correct_index_name, ['my_category'], ['en', 'es']))
+        self.assertEqual(new_offset, None)
+        self.assertEqual(result, [])
+
+    def test_search_constructs_nonempty_query_with_categories_and_langs(self):
+        correct_index_name = 'index1'
+
+        def mock_search(body, index, params):
+            self.assertEqual(body, {
+                'query': {
+                    'bool': {
+                        'must': [{
+                            'multi_match': {
+                                'query': 'query'
+                            }
+                        }],
+                        'filter': [{
+                            'match': {
+                                'category': '"my_category"',
+                            }
+                        }, {
+                            'match': {
+                                'language_code': '"en" "es"'
+                            }
+                        }]
+                    }
+                }
+            })
+            self.assertEqual(index, correct_index_name)
+            self.assertEqual(params, {
+                'from': 0,
+                'size': 21
+            })
+            return {
+                'hits': {
+                    'hits': []
+                }
+            }
+
+        swap_search = self.swap(
+            elastic_search_services.ES, 'search', mock_search)
+        with swap_search:
+            result, new_offset = (
+                elastic_search_services.search(
+                    'query', correct_index_name, ['my_category'], ['en', 'es']))
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
