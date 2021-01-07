@@ -87,9 +87,11 @@ class StorySnapshotMetadataModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class StorySnapshotContentModelValidator(
@@ -136,7 +138,11 @@ class StoryCommitLogEntryModelValidator(
         return [
             base_model_validators.ExternalModelFetcherDetails(
                 'story_ids', story_models.StoryModel, [item.story_id]),
-        ]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class StorySummaryModelValidator(
