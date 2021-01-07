@@ -12,8 +12,7 @@
   </div>
   <div class="d-md-block oppia-story-viewer-card-container">
     <div ng-repeat="node in $ctrl.storyContents.getNodes() track by $index;"
-         target="_blank" rel="noopener"
-         ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+         target="_blank" rel="noopener">
       <div class="oppia-story-viewer-desktop">
         <div ng-style="($index > 0 && !$ctrl.nodes[$index-1].isCompleted() && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
           <a class="oppia-story-viewer-card" ng-href="<[$ctrl.getExplorationUrl(node)]>">
@@ -43,7 +42,7 @@
                     </image>
                   </pattern>
                 </defs>
-                <a ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}" target="_blank" rel="noopener">
+                <a target="_blank" rel="noopener">
                   <rect width="320"
                         height="180"
                         fill="url(#image<[$index]>)"
@@ -81,7 +80,7 @@
                 </image>
               </pattern>
             </defs>
-            <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+            <a xlink:href="<[$ctrl.getExplorationUrl(node)]>">
               <rect width="192"
                     height="108"
                     x="0"
