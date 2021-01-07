@@ -39,17 +39,20 @@ require('services/bottom-navbar-status.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/window-ref.service');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('skillEditorPage', {
   template: require('./skill-editor-page.component.html'),
   controller: [
-    '$uibModal', 'BottomNavbarStatusService',
+    '$rootScope', '$uibModal', 'BottomNavbarStatusService',
     'SkillEditorRoutingService', 'SkillEditorStateService',
     'UndoRedoService', 'UrlInterpolationService', 'UrlService', 'WindowRef',
     function(
-        $uibModal, BottomNavbarStatusService,
+        $rootScope, $uibModal, BottomNavbarStatusService,
         SkillEditorRoutingService, SkillEditorStateService,
         UndoRedoService, UrlInterpolationService, UrlService, WindowRef) {
       var ctrl = this;
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.getActiveTabName = function() {
         return SkillEditorRoutingService.getActiveTabName();
       };
@@ -104,6 +107,9 @@ angular.module('oppia').component('skillEditorPage', {
         ctrl.setUpBeforeUnload();
         SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
         ctrl.skill = SkillEditorStateService.getSkill();
+        ctrl.directiveSubscriptions.add(
+          SkillEditorStateService.onSkillChange.subscribe(
+            () => $rootScope.$applyAsync()));
       };
     }
   ]
