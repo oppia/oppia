@@ -156,7 +156,7 @@ var ExplorationEditorPage = function() {
       testExplorationLanguageSelectButton);
 
     await action.sendKeys(
-      'Test Exploration Language Select Button',
+      'Exploration Language Select',
       testExplorationLanguageSelectButton, language + '\n');
 
     await action.click('Exp Tags', expTags);
