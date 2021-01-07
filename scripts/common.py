@@ -134,6 +134,7 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 FECONF_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
 # used by the Redis server.
@@ -613,7 +614,7 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
 
 def wait_for_port_to_be_open(port_number):
     """Wait until the port is open and exit if port isn't open after
-    1000 seconds.
+    MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
 
     Args:
         port_number: int. The port number to wait.
@@ -629,6 +630,24 @@ def wait_for_port_to_be_open(port_number):
             'Failed to start server on port %s, exiting ...' %
             port_number)
         sys.exit(1)
+
+
+def wait_for_port_to_be_closed(port_number):
+    """Wait until the port is closed or
+    MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+
+    Returns:
+        bool. Whether the port closed in time.
+    """
+    waited_seconds = 0
+    while (is_port_open(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    return not is_port_open(port_number)
 
 
 def start_redis_server():
@@ -780,15 +799,33 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     try:
         yield popen_proc
     finally:
-        if popen_proc.is_running():
-            procs = popen_proc.children(recursive=True) + [popen_proc]
-            for proc in procs:
-                proc.terminate()
+        procs_to_kill = (
+            popen_proc.children(recursive=True) if popen_proc.is_running() else
+            [])
+        # Children must be terminated before the parent, otherwise they risk
+        # becoming zombies.
+        procs_to_kill.append(popen_proc)
 
-            _, still_running = psutil.wait_procs(procs, timeout=timeout_secs)
-            for proc in still_running:
-                proc.kill()
-                logging.warn('Process killed (pid=%d)' % proc.pid)
+        get_debug_info = lambda proc: (
+            'Process(name=%r, pid=%d)' % (proc.name(), proc.pid)
+            if proc.is_running() else 'Process(pid=%d)' % (proc.pid,))
+
+        procs_still_alive = []
+        for proc in procs_to_kill:
+            if proc.is_running():
+                procs_still_alive.append(proc)
+                proc.terminate()
+                logging.info('Terminating %s...' % get_debug_info(proc))
+            else:
+                logging.info('%s has ended.' % get_debug_info(proc))
+
+        procs_gone, procs_still_alive = (
+            psutil.wait_procs(procs_still_alive, timeout=timeout_secs))
+        for proc in procs_gone:
+            logging.info('%s has ended.' % get_debug_info(proc))
+        for proc in procs_still_alive:
+            proc.kill()
+            logging.warn('Forced to kill %s!' % get_debug_info(proc))
 
 
 @contextlib.contextmanager
