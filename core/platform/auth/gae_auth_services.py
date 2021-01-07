@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import auth_domain
 from core.platform import models
-import feconf
 import python_utils
 
 from google.appengine.api import users
@@ -29,9 +28,9 @@ from google.appengine.api import users
 user_models, = models.Registry.import_models([models.NAMES.user])
 
 
-def get_provider_id():
-    """Returns the name of the provider for these services."""
-    return feconf.GAE_AUTH_PROVIDER_ID
+def create_user_auth_details(user_id, auth_id):
+    """Returns a UserAuthDetails object configured with GAE properties."""
+    return auth_domain.UserAuthDetails(user_id, gae_id=auth_id)
 
 
 def get_auth_claims_from_request(unused_request):

@@ -37,15 +37,17 @@ import feconf
 import python_utils
 
 (
-    base_models, collection_models, config_models,
-    exp_models, feedback_models, question_models,
-    skill_models, story_models, subtopic_models,
-    suggestion_models, topic_models, user_models
+    auth_models, base_models, collection_models,
+    config_models, exp_models, feedback_models,
+    question_models, skill_models, story_models,
+    subtopic_models, suggestion_models, topic_models,
+    user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.config,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user,
+    models.NAMES.auth, models.NAMES.base_model, models.NAMES.collection,
+    models.NAMES.config, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
+    models.NAMES.user,
 ])
 
 auth_services = models.Registry.import_auth_services()
@@ -229,7 +231,7 @@ def run_user_deletion_completion(pending_deletion_request):
     if not pending_deletion_request.deletion_complete:
         return wipeout_domain.USER_VERIFICATION_NOT_DELETED
     elif verify_user_deleted(pending_deletion_request.user_id):
-        _delete_user_models_with_delete_at_end_policy(
+        _delete_models_with_delete_at_end_policy(
             pending_deletion_request.user_id)
         user_models.DeletedUserModel(
             id=pending_deletion_request.user_id
@@ -246,14 +248,14 @@ def run_user_deletion_completion(pending_deletion_request):
         return wipeout_domain.USER_VERIFICATION_FAILURE
 
 
-def _delete_user_models_with_delete_at_end_policy(user_id):
-    """Delete user models with deletion policy 'DELETE_AT_END'.
+def _delete_models_with_delete_at_end_policy(user_id):
+    """Delete auth and user models with deletion policy 'DELETE_AT_END'.
 
     Args:
         user_id: str. The unique ID of the user that is being deleted.
     """
     for model_class in models.Registry.get_storage_model_classes(
-            [models.NAMES.user]):
+            [models.NAMES.auth, models.NAMES.user]):
         policy = model_class.get_deletion_policy()
         if policy == base_models.DELETION_POLICY.DELETE_AT_END:
             model_class.apply_deletion_policy(user_id)
@@ -272,6 +274,7 @@ def delete_user(pending_deletion_request):
 
     auth_services.delete_auth_associations(user_id)
 
+    _delete_models(user_id, user_role, models.NAMES.auth)
     _delete_models(user_id, user_role, models.NAMES.user)
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, user_role, models.NAMES.feedback)

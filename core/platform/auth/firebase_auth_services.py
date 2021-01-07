@@ -59,7 +59,6 @@ import logging
 
 from core.domain import auth_domain
 from core.platform import models
-import feconf
 import python_utils
 
 import firebase_admin
@@ -120,9 +119,9 @@ def _verify_id_token(auth_header):
         return {}
 
 
-def get_provider_id():
-    """Returns the name of the provider for these services."""
-    return feconf.FIREBASE_AUTH_PROVIDER_ID
+def create_user_auth_details(user_id, auth_id):
+    """Returns a UserAuthDetails object configured with Firebase properties."""
+    return auth_domain.UserAuthDetails(user_id, firebase_auth_id=auth_id)
 
 
 def get_auth_claims_from_request(request):

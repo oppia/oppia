@@ -982,7 +982,7 @@ class UserAuthDetailsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserAuthDetailsModel]
+        return [auth_models.UserAuthDetailsModel]
 
 
 class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):

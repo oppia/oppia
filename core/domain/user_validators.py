@@ -34,15 +34,15 @@ import feconf
 import utils
 
 (
-    base_models, collection_models, email_models,
-    exp_models, feedback_models, question_models,
-    skill_models, story_models, suggestion_models,
-    topic_models, user_models
+    auth_models, base_models, collection_models,
+    email_models, exp_models, feedback_models,
+    question_models, skill_models, story_models,
+    suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user
+    models.NAMES.auth, models.NAMES.base_model, models.NAMES.collection,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
+    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
 
 
@@ -1556,23 +1556,6 @@ class DeletedUsernameModelValidator(
         return []
 
 
-class UserAuthDetailsModelValidator(
-        base_model_validators.BaseUserModelValidator):
-    """Class for validating UserAuthDetailsModels."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_identifiers_ids',
-                user_models.UserIdentifiersModel,
-                [item.gae_id]
-            )
-        ]
-
-
 class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating UserIdentifiersModels."""
 
@@ -1600,7 +1583,7 @@ class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
             ),
             base_model_validators.ExternalModelFetcherDetails(
                 'user_auth_details_ids',
-                user_models.UserAuthDetailsModel,
+                auth_models.UserAuthDetailsModel,
                 [item.user_id]
             )
         ]

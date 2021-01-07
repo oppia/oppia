@@ -25,7 +25,6 @@ from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
-import feconf
 import python_utils
 
 import contextlib2
@@ -415,11 +414,6 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
         """Asserts that only the given message appeared in the logs."""
         self.assertEqual(len(logs), 1)
         self.assertIn(msg, logs[0])
-
-    def test_provider_id_is_firebase(self):
-        self.assertEqual(
-            firebase_auth_services.get_provider_id(),
-            feconf.FIREBASE_AUTH_PROVIDER_ID)
 
     def test_delete_user_without_firebase_initialization_returns_false(self):
         init_swap = self.swap_to_always_raise(

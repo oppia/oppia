@@ -23,7 +23,6 @@ from core.domain import auth_domain
 from core.platform import models
 from core.platform.auth import gae_auth_services
 from core.tests import test_utils
-import feconf
 
 import webapp2
 
@@ -31,10 +30,6 @@ user_models, = models.Registry.import_models([models.NAMES.user])
 
 
 class GaeAuthServicesTests(test_utils.GenericTestBase):
-
-    def test_get_provider_id_is_gae(self):
-        self.assertEqual(
-            gae_auth_services.get_provider_id(), feconf.GAE_AUTH_PROVIDER_ID)
 
     def test_get_auth_claims_from_request_returns_none_if_not_logged_in(self):
         request = webapp2.Request.blank('/')

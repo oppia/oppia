@@ -22,7 +22,25 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import base_model_validators
 from core.platform import models
 
-user_models, = models.Registry.import_models([models.NAMES.user])
+auth_models, user_models = (
+    models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
+
+
+class UserAuthDetailsModelValidator(
+        base_model_validators.BaseUserModelValidator):
+    """Class for validating UserAuthDetailsModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_settings_ids', user_models.UserSettingsModel, [item.id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'user_identifiers_ids',
+                user_models.UserIdentifiersModel,
+                [item.gae_id]
+            )
+        ]
 
 
 class UserIdByFirebaseAuthIdModelValidator(
@@ -57,6 +75,6 @@ class UserIdByFirebaseAuthIdModelValidator(
                 [item.user_id]),
             base_model_validators.ExternalModelFetcherDetails(
                 'user_auth_details_ids',
-                user_models.UserAuthDetailsModel,
+                auth_models.UserAuthDetailsModel,
                 [item.user_id]),
         ]
