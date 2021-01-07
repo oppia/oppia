@@ -77,7 +77,6 @@ import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { AnswerClassificationService } from
   'pages/exploration-player-page/services/answer-classification.service';
-import { AnswerGroupsCacheService } from 'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { AnswerStatsObjectFactory } from
@@ -360,6 +359,7 @@ import { SchemaUndefinedLastElementService } from
   'services/schema-undefined-last-element.service';
 import { SearchExplorationsBackendApiService } from
   'domain/collection/search-explorations-backend-api.service';
+import { SearchBackendApiService } from 'services/search-backend-api.service';
 import { SetInputRulesService } from
   'interactions/SetInput/directives/set-input-rules.service';
 import { SetInputValidationService } from
@@ -509,7 +509,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     AlgebraicExpressionInputValidationService;
   static angularNameService: AngularNameService;
   static answerClassificationService: AnswerClassificationService;
-  static answerGroupsCacheService: AnswerGroupsCacheService;
   static answerGroupObjectFactory: AnswerGroupObjectFactory;
   static answerStatsObjectFactory: AnswerStatsObjectFactory;
   static appService: AppService;
@@ -704,6 +703,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static schemaUndefinedLastElementService: SchemaUndefinedLastElementService;
   static searchExplorationsBackendApiService:
     SearchExplorationsBackendApiService;
+  static searchBackendApiService: SearchBackendApiService;
   static setInputRulesService: SetInputRulesService;
   static setInputValidationService: SetInputValidationService;
   static shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory;
@@ -803,7 +803,6 @@ private algebraicExpressionInputValidationService:
   AlgebraicExpressionInputValidationService,
 private angularNameService: AngularNameService,
 private answerClassificationService: AnswerClassificationService,
-private answerGroupsCacheService: AnswerGroupsCacheService,
 private answerGroupObjectFactory: AnswerGroupObjectFactory,
 private answerStatsObjectFactory: AnswerStatsObjectFactory,
 private appService: AppService,
@@ -1000,6 +999,7 @@ private schemaFormSubmittedService: SchemaFormSubmittedService,
 private schemaUndefinedLastElementService: SchemaUndefinedLastElementService,
 private searchExplorationsBackendApiService:
   SearchExplorationsBackendApiService,
+private searchBackendApiService: SearchBackendApiService,
 private setInputRulesService: SetInputRulesService,
 private setInputValidationService: SetInputValidationService,
 private shortSkillSummaryObjectFactory: ShortSkillSummaryObjectFactory,
@@ -1104,8 +1104,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.angularNameService = this.angularNameService;
     OppiaAngularRootComponent.answerClassificationService = (
       this.answerClassificationService);
-    OppiaAngularRootComponent.answerGroupsCacheService = (
-      this.answerGroupsCacheService);
     OppiaAngularRootComponent.answerGroupObjectFactory = (
       this.answerGroupObjectFactory);
     OppiaAngularRootComponent.answerStatsObjectFactory = (

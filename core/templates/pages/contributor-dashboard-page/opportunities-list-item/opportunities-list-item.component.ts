@@ -44,7 +44,7 @@ angular.module('oppia').component('opportunitiesListItem', {
         }
 
         if (!ctrl.opportunityHeadingTruncationLength) {
-          ctrl.opportunityHeadingTruncationLength = 35;
+          ctrl.opportunityHeadingTruncationLength = 40;
         }
         if (ctrl.opportunity) {
           if (ctrl.opportunity.progressPercentage) {
