@@ -173,7 +173,7 @@ var PreferencesPage = function() {
     var selectedLanguageElement = systemLanguageSelector.element(
       by.css('.select2-selection__rendered'));
     await waitFor.visibilityOf(
-      selectedLanguageElement, 
+      selectedLanguageElement,
       'selectedLanguageElement taking too long to appear.');
     expect(await selectedLanguageElement.getText()).toEqual(language);
   };
