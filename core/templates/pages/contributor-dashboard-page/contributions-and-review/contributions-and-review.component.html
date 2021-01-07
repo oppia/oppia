@@ -28,7 +28,8 @@
     <div class="oppia-login-required" ng-if="$ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
       <opportunities-list load-opportunities="$ctrl.loadContributions"
                           on-click-action-button="$ctrl.onClickViewSuggestion"
-                          label-required="!$ctrl.activeReviewTab">
+                          label-required="!$ctrl.activeReviewTab"
+                          opportunity-heading-truncation-length="30">
       </opportunities-list>
     </div>
   </div>

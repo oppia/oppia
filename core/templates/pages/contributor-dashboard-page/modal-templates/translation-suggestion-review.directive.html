@@ -23,6 +23,9 @@
     Review message (required if rejecting):
     <input class="protractor-test-suggestion-review-message w-100" type="text" ng-model="reviewMessage">
   </div>
+  <div ng-show="!reviewable && suggestionIsRejected" class="oppia-suggestion-review-message">
+    <strong>Review message: </strong><[reviewMessage]>
+  </div>
 </div>
 
 <div class="modal-footer">
@@ -42,6 +45,9 @@
 </div>
 
 <style>
+  .oppia-suggestion-review-panel {
+    border: 1px solid #ccc;
+  }
   .oppia-suggestion-review-message {
     margin-left: 10px;
     margin-top: 20px;
