@@ -124,7 +124,7 @@ def create_user_auth_details(user_id, auth_id):
 
     Args:
         user_id: str. The unique ID of the user.
-        auth_id: str|None. The ID of the user retrieved from Firebase.
+        auth_id: str. The ID of the user retrieved from Firebase.
 
     Returns:
         UserAuthDetails. A UserAuthDetails domain object.

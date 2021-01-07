@@ -456,6 +456,12 @@ class AuthServicesStub(python_utils.OBJECT):
                 auth_services, 'associate_multi_auth_ids_to_user_ids',
                 stub.associate_multi_auth_ids_to_user_ids))
 
+            # Standard usage of ExitStack: enter a bunch of context managers
+            # from the safety of an ExitStack's context. Once they've all been
+            # opened, pop_all() of them off of the original context so they can
+            # *stay* open. Calling the function returned will exit all of them
+            # in reverse order.
+            # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             return stack.pop_all().close
 
     def create_user_auth_details(self, user_id, auth_id):
