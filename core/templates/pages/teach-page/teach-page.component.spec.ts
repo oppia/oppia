@@ -151,7 +151,7 @@ describe('Teach Page', () => {
     flushMicrotasks();
     expect(component.userIsLoggedIn).toBe(true);
   }));
-  
+
   it('should record analytics when Start Learning is clicked', function() {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickStartLearningButtonEvent')
