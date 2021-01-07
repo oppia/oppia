@@ -137,7 +137,7 @@ var ExplorationEditorPage = function() {
     );
 
     await action.sendKeys('Exploration Title Input', expTitle, title);
-    await action.sendKeys('Exp Objective', expObjective, objective);
+    await action.sendKeys('Exploration Objective input', expObjective, objective);
 
     var selectContainerButton = element(by.css('.select2-container'));
     await action.click(' Select Container Button', selectContainerButton);
