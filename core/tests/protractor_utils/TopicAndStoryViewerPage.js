@@ -28,6 +28,7 @@ var TopicAndStoryViewerPage = function() {
     by.css('.protractor-test-lesson-icon-completed'));
   var lessonUncompletedIcons = element.all(
     by.css('.protractor-test-lesson-icon-uncompleted'));
+  var lessonTrack = element(by.css('.protractor-test-lesson-track'));
 
   this.get = async function(
       classroomUrlFragment, topicUrlFragment, storyUrlFragment) {
@@ -44,10 +45,14 @@ var TopicAndStoryViewerPage = function() {
   };
 
   this.expectCompletedLessonCountToBe = async function(count) {
+    await waitFor.visibilityOf(
+      lessonTrack, 'Lesson track takes too long to be visible.');
     expect(await lessonCompletedIcons.count()).toEqual(count);
   };
 
   this.expectUncompletedLessonCountToBe = async function(count) {
+    await waitFor.visibilityOf(
+      lessonTrack, 'Lesson track takes too long to be visible.');
     expect(await lessonUncompletedIcons.count()).toEqual(count);
   };
 
