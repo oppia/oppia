@@ -5016,7 +5016,8 @@ export default {
   }, {
     "id": "prs",
     "description": "Dari",
-    "relatedLanguages": ["prs"]
+    "relatedLanguages": ["prs"],
+    "direction": "ltr"
   }, {
     "id": "nl",
     "description": "Dutch",
@@ -5170,7 +5171,8 @@ export default {
   }, {
     "id": "te",
     "description": "Telugu",
-    "relatedLanguages": ["te"]
+    "relatedLanguages": ["te"],
+    "direction": "ltr"
   }, {
     "id": "th",
     "description": "Thai",

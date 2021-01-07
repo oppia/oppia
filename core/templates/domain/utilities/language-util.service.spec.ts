@@ -83,17 +83,31 @@ describe('Language util service', function() {
 
   it('should get the correct language direction given a content language code',
     () => {
-      expect(lus.getLanguageDirection('en')).toEqual('ltr');
-      expect(lus.getLanguageDirection('ar')).toEqual('rtl');
-      expect(lus.getLanguageDirection('bg')).toEqual('ltr');
-      expect(lus.getLanguageDirection('hi-en')).toEqual('ltr');
+      expect(lus.getContentLanguageDirection('en')).toEqual('ltr');
+      expect(lus.getContentLanguageDirection('ar')).toEqual('rtl');
+      expect(lus.getContentLanguageDirection('bg')).toEqual('ltr');
     }
   );
 
   // eslint-disable-next-line max-len
   it('should get "auto" language direction when given an invalid content language code',
     () => {
-      expect(lus.getLanguageDirection('invalid code')).toEqual('auto');
+      expect(lus.getContentLanguageDirection('invalid code')).toEqual('auto');
+    }
+  );
+
+  it('should get the correct language direction given a audio language code',
+    () => {
+      expect(lus.getAudioLanguageDirection('en')).toEqual('ltr');
+      expect(lus.getAudioLanguageDirection('es')).toEqual('ltr');
+      expect(lus.getAudioLanguageDirection('hi-en')).toEqual('ltr');
+    }
+  );
+
+  // eslint-disable-next-line max-len
+  it('should get "auto" language direction when given an invalid audio language code',
+    () => {
+      expect(lus.getAudioLanguageDirection('invalid code')).toEqual('auto');
     }
   );
 

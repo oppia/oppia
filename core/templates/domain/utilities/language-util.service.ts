@@ -148,26 +148,28 @@ export class LanguageUtilService {
     const language = this.getSupportedAudioLanguages()[audioLanguageCode];
     return language ? language.description : null;
   }
-  getLanguageDirection(languageCode: string): string {
+
+  getContentLanguageDirection(languageCode: string): string {
     let languageDirection = 'auto'; // Default auto for invalid languageCode
-    const languageSearchCallback = (lang: ContentLanguage) => {
+    this.SUPPORTED_CONTENT_LANGUAGES.forEach((lang: ContentLanguage) => {
       if (lang.code === languageCode) {
         languageDirection = lang.direction;
       }
-    };
-    this.SUPPORTED_CONTENT_LANGUAGES.forEach(languageSearchCallback);
-    // Also search through supported audio languages since this constant is used
-    // for supported translation languages.
+    });
+    return languageDirection;
+  }
+
+  getAudioLanguageDirection(languageCode: string): string {
+    let languageDirection = 'auto'; // Default auto for invalid languageCode
     this.SUPPORTED_AUDIO_LANGUAGES.forEach(
-      (audioLang: SupportedAudioLanguageBackendDict) => {
-        languageSearchCallback({
-          code: audioLang.id,
-          direction: audioLang.direction,
-          description: audioLang.description
-        });
+      (audioLanguage: SupportedAudioLanguageBackendDict) => {
+        if (audioLanguage.id === languageCode) {
+          languageDirection = audioLanguage.direction;
+        }
       });
     return languageDirection;
   }
+
   // Given a list of audio language codes, returns the complement list, i.e.
   // the list of audio language codes not in the input list.
   getComplementAudioLanguageCodes(
