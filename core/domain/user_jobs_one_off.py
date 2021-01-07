@@ -633,6 +633,7 @@ class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield (key, len(values))
 
+
 class UserSettingsCreatedOnAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that audits the value of created_on attribute in the
     UserSettingsModel. This one-off job can be removed after we have verified
@@ -707,7 +708,7 @@ class UserSettingsCreatedOnAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             ('ExplorationUserDataModel', exploration_user_data_model)
         ]
 
-        # Models in user storage module keyed by user_id itself.
+        # Models in user storage module keyed by user_id.
         model_names_and_ids_to_be_fetched_in_batch = [
             ('UserContributionsModel', [user_id]),
             ('UserEmailPreferencesModel', [user_id]),
@@ -770,22 +771,18 @@ class UserSettingsCreatedOnAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         ]
         model_name, min_date = min(filtered_user_dates_list, key=lambda x: x[1])
         time_delta_for_correctness = datetime.timedelta(minutes=5)
-
-        # This method for converting date_time_string to datettime object has
-        # also been used here:
-        # https://github.com/oppia/oppia/blob/d394b6a186acc74b5ec9c3fecc20cc3f1954f441/utils.py#L479
-        correction_cutoff_timestamp = datetime.datetime.strptime(
-            'Jul 1 2020', '%b %d %Y')
         if user_settings_model.created_on - min_date > (
                 time_delta_for_correctness):
-            yield ('ERROR_NOT_UP_TO_DATE', user_id)
+            yield (
+                'ERROR_NEED_TO_UPDATE_USING_' + python_utils.UNICODE(
+                    model_name), user_id)
         else:
             yield ('SUCCESS_ALREADY_UP_TO_DATE', 1)
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
-        if key == 'ERROR_NOT_UP_TO_DATE':
+        if key.startswith('ERROR_NEED_TO_UPDATE_USING'):
             yield (key, values)
         else:
             yield (key, len(values))
