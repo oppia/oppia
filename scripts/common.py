@@ -799,15 +799,33 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
     try:
         yield popen_proc
     finally:
-        if popen_proc.is_running():
-            procs = popen_proc.children(recursive=True) + [popen_proc]
-            for proc in procs:
-                proc.terminate()
+        procs_to_kill = (
+            popen_proc.children(recursive=True) if popen_proc.is_running() else
+            [])
+        # Children must be terminated before the parent, otherwise they risk
+        # becoming zombies.
+        procs_to_kill.append(popen_proc)
 
-            _, still_running = psutil.wait_procs(procs, timeout=timeout_secs)
-            for proc in still_running:
-                proc.kill()
-                logging.warn('Process killed (pid=%d)' % proc.pid)
+        get_debug_info = lambda proc: (
+            'Process(name=%r, pid=%d)' % (proc.name(), proc.pid)
+            if proc.is_running() else 'Process(pid=%d)' % (proc.pid,))
+
+        procs_still_alive = []
+        for proc in procs_to_kill:
+            if proc.is_running():
+                procs_still_alive.append(proc)
+                proc.terminate()
+                logging.info('Terminating %s...' % get_debug_info(proc))
+            else:
+                logging.info('%s has ended.' % get_debug_info(proc))
+
+        procs_gone, procs_still_alive = (
+            psutil.wait_procs(procs_still_alive, timeout=timeout_secs))
+        for proc in procs_gone:
+            logging.info('%s has ended.' % get_debug_info(proc))
+        for proc in procs_still_alive:
+            proc.kill()
+            logging.warn('Forced to kill %s!' % get_debug_info(proc))
 
 
 @contextlib.contextmanager
