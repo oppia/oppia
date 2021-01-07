@@ -17,7 +17,7 @@
  */
 import { Pipe, EventEmitter } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { TranslateService } from 'services/translate.service';
 import { TeachPageComponent } from './teach-page.component';
@@ -132,7 +132,7 @@ describe('Teach Page', () => {
         .toHaveBeenCalledWith('Loading');
     }));
 
-  it('should check if user is logged in or not', () => {
+  it('should check if user is logged in or not', fakeAsync(() => {
     const UserInfoObject = {
       is_moderator: false,
       is_admin: false,
@@ -147,10 +147,11 @@ describe('Teach Page', () => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
       UserInfo.createFromBackendDict(UserInfoObject))
     );
-
     component.ngOnInit();
+    flushMicrotasks();
     expect(component.userIsLoggedIn).toBe(true);
-  });
+  }));
+  
   it('should record analytics when Start Learning is clicked', function() {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickStartLearningButtonEvent')
