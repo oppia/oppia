@@ -193,20 +193,22 @@ describe('Skill backend API service', () => {
       const backendResponse = {
         skill_description_exists: false,
       };
-      const description = "Adding Fractions";
+      const description = 'Adding Fractions';
 
       skillBackendApiService.doesSkillWithDescriptionExistAsync(
         description).then(response => {
         expect(response).toEqual(false);
       });
 
-      let req = httpTestingController.expectOne('/skill_description_handler/Adding%20Fractions');
+      let req = httpTestingController.expectOne(
+        '/skill_description_handler/Adding%20Fractions'
+      );
       expect(req.request.method).toEqual('GET');
       req.flush(backendResponse);
 
       flushMicrotasks();
     }));
-  
+
   it(
     'should use the rejection handler if the skill update in the backend' +
     'failed.', fakeAsync(() => {
