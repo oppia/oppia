@@ -167,7 +167,7 @@ export class SkillBackendApiService {
         successCallback(response.skill_description_exists);
       }
     }, (errorResponse) => {
-      errorCallback(errorResponse.error);
+      errorCallback(errorResponse.error.error);
     });
   }
 

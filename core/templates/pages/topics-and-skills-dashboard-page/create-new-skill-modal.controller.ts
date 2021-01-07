@@ -61,6 +61,10 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
       $scope.conceptCardExplanationEditorIsShown = true;
     };
 
+    $scope._SkillEditorStateServiceCallback = function() {
+      $scope.skillDescriptionExists = (
+        SkillEditorStateService.getSkillDescriptionExists());
+    }
     $scope.updateSkillDescriptionAndCheckIfExists = function() {
       $scope.resetErrorMsg();
       if (
@@ -70,10 +74,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
         SkillCreationService.markChangeInSkillDescription();
       }
       SkillEditorStateService.updateExistenceOfSkillDescription(
-        $scope.newSkillDescription, function() {
-          $scope.skillDescriptionExists = (
-            SkillEditorStateService.getSkillDescriptionExists());
-        }
+        $scope.newSkillDescription, $scope._SkillEditorStateServiceCallback
       );
     };
 

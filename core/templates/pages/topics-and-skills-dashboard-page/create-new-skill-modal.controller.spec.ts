@@ -123,12 +123,20 @@ describe('Create new skill modal', function() {
       $scope.skillDescriptionExists = false;
       $scope.createNewSkill();
       expect($scope.isSkillDescriptionValid()).toBe(true);
+      expect($scope.skillDescriptionExists).toBe(false);
 
       $scope.newSkillDescription = 'Adding';
       $scope.skillDescriptionExists = true;
       $scope.createNewSkill();
       expect($scope.isSkillDescriptionValid()).toBe(false);
       expect($scope.errorMsg).toEqual(errorString);
+    });
+
+  it('should run callback to update skill description exists value',
+    function() {
+      $scope.newSkillDescription = 'Adding';
+      $scope._SkillEditorStateServiceCallback();
+      expect($scope.skillDescriptionExists).toBe(false);
     });
 
   it('should return if the skill description is valid', function() {

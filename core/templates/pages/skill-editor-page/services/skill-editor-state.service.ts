@@ -223,7 +223,14 @@ export class SkillEditorStateService {
       });
     return true;
   }
-
+  /**
+   * Attempts to save the current skill given a commit message. This
+   * function cannot be called until after a skill has been initialized
+   * in this service. Returns false if a save is not performed due to no
+   * changes pending, or true if otherwise. This function, upon success,
+   * will clear the UndoRedoService of pending changes. This function also
+   * shares behavior with setSkill(), when it succeeds.
+   */
   updateExistenceOfSkillDescription(
       description: string,
       successCallback: (value?: Object) => void): void {
