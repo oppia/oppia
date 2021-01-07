@@ -351,15 +351,17 @@ class ElasticSearchServicesStub(python_utils.OBJECT):
         query = {
             'query': {
                 'bool': {
-                    'must': [{
-                        'multi_match': {
-                            'query': query_string,
-                        }
-                    }],
+                    'must': [],
                     'filter': [],
                 }
             }
         }
+        if query_string:
+            query_definition['query']['bool']['must'] = [{
+                'multi_match': {
+                    'query': query_string,
+                }
+            }]
         if categories:
             category_string = ' '.join(['"%s"' % cat for cat in categories])
             query['query']['bool']['filter'].append({
@@ -1279,8 +1281,17 @@ tags: []
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
-                models.Registry, 'import_search_services',
-                classmethod(lambda _: self._search_services_stub)))
+                platform_search_services, 'add_documents_to_index',
+                self._search_services_stub.add_documents_to_index))
+            stack.enter_context(self.swap(
+                platform_search_services, 'delete_documents_from_index',
+                self._search_services_stub.delete_documents_from_index))
+            stack.enter_context(self.swap(
+                platform_search_services, 'clear_index',
+                self._search_services_stub.clear_index))
+            stack.enter_context(self.swap(
+                platform_search_services, 'search',
+                self._search_services_stub.search))
 
             stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',

@@ -26,17 +26,11 @@ import python_utils
 
 import elasticsearch
 
-# https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-max-result-window
-# This is the maximum number of results that can be returned for any given
-# search query. This number is equal to the size 'index.max_result_window' and
-# defines the maximum the sum of the parameters (size + from) can be. If
-# needed, we will have to change this to use the search_after parameter or
-# scrolling option as mentioned in the link above.
-MAXIMUM_NUMBER_OF_RESULTS = 10000
 ES = elasticsearch.Elasticsearch(
     '%s:%s' % (feconf.ES_HOST, feconf.ES_PORT),
     use_ssl=(False if feconf.ES_HOST == 'localhost' else True)
 )
+
 
 def _create_index(index_name):
     """Creates a new index.
@@ -177,6 +171,7 @@ def search(
     query_definition = {
         'query': {
             'bool': {
+                'must': [],
                 'filter': [],
             }
         }
