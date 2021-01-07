@@ -1174,11 +1174,15 @@ class ManagedProcessTests(test_utils.TestBase):
             'shutil_rmtree_is_called': False
         }
 
+        old_os_path_exists = os.path.exists
+
         def mock_os_remove_files(file_path): # pylint: disable=unused-argument
             check_function_calls['shutil_rmtree_is_called'] = True
 
         def mock_os_path_exists(file_path): # pylint: disable=unused-argument
-            return True
+            if file_path == common.ES_PATH_DATA_DIR:
+                return True
+            return old_os_path_exists(file_path)
 
         def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
             class Ret(python_utils.OBJECT):
@@ -1196,6 +1200,7 @@ class ManagedProcessTests(test_utils.TestBase):
         swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
         stack = contextlib2.ExitStack()
         with swap_call, swap_os_remove, swap_os_path_exists, stack:
+            stack.enter_context(self._swap_popen())
             stack.enter_context(common.managed_elasticsearch_dev_server())
 
         self.assertTrue(check_function_calls['shutil_rmtree_is_called'])
