@@ -1,5 +1,7 @@
 timeout: 9000s # 2.5 hours
 logsBucket: 'gs://$_LOGS_BUCKET_NAME'
+options:
+  machineType: 'N1_HIGHCPU_8'
 steps:
   - id: build-oppia-base
     name: gcr.io/kaniko-project/executor:latest
