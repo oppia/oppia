@@ -193,8 +193,8 @@
     </div>
     <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-five-right">
       <picture class="teach-student-image">
-        <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
-        <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
+        <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
+        <source type="image/png" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
         <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
@@ -202,8 +202,8 @@
     <div *ngIf="isWindowNarrow">
       <div class="oppia-teach-section-five-image">
         <picture class="teach-student-image">
-          <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
-          <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
+          <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
+          <source type="image/png" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
           <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
         </picture>
       </div>
