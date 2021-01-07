@@ -39,27 +39,27 @@
   }
 
   .oppia-hint-and-solution-buttons .popover-content {
-    color: #2d4a9d;
+    -webkit-animation: bounce 4s infinite ease-out;
+    animation: bounce 4s infinite ease-out;
     background-color: #f0ffff;
-    display: inline-block;
+    border: 1px solid #2d4a9d;
+    border-radius: 5px;
     box-shadow: 0px 0px 6px #2d4a9d;
+    color: #2d4a9d;
+    display: inline-block;
     font-size: 16px;
     padding: 10px;
     position: relative;
     z-index: 2;
-    border: 1px solid #2d4a9d;
-    border-radius: 5px;
-    -webkit-animation: bounce 4s infinite ease-out;
-    animation: bounce 4s infinite ease-out;
   }
 
   .oppia-hint-and-solution-buttons .popover-content::after,
   .oppia-hint-and-solution-buttons .popover-content::before {
-    content: " ";
-    top: 100%;
-    left: 50%;
     border: solid transparent;
+    content: " ";
+    left: 50%;
     position: absolute;
+    top: 100%;
   }
 
   .oppia-hint-and-solution-buttons .popover-content::after {
@@ -69,7 +69,6 @@
   }
 
   .oppia-hint-and-solution-buttons .popover-content::before {
-    border-color: rgba(0, 0, 51, 0);
     border-width: 6px;
     border-top: 29px solid #2d4a9d;
     margin-left: 128px;
@@ -115,9 +114,9 @@
 
   @media screen and (min-width: 769px) {
     .oppia-hint-and-solution-buttons .popover.top.fade.in {
-      top: -73px !important;
       left: 749px !important;
       max-width: 500px;
+      top: -73px !important;
     }
 
     .oppia-hint-and-solution-buttons .popover.top > .arrow {
