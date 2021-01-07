@@ -66,8 +66,8 @@ class AuthClaims(python_utils.OBJECT):
     def __eq__(self, other):
         # https://docs.python.org/2/library/constants.html#NotImplemented.
         return NotImplemented if not isinstance(other, AuthClaims) else (
-            self.auth_id == other.auth_id and self.email == other.email and
-            self.role_is_super_admin == other.role_is_super_admin)
+            (self.auth_id, self.email, self.role_is_super_admin) ==
+            (other.auth_id, other.email, other.role_is_super_admin))
 
     def __ne__(self, other):
         # TODO(#11474): Delete this method once we've moved to Python 3 and rely
@@ -82,8 +82,7 @@ class UserAuthDetails(python_utils.OBJECT):
     Attributes:
         user_id: str. The unique ID of the user.
         gae_id: str or None. The ID of the user retrieved from GAE.
-        firebase_auth_id: str or None. The Firebase authentication ID of the
-            user.
+        firebase_auth_id: str or None. The Firebase account ID of the user.
         parent_user_id: str or None. For profile users, the user ID of the full
             user associated with that profile. None for full users.
         deleted: bool. Whether the user is marked as deleted and will be fully
@@ -98,8 +97,7 @@ class UserAuthDetails(python_utils.OBJECT):
         Args:
             user_id: str. The unique ID of the user.
             gae_id: str or None. The ID of the user retrieved from GAE.
-            firebase_auth_id: str or None. The Firebase authentication ID of the
-                user.
+            firebase_auth_id: str or None. The Firebase account ID of the user.
             parent_user_id: str or None. For profile users, the user ID of the
                 full user associated with that profile. None for full users.
             deleted: bool. Whether the user has requested removal of their
@@ -116,19 +114,25 @@ class UserAuthDetails(python_utils.OBJECT):
         fields of this UserAuthDetails domain object are valid.
 
         Raises:
-            ValidationError. The user_id is not str.
-            ValidationError. The gae_id is not str.
-            ValidationError. The firebase_auth_id is not str.
-            ValidationError. The parent_user_id is not str.
+            ValidationError. The user_id is not specified.
+            ValidationError. The user_id is not a string.
+            ValidationError. The user_id has the wrong format.
+            ValidationError. The gae_id is not a string.
+            ValidationError. The firebase_auth_id is not a string.
+            ValidationError. The parent_user_id has the wrong format.
+            ValidationError. The parent_user_id is set for a full user.
+            ValidationError. The parent_user_id is not set for a profile user.
         """
         if not self.user_id:
-            raise utils.ValidationError('No user_id specified.')
+            raise utils.ValidationError('No user_id specified')
+
         if not isinstance(self.user_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'user_id must be a string, but got %r' % self.user_id)
+
         if not utils.is_user_id_valid(self.user_id):
             raise utils.ValidationError(
-                'user_id=%r has the wrong format.' % self.user_id)
+                'user_id=%r has the wrong format' % self.user_id)
 
         if (self.gae_id is not None and
                 not isinstance(self.gae_id, python_utils.BASESTRING)):
@@ -144,38 +148,38 @@ class UserAuthDetails(python_utils.OBJECT):
         if (self.parent_user_id is not None and
                 not utils.is_user_id_valid(self.parent_user_id)):
             raise utils.ValidationError(
-                'parent_user_id=%r has the wrong format.' % self.parent_user_id)
+                'parent_user_id=%r has the wrong format' % self.parent_user_id)
 
         if self.is_full_user() and self.parent_user_id:
             raise utils.ValidationError(
-                'parent_user_id must not be set for a full user.')
+                'parent_user_id must not be set for a full user')
 
         if not self.is_full_user() and not self.parent_user_id:
             raise utils.ValidationError(
                 'parent_user_id must be set for a profile user')
 
     def is_full_user(self):
-        """Whether the user is a full user (not a profile user).
+        """Returns whether the user is a full user (not a profile user).
 
         Returns:
-            bool. True if user is full user, False otherwise.
+            bool. Whether the user is a full user (not a profile user).
         """
         return self.gae_id is not None or self.firebase_auth_id is not None
 
     def to_dict(self):
         """Returns a dict matching the properties of UserAuthDetailsModel.
 
-        Intended to provide syntax sugar for assigning values to models:
+        Intended to provide syntax sugar when assigning values to models:
 
             user_auth_details_model.populate(**user_auth_details.to_dict())
 
-        Note that the dict does not include user_id, because that value
-        functions as the key of UserAuthDetailsModel. Keys are distinct from
-        properties, and cannot be assigned to using `populate()`.
+        Note that the dict does not include user_id because that value functions
+        as UserAuthDetailsModel's key. Keys are distinct from properties, and
+        cannot be re-assigned with `populate()`.
 
         Returns:
             dict(str: *). A dict with UserAuthDetailsModel property names as
-            keys and their values in self.
+            keys and values from self.
         """
         return {
             'gae_id': self.gae_id,

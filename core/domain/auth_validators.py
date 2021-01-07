@@ -31,16 +31,29 @@ class UserAuthDetailsModelValidator(
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return [
+        external_id_relationships = [
             base_model_validators.UserSettingsModelFetcherDetails(
                 'user_settings_ids', [item.id],
                 may_contain_system_ids=False,
                 may_contain_pseudonymous_ids=False),
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_identifiers_ids',
-                auth_models.UserIdentifiersModel,
-                [item.gae_id]),
         ]
+        if item.parent_user_id is None:
+            # Full users (users without a parent) should have a valid auth ID.
+            # TODO(#11462): Check for firebase_auth_id instead of gae_id after
+            # the Firebase migration has finished.
+            external_id_relationships.append(
+                base_model_validators.ExternalModelFetcherDetails(
+                    'auth_ids',
+                    auth_models.UserIdentifiersModel,
+                    [item.gae_id]))
+        else:
+            # Profile users (users with a parent) should have a valid parent ID.
+            external_id_relationships.append(
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'parent_user_settings_ids', [item.parent_user_id],
+                    may_contain_system_ids=False,
+                    may_contain_pseudonymous_ids=False))
+        return external_id_relationships
 
 
 class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):

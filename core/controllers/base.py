@@ -170,8 +170,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.current_user_is_super_admin = (
             auth_claims is not None and auth_claims.role_is_super_admin)
 
-        if feconf.ENABLE_MAINTENANCE_MODE and not (
-                self.current_user_is_super_admin):
+        if (feconf.ENABLE_MAINTENANCE_MODE and
+                not self.current_user_is_super_admin):
             return
 
         self.user_id = None
@@ -202,8 +202,8 @@ class BaseHandler(webapp2.RequestHandler):
 
             if user_settings.deleted:
                 self.user_is_scheduled_for_deletion = user_settings.deleted
-            elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                  user_services.has_fully_registered_account(self.user_id)):
+            elif (self.REDIRECT_UNFINISHED_SIGNUPS and
+                  not user_services.has_fully_registered_account(self.user_id)):
                 self.partially_logged_in = True
             else:
                 self.username = user_settings.username
@@ -243,8 +243,8 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if feconf.ENABLE_MAINTENANCE_MODE and not (
-                self.current_user_is_super_admin):
+        if (feconf.ENABLE_MAINTENANCE_MODE and
+                not self.current_user_is_super_admin):
             self.handle_exception(
                 self.TemporaryMaintenanceException(
                     'Oppia is currently being upgraded, and the site should '
