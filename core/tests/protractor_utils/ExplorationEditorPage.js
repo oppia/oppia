@@ -136,7 +136,7 @@ var ExplorationEditorPage = function() {
         '.protractor-test-exploration-title-input'))
     );
 
-    await action.sendKeys('Exp Title', expTitle, title);
+    await action.sendKeys('Exploration Title Input', expTitle, title);
     await action.sendKeys('Exp Objective', expObjective, objective);
 
     var selectContainerButton = element(by.css('.select2-container'));
