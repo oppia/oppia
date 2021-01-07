@@ -284,6 +284,12 @@ class GenericAssociationTests(test_utils.GenericTestBase):
         self._uninstall_stub()
         super(GenericAssociationTests, self).tearDown()
 
+    def test_create_user_auth_details(self):
+        user_auth_details = (
+            firebase_auth_services.create_user_auth_details('uid', 'aid'))
+        self.assertEqual(user_auth_details.user_id, 'uid')
+        self.assertEqual(user_auth_details.firebase_auth_id, 'aid')
+
     def test_get_association_that_is_present(self):
         firebase_auth_services.associate_auth_id_to_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
@@ -458,3 +464,136 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
         self.assertTrue(
             firebase_auth_services.are_auth_associations_deleted(self.USER_ID))
         self.assertEqual(logs, [])
+
+
+class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
+    """Tests for delete_auth_associations."""
+
+    EMAIL = 'some@email.com'
+    USERNAME = 'username'
+    AUTH_ID = 'authid'
+
+    UNKNOWN_ERROR = firebase_exceptions.UnknownError('error')
+
+    def setUp(self):
+        super(DeleteAuthAssociationsTests, self).setUp()
+
+        self._uninstall_stub = FirebaseAdminSdkStub.install(self)
+
+        firebase_admin.auth.create_user(uid=self.AUTH_ID)
+        self.signup(self.EMAIL, self.USERNAME)
+        self.user_id = self.get_user_id_from_email(self.EMAIL)
+        firebase_auth_services.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.user_id))
+
+    def tearDown(self):
+        self._uninstall_stub()
+        super(DeleteAuthAssociationsTests, self).tearDown()
+
+    def delete_auth_associations(self):
+        """Runs delete_auth_associations on the user created by this test."""
+        firebase_auth_services.delete_auth_associations(self.user_id)
+
+    def assert_firebase_account_is_deleted(self):
+        """Asserts that the Firebase account has been deleted."""
+        self.assertRaisesRegexp(
+            firebase_admin.auth.UserNotFoundError, 'not found',
+            lambda: firebase_admin.auth.get_user(self.AUTH_ID))
+
+    def assert_firebase_account_is_not_deleted(self):
+        """Asserts that the Firebase account still exists."""
+        user = firebase_admin.auth.get_user(self.AUTH_ID)
+        self.assertIsNotNone(user)
+        self.assertEqual(user.uid, self.AUTH_ID)
+
+    def assert_auth_associations_are_deleted(self):
+        """Asserts that the Firebase auth associations have been deleted."""
+        self.assertTrue(
+            firebase_auth_services.are_auth_associations_deleted(self.user_id))
+
+    def assert_auth_associations_are_not_deleted(self):
+        """Asserts that the Firebase auth associations have been not deleted."""
+        self.assertFalse(
+            firebase_auth_services.are_auth_associations_deleted(self.user_id))
+
+    def swap_initialize_sdk_to_always_fail(self):
+        """Swaps the initialize_app function so that it always fails."""
+        return self.swap_to_always_raise(
+            firebase_admin, 'initialize_app', error=self.UNKNOWN_ERROR)
+
+    def swap_get_user_to_always_fail(self):
+        """Swaps the get_user function so that it always fails."""
+        return self.swap_to_always_raise(
+            firebase_admin.auth, 'get_user', error=self.UNKNOWN_ERROR)
+
+    def swap_delete_user_to_always_fail(self):
+        """Swaps the delete_user function so that it always fails."""
+        return self.swap_to_always_raise(
+            firebase_admin.auth, 'delete_user', error=self.UNKNOWN_ERROR)
+
+    def test_delete_auth_associations_happy_path(self):
+        self.delete_auth_associations()
+
+        self.assert_firebase_account_is_deleted()
+        self.assert_auth_associations_are_deleted()
+
+    def test_delete_auth_associations_retry_after_failed_attempt(self):
+        with self.swap_initialize_sdk_to_always_fail():
+            self.delete_auth_associations()
+
+        self.assert_firebase_account_is_not_deleted()
+        self.assert_auth_associations_are_not_deleted()
+
+        self.delete_auth_associations()
+
+        self.assert_firebase_account_is_deleted()
+        self.assert_auth_associations_are_deleted()
+
+    def test_delete_auth_associations_retry_after_unverified_successful_attempt(
+            self):
+        self.delete_auth_associations()
+
+        self.assert_firebase_account_is_deleted()
+
+        with self.swap_initialize_sdk_to_always_fail():
+            self.assert_auth_associations_are_not_deleted()
+
+        self.delete_auth_associations()
+
+        self.assert_auth_associations_are_deleted()
+
+    def test_delete_auth_associations_when_delete_user_fails(self):
+        with self.swap_delete_user_to_always_fail():
+            self.delete_auth_associations()
+
+        self.assert_firebase_account_is_not_deleted()
+
+        self.assert_auth_associations_are_not_deleted()
+
+    def test_delete_auth_associations_when_get_user_fails(self):
+        self.delete_auth_associations()
+
+        self.assert_firebase_account_is_deleted()
+
+        with self.swap_get_user_to_always_fail():
+            self.assert_auth_associations_are_not_deleted()
+
+        self.assert_auth_associations_are_deleted()
+
+    def test_delete_auth_associations_when_init_fails_during_delete(self):
+        with self.swap_initialize_sdk_to_always_fail():
+            self.delete_auth_associations()
+
+        self.assert_firebase_account_is_not_deleted()
+
+        self.assert_auth_associations_are_not_deleted()
+
+    def test_delete_auth_associations_when_init_fails_during_verify(self):
+        self.delete_auth_associations()
+
+        self.assert_firebase_account_is_deleted()
+
+        with self.swap_initialize_sdk_to_always_fail():
+            self.assert_auth_associations_are_not_deleted()
+
+        self.assert_auth_associations_are_deleted()

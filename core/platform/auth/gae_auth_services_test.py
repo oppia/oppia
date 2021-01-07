@@ -31,6 +31,12 @@ user_models, = models.Registry.import_models([models.NAMES.user])
 
 class GaeAuthServicesTests(test_utils.GenericTestBase):
 
+    def test_create_user_auth_details(self):
+        user_auth_details = (
+            gae_auth_services.create_user_auth_details('uid', 'aid'))
+        self.assertEqual(user_auth_details.user_id, 'uid')
+        self.assertEqual(user_auth_details.gae_id, 'aid')
+
     def test_get_auth_claims_from_request_returns_none_if_not_logged_in(self):
         request = webapp2.Request.blank('/')
 

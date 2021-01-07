@@ -24,12 +24,15 @@ import os
 
 from constants import constants
 from core import jobs
+from core.domain import auth_domain
 from core.domain import param_domain
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
+
+import webapp2
 
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()
@@ -162,6 +165,136 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         wrapped = test_utils.FunctionWrapper(function)
 
         self.assertIsNone(wrapped.pre_call_hook('args'))
+
+
+class AuthServicesStubTests(test_utils.GenericTestBase):
+
+    EMAIL = 'user@test.com'
+
+    @property
+    def stub(self):
+        """Acquires auth_services and asserts it is being stubbed."""
+        auth_services = models.Registry.import_auth_services()
+        self.assertIsInstance(auth_services, test_utils.AuthServicesStub)
+        return auth_services
+
+    def test_create_user_auth_details(self):
+        user_auth_details = self.stub.create_user_auth_details('uid', 'aid')
+        self.assertEqual(user_auth_details.user_id, 'uid')
+        self.assertEqual(user_auth_details.gae_id, 'aid')
+
+    def test_get_auth_claims_from_request(self):
+        request = webapp2.Request.blank('/')
+
+        self.assertIsNone(self.stub.get_auth_claims_from_request(request))
+
+        with self.login_context(self.EMAIL):
+            self.assertEqual(
+                self.stub.get_auth_claims_from_request(request),
+                auth_domain.AuthClaims(
+                    self.get_auth_id_from_email(self.EMAIL), self.EMAIL, False))
+
+        with self.super_admin_context():
+            self.assertEqual(
+                self.stub.get_auth_claims_from_request(request),
+                auth_domain.AuthClaims(
+                    self.get_auth_id_from_email(self.SUPER_ADMIN_EMAIL),
+                    self.SUPER_ADMIN_EMAIL,
+                    True))
+
+        self.assertIsNone(self.stub.get_auth_claims_from_request(request))
+
+    def test_get_association_that_is_present(self):
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+
+        self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
+
+    def test_get_association_that_is_missing(self):
+        self.assertIsNone(self.stub.get_user_id_from_auth_id('does_not_exist'))
+
+    def test_get_multi_associations_with_all_present(self):
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid1', 'uid1'))
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid2', 'uid2'))
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid3', 'uid3'))
+
+        self.assertEqual(
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']),
+            ['uid1', 'uid2', 'uid3'])
+
+    def test_get_multi_associations_with_one_missing(self):
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid1', 'uid1'))
+        # The aid2 <-> uid2 association is missing.
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid3', 'uid3'))
+
+        self.assertEqual(
+            self.stub.get_multi_user_ids_from_auth_ids(
+                ['aid1', 'aid2', 'aid3']),
+            ['uid1', None, 'uid3'])
+
+    def test_associate_auth_id_to_user_id_without_collision(self):
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+
+        self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
+
+    def test_associate_auth_id_to_user_id_with_collision_raises(self):
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+                'aid', 'uid'))
+
+    def test_associate_multi_auth_ids_to_user_ids_without_collisions(self):
+        self.stub.associate_multi_auth_ids_to_user_ids(
+            [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+             auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+             auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
+
+        self.assertEqual(
+            [self.stub.get_user_id_from_auth_id('aid1'),
+             self.stub.get_user_id_from_auth_id('aid2'),
+             self.stub.get_user_id_from_auth_id('aid3')],
+            ['uid1', 'uid2', 'uid3'])
+
+    def test_associate_multi_auth_ids_to_user_ids_with_collision_raises(self):
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid1', 'uid1'))
+
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            self.stub.associate_multi_auth_ids_to_user_ids(
+                [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+                 auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+                 auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
+
+    def test_present_association_is_not_considered_to_be_deleted(self):
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+        self.assertFalse(self.stub.are_auth_associations_deleted('uid'))
+
+    def test_missing_association_is_considered_to_be_deleted(self):
+        self.assertTrue(self.stub.are_auth_associations_deleted(
+            'does_not_exist'))
+
+    def test_delete_association_when_it_is_present(self):
+        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
+            'aid', 'uid'))
+        self.assertFalse(self.stub.are_auth_associations_deleted('uid'))
+
+        self.stub.delete_auth_associations('uid')
+
+        self.assertTrue(self.stub.are_auth_associations_deleted('uid'))
+
+    def test_delete_association_when_it_is_missing_does_not_raise(self):
+        # Should not raise.
+        self.stub.delete_auth_associations('does_not_exist')
 
 
 class CallCounterTests(test_utils.GenericTestBase):
