@@ -167,6 +167,11 @@ def mark_user_for_deletion(user_id):
         assoc_model.deleted = True
         assoc_model.update_timestamps()
         assoc_model.put()
+    try:
+        with _acquire_firebase_context():
+            firebase_auth.update_user(assoc_model.id, disabled=True)
+    except (ValueError, firebase_exceptions.FirebaseError) as e:
+        logging.exception(e)
 
 
 def delete_auth_associations(user_id):

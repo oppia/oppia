@@ -38,8 +38,8 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 class FirebaseAdminSdkStub(python_utils.OBJECT):
     """Helper class for swapping the Firebase Admin SDK with a stateful stub.
 
-    NOT INTENDED TO BE USED DIRECTLY. Just install and interact with the
-    Firebase Admin SDK as if it were connected to a real server.
+    NOT INTENDED TO BE USED DIRECTLY. Just install and then interact with the
+    Firebase Admin SDK as if it were real.
 
     Example:
         class Test(test_utils.TestBase):
@@ -85,6 +85,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 firebase_admin.auth, 'get_user', stub._get_user)) # pylint: disable=protected-access
             stack.enter_context(test.swap(
                 firebase_admin.auth, 'delete_user', stub._delete_user)) # pylint: disable=protected-access
+            stack.enter_context(test.swap(
+                firebase_admin.auth, 'update_user', stub._update_user)) # pylint: disable=protected-access
 
             for function_name in cls._YAGNI_FUNCTION_NAMES:
                 stack.enter_context(test.swap_to_always_raise(
@@ -93,7 +95,8 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
             # Standard usage of ExitStack: enter a bunch of context managers
             # from the safety of an ExitStack's context. Once they've all been
             # opened, pop_all() of them off of the original context so they can
-            # *stay* open.
+            # *stay* open. Calling the function returned will all of exit the
+            # opened contexts.
             # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             return stack.pop_all().close
 
@@ -110,32 +113,86 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         'list_users',
         'revoke_refresh_tokens',
         'set_custom_user_claims',
-        'update_user',
         'verify_session_cookie',
     ]
 
     def __init__(self):
         self._users = {}
 
-    def _create_user(self, uid=None, **kwargs):
-        """Adds user to storage if new, otherwise raises an error."""
+    def _create_user(self, uid=None, disabled=False):
+        """Adds user to storage if new, otherwise raises an error.
+
+        Args:
+            uid: str. The unique Firebase account ID for the user. The uid
+                argument cannot be made into a positional argument because the
+                Firebase Admin SDK generates a value when it is None. Generating
+                a value is too complicated for tests, so we force test writers
+                to provide their own instead by raising an Exception when None.
+            disabled: bool. Whether the user account is to be disabled.
+
+        Raises:
+            ValueError. The uid argument was not provided.
+            UidAlreadyExistsError. The uid has already been assigned to a user.
+        """
+        if uid is None:
+            raise ValueError('FirebaseAdminSdkStub requires uid to be set')
         if uid in self._users:
             raise firebase_admin.auth.UidAlreadyExistsError(
-                '%s exists' % uid, None, None)
-        # FRAGILE: UserRecord doesn't have a public constructor, so this may
-        # break in future versions of the SDK. OK with taking that risk because
-        # this is only for stubbing purposes.
+                'uid=%r already exists' % uid, None, None)
+        self._set_user(uid, disabled)
+
+    def _update_user(self, uid, disabled=False):
+        """Updates the user in storage if found, otherwise raises an error.
+
+        Args:
+            uid: str. The Firebase account ID of the user.
+            disabled: bool. Whether the user account is to be disabled.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
+        if uid not in self._users:
+            raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
+        self._set_user(uid, disabled)
+
+    def _set_user(self, uid, disabled):
+        """Sets the given properties for the corresponding user.
+
+        Args:
+            uid: str. The Firebase account ID of the user.
+            disabled: bool. Whether the user account is to be disabled.
+        """
         self._users[uid] = firebase_admin.auth.UserRecord(
-            firebase_admin.auth.ImportUserRecord(uid, **kwargs).to_dict())
+            # FRAGILE: UserRecord doesn't expose the payload keys as part of its
+            # public API, so this may break in future versions of the SDK. OK
+            # with taking that risk because this is only for stubbing purposes.
+            {'localId': uid, 'disabled': disabled})
 
     def _get_user(self, uid):
-        """Returns user with given ID if exists, otherwise raises an error."""
+        """Returns the user with given ID if found, otherwise raises an error.
+
+        Args:
+            uid: str. The Firebase account ID of the user.
+
+        Returns:
+            UserRecord. The UserRecord object of the user.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
         if uid not in self._users:
             raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
         return self._users[uid]
 
     def _delete_user(self, uid):
-        """Removes user from storage if exists, otherwise raises an error."""
+        """Removes user from storage if found, otherwise raises an error.
+
+        Args:
+            uid: str. The Firebase account ID of the user.
+
+        Raises:
+            UserNotFoundError. The Firebase account has not been created yet.
+        """
         if uid not in self._users:
             raise firebase_admin.auth.UserNotFoundError('%s not found' % uid)
         del self._users[uid]
@@ -391,12 +448,61 @@ class GenericAssociationTests(test_utils.GenericTestBase):
         # Should not raise.
         firebase_auth_services.delete_auth_associations('does_not_exist')
 
-    def test_disable_association_marks_model_for_deletion(self):
+    def test_disable_association_marks_user_for_deletion(self):
+        firebase_admin.auth.create_user(uid='aid')
         firebase_auth_services.associate_auth_id_to_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
+
+        self.assertIsNotNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
+        self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
+
         firebase_auth_services.mark_user_for_deletion('uid')
+
         self.assertIsNone(
             auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
+        self.assertTrue(firebase_admin.auth.get_user('aid').disabled)
+
+    def test_disable_association_warns_when_firebase_fails_to_init(self):
+        firebase_admin.auth.create_user(uid='aid')
+        firebase_auth_services.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        init_swap = self.swap_to_always_raise(
+            firebase_admin, 'initialize_app',
+            error=firebase_exceptions.UnknownError('could not init'))
+
+        self.assertIsNotNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
+        self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
+
+        with init_swap, self.capture_logging(min_level=logging.WARN) as logs:
+            firebase_auth_services.mark_user_for_deletion('uid')
+
+        self.assert_matches_regexps(logs, ['could not init'])
+        self.assertIsNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
+        self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
+
+    def test_disable_association_warns_when_firebase_fails_to_update_user(self):
+        firebase_admin.auth.create_user(uid='aid')
+        firebase_auth_services.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        update_user_swap = self.swap_to_always_raise(
+            firebase_admin.auth, 'update_user',
+            error=firebase_exceptions.UnknownError('could not update'))
+        log_capturing_context = self.capture_logging(min_level=logging.WARN)
+
+        self.assertIsNotNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
+        self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
+
+        with update_user_swap, log_capturing_context as logs:
+            firebase_auth_services.mark_user_for_deletion('uid')
+
+        self.assert_matches_regexps(logs, ['could not update'])
+        self.assertIsNone(
+            auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
+        self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
 
 
 class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
@@ -416,11 +522,6 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
         self._uninstall_stub()
         super(FirebaseSpecificAssociationTests, self).tearDown()
 
-    def assert_only_item_is_exception(self, logs, msg):
-        """Asserts that only the given message appeared in the logs."""
-        self.assertEqual(len(logs), 1)
-        self.assertIn(msg, logs[0])
-
     def test_delete_user_without_firebase_initialization_returns_false(self):
         init_swap = self.swap_to_always_raise(
             firebase_admin, 'initialize_app',
@@ -431,7 +532,7 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             firebase_auth_services.are_auth_associations_deleted(self.USER_ID))
-        self.assert_only_item_is_exception(logs, 'could not init')
+        self.assert_matches_regexps(logs, ['could not init'])
 
     def test_is_associated_auth_id_deleted_without_init_returns_false(self):
         init_swap = self.swap_to_always_raise(
@@ -443,7 +544,7 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
                 firebase_auth_services.are_auth_associations_deleted(
                     self.USER_ID))
 
-        self.assert_only_item_is_exception(logs, 'could not init')
+        self.assert_matches_regexps(logs, ['could not init'])
 
     def test_delete_user_when_firebase_raises_an_error(self):
         delete_swap = self.swap_to_always_raise(
@@ -455,7 +556,7 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             firebase_auth_services.are_auth_associations_deleted(self.USER_ID))
-        self.assert_only_item_is_exception(logs, 'could not connect')
+        self.assert_matches_regexps(logs, ['could not connect'])
 
     def test_delete_user_when_firebase_succeeds(self):
         with self.capture_logging(min_level=logging.ERROR) as logs:
