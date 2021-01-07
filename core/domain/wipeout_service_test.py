@@ -58,6 +58,7 @@ import python_utils
     models.NAMES.topic, models.NAMES.user
 ])
 
+auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -4421,5 +4422,20 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
 
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
+        self.assertTrue(
+            wipeout_service.verify_user_deleted(self.profile_user_id))
+
+    def test_verify_user_delete_when_auth_associations_are_not_deleted(self):
+        wipeout_service.pre_delete_user(self.profile_user_id)
+        self.process_and_flush_pending_tasks()
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.profile_user_id))
+        are_auth_associations_deleted_swap = self.swap_to_always_return(
+            auth_services, 'are_auth_associations_deleted', value=False)
+
+        with are_auth_associations_deleted_swap:
+            self.assertFalse(
+                wipeout_service.verify_user_deleted(self.profile_user_id))
+
         self.assertTrue(
             wipeout_service.verify_user_deleted(self.profile_user_id))
