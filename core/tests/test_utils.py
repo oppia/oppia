@@ -429,9 +429,6 @@ class AuthServicesStub(python_utils.OBJECT):
             stub = cls()
 
             stack.enter_context(test.swap(
-                auth_services, 'create_user_auth_details',
-                stub.create_user_auth_details))
-            stack.enter_context(test.swap(
                 auth_services, 'get_auth_claims_from_request',
                 stub.get_auth_claims_from_request))
             stack.enter_context(test.swap(
@@ -463,20 +460,6 @@ class AuthServicesStub(python_utils.OBJECT):
             # in reverse order.
             # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             return stack.pop_all().close
-
-    def create_user_auth_details(self, user_id, auth_id):
-        """Returns a UserAuthDetails object configured with Firebase properties.
-
-        The stub pretends to use Firebase auth IDs.
-
-        Args:
-            user_id: str. The unique ID of the user.
-            auth_id: str|None. The ID of the user retrieved from Firebase.
-
-        Returns:
-            UserAuthDetails. A UserAuthDetails domain object.
-        """
-        return auth_domain.UserAuthDetails(user_id, firebase_auth_id=auth_id)
 
     def get_auth_claims_from_request(self, unused_request):
         """Authenticates request and returns claims about its authorizer.

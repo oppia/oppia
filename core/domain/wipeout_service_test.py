@@ -265,10 +265,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     def test_pre_delete_profile_users_works_correctly(self):
         user_settings = user_services.get_user_settings(self.profile_user_id)
         self.assertFalse(user_settings.deleted)
-        user_auth_details = user_services.get_auth_details_by_user_id(
-            self.profile_user_id)
         self.assertFalse(user_settings.deleted)
-        self.assertFalse(user_auth_details.deleted)
 
         wipeout_service.pre_delete_user(self.profile_user_id)
         self.process_and_flush_pending_tasks()
@@ -282,9 +279,6 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     def test_pre_delete_user_for_full_user_also_deletes_all_profiles(self):
         user_settings = user_services.get_user_settings(self.user_1_id)
         self.assertFalse(user_settings.deleted)
-        user_auth_details = user_services.get_auth_details_by_user_id(
-            self.user_1_id)
-        self.assertFalse(user_auth_details.deleted)
         profile_user_settings = user_services.get_user_settings(
             self.profile_user_id)
         self.assertFalse(profile_user_settings.deleted)
@@ -315,9 +309,6 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
         user_settings = user_services.get_user_settings(self.user_1_id)
         self.assertFalse(user_settings.deleted)
-        user_auth_details = user_services.get_auth_details_by_user_id(
-            self.user_1_id)
-        self.assertFalse(user_auth_details.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()

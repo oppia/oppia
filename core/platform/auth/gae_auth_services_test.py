@@ -31,11 +31,7 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 class GaeAuthServicesTests(test_utils.GenericTestBase):
 
-    def test_create_user_auth_details(self):
-        user_auth_details = (
-            gae_auth_services.create_user_auth_details('uid', 'aid'))
-        self.assertEqual(user_auth_details.user_id, 'uid')
-        self.assertEqual(user_auth_details.gae_id, 'aid')
+    ENABLE_AUTH_SERVICES_STUB = False
 
     def test_get_auth_claims_from_request_returns_none_if_not_logged_in(self):
         request = webapp2.Request.blank('/')
@@ -74,10 +70,14 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             gae_auth_services.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(
+            gae_auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
     def test_get_association_that_is_missing(self):
         self.assertIsNone(
             gae_auth_services.get_user_id_from_auth_id('does_not_exist'))
+        self.assertIsNone(
+            gae_auth_services.get_auth_id_from_user_id('does_not_exist'))
 
     def test_get_multi_associations_with_all_present(self):
         gae_auth_services.associate_auth_id_to_user_id(
@@ -110,6 +110,8 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             gae_auth_services.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(
+            gae_auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
     def test_associate_with_collision_raises(self):
         gae_auth_services.associate_auth_id_to_user_id(

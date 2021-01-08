@@ -119,19 +119,6 @@ def _verify_id_token(auth_header):
         return {}
 
 
-def create_user_auth_details(user_id, auth_id):
-    """Returns a UserAuthDetails object configured with Firebase properties.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        auth_id: str. The ID of the user retrieved from Firebase.
-
-    Returns:
-        UserAuthDetails. A UserAuthDetails domain object.
-    """
-    return auth_domain.UserAuthDetails(user_id, firebase_auth_id=auth_id)
-
-
 def get_auth_claims_from_request(request):
     """Authenticates request and returns claims about its authorizer.
 
@@ -162,15 +149,28 @@ def mark_user_for_deletion(user_id):
     Args:
         user_id: str. The unique ID of the user who should be deleted.
     """
-    assoc_model = (
-        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
-    if assoc_model is not None:
-        assoc_model.deleted = True
-        assoc_model.update_timestamps()
-        assoc_model.put()
+    assoc_by_user_id_model = (
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+
+    if assoc_by_user_id_model is not None:
+        assoc_by_user_id_model.deleted = True
+        assoc_by_user_id_model.update_timestamps()
+        assoc_by_user_id_model.put()
+
+    assoc_by_auth_id_model = (
+        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id)
+        if assoc_by_user_id_model is None else
+        auth_models.UserIdByFirebaseAuthIdModel.get(
+            assoc_by_user_id_model.firebase_auth_id, strict=False))
+
+    if assoc_by_auth_id_model is not None:
+        assoc_by_auth_id_model.deleted = True
+        assoc_by_auth_id_model.update_timestamps()
+        assoc_by_auth_id_model.put()
+
     try:
         with _acquire_firebase_context():
-            firebase_auth.update_user(assoc_model.id, disabled=True)
+            firebase_auth.update_user(assoc_by_auth_id_model.id, disabled=True)
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
 
@@ -182,13 +182,12 @@ def delete_auth_associations(user_id):
         user_id: str. The unique ID of the user whose associations should be
             deleted.
     """
-    assoc_model = (
-        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
-    if assoc_model is None:
+    auth_id = get_auth_id_from_user_id(user_id)
+    if auth_id is None:
         return
     try:
         with _acquire_firebase_context():
-            firebase_auth.delete_user(assoc_model.id)
+            firebase_auth.delete_user(auth_id)
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
 
@@ -205,18 +204,34 @@ def are_auth_associations_deleted(user_id):
         bool. Whether all associations outside of Oppia referring to the given
         user have been deleted.
     """
-    assoc_model = (
-        auth_models.UserIdByFirebaseAuthIdModel.get_by_user_id(user_id))
-    if assoc_model is None:
+    auth_id = get_auth_id_from_user_id(user_id)
+    if auth_id is None:
         return True
     try:
         with _acquire_firebase_context():
-            firebase_auth.get_user(assoc_model.id)
+            firebase_auth.get_user(auth_id)
     except firebase_auth.UserNotFoundError:
         return True
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
     return False
+
+
+def get_auth_id_from_user_id(user_id):
+    """Returns the auth ID associated with the given user ID.
+
+    Args:
+        user_id: str. The auth ID.
+
+    Returns:
+        str|None. The user ID associated with the given auth ID, or None if no
+        association exists.
+    """
+    assoc_by_user_id_model = (
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+    return (
+        None if assoc_by_user_id_model is None else
+        assoc_by_user_id_model.firebase_auth_id)
 
 
 def get_user_id_from_auth_id(auth_id):
@@ -229,9 +244,11 @@ def get_user_id_from_auth_id(auth_id):
         str|None. The user ID associated with the given auth ID, or None if no
         association exists.
     """
-    assoc_model = (
+    assoc_by_auth_id_model = (
         auth_models.UserIdByFirebaseAuthIdModel.get(auth_id, strict=False))
-    return None if assoc_model is None else assoc_model.user_id
+    return (
+        None if assoc_by_auth_id_model is None else
+        assoc_by_auth_id_model.user_id)
 
 
 def get_multi_user_ids_from_auth_ids(auth_ids):
@@ -268,10 +285,15 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
         raise Exception('auth_id=%r is already associated to user_id=%r' % (
             auth_id, collision))
 
-    assoc_model = (
+    assoc_by_auth_id_model = (
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id))
-    assoc_model.update_timestamps()
-    assoc_model.put()
+    assoc_by_auth_id_model.update_timestamps()
+    assoc_by_auth_id_model.put()
+
+    assoc_by_user_id_model = (
+        auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id))
+    assoc_by_user_id_model.update_timestamps()
+    assoc_by_user_id_model.put()
 
 
 @transaction_services.run_in_transaction_wrapper
@@ -296,10 +318,18 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
             if user_id is not None)
         raise Exception('already associated: %s' % collisions)
 
-    assoc_models = [
+    assoc_by_auth_id_models = [
         auth_models.UserIdByFirebaseAuthIdModel(id=auth_id, user_id=user_id)
         for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
     ]
     auth_models.UserIdByFirebaseAuthIdModel.update_timestamps_multi(
-        assoc_models)
-    auth_models.UserIdByFirebaseAuthIdModel.put_multi(assoc_models)
+        assoc_by_auth_id_models)
+    auth_models.UserIdByFirebaseAuthIdModel.put_multi(assoc_by_auth_id_models)
+
+    assoc_by_user_id_models = [
+        auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id)
+        for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
+    ]
+    auth_models.UserAuthDetailsModel.update_timestamps_multi(
+        assoc_by_user_id_models)
+    auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)

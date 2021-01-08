@@ -41,11 +41,18 @@ class UserAuthDetailsModelValidator(
             # Full users (users without a parent) should have a valid auth ID.
             # TODO(#11462): Check for firebase_auth_id instead of gae_id after
             # the Firebase migration has finished.
-            external_id_relationships.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'auth_ids',
-                    auth_models.UserIdentifiersModel,
-                    [item.gae_id]))
+            if item.gae_id is not None:
+                external_id_relationships.append(
+                    base_model_validators.ExternalModelFetcherDetails(
+                        'auth_ids',
+                        auth_models.UserIdentifiersModel,
+                        [item.gae_id]))
+            if item.firebase_auth_id is not None:
+                external_id_relationships.append(
+                    base_model_validators.ExternalModelFetcherDetails(
+                        'auth_ids',
+                        auth_models.UserIdByFirebaseAuthIdModel,
+                        [item.firebase_auth_id]))
         else:
             # Profile users (users with a parent) should have a valid parent ID.
             external_id_relationships.append(

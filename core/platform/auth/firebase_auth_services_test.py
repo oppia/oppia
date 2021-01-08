@@ -331,6 +331,8 @@ class AuthenticateRequestTests(test_utils.TestBase):
 
 class GenericAssociationTests(test_utils.GenericTestBase):
 
+    ENABLE_AUTH_SERVICES_STUB = False
+
     def setUp(self):
         super(GenericAssociationTests, self).setUp()
         self._uninstall_stub = FirebaseAdminSdkStub.install(self)
@@ -339,22 +341,20 @@ class GenericAssociationTests(test_utils.GenericTestBase):
         self._uninstall_stub()
         super(GenericAssociationTests, self).tearDown()
 
-    def test_create_user_auth_details(self):
-        user_auth_details = (
-            firebase_auth_services.create_user_auth_details('uid', 'aid'))
-        self.assertEqual(user_auth_details.user_id, 'uid')
-        self.assertEqual(user_auth_details.firebase_auth_id, 'aid')
-
     def test_get_association_that_is_present(self):
         firebase_auth_services.associate_auth_id_to_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertEqual(
             firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(
+            firebase_auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
     def test_get_association_that_is_missing(self):
         self.assertIsNone(
             firebase_auth_services.get_user_id_from_auth_id('does_not_exist'))
+        self.assertIsNone(
+            firebase_auth_services.get_auth_id_from_user_id('does_not_exist'))
 
     def test_get_multi_associations_with_all_present(self):
         firebase_auth_services.associate_auth_id_to_user_id(
@@ -387,6 +387,8 @@ class GenericAssociationTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             firebase_auth_services.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(
+            firebase_auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
     def test_associate_with_collision_raises(self):
         firebase_auth_services.associate_auth_id_to_user_id(
@@ -505,6 +507,8 @@ class GenericAssociationTests(test_utils.GenericTestBase):
 
 class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
 
+    ENABLE_AUTH_SERVICES_STUB = False
+
     USER_ID = 'uid'
     AUTH_ID = 'sub'
 
@@ -566,7 +570,8 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
 
 
 class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
-    """Tests for delete_auth_associations."""
+
+    ENABLE_AUTH_SERVICES_STUB = False
 
     EMAIL = 'some@email.com'
     USERNAME = 'username'

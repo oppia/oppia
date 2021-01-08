@@ -34,6 +34,7 @@ import python_utils
 
 import webapp2
 
+auth_services = models.Registry.import_auth_services()
 exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()
 
@@ -171,17 +172,9 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
 
     EMAIL = 'user@test.com'
 
-    @property
-    def stub(self):
-        """Acquires auth_services and asserts it is being stubbed."""
-        auth_services = models.Registry.import_auth_services()
-        self.assertIsInstance(auth_services, test_utils.AuthServicesStub)
-        return auth_services
-
-    def test_create_user_auth_details(self):
-        user_auth_details = self.stub.create_user_auth_details('uid', 'aid')
-        self.assertEqual(user_auth_details.user_id, 'uid')
-        self.assertEqual(user_auth_details.firebase_auth_id, 'aid')
+    def setUp(self):
+        super(AuthServicesStubTests, self).setUp()
+        self.stub = test_utils.AuthServicesStub()
 
     def test_get_auth_claims_from_request(self):
         request = webapp2.Request.blank('/')

@@ -28,19 +28,6 @@ from google.appengine.api import users
 auth_models, = models.Registry.import_models([models.NAMES.auth])
 
 
-def create_user_auth_details(user_id, auth_id):
-    """Returns a UserAuthDetails object configured with GAE properties.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        auth_id: str. The ID of the user retrieved from GAE.
-
-    Returns:
-        UserAuthDetails. A UserAuthDetails domain object.
-    """
-    return auth_domain.UserAuthDetails(user_id, gae_id=auth_id)
-
-
 def get_auth_claims_from_request(unused_request):
     """Authenticates request and returns claims about its authorizer.
 
@@ -65,11 +52,24 @@ def mark_user_for_deletion(user_id):
     Args:
         user_id: str. The unique ID of the user who should be deleted.
     """
-    assoc_model = auth_models.UserIdentifiersModel.get_by_user_id(user_id)
-    if assoc_model is not None:
-        assoc_model.deleted = True
-        assoc_model.update_timestamps()
-        assoc_model.put()
+    assoc_by_user_id_model = (
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+
+    if assoc_by_user_id_model is not None:
+        assoc_by_user_id_model.deleted = True
+        assoc_by_user_id_model.update_timestamps()
+        assoc_by_user_id_model.put()
+
+    assoc_by_auth_id_model = (
+        auth_models.UserIdentifiersModel.get_by_user_id(user_id)
+        if assoc_by_user_id_model is None else
+        auth_models.UserIdentifiersModel.get(
+            assoc_by_user_id_model.gae_id, strict=False))
+
+    if assoc_by_auth_id_model is not None:
+        assoc_by_auth_id_model.deleted = True
+        assoc_by_auth_id_model.update_timestamps()
+        assoc_by_auth_id_model.put()
 
 
 def delete_auth_associations(unused_user_id):
@@ -102,6 +102,23 @@ def are_auth_associations_deleted(unused_user_id):
     return True
 
 
+def get_auth_id_from_user_id(user_id):
+    """Returns the auth ID associated with the given user ID.
+
+    Args:
+        user_id: str. The auth ID.
+
+    Returns:
+        str|None. The user ID associated with the given auth ID, or None if no
+        association exists.
+    """
+    assoc_by_user_id_model = (
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+    return (
+        None if assoc_by_user_id_model is None else
+        assoc_by_user_id_model.gae_id)
+
+
 def get_user_id_from_auth_id(auth_id):
     """Returns the user ID associated with the given auth ID.
 
@@ -112,8 +129,11 @@ def get_user_id_from_auth_id(auth_id):
         str|None. The user ID associated with the given auth ID, or None if no
         association exists.
     """
-    assoc_model = auth_models.UserIdentifiersModel.get_by_gae_id(auth_id)
-    return None if assoc_model is None else assoc_model.user_id
+    assoc_by_auth_id_model = (
+        auth_models.UserIdentifiersModel.get(auth_id, strict=False))
+    return (
+        None if assoc_by_auth_id_model is None else
+        assoc_by_auth_id_model.user_id)
 
 
 def get_multi_user_ids_from_auth_ids(auth_ids):
@@ -126,9 +146,9 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
         list(str|None). The user IDs associated with each of the given auth IDs,
         or None for associations which don't exist.
     """
-    assoc_models = auth_models.UserIdentifiersModel.get_multi(
+    assoc_by_auth_id_models = auth_models.UserIdentifiersModel.get_multi(
         auth_ids, include_deleted=True)
-    return [None if m is None else m.user_id for m in assoc_models]
+    return [None if m is None else m.user_id for m in assoc_by_auth_id_models]
 
 
 def associate_auth_id_to_user_id(auth_id_user_id_pair):
@@ -148,9 +168,15 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
         raise Exception('auth_id=%r is already associated to user_id=%r' % (
             auth_id, collision))
 
-    assoc_model = auth_models.UserIdentifiersModel(id=auth_id, user_id=user_id)
-    assoc_model.update_timestamps()
-    assoc_model.put()
+    assoc_by_auth_id_model = (
+        auth_models.UserIdentifiersModel(id=auth_id, user_id=user_id))
+    assoc_by_auth_id_model.update_timestamps()
+    assoc_by_auth_id_model.put()
+
+    assoc_by_user_id_model = (
+        auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id))
+    assoc_by_user_id_model.update_timestamps()
+    assoc_by_user_id_model.put()
 
 
 def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
@@ -174,9 +200,18 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
             if user_id is not None)
         raise Exception('already associated: %s' % collisions)
 
-    assoc_models = [
+    assoc_by_auth_id_models = [
         auth_models.UserIdentifiersModel(id=auth_id, user_id=user_id)
         for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
     ]
-    auth_models.UserIdentifiersModel.update_timestamps_multi(assoc_models)
-    auth_models.UserIdentifiersModel.put_multi(assoc_models)
+    auth_models.UserIdentifiersModel.update_timestamps_multi(
+        assoc_by_auth_id_models)
+    auth_models.UserIdentifiersModel.put_multi(assoc_by_auth_id_models)
+
+    assoc_by_user_id_models = [
+        auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id)
+        for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
+    ]
+    auth_models.UserAuthDetailsModel.update_timestamps_multi(
+        assoc_by_user_id_models)
+    auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
