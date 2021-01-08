@@ -72,7 +72,7 @@ def mark_user_for_deletion(user_id):
         assoc_by_auth_id_model.put()
 
 
-def delete_auth_associations(unused_user_id):
+def delete_external_auth_associations(unused_user_id):
     """Deletes associations outside of Oppia that refer to the given user.
 
     There are no associations to GAE models managed outside of Oppia.
@@ -84,7 +84,7 @@ def delete_auth_associations(unused_user_id):
     pass
 
 
-def are_auth_associations_deleted(unused_user_id):
+def are_external_auth_associations_deleted(unused_user_id):
     """Returns whether all associations outside of Oppia referring to the given
     user have been deleted.
 

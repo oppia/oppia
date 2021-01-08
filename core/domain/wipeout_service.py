@@ -272,7 +272,7 @@ def delete_user(pending_deletion_request):
     user_id = pending_deletion_request.user_id
     user_role = pending_deletion_request.role
 
-    auth_services.delete_auth_associations(user_id)
+    auth_services.delete_external_auth_associations(user_id)
 
     _delete_models(user_id, user_role, models.NAMES.auth)
     _delete_models(user_id, user_role, models.NAMES.user)
@@ -357,7 +357,7 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    if not auth_services.are_auth_associations_deleted(user_id):
+    if not auth_services.are_external_auth_associations_deleted(user_id):
         return False
 
     policies_not_to_verify = [

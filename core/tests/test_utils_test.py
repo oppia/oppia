@@ -270,24 +270,24 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
     def test_present_association_is_not_considered_to_be_deleted(self):
         self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
             'aid', 'uid'))
-        self.assertFalse(self.stub.are_auth_associations_deleted('uid'))
+        self.assertFalse(self.stub.are_external_auth_associations_deleted('uid'))
 
     def test_missing_association_is_considered_to_be_deleted(self):
-        self.assertTrue(self.stub.are_auth_associations_deleted(
+        self.assertTrue(self.stub.are_external_auth_associations_deleted(
             'does_not_exist'))
 
     def test_delete_association_when_it_is_present(self):
         self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
             'aid', 'uid'))
-        self.assertFalse(self.stub.are_auth_associations_deleted('uid'))
+        self.assertFalse(self.stub.are_external_auth_associations_deleted('uid'))
 
-        self.stub.delete_auth_associations('uid')
+        self.stub.delete_external_auth_associations('uid')
 
-        self.assertTrue(self.stub.are_auth_associations_deleted('uid'))
+        self.assertTrue(self.stub.are_external_auth_associations_deleted('uid'))
 
     def test_delete_association_when_it_is_missing_does_not_raise(self):
         # Should not raise.
-        self.stub.delete_auth_associations('does_not_exist')
+        self.stub.delete_external_auth_associations('does_not_exist')
 
 
 class CallCounterTests(test_utils.GenericTestBase):

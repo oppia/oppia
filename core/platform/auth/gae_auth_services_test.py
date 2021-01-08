@@ -145,8 +145,8 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
 
     def test_gae_associations_are_deleted(self):
         # Should not raise.
-        gae_auth_services.delete_auth_associations('does_not_exist')
-        self.assertTrue(gae_auth_services.are_auth_associations_deleted('uid'))
+        gae_auth_services.delete_external_auth_associations('does_not_exist')
+        self.assertTrue(gae_auth_services.are_external_auth_associations_deleted('uid'))
 
     def test_disable_association_marks_model_for_deletion(self):
         gae_auth_services.associate_auth_id_to_user_id(

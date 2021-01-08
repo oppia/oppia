@@ -59,6 +59,7 @@ import logging
 
 from core.domain import auth_domain
 from core.platform import models
+import feconf
 import python_utils
 
 import firebase_admin
@@ -136,7 +137,8 @@ def get_auth_claims_from_request(request):
     claims = _verify_id_token(request.headers.get('Authorization', ''))
     auth_id = claims.get('sub', None)
     email = claims.get('email', None)
-    role_is_super_admin = claims.get('role', None) == 'admin'
+    role_is_super_admin = (
+        claims.get('role', None) == feconf.FIREBASE_ROLE_SUPER_ADMIN)
     if auth_id:
         return auth_domain.AuthClaims(auth_id, email, role_is_super_admin)
     return None
@@ -144,7 +146,7 @@ def get_auth_claims_from_request(request):
 
 def mark_user_for_deletion(user_id):
     """Set the 'deleted' property of the user with given user_id to True, and
-    disables the user's Firebase account so that they cannot use it to sign-in.
+    disables the user's Firebase account so that they cannot use it to signin.
 
     Args:
         user_id: str. The unique ID of the user who should be deleted.
@@ -175,7 +177,7 @@ def mark_user_for_deletion(user_id):
         logging.exception(e)
 
 
-def delete_auth_associations(user_id):
+def delete_external_auth_associations(user_id):
     """Deletes associations outside of Oppia that refer to the given user.
 
     Args:
@@ -192,7 +194,7 @@ def delete_auth_associations(user_id):
         logging.exception(e)
 
 
-def are_auth_associations_deleted(user_id):
+def are_external_auth_associations_deleted(user_id):
     """Returns whether all associations outside of Oppia referring to the given
     user have been deleted.
 
