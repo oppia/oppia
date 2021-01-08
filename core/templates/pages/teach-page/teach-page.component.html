@@ -193,8 +193,8 @@
     </div>
     <div  *ngIf="!isWindowNarrow" class="oppia-teach-section-five-right">
       <picture class="teach-student-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
-        <source type="image/png" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
+        <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)" >
+        <source type="image/png" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" >
         <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
       </picture>
     </div>
@@ -202,8 +202,8 @@
     <div *ngIf="isWindowNarrow">
       <div class="oppia-teach-section-five-image">
         <picture class="teach-student-image">
-          <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)">
-          <source type="image/png" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)">
+          <source type="image/webp" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrlWebp)" >
+          <source type="image/png" [srcset]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" >
           <img [src]="getStaticImageUrl(testimonials[displayedTestimonialId].imageUrl)" [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}" alt="">
         </picture>
       </div>
@@ -223,7 +223,7 @@
   </div>
 
   <div class="oppia-teach-section-six">
-    <div *ngIf="!isWindowNarrow">
+    <!--<div *ngIf="!isWindowNarrow">
       <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
       <div class="oppia-teach-button-container-button-one">
         <form action="/teach">
@@ -240,45 +240,46 @@
                   [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
           </button>
         </form>
-      </div>
-      <div class="oppia-teach-button-container-button-one">
-        <form action="classroomUrl">
-          <button type="submit" (click)="onClickExploreLessonsButton()"
-                  class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <div *ngIf="isWindowNarrow">
-      <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
-      <div class="oppia-teach-button-container-button-one">
-        <form action="/teach">
-          <button type="submit" (click)="onClickGuideParentsButton()"
-                  class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_GUIDE_FOR_TEACHERS' | translate">
-          </button>
-        </form>
-      </div>
-      <div class="oppia-teach-button-container-button-one">
-        <form action="/teach">
-          <button type="submit" (click)="onClickTipforParentsButton()"
-                  class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
-          </button>
-        </form>
-      </div>
-      <div class="oppia-teach-button-container-button-one">
-        <form action="classroomUrl">
-          <button type="submit" (click)="onClickExploreLessonsButton()"
-                  class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                  [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
-          </button>
-        </form>
-      </div>
+      </div> -->
+    <div class="oppia-teach-button-container-button-one">
+      <form action="classroomUrl">
+        <button type="submit" (click)="onClickExploreLessonsButton()"
+                class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
+        </button>
+      </form>
     </div>
   </div>
+
+  <div *ngIf="isWindowNarrow">
+    <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
+    <!--Removing these 2 buttons for now. Will add them back after Tips for parents and guide for teachers  pages are ready
+      <div class="oppia-teach-button-container-button-one">
+      <form action="/teach">
+        <button type="submit" (click)="onClickGuideParentsButton()"
+                class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                [innerHTML]="'I18N_ACTION_GUIDE_FOR_TEACHERS' | translate">
+        </button>
+      </form>
+    </div>
+    <div class="oppia-teach-button-container-button-one">
+      <form action="/teach">
+        <button type="submit" (click)="onClickTipforParentsButton()"
+                class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
+        </button>
+      </form>
+    </div> -->
+    <div class="oppia-teach-button-container-button-one">
+      <form action="classroomUrl">
+        <button type="submit" (click)="onClickExploreLessonsButton()"
+                class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
+        </button>
+      </form>
+    </div>
+  </div>
+  <!--</div>-->
 </div>
 
 <style>
