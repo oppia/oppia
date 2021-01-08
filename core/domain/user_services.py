@@ -422,8 +422,7 @@ def is_user_or_pseudonymous_id(user_or_pseudonymous_id):
     """
     return (
         utils.is_user_id_valid(user_or_pseudonymous_id) or
-        utils.is_pseudonymous_id(user_or_pseudonymous_id)
-    )
+        utils.is_pseudonymous_id(user_or_pseudonymous_id))
 
 
 def is_username_taken(username):
@@ -1180,12 +1179,11 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
     for modifiable_user_data in modifiable_user_data_list:
         if modifiable_user_data.user_id is not None:
             raise Exception('User id cannot already exist for a new user.')
-        user_id = user_models.UserSettingsModel.get_new_id('')
+        user_id = user_models.UserSettingsModel.get_new_id()
         user_settings = UserSettings(
             user_id, email, feconf.ROLE_ID_LEARNER,
             preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
-            pin=modifiable_user_data.pin
-        )
+            pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 
         user_auth_details = (
@@ -1211,8 +1209,8 @@ def _create_new_profile_transactional(user_settings, user_auth_details):
         user_auth_details: UserAuthDetails. The user auth details domain
             object corresponding to the newly created list of users.
     """
-    _save_user_auth_details(user_auth_details)
     _save_user_settings(user_settings)
+    _save_user_auth_details(user_auth_details)
 
 
 def update_multiple_users_data(modifiable_user_data_list):
@@ -1232,14 +1230,13 @@ def update_multiple_users_data(modifiable_user_data_list):
     user_ids = [user.user_id for user in modifiable_user_data_list]
     user_settings_list = get_users_settings(user_ids)
     user_auth_details_list = get_multiple_user_auth_details(user_ids)
-    for modifiable_user_data, user_settings, user_auth_details in (
+    for modifiable_user_data, user_settings in (
             python_utils.ZIP(
-                modifiable_user_data_list, user_settings_list,
-                user_auth_details_list)):
+                modifiable_user_data_list, user_settings_list)):
         user_id = modifiable_user_data.user_id
         if user_id is None:
             raise Exception('Missing user ID.')
-        if not user_settings or not user_auth_details:
+        if not user_settings:
             raise Exception('User not found.')
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 
@@ -1325,7 +1322,7 @@ def get_multiple_user_auth_details(user_ids):
     user_settings_models = auth_models.UserAuthDetailsModel.get_multi(user_ids)
     return [
         _get_user_auth_details_from_model(model)
-        if model is not None else None for model in user_settings_models
+        for model in user_settings_models if model is not None
     ]
 
 
@@ -1346,8 +1343,8 @@ def get_auth_details_by_user_id(user_id, strict=False):
         Exception. The value of strict is True and given user_id does not exist.
     """
     user_auth_details_model = (
-        auth_models.UserAuthDetailsModel.get_by_id(user_id))
-    if user_auth_details_model and not user_auth_details_model.deleted:
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+    if user_auth_details_model is not None:
         return _get_user_auth_details_from_model(user_auth_details_model)
     elif strict:
         logging.error('Could not find user with id %s' % user_id)
@@ -1654,11 +1651,10 @@ def mark_user_for_deletion(user_id):
     user_settings.deleted = True
     _save_user_settings(user_settings)
     user_auth_details = _get_user_auth_details_from_model(
-        auth_models.UserAuthDetailsModel.get_by_id(user_id))
+        auth_models.UserAuthDetailsModel.get(user_id))
     user_auth_details.deleted = True
     _save_user_auth_details(user_auth_details)
-    if user_auth_details.is_full_user():
-        auth_services.mark_user_for_deletion(user_id)
+    auth_services.mark_user_for_deletion(user_id)
 
 
 def save_deleted_username(normalized_username):

@@ -27,6 +27,21 @@ from google.appengine.api import users
 
 auth_models, = models.Registry.import_models([models.NAMES.auth])
 
+transaction_services = models.Registry.import_transaction_services()
+
+
+def create_user_auth_details(user_id, auth_id):
+    """Returns a UserAuthDetails object configured with GAE properties.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        auth_id: str. The ID of the user retrieved from GAE.
+
+    Returns:
+        UserAuthDetails. A UserAuthDetails domain object.
+    """
+    return auth_domain.UserAuthDetails(user_id, gae_id=auth_id)
+
 
 def get_auth_claims_from_request(unused_request):
     """Authenticates request and returns claims about its authorizer.
@@ -151,6 +166,7 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
     return [None if m is None else m.user_id for m in assoc_by_auth_id_models]
 
 
+@transaction_services.run_in_transaction_wrapper
 def associate_auth_id_to_user_id(auth_id_user_id_pair):
     """Commits the association between auth ID and user ID.
 
@@ -174,11 +190,17 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
     assoc_by_auth_id_model.put()
 
     assoc_by_user_id_model = (
-        auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id))
-    assoc_by_user_id_model.update_timestamps()
-    assoc_by_user_id_model.put()
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+    # Do not depend on the non-platform layers to create these models because
+    # they are required by gae_auth_services.
+    if assoc_by_user_id_model is None or assoc_by_user_id_model.gae_id is None:
+        assoc_by_user_id_model = (
+            auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id))
+        assoc_by_user_id_model.update_timestamps()
+        assoc_by_user_id_model.put()
 
 
+@transaction_services.run_in_transaction_wrapper
 def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
     """Commits the associations between auth IDs and user IDs.
 
@@ -210,8 +232,15 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
 
     assoc_by_user_id_models = [
         auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id)
-        for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
+        for auth_id, user_id, assoc_by_user_id_model in python_utils.ZIP(
+            auth_ids, user_ids,
+            auth_models.UserAuthDetailsModel.get_multi(user_ids))
+        if (assoc_by_user_id_model is None or
+            assoc_by_user_id_model.gae_id is None)
     ]
-    auth_models.UserAuthDetailsModel.update_timestamps_multi(
-        assoc_by_user_id_models)
-    auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
+    # Do not depend on the non-platform layers to create these models because
+    # they are required by gae_auth_services.
+    if assoc_by_user_id_models:
+        auth_models.UserAuthDetailsModel.update_timestamps_multi(
+            assoc_by_user_id_models)
+        auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)

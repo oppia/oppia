@@ -202,9 +202,11 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
             'aid', 'uid'))
 
         self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(self.stub.get_auth_id_from_user_id('uid'), 'aid')
 
     def test_get_association_that_is_missing(self):
         self.assertIsNone(self.stub.get_user_id_from_auth_id('does_not_exist'))
+        self.assertIsNone(self.stub.get_auth_id_from_user_id('does_not_exist'))
 
     def test_get_multi_associations_with_all_present(self):
         self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
@@ -236,6 +238,7 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
             'aid', 'uid'))
 
         self.assertEqual(self.stub.get_user_id_from_auth_id('aid'), 'uid')
+        self.assertEqual(self.stub.get_auth_id_from_user_id('uid'), 'aid')
 
     def test_associate_auth_id_to_user_id_with_collision_raises(self):
         self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
@@ -268,18 +271,26 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
                  auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
 
     def test_present_association_is_not_considered_to_be_deleted(self):
-        self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid', 'uid'))
-        self.assertFalse(self.stub.are_external_auth_associations_deleted('uid'))
+        # This operation creates the external auth association.
+        self.stub.create_user_auth_details('uid', 'aid')
+
+        self.stub.associate_auth_id_to_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        self.assertFalse(
+            self.stub.are_external_auth_associations_deleted('uid'))
 
     def test_missing_association_is_considered_to_be_deleted(self):
         self.assertTrue(self.stub.are_external_auth_associations_deleted(
             'does_not_exist'))
 
     def test_delete_association_when_it_is_present(self):
+        # This operation creates the external auth association.
+        self.stub.create_user_auth_details('uid', 'aid')
+
         self.stub.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
             'aid', 'uid'))
-        self.assertFalse(self.stub.are_external_auth_associations_deleted('uid'))
+        self.assertFalse(self.stub.are_external_auth_associations_deleted(
+            'uid'))
 
         self.stub.delete_external_auth_associations('uid')
 

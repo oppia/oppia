@@ -181,9 +181,10 @@ class UserAuthDetails(python_utils.OBJECT):
             dict(str: *). A dict with UserAuthDetailsModel property names as
             keys and values from self.
         """
-        return {
-            'gae_id': self.gae_id,
-            'firebase_auth_id': self.firebase_auth_id,
-            'parent_user_id': self.parent_user_id,
-            'deleted': self.deleted
-        }
+        property_values = [
+            ('gae_id', self.gae_id),
+            ('firebase_auth_id', self.firebase_auth_id),
+            ('parent_user_id', self.parent_user_id),
+            ('deleted', self.deleted),
+        ]
+        return {name: val for name, val in property_values if val is not None}

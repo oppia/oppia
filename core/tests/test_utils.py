@@ -414,6 +414,7 @@ class AuthServicesStub(python_utils.OBJECT):
     def __init__(self):
         """Initializes a new instance that emulates an empty auth server."""
         self._user_id_by_auth_id = {}
+        self._external_user_id_associations = set()
 
     @classmethod
     def install_stub(cls, test):
@@ -429,6 +430,9 @@ class AuthServicesStub(python_utils.OBJECT):
             stub = cls()
 
             stack.enter_context(test.swap(
+                auth_services, 'create_user_auth_details',
+                stub.create_user_auth_details))
+            stack.enter_context(test.swap(
                 auth_services, 'get_auth_claims_from_request',
                 stub.get_auth_claims_from_request))
             stack.enter_context(test.swap(
@@ -440,6 +444,9 @@ class AuthServicesStub(python_utils.OBJECT):
             stack.enter_context(test.swap(
                 auth_services, 'are_external_auth_associations_deleted',
                 stub.are_external_auth_associations_deleted))
+            stack.enter_context(test.swap(
+                auth_services, 'get_auth_id_from_user_id',
+                stub.get_auth_id_from_user_id))
             stack.enter_context(test.swap(
                 auth_services, 'get_user_id_from_auth_id',
                 stub.get_user_id_from_auth_id))
@@ -461,10 +468,29 @@ class AuthServicesStub(python_utils.OBJECT):
             # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             return stack.pop_all().close
 
+    def create_user_auth_details(self, user_id, auth_id):
+        """Returns a UserAuthDetails object configured with Firebase properties.
+
+        The stub pretends to use Firebase auth IDs. To make the operation more
+        authentic, this method also creates a new "external" association for the
+        user to simulate a genuine provided value.
+
+        Args:
+            user_id: str. The unique ID of the user.
+            auth_id: str|None. The ID of the user retrieved from Firebase.
+
+        Returns:
+            UserAuthDetails. A UserAuthDetails domain object.
+        """
+        self._external_user_id_associations.add(user_id)
+        return auth_domain.UserAuthDetails(user_id, firebase_auth_id=auth_id)
+
     def get_auth_claims_from_request(self, unused_request):
         """Authenticates request and returns claims about its authorizer.
 
-        This stub obtains authorization information from os.environ.
+        This stub obtains authorization information from os.environ. To make the
+        operation more authentic, this method also creates a new "external"
+        association for the user to simulate a genuine "provided" value.
 
         Args:
             unused_request: webapp2.Request. The HTTP request to authenticate.
@@ -480,37 +506,35 @@ class AuthServicesStub(python_utils.OBJECT):
             return auth_domain.AuthClaims(auth_id, email, role_is_super_admin)
         return None
 
-    def mark_user_for_deletion(self, unused_user_id):
+    def mark_user_for_deletion(self, user_id):
         """Set the 'deleted' property of the user with given user_id to True.
 
-        Models aren't used by the stub, so this function is a no-op.
+        Since the stub does not use models, this operation actually deletes the
+        user's association. The "external" associations, however, are not
+        deleted yet.
 
         Args:
-            unused_user_id: str. The unique ID of the user who should be
-                deleted.
-        """
-        pass
-
-    def delete_external_auth_associations(self, user_id):
-        """Deletes associations outside of Oppia that refer to the given user.
-
-        This stub emulates "outside associations" with the _user_id_by_auth_id
-        dict.
-
-        Args:
-            user_id: str. The unique ID of the user whose associations should be
-                deleted.
+            user_id: str. The unique ID of the user who should be deleted.
         """
         self._user_id_by_auth_id = {
             a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
         }
 
+    def delete_external_auth_associations(self, user_id):
+        """Deletes associations outside of Oppia that refer to the given user.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
+        """
+        self._external_user_id_associations.discard(user_id)
+
     def are_external_auth_associations_deleted(self, user_id):
         """Returns whether all associations outside of Oppia referring to the
         given user have been deleted.
 
-        This stub emulates "outside associations" with the _user_id_by_auth_id
-        dict.
+        This stub does not emulate an external association, so this operation
+        always returns True.
 
         Args:
             user_id: str. The unique ID of the user whose associations should be
@@ -520,7 +544,21 @@ class AuthServicesStub(python_utils.OBJECT):
             bool. Whether all associations outside of Oppia referring to the
             given user have been deleted.
         """
-        return not any(u == user_id for u in self._user_id_by_auth_id.values())
+        return user_id not in self._external_user_id_associations
+
+    def get_auth_id_from_user_id(self, user_id):
+        """Returns the auth ID associated with the given user ID.
+
+        Args:
+            user_id: str. The user ID.
+
+        Returns:
+            str|None. The auth ID associated with the given user ID, or None if
+            no association exists.
+        """
+        return next(
+            (a for a, u in self._user_id_by_auth_id.items() if u == user_id),
+            None)
 
     def get_user_id_from_auth_id(self, auth_id):
         """Returns the user ID associated with the given auth ID.
@@ -549,6 +587,9 @@ class AuthServicesStub(python_utils.OBJECT):
     def associate_auth_id_to_user_id(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID.
 
+        This method also updates the "external" user ID associations just in
+        case it was wrong.
+
         Args:
             auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association
                 to commit.
@@ -564,6 +605,9 @@ class AuthServicesStub(python_utils.OBJECT):
 
     def associate_multi_auth_ids_to_user_ids(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs.
+
+        This method also updates the "external" user ID associations just in
+        case it was wrong.
 
         Args:
             auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
@@ -1758,7 +1802,8 @@ tags: []
             self.get_auth_id_from_email(email))
         return user_settings and user_settings.user_id
 
-    def get_auth_id_from_email(self, email):
+    @classmethod
+    def get_auth_id_from_email(cls, email):
         """Returns a mock GAE user ID corresponding to the given email.
 
         This method can use any algorithm to produce results as long as, during

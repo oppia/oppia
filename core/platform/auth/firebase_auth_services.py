@@ -67,6 +67,7 @@ from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 
 auth_models, = models.Registry.import_models([models.NAMES.auth])
+
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -118,6 +119,19 @@ def _verify_id_token(auth_header):
     except (ValueError, firebase_exceptions.FirebaseError) as e:
         logging.exception(e)
         return {}
+
+
+def create_user_auth_details(user_id, auth_id):
+    """Returns a UserAuthDetails object configured with Firebase properties.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        auth_id: str. The ID of the user retrieved from Firebase.
+
+    Returns:
+        UserAuthDetails. A UserAuthDetails domain object.
+    """
+    return auth_domain.UserAuthDetails(user_id, firebase_auth_id=auth_id)
 
 
 def get_auth_claims_from_request(request):
@@ -293,9 +307,15 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
     assoc_by_auth_id_model.put()
 
     assoc_by_user_id_model = (
-        auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id))
-    assoc_by_user_id_model.update_timestamps()
-    assoc_by_user_id_model.put()
+        auth_models.UserAuthDetailsModel.get(user_id, strict=False))
+    # Do not depend on the non-platform layers to create these models because
+    # they are required by firebase_auth_services.
+    if (assoc_by_user_id_model is None or
+            assoc_by_user_id_model.firebase_auth_id is None):
+        assoc_by_user_id_model = auth_models.UserAuthDetailsModel(
+            id=user_id, firebase_auth_id=auth_id)
+        assoc_by_user_id_model.update_timestamps()
+        assoc_by_user_id_model.put()
 
 
 @transaction_services.run_in_transaction_wrapper
@@ -330,8 +350,15 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
 
     assoc_by_user_id_models = [
         auth_models.UserAuthDetailsModel(id=user_id, firebase_auth_id=auth_id)
-        for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
+        for auth_id, user_id, assoc_by_user_id_model in python_utils.ZIP(
+            auth_ids, user_ids,
+            auth_models.UserAuthDetailsModel.get_multi(user_ids))
+        if (assoc_by_user_id_model is None or
+            assoc_by_user_id_model.firebase_auth_id is None)
     ]
-    auth_models.UserAuthDetailsModel.update_timestamps_multi(
-        assoc_by_user_id_models)
-    auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
+    # Do not depend on the non-platform layers to create these models because
+    # they are required by firebase_auth_services.
+    if assoc_by_user_id_models:
+        auth_models.UserAuthDetailsModel.update_timestamps_multi(
+            assoc_by_user_id_models)
+        auth_models.UserAuthDetailsModel.put_multi(assoc_by_user_id_models)
