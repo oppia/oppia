@@ -24,7 +24,7 @@ import { UrlInterpolationService } from
 import { WindowRef } from
   'services/contextual/window-ref.service.ts';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserService } from 'services/user.service';
 import { LoaderService } from 'services/loader.service.ts';
 import splashConstants from 'assets/constants';
 
@@ -33,8 +33,6 @@ import splashConstants from 'assets/constants';
   templateUrl: './about-page.component.html'
 })
 export class AboutPageComponent implements OnInit {
-  canCreateCollections: null;
-  aboutPageMascotImgUrl: string;
   classroomUrlFragment: string;
   classroomUrl :string;
   userIsLoggedIn: boolean | null;
@@ -42,7 +40,7 @@ export class AboutPageComponent implements OnInit {
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private siteAnalyticsService: SiteAnalyticsService,
-    private userBackendApiService: UserBackendApiService,
+    private userService: UserService,
     private loaderService: LoaderService) {
   }
 
@@ -95,15 +93,13 @@ export class AboutPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.aboutPageMascotImgUrl = this.urlInterpolationService
-      .getStaticImageUrl('/general/about_page_mascot.webp');
     this.userIsLoggedIn = null;
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.loaderService.showLoadingScreen('Loading');
-    this.userBackendApiService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
     });

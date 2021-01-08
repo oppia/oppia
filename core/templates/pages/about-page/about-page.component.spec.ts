@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { EventEmitter, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from
   '@angular/common/http/testing';
@@ -30,7 +30,8 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { TranslateService } from 'services/translate.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
+import { UserInfo } from 'domain/user/user-info.model.ts';
+import { UserService } from 'services/user.service';
 import { LoaderService } from 'services/loader.service.ts';
 
 @Pipe({name: 'translate'})
@@ -63,7 +64,7 @@ describe('About Page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
-  let userBackendApiService: UserBackendApiService = null;
+  let userService: UserService;
   beforeEach(async() => {
     TestBed.configureTestingModule({
       declarations: [AboutPageComponent, MockTranslatePipe],
@@ -101,7 +102,7 @@ describe('About Page', () => {
       imports: [HttpClientTestingModule]
     });
     loaderService = TestBed.get(LoaderService);
-    userBackendApiService = TestBed.get(SiteAnalyticsService);
+    userService = TestBed.get(UserService);
   });
   let component;
   beforeEach(() => {
@@ -125,23 +126,33 @@ describe('About Page', () => {
     expect(component.classroomUrl).toBe('/learn/math');
   });
 
-  it('should check loader screen is working', () => {
-    component.ngOnInit();
+  it('should check if loader screen is working', () =>
     fakeAsync(() => {
+      component.ngOnInit();
       spyOn(loaderService, 'showLoadingScreen').and.callThrough();
       expect(loaderService.showLoadingScreen)
         .toHaveBeenCalledWith('Loading');
-      spyOn(userBackendApiService, 'getUserInfoAsync')
-        .and.callThrough();
-      expect(userBackendApiService.getUserInfoAsync)
-        .toHaveBeenCalled();
-      expect(component.userIsLoggedIn).toBe(!null);
-      spyOn(loaderService, 'hideLoadingScreen')
-        .and.callThrough();
-      expect(loaderService.hideLoadingScreen)
-        .toHaveBeenCalled();
-    });
-  });
+    }));
+
+  it('should check if user is logged in or not', fakeAsync(() => {
+    const UserInfoObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      email: 'test@test.com',
+      user_is_logged_in: true
+    };
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+      UserInfo.createFromBackendDict(UserInfoObject))
+    );
+    component.ngOnInit();
+    flushMicrotasks();
+    expect(component.userIsLoggedIn).toBe(true);
+  }));
 
   it('should activate when Visit Classroom is clicked', function() {
     spyOn(
