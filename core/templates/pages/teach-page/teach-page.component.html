@@ -223,9 +223,9 @@
   </div>
 
   <div class="oppia-teach-section-six">
-    <!--<div *ngIf="!isWindowNarrow">
+    <div *ngIf="!isWindowNarrow">
       <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
-      <div class="oppia-teach-button-container-button-one">
+      <!--<div class="oppia-teach-button-container-button-one">
         <form action="/teach">
           <button type="submit" (click)="onClickGuideParentsButton()"
                   class="btn oppia-teach-bottom-button oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
@@ -249,37 +249,37 @@
         </button>
       </form>
     </div>
-  </div>
+    </div>
 
-  <div *ngIf="isWindowNarrow">
-    <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
-    <!--Removing these 2 buttons for now. Will add them back after Tips for parents and guide for teachers  pages are ready
+    <div *ngIf="isWindowNarrow">
+      <h2 [innerHTML]="'I18N_TEACH_PAGE_SIX_TITLE' | translate"></h2>
+      <!--Removing these 2 buttons for now. Will add them back after Tips for parents and guide for teachers  pages are ready
+        <div class="oppia-teach-button-container-button-one">
+        <form action="/teach">
+          <button type="submit" (click)="onClickGuideParentsButton()"
+                  class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                  [innerHTML]="'I18N_ACTION_GUIDE_FOR_TEACHERS' | translate">
+          </button>
+        </form>
+      </div>
       <div class="oppia-teach-button-container-button-one">
-      <form action="/teach">
-        <button type="submit" (click)="onClickGuideParentsButton()"
-                class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_ACTION_GUIDE_FOR_TEACHERS' | translate">
-        </button>
-      </form>
-    </div>
-    <div class="oppia-teach-button-container-button-one">
-      <form action="/teach">
-        <button type="submit" (click)="onClickTipforParentsButton()"
-                class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
-        </button>
-      </form>
-    </div> -->
-    <div class="oppia-teach-button-container-button-one">
-      <form action="classroomUrl">
-        <button type="submit" (click)="onClickExploreLessonsButton()"
-                class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
-        </button>
-      </form>
-    </div>
+        <form action="/teach">
+          <button type="submit" (click)="onClickTipforParentsButton()"
+                  class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                  [innerHTML]="'I18N_ACTION_TIPS_FOR_PARENTS' | translate">
+          </button>
+        </form>
+      </div> -->
+        <div class="oppia-teach-button-container-button-one">
+          <form action="classroomUrl">
+            <button type="submit" (click)="onClickExploreLessonsButton()"
+                    class="btn oppia-teach-bottom-button mobile oppia-teach-button-browse oppia-teach-browse-button-position oppia-transition-200"
+                    [innerHTML]="'I18N_ACTION_EXPLORE_LESSONS' | translate">
+            </button>
+          </form>
+        </div>
+    </div>  
   </div>
-  <!--</div>-->
 </div>
 
 <style>
@@ -313,8 +313,6 @@
   }
 
   .teach-page .oppia-teach-section-five-left.mobile {
-   margin-left: 3vw;
-   margin-right: 3vw;
    max-width: unset;
    min-width: unset;
    padding-bottom: 2vh;
@@ -549,6 +547,7 @@
     min-height: 105vh;
     padding-bottom: 25vh;
     padding-top: 21vh;
+    text-align: center;
     width: 100vw;
   }
 
@@ -570,6 +569,7 @@
     margin-left: 10vw;
     margin-top: auto;
     width: 50vw;
+    text-align: left;
   }
 
   .teach-page .oppia-teach-section-five-right {
@@ -640,12 +640,14 @@
     align-items: center;
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
   }
 
   .teach-page .oppia-teach-section-four-right {
     filter: drop-shadow(0px 4px 4px #00000040);
     margin-left: auto;
     margin-right: auto;
+    text-align: center;
   }
 
   .teach-page .oppia-teach-section-three-left {
@@ -734,6 +736,12 @@
   }
 
   @media (max-width: 768px) {
+    .teach-page .oppia-teach-main-image img{
+      max-width: 768px;
+    }
+  }
+
+  @media (max-width: 768px) {
     .teach-page .oppia-teach-section-one ,
     .teach-page .oppia-teach-section-two,
     .teach-page .oppia-teach-section-three,
@@ -745,6 +753,12 @@
       max-height: fit-content;
     }
 
+  @media (max-width: 768px){
+    .teach-page .oppia-teach-section-five{
+     min-height: unset;
+     padding-bottom: 4vh;
+    }
+  }
 
     .teach-page .oppia-teach-section-five {
       background-image: url(/assets/images/splash/m_testimonial_background.png);
