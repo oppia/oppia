@@ -61,7 +61,7 @@ export class AboutPageComponent implements OnInit {
       registerClickBrowseLibraryButtonEvent();
     setTimeout(
       () => this.windowRef.nativeWindow.location.href =
-       'community-library', 150);
+       '/community-library', 150);
     return;
   }
 

@@ -113,6 +113,7 @@ describe('About Page', () => {
   it('should successfully instantiate the component from beforeEach block',
     () => {
       expect(component).toBeDefined();
+      component.ngOnInit();
     });
 
   it('should get static image url', () => {
@@ -124,6 +125,7 @@ describe('About Page', () => {
     component.ngOnInit();
     expect(component.userIsLoggedIn).toBe(null);
     expect(component.classroomUrl).toBe('/learn/math');
+    expect(component.classroomUrlFragment).toBe('/math');
   });
 
   it('should check if loader screen is working', () =>
@@ -154,6 +156,13 @@ describe('About Page', () => {
     expect(component.userIsLoggedIn).toBe(true);
   }));
 
+  it('Should store if user is logged in or not', fakeAsync(() => {
+    component.ngOnInit();
+    expect(component.userIsLoggedIn).toBeTrue();
+    expect(component.loaderService).toHaveBeenCalled();
+  }
+  ))
+
   it('should activate when Visit Classroom is clicked', function() {
     spyOn(
       siteAnalyticsServiceStub, 'registerClickVisitClassroomButtonEvent')
@@ -161,6 +170,7 @@ describe('About Page', () => {
     component.onClickVisitClassroomButton();
     expect(siteAnalyticsServiceStub.registerClickVisitClassroomButtonEvent)
       .toHaveBeenCalledWith();
+    expect(component.classroomUrlFragment).toBe('/learn/math');
   });
 
   it('should activate when Browse Library is clicked', function() {
@@ -171,6 +181,7 @@ describe('About Page', () => {
     component.onClickBrowseLibraryButton();
     expect(siteAnalyticsServiceStub.registerClickBrowseLibraryButtonEvent)
       .toHaveBeenCalledWith();
+    expect(component.onClickBrowseLibraryButton()).toBe('/community-library');
   });
 
   it('should activate when Create Lesson is clicked', function() {
@@ -179,6 +190,8 @@ describe('About Page', () => {
       .and.callThrough();
     spyOn(global, 'setTimeout');
     component.onClickCreateLessonButton();
+    expect(component.userIsLoggedIn).toBeNull('/_ah/login');
+    expect(component.userIsLoggedIn).toBeUndefined('/creator-dashboard?mode=create');
     expect(siteAnalyticsServiceStub.registerCreateLessonButtonEvent)
       .toHaveBeenCalledWith();
   });
@@ -188,6 +201,7 @@ describe('About Page', () => {
       siteAnalyticsServiceStub, 'registerClickGuideForTeacherButtonEvent')
       .and.callThrough();
     component.onClickGuideForTeacherButton();
+    expect(component.onClickGuideForTeacherButton()).toBe('/teach');
     expect(siteAnalyticsServiceStub.registerClickGuideForTeacherButtonEvent)
       .toHaveBeenCalledWith();
   });
@@ -197,6 +211,7 @@ describe('About Page', () => {
       siteAnalyticsServiceStub, 'registerClickTipforParentsButtonEvent')
       .and.callThrough();
     component.onClickTipsForParentsButton();
+    expect(component.onClickTipsForParentsButton()).toBe('/teach');
     expect(siteAnalyticsServiceStub.registerClickTipforParentsButtonEvent)
       .toHaveBeenCalledWith();
   });
