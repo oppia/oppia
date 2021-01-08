@@ -167,7 +167,13 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
         $scope.HTML_SCHEMA = {
-          type: 'html'
+          type: 'html',
+          ui_config: {
+            activeLanguage: (
+              TranslationLanguageService.getActiveLanguageCode()),
+            activeLanguageDirection: (
+              TranslationLanguageService.getActiveLanguageDirection())
+          }
         };
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'

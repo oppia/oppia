@@ -57,6 +57,15 @@ describe('Translation language service', () => {
         translationLanguageService.getActiveLanguageCode()).toBeNull();
     });
 
+    it('should show the language direction', () => {
+      translationLanguageService.setActiveLanguageCode('ar');
+      expect(
+        translationLanguageService.getActiveLanguageDirection()).toBe('rtl');
+      translationLanguageService.setActiveLanguageCode('en');
+      expect(
+        translationLanguageService.getActiveLanguageDirection()).toBe('ltr');
+    });
+
     it('should show the language description', () => {
       translationLanguageService.setActiveLanguageCode('en');
       expect(
