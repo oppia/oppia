@@ -376,10 +376,16 @@ var TopicEditorPage = function() {
   };
 
   this.expectNumberOfStoriesToBe = async function(count) {
+    if (count) {
+      await waitFor.visibilityOf(
+        storyListTable, 'Story list table takes too long to appear.');
+    }
     expect(await storyListItems.count()).toEqual(count);
   };
 
   this.expectStoryTitleToBe = async function(title, index) {
+    await waitFor.visibilityOf(
+      storyListTable, 'Story list table takes too long to appear.');
     expect(
       await storyListItems.get(index).all(
         by.css('.protractor-test-story-title')).first().getText()
@@ -387,6 +393,8 @@ var TopicEditorPage = function() {
   };
 
   this.expectStoryPublicationStatusToBe = async function(status, index) {
+    await waitFor.visibilityOf(
+      storyListTable, 'Story list table takes too long to appear.');
     expect(
       await storyListItems.get(index).all(
         by.css('.protractor-test-story-publication-status')).first().getText()
@@ -466,6 +474,7 @@ var TopicEditorPage = function() {
   };
 
   this.changeTopicDescription = async function(newDescription) {
+    await general.scrollToTop();
     await topicDescriptionField.clear();
     await topicDescriptionField.sendKeys(newDescription);
     await topicDescriptionHeading.click();
