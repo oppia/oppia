@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2020 The Oppia Authors. All Rights Reserved.
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,13 +19,25 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
 import datetime
 
 from constants import constants
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import prod_validation_jobs_one_off
+from core.domain import rating_services
+from core.domain import rights_domain
+from core.domain import rights_manager
+from core.domain import skill_domain
+from core.domain import skill_services
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import subtopic_page_domain
+from core.domain import taskqueue_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -38,15 +50,13 @@ USER_NAME = 'username'
 
 (
     collection_models, exp_models, feedback_models,
-    job_models, story_models, subtopic_models,
+    story_models, subtopic_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.collection, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.job, models.NAMES.story, models.NAMES.subtopic,
+    models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
-
-
 class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
@@ -64,6 +74,31 @@ class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                '%s' % i, 'skill%s' % i, rubrics)
+            for i in python_utils.RANGE(9)]
+
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
+        ) for i in python_utils.RANGE(6)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
 
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
@@ -268,8 +303,33 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
-        language_codes = ['ar', 'en', 'en']
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                '%s' % i, 'skill%s' % i, rubrics)
+            for i in python_utils.RANGE(9)]
 
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
+        ) for i in python_utils.RANGE(6)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
+
+        language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
@@ -327,6 +387,28 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 4]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_committer_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageSnapshotMetadataModel\', 3]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -461,8 +543,33 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
-        language_codes = ['ar', 'en', 'en']
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                '%s' % i, 'skill%s' % i, rubrics)
+            for i in python_utils.RANGE(9)]
 
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
+        ) for i in python_utils.RANGE(6)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
+
+        language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic.add_additional_story('%s' % (index * 2))
@@ -613,6 +720,31 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
             'topic%s' % i,
             'abbrev-%s' % chr(120 + i),
             'description%s' % i) for i in python_utils.RANGE(3)]
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skills = [
+            skill_domain.Skill.create_default_skill(
+                '%s' % i, 'skill%s' % i, rubrics)
+            for i in python_utils.RANGE(9)]
+
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            'title %d',
+            'description %d' % i,
+            '%s' % (python_utils.divide(i, 2)),
+            'title-%s' % chr(97 + i)
+        ) for i in python_utils.RANGE(6)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
 
         language_codes = ['ar', 'en', 'en']
         for index, topic in enumerate(topics):
@@ -672,6 +804,28 @@ class SubtopicPageCommitLogEntryModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 4]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_user_id_migration_bot(self):
+        self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_user_id(self):
+        self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 3]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
