@@ -34,8 +34,8 @@ import utils
 
 
 def get_matching_activity_dicts(
-        query_string, categories, language_codes, search_cursor):
-    """Given the details of a query and a search cursor, returns a list of
+        query_string, categories, language_codes, search_offset):
+    """Given the details of a query and a search offset, returns a list of
     activity dicts that satisfy the query.
 
     Args:
@@ -49,7 +49,7 @@ def get_matching_activity_dicts(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        search_cursor: str or None. Cursor indicating where, in the list of
+        search_offset: str or None. Offset indicating where, in the list of
             exploration search results, to start the search from. If None,
             collection search results are returned first before the
             explorations.
@@ -58,22 +58,22 @@ def get_matching_activity_dicts(
         tuple. A tuple consisting of two elements:
             - list(dict). Each element in this list is a collection or
                 exploration summary dict, representing a search result.
-            - str. The exploration index cursor from which to start the
+            - str. The exploration index offset from which to start the
                 next search.
     """
     # We only populate collections in the initial load, since the current
     # frontend search infrastructure is set up to only deal with one search
-    # cursor at a time.
+    # offset at a time.
     # TODO(sll): Remove this special casing.
     collection_ids = []
-    if not search_cursor:
+    if not search_offset:
         collection_ids, _ = (
             collection_services.get_collection_ids_matching_query(
                 query_string, categories, language_codes))
 
-    exp_ids, new_search_cursor = (
+    exp_ids, new_search_offset = (
         exp_services.get_exploration_ids_matching_query(
-            query_string, categories, language_codes, cursor=search_cursor))
+            query_string, categories, language_codes, offset=search_offset))
     activity_list = (
         summary_services.get_displayable_collection_summary_dicts_matching_ids(
             collection_ids) +
@@ -85,7 +85,7 @@ def get_matching_activity_dicts(
             '%s activities were fetched to load the library page. '
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
-    return activity_list, new_search_cursor
+    return activity_list, new_search_offset
 
 
 class OldLibraryRedirectPage(base.BaseHandler):
@@ -263,14 +263,15 @@ class SearchHandler(base.BaseHandler):
             language_code_string[2:-2].split('" OR "')
             if language_code_string else [])
 
-        search_cursor = self.request.get('cursor', None)
+        # TODO(#11314): Change 'cursor' to 'offset' here and in the frontend.
+        search_offset = self.request.get('cursor', None)
 
-        activity_list, new_search_cursor = get_matching_activity_dicts(
-            query_string, categories, language_codes, search_cursor)
+        activity_list, new_search_offset = get_matching_activity_dicts(
+            query_string, categories, language_codes, search_offset)
 
         self.values.update({
             'activity_list': activity_list,
-            'search_cursor': new_search_cursor,
+            'search_cursor': new_search_offset,
         })
 
         self.render_json(self.values)
