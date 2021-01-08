@@ -130,10 +130,12 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectNextCardButtonTextToBe = async function(text) {
+    await browser.waitForAngularEnabled(false);
     await waitFor.visibilityOf(
       nextCardButton, 'Next Card Button not showing up.');
     var buttonText = await nextCardButton.getText();
     expect(buttonText).toMatch(text);
+    await browser.waitForAngularEnabled(true);
   };
 
   this.fillAndSubmitSuggestion = async function(
@@ -393,9 +395,11 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectCorrectFeedback = async function() {
+    await browser.waitForAngularEnabled(false);
     await waitFor.visibilityOf(
       correctFeedbackElement,
       'Correct feedback footer takes too long to appear');
+    await browser.waitForAngularEnabled(true);
   };
 };
 
