@@ -210,20 +210,18 @@ def search(
     except elasticsearch.NotFoundError:
         # The index does not exist yet. Create it and return an empty result.
         _create_index(index_name)
-        return [], '0'
+        return [], None
 
     matched_search_docs = response['hits']['hits']
 
     # TODO(#11314): Convert all offsets in this function to ints once the
     # elasticsearch migration is fully complete.
     resulting_offset = None
-    if 0 < len(matched_search_docs) < num_docs_to_fetch:
-        resulting_offset = python_utils.UNICODE(
-            int(offset) + len(matched_search_docs))
-    elif len(matched_search_docs) == num_docs_to_fetch:
+    if len(matched_search_docs) == num_docs_to_fetch:
         # There is at least one more page of results to fetch. Trim the results
         # in this call to the desired size.
         matched_search_docs = matched_search_docs[size:]
+        resulting_offset = python_utils.UNICODE(int(offset) + size)
 
     if ids_only:
         result_docs = [doc['_id'] for doc in matched_search_docs]

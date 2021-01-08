@@ -94,6 +94,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         elastic_search_services.delete_documents_from_index(
             ['not_a_real_id'], 'index1')
 
+    def test_delete_returns_without_error_when_index_does_not_exist(self):
+        elastic_search_services.delete_documents_from_index(
+            ['doc_id'], 'nonexistent_index')
+
     def test_clear_index(self):
         correct_index_name = 'index1'
         def mock_delete_by_query(index, body):
@@ -112,52 +116,26 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
     def test_search_returns_ids_only(self):
         correct_index_name = 'index1'
-        offset = 30
-        size = 50
-        documents = [
-            {
-                '_id': 1,
-                '_source': {
-                    'param1': 1,
-                    'param2': 2
-                }
-            },
-            {
-                '_id': 12,
-                '_source': {
-                    'param1': 3,
-                    'param2': 4
-                }
+        elastic_search_services.add_documents_to_index([{
+            'id': 1,
+            'source': {
+                'param1': 1,
+                'param2': 2
             }
-        ]
-        def mock_search(body, index, params):
-            self.assertEqual(body, {
-                'query': {
-                    'bool': {
-                        'filter': [],
-                        'must': [],
-                    },
-
-                }
-            })
-            self.assertEqual(index, correct_index_name)
-            self.assertEqual(params['size'], 51)
-            self.assertEqual(params['from'], offset)
-            return {
-                'hits': {
-                    'hits': documents
-                }
+        }, {
+            'id': 12,
+            'source': {
+                'param1': 3,
+                'param2': 4
             }
+        }], correct_index_name)
 
-        swap_search = self.swap(
-            elastic_search_services.ES, 'search', mock_search)
-        with swap_search:
-            result, new_offset = (
-                elastic_search_services.search(
-                    '', correct_index_name, [], [], offset=offset,
-                    size=size, ids_only=True))
-        self.assertEqual(new_offset, '32')
+        result, new_offset = (
+            elastic_search_services.search(
+                '', correct_index_name, [], [], offset='0',
+                size=50, ids_only=True))
         self.assertEqual(result, [1, 12])
+        self.assertIsNone(new_offset)
 
     def test_search_returns_full_response(self):
         correct_index_name = 'index1'
@@ -204,39 +182,14 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 elastic_search_services.search(
                     '', correct_index_name, [], [], offset=offset,
                     size=size, ids_only=False))
-        self.assertEqual(new_offset, '32')
+        self.assertIsNone(new_offset)
         self.assertEqual(
             result, [document['_source'] for document in documents])
 
     def test_search_returns_none_when_response_is_empty(self):
-        correct_index_name = 'index1'
-        offset = 30
-        size = 50
-        def mock_search(body, index, params):
-            self.assertEqual(body, {
-                'query': {
-                    'bool': {
-                        'filter': [],
-                        'must': [],
-                    },
-                }
-            })
-            self.assertEqual(index, correct_index_name)
-            self.assertEqual(params['size'], 51)
-            self.assertEqual(params['from'], offset)
-            return {
-                'hits': {
-                    'hits': []
-                }
-            }
-
-        swap_search = self.swap(
-            elastic_search_services.ES, 'search', mock_search)
-        with swap_search:
-            result, new_offset = (
-                elastic_search_services.search(
-                    '', correct_index_name, [], [], offset=offset,
-                    size=size, ids_only=False))
+        result, new_offset = elastic_search_services.search(
+            '', 'index', [], [], offset='0',
+            size=50, ids_only=False)
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
 
@@ -323,3 +276,22 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'query', correct_index_name, ['my_category'], ['en', 'es']))
         self.assertEqual(new_offset, None)
         self.assertEqual(result, [])
+
+    def test_search_returns_the_right_number_of_docs_even_if_more_exist(self):
+        elastic_search_services.add_documents_to_index([{
+            'id': 'doc_id1',
+            'title': 'hello world'
+        }, {
+            'id': 'doc_id2',
+            'title': 'hello me'
+        }], 'index')
+        results, new_offset = elastic_search_services.search(
+            'hello', 'index', [], [], size=1)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(new_offset, '1')
+
+    def test_search_returns_without_error_when_index_does_not_exist(self):
+        result, new_offset = elastic_search_services.search(
+            'query', 'nonexistent_index', [], [])
+        self.assertEqual(result, [])
+        self.assertEqual(new_offset, None)
