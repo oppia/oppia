@@ -181,7 +181,7 @@ export class QuestionBackendApiService {
    * Returns a list of questions based on the list of skill ids and number
    * of questions requested.
    */
-  fetchQuestionsAsync(
+  async fetchQuestionsAsync(
       skillIds: string[], questionCount: number,
       questionsSortedByDifficulty: boolean): Promise<QuestionBackendDict[]> {
     return new Promise((resolve, reject) => {
@@ -197,7 +197,7 @@ export class QuestionBackendApiService {
     });
   }
 
-  fetchQuestionSummariesAsync(
+  async fetchQuestionSummariesAsync(
       skillId: string,
       cursor: string = ''): Promise<QuestionSummariesResponse> {
     return new Promise((resolve, reject) => {
