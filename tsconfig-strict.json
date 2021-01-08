@@ -2,14 +2,20 @@
   "compilerOptions": {
     "allowJs": true,
     "downlevelIteration": true,
-    "lib": ["es2017", "dom", "webworker"],
+    "lib": [
+      "es2017",
+      "dom",
+      "webworker"
+    ],
     "outDir": "local_compiled_js_for_test",
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es6",
     "sourceMap": true,
     "strict": true,
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
@@ -18,20 +24,31 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "app.constants": ["core/templates/app.constants"],
-      "components/*": ["core/templates/components/*"],
-      "domain/*": ["core/templates/domain/*"],
-      "expressions/*": ["core/templates/expressions/*"],
-      "pages/*": ["core/templates/pages/*"],
-      "services/*": ["core/templates/services/*"],
-      "classifiers/*": ["extensions/classifiers/*"],
-      "interactions/*": ["extensions/interactions/*"],
-      "filters/*": ["core/templates/filters/*"],
-      "static/*": ["third_party/static/*"],
-      "tests/*": ["core/templates/tests/*"]
+      "app.constants": [
+        "core/templates/app.constants"
+      ],
+      "components/*": [
+        "core/templates/components/*"
+      ],
+      "domain/*": [
+        "core/templates/domain/*"
+      ],
+      "expressions/*": [
+        "core/templates/expressions/*"
+      ],
+      "pages/*": [
+        "core/templates/pages/*"
+      ],
+      "services/*": [
+        "core/templates/services/*"
+      ]
     }
   },
   "files": [
+    "core/templates/services/alerts.service.spec.ts",
+    "core/templates/services/alerts.service.ts",
+    "core/templates/services/exploration-features.service.ts",
+    "core/templates/services/exploration-features.service.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
     "core/templates/domain/classifier/classifier.model.spec.ts",
     "core/templates/domain/creator_dashboard/creator-dashboard-stats.model.ts",
@@ -68,6 +85,8 @@
     "core/templates/pages/admin-page/services/admin-router.service.spec.ts",
     "core/templates/pages/admin-page/services/admin-task-manager.service.ts",
     "core/templates/pages/admin-page/services/admin-task-manager.service.spec.ts",
+    "core/templates/pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.ts",
+    "core/templates/pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service.spec.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.ts",
     "core/templates/pages/exploration-editor-page/services/angular-name.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/audio-translation-manager.service.ts",
@@ -119,5 +138,7 @@
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.ts",
     "extensions/interactions/LogicProof/directives/logic-proof-rules.service.spec.ts"
   ],
-  "include": ["typings/*.ts"]
+  "include": [
+    "typings/*.ts"
+  ]
 }
