@@ -60,7 +60,7 @@ class MockI18nLanguageCodeService {
   }
 }
 
-fdescribe('About Page', () => {
+describe('About Page', () => {
   const siteAnalyticsServiceStub = new SiteAnalyticsService(
     new WindowRef());
   let loaderService: LoaderService = null;
