@@ -17,8 +17,7 @@
  */
 
 import { TestBed, fakeAsync } from '@angular/core/testing';
-import { EventEmitter, Pipe }
-  from '@angular/core';
+import { EventEmitter, Pipe } from '@angular/core';
 import { HttpClientTestingModule } from
   '@angular/common/http/testing';
 

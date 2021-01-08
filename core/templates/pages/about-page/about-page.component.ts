@@ -18,10 +18,6 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service.ts';
@@ -36,19 +32,9 @@ import splashConstants from 'assets/constants';
   selector: 'about-page',
   templateUrl: './about-page.component.html'
 })
-@NgModule({
-  declarations: [
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule
-  ],
-  providers: [],
-})
 export class AboutPageComponent implements OnInit {
-  aboutPageMascotImgUrl: string;
   canCreateCollections: null;
+  aboutPageMascotImgUrl: string;
   classroomUrlFragment: string;
   classroomUrl :string;
   userIsLoggedIn: boolean | null;
@@ -95,7 +81,7 @@ export class AboutPageComponent implements OnInit {
   onClickGuideForTeacherButton(): boolean {
     this.siteAnalyticsService.registerClickGuideForTeacherButtonEvent();
     setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.classroomUrl;
+      this.windowRef.nativeWindow.location.href = '/teach';
     }, 150);
     return false;
   }
@@ -103,7 +89,7 @@ export class AboutPageComponent implements OnInit {
   onClickTipsForParentsButton(): boolean {
     this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
     setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.classroomUrl;
+      this.windowRef.nativeWindow.location.href = '/teach';
     }, 150);
     return false;
   }
@@ -116,7 +102,6 @@ export class AboutPageComponent implements OnInit {
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
-    this.classroomUrl = '/learn/math';
     this.loaderService.showLoadingScreen('Loading');
     this.userBackendApiService.getUserInfoAsync().then((userInfo) => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
