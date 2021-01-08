@@ -10,21 +10,21 @@
   </div>
 </div>
 <div class="modal-body">
-  <div ng-if="!textToTranslate">
+  <div class="oppia-loading-text" ng-if="loadingData || uploadingTranslation">
+    <div class="oppia-loading-text1 oppia-animate-fadein">
+      <lazy-loading></lazy-loading>
+    </div>
+    <div class="oppia-loading-text2 oppia-animate-fadein">
+      <lazy-loading></lazy-loading>
+    </div>
+  </div>
+  <div ng-if="!textToTranslate && !loadingData">
     <strong>Sorry! All available translations are in review currently.</strong>
   </div>
   <div ng-if="textToTranslate">
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given content in <[languageDescription]>:</strong>
       <a class="oppia-skip-button" href="" ng-if="moreAvailable" ng-click="skipActiveTranslation()">skip</a>
-    </div>
-    <div class="oppia-loading-text" ng-if="loadingData || uploadingTranslation">
-      <div class="oppia-loading-text1 oppia-animate-fadein">
-        <lazy-loading></lazy-loading>
-      </div>
-      <div class="oppia-loading-text2 oppia-animate-fadein">
-        <lazy-loading></lazy-loading>
-      </div>
     </div>
     <div ng-if="!loadingData && !uploadingTranslation" class="oppia-text-to-translate-container">
       <angular-html-bind ng-class="{'oppia-rte-editor-focused': isCopyModeActive()}"
@@ -53,6 +53,18 @@
   </button>
 </div>
 <style>
+  .oppia-translate-text-header-container .oppia-opportunities-subheading {
+    color: #009688;
+    font-size: 14px;
+    height: 40%;
+    width: 100%;
+  }
+  .oppia-translate-text-header-container .oppia-opportunities-details {
+    display: flex;
+    flex-direction: column;
+    margin: 1.8% 0;
+    width: 95%;
+  }
   .oppia-translate-text-header-container {
     border-bottom: 1px solid #e5e5e5;
     padding-left: 15px;

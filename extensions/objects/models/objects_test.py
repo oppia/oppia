@@ -671,21 +671,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.GraphProperty, mappings, invalid_values_with_error_messages)
 
-    def test_set_of_html_string(self):
-        """Tests objects of the type StringList."""
-
-        mappings = [(['abc', 'abb'], [u'abc', u'abb']), ([], [])]
-        invalid_values_with_error_messages = [
-            ('123', 'Expected list, received 123'),
-            ({'a': 1}, r'Expected list, received \{u\'a\': 1\}'),
-            (3.0, 'Expected list, received 3.0'),
-            (None, 'Expected list, received None'),
-            ([3, 'a'], 'Expected unicode HTML string, received 3'),
-            ([1, 2, 1], 'Expected unicode HTML string, received 1')]
-        self.check_normalization(
-            objects.SetOfHtmlString, mappings,
-            invalid_values_with_error_messages)
-
     def test_fraction(self):
         """Tests objects of type Fraction."""
         mappings = [(
@@ -843,13 +828,18 @@ class SchemaValidityTests(test_utils.GenericTestBase):
 
     def test_schemas_used_to_define_objects_are_valid(self):
         count = 0
-        for _, member in inspect.getmembers(objects):
+        for name, member in inspect.getmembers(objects):
             if inspect.isclass(member):
-                if hasattr(member, 'SCHEMA'):
-                    schema_utils_test.validate_schema(member.SCHEMA)
+                # Since BaseTranslatableObject acts as an interface, it will
+                # throw an NotImplementedError exception on get_schema().
+                if name == 'BaseTranslatableObject':
+                    continue
+
+                if hasattr(member, 'get_schema'):
+                    schema_utils_test.validate_schema(member.get_schema())
                     count += 1
 
-        self.assertEqual(count, 50)
+        self.assertEqual(count, 52)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
@@ -857,6 +847,14 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
     def test_default_values_for_objects_are_valid(self):
         for _, member in inspect.getmembers(objects):
             if inspect.isclass(member) and member.default_value is not None:
+                if isinstance(member(), objects.BaseTranslatableObject):
+                    # If object is a BaseTranslatableObject, the default
+                    # content_id could be None but the normalization will
+                    # enforce a non-None string. This is because the content id
+                    # is populated before being saved. To get around this, we
+                    # populate the content id.
+                    member.default_value['contentId'] = 'rule_input'
+
                 self.assertEqual(
                     member.normalize(member.default_value),
                     member.default_value)
@@ -900,3 +898,90 @@ class CodeStringTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             TypeError, 'Unexpected tab characters in code string: \t'):
             code_string.normalize('\t')
+
+
+class BaseTranslatableObjectTests(test_utils.GenericTestBase):
+
+    def test_translatable_objects_naming(self):
+        for name, member in inspect.getmembers(objects):
+            if not inspect.isclass(member):
+                continue
+
+            # Assert that BaseTranslatableObject subclasses start with
+            # 'Translatable'. All objects that start with 'Translatable'
+            # subclass BaseTranslatableObject, with the exception of any object
+            # name that contains 'ContentId' (e.g. TranslatableHtmlContentId).
+            if isinstance(member(), objects.BaseTranslatableObject):
+                if name == 'BaseTranslatableObject':
+                    continue
+                self.assertEqual(name.find('Translatable'), 0)
+            elif 'ContentId' not in name:
+                self.assertNotIn('Translatable', name)
+
+    def test_abstract_base_class_raises_not_implemented_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError, 'Subclasses of BaseTranslatableObject should'):
+            objects.BaseTranslatableObject.get_schema()
+
+        with self.assertRaisesRegexp(
+            NotImplementedError, 'Subclasses of BaseTranslatableObject should'):
+            objects.BaseTranslatableObject.normalize({
+                'contentId': 'rule_input'
+            })
+
+    def test_base_translatable_object_normalization(self):
+        with self.assertRaisesRegexp(
+            TypeError, 'Expected content id to be a string'):
+            objects.BaseTranslatableObject.normalize({
+                'contentId': 5
+            })
+
+
+class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        with self.assertRaisesRegexp(
+            TypeError, 'Invalid unicode string set'):
+            objects.TranslatableSetOfNormalizedString.normalize({
+                'contentId': 'rule_input',
+                'normalizedStrSet': 5
+            })
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Invalid content unicode'):
+            objects.TranslatableSetOfNormalizedString.normalize({
+                'contentId': 'rule_input',
+                'normalizedStrSet': ['1', 2, '3']
+            })
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Duplicate unicode found'):
+            objects.TranslatableSetOfNormalizedString.normalize({
+                'contentId': 'rule_input',
+                'normalizedStrSet': ['1', '1']
+            })
+
+
+class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
+
+    def test_normalization(self):
+        with self.assertRaisesRegexp(
+            TypeError, 'Invalid unicode string set'):
+            objects.TranslatableSetOfUnicodeString.normalize({
+                'contentId': 'rule_input',
+                'unicodeStrSet': 5
+            })
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Invalid content unicode'):
+            objects.TranslatableSetOfUnicodeString.normalize({
+                'contentId': 'rule_input',
+                'unicodeStrSet': ['1', 2, '3']
+            })
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Duplicate unicode found'):
+            objects.TranslatableSetOfUnicodeString.normalize({
+                'contentId': 'rule_input',
+                'unicodeStrSet': ['1', '1']
+            })

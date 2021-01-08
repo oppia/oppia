@@ -47,7 +47,7 @@
           <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
         </div>
 
-        <div class="d-lg-none oppia-search-bar-container">
+        <div class="oppia-search-bar-container">
           <search-bar enable-dropup="false"></search-bar>
         </div>
 
@@ -218,11 +218,13 @@
   }
   library-page .oppia-classroom-h2 {
     color: #033e39;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-family: "Roboto", Arial, sans-serif;
+    font-weight: 700;
   }
   library-page .oppia-classroom-p {
     color: #383838;
     font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
+    line-height: 1.5;
     margin-top: 25px;
   }
   library-page .oppia-classroom-div > img {
@@ -393,7 +395,7 @@
       font-size: 1.05em;
     }
   }
-  @media (max-width: 992px) {
+  @media (max-width: 1126px) {
     library-page .oppia-classroom-div {
       margin-top: 100px;
     }
@@ -461,6 +463,11 @@
     }
     library-page .oppia-classroom-text > a {
       margin-top: 40px;
+    }
+  }
+  @media(min-width: 1126px) {
+    .oppia-search-bar-container {
+      display: none;
     }
   }
 </style>

@@ -1327,6 +1327,25 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(len(extracted_answers), 1)
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
 
+    def test_handler_when_exp_version_is_not_int_throws_exception(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+
+        # Test that it returns all answers when 'num_answers' is 0.
+        payload = {
+            'exp_id': self.EXP_ID,
+            'exp_version': 'a',
+            'state_name': self.exploration.init_state_name,
+            'num_answers': 0
+        }
+
+        response = self.get_json(
+            '/explorationdataextractionhandler',
+            params=payload,
+            expected_status_int=400
+        )
+        self.assertEqual(
+            response['error'], 'Version a cannot be converted to int.')
+
     def test_that_handler_raises_exception(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         payload = {
@@ -1387,10 +1406,11 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
     def test_clear_search_index(self):
         exp_services.load_demo('0')
         result_explorations = search_services.search_explorations(
-            'Welcome', 2)[0]
+            'Welcome', [], [], 2)[0]
         self.assertEqual(result_explorations, ['0'])
         collection_services.load_demo('0')
-        result_collections = search_services.search_collections('Welcome', 2)[0]
+        result_collections = search_services.search_collections(
+            'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, ['0'])
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -1402,9 +1422,10 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
             csrf_token=csrf_token)
         self.assertEqual(generated_exps_response, {})
         result_explorations = search_services.search_explorations(
-            'Welcome', 2)[0]
+            'Welcome', [], [], 2)[0]
         self.assertEqual(result_explorations, [])
-        result_collections = search_services.search_collections('Welcome', 2)[0]
+        result_collections = search_services.search_collections(
+            'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, [])
 
 

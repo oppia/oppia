@@ -78,8 +78,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             suggestion_models.SCORE_CATEGORY_DELIMITER + exp.category)
 
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, '0',
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
             self.admin_id, change, score_category, self.thread_id, None)
         self.model_instance = (
@@ -91,6 +91,50 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralSuggestionModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_author_id_migration_bot(self):
+        self.model_instance.author_ids = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_author_id(self):
+        self.model_instance.author_ids = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_final_reviewer_id_migration_bot(self):
+        self.model_instance.final_reviewer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_final_reviewer_id(self):
+        self.model_instance.final_reviewer_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -325,8 +369,8 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             'suggestion', has_suggestion=True)
 
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, '0',
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, '0',
             1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
             self.admin_id, change, score_category, thread_id, 'en')
         model_instance = (
@@ -361,7 +405,7 @@ class GeneralVoiceoverApplicationModelValidatorTests(
 
         suggestion_models.GeneralVoiceoverApplicationModel(
             id='valid_id',
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id='0',
             status=suggestion_models.STATUS_ACCEPTED,
             author_id=self.owner_id,
@@ -381,6 +425,28 @@ class GeneralVoiceoverApplicationModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_author_id(self):
+        self.model_instance.author_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_final_reviewer_id(self):
+        self.model_instance.final_reviewer_id = self.PSEUDONYMOUS_ID
+        self.model_instance.update_timestamps(update_last_updated_time=False)
+        self.model_instance.put()
+
+        expected_output = [
+            u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -532,8 +598,8 @@ class CommunityContributionStatsModelValidatorTests(
         )
 
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, self.author_id,
             self.reviewer_id, self.change_cmd, score_category,
@@ -548,8 +614,8 @@ class CommunityContributionStatsModelValidatorTests(
         )
 
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, self.author_id,
             self.reviewer_id, self.change_cmd, score_category,

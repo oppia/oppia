@@ -31,14 +31,10 @@ describe('Pie Chart component', function() {
       getResizeEvent: () => of(resizeEvent)
     });
   }));
-
-  afterEach(function() {
-    // Resetting google global property.
-    window.google = undefined;
-    Object.defineProperty(window, 'google', {
-      get: () => undefined
-    });
-    ctrl.$onDestroy();
+  afterEach(() => {
+    if (ctrl) {
+      ctrl.$onDestroy();
+    }
   });
 
   describe('when $scope data is not an array', function() {
@@ -50,13 +46,6 @@ describe('Pie Chart component', function() {
         draw: () => {}
       };
 
-      // This throws "Type '{}' is missing the following properties from type
-      // 'typeof google': load, setOnLoadCallback, charts, visualization".
-      // This is because it expect properties matching actual window.google.
-      // We are suppressing this error because we don't need those properties
-      // for testing purposes.
-      // @ts-expect-error
-      window.google = {};
       // This approach was choosen because spyOnProperty() doesn't work on
       // properties that doesn't have a get access type.
       // Without this approach the test will fail because it'll throw
@@ -107,13 +96,6 @@ describe('Pie Chart component', function() {
         draw: () => {}
       };
 
-      // This throws "Type '{}' is missing the following properties from type
-      // 'typeof google': load, setOnLoadCallback, charts, visualization".
-      // This is because it expect properties matching actual window.google.
-      // We are suppressing this error because we don't need those properties
-      // for testing purposes.
-      // @ts-expect-error
-      window.google = {};
       // This approach was choosen because spyOnProperty() doesn't work on
       // properties that doesn't have a get access type.
       // Without this approach the test will fail because it'll throw
@@ -157,21 +139,13 @@ describe('Pie Chart component', function() {
   });
 
   describe('when chart is defined and $scope data is an array', function() {
+    let drawSpy: jasmine.Spy<() => void>;
+
     beforeEach(angular.mock.inject(function($injector, $componentController) {
       $flushPendingTasks = $injector.get('$flushPendingTasks');
       var $rootScope = $injector.get('$rootScope');
+      drawSpy = jasmine.createSpy('draw', () => {});
 
-      mockedChart = {
-        draw: () => {}
-      };
-
-      // This throws "Type '{}' is missing the following properties from type
-      // 'typeof google': load, setOnLoadCallback, charts, visualization".
-      // This is because it expect properties matching actual window.google.
-      // We are suppressing this error because we don't need those properties
-      // for testing purposes.
-      // @ts-expect-error
-      window.google = {};
       // This approach was choosen because spyOnProperty() doesn't work on
       // properties that doesn't have a get access type.
       // Without this approach the test will fail because it'll throw
@@ -182,14 +156,17 @@ describe('Pie Chart component', function() {
       Object.defineProperty(window, 'google', {
         get: () => ({})
       });
+
       spyOnProperty(window, 'google').and.returnValue({
         visualization: {
           arrayToDataTable: () => {},
-          PieChart: () => mockedChart
+          PieChart: function() {
+            this.draw = drawSpy;
+          }
         },
         charts: {
           setOnLoadCallback: callback => callback()
-        },
+        }
       });
 
       $scope = $rootScope.$new();
@@ -214,7 +191,6 @@ describe('Pie Chart component', function() {
     }));
 
     it('should redraw chart', function() {
-      const drawSpy = spyOn(mockedChart, 'draw');
       angular.element(window).triggerHandler('resize');
 
       // Waiting for $applyAsync be called, which can take ~10 miliseconds

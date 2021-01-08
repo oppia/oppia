@@ -97,7 +97,9 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           action: action,
           review_message: reviewMessage,
           commit_message: (
-            action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null)
+            action === ACTION_ACCEPT_SUGGESTION ?
+            commitMessage : null
+          )
         }).then(function() {
           onSuccess(suggestionId);
         });

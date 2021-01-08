@@ -912,9 +912,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    # IDs of activities (e.g., explorations) that this user subscribes to.
-    # TODO(#10727): Rename this to exploration_ids and perform a migration.
-    activity_ids = (
+    # IDs of explorations that this user subscribes to.
+    exploration_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
     # IDs of collections that this user subscribes to.
     collection_ids = (
@@ -927,8 +926,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # When the user last checked notifications. May be None.
     last_checked = datastore_services.DateTimeProperty(default=None)
 
-    # DEPRECATED in v2.6.8. Do not use. Use general_feedback_thread_ids instead.
-    feedback_thread_ids = (
+    # DEPRECATED in v3.0.7. Do not use. Use exploration_ids instead.
+    activity_ids = (
         datastore_services.StringProperty(repeated=True, indexed=True))
 
     @staticmethod
@@ -945,13 +944,13 @@ class UserSubscriptionsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'activity_ids': base_models.EXPORT_POLICY.EXPORTED,
+            'activity_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
                 base_models.EXPORT_POLICY.EXPORTED,
             'creator_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'last_checked': base_models.EXPORT_POLICY.EXPORTED,
-            'feedback_thread_ids': base_models.EXPORT_POLICY.EXPORTED
+            'last_checked': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
@@ -1015,12 +1014,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
             creator.username for creator in creator_user_models]
 
         user_data = {
-            'activity_ids': user_model.activity_ids,
+            'exploration_ids': user_model.exploration_ids,
             'collection_ids': user_model.collection_ids,
             'general_feedback_thread_ids': (
                 user_model.general_feedback_thread_ids),
-            'feedback_thread_ids': (
-                user_model.feedback_thread_ids),
             'creator_usernames': creator_usernames,
             'last_checked_msec':
                 None if user_model.last_checked is None else
@@ -2885,8 +2882,21 @@ class UserIdentifiersModel(base_models.BaseModel):
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @classmethod
+    def get_by_gae_id(cls, gae_id):
+        """Get an entry by GAE ID.
+
+        Args:
+            gae_id: str. The GAE ID.
+
+        Returns:
+            UserIdentifiersModel. The model with ID field equal to gae_id
+            argument.
+        """
+        return cls.get_by_id(gae_id)
+
+    @classmethod
     def get_by_user_id(cls, user_id):
-        """Fetch a entry by user ID.
+        """Fetch an entry by user ID.
 
         Args:
             user_id: str. The user ID.

@@ -30,9 +30,6 @@ require(
 
 require(
   'components/question-directives/modal-templates/' +
-    'change-question-difficulty-modal.controller.ts');
-require(
-  'components/question-directives/modal-templates/' +
     'question-editor-modal.controller.ts');
 require('directives/angular-html-bind.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
@@ -67,14 +64,16 @@ angular.module('oppia').factory('QuestionCreationService', [
   'QuestionObjectFactory',
   'QuestionUndoRedoService', 'SkillBackendApiService',
   'SkillEditorStateService', 'UrlInterpolationService',
-  'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY', 'SKILL_DIFFICULTIES',
+  'DEFAULT_SKILL_DIFFICULTY', 'MODE_SELECT_DIFFICULTY',
+  'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
       $location, $rootScope, $uibModal, AlertsService,
       EditableQuestionBackendApiService, ImageLocalStorageService,
       QuestionObjectFactory,
       QuestionUndoRedoService, SkillBackendApiService,
       SkillEditorStateService, UrlInterpolationService,
-      DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY, SKILL_DIFFICULTIES) {
+      DEFAULT_SKILL_DIFFICULTY, MODE_SELECT_DIFFICULTY,
+      SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
     var newQuestionSkillDifficulties = [];
     var question = null;
     var skill = null;
@@ -130,7 +129,7 @@ angular.module('oppia').factory('QuestionCreationService', [
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/topic-editor-page/modal-templates/' +
             'select-skill-and-difficulty-modal.template.html'),
-        backdrop: true,
+        backdrop: 'static',
         resolve: {
           allSkillSummaries: () => allSkillSummaries,
           countOfSkillsToPrioritize: () => countOfSkillsToPrioritize,
@@ -169,16 +168,6 @@ angular.module('oppia').factory('QuestionCreationService', [
       openQuestionEditor(newQuestionSkillDifficulties[0]);
     };
 
-    var getDifficultyString = function(difficulty) {
-      if (difficulty === 0.3) {
-        return SKILL_DIFFICULTIES[0];
-      } else if (difficulty === 0.6) {
-        return SKILL_DIFFICULTIES[1];
-      } else {
-        return SKILL_DIFFICULTIES[2];
-      }
-    };
-
     var saveAndPublishQuestion = function() {
       var validationErrors = question.getValidationErrorMessage();
       var unaddressedMisconceptions = (
@@ -207,15 +196,12 @@ angular.module('oppia').factory('QuestionCreationService', [
       QuestionUndoRedoService.clearChanges();
       var selectedSkillId = SkillEditorStateService.getSkill().getId();
       $location.hash(questionId);
-      var skillIdToNameMapping = (
-        [].reduce((obj, skill) => (
-          obj[skill.getId()] = skill.getDescription(), obj), {}));
-      var skillNames = [];
-      var rubrics = [];
-      skillNames = [skillIdToNameMapping[selectedSkillId]];
-      rubrics = [skillIdToRubricsObject[selectedSkillId].find(
-        rubric => rubric.getDifficulty() === getDifficultyString(
-          parseFloat(questionDifficulty)))];
+      var skillName = SkillEditorStateService.getSkill().getDescription();
+      var skillDifficultyMapping = SKILL_DIFFICULTY_LABEL_TO_FLOAT;
+      var rubric = skillIdToRubricsObject[selectedSkillId].find(
+        rubric => skillDifficultyMapping[rubric.getDifficulty()] === parseFloat(
+          questionDifficulty));
+
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/components/question-directives/modal-templates/' +
@@ -233,8 +219,8 @@ angular.module('oppia').factory('QuestionCreationService', [
           question: () => question,
           questionId: () => questionId,
           questionStateData: () => questionStateData,
-          rubrics: () => rubrics,
-          skillNames: () => skillNames
+          rubric: () => rubric,
+          skillName: () => skillName
         },
         controller: 'QuestionEditorModalController',
       }).result.then(function() {
@@ -251,7 +237,6 @@ angular.module('oppia').factory('QuestionCreationService', [
       initializeNewQuestionCreation: initializeNewQuestionCreation,
       openQuestionEditor: openQuestionEditor,
       saveAndPublishQuestion: saveAndPublishQuestion,
-      getDifficultyString: getDifficultyString,
       populateMisconceptions: populateMisconceptions,
     };
   }

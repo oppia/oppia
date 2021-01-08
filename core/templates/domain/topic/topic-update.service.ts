@@ -352,7 +352,7 @@ export class TopicUpdateService {
       topic: Topic, subtopicId: number): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
-      throw new Error('Subtopic doesn\'t exist');
+      throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
     let newlyCreated = false;
     let changeList =
@@ -545,7 +545,7 @@ export class TopicUpdateService {
       topic: Topic, subtopicId: number, thumbnailFilename: string): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
-      throw new Error('Subtopic doesn\'t exist');
+      throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
     let oldThumbnailFilename = cloneDeep(
       subtopic.getThumbnailFilename());
@@ -572,7 +572,7 @@ export class TopicUpdateService {
   : void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
-      throw new Error('Subtopic doesn\'t exist');
+      throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
     let oldUrlFragment = cloneDeep(subtopic.getUrlFragment());
     this._applySubtopicPropertyChange(
@@ -597,7 +597,7 @@ export class TopicUpdateService {
       topic: Topic, subtopicId: number, thumbnailBgColor: string): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
-      throw new Error('Subtopic doesn\'t exist');
+      throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
     let oldThumbnailBgColor = cloneDeep(
       subtopic.getThumbnailBgColor());
@@ -623,7 +623,7 @@ export class TopicUpdateService {
       topic: Topic, subtopicId: number, title: string): void {
     let subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
-      throw new Error('Subtopic doesn\'t exist');
+      throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
     let oldTitle = cloneDeep(subtopic.getTitle());
     this._applySubtopicPropertyChange(

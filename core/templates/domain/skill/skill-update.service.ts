@@ -155,7 +155,7 @@ export class SkillUpdateService {
         let description = this._getNewPropertyValueFromChangeDict(changeDict);
         skill.setDescription(description);
       },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.setDescription(oldDescription);
       }
     );
@@ -168,10 +168,10 @@ export class SkillUpdateService {
       SkillDomainConstants.SKILL_CONTENTS_PROPERTY_EXPLANATION,
       newExplanation.toBackendDict(),
       oldExplanation.toBackendDict(),
-      (unusedC(hangeDict, skill) => {
+      (changeDict, skill) => {
         skill.getConceptCard().setExplanation(newExplanation);
       },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.getConceptCard().setExplanation(oldExplanation);
       }
     );
@@ -190,10 +190,10 @@ export class SkillUpdateService {
         return workedExample.toBackendDict();
       }),
       oldWorkedExamples.map((workedExample) => workedExample.toBackendDict()),
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
       }
     );
@@ -214,44 +214,10 @@ export class SkillUpdateService {
       oldWorkedExamples.map((workedExample) => {
         return workedExample.toBackendDict();
       }),
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
-      (unusedChangeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
-      }
-    );
-  }
-
-  updateWorkedExample(
-      skill: Skill,
-      workedExampleIndex: number,
-      newWorkedExampleQuestionHtml: string,
-      newWorkedExampleAnswerHtml: string
-  ): void {
-    const oldWorkedExamples = cloneDeep(
-      skill.getConceptCard().getWorkedExamples()
-    );
-    const newWorkedExamples = cloneDeep(oldWorkedExamples);
-    newWorkedExamples[workedExampleIndex]
-      .getQuestion()
-      .setHtml(newWorkedExampleQuestionHtml);
-    newWorkedExamples[workedExampleIndex]
-      .getExplanation()
-      .setHtml(newWorkedExampleAnswerHtml);
-    this._applySkillContentsPropertyChange(
-      skill,
-      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-      newWorkedExamples.map((workedExample) => {
-        return workedExample.toBackendDict();
-      }),
-      oldWorkedExamples.map((workedExample) => {
-        return workedExample.toBackendDict();
-      }),
-      (unusedChangeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
-      },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
       }
     );
@@ -268,13 +234,31 @@ export class SkillUpdateService {
       oldWorkedExamples.map((workedExample) => {
         return workedExample.toBackendDict();
       }),
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
       }
     );
+  }
+
+  updateWorkedExample(
+      skill: Skill,
+      workedExampleIndex: number,
+      newWorkedExampleQuestionHtml: string,
+      newWorkedExampleAnswerHtml: string
+  ): void {
+    const newWorkedExamples = cloneDeep(
+      skill.getConceptCard().getWorkedExamples()
+    );
+    newWorkedExamples[workedExampleIndex]
+      .getQuestion()
+      .setHtml(newWorkedExampleQuestionHtml);
+    newWorkedExamples[workedExampleIndex]
+      .getExplanation()
+      .setHtml(newWorkedExampleAnswerHtml);
+    this.updateWorkedExamples(skill, newWorkedExamples);
   }
 
   addMisconception(skill: Skill, newMisconception: Misconception): void {
@@ -287,10 +271,10 @@ export class SkillUpdateService {
       skill,
       SkillDomainConstants.CMD_ADD_SKILL_MISCONCEPTION,
       params,
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.appendMisconception(newMisconception);
       },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.deleteMisconception(misconceptionId);
       }
     );
@@ -305,10 +289,10 @@ export class SkillUpdateService {
       skill,
       SkillDomainConstants.CMD_DELETE_SKILL_MISCONCEPTION,
       params,
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.deleteMisconception(misconceptionId);
       },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.appendMisconception(oldMisconception);
       }
     );
@@ -322,10 +306,10 @@ export class SkillUpdateService {
       skill,
       SkillDomainConstants.CMD_ADD_PREREQUISITE_SKILL,
       params,
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.addPrerequisiteSkill(skillId);
       },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.deletePrerequisiteSkill(skillId);
       }
     );
@@ -339,10 +323,10 @@ export class SkillUpdateService {
       skill,
       SkillDomainConstants.CMD_DELETE_PREREQUISITE_SKILL,
       params,
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.deletePrerequisiteSkill(skillId);
       },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.addPrerequisiteSkill(skillId);
       }
     );
@@ -457,10 +441,10 @@ export class SkillUpdateService {
       skill,
       difficulty,
       explanations,
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.updateRubricForDifficulty(difficulty, explanations);
       },
-      (unusedChangeDict, skill) => {
+      (changeDict, skill) => {
         skill.updateRubricForDifficulty(difficulty, oldExplanations);
       }
     );

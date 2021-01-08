@@ -133,8 +133,9 @@ describe('Exploration Recommendations Service', () => {
       );
 
       spyOn(
-        expRecsBackendApiService, 'getRecommendedSummaryDicts').and.callFake(
-        (unused_, includeSystemRecommendations: string) => {
+        expRecsBackendApiService,
+        'getRecommendedSummaryDictsAsync').and.callFake(
+        (_, includeSystemRecommendations: string) => {
           return Promise.resolve(
             includeSystemRecommendations === 'true' ?
             systemRecommendations.concat(authorRecommendations) :

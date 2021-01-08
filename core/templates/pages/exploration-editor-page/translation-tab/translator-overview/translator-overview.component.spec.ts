@@ -57,6 +57,7 @@ describe('Translator Overview component', function() {
   var translationLanguageService = null;
   var translationStatusService = null;
   var translationTabActiveModeService = null;
+  var explorationLanguageCode = 'hi';
 
   var mockWindow = null;
   beforeEach(angular.mock.module('oppia'));
@@ -103,7 +104,7 @@ describe('Translator Overview component', function() {
     spyOn(translationTabActiveModeService, 'isVoiceoverModeActive').and
       .returnValue(true);
 
-    explorationLanguageCodeService.init('hi');
+    explorationLanguageCodeService.init(explorationLanguageCode);
 
     $scope = $rootScope.$new();
     ctrl = $componentController('translatorOverview', {
@@ -121,7 +122,15 @@ describe('Translator Overview component', function() {
       expect($scope.languageCode).toBe('en');
       expect($scope.inTranslationMode).toBe(true);
       expect($scope.inVoiceoverMode).toBe(true);
-      expect($scope.languageCodesAndDescriptions.length).toBe(45);
+      expect($scope.languageCodesAndDescriptions.length).toBe(
+        languageUtilService.getAllVoiceoverLanguageCodes().length - 1);
+      expect(languageUtilService.getAllVoiceoverLanguageCodes()).toContain(
+        explorationLanguageCode);
+      expect($scope.languageCodesAndDescriptions).not.toContain({
+        id: explorationLanguageCode,
+        description: languageUtilService.getAudioLanguageDescription(
+          explorationLanguageCode)
+      });
     });
 
   it('should show tab mode switcher when language code is different' +

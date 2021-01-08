@@ -123,7 +123,7 @@ export class ItemSelectionInputValidationService {
         answerGroups, stateName));
 
     var seenChoices = customizationArgs.choices.value;
-    var handledAnswers = seenChoices.map((unusedItem) => {
+    var handledAnswers = seenChoices.map((item) => {
       return false;
     });
 
@@ -136,7 +136,7 @@ export class ItemSelectionInputValidationService {
     if (maxAllowedCount === 1) {
       var answerChoiceToIndex = {};
       seenChoices.forEach((seenChoice, choiceIndex) => {
-        answerChoiceToIndex[seenChoice.getHtml()] = choiceIndex;
+        answerChoiceToIndex[seenChoice.getContentId()] = choiceIndex;
       });
 
       answerGroups.forEach((answerGroup, answerIndex) => {
@@ -187,11 +187,24 @@ export class ItemSelectionInputValidationService {
       }
     }
 
+    const choicesContentIds = new Set(customizationArgs.choices.value.map(
+      choice => choice.getContentId()));
+
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
       rules.forEach((rule, ruleIndex) => {
         var ruleInputs = (<string[]>rule.inputs.x);
-        ruleInputs.forEach((unusedRuleInput) => {
+        ruleInputs.forEach((ruleInput) => {
+          if (!choicesContentIds.has(ruleInput)) {
+            warningsList.push({
+              type: AppConstants.WARNING_TYPES.ERROR,
+              message: (
+                `Rule ${(ruleIndex + 1)} from answer group ` +
+                `${(answerIndex + 1)} options do not match customization ` +
+                'argument choices.')
+            });
+          }
+
           if (rule.type === 'IsProperSubsetOf') {
             if (ruleInputs.length < 2) {
               warningsList.push({
