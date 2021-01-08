@@ -150,7 +150,7 @@ var PreferencesPage = function() {
   // when hovering over the tile.
   this.expectDisplayedFirstSubscriptionToBe = async function(name) {
     await waitFor.visibilityOf(
-      subscriptions, 'subscriptions taking too long to appear.');
+      subscriptions.first(), 'subscriptions taking too long to appear.');
     expect(await subscriptions.first().getText()).toMatch(name);
   };
 
@@ -159,7 +159,7 @@ var PreferencesPage = function() {
   // when hovering over the tile.
   this.expectDisplayedLastSubscriptionToBe = async function(name) {
     await waitFor.visibilityOf(
-      subscriptions, 'subscriptions taking too long to appear.');
+      subscriptions.last(), 'subscriptions taking too long to appear.');
     expect(await subscriptions.last().getText()).toMatch(name);
   };
 
