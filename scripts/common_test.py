@@ -1158,3 +1158,49 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(len(popen_calls), 1)
         self.assertIn('dev_appserver.py', popen_calls[0].program_args)
         self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'env': None})
+
+    def test_managed_elasticsearch_dev_server(self):
+        with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+            stack.enter_context(common.managed_elasticsearch_dev_server())
+
+        self.assertIn(
+            '%s/bin/elasticsearch' % common.ES_PATH,
+            popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+
+    def test_start_server_removes_elasticsearch_data(self):
+        check_function_calls = {
+            'shutil_rmtree_is_called': False
+        }
+
+        old_os_path_exists = os.path.exists
+
+        def mock_os_remove_files(file_path): # pylint: disable=unused-argument
+            check_function_calls['shutil_rmtree_is_called'] = True
+
+        def mock_os_path_exists(file_path): # pylint: disable=unused-argument
+            if file_path == common.ES_PATH_DATA_DIR:
+                return True
+            return old_os_path_exists(file_path)
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            return Ret()
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_os_remove = self.swap(shutil, 'rmtree', mock_os_remove_files)
+        swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
+        stack = contextlib2.ExitStack()
+        with swap_call, swap_os_remove, swap_os_path_exists, stack:
+            stack.enter_context(self._swap_popen())
+            stack.enter_context(common.managed_elasticsearch_dev_server())
+
+        self.assertTrue(check_function_calls['shutil_rmtree_is_called'])

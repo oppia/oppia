@@ -126,14 +126,14 @@ def get_exploration_titles_and_categories(exp_ids):
 
 
 def get_exploration_ids_matching_query(
-        query_string, categories, language_codes, cursor=None):
+        query_string, categories, language_codes, offset=None):
     """Returns a list with all exploration ids matching the given search query
-    string, as well as a search cursor for future fetches.
+    string, as well as a search offset for future fetches.
 
     This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
     there are at least that many, otherwise it returns all remaining results.
     (If this behaviour does not occur, an error will be logged.) The method
-    also returns a search cursor.
+    also returns a search offset.
 
     Args:
         query_string: str. A search query string.
@@ -145,23 +145,23 @@ def get_exploration_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        cursor: str or None. Optional cursor from which to start the search
-            query. If no cursor is supplied, the first N results matching
+        offset: str or None. Optional offset from which to start the search
+            query. If no offset is supplied, the first N results matching
             the query are returned.
 
     Returns:
         list(str). A list of exploration ids matching the given search query.
     """
     returned_exploration_ids = []
-    search_cursor = cursor
+    search_offset = offset
 
     for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
-        exp_ids, search_cursor = search_services.search_explorations(
+        exp_ids, search_offset = search_services.search_explorations(
             query_string, categories, language_codes, remaining_to_fetch,
-            cursor=search_cursor)
+            offset=search_offset)
 
         invalid_exp_ids = []
         for ind, model in enumerate(
@@ -172,7 +172,7 @@ def get_exploration_ids_matching_query(
                 invalid_exp_ids.append(exp_ids[ind])
 
         if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
-                or search_cursor is None):
+                or search_offset is None):
             break
         else:
             logging.error(
@@ -180,12 +180,12 @@ def get_exploration_ids_matching_query(
                 ', '.join(invalid_exp_ids))
 
     if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-            and search_cursor is not None):
+            and search_offset is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
-    return (returned_exploration_ids, search_cursor)
+    return (returned_exploration_ids, search_offset)
 
 
 def get_non_private_exploration_summaries():

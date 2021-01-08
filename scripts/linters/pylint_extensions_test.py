@@ -222,7 +222,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""self.post_json('/ml/\\trainedclassifierhandler',  # pylint: disable=invalid-name
+                u"""self.post_json('/ml/\\trainedclassifierhandler',
                 self.payload, expect_errors=True, expected_status_int=401)
 
                 if (a > 1 and
@@ -275,7 +275,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""self.post_json(  # pylint-disable=invalid-name
+                u"""self.post_json(  # Random comment
                 '(',
                 self.payload, expect_errors=True, expected_status_int=401)""")
         node_with_no_error_message.file = filename
@@ -296,7 +296,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         filename = temp_file.name
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""self.post_json(func(  # pylint-disable=invalid-name
+                u"""self.post_json(func(  # Random comment
                 '(',
                 self.payload, expect_errors=True, expected_status_int=401))""")
         node_with_no_error_message.file = filename

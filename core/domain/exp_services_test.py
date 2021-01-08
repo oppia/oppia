@@ -347,13 +347,13 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_summaries_with_no_query(self):
         # An empty query should return all explorations.
-        (exp_ids, search_cursor) = (
+        (exp_ids, search_offset) = (
             exp_services.get_exploration_ids_matching_query('', [], []))
         self.assertEqual(sorted(exp_ids), [
             self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6
         ])
-        self.assertIsNone(search_cursor)
+        self.assertIsNone(search_offset)
 
     def test_get_exploration_summaries_with_deleted_explorations(self):
         # Ensure a deleted exploration does not show up in search results.
@@ -467,27 +467,27 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             found_exp_ids = []
 
             # Page 1: 3 initial explorations.
-            (exp_ids, search_cursor) = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
                     '', [], []))
             self.assertEqual(len(exp_ids), 3)
-            self.assertIsNotNone(search_cursor)
+            self.assertIsNotNone(search_offset)
             found_exp_ids += exp_ids
 
             # Page 2: 3 more explorations.
-            (exp_ids, search_cursor) = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', [], [], cursor=search_cursor))
+                    '', [], [], offset=search_offset))
             self.assertEqual(len(exp_ids), 3)
-            self.assertIsNotNone(search_cursor)
+            self.assertIsNotNone(search_offset)
             found_exp_ids += exp_ids
 
             # Page 3: 1 final exploration.
-            (exp_ids, search_cursor) = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', [], [], cursor=search_cursor))
+                    '', [], [], offset=search_offset))
             self.assertEqual(len(exp_ids), 1)
-            self.assertIsNone(search_cursor)
+            self.assertIsNone(search_offset)
             found_exp_ids += exp_ids
 
             # Validate all explorations were seen.

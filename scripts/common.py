@@ -89,6 +89,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.0.5'
+ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -124,6 +125,13 @@ REDIS_SERVER_PATH = os.path.join(
 REDIS_CLI_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-cli')
+
+ES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
+ES_PATH_CONFIG_DIR = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config')
+ES_PATH_DATA_DIR = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data')
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
@@ -630,6 +638,29 @@ def wait_for_port_to_be_open(port_number):
             'Failed to start server on port %s, exiting ...' %
             port_number)
         sys.exit(1)
+
+
+@contextlib.contextmanager
+def managed_elasticsearch_dev_server():
+    """Returns a context manager for ElasticSearch server for running tests
+    in development mode and running a local dev server. This is only required
+    in a development environment.
+
+    Yields:
+        psutil.Process. The ElasticSearch server process.
+    """
+    # Clear previous data stored in the local cluster.
+    if os.path.exists(ES_PATH_DATA_DIR):
+        shutil.rmtree(ES_PATH_DATA_DIR)
+
+    # Override the default path to ElasticSearch config files.
+    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
+    es_args = [
+        '%s/bin/elasticsearch' % ES_PATH,
+        '-d'
+    ]
+    with managed_process(es_args, shell=True) as proc:
+        yield proc
 
 
 def wait_for_port_to_be_closed(port_number):

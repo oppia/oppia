@@ -283,8 +283,10 @@ def collect_files_being_pushed(ref_list, remote):
     if not ref_list:
         return {}
     # Avoid testing of non branch pushes (tags for instance) or deletions.
-    ref_heads_only = [ref for ref in ref_list
-                      if ref.local_ref.startswith('refs/heads/')]
+    # TODO(#11620): Change the following to a denylist instead of an allowlist.
+    ref_heads_only = [
+        ref for ref in ref_list
+        if (ref.local_ref.startswith('refs/heads/') or ref.local_ref == 'HEAD')]
     # Get branch name from e.g. local_ref='refs/heads/lint_hook'.
     branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]

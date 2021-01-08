@@ -764,27 +764,27 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             found_col_ids = []
 
             # Page 1: 2 initial collections.
-            (col_ids, search_cursor) = (
+            (col_ids, search_offset) = (
                 collection_services.get_collection_ids_matching_query(
                     '', [], []))
             self.assertEqual(len(col_ids), 2)
-            self.assertIsNotNone(search_cursor)
+            self.assertIsNotNone(search_offset)
             found_col_ids += col_ids
 
             # Page 2: 2 more collections.
-            (col_ids, search_cursor) = (
+            (col_ids, search_offset) = (
                 collection_services.get_collection_ids_matching_query(
-                    '', [], [], cursor=search_cursor))
+                    '', [], [], offset=search_offset))
             self.assertEqual(len(col_ids), 2)
-            self.assertIsNotNone(search_cursor)
+            self.assertIsNotNone(search_offset)
             found_col_ids += col_ids
 
             # Page 3: 1 final collection.
-            (col_ids, search_cursor) = (
+            (col_ids, search_offset) = (
                 collection_services.get_collection_ids_matching_query(
-                    '', [], [], cursor=search_cursor))
+                    '', [], [], offset=search_offset))
             self.assertEqual(len(col_ids), 1)
-            self.assertIsNone(search_cursor)
+            self.assertIsNone(search_offset)
             found_col_ids += col_ids
 
             # Validate all collections were seen.
