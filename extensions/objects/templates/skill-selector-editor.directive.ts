@@ -38,7 +38,7 @@ angular.module('oppia').directive('skillSelectorEditor', [
             $http, $scope, ContextService, ENTITY_TYPE,
             FETCH_SKILLS_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.selectSkill = function(skillId, skillDescription) {
+          ctrl.selectSkill = function(skillId, unusedSkillDescription) {
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             ctrl.value = skillId;
           };

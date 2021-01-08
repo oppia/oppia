@@ -140,7 +140,7 @@ describe('TrainingDataService', function() {
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(angular.mock.inject(function($injector, $rootScope) {
+  beforeEach(angular.mock.inject(function($injector, unused$rootScope) {
     siis = $injector.get('StateInteractionIdService');
     ecs = $injector.get('StateEditorService');
     ess = $injector.get('ExplorationStatesService');

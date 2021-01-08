@@ -124,19 +124,19 @@ describe('SvgFilenameEditor', function() {
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockAssetsBackendApiService = {
-    getImageUrlForPreview: function(contentType, contentId, filepath) {
+    getImageUrlForPreview: function(unusedContentType, unusedContentId, unusedFilepath) {
       return dataUrl;
     }
   };
 
   var mockImageUploadHelperService = {
-    convertImageDataToImageFile: function(svgDataUri) {
+    convertImageDataToImageFile: function(unusedSvgDataUri) {
       return new Blob();
     },
     generateImageFilename: function(height, width, extension) {
       return height + '_' + width + '.' + extension;
     },
-    getInvalidSvgTagsAndAttrs: function(dataUri) {
+    getInvalidSvgTagsAndAttrs: function(unusedDataUri) {
       return { tags: [], attrs: [] };
     }
   };
@@ -158,7 +158,7 @@ describe('SvgFilenameEditor', function() {
         return 'Fake onload executed';
       };
     }
-    readAsDataURL(file) {
+    readAsDataURL(unusedFile) {
       this.onload();
       return 'The file is loaded';
     }
@@ -225,7 +225,7 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.canvas = new fabric.Canvas(svgFilenameCtrl.canvasID);
     svgFilenameCtrl.initializeMouseEvents();
     var mockPicker = {
-      setOptions: function(data) {
+      setOptions: function(unusedData) {
         return 'The value is set.';
       }
     };
@@ -574,7 +574,7 @@ describe('SvgFilenameEditor', function() {
     svgFilenameCtrl.savedSvgDiagram = 'saved';
     svgFilenameCtrl.savedSvgDiagram = samplesvg;
     svgFilenameCtrl.continueDiagramEditing();
-    var mocktoSVG = function(arg) {
+    var mocktoSVG = function(unusedArg) {
       return '<path></path>';
     };
     var customToSVG = svgFilenameCtrl.createCustomToSVG(
@@ -650,28 +650,28 @@ describe('SvgFilenameEditor with image save destination as ' +
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockilss = {
-    getObjectUrlForImage: function(filename) {
+    getObjectUrlForImage: function(unusedFilename) {
       return dataUrl;
     },
-    saveImage: function(filename, imageData) {
+    saveImage: function(unusedFilename, unusedImageData) {
       return 'Image file save.';
     },
-    deleteImage: function(filename) {
+    deleteImage: function(unusedFilename) {
       return 'Image file is deleted.';
     },
-    isInStorage: function(filename) {
+    isInStorage: function(unusedFilename) {
       return true;
     }
   };
 
   var mockImageUploadHelperService = {
-    convertImageDataToImageFile: function(svgDataUri) {
+    convertImageDataToImageFile: function(unusedSvgDataUri) {
       return new Blob();
     },
     generateImageFilename: function(height, widht, extension) {
       return height + '_' + widht + '.' + extension;
     },
-    getInvalidSvgTagsAndAttrs: function(dataUri) {
+    getInvalidSvgTagsAndAttrs: function(unusedDataUri) {
       return { tags: [], attrs: [] };
     }
   };
@@ -693,7 +693,7 @@ describe('SvgFilenameEditor with image save destination as ' +
         return 'Fake onload executed';
       };
     }
-    readAsDataURL(file) {
+    readAsDataURL(unusedFile) {
       this.onload();
       return 'The file is loaded';
     }
@@ -768,7 +768,7 @@ describe('SvgFilenameEditor with image save destination as ' +
 describe('should fail svg tag validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
-    getInvalidSvgTagsAndAttrs: function(dataURI) {
+    getInvalidSvgTagsAndAttrs: function(unusedDataURI) {
       return { tags: ['script'], attrs: [] };
     }
   };
@@ -799,7 +799,7 @@ describe('should fail svg tag validation', function() {
 describe('should fail svg attribute validation', function() {
   var svgFilenameCtrl = null;
   var mockImageUploadHelperService = {
-    getInvalidSvgTagsAndAttrs: function(dataURI) {
+    getInvalidSvgTagsAndAttrs: function(unusedDataURI) {
       return { tags: [], attrs: ['widht'] };
     }
   };

@@ -88,7 +88,7 @@ describe('Create new topic modal', function() {
     spyOn(
       TopicEditorStateService,
       'updateExistenceOfTopicUrlFragment').and.callFake(
-      (urlFragment, callback) => callback());
+      (unusedUrlFragment, callback) => callback());
     spyOn(
       TopicEditorStateService,
       'getTopicWithUrlFragmentExists').and.returnValue(true);
@@ -112,7 +112,7 @@ describe('Create new topic modal', function() {
     spyOn(
       TopicEditorStateService,
       'updateExistenceOfTopicName').and.callFake(
-      (urlFragment, callback) => callback());
+      (unusedUrlFragment, callback) => callback());
     spyOn(
       TopicEditorStateService,
       'getTopicWithNameExists').and.returnValue(true);

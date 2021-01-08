@@ -201,7 +201,7 @@ angular.module('oppia').directive('audioBar', [
             }
           };
 
-          var playPauseUploadedAudioTranslation = function(languageCode) {
+          var playPauseUploadedAudioTranslation = function(unusedLanguageCode) {
             if (!AudioPlayerService.isPlaying()) {
               if (AudioPlayerService.isTrackLoaded()) {
                 AudioPlayerService.play();
@@ -287,7 +287,7 @@ angular.module('oppia').directive('audioBar', [
                 AudioTranslationLanguageService.getCurrentAudioLanguageCode())
             };
 
-            $(window).scroll(function(event) {
+            $(window).scroll(function(unusedEvent) {
               if (WindowDimensionsService.isWindowNarrow()) {
                 updateAudioHeaderPosition();
               }

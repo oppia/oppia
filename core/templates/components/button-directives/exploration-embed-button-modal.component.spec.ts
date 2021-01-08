@@ -32,7 +32,7 @@ class MockActiveModal {
 }
 
 class MockSiteAnalyticsService {
-  registerOpenEmbedInfoEvent(id: string): void {
+  registerOpenEmbedInfoEvent(unusedId: string): void {
     return;
   }
 }

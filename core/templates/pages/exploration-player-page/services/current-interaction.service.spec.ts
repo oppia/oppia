@@ -43,7 +43,7 @@ describe('Current Interaction Service', () => {
 
   it('should properly register onSubmitFn and submitAnswerFn', () => {
     let answerState = null;
-    let dummyOnSubmitFn = (answer, interactionRulesService) => {
+    let dummyOnSubmitFn = (answer, unusedInteractionRulesService) => {
       answerState = answer;
     };
 

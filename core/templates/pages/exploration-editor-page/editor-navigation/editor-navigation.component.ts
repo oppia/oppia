@@ -183,7 +183,7 @@ angular.module('oppia').component('editorNavigation', {
 
         this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
         this.directiveSubscriptions.add(
-          WindowDimensionsService.getResizeEvent().subscribe(evt => {
+          WindowDimensionsService.getResizeEvent().subscribe(unusedEvt => {
             this.screenIsLarge = WindowDimensionsService.getWidth() >= 1024;
             $scope.$applyAsync();
           })

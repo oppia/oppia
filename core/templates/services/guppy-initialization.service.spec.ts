@@ -28,24 +28,24 @@ declare global {
 }
 
 class MockGuppy {
-  constructor(id: string, config: Object) {}
+  constructor(unusedId: string, unusedConfig: Object) {}
 
   engine = {
     end: () => {}
   };
 
-  render(_): void {}
+  render(unused_): void {}
   'import_text'(): void {}
   asciimath(): string {
     return 'Dummy value';
   }
-  configure(name: string, val: Object): void {}
-  static event(name: string, handler: Function): void {
+  configure(unusedName: string, unusedVal: Object): void {}
+  static event(unusedName: string, handler: Function): void {
     handler({focused: true});
   }
-  static configure(name: string, val: Object): void {}
-  static 'remove_global_symbol'(symbol: string): void {}
-  static 'add_global_symbol'(name: string, symbol: Object): void {}
+  static configure(unusedName: string, unusedVal: Object): void {}
+  static 'remove_global_symbol'(unusedSymbol: string): void {}
+  static 'add_global_symbol'(unusedName: string, unusedSymbol: Object): void {}
 }
 
 describe('GuppyInitializationService', () => {

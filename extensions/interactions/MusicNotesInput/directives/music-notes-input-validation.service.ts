@@ -37,7 +37,7 @@ export class MusicNotesInputValidationService {
         baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: MusicNotesInputCustomizationArgs): Warning[] {
+      unusedCustomizationArgs: MusicNotesInputCustomizationArgs): Warning[] {
     // TODO(juansaba): Implement customization args validations.
     return [];
   }

@@ -123,7 +123,7 @@ export class ItemSelectionInputValidationService {
         answerGroups, stateName));
 
     var seenChoices = customizationArgs.choices.value;
-    var handledAnswers = seenChoices.map((item) => {
+    var handledAnswers = seenChoices.map((unusedItem) => {
       return false;
     });
 
@@ -191,7 +191,7 @@ export class ItemSelectionInputValidationService {
       var rules = answerGroup.rules;
       rules.forEach((rule, ruleIndex) => {
         var ruleInputs = (<string[]>rule.inputs.x);
-        ruleInputs.forEach((ruleInput) => {
+        ruleInputs.forEach((unusedRuleInput) => {
           if (rule.type === 'IsProperSubsetOf') {
             if (ruleInputs.length < 2) {
               warningsList.push({

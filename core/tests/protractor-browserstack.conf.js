@@ -178,7 +178,7 @@ exports.config = {
 
   // Code to stop browserstack local after end of test.
   afterLaunch: function() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, unusedReject) {
       exports.bs_local.stop(resolve);
     });
   },

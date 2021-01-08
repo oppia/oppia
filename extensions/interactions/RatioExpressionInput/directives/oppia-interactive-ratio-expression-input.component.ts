@@ -86,7 +86,7 @@ angular.module('oppia').component('oppiaInteractiveRatioExpressionInput', {
       };
 
       ctrl.$onInit = function() {
-        $scope.$watch('$ctrl.answer', function(newValue) {
+        $scope.$watch('$ctrl.answer', function(unusedNewValue) {
           errorMessage = '';
           ctrl.RatioExpressionInputForm.answer.$setValidity(
             FORM_ERROR_TYPE, true);

@@ -36,7 +36,7 @@ describe('Question Suggestion Service', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('when question is valid', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
+    beforeEach(angular.mock.inject(function($injector, unused$controller) {
       $httpBackend = $injector.get('$httpBackend');
       $q = $injector.get('$q');
       CsrfTokenService = $injector.get('CsrfTokenService');

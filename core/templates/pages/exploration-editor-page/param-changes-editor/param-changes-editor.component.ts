@@ -247,7 +247,7 @@ angular.module('oppia').component('paramChangesEditor', {
           handle: '.oppia-param-change-sort-handle',
           items: '.oppia-param-editor-row',
           tolerance: 'pointer',
-          start: function(e, ui) {
+          start: function(unusedE, ui) {
             $scope.$apply();
             ui.placeholder.height(ui.item.height());
           },

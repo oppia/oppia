@@ -755,7 +755,7 @@ angular.module('oppia').directive('stateResponses', [
               items: '.oppia-sortable-rule-block',
               revert: 100,
               tolerance: 'pointer',
-              start: function(e, ui) {
+              start: function(unusedE, ui) {
                 ExternalSaveService.onExternalSave.emit();
                 $scope.changeActiveAnswerGroupIndex(-1);
                 ui.placeholder.height(ui.item.height());

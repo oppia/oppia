@@ -130,7 +130,7 @@ export class EditableStoryBackendApiService {
       new_story_status_is_public: newStoryStatusIsPublic
     };
     this.http.put(storyPublishUrl, putData).toPromise().then(
-      response => successCallback(),
+      unusedResponse => successCallback(),
       errorResponse => errorCallback(errorResponse.error.error));
   }
 

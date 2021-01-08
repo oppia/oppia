@@ -39,7 +39,7 @@ angular.module('oppia').controller('Base', [
     $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
 
     // Listener function to catch the change in language preference.
-    $rootScope.$on('$translateChangeSuccess', function(evt, response) {
+    $rootScope.$on('$translateChangeSuccess', function(unusedEvt, response) {
       $scope.currentLang = response.language;
     });
 

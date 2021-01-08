@@ -166,7 +166,7 @@ var expectComponentDetailsToMatch = async function(elem, shapesName, altText) {
   var src = await svgDiagramInputElement.getAttribute('src');
   var alt = await svgDiagramInputElement.getAttribute('alt');
   expect(alt).toEqual(altText);
-  await request(src, function(error, response, body) {
+  await request(src, function(unusedError, unusedResponse, body) {
     expect(body.replace(/(\r\n|\n|\r|\t)/gm, '')).toBe(SVGTAGS[svgName]);
   });
 };

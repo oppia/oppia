@@ -47,7 +47,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
       UrlInterpolationService) {
     let showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
-        setActiveThread = (threadId => {}), threadUibModalInstance = null) {
+        setActiveThread = (unusedThreadId => {}), threadUibModalInstance = null) {
       return $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/suggestion-modal-for-editor-view/' +

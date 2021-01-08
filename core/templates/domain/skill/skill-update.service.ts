@@ -155,7 +155,7 @@ export class SkillUpdateService {
         let description = this._getNewPropertyValueFromChangeDict(changeDict);
         skill.setDescription(description);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.setDescription(oldDescription);
       }
     );
@@ -168,10 +168,10 @@ export class SkillUpdateService {
       SkillDomainConstants.SKILL_CONTENTS_PROPERTY_EXPLANATION,
       newExplanation.toBackendDict(),
       oldExplanation.toBackendDict(),
-      (changeDict, skill) => {
+      (unusedC(hangeDict, skill) => {
         skill.getConceptCard().setExplanation(newExplanation);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.getConceptCard().setExplanation(oldExplanation);
       }
     );
@@ -190,10 +190,10 @@ export class SkillUpdateService {
         return workedExample.toBackendDict();
       }),
       oldWorkedExamples.map((workedExample) => workedExample.toBackendDict()),
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
       }
     );
@@ -214,10 +214,10 @@ export class SkillUpdateService {
       oldWorkedExamples.map((workedExample) => {
         return workedExample.toBackendDict();
       }),
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
       }
     );
@@ -248,10 +248,10 @@ export class SkillUpdateService {
       oldWorkedExamples.map((workedExample) => {
         return workedExample.toBackendDict();
       }),
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
       }
     );
@@ -268,10 +268,10 @@ export class SkillUpdateService {
       oldWorkedExamples.map((workedExample) => {
         return workedExample.toBackendDict();
       }),
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
       }
     );
@@ -287,10 +287,10 @@ export class SkillUpdateService {
       skill,
       SkillDomainConstants.CMD_ADD_SKILL_MISCONCEPTION,
       params,
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.appendMisconception(newMisconception);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.deleteMisconception(misconceptionId);
       }
     );
@@ -305,10 +305,10 @@ export class SkillUpdateService {
       skill,
       SkillDomainConstants.CMD_DELETE_SKILL_MISCONCEPTION,
       params,
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.deleteMisconception(misconceptionId);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.appendMisconception(oldMisconception);
       }
     );
@@ -322,10 +322,10 @@ export class SkillUpdateService {
       skill,
       SkillDomainConstants.CMD_ADD_PREREQUISITE_SKILL,
       params,
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.addPrerequisiteSkill(skillId);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.deletePrerequisiteSkill(skillId);
       }
     );
@@ -339,10 +339,10 @@ export class SkillUpdateService {
       skill,
       SkillDomainConstants.CMD_DELETE_PREREQUISITE_SKILL,
       params,
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.deletePrerequisiteSkill(skillId);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.addPrerequisiteSkill(skillId);
       }
     );
@@ -457,10 +457,10 @@ export class SkillUpdateService {
       skill,
       difficulty,
       explanations,
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.updateRubricForDifficulty(difficulty, explanations);
       },
-      (changeDict, skill) => {
+      (unusedChangeDict, skill) => {
         skill.updateRubricForDifficulty(difficulty, oldExplanations);
       }
     );

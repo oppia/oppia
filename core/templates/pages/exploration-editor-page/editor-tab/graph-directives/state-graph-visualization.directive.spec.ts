@@ -336,7 +336,7 @@ describe('State Graph Visualization directive', function() {
     // Spies for d3 library.
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({
-        on: (evt, callback) => callback()
+        on: (unusedEvt, callback) => callback()
       })
     });
     spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);
@@ -368,7 +368,7 @@ describe('State Graph Visualization directive', function() {
     $flushPendingTasks();
     var zoomSpy = jasmine.createSpy('zoom').and.returnValue({
       scaleExtent: () => ({
-        on: (evt, callback) => callback()
+        on: (unusedEvt, callback) => callback()
       })
     });
     spyOnProperty(d3, 'zoom').and.returnValue(zoomSpy);

@@ -21,8 +21,8 @@ import { SuggestionModalService } from './suggestion-modal.service';
 describe('Suggestion Modal Service', () => {
   let sms;
   const uibModalInstanceMock = {
-    close: paramDict => {},
-    dismiss: message => {}
+    close: unusedParamDict => {},
+    dismiss: unusedMessage => {}
   };
 
   beforeEach(() => {

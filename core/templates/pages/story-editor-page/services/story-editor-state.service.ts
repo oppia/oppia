@@ -243,7 +243,7 @@ export class StoryEditorStateService {
 
     this.editableStoryBackendApiService.changeStoryPublicationStatus(
       this._story.getId(), newStoryStatusIsPublic).then(
-      (storyBackendObject) => {
+      (unusedStoryBackendObject) => {
         this._setStoryPublicationStatus(newStoryStatusIsPublic);
         if (successCallback) {
           successCallback();

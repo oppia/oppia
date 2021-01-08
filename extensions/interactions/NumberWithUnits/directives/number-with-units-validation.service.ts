@@ -42,7 +42,7 @@ export class NumberWithUnitsValidationService {
     private baseInteraction: baseInteractionValidationService) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: NumberWithUnitsCustomizationArgs): Warning[] {
+      unusedCustomizationArgs: NumberWithUnitsCustomizationArgs): Warning[] {
     return [];
   }
 

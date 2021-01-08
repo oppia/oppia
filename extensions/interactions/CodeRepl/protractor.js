@@ -20,7 +20,7 @@
 var waitFor = require(
   process.cwd() + '/core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = async function(interactionEditor, placeHolderText) {
+var customizeInteraction = async function(unusedInteractionEditor, placeHolderText) {
   await browser.executeScript(
     "var editor = $('schema-based-editor .CodeMirror')[0].CodeMirror;" +
     "editor.setValue('" + placeHolderText + "');");
@@ -39,7 +39,7 @@ var expectInteractionDetailsToMatch = async function(elem, placeHolderText) {
   expect(testValue).toEqual(placeHolderText + '\n');
 };
 
-var submitAnswer = async function(conversationInput, answerCode) {
+var submitAnswer = async function(unusedConversationInput, answerCode) {
   await browser.executeScript(
     "var elem = $('.protractor-test-preview-tab .CodeMirror')[0].CodeMirror;" +
     "elem.setValue('" + answerCode + "');");

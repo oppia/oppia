@@ -79,7 +79,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
     };
 
     return {
-      showSuggestionModal: function(suggestionType, extraParams) {
+      showSuggestionModal: function(suggestionType, unusedExtraParams) {
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal();
         }

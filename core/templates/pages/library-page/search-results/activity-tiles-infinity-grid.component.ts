@@ -66,7 +66,7 @@ angular.module('oppia').component('activityTilesInfinityGrid', {
           WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
         ctrl.directiveSubscriptions.add(
-          WindowDimensionsService.getResizeEvent().subscribe(evt => {
+          WindowDimensionsService.getResizeEvent().subscribe(unusedEvt => {
             ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
             $scope.$applyAsync();

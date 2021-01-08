@@ -348,7 +348,7 @@ angular.module('oppia').component('libraryPage', {
           WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
         ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-          subscribe(evt => {
+          subscribe(unusedEvt => {
             initCarousels();
 
             ctrl.libraryWindowIsNarrow = (

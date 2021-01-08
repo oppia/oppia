@@ -209,7 +209,7 @@ angular.module('oppia').config([
         return {
           request: function(config) {
             if (config.data) {
-              return $q(function(resolve, reject) {
+              return $q(function(resolve, unusedReject) {
                 // Get CSRF token before sending the request.
                 CsrfTokenService.getTokenAsync().then(function(token) {
                   if ((config.data instanceof FormData)) {

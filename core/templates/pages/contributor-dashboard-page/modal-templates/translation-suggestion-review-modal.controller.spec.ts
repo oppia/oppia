@@ -113,7 +113,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
       'registerContributorDashboardAcceptSuggestion');
     spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
       .and.callFake((
-          targetId, suggestionId, action, reviewMessage, commitMessage,
+        unusedTargetId, unusedSuggestionId, unusedAction, unusedReviewMessage, unusedCommitMessage,
           callback) => {
         callback();
       });
@@ -156,7 +156,7 @@ describe('Translation Suggestion Review Modal Controller', function() {
 
     spyOn(contributionAndReviewService, 'resolveSuggestionToExploration')
       .and.callFake((
-          targetId, suggestionId, action, reviewMessage, commitMessage,
+        unusedTargetId, unusedSuggestionId, unusedAction, unusedReviewMessage, unusedCommitMessage,
           callback) => {
         callback();
       });

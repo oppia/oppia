@@ -27,7 +27,7 @@ angular.module('oppia').directive(
     controller: ['$scope', function($scope) {
       this.$onInit = () => {
         // By default only the first element is shown, the rest are hidden.
-        $scope.answerVisible = $scope.data.map((_, i) => i === 0);
+        $scope.answerVisible = $scope.data.map((unused_, i) => i === 0);
 
         $scope.toggleAnswerVisibility = (i: number) => {
           $scope.answerVisible[i] = !$scope.answerVisible[i];

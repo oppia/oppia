@@ -49,7 +49,7 @@ module.exports = async(browser, context) => {
 };
 
 // Needed to relogin after lighthouse_setup.js.
-const login = async function(context, page) {
+const login = async function(unusedContext, page) {
   try {
     // eslint-disable-next-line dot-notation
     await page.goto(
@@ -99,7 +99,7 @@ const setRole = async function(page, role) {
 };
 
 
-const createCollections = async function(context, page) {
+const createCollections = async function(unusedContext, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Collections...');
@@ -118,7 +118,7 @@ const createCollections = async function(context, page) {
   }
 };
 
-const createExplorations = async function(context, page) {
+const createExplorations = async function(unusedContext, page) {
   try {
     // eslint-disable-next-line no-console
     console.log('Creating Exploration...');

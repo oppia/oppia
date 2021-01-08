@@ -40,7 +40,7 @@ angular.module('oppia').factory('CollectionLinearizerService', [
       return collection.getCollectionNodes();
     };
 
-    var addAfter = function(collection, curExplorationId, newExplorationId) {
+    var addAfter = function(collection, curExplorationId, unusedNewExplorationId) {
       collection.getCollectionNodeByExplorationId(curExplorationId);
     };
 
@@ -57,7 +57,7 @@ angular.module('oppia').factory('CollectionLinearizerService', [
 
     // Swap the node at the specified index with the node immediately to the
     // left of it.
-    var swapLeft = function(collection, linearNodeList, nodeIndex) {
+    var swapLeft = function(collection, unusedLinearNodeList, nodeIndex) {
       var leftNodeIndex = nodeIndex > 0 ? nodeIndex - 1 : null;
 
       if (leftNodeIndex === null) {

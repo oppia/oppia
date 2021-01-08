@@ -39,7 +39,7 @@ export class ExpressionInterpolationService {
   ) {}
 
   processHtml(sourceHtml: string, envs: Record<string, string>[]): string {
-    return sourceHtml.replace(/{{([^}]*)}}/g, (match, p1)=> {
+    return sourceHtml.replace(/{{([^}]*)}}/g, (unusedMatch, p1)=> {
       try {
         // TODO(sll): Remove the call to $filter once we have a
         // custom UI for entering expressions. It is only needed because
@@ -62,7 +62,7 @@ export class ExpressionInterpolationService {
   processUnicode(
       sourceUnicode: string, envs: Record<string, string>[]): string {
     try {
-      return sourceUnicode.replace(/{{([^}]*)}}/g, (match, p1)=> {
+      return sourceUnicode.replace(/{{([^}]*)}}/g, (unusedMatch, p1)=> {
         // TODO(sll): Remove the call to $filter once we have a
         // custom UI for entering expressions. It is only needed because
         // expressions are currently input inline via the RTE.

@@ -130,7 +130,7 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     // Subscribe to onLangChange event, in case the language changes.
     if (this.onLangChange === null) {
       this.onLangChange = this.translateService.onLangChange.subscribe(
-        (event: LangChangeEvent) => {
+        (unusedEvent: LangChangeEvent) => {
           this.updateInterpolatedValue(key, interpolateParams);
         }
       );

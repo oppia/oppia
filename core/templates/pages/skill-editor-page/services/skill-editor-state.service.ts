@@ -118,7 +118,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
             );
             _skillIsBeingLoaded = false;
             $rootScope.$apply();
-          }, function(error) {
+          }, function(unusedError) {
             AlertsService.addWarning();
             _skillIsBeingLoaded = false;
           });

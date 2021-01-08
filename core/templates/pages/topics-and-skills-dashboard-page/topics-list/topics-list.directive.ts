@@ -121,7 +121,7 @@ angular.module('oppia').directive('topicsList', [
               controller: 'DeleteTopicModalController'
             }).result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
-                function(status) {
+                function(unusedStatus) {
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
                   $rootScope.$applyAsync();

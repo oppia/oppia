@@ -702,7 +702,7 @@ angular.module('oppia').directive('filepathEditor', [
           }
         };
 
-        ctrl.onFileChanged = function(file, filename) {
+        ctrl.onFileChanged = function(file, unusedFilename) {
           ctrl.setUploadedFile(file);
           $scope.$apply();
         };

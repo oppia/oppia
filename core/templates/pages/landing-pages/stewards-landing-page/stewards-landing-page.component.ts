@@ -131,7 +131,7 @@ angular.module('oppia').component('stewardsLandingPage', {
         ctrl.windowIsNarrow = isWindowNarrow(
           WindowDimensionsService.getWidth());
         ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-          subscribe(evt => {
+          subscribe(unusedEvt => {
             ctrl.windowIsNarrow = isWindowNarrow(
               WindowDimensionsService.getWidth());
             $scope.$applyAsync();

@@ -69,7 +69,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return _fetchSuggestionsAsync(url);
       },
-      getUserCreatedTranslationSuggestionsAsync: async function(onSuccess) {
+      getUserCreatedTranslationSuggestionsAsync: async function(unusedOnSuccess) {
         var url = UrlInterpolationService.interpolateUrl(
           _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
             target_type: 'exploration',
@@ -77,7 +77,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           });
         return _fetchSuggestionsAsync(url);
       },
-      getReviewableTranslationSuggestionsAsync: async function(onSuccess) {
+      getReviewableTranslationSuggestionsAsync: async function(unusedOnSuccess) {
         var url = UrlInterpolationService.interpolateUrl(
           _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
             target_type: 'exploration',

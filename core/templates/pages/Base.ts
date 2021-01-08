@@ -114,7 +114,7 @@ angular.module('oppia').controller('Base', [
       ]);
 
       // Listener function to catch the change in language preference.
-      $rootScope.$on('$translateChangeSuccess', function(evt, response) {
+      $rootScope.$on('$translateChangeSuccess', function(unusedEvt, response) {
         $scope.currentLang = response.language;
       });
       $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;

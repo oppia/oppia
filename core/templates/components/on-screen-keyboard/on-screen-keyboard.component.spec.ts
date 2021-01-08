@@ -30,8 +30,8 @@ describe('OnScreenKeyboard', function() {
 
   class MockGuppy {
     engine = {
-      insert_string: function(_) {},
-      insert_symbol: function(_) {},
+      insert_string: function(unused_) {},
+      insert_symbol: function(unused_) {},
       backspace: function() {},
       left: function() {},
       right: function() {},

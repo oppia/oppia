@@ -147,7 +147,7 @@ export class UrlInterpolationService {
     }
 
     let nonStringParams = Object.entries(interpolationValues).filter(
-      ([key, val]) => !this.utilsService.isString(val));
+      ([unusedKey, val]) => !this.utilsService.isString(val));
     if (nonStringParams.length > 0) {
       this.alertsService.fatalWarning(
         'Every parameter passed into interpolateUrl must have string values, ' +

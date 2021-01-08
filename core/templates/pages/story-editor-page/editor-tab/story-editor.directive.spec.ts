@@ -254,7 +254,7 @@ describe('Story editor Directive', function() {
     var storyUpdateSpy = spyOn(
       StoryEditorStateService,
       'updateExistenceOfStoryUrlFragment').and.callFake(
-      (urlFragment, callback) => callback());
+      (unusedUrlFragment, callback) => callback());
     $scope.updateStoryUrlFragment('story_second');
     expect(storyUpdateSpy).toHaveBeenCalled();
   });

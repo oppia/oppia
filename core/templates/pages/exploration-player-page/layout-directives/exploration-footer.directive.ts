@@ -45,7 +45,7 @@ angular.module('oppia').directive('explorationFooter', [
             $scope.iframed = UrlService.isIframed();
             $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.resizeSubscription = WindowDimensionsService.getResizeEvent().
-              subscribe(evt => {
+              subscribe(unusedEvt => {
                 $scope.windowIsNarrow = (
                   WindowDimensionsService.isWindowNarrow());
                 $scope.$applyAsync();

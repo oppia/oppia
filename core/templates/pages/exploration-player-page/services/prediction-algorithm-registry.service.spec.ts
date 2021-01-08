@@ -75,7 +75,7 @@ describe('Prediction Algorithm Registry Service', () => {
 
   describe('when trying to mock prediction services in tests', () => {
     class MockPredictionService {
-      predict(classifierData, answer): number {
+      predict(unusedClassifierData, unusedAnswer): number {
         return 1;
       }
     }

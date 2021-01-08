@@ -33,7 +33,7 @@ angular.module('oppia').directive('coordTwoDimEditor', [
         ctrl.$onInit = function() {
           $scope.$on(
             'leafletDirectiveMap.coordTwoDimEditor.click',
-            function(evt, args) {
+            function(unusedEvt, args) {
               var newLat = args.leafletEvent.latlng.lat;
               var newLng = args.leafletEvent.latlng.lng;
               ctrl.value = [newLat, newLng];
@@ -42,7 +42,7 @@ angular.module('oppia').directive('coordTwoDimEditor', [
 
           $scope.$on(
             'leafletDirectiveMarker.coordTwoDimEditor.dragend',
-            function(evt, args) {
+            function(unusedEvt, args) {
               ctrl.value = [args.model.lat, args.model.lng];
             });
           ctrl.mapCenter = {

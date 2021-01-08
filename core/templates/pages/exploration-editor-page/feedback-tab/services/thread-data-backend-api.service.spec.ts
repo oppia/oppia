@@ -146,7 +146,7 @@ describe('retrieving threads service', () => {
 
   it('should retrieve feedback threads and suggestion thread', fakeAsync(() => {
     threadDataBackendApiService.getThreadsAsync().then(
-      threadData => {
+      unusedThreadData => {
         for (let mockFeedbackThread of mockFeedbackThreads) {
           expect(threadDataBackendApiService.getThread(
             mockFeedbackThread.thread_id)).not.toBeNull();

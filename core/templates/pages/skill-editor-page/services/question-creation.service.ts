@@ -95,7 +95,7 @@ angular.module('oppia').factory('QuestionCreationService', [
               skill.getMisconceptions();
           });
           $rootScope.$apply();
-        }, function(error) {
+        }, function(unusedError) {
           AlertsService.addWarning();
         });
     };

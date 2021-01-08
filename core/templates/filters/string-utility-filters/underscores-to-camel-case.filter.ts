@@ -18,7 +18,7 @@
 
 angular.module('oppia').filter('underscoresToCamelCase', [function() {
   return function(input) {
-    return input.replace(/_+(.)/g, function(match, group1) {
+    return input.replace(/_+(.)/g, function(unusedMatch, group1) {
       return group1.toUpperCase();
     });
   };

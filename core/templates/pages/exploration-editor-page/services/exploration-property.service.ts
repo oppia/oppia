@@ -75,7 +75,7 @@ angular.module('oppia').factory('ExplorationPropertyService', [
       // Validates the given value and returns a boolean stating whether it
       // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
       // behavior is to always return true.
-      _isValid: function(value) {
+      _isValid: function(unusedValue) {
         return true;
       },
       // Normalizes the displayed value. Then, if the memento and the displayed

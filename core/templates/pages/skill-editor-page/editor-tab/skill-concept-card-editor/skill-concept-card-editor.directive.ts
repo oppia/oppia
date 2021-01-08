@@ -107,7 +107,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             }
           };
 
-          $scope.deleteWorkedExample = function(index, evt) {
+          $scope.deleteWorkedExample = function(index, unusedEvt) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/modal-templates/' +
@@ -223,7 +223,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               items: '.oppia-sortable-worked-example',
               revert: 100,
               tolerance: 'pointer',
-              start: function(e, ui) {
+              start: function(unusedE, ui) {
                 $scope.activeWorkedExampleIndex = null;
                 ui.placeholder.height(ui.item.height());
               },

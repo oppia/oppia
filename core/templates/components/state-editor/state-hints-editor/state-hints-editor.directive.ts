@@ -237,7 +237,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               items: '.oppia-sortable-hint',
               revert: 100,
               tolerance: 'pointer',
-              start: function(e, ui) {
+              start: function(unusedE, ui) {
                 ExternalSaveService.onExternalSave.emit();
                 StateHintsService.setActiveHintIndex(null);
                 ui.placeholder.height(ui.item.height());

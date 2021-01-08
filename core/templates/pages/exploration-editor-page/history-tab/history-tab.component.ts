@@ -240,7 +240,7 @@ angular.module('oppia').component('historyTab', {
           }).then(function() {
             WindowRef.nativeWindow.location.reload();
           });
-        }, function(error) {
+        }, function(unusedError) {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.

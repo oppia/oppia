@@ -109,7 +109,7 @@ describe('Exploration Player State Service', () => {
       _ExplorationPlayerStateService_,
       _PlaythroughIssuesService_,
       _PlaythroughService_,
-      _ReadOnlyExplorationBackendApiService_,
+      unused_ReadOnlyExplorationBackendApiService_,
       _StatsReportingService_) => {
     $rootScope = _$rootScope_;
     $q = _$q_;
@@ -132,20 +132,20 @@ describe('Exploration Player State Service', () => {
     }, {}, {}]);
     spyOn($q, 'all').and.returnValue(deferred.promise);
     spyOn(StatsReportingService, 'initSession').and.callFake((
-        explorationId, title, version, sessionId, collectionId) => {
+        unusedExplorationId, unusedTitle, version, unusedSessionId, unusedCollectionId) => {
       expect(version).toEqual(1);
     });
     spyOn(PlaythroughService, 'initSession').and.callFake((
-        explorationId, version, recordPlaythroughProbability) => {
+        unusedExplorationId, version, unusedRecordPlaythroughProbability) => {
       expect(version).toEqual(1);
     });
     spyOn(PlaythroughIssuesService, 'initSession').and.callFake((
-        explorationId, version) => {
+        unusedExplorationId, version) => {
       expect(version).toEqual(1);
     });
     spyOn(ExplorationEngineService, 'init').and.callFake((
-        exploration, version, preferredAudioLanguageCode,
-        autoTtsEnabled, callback) => {
+        unusedExploration, version, unusedPreferredAudioLanguageCode,
+        unusedAutoTtsEnabled, callback) => {
       expect(version).toEqual(1);
       callback();
     });

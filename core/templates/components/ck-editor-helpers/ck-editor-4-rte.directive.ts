@@ -46,7 +46,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
                 '</div></div>',
       require: '?ngModel',
 
-      link: function(scope: CkeditorCustomScope, el, attr, ngModel) {
+      link: function(scope: CkeditorCustomScope, el, unusedAttr, ngModel) {
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
@@ -185,7 +185,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
           if (html === undefined) {
             return html;
           }
-          return html.replace(componentRe, function(match, p1, p2, p3) {
+          return html.replace(componentRe, function(match, unusedP1, unusedP2, p3) {
             if (RteHelperService.isInlineComponent(p3)) {
               return '<span type="oppia-noninteractive-' + p3 + '">' +
                     match + '</span>';
@@ -225,7 +225,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
           if (event.data === undefined) {
             return;
           }
-          event.data = event.data.replace(componentRe, function(match, p1, p2) {
+          event.data = event.data.replace(componentRe, function(unusedMatch, p1, p2) {
             return p1 + '</' + p2 + '>';
           });
         }, null, null, 20);

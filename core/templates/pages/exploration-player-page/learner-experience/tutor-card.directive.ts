@@ -118,7 +118,7 @@ angular.module('oppia').directive('tutorCard', [
               !$scope.getDisplayedCard().isCompleted();
             ctrl.directiveSubscriptions.add(
               PlayerPositionService.onNewCardAvailable.subscribe(
-                (data) => $scope.interactionIsActive = false
+                (unusedData) => $scope.interactionIsActive = false
               )
             );
             CurrentInteractionService.registerPresubmitHook(function() {

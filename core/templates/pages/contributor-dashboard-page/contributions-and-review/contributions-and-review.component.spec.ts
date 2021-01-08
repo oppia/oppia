@@ -459,7 +459,7 @@ describe('Contributions and review component', function() {
     it('should show correct heading for translation suggestions', function() {
       contributionOpportunitiesService
         .reloadOpportunitiesEventEmitter.subscribe(() => {
-          ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+          ctrl.loadContributions().then(({opportunitiesDicts, unusedMore}) => {
             expect(opportunitiesDicts).toEqual([{
               id: 'suggestion_1',
               heading: 'Tradução',
@@ -489,7 +489,7 @@ describe('Contributions and review component', function() {
       ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
       $scope.$apply();
 
-      ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+      ctrl.loadContributions().then(({opportunitiesDicts, unusedMore}) => {
         expect(opportunitiesDicts).toEqual([{
           id: 'suggestion_1',
           heading: 'Question 1',

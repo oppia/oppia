@@ -71,7 +71,7 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
             return misconception.getName();
           };
 
-          $scope.openDeleteMisconceptionModal = function(index, evt) {
+          $scope.openDeleteMisconceptionModal = function(index, unusedEvt) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/modal-templates/' +

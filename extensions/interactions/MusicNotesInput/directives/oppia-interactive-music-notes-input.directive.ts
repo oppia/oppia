@@ -279,7 +279,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
           for (var i = 0; i < NOTE_TYPES.length; i++) {
             var innerDiv = $('<div></div>')
               .data('noteType', NOTE_TYPES[i])
-              .addClass(function(index, currentClassName) {
+              .addClass(function(unusedIndex, unusedCurrentClassName) {
                 var addedClass = null;
                 if ($(this).data('noteType') === NOTE_TYPE_NATURAL) {
                   addedClass = 'oppia-music-input-natural-note';
@@ -295,7 +295,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
                 helper: 'clone',
                 stack: '.oppia-music-input-note-choices div',
                 grid: [scope.HORIZONTAL_GRID_SPACING, 1],
-                stop: function(evt, ui) {
+                stop: function(unusedEvt, ui) {
                   if (!isCloneOffStaff($(ui.helper))) {
                     // This makes the helper clone a new draggable note.
                     $(ui.helper)

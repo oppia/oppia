@@ -248,8 +248,8 @@ var ExplorationEditorMainTab = function() {
    *                            match with interaction type.
    */
   this.addResponse = async function(
-      interactionId, feedbackInstructions, destStateName,
-      createNewState, ruleName) {
+      unusedInteractionId, unusedFeedbackInstructions, unusedDestStateName,
+      unusedCreateNewState, unusedRuleName) {
     // Open the "Add Response" modal if it is not already open.
     await waitFor.elementToBeClickable(
       addResponseButton, 'Response Editor button is not clickable');
@@ -437,7 +437,7 @@ var ExplorationEditorMainTab = function() {
       expectCannotAddRule: async function() {
         expect(await addAnswerButton.isPresent()).toBeFalsy();
       },
-      expectCannotDeleteRule: async function(ruleNum) {
+      expectCannotDeleteRule: async function(unusedRuleNum) {
         expect(await deleteAnswerButton.isPresent()).toBeFalsy();
       },
       expectCannotDeleteResponse: async function() {
@@ -752,7 +752,7 @@ var ExplorationEditorMainTab = function() {
   //   _selectRuleParameters(ruleElement, 'NumericInput', 'Equals', 24)
   // will result in a rule that checks whether the learner's answer equals 24.
   var _setRuleParameters = async function(
-      ruleElement, interactionId, ruleName) {
+      unusedRuleElement, interactionId, ruleName) {
     var parameterValues = [];
     for (var i = 3; i < arguments.length; i++) {
       parameterValues.push(arguments[i]);
@@ -818,7 +818,7 @@ var ExplorationEditorMainTab = function() {
 
   // This function selects a rule from the dropdown,
   // but does not set any of its input parameters.
-  var _selectRule = async function(ruleElem, interactionId, ruleName) {
+  var _selectRule = async function(unusedRuleElem, interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
     // Replace selectors with "...".
     ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);

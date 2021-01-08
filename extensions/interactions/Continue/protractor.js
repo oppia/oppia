@@ -31,7 +31,7 @@ var customizeInteraction = async function(elem, buttonText) {
   }
 };
 
-var expectInteractionDetailsToMatch = async function(elem, buttonText) {
+var expectInteractionDetailsToMatch = async function(unusedElem, buttonText) {
   expect(await continueButton.getText()).toBe(buttonText.toUpperCase());
 };
 

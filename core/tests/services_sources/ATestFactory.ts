@@ -19,7 +19,7 @@ require('controller.ts');
 
 angular.module('oppia').factory('ATestFactory', [
   'ATestFactory',
-  function(ATestFactory) {
+  function(unusedATestFactory) {
     var States = function(states) {
       this._states = states;
     };

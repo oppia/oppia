@@ -88,7 +88,7 @@ angular.module('oppia').factory('RteHelperService', [
       // before the modal was opened.
       openCustomizationModal: function(
           customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-          onDismissCallback, refocusFn) {
+          onDismissCallback, unusedRefocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

@@ -70,7 +70,7 @@ describe('Interaction validator', function() {
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $rootScope) {
+  beforeEach(angular.mock.inject(function($injector, unused$rootScope) {
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     agof = $injector.get('AnswerGroupObjectFactory');

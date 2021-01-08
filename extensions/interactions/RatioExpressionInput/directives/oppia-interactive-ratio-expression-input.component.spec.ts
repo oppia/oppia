@@ -26,14 +26,14 @@ require(
 describe('RatioExpressionInputInteractive', function() {
   let ctrl = null, $scope = null, $rootScope = null;
   let mockCurrentInteractionService = {
-    onSubmit: function(answer, rulesService) {},
-    registerCurrentInteraction: function(submitAnswerFn, isAnswerValid) {
+    onSubmit: function(unusedAnswer, unusedRulesService) {},
+    registerCurrentInteraction: function(submitAnswerFn, unusedIsAnswerValid) {
       submitAnswerFn();
     }
   };
   let mockRatioExpressionInputRulesService = {};
   let mockInteractionAttributesExtractorService = {
-    getValuesFromAttributes: function(interactionId, attrs) {
+    getValuesFromAttributes: function(unuseIinteractionId, attrs) {
       return attrs;
     }
   };
@@ -65,7 +65,7 @@ describe('RatioExpressionInputInteractive', function() {
     ctrl.RatioExpressionInputForm = {
       answer: {
         $invalid: false,
-        $setValidity: function(errorType, valid) {
+        $setValidity: function(unusedErrorType, valid) {
           this.$invalid = !valid;
         }
       }

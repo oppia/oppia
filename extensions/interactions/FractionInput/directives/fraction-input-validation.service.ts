@@ -54,7 +54,7 @@ export class FractionInputValidationService {
     };
   }
   getCustomizationArgsWarnings(
-      customizationArgs: FractionInputCustomizationArgs): Warning[] {
+      unusedCustomizationArgs: FractionInputCustomizationArgs): Warning[] {
     return [];
   }
   getAllWarnings(

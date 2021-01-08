@@ -932,7 +932,7 @@ angular.module('oppia').directive('conversationSkin', [
                   feedbackAudioTranslations, refresherExplorationId,
                   missingPrerequisiteSkillId, remainOnCurrentCard,
                   taggedSkillMisconceptionId, wasOldStateInitial,
-                  isFirstHit, isFinalQuestion, focusLabel) {
+                  isFirstHit, isFinalQuestion, unusedFocusLabel) {
                 $scope.nextCard = nextCard;
                 if (!_editorPreviewMode &&
                     !ExplorationPlayerStateService.isInQuestionMode()) {

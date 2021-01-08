@@ -16,7 +16,7 @@ require('core/tests/services-sources/DTest.service.ts');
 
 angular.module('oppia').factory('BTestFactory', [
   'BTestFactory',
-  function(BTestFactory) {
+  function(unusedBTestFactory) {
     var States = function(states) {
       this._states = states;
     };

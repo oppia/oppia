@@ -72,7 +72,7 @@ describe('Window Dimensions Service', () => {
     let mockWidth = 668;
     spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(mockWidth);
 
-    let subscription = wds.getResizeEvent().subscribe(evt => {
+    let subscription = wds.getResizeEvent().subscribe(unusedEvt => {
       expect(wds.getWidth()).toEqual(668);
     });
     window.dispatchEvent(new Event('resize'));

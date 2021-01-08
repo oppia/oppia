@@ -399,7 +399,7 @@ describe('Audio translation bar directive', function() {
       $q.resolve([]));
     var waveSurferObjSpy = {
       load: () => {},
-      on: (evt, callback) => {
+      on: (unusedEvt, callback) => {
         callback();
       },
       pause: () => {},

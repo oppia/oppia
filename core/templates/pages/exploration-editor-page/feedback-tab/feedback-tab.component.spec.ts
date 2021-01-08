@@ -371,7 +371,7 @@ describe('Feedback Tab Component', function() {
     $scope.$apply();
 
     spyOn(suggestionModalForExplorationEditorService, 'showSuggestionModal')
-      .and.callFake(function(suggestionType, obj) {
+      .and.callFake(function(unusedSuggestionType, obj) {
         obj.setActiveThread('0');
       });
 

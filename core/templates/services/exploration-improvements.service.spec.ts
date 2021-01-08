@@ -339,7 +339,7 @@ describe('ExplorationImprovementsService', function() {
         [eqPlaythrough]));
 
       // The newly open HBR tasks should be flushed to the back-end.
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async(unused_, tasks) => {
         expect(tasks.length).toEqual(1);
         expect(tasks[0].taskType).toEqual('high_bounce_rate');
       });
@@ -353,7 +353,7 @@ describe('ExplorationImprovementsService', function() {
 
       // Each newly opened HBR task is flushed once and only once.
       this.eibasPostTasksAsyncSpy.calls.reset();
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async(unused_, tasks) => {
         expect(tasks.length).toEqual(0);
       });
 
@@ -406,7 +406,7 @@ describe('ExplorationImprovementsService', function() {
         .toEqual(0);
 
       // The HBR task should be flushed.
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async(unused_, tasks) => {
         expect(tasks).toEqual([hbrTask]);
       });
 
@@ -418,7 +418,7 @@ describe('ExplorationImprovementsService', function() {
 
       // The HBR task should not be flushed again.
       this.eibasPostTasksAsyncSpy.calls.reset();
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async(unused_, tasks) => {
         expect(tasks).toEqual([]);
       });
 
@@ -455,7 +455,7 @@ describe('ExplorationImprovementsService', function() {
 
         // There should be no tasks to flush, because the NGR task is still
         // open.
-        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+        this.eibasPostTasksAsyncSpy.and.callFake(async(unused_, tasks) => {
           expect(tasks).toEqual([]);
         });
 
@@ -472,7 +472,7 @@ describe('ExplorationImprovementsService', function() {
         expect(ngrTask.isResolved()).toBeTrue();
 
         this.eibasPostTasksAsyncSpy.calls.reset();
-        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+        this.eibasPostTasksAsyncSpy.and.callFake(async(unused_, tasks) => {
           expect(tasks).toEqual([ngrTask]);
         });
 
@@ -484,7 +484,7 @@ describe('ExplorationImprovementsService', function() {
 
         // The NGR task should be flushed once and only once.
         this.eibasPostTasksAsyncSpy.calls.reset();
-        this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+        this.eibasPostTasksAsyncSpy.and.callFake(async(unused_, tasks) => {
           expect(tasks).toEqual([]);
         });
 
@@ -527,7 +527,7 @@ describe('ExplorationImprovementsService', function() {
       expect(ngrTask.isResolved()).toBeTrue();
 
       // It should not be flushed because it wasn't created by initAsync().
-      this.eibasPostTasksAsyncSpy.and.callFake(async(_, tasks) => {
+      this.eibasPostTasksAsyncSpy.and.callFake(async(unused_, tasks) => {
         expect(tasks).toEqual([]);
       });
 

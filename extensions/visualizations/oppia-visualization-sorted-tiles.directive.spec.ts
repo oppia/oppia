@@ -68,7 +68,7 @@ describe('Oppia sorted tiles visualization', function() {
       expect(element.find('strong').text()).toEqual('Pretty Tiles!');
       expect(
         element.find('div.oppia-visualization-sorted-tile-content > div')
-          .map((_, el) => el.textContent.trim()).toArray())
+          .map((unused_, el) => el.textContent.trim()).toArray())
         .toEqual(['foo', '3 times', 'bar', '1 time']);
     });
   });
@@ -85,7 +85,7 @@ describe('Oppia sorted tiles visualization', function() {
     it('should render the provided data with percentages', () => {
       expect(
         element.find('div.oppia-visualization-sorted-tile-content > div')
-          .map((_, el) => el.textContent.trim()).toArray())
+          .map((unused_, el) => el.textContent.trim()).toArray())
         .toEqual(['foo', '75%', 'bar', '25%']);
     });
 

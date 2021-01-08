@@ -62,7 +62,7 @@ angular.module('oppia').controller(
 
       $scope.showNextItemToReview = function(suggestionId) {
         resolvedSuggestionIds.push($scope.activeSuggestionId);
-        var suggestionId = null;
+        var unusedSuggestionId = null;
         if ($scope.lastSuggestionToReview) {
           $uibModalInstance.close(resolvedSuggestionIds);
           return;

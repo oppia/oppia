@@ -26,7 +26,7 @@ describe('ImageLocalStorageService', function() {
   var sampleImageData = 'data:image/png;base64,xyz';
   var imageFilename = 'filename';
   var mockImageUploadHelperService = {
-    convertImageDataToImageFile: function(imageData) {}
+    convertImageDataToImageFile: function(unusedImageData) {}
   };
 
   beforeEach(angular.mock.module('oppia'));

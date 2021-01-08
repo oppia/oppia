@@ -77,7 +77,7 @@ describe('Create New Story Modal Controller', function() {
     spyOn(
       StoryEditorStateService,
       'updateExistenceOfStoryUrlFragment').and.callFake(
-      (urlFragment, callback) => callback());
+      (unusedUrlFragment, callback) => callback());
     spyOn(
       StoryEditorStateService,
       'getStoryWithUrlFragmentExists').and.returnValue(true);
