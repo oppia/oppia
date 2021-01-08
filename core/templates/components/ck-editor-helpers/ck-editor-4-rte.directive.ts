@@ -132,19 +132,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
           scope.uiConfig().startupFocusEnabled !== undefined) {
           startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
         }
-        let activeLanguage;
-        let activeLanguageDirection;
-        if (scope.uiConfig()) {
-          activeLanguage = scope.uiConfig().activeLanguage;
-          activeLanguageDirection = scope.uiConfig().activeLanguageDirection;
-        }
 
-        // Initialize CKEditor.
-        var ck = CKEDITOR.inline(<HTMLElement>(el[0].children[0].children[1]), {
-          // Language configs use default language when undefined.
-          language: activeLanguage,
-          contentsLanguage: activeLanguage,
-          contentsLangDirection: activeLanguageDirection,
+        const ckConfig:CKEDITOR.config = {
           extraPlugins: 'pre,sharedspace,' + pluginNames,
           startupFocus: startupFocusEnabled,
           removePlugins: 'indentblock',
@@ -183,7 +172,22 @@ angular.module('oppia').directive('ckEditor4Rte', [
               items: ['Source']
             }
           ]
-        });
+        };
+
+        if (scope.uiConfig()) {
+          if (scope.uiConfig().activeLanguage) {
+            ckConfig.language = scope.uiConfig().activeLanguage;
+            ckConfig.contentsLanguage = scope.uiConfig().activeLanguage;
+          }
+          if (scope.uiConfig().activeLanguageDirection) {
+            ckConfig.contentsLangDirection = (
+              scope.uiConfig().activeLanguageDirection);
+          }
+        }
+
+        // Initialize CKEditor.
+        var ck = CKEDITOR.inline(
+          <HTMLElement>(el[0].children[0].children[1]), ckConfig);
         // A RegExp for matching rich text components.
         var componentRe = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
