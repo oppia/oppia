@@ -91,8 +91,8 @@ describe('Language util service', function() {
 
   it('should get throw an error when given an invalid content language code',
     () => {
-      expect(lus.getContentLanguageDirection('invalid code')).toThrow(
-        'Invalid language code: invalid code');
+      expect(() => lus.getContentLanguageDirection('invalid code'))
+        .toThrowError('Invalid language code: invalid code');
     }
   );
 
@@ -106,7 +106,7 @@ describe('Language util service', function() {
 
   it('should get throw an error when given an invalid content language code',
     () => {
-      expect(lus.getAudioLanguageDirection('invalid code')).toThrow(
+      expect(() => lus.getAudioLanguageDirection('invalid code')).toThrowError(
         'Invalid language code: invalid code');
     }
   );
