@@ -180,7 +180,7 @@ class FileCache(python_utils.OBJECT):
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with python_utils.open_file(filepath, mode, newline='', 'rb') as f:
+            with python_utils.open_file(filepath, mode, newline='') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]
