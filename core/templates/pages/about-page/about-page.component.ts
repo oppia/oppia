@@ -48,24 +48,24 @@ export class AboutPageComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  onClickVisitClassroomButton(): boolean {
+  onClickVisitClassroomButton(): void {
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = this.classroomUrl;
     }, 150);
-    return false;
+    return;
   }
 
-  onClickBrowseLibraryButton(): boolean {
+  onClickBrowseLibraryButton(): void {
     this.siteAnalyticsService.
       registerClickBrowseLibraryButtonEvent();
     setTimeout(
       () => this.windowRef.nativeWindow.location.href =
        'community-library', 150);
-    return false;
+    return;
   }
 
-  onClickCreateLessonButton(): boolean {
+  onClickCreateLessonButton(): void {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
     if (this.userIsLoggedIn === null) {
       setTimeout(() => window.location.replace('/_ah/login'), 150);
@@ -73,23 +73,23 @@ export class AboutPageComponent implements OnInit {
       setTimeout(() => window.location.replace(
         '/creator-dashboard?mode=create'), 150);
     }
-    return false;
+    return;
   }
 
-  onClickGuideForTeacherButton(): boolean {
+  onClickGuideForTeacherButton(): void {
     this.siteAnalyticsService.registerClickGuideForTeacherButtonEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = '/teach';
     }, 150);
-    return false;
+    return;
   }
 
-  onClickTipsForParentsButton(): boolean {
+  onClickTipsForParentsButton(): void {
     this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = '/teach';
     }, 150);
-    return false;
+    return;
   }
 
   ngOnInit(): void {
