@@ -76,7 +76,7 @@ describe('ExplorationFeatureService', () => {
     expect(explorationFeatureService.areParametersEnabled()).toEqual(true);
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
       .toEqual(true);
-   });
+  });
 
   it('should not init the exploration feature if service is initialized',
     () => {
