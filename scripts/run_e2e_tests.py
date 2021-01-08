@@ -27,11 +27,13 @@ import subprocess
 import sys
 import time
 
+import feconf
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import flake_checker
 from scripts import install_third_party_libs
+
 
 MAX_RETRY_COUNT = 3
 RERUN_NON_FLAKY = True
@@ -194,6 +196,12 @@ def cleanup():
     build.set_constants_to_default()
     common.stop_redis_server()
 
+    for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
+        if not common.wait_for_port_to_be_closed(port):
+            raise RuntimeError(
+                'Port {} failed to close within {} seconds.'.format(
+                    port, common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))
+
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -202,16 +210,14 @@ def is_oppia_server_already_running():
     Returns:
         bool. Whether there is a running Oppia instance.
     """
-    running = False
     for port in [OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT]:
         if common.is_port_open(port):
             python_utils.PRINT(
                 'There is already a server running on localhost:%s.'
                 'Please terminate it before running the end-to-end tests.'
                 'Exiting.' % port)
-            running = True
-            break
-    return running
+            return True
+    return False
 
 
 def run_webpack_compilation(source_maps=False):
@@ -522,16 +528,19 @@ def run_tests(args):
 
     # TODO(#11549): Move this to top of the file.
     import contextlib2
+    managed_dev_appserver = common.managed_dev_appserver(
+        'app.yaml' if args.prod_env else 'app_dev.yaml',
+        port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
+        clear_datastore=True, skip_sdk_update_check=True,
+        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
 
     with contextlib2.ExitStack() as stack:
+        stack.enter_context(common.managed_elasticsearch_dev_server())
         stack.enter_context(common.managed_firebase_auth_emulator())
+        stack.enter_context(managed_dev_appserver)
 
-        stack.enter_context(common.managed_dev_appserver(
-            'app.yaml' if args.prod_env else 'app_dev.yaml',
-            port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
-            clear_datastore=True, skip_sdk_update_check=True,
-            env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH}))
-
+        # Wait for the servers to come up.
+        common.wait_for_port_to_be_open(feconf.ES_PORT)
         common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
         python_utils.PRINT(
