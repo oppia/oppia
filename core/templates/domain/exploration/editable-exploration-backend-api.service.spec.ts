@@ -36,11 +36,11 @@ describe('Editable exploration backend API service', function() {
   var $httpBackend = null;
   var CsrfService = null;
 
-<<<<<<< HEAD
-  beforeEach(()=> {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module(
+    'oppia', TranslatorProviderForTests));
+  importAllAngularServices();
+
   beforeEach(angular.mock.inject(function($injector, $q) {
     EditableExplorationBackendApiService = $injector.get(
       'EditableExplorationBackendApiService');
@@ -54,11 +54,11 @@ describe('Editable exploration backend API service', function() {
       var deferred = $q.defer();
       deferred.resolve('sample-csrf-token');
       return deferred.promise;
->>>>>>> upstream/develop
     });
 
     // Sample exploration object returnable from the backend.
     sampleDataResults = {
+      exploration_id: '0',
       init_state_name: 'Introduction',
       language_code: 'en',
       states: {
