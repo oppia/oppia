@@ -26,8 +26,8 @@ interface UiConfig {
   (): UiConfig;
   'hide_complex_extensions': boolean;
   'startupFocusEnabled'?: boolean;
-  'activeLanguage'?: string;
-  'activeLanguageDirection'?: string;
+  'language'?: string;
+  'languageDirection'?: string;
 }
 
 interface CkeditorCustomScope extends ng.IScope {
@@ -126,16 +126,9 @@ angular.module('oppia').directive('ckEditor4Rte', [
         CKEDITOR.plugins.addExternal(
           'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
 
-        var startupFocusEnabled = true;
-        if (
-          scope.uiConfig() &&
-          scope.uiConfig().startupFocusEnabled !== undefined) {
-          startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
-        }
-
         const ckConfig:CKEDITOR.config = {
           extraPlugins: 'pre,sharedspace,' + pluginNames,
-          startupFocus: startupFocusEnabled,
+          startupFocus: true,
           removePlugins: 'indentblock',
           title: false,
           floatSpaceDockedOffsetY: 15,
@@ -175,19 +168,23 @@ angular.module('oppia').directive('ckEditor4Rte', [
         };
 
         if (scope.uiConfig()) {
-          if (scope.uiConfig().activeLanguage) {
-            ckConfig.language = scope.uiConfig().activeLanguage;
-            ckConfig.contentsLanguage = scope.uiConfig().activeLanguage;
+          if (scope.uiConfig().language) {
+            ckConfig.language = scope.uiConfig().language;
+            ckConfig.contentsLanguage = scope.uiConfig().language;
           }
-          if (scope.uiConfig().activeLanguageDirection) {
+          if (scope.uiConfig().languageDirection) {
             ckConfig.contentsLangDirection = (
-              scope.uiConfig().activeLanguageDirection);
+              scope.uiConfig().languageDirection);
+          }
+          if (scope.uiConfig().startupFocusEnabled !== undefined) {
+            ckConfig.startupFocus = scope.uiConfig().startupFocusEnabled;
           }
         }
 
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(
           <HTMLElement>(el[0].children[0].children[1]), ckConfig);
+
         // A RegExp for matching rich text components.
         var componentRe = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g

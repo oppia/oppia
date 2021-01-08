@@ -169,9 +169,9 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.HTML_SCHEMA = {
           type: 'html',
           ui_config: {
-            activeLanguage: (
+            language: (
               TranslationLanguageService.getActiveLanguageCode()),
-            activeLanguageDirection: (
+            languageDirection: (
               TranslationLanguageService.getActiveLanguageDirection())
           }
         };
