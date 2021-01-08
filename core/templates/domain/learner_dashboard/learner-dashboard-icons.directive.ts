@@ -34,11 +34,11 @@ angular.module('oppia').directive('learnerDashboardIcons', [
         '/domain/learner_dashboard/' +
         'learner-dashboard-icons.directive.html'),
       controller: [
-        '$scope', 'LearnerDashboardIdsBackendApiService',
+        '$rootScope', '$scope', 'LearnerDashboardIdsBackendApiService',
         'LearnerPlaylistService', 'ACTIVITY_TYPE_COLLECTION',
         'ACTIVITY_TYPE_EXPLORATION',
         function(
-            $scope, LearnerDashboardIdsBackendApiService,
+            $rootScope, $scope, LearnerDashboardIdsBackendApiService,
             LearnerPlaylistService, ACTIVITY_TYPE_COLLECTION,
             ACTIVITY_TYPE_EXPLORATION) {
           $scope.activityIsCurrentlyHoveredOver = true;
@@ -148,6 +148,7 @@ angular.module('oppia').directive('learnerDashboardIcons', [
               }
               $scope.disablePlaylistTooltip();
             }
+            $rootScope.$apply();
           };
         }
       ]

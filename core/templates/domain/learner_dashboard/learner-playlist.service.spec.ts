@@ -27,23 +27,28 @@ import { TranslatorProviderForTests } from 'tests/test.extras';
 import { LearnerPlaylistService } from './learner-playlist.service';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { HttpBackend } from '@angular/common/http';
 import constants from 'assets/constants';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { ChangeDetectorRef } from '@angular/core';
+import { ApplicationRef } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
 
 describe('Learner playlist service factory', () => {
-  let httpBackend: HttpBackend = null;
-  let activityType = null;
-  let urlInterpolationService: UrlInterpolationService = null;
+  let activityType: string;
+  let urlInterpolationService: UrlInterpolationService;
   let activityId = '1';
   let addToLearnerPlaylistUrl = '';
-  let alertsService: AlertsService = null;
-  let csrfService: CsrfTokenService = null;
-  let $uibModal = null;
+  let alertsService: AlertsService;
+  let csrfService: CsrfTokenService;
   let httpTestingController: HttpTestingController;
   let instance: LearnerPlaylistService;
+  let ref: ChangeDetectorRef;
+  let appRef: ApplicationRef;
+  let ngbModal: NgbModal;
+  let mockModalRef: NgbModalRef;
 
   beforeEach(
     angular.mock.module('oppia', TranslatorProviderForTests));
@@ -54,11 +59,14 @@ describe('Learner playlist service factory', () => {
     });
     httpTestingController = TestBed.get(HttpTestingController);
     instance = TestBed.get(LearnerPlaylistService);
-    httpBackend = TestBed.get(HttpBackend);
+    ref = TestBed.get(ChangeDetectorRef);
+    appRef = TestBed.get(ApplicationRef);
     activityType = TestBed.get(constants.ACTIVITY_TYPE_EXPLORATION);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
     alertsService = TestBed.get(AlertsService);
     csrfService = TestBed.get(CsrfTokenService);
+    ngbModal = TestBed.get(NgbModal);
+    mockModalRef = TestBed.get(NgbModalRef);
   });
 
   afterEach(() => {
@@ -67,11 +75,13 @@ describe('Learner playlist service factory', () => {
 
   spyOn(alertsService, 'addInfoMessage').and.callThrough();
   spyOn(alertsService, 'addSuccessMessage').and.callThrough();
-  spyOn(csrfService, 'getTokenAsync').and.callFake(function() {
-    var deferred = $q.defer();
-    deferred.resolve('sample-csrf-token');
-    return deferred.promise;
-  });
+  spyOn(csrfService, 'getTokenAsync').and.callFake(
+    (): Promise<string> => {
+      let deferred = new Promise<string>((resolve) => {
+        resolve('sample-csrf-token');
+      });
+      return deferred;
+    });
 
   beforeEach(() => {
     addToLearnerPlaylistUrl = (
@@ -82,8 +92,7 @@ describe('Learner playlist service factory', () => {
         }));
   });
   afterEach(() => {
-    httpBackend.verifyNoOutstandingExpectation();
-    httpBackend.verifyNoOutstandingRequest();
+    httpTestingController.verify();
   });
 
   it('should successfully add playlist to play later list', fakeAsync(() => {
@@ -92,30 +101,32 @@ describe('Learner playlist service factory', () => {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
     instance.addToLearnerPlaylist(activityId, activityType);
+    let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
+    expect(req.request.method).toEqual('POST');
+    req.flush(JSON.stringify(response));
 
-    $httpBackend.flush();
-    $rootScope.$digest();
-    expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith(
+    flushMicrotasks();
+    appRef.tick();
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
       'Successfully added to your \'Play Later\' list.');
-    expect(AlertsService.addInfoMessage).not.toHaveBeenCalled();
+    expect(alertsService.addInfoMessage).not.toHaveBeenCalled();
   }));
 
   it('should not add playlist to play later list' +
     'and show belongs to completed or incomplete list', fakeAsync(() => {
-    var response = {
+    let response = {
       belongs_to_completed_or_incomplete_list: true,
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
     instance.addToLearnerPlaylist(activityId, activityType);
+    let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
+    expect(req.request.method).toEqual('POST');
+    req.flush(JSON.stringify(response));
 
-    $httpBackend.flush();
-    this.digest();
+    flushMicrotasks();
+    appRef.tick();
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'You have already completed or are completing this activity.');
     expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
@@ -123,58 +134,67 @@ describe('Learner playlist service factory', () => {
 
   it('should not add playlist to play later list' +
     'and show belongs to subscribed activities', fakeAsync(() => {
-    var response = {
+    let response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: true,
       playlist_limit_exceeded: false
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
     instance.addToLearnerPlaylist(activityId, activityType);
+    let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
+    expect(req.request.method).toEqual('POST');
+    req.flush(JSON.stringify(response));
 
-    $httpBackend.flush();
-    $rootScope.$digest();
-    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
+    flushMicrotasks();
+    appRef.tick();
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'This is present in your creator dashboard');
-    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
   it('should not add playlist to play later list' +
     'and show playlist limit exceeded', fakeAsync(() => {
-    var response = {
+    let response = {
       belongs_to_completed_or_incomplete_list: false,
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: true
     };
-    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
-      JSON.stringify(response));
     instance.addToLearnerPlaylist(activityId, activityType);
+    let req = httpTestingController.expectOne(addToLearnerPlaylistUrl);
+    expect(req.request.method).toEqual('POST');
+    req.flush(JSON.stringify(response));
 
-    $httpBackend.flush();
-    $rootScope.$digest();
-    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
+    flushMicrotasks();
+    appRef.tick();
+    expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'Your \'Play Later\' list is full!  Either you can ' +
       'complete some or you can head to the learner dashboard ' +
       'and remove some.');
-    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
+    expect(alertsService.addSuccessMessage).not.toHaveBeenCalled();
   }));
 
-  it('should open an $uibModal when removing from learner playlist',
+  it('should open an ngbModal when removing from learner playlist',
     fakeAsync(() => {
-      var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+      let learnerDashboardActivityIds = LearnerDashboardActivityIds
+        .createFromBackendDict({
+          incomplete_exploration_ids: [],
+          incomplete_collection_ids: [],
+          completed_exploration_ids: [],
+          completed_collection_ids: [],
+          exploration_playlist_ids: ['0', '1', '2'],
+          collection_playlist_ids: []
+        });
+      const modalSpy = spyOn(ngbModal, 'open').and.callThrough();
       instance.removeFromLearnerPlaylist(
-        '0', 'title', 'exploration', []);
+        '0', 'title', 'exploration', learnerDashboardActivityIds);
       expect(modalSpy).toHaveBeenCalled();
     }));
 
   it('should remove an exploration from learner playlist', fakeAsync(() => {
-    spyOn($uibModal, 'open').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve();
-      return {
-        result: deferred.promise
-      };
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+    let deferred = new Promise<void>((resolve) => {
+      resolve();
     });
+    mockModalRef.result = deferred;
 
     let learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
@@ -188,21 +208,19 @@ describe('Learner playlist service factory', () => {
 
     instance.removeFromLearnerPlaylist(
       '0', 'title', 'exploration', learnerDashboardActivityIds);
-    $rootScope.$apply();
+    ref.detectChanges();
 
     expect(learnerDashboardActivityIds.explorationPlaylistIds).toEqual(
       ['1', '2']);
   }));
 
   it('should remove a collection from learner playlist', fakeAsync(() => {
-    spyOn($uibModal, 'open').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve();
-      return {
-        result: deferred.promise
-      };
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+    let deferred = new Promise<void>((resolve) => {
+      resolve();
     });
-    var learnerDashboardActivityIds = LearnerDashboardActivityIds
+    mockModalRef.result = deferred;
+    let learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
@@ -214,7 +232,7 @@ describe('Learner playlist service factory', () => {
 
     instance.removeFromLearnerPlaylist(
       '0', 'title', 'collection', learnerDashboardActivityIds);
-    $rootScope.$apply();
+    ref.detectChanges();
 
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
       ['1', '2']);
@@ -222,14 +240,12 @@ describe('Learner playlist service factory', () => {
 
   it('should not remove anything from learner playlist when cancel' +
     ' button is clicked', fakeAsync(() => {
-    spyOn($uibModal, 'open').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.reject();
-      return {
-        result: deferred.promise
-      };
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+    let deferred = new Promise<void>((reject) => {
+      reject();
     });
-    var learnerDashboardActivityIds = LearnerDashboardActivityIds
+    mockModalRef.result = deferred;
+    let learnerDashboardActivityIds = LearnerDashboardActivityIds
       .createFromBackendDict({
         incomplete_exploration_ids: [],
         incomplete_collection_ids: [],
@@ -241,7 +257,7 @@ describe('Learner playlist service factory', () => {
 
     instance.removeFromLearnerPlaylist(
       activityId, 'title', 'collection', learnerDashboardActivityIds);
-    $rootScope.$apply();
+    ref.detectChanges();
 
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
       ['0', '1', '2']);

@@ -26,7 +26,13 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LearnerDashboardActivityIds } from
   'domain/learner_dashboard/learner-dashboard-activity-ids.model';
-import { LearnerPlaylistModalController } from './learner-playlist-modal.controller';
+import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
+
+export interface LearnerPlaylistDict {
+  'belongs_to_completed_or_incomplete_list': boolean;
+  'belongs_to_subscribed_activities': boolean;
+  'playlist_limit_exceeded': boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -39,27 +45,28 @@ export class LearnerPlaylistService {
     private urlInterpolationService: UrlInterpolationService) {}
 
   addToLearnerPlaylist(activityId: string, activityType: string): boolean {
-    var successfullyAdded = true;
-    var addToLearnerPlaylistUrl = (
+    let successfullyAdded = true;
+    let addToLearnerPlaylistUrl: string = (
       this.urlInterpolationService.interpolateUrl(
         '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
           activityType: activityType,
           activityId: activityId
         }));
-    this.http.post(addToLearnerPlaylistUrl,{}).toPromise().then(
+    this.http.post<LearnerPlaylistDict>(
+      addToLearnerPlaylistUrl, {}).toPromise().then(
       (response) => {
-        if (response.data.belongs_to_completed_or_incomplete_list) {
+        if (response.belongs_to_completed_or_incomplete_list) {
           successfullyAdded = false;
           this.alertsService.addInfoMessage(
             'You have already completed or are completing this ' +
             'activity.');
         }
-        if (response.data.belongs_to_subscribed_activities) {
+        if (response.belongs_to_subscribed_activities) {
           successfullyAdded = false;
           this.alertsService.addInfoMessage(
             'This is present in your creator dashboard');
         }
-        if (response.data.playlist_limit_exceeded) {
+        if (response.playlist_limit_exceeded) {
           successfullyAdded = false;
           this.alertsService.addInfoMessage(
             'Your \'Play Later\' list is full!  Either you can ' +
@@ -77,11 +84,15 @@ export class LearnerPlaylistService {
   removeFromLearnerPlaylist(
       activityId: string, activityTitle: string, activityType: string,
       learnerDashboardActivityIds: LearnerDashboardActivityIds):void {
-    this.ngbModal.open(
-      LearnerPlaylistModalController,
+    const modalRef = this.ngbModal.open(
+      LearnerPlaylistModalComponent,
       {
-        backdrop: true,
-      }).result.then(function() {
+        backdrop: true
+      });
+    modalRef.componentInstance.activityId = activityId;
+    modalRef.componentInstance.activityType = activityType;
+    modalRef.componentInstance.activityTitle = activityTitle;
+    modalRef.result.then(function() {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
           activityId);
@@ -100,89 +111,3 @@ export class LearnerPlaylistService {
 angular.module('oppia').factory(
   'LearnerPlaylistService',
   downgradeInjectable(LearnerPlaylistService));
-
-// require('domain/utilities/url-interpolation.service.ts');
-// require('services/alerts.service.ts');
-// require('domain/learner_dashboard/learner-playlist-modal.controller.ts');
-
-// angular.module('oppia').factory('LearnerPlaylistService', [
-//   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
-//   'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
-//   function(
-//       $http, $uibModal, AlertsService, UrlInterpolationService,
-//       ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION) {
-//     var _addToLearnerPlaylist = function(activityId, activityType) {
-//       var successfullyAdded = true;
-//       var addToLearnerPlaylistUrl = (
-//         UrlInterpolationService.interpolateUrl(
-//           '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-//             activityType: activityType,
-//             activityId: activityId
-//           }));
-//       $http.post(addToLearnerPlaylistUrl, {})
-//         .then(function(response) {
-//           if (response.data.belongs_to_completed_or_incomplete_list) {
-//             successfullyAdded = false;
-//             AlertsService.addInfoMessage(
-//               'You have already completed or are completing this ' +
-//               'activity.');
-//           }
-//           if (response.data.belongs_to_subscribed_activities) {
-//             successfullyAdded = false;
-//             AlertsService.addInfoMessage(
-//               'This is present in your creator dashboard');
-//           }
-//           if (response.data.playlist_limit_exceeded) {
-//             successfullyAdded = false;
-//             AlertsService.addInfoMessage(
-//               'Your \'Play Later\' list is full!  Either you can ' +
-//               'complete some or you can head to the learner dashboard ' +
-//               'and remove some.');
-//           }
-//           if (successfullyAdded) {
-//             AlertsService.addSuccessMessage(
-//               'Successfully added to your \'Play Later\' list.');
-//           }
-//         });
-//       return successfullyAdded;
-//     };
-
-//     var _removeFromLearnerPlaylist = function(
-//         activityId, activityTitle, activityType, learnerDashboardActivityIds) {
-//       $uibModal.open({
-//         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-//           '/pages/learner-dashboard-page/modal-templates/' +
-//           'remove-activity-from-learner-dashboard-modal.template.html'),
-//         backdrop: true,
-//         resolve: {
-//           activityId: function() {
-//             return activityId;
-//           },
-//           activityTitle: function() {
-//             return activityTitle;
-//           },
-//           activityType: function() {
-//             return activityType;
-//           }
-//         },
-//         controller: 'LearnerPlaylistModalController'
-//       }).result.then(function() {
-//         if (activityType === ACTIVITY_TYPE_EXPLORATION) {
-//           learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
-//             activityId);
-//         } else if (activityType === ACTIVITY_TYPE_COLLECTION) {
-//           learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
-//             activityId);
-//         }
-//       }, function() {
-//         // Note to developers:
-//         // This callback is triggered when the Cancel button is clicked.
-//         // No further action is needed.
-//       });
-//     };
-
-//     return {
-//       addToLearnerPlaylist: _addToLearnerPlaylist,
-//       removeFromLearnerPlaylist: _removeFromLearnerPlaylist
-//     };
-// //   }]);
