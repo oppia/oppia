@@ -691,14 +691,14 @@ describe('States Object Factory', () => {
       });
   });
 
-  describe('getIsReadyToDisplayWrittenTranslations', () => {
+  describe('areWrittenTranslationsDisplayable', () => {
     // TODO(#11581): Add rule translation support for TextInput and SetInput
     // interactions. Remove this test case afterwards.
     it('should return false for states that contains a state with' +
        'a TextInput interaction', () => {
       const states = ssof.createFromBackendDict(statesDict);
       expect(
-        states.getIsReadyToDisplayWrittenTranslations('fr')
+        states.areWrittenTranslationsDisplayable('fr')
       ).toBe(false);
     });
 
@@ -717,7 +717,7 @@ describe('States Object Factory', () => {
         'default_outcome', 'fr', 'html', '<p>translation</p>');
 
       expect(
-        states.getIsReadyToDisplayWrittenTranslations('fr')
+        states.areWrittenTranslationsDisplayable('fr')
       ).toBe(true);
     });
 
@@ -755,7 +755,7 @@ describe('States Object Factory', () => {
         'default_outcome', 'fr');
 
       expect(
-        states.getIsReadyToDisplayWrittenTranslations('fr')
+        states.areWrittenTranslationsDisplayable('fr')
       ).toBe(true);
     });
 
@@ -780,7 +780,7 @@ describe('States Object Factory', () => {
         ]));
 
       expect(
-        states.getIsReadyToDisplayWrittenTranslations('fr')
+        states.areWrittenTranslationsDisplayable('fr')
       ).toBe(false);
     });
   });

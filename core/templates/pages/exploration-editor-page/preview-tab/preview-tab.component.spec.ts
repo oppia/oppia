@@ -236,7 +236,7 @@ describe('Preview Tab Component', function() {
       spyOn(explorationEngineService, 'init').and.callFake(function(
           explorationDict, explorationVersion, preferredAudioLanguage,
           autoTtsEnabled, preferredContentLanguageCodes,
-          preferredSiteLanguageCode, successCallback) {
+          successCallback) {
         successCallback();
       });
 

@@ -118,7 +118,7 @@ export class State {
     let allContentIds = new Set(this.writtenTranslations.getAllContentIds());
 
     // As of now we do not delete interaction.hints when a user deletes
-    // interaction, so these hints written translations are not counted in
+    // interaction, so these hints' written translations are not counted in
     // checking status of a state.
     if (!interactionId ||
       INTERACTION_SPECS[interactionId].is_linear ||

@@ -43,7 +43,7 @@ export interface VoiceoverObjectsDict {
 }
 
 export interface WrittenTranslationObjectsDict {
-  [state: string]: WrittenTranslation[];
+  [stateName: string]: WrittenTranslation[];
 }
 
 const MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS = 5;
@@ -178,7 +178,7 @@ export class States {
     return allAudioTranslations;
   }
 
-  getIsReadyToDisplayWrittenTranslations(languageCode: string): boolean {
+  areWrittenTranslationsDisplayable(languageCode: string): boolean {
     // A language's translations are ready to be displayed if there are less
     // than five missing or update-needed translations.
     let translationsNeedingUpdate = 0;

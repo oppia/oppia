@@ -44,25 +44,19 @@ export class PlayerTranscriptService {
   transcript: StateCard[] = [];
   numAnswersSubmitted = 0;
 
-  // The 'originalTranscript' represents the transcript in the exploration
-  // language, while the 'transcript' represents the displayed transcript, which
-  // will be in the currently selected language.
-  private originalTranscript: StateCard[] = [];
-
   restore(oldTranscript: StateCard[]): void {
     this.transcript = cloneDeep(oldTranscript);
   }
 
-  restoreImmutably(): void {
+  restoreImmutably(oldTranscript: StateCard[]): void {
     for (let i = 0; i < this.transcript.length; i++) {
       // Immutably restore the cards so that Angular can detect changes.
-      this.transcript[i].restoreImmutable(this.originalTranscript[i]);
+      this.transcript[i].restoreImmutable(oldTranscript[i]);
     }
   }
 
   init(): void {
     this.transcript = [];
-    this.originalTranscript = [];
     this.numAnswersSubmitted = 0;
   }
 
@@ -73,7 +67,6 @@ export class PlayerTranscriptService {
   }
   addNewCard(newCard: StateCard): void {
     this.transcript.push(newCard);
-    this.originalTranscript.push(cloneDeep(newCard));
     this.numAnswersSubmitted = 0;
   }
 

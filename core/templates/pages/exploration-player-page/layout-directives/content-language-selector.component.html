@@ -1,9 +1,10 @@
-<div *ngIf="languageOptions.length > 1" class="row oppia-content-language-selector-container">
+<div *ngIf="shouldDisplaySelector()" class="row oppia-content-language-selector-container">
   <i class="oppia-content-language-selector-icon fas fa-book-open"></i>
   <span [innerHTML]="'I18N_PLAYER_AUDIO_LANGUAGE' | translate:{abc: xyz}"></span>
-  <select class="oppia-content-language-selector"
-          [value]="selectedLanguageCode"
-          (change)="onSelectLanguage($event.target.value)">
+  <select #select
+          class="oppia-content-language-selector"
+          [ngModel]="selectedLanguageCode"
+          (change)="select.value = onSelectLanguage($event.target.value)">
     <option *ngFor="let language of languageOptions" [value]="language.value">{{language.displayed}}</option>
   </select>
 </div>

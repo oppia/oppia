@@ -30,6 +30,9 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
 import { ContentLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/layout-directives/content-language-selector.component';
+import { SwitchContentLanguageRefreshRequiredModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 
 @NgModule({
   imports: [
@@ -39,11 +42,13 @@ import { ContentLanguageSelectorComponent } from
   ],
   declarations: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SwitchContentLanguageRefreshRequiredModalComponent
   ],
   entryComponents: [
     ContentLanguageSelectorComponent,
-    OppiaAngularRootComponent
+    OppiaAngularRootComponent,
+    SwitchContentLanguageRefreshRequiredModalComponent
   ],
   providers: [
     {

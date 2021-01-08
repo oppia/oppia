@@ -19,7 +19,6 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
@@ -229,7 +228,7 @@ export class StateCard {
   }
 
   get writtenTranslations(): WrittenTranslations {
-    return this._writtenTranslations;
+    return cloneDeep(this._writtenTranslations);
   }
 
   get contentHtml(): string {

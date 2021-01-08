@@ -25,7 +25,11 @@ import { ContentTranslationManagerService } from
 import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { UrlService } from 'services/contextual/url.service';
 
+import { INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 
 @Injectable({
   providedIn: 'root'
@@ -33,49 +37,53 @@ import { LanguageUtilService } from 'domain/utilities/language-util.service';
 export class ContentTranslationLanguageService {
   constructor(
     private languageUtilService: LanguageUtilService,
-    private contentTranslationManagerService: ContentTranslationManagerService
+    private contentTranslationManagerService: ContentTranslationManagerService,
+    private urlService: UrlService
   ) {}
 
-  _currentContentLanguageCode: string = null;
-  _explorationLanguageCode: string = null;
-  _languageOptions: ExplorationLanguageInfo[] = [];
+  private currentContentLanguageCode: string;
+  private languageOptions: ExplorationLanguageInfo[] = [];
 
   _init(
       allContentLanguageCodesInExploration: string[],
       preferredContentLanguageCodes: string[],
-      preferredSiteLanguageCode: string,
       explorationLanguageCode: string
   ): void {
-    this._currentContentLanguageCode = null;
-    this._explorationLanguageCode = explorationLanguageCode;
-    this._languageOptions = [];
+    this.currentContentLanguageCode = null;
+    this.languageOptions = [];
     // Set the content language that is chosen initially.
     // Use the following priority (highest to lowest):
-    // 1. Preferred content languages.
-    // 2. Preferred site language.
+    // 1. The URL parameter "initialContentLanguageCode".
+    // 2. Preferred content languages.
     // 3. Otherwise, the exploration language code.
-    if (preferredContentLanguageCodes !== null) {
+
+    const urlParams = this.urlService.getUrlParams();
+    if (
+      urlParams.hasOwnProperty(INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM) &&
+      allContentLanguageCodesInExploration.includes(
+        urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM])
+    ) {
+      this.setCurrentContentLanguageCode(urlParams[
+        INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]);
+    }
+
+    if (
+      this.currentContentLanguageCode === null &&
+      preferredContentLanguageCodes !== null
+    ) {
       for (const languageCode of preferredContentLanguageCodes) {
         if (allContentLanguageCodesInExploration.includes(languageCode)) {
-          this._currentContentLanguageCode = languageCode;
+          this.setCurrentContentLanguageCode(languageCode);
           break;
         }
       }
     }
 
     if (
-      this._currentContentLanguageCode === null &&
-      preferredSiteLanguageCode !== null &&
-      allContentLanguageCodesInExploration.includes(preferredSiteLanguageCode)
-    ) {
-      this._currentContentLanguageCode = preferredSiteLanguageCode;
-    }
-
-    if (
-      this._currentContentLanguageCode === null &&
+      this.currentContentLanguageCode === null &&
       explorationLanguageCode !== null
     ) {
-      this._currentContentLanguageCode = explorationLanguageCode;
+      this.currentContentLanguageCode = explorationLanguageCode;
     }
 
     allContentLanguageCodesInExploration.push(explorationLanguageCode);
@@ -84,7 +92,7 @@ export class ContentTranslationLanguageService {
         let languageDescription =
             this.languageUtilService.getContentLanguageDescription(
               languageCode);
-        this._languageOptions.push({
+        this.languageOptions.push({
           value: languageCode,
           displayed: languageDescription
         });
@@ -94,11 +102,10 @@ export class ContentTranslationLanguageService {
   init(
       allContentLanguageCodesInExploration: string[],
       preferredContentLanguageCodes: string[],
-      preferredSiteLanguageCode: string,
       explorationLanguageCode: string): void {
     this._init(
       allContentLanguageCodesInExploration, preferredContentLanguageCodes,
-      preferredSiteLanguageCode, explorationLanguageCode);
+      explorationLanguageCode);
     this.contentTranslationManagerService.init(explorationLanguageCode);
   }
 
@@ -106,7 +113,7 @@ export class ContentTranslationLanguageService {
    * @return {string} The current audio language code (eg. en).
    */
   getCurrentContentLanguageCode(): string {
-    return this._currentContentLanguageCode;
+    return this.currentContentLanguageCode;
   }
 
   /**
@@ -116,17 +123,17 @@ export class ContentTranslationLanguageService {
    * the exploration.
    */
   getLanguageOptionsForDropdown(): ExplorationLanguageInfo[] {
-    return this._languageOptions;
+    return this.languageOptions;
   }
 
   /**
    * @param {string} set a new language code.
    */
   setCurrentContentLanguageCode(newLanguageCode: string): void {
-    if (this._currentContentLanguageCode !== newLanguageCode) {
+    if (this.currentContentLanguageCode !== newLanguageCode) {
       this.contentTranslationManagerService.displayTranslations(
         newLanguageCode);
-      this._currentContentLanguageCode = newLanguageCode;
+      this.currentContentLanguageCode = newLanguageCode;
     }
   }
 }

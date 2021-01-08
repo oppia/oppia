@@ -276,16 +276,10 @@ angular.module('oppia').factory('ExplorationEngineService', [
       init: function(
           explorationDict, explorationVersion, preferredAudioLanguage,
           autoTtsEnabled, preferredContentLanguageCodes,
-          preferredSiteLanguageCode, successCallback) {
+          successCallback) {
         exploration = ExplorationObjectFactory.createFromBackendDict(
           explorationDict);
         answerIsBeingProcessed = false;
-        ContentTranslationLanguageService.init(
-          exploration.getDisplayableWrittenTranslationLanguageCodes(),
-          preferredContentLanguageCodes,
-          preferredSiteLanguageCode,
-          exploration.getLanguageCode()
-        );
         if (_editorPreviewMode) {
           exploration.setInitialStateName(initStateName);
           visitedStateNames = [exploration.getInitialState().name];
@@ -316,6 +310,11 @@ angular.module('oppia').factory('ExplorationEngineService', [
           checkAlwaysAskLearnersForAnswerDetails();
           _loadInitialState(successCallback);
         }
+        ContentTranslationLanguageService.init(
+          exploration.getDisplayableWrittenTranslationLanguageCodes(),
+          preferredContentLanguageCodes,
+          exploration.getLanguageCode()
+        );
       },
       moveToExploration: function(successCallback) {
         _loadInitialState(successCallback);

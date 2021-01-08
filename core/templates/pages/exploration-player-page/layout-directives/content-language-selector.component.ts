@@ -19,13 +19,19 @@
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ContentTranslationLanguageService } from
   'pages/exploration-player-page/services/content-translation-language.service';
 import { ExplorationLanguageInfo } from
   'pages/exploration-player-page/services/audio-translation-language.service';
-import { ContentTranslationManagerService } from
-  'pages/exploration-player-page/services/content-translation-manager.service';
+import { PlayerPositionService } from
+  'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from
+  'pages/exploration-player-page/services/player-transcript.service';
+import { SwitchContentLanguageRefreshRequiredModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 
 @Component({
   selector: 'content-language-selector',
@@ -36,7 +42,9 @@ export class ContentLanguageSelectorComponent implements OnInit {
   constructor(
     private contentTranslationLanguageService:
       ContentTranslationLanguageService,
-    private contentTranslationManagerService: ContentTranslationManagerService
+    private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService,
+    private ngbModal: NgbModal
   ) {}
 
   selectedLanguageCode: string;
@@ -49,11 +57,29 @@ export class ContentLanguageSelectorComponent implements OnInit {
       this.contentTranslationLanguageService.getLanguageOptionsForDropdown());
   }
 
-  onSelectLanguage(newLanguageCode: string): void {
-    this.contentTranslationLanguageService.setCurrentContentLanguageCode(
-      newLanguageCode);
-    this.contentTranslationManagerService.displayTranslations(newLanguageCode);
-    this.selectedLanguageCode = newLanguageCode;
+  onSelectLanguage(newLanguageCode: string): string {
+    if (this.shouldPromptForRefresh()) {
+      const modalRef = this.ngbModal.open(
+        SwitchContentLanguageRefreshRequiredModalComponent);
+      modalRef.componentInstance.languageCode = newLanguageCode;
+    } else {
+      this.contentTranslationLanguageService.setCurrentContentLanguageCode(
+        newLanguageCode);
+      this.selectedLanguageCode = newLanguageCode;
+    }
+
+    return this.selectedLanguageCode;
+  }
+
+  shouldDisplaySelector(): boolean {
+    return (
+      this.languageOptions.length > 1 &&
+      this.playerPositionService.displayedCardIndex === 0);
+  }
+
+  private shouldPromptForRefresh(): boolean {
+    const firstCard = this.playerTranscriptService.getCard(0);
+    return firstCard.getInputResponsePairs().length > 0;
   }
 }
 

@@ -226,11 +226,11 @@ export class Exploration {
     const allLanguageCodes = (
       this.states.getAllWrittenTranslationLanguageCodes());
 
-    const languageCodesReadyForDisplay = allLanguageCodes.filter(
-      languageCode => this.states.getIsReadyToDisplayWrittenTranslations(
+    const displayableLanguageCodes = allLanguageCodes.filter(
+      languageCode => this.states.areWrittenTranslationsDisplayable(
         languageCode));
 
-    return languageCodesReadyForDisplay;
+    return displayableLanguageCodes;
   }
 }
 

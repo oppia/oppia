@@ -24,7 +24,7 @@ import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
-import { WrittenTranslationsObjectFactory } from
+import { WrittenTranslations, WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
@@ -45,6 +45,8 @@ describe('Content translation manager service', () => {
   let suof: SubtitledUnicodeObjectFactory;
   let rvof: RecordedVoiceoversObjectFactory;
   let wtof: WrittenTranslationsObjectFactory;
+
+  let writtenTranslations: WrittenTranslations;
 
   beforeEach(() => {
     ctms = TestBed.get(ContentTranslationManagerService);
@@ -119,7 +121,7 @@ describe('Content translation manager service', () => {
       solution: solutionDict
     };
 
-    let writtenTranslations = wtof.createFromBackendDict({
+    writtenTranslations = wtof.createFromBackendDict({
       translations_mapping: {
         content: {
           fr: {
@@ -182,11 +184,6 @@ describe('Content translation manager service', () => {
     );
   });
 
-  it('should initialize the exploration language code', () => {
-    ctms.init('en');
-    expect(ctms._explorationLanguageCode).toBe('en');
-  });
-
   it('should switch to a new language', () => {
     ctms.init('en');
     ctms.displayTranslations('fr');
@@ -228,7 +225,7 @@ describe('Content translation manager service', () => {
       rows: {value: 1}
     };
 
-    card.writtenTranslations.toggleNeedsUpdateAttribute('hint_0', 'fr');
+    writtenTranslations.toggleNeedsUpdateAttribute('hint_0', 'fr');
     ctms.displayTranslations('fr');
 
     expect(card.contentHtml).toBe('<p>fr content</p>');
@@ -318,11 +315,11 @@ describe('Content translation manager service', () => {
       const card = pts.transcript[0];
       const interaction = card.getInteraction();
 
-      card.writtenTranslations.addContentId('ca_0');
-      card.writtenTranslations.addWrittenTranslation(
+      writtenTranslations.addContentId('ca_0');
+      writtenTranslations.addWrittenTranslation(
         'ca_0', 'fr', 'unicode', 'fr 1');
-      card.writtenTranslations.addContentId('ca_1');
-      card.writtenTranslations.addWrittenTranslation(
+      writtenTranslations.addContentId('ca_1');
+      writtenTranslations.addWrittenTranslation(
         'ca_1', 'fr', 'unicode', 'fr 2');
 
       interaction.id = 'DummyInteraction';

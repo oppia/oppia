@@ -16,9 +16,11 @@
  * @fileoverview Unit tests for the CkEditor copy toolbar component.
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserDynamicTestingModule } from
+  '@angular/platform-browser-dynamic/testing';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { By } from '@angular/platform-browser';
 import { ContentLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
   'pages/exploration-player-page/layout-directives/content-language-selector.component';
@@ -27,6 +29,14 @@ import { ContentTranslationLanguageService } from
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslatePipe } from 'filters/translate.pipe';
+import { PlayerTranscriptService } from
+  'pages/exploration-player-page/services/player-transcript.service';
+import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
+import { RecordedVoiceoversObjectFactory } from 'domain/exploration/RecordedVoiceoversObjectFactory';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { SwitchContentLanguageRefreshRequiredModalComponent } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 
 class MockContentTranslationLanguageService {
   getCurrentContentLanguageCode() {
@@ -44,29 +54,42 @@ class MockContentTranslationLanguageService {
 
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
-  let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
-  let select: HTMLSelectElement;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
+  let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
+  let playerTranscriptService: PlayerTranscriptService;
+  let recordedVoiceoversObjectFactory: RecordedVoiceoversObjectFactory;
+  let stateCardObjectFactory: StateCardObjectFactory;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
 
-  beforeEach(() => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, HttpClientTestingModule],
-      declarations: [ContentLanguageSelectorComponent, TranslatePipe],
+      imports: [FormsModule, HttpClientTestingModule, NgbModule],
+      declarations: [
+        ContentLanguageSelectorComponent,
+        SwitchContentLanguageRefreshRequiredModalComponent,
+        TranslatePipe
+      ],
       providers: [{
         provide: ContentTranslationLanguageService,
         useClass: MockContentTranslationLanguageService
       }]
+    }).overrideModule(BrowserDynamicTestingModule, {
+      set: {
+        entryComponents: [SwitchContentLanguageRefreshRequiredModalComponent],
+      }
     }).compileComponents();
-
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService);
+    playerTranscriptService = TestBed.get(PlayerTranscriptService);
+    stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
+    recordedVoiceoversObjectFactory = TestBed.get(
+      RecordedVoiceoversObjectFactory);
+    writtenTranslationsObjectFactory = TestBed.get(
+      WrittenTranslationsObjectFactory);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    select = fixture.debugElement.query(
-      By.css('.oppia-content-language-selector')
-    ).nativeElement;
-  });
+  }));
 
   it('should correctly initialize selectedLanguageCode and ' +
      'languagesInExploration', () => {
@@ -78,21 +101,45 @@ describe('Content language selector component', () => {
     ]);
   });
 
-  it('should correctly display the options', () => {
-    expect(select.options.length).toBe(3);
-    expect(select.options[0].innerText).toBe('français (French)');
-    expect(select.options[1].innerText).toBe('中文 (Chinese)');
-    expect(select.options[2].innerText).toBe('English');
-  });
-
-  it('should correctly select an option', () => {
+  it('should correctly select an option when refresh is not needed', () => {
     const setCurrentContentLanguageCodeSpy = spyOn(
       contentTranslationLanguageService,
       'setCurrentContentLanguageCode');
+
+    const card = stateCardObjectFactory.createNewCard(
+      'State 1', '<p>Content</p>', '<interaction></interaction>',
+      null,
+      recordedVoiceoversObjectFactory.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content');
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
     component.onSelectLanguage('fr');
 
     expect(setCurrentContentLanguageCodeSpy).toHaveBeenCalledWith('fr');
     expect(component.selectedLanguageCode).toBe('fr');
+  });
+
+  it('should correctly open the refresh required modal when refresh is ' +
+     'needed', () => {
+    const setCurrentContentLanguageCodeSpy = spyOn(
+      contentTranslationLanguageService,
+      'setCurrentContentLanguageCode');
+
+    const card = stateCardObjectFactory.createNewCard(
+      'State 1', '<p>Content</p>', '<interaction></interaction>',
+      null,
+      recordedVoiceoversObjectFactory.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content');
+    card.addInputResponsePair({
+      learnerInput: '',
+      oppiaResponse: '',
+      isHint: false
+    });
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
+
+    component.onSelectLanguage('fr');
+    expect(setCurrentContentLanguageCodeSpy).not.toHaveBeenCalled();
   });
 });

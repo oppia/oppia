@@ -18,6 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter, Injectable } from '@angular/core';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
@@ -43,8 +44,12 @@ import { ExtensionTagAssemblerService } from
   providedIn: 'root'
 })
 export class ContentTranslationManagerService {
-  _explorationLanguageCode: string;
-  _onStateCardContentUpdateEmitter: EventEmitter<void> = new EventEmitter();
+  private explorationLanguageCode: string;
+  private onStateCardContentUpdateEmitter: EventEmitter<void> = (
+    new EventEmitter());
+  // The 'originalTranscript' is a copy of the transcript in the exploration
+  // language in it's initial state.
+  private originalTranscript: StateCard[] = [];
 
   constructor(
     private playerTranscriptService: PlayerTranscriptService,
@@ -52,11 +57,13 @@ export class ContentTranslationManagerService {
   ) {}
 
   init(explorationLanguageCode: string) : void {
-    this._explorationLanguageCode = explorationLanguageCode;
+    this.explorationLanguageCode = explorationLanguageCode;
+    this.originalTranscript = cloneDeep(
+      this.playerTranscriptService.transcript);
   }
 
   get onStateCardContentUpdate(): EventEmitter<void> {
-    return this._onStateCardContentUpdateEmitter;
+    return this.onStateCardContentUpdateEmitter;
   }
 
   /**
@@ -64,31 +71,22 @@ export class ContentTranslationManagerService {
    * service's StateCards. If the language code is set back to the original
    * exploration language, the original transcript in the exploration language
    * is restored, since it was previously modified from switching to another
-   * language previously.
+   * language previously. Note that learners can only freely switch content
+   * languages on the first state and when there are no response pairs,
+   * otherwise they will have to refresh the page and restart the exploration.
    * @param {string} languageCode The language code to display translations for.
    */
   displayTranslations(languageCode: string) : void {
     const cards = this.playerTranscriptService.transcript;
 
-    if (languageCode === this._explorationLanguageCode) {
-      this.playerTranscriptService.restoreImmutably();
+    if (languageCode === this.explorationLanguageCode) {
+      this.playerTranscriptService.restoreImmutably(this.originalTranscript);
     } else {
       cards.forEach(
         card => this._displayTranslationsForCard(card, languageCode));
     }
 
-    cards.forEach(card => {
-      // Because we do not have a mapping of the learner's input and Oppia's
-      // response to the content from which it originates from, we cannot
-      // easily swap them with translated values. Instead, we opt to clear
-      // the responses.
-      card.getInputResponsePairs().splice(
-        0, card.getInputResponsePairs().length);
-      // Mark card as uncompleted because we clear response pairs.
-      card.markAsNotCompleted();
-    });
-
-    this._onStateCardContentUpdateEmitter.emit();
+    this.onStateCardContentUpdateEmitter.emit();
   }
 
   _swapContent(
