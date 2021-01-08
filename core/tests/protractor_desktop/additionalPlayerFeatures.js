@@ -34,6 +34,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+const { browser } = require('protractor');
 
 describe('Full exploration editor', function() {
   var collectionEditorPage = null;
@@ -165,12 +166,16 @@ describe('Full exploration editor', function() {
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
     var backButton = element(by.css('.protractor-test-back-button'));
-    expect(await backButton.isPresent()).toEqual(true);
+    await browser.waitForAngularEnabled(false);
+    expect(await backButton.isPresent()).toEqual(false);
+    await browser.waitForAngularEnabled(true);
     await explorationPlayerPage.submitAnswer('LogicProof');
+    await browser.waitForAngularEnabled(false);
     await waitFor.invisibilityOf(
       backButton, 'Back button takes too long to disappear.');
-
+    await browser.waitForAngularEnabled(true);
     await explorationPlayerPage.clickThroughToNextCard();
+    await waitFor.pageToFullyLoad();
     await explorationPlayerPage.expectExplorationToBeOver();
     await users.logout();
   });
@@ -206,15 +211,17 @@ describe('Full exploration editor', function() {
     await waitFor.pageToFullyLoad();
 
     await explorationPlayerPage.clickOnReturnToParentButton();
-
+    await browser.waitForAngularEnabled(false);
     var url = await browser.getCurrentUrl();
     var currentExplorationId = url.split('/')[4].split('?')[0];
     expect(currentExplorationId).toBe(parentId2);
+    await browser.waitForAngularEnabled(false);
     await explorationPlayerPage.clickOnReturnToParentButton();
-
+    await browser.waitForAngularEnabled(false);
     url = await browser.getCurrentUrl();
     currentExplorationId = url.split('/')[4];
     expect(currentExplorationId).toBe(parentId1);
+    await browser.waitForAngularEnabled(true);
     await users.logout();
   });
 
@@ -342,7 +349,7 @@ describe('Full exploration editor', function() {
     await explorationPlayerPage.expectContentToMatch(
       await forms.toRichText('Parent Exploration Content'));
     await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
-
+    await waitFor.pageToFullyLoad();
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
     await libraryPage.playCollection('Test Collection');
@@ -353,10 +360,12 @@ describe('Full exploration editor', function() {
       'MultipleChoiceInput', 'Incorrect');
     await explorationPlayerPage.clickConfirmRedirectionButton();
     // Check the current url to see if collection_id is present in it.
+    await browser.waitForAngularEnabled(false);
     var url = await browser.getCurrentUrl();
     var pathname = url.split('/');
     expect(
       pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
+    await browser.waitForAngularEnabled(true);
     await users.logout();
   });
 
@@ -508,11 +517,14 @@ describe('Full exploration editor', function() {
     await libraryPage.get();
     await libraryPage.findExploration('Exploration with Recommendation');
     await libraryPage.playExploration('Exploration with Recommendation');
+    await browser.waitForAngularEnabled(false);
     var recommendedExplorationTile = element(
       by.css('.protractor-test-exp-summary-tile-title'));
+    await waitFor.visibilityOf(recommendedExplorationTile);
     expect(await recommendedExplorationTile.getText())
       .toEqual('Recommended Exploration 1');
     await recommendedExplorationTile.click();
+    await browser.waitForAngularEnabled(true);
     await explorationPlayerPage.expectExplorationNameToBe(
       'Recommended Exploration 1');
     await users.logout();

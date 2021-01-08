@@ -17,6 +17,7 @@
  * tests.
  */
 
+const { browser } = require('protractor');
 var action = require('./action.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
@@ -189,10 +190,12 @@ var LibraryPage = function() {
   };
 
   this.clickExplorationObjective = async function() {
+    await browser.waitForAngularEnabled(false);
     await waitFor.elementToBeClickable(
       explorationObjective,
       'Exploration Objective takes too long to be clickable');
     await explorationObjective.click();
+    await browser.waitForAngularEnabled(true);
   };
 
   this.findExploration = async function(explorationTitle) {
