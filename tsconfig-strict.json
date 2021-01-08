@@ -116,6 +116,7 @@
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.ts",
     "extensions/interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service.spec.ts",
     "extensions/interactions/EndExploration/directives/end-exploration-rules.service.ts",
+    "extensions/interactions/GraphInput/directives/graph-detail.service.ts",
     "extensions/interactions/ImageClickInput/directives/image-click-input-rules.service.ts",
     "extensions/interactions/ImageClickInput/directives/image-click-input-rules.service.spec.ts",
     "extensions/interactions/InteractiveMap/directives/interactive-map-rules.service.ts",
