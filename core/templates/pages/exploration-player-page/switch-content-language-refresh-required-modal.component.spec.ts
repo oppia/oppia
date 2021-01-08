@@ -37,7 +37,7 @@ class MockActiveModal {
 class MockWindowRef {
   _window = {
     location: {
-      href: 'localhost:8181/explore/0'
+      href: 'host.name:1234/explore/0'
     },
   };
   get nativeWindow() {
@@ -80,16 +80,16 @@ describe('SwitchContentLanguageRefreshRequiredModalComponent', function() {
   it('should set the href with the correct URL parameters on confirm',
     () => {
       expect(windowRef.nativeWindow.location.href).toBe(
-        'localhost:8181/explore/0');
+        'host.name:1234/explore/0');
 
       component.languageCode = 'fr';
       component.confirm();
       expect(windowRef.nativeWindow.location.href).toBe(
-        'localhost:8181/explore/0?initialContentLanguageCode=fr');
+        'host.name:1234/explore/0?initialContentLanguageCode=fr');
 
       component.languageCode = 'en';
       component.confirm();
       expect(windowRef.nativeWindow.location.href).toBe(
-        'localhost:8181/explore/0?initialContentLanguageCode=en');
+        'host.name:1234/explore/0?initialContentLanguageCode=en');
     });
 });
