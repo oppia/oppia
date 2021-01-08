@@ -89,10 +89,10 @@ describe('Language util service', function() {
     }
   );
 
-  // eslint-disable-next-line max-len
-  it('should get "auto" language direction when given an invalid content language code',
+  it('should get throw an error when given an invalid content language code',
     () => {
-      expect(lus.getContentLanguageDirection('invalid code')).toEqual('auto');
+      expect(lus.getContentLanguageDirection('invalid code')).toThrow(
+        'Invalid language code: invalid code');
     }
   );
 
@@ -104,10 +104,10 @@ describe('Language util service', function() {
     }
   );
 
-  // eslint-disable-next-line max-len
-  it('should get "auto" language direction when given an invalid audio language code',
+  it('should get throw an error when given an invalid content language code',
     () => {
-      expect(lus.getAudioLanguageDirection('invalid code')).toEqual('auto');
+      expect(lus.getAudioLanguageDirection('invalid code')).toThrow(
+        'Invalid language code: invalid code');
     }
   );
 

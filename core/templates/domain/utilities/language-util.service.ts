@@ -150,24 +150,23 @@ export class LanguageUtilService {
   }
 
   getContentLanguageDirection(languageCode: string): string {
-    let languageDirection = 'auto'; // Default auto for invalid languageCode
-    this.SUPPORTED_CONTENT_LANGUAGES.forEach((lang: ContentLanguage) => {
-      if (lang.code === languageCode) {
-        languageDirection = lang.direction;
+    for (let i = 0; i < this.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
+      const language = this.SUPPORTED_CONTENT_LANGUAGES[i];
+      if (language.code === languageCode) {
+        return language.direction;
       }
-    });
-    return languageDirection;
+    }
+    throw new Error('Invalid language code: ' + languageCode);
   }
 
   getAudioLanguageDirection(languageCode: string): string {
-    let languageDirection = 'auto'; // Default auto for invalid languageCode
-    this.SUPPORTED_AUDIO_LANGUAGES.forEach(
-      (audioLanguage: SupportedAudioLanguageBackendDict) => {
-        if (audioLanguage.id === languageCode) {
-          languageDirection = audioLanguage.direction;
-        }
-      });
-    return languageDirection;
+    for (let i = 0; i < this.SUPPORTED_AUDIO_LANGUAGES.length; i++) {
+      const language = this.SUPPORTED_AUDIO_LANGUAGES[i];
+      if (language.id === languageCode) {
+        return language.direction;
+      }
+    }
+    throw new Error('Invalid language code: ' + languageCode);
   }
 
   // Given a list of audio language codes, returns the complement list, i.e.
