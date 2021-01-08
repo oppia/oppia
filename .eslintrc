@@ -181,7 +181,7 @@
       "error",
       {
         "vars": "all",
-        "varsIgnorePattern": "^unused",
+        "varsIgnorePattern": ".+",
         "args": "all",
         "argsIgnorePattern": "^unused"
       }
