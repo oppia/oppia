@@ -30,21 +30,20 @@ TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
 PREREQUISITES = [
     ('pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')),
-    ('future', '0.18.2', os.path.join(
-        'third_party', 'python_libs')),
+    ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
+    ('six', '1.15.0', os.path.join('third_party', 'python_libs')),
 ]
 
 for package_name, version_number, target_path in PREREQUISITES:
-    if not os.path.exists(target_path):
-        command_text = [
-            sys.executable, '-m', 'pip', 'install', '%s==%s'
-            % (package_name, version_number), '--target', target_path]
-        uextention_text = ['--user', '--prefix=', '--system']
-        current_process = subprocess.Popen(
-            command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output_stderr = current_process.communicate()[1]
-        if 'can\'t combine user with prefix' in output_stderr:
-            subprocess.check_call(command_text + uextention_text)
+    command_text = [
+        sys.executable, '-m', 'pip', 'install', '%s==%s'
+        % (package_name, version_number), '--target', target_path]
+    uextention_text = ['--user', '--prefix=', '--system']
+    current_process = subprocess.Popen(
+        command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output_stderr = current_process.communicate()[1]
+    if 'can\'t combine user with prefix' in output_stderr:
+        subprocess.check_call(command_text + uextention_text)
 
 
 import python_utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
@@ -227,8 +226,7 @@ def main():
         ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
         ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
         ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-        ('simple-crypt', common.SIMPLE_CRYPT_VERSION, common.OPPIA_TOOLS_DIR),
-        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR)
+        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in local_pip_dependencies:

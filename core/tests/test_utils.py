@@ -26,7 +26,9 @@ import copy
 import inspect
 import itertools
 import json
+import logging
 import os
+import re
 import unittest
 
 from constants import constants
@@ -85,11 +87,25 @@ current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
+platform_search_services = models.Registry.import_search_services()
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 # Prefix to append to all lines printed by tests to the console.
 # We are using the b' prefix as all the stdouts are in bytes.
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
+
+# List of model classes that don't have Wipeout or Takeout, related class
+# methods defined because they're not used directly but only as
+# base classes for the other models.
+BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES = (
+    'BaseCommitLogEntryModel',
+    'BaseHumanMaintainedModel',
+    'BaseMapReduceBatchResultsModel',
+    'BaseModel',
+    'BaseSnapshotContentModel',
+    'BaseSnapshotMetadataModel',
+    'VersionedModel',
+)
 
 
 def get_filepath_from_filename(filename, rootdir):
@@ -159,6 +175,235 @@ def check_image_png_or_webp(image_string):
         bool. Returns true if image is in WebP format.
     """
     return image_string.startswith(('data:image/png', 'data:image/webp'))
+
+
+def get_storage_model_module_names():
+    """Get all module names in storage."""
+    # As models.NAMES is an enum, it cannot be iterated over. So we use the
+    # __dict__ property which can be iterated over.
+    for name in models.NAMES.__dict__:
+        if '__' not in name:
+            yield name
+
+
+def get_storage_model_classes():
+    """Get all model classes in storage."""
+    for module_name in get_storage_model_module_names():
+        (module,) = models.Registry.import_models([module_name])
+        for member_name, member_obj in inspect.getmembers(module):
+            if inspect.isclass(member_obj):
+                clazz = getattr(module, member_name)
+                all_base_classes = [
+                    base_class.__name__ for base_class in inspect.getmro(
+                        clazz)]
+                if 'Model' in all_base_classes:
+                    yield clazz
+
+
+class ElasticSearchServicesStub(python_utils.OBJECT):
+    """The stub class that mocks the API functionality offered by the platform
+    layer, namely the platform.search elastic search services API.
+    """
+
+    _DB = {}
+
+    def add_documents_to_index(self, documents, index_name):
+        """Adds documents in a list of documents to a given index in the mock
+        database.
+
+        Args:
+            documents: list(dict). Each document should be a dictionary. Every
+                key in the document is a field name, and the corresponding
+                value will be the field's value. There MUST be a key named
+                'id', its value will be used as the document's id.
+            index_name: str. The name of the index to insert the document into.
+
+        Raises:
+            Exception. A document cannot be added to the index.
+        """
+        for document in documents:
+            assert 'id' in document
+            if index_name not in self._DB:
+                self._DB[index_name] = []
+            self._DB[index_name] = [
+                d for d in self._DB[index_name] if d['id'] != document['id']]
+            self._DB[index_name].append(document)
+
+    def delete_documents_from_index(self, doc_ids, index_name):
+        """Deletes documents from an index in the mock database.
+
+        Args:
+            doc_ids: list(str). A list of document ids of documents to be
+                deleted from the index.
+            index_name: str. The name of the index to delete the document from.
+
+        Raises:
+            Exception. Document id does not exist.
+        """
+        assert isinstance(index_name, python_utils.BASESTRING)
+        if index_name in self._DB:
+            for doc_id in doc_ids:
+                assert isinstance(doc_id, python_utils.BASESTRING)
+                docs = [d for d in self._DB[index_name] if d['id'] != doc_id]
+                if len(self._DB[index_name]) != len(docs):
+                    self._DB[index_name] = docs
+                else:
+                    raise Exception('Document id does not exist: %s' % doc_id)
+
+    def clear_index(self, index_name):
+        """Clears an index on the mock elastic search instance.
+
+        Args:
+            index_name: str. The name of the index to clear.
+        """
+        assert isinstance(index_name, python_utils.BASESTRING)
+        del self._DB[index_name][:]
+
+    def get_document_from_index(self, doc_id, index_name):
+        """Get the document with the given ID from the given index.
+
+        Args:
+            doc_id: str. The document id.
+            index_name: str. The name of the index to get the document from.
+
+        Returns:
+            dict or None. The document in a dict format or None if not found.
+        """
+        assert isinstance(index_name, python_utils.BASESTRING)
+        for document in self._DB[index_name]:
+            if document['id'] == doc_id:
+                return document
+
+    def _filter_search(self, query, result_docs):
+        """Helper method that returns filtered search results.
+
+        Args:
+            query: dict. A dictionary search definition that uses Query DSL.
+            result_docs: list(dict). A list of documents represented as dicts.
+
+        Returns:
+            list(dict). A list of documents represented as dicts.
+        """
+        filters = query['query']['bool']['filter']
+        terms = query['query']['bool']['must']
+
+        for f in filters:
+            for k, v in f['match'].items():
+                result_docs = [doc for doc in result_docs if doc[k] in v]
+
+        if terms:
+            filtered_docs = []
+            for term in terms:
+                for _, v in term.items():
+                    values = v['query'].split(' ')
+                    for doc in result_docs:
+                        strs = [val for val in doc.values() if isinstance(
+                            val, python_utils.BASESTRING)]
+                        words = []
+                        for s in strs:
+                            words += s.split(' ')
+                        if all([value in words for value in values]):
+                            filtered_docs.append(doc)
+            result_docs = filtered_docs
+        return result_docs
+
+    def reset(self):
+        """Helper method that clears the mock database."""
+
+        self._DB.clear()
+
+    def search(
+            self, query_string, index_name, categories, language_codes,
+            cursor=None, offset=0, size=feconf.SEARCH_RESULTS_PAGE_SIZE,
+            ids_only=False):
+        """Returns search results from mock db object.
+
+        Args:
+            query_string: str. The search query.
+            index_name: str. The name of the index. Use '_all' or empty
+                string to perform the operation on all indices.
+            categories: list(str). The list of categories to query for. If it
+                is empty, no category filter is applied to the results. If it
+                is not empty, then a result is considered valid if it matches
+                at least one of these categories.
+            language_codes: list(str). The list of language codes to query for.
+                If it is empty, no language code filter is applied to the
+                results. If it is not empty, then a result is considered valid
+                if it matches at least one of these language codes.
+            cursor: str|None. Not used in this implementation.
+            offset: int. The offset into the index. Pass this in to start at
+                the 'offset' when searching through a list of results of max
+                length 'size'. Leave as None to start at the beginning.
+            size: int. The maximum number of documents to return.
+            ids_only: bool. Whether to only return document ids.
+
+        Returns:
+            2-tuple of (result_docs, resulting_offset). Where:
+                result_docs: list(dict)|list(str). Represents search documents.
+                    If'ids_only' is True, this will be a list of strings
+                    corresponding to the search document ids. If 'ids_only' is
+                    False, the full dictionaries representing each document
+                    retrieved from the elastic search instance will be returned.
+                resulting_offset: int. The resulting offset to start at for the
+                    next section of the results. Returns None if there are no
+                    more results.
+        """
+
+        result_docs = []
+        result_doc_ids = set()
+        resulting_offset = None
+
+        # TODO(#11314): This block will make tests pass when the caller
+        # passes in a cursor instead of an offset.
+        # Remove once migration to ElasticSearch is complete.
+        if cursor and not offset:
+            offset = cursor
+        elif not cursor and not offset:
+            offset = 0
+
+        # The search query dict, formatted using Query DSL. See
+        # elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
+        # for more details about Query DSL.
+        query = {
+            'query': {
+                'bool': {
+                    'must': [{
+                        'multi_match': {
+                            'query': query_string,
+                        }
+                    }],
+                    'filter': [],
+                }
+            }
+        }
+        if categories:
+            category_string = ' '.join(['"%s"' % cat for cat in categories])
+            query['query']['bool']['filter'].append({
+                'match': {'category': category_string}
+            })
+        if language_codes:
+            language_string = ' '.join(['"%s"' % lc for lc in language_codes])
+            query['query']['bool']['filter'].append({
+                'match': {'language_code': language_string}
+            })
+
+        for db_index_name, docs in self._DB.items():
+            if index_name == db_index_name or index_name == '_all':
+                for doc in docs:
+                    if not doc['id'] in result_doc_ids:
+                        result_docs.append(doc)
+                        result_doc_ids.add(doc['id'])
+
+        result_docs = self._filter_search(query, result_docs)
+
+        if offset + size < len(result_docs):
+            resulting_offset = offset + size
+        if ids_only:
+            result_docs = [d['id'] for d in result_docs]
+        if resulting_offset:
+            return result_docs[offset:resulting_offset], resulting_offset
+        else:
+            return result_docs[offset:], resulting_offset
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -396,6 +641,48 @@ class TestBase(unittest.TestCase):
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
+    def capture_logging(self, min_level=logging.NOTSET):
+        """Context manager that captures logs into a list.
+
+        Strips whitespace from messages for convenience.
+
+        https://docs.python.org/3/howto/logging-cookbook.html#using-a-context-manager-for-selective-logging
+
+        Args:
+            min_level: int. The minimum logging level captured by the context
+                manager. By default, all logging levels are captured. Values
+                should be one of the following values from the logging module:
+                NOTSET, DEBUG, INFO, WARNING, ERROR, CRITICAL.
+
+        Yields:
+            list(str). A live-feed of the logging messages captured so-far.
+        """
+        captured_logs = []
+
+        class ListStream(python_utils.OBJECT):
+            """Stream-like object that appends writes to the captured logs."""
+
+            def write(self, msg):
+                """Appends stripped messages to captured logs."""
+                captured_logs.append(msg.strip())
+
+            def flush(self):
+                """Does nothing."""
+                pass
+
+        list_stream_handler = logging.StreamHandler(stream=ListStream())
+
+        logger = logging.getLogger()
+        old_level = logger.level
+        logger.addHandler(list_stream_handler)
+        logger.setLevel(min_level)
+        try:
+            yield captured_logs
+        finally:
+            logger.setLevel(old_level)
+            logger.removeHandler(list_stream_handler)
+
+    @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a 'with'
         statement. The object can be anything that supports getattr and setattr,
@@ -408,13 +695,13 @@ class TestBase(unittest.TestCase):
                 print math.sqrt(16.0) # prints 42
             print math.sqrt(16.0) # prints 4 as expected.
 
-        Note that this does not work directly for classmethods. In this case,
-        you will need to import the 'types' module, as follows:
+        To mock class methods, pass the function to the classmethod decorator
+        first, for example:
 
             import types
             with self.swap(
                 SomePythonClass, 'some_classmethod',
-                types.MethodType(new_classmethod, SomePythonClass)):
+                classmethod(new_classmethod)):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This
@@ -428,6 +715,24 @@ class TestBase(unittest.TestCase):
             yield
         finally:
             setattr(obj, attr, original)
+
+    @contextlib.contextmanager
+    def swap_to_always_return(self, obj, attr, value=None):
+        """Swap obj.attr with a function that always returns the given value."""
+        def function_that_always_returns(*unused_args, **unused_kwargs):
+            """Returns the input value."""
+            return value
+        with self.swap(obj, attr, function_that_always_returns):
+            yield
+
+    @contextlib.contextmanager
+    def swap_to_always_raise(self, obj, attr, error=Exception):
+        """Swap obj.attr with a function that always raises the given error."""
+        def function_that_always_raises(*unused_args, **unused_kwargs):
+            """Raises the input exception."""
+            raise error
+        with self.swap(obj, attr, function_that_always_raises):
+            yield
 
     @contextlib.contextmanager
     def swap_with_checks(
@@ -535,6 +840,45 @@ class TestBase(unittest.TestCase):
         return super(TestBase, self).assertRaisesRegexp(
             expected_exception, expected_regexp,
             callable_obj=callable_obj, *args, **kwargs)
+
+    def assert_matches_regexps(self, items, regexps):
+        """Asserts that each item is a full match of the corresponding regexp.
+
+        Every regexp in the list must be a full match, substring matches are
+        still treated as errors.
+
+        If there are any missing or extra items that do not correspond to a
+        regexp element, then that is also an error.
+
+        Args:
+            items: list(str). The string elements being matched.
+            regexps: list(str|RegexObject). The patterns that each item is
+                expected to match.
+
+        Raises:
+            AssertionError. At least one item does not match its corresponding
+                pattern, or the number of items does not match the number of
+                regexp patterns.
+        """
+        differences = [
+            '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
+            for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
+            if re.match(regexp, item) is None
+        ]
+        if len(items) < len(regexps):
+            extra_regexps = regexps[len(items):]
+            differences.extend(
+                '- [i=%d]:\tmissing item expected to match: %r' % (i, regexp)
+                for i, regexp in enumerate(extra_regexps, start=len(items)))
+        if len(regexps) < len(items):
+            extra_items = items[len(regexps):]
+            differences.extend(
+                '+ [i=%d]:\textra item %r' % (i, item)
+                for i, item in enumerate(extra_items, start=len(regexps)))
+
+        if differences:
+            error_message = 'Lists differ:\n\t%s' % '\n\t'.join(differences)
+            raise AssertionError(error_message)
 
 
 class AppEngineTestBase(TestBase):
@@ -969,6 +1313,7 @@ tags: []
         # while minimizing the swap's scope. We accomplish this by using a
         # context manager over run().
         self._taskqueue_services_stub = TaskqueueServicesStub(self)
+        self._search_services_stub = ElasticSearchServicesStub()
 
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
@@ -989,8 +1334,13 @@ tags: []
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
+                models.Registry, 'import_search_services',
+                classmethod(lambda _: self._search_services_stub)))
+
+            stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self._taskqueue_services_stub.create_http_task))
+
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
                 memory_cache_services_stub.flush_cache))
@@ -1043,6 +1393,7 @@ tags: []
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
         self.signup_superadmin_user()
+        self._search_services_stub.reset()
 
     def tearDown(self):
         datastore_services.delete_multi(
@@ -2076,7 +2427,8 @@ tags: []
             subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False):
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='topic page title'):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -2103,6 +2455,8 @@ tags: []
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
+            page_title_fragment_for_web: str. The page title fragment for the
+                topic.
 
         Returns:
             Topic. A newly-created topic.
@@ -2123,7 +2477,8 @@ tags: []
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
-            meta_tag_content, practice_tab_is_displayed)
+            meta_tag_content, practice_tab_is_displayed,
+            page_title_fragment_for_web)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
@@ -2134,7 +2489,8 @@ tags: []
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False):
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='topic page title'):
         """Saves a new topic with a default version 1 subtopic data dict.
 
         This function should only be used for creating topics in tests involving
@@ -2170,6 +2526,8 @@ tags: []
             meta_tag_content: str. The meta tag content for the topic.
             practice_tab_is_displayed: bool. Whether the practice tab should be
                 displayed.
+            page_title_fragment_for_web: str. The page title fragment for the
+                topic.
         """
         topic_rights_model = topic_models.TopicRightsModel(
             id=topic_id, manager_ids=[], topic_is_published=True)
@@ -2188,7 +2546,8 @@ tags: []
             next_subtopic_id=next_subtopic_id,
             subtopics=[self.VERSION_1_SUBTOPIC_DICT],
             meta_tag_content=meta_tag_content,
-            practice_tab_is_displayed=practice_tab_is_displayed)
+            practice_tab_is_displayed=practice_tab_is_displayed,
+            page_title_fragment_for_web=page_title_fragment_for_web)
         commit_message = 'New topic created with name \'%s\'.' % name
         topic_rights_model.commit(
             committer_id=owner_id,
@@ -2301,10 +2660,10 @@ tags: []
             suggestion_id = (
                 feedback_models.GeneralFeedbackThreadModel.
                 generate_new_thread_id(
-                    suggestion_models.TARGET_TYPE_SKILL, skill_id))
+                    feconf.ENTITY_TYPE_SKILL, skill_id))
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             suggestion_models.STATUS_IN_REVIEW, author_id, None, change,
             score_category, suggestion_id, language_code)
 

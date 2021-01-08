@@ -42,7 +42,7 @@ import { Subscription } from 'rxjs';
 
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
-const storyConstants = require('constants.ts');
+import storyConstants from 'assets/constants';
 
 angular.module('oppia').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -168,7 +168,7 @@ angular.module('oppia').directive('storyEditor', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/story-editor-page/modal-templates/' +
                 'new-chapter-title-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 nodeTitles: () => nodeTitles
               },

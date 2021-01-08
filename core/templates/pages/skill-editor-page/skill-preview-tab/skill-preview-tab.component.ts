@@ -37,14 +37,16 @@ require(
   'domain/topics_and_skills_dashboard/' +
     'topics-and-skills-dashboard-backend-api.service.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').component('skillPreviewTab', {
   template: require('./skill-preview-tab.component.html'),
   controllerAs: '$ctrl',
   controller: [
-    '$scope', 'ContextService', 'QuestionBackendApiService',
+    '$rootScope', '$scope', 'ContextService', 'QuestionBackendApiService',
     'QuestionPlayerEngineService', 'SkillEditorStateService', 'UrlService',
     function(
-        $scope, ContextService, QuestionBackendApiService,
+        $rootScope, $scope, ContextService, QuestionBackendApiService,
         QuestionPlayerEngineService, SkillEditorStateService, UrlService) {
       var ctrl = this;
       var QUESTION_COUNT = 20;
@@ -55,6 +57,7 @@ angular.module('oppia').component('skillPreviewTab', {
         NUMERIC_INPUT: 'Numeric Input',
         ITEM_SELECTION: 'Item Selection'
       };
+      ctrl.directiveSubscriptions = new Subscription();
       ctrl.$onInit = function() {
         ctrl.skillId = UrlService.getSkillIdFromUrl();
         SkillEditorStateService.loadSkill(ctrl.skillId);
@@ -79,6 +82,9 @@ angular.module('oppia').component('skillPreviewTab', {
             ctrl.selectQuestionToPreview(0);
           }
         });
+        ctrl.directiveSubscriptions.add(
+          SkillEditorStateService.onSkillChange.subscribe(
+            () => $rootScope.$applyAsync()));
       };
 
       ctrl.initializeQuestionCard = function(card) {
