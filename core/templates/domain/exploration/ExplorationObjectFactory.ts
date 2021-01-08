@@ -221,8 +221,6 @@ export class Exploration {
   }
 
   getDisplayableWrittenTranslationLanguageCodes(): string[] {
-    // A language's translations are ready to be displayed if there are less
-    // than five missing or update-needed translations.
     const allLanguageCodes = (
       this.states.getAllWrittenTranslationLanguageCodes());
 

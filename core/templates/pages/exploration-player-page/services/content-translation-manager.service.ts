@@ -72,8 +72,9 @@ export class ContentTranslationManagerService {
    * exploration language, the original transcript in the exploration language
    * is restored, since it was previously modified from switching to another
    * language previously. Note that learners can only freely switch content
-   * languages on the first state and when there are no response pairs,
-   * otherwise they will have to refresh the page and restart the exploration.
+   * languages when they are on the first state and have not entered an answer
+   * yet (so, there are no response pairs), otherwise they will have to refresh
+   * the page and restart the exploration.
    * @param {string} languageCode The language code to display translations for.
    */
   displayTranslations(languageCode: string) : void {
@@ -102,6 +103,7 @@ export class ContentTranslationManagerService {
     }
 
     let valueName;
+    // Note: The content can only be of type SubtitledHtml|SubtitledUnicode.
     if (content instanceof SubtitledHtml) {
       valueName = 'html';
     } else if (content instanceof SubtitledUnicode) {
@@ -170,15 +172,9 @@ export class ContentTranslationManagerService {
           writtenTranslations, languageCode,
           <SubtitledHtml|SubtitledUnicode>value);
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (
-          let i = 0;
-          i < (<Object[]> value).length;
-          i++
-        ) {
-          traverseSchemaAndSwapTranslatableContent(
-            value[i],
-            <Schema> schema.items);
-        }
+        (<Object[]> value).forEach(
+          item => traverseSchemaAndSwapTranslatableContent(
+            item, <Schema> schema.items));
       } else if (schema.type === SchemaConstants.SCHEMA_TYPE_DICT) {
         schema.properties.forEach(property => {
           const name = property.name;
