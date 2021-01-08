@@ -120,14 +120,17 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """This job is used to migrate the old commit cmds in skill commit log
-    model to the latest cmd format.
+    and the snapshot metadata model to the latest cmd format.
 
     NOTE TO DEVELOPERS: Do not delete this job until issue #10807 is fixed.
     """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [skill_models.SkillCommitLogEntryModel]
+        return [
+            skill_models.SkillCommitLogEntryModel,
+            skill_models.SkillSnapshotMetadataModel
+        ]
 
     @staticmethod
     def map(item):
@@ -150,7 +153,10 @@ class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             item.commit_cmds = updated_commit_cmds
             item.update_timestamps(update_last_updated_time=False)
             item.put()
-            yield ('Commit Commands Updated', item.id)
+            yield (
+                'Commit Commands Updated-%s' % item.__class__.__name__,
+                item.id
+            )
 
     @staticmethod
     def reduce(key, values):
@@ -158,25 +164,34 @@ class SkillCommitCmdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class MissingSkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """This job is used to delete skill commit log models for which skill models
-    are missing.
+    """This job is used to delete skill commit log, snapshot metadata and
+    snapshot content models for which skill models are missing.
 
     NOTE TO DEVELOPERS: Do not delete this job until issue #10808 is fixed.
     """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [skill_models.SkillCommitLogEntryModel]
+        return [
+            skill_models.SkillCommitLogEntryModel,
+            skill_models.SkillSnapshotMetadataModel,
+            skill_models.SkillSnapshotContentModel
+        ]
 
     @staticmethod
     def map(item):
         if item.deleted:
             return
 
-        skill = skill_fetchers.get_skill_by_id(item.skill_id, strict=False)
+        model_class_name = item.__class__.__name__
+        if model_class_name == 'SkillCommitLogEntryModel':
+            model_id = item.skill_id
+        else:
+            model_id, _ = item.id.rsplit('-', 1)
+        skill = skill_models.SkillModel.get(model_id, strict=False)
         if skill is None:
-            yield ('Skill Commit Model deleted', item.id)
             item.delete()
+            yield ('Skill Commit Model deleted-%s' % model_class_name, item.id)
 
     @staticmethod
     def reduce(key, values):

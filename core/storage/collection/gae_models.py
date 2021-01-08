@@ -185,7 +185,7 @@ class CollectionModel(base_models.VersionedModel):
                 commit_log_models.append(collection_commit_log)
             CollectionCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
-            datastore_services.put_multi_async(commit_log_models)
+            datastore_services.put_multi(commit_log_models)
 
 
 class CollectionRightsSnapshotMetadataModel(
@@ -441,9 +441,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         # Create and delete events will already be recorded in the
         # CollectionModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when collections
-            # are changed).
             CollectionCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -456,7 +453,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
