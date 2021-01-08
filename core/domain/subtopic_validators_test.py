@@ -49,6 +49,8 @@ USER_NAME = 'username'
     models.NAMES.story, models.NAMES.subtopic,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
+
+
 class SubtopicPageModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
