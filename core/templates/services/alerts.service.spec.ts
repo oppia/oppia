@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 import { AlertsService } from 'services/alerts.service';
 
 describe('Alerts Service', function() {
-  let alertsService: AlertsService = null;
+  let alertsService: AlertsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -148,7 +148,7 @@ describe('Alerts Service', function() {
       alertsService.deleteMessage({
         type: 'info',
         content: message,
-        timeout: null
+        timeout: 0
       });
       expect(alertsService.messages.length).toBe(2);
 
@@ -178,7 +178,7 @@ describe('Alerts Service', function() {
       alertsService.deleteMessage({
         type: 'info',
         content: message,
-        timeout: null
+        timeout: 0
       });
       expect(alertsService.messages.length).toBe(2);
 
