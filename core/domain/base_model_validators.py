@@ -100,11 +100,10 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
                 'ExternalModelFetcherDetails')
         filtered_model_ids = []
         for model_id in model_ids:
-            if not bool(
-                    re.match(
-                        '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH,
-                        model_id)):
-                raise utils.ValidationError(
+            if not re.compile(
+                    '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH).match(
+                        model_id):
+                raise Exception(
                     'The model id %s in the field \'%s\' '
                     'is invalid' % (model_id, field_name))
             else:
@@ -165,7 +164,7 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                     'pseudonymous IDs' % field_name)
         for model_id in filtered_model_ids:
             if not user_services.is_user_id_valid(model_id):
-                raise utils.ValidationError(
+                raise Exception(
                     'The user id %s in the field \'%s\' is '
                     'invalid' % (model_id, field_name))
         self.field_name = field_name

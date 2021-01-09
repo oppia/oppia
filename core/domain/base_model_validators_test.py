@@ -241,10 +241,10 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_external_model_fetcher_with_invalid_id(self):
         with self.assertRaisesRegexp(
             Exception,
-            'The model id Mock-12 in the field \'mock_field\' '
-            'is invalid'):
+            'The model id %s in the field \'mock_field\' '
+            'is invalid' % ('a' * 13)):
             base_model_validators.ExternalModelFetcherDetails(
-                'mock_field', MockModel, ['Mock-12']
+                'mock_field', MockModel, ['a' * 13]
             )
 
     def test_user_setting_model_fetcher_with_invalid_id(self):
