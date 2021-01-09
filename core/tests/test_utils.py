@@ -26,7 +26,9 @@ import copy
 import inspect
 import itertools
 import json
+import logging
 import os
+import re
 import unittest
 
 from constants import constants
@@ -56,6 +58,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
@@ -68,6 +71,7 @@ import schema_utils
 import utils
 
 import contextlib2
+import elasticsearch
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
@@ -96,6 +100,7 @@ LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 # base classes for the other models.
 BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES = (
     'BaseCommitLogEntryModel',
+    'BaseHumanMaintainedModel',
     'BaseMapReduceBatchResultsModel',
     'BaseModel',
     'BaseSnapshotContentModel',
@@ -194,6 +199,321 @@ def get_storage_model_classes():
                         clazz)]
                 if 'Model' in all_base_classes:
                     yield clazz
+
+
+class ElasticSearchStub(python_utils.OBJECT):
+    """This stub class mocks the functionality of ES in
+    elastic_search_services.py.
+
+    IMPORTANT NOTE TO DEVELOPERS: These mock functions are NOT guaranteed to
+    be exact implementations of elasticsearch functionality. If the results of
+    this mock and the local dev elasticsearch instance differ, the mock
+    functions should be updated so that their behaviour matches what a local
+    dev instance would return. (For example, this mock always has a 'version'
+    of 1 in the return dict and an arbitrary '_seq_no', although the version
+    number increments with every PUT in the elasticsearch Python client
+    library and the '_seq_no' increments with every operation.)
+    """
+
+    _DB = {}
+
+    def reset(self):
+        """Helper method that clears the mock database."""
+        self._DB.clear()
+
+    def _generate_index_not_found_error(self, index_name):
+        """Helper method that generates an elasticsearch 'index not found' 404
+        error.
+
+        Args:
+            index_name: str. The index that was not found.
+
+        Returns:
+            elasticsearch.NotFoundError. A manually-constructed error
+            indicating that the index was not found.
+        """
+        raise elasticsearch.NotFoundError(
+            404, 'index_not_found_exception', {
+                'status': 404,
+                'error': {
+                    'reason': 'no such index [%s]' % index_name,
+                    'root_cause': [{
+                        'reason': 'no such index [%s]' % index_name,
+                        'index': index_name,
+                        'index_uuid': '_na_',
+                        'type': 'index_not_found_exception',
+                        'resource.type': 'index_or_alias',
+                        'resource.id': index_name
+                    }],
+                    'index': index_name,
+                    'index_uuid': '_na_',
+                    'type': 'index_not_found_exception',
+                    'resource.type': 'index_or_alias',
+                    'resource.id': index_name
+                }
+            }
+        )
+
+    def mock_create_index(self, index_name):
+        """Creates an index with the given name.
+
+        Args:
+            index_name: str. The name of the index to create.
+
+        Returns:
+            dict. A dict representing the ElasticSearch API response.
+
+        Raises:
+            elasticsearch.RequestError. An index with the given name already
+                exists.
+        """
+        if index_name in self._DB:
+            raise elasticsearch.RequestError(
+                400, 'resource_already_exists_exception',
+                'index [%s/RaNdOmStRiNgOfAlPhAs] already exists' % index_name)
+        self._DB[index_name] = []
+        return {
+            'index': index_name,
+            'acknowledged': True,
+            'shards_acknowledged': True
+        }
+
+    def mock_index(self, index_name, document, id=None):  # pylint: disable=redefined-builtin
+        """Adds a document with the given ID to the index.
+
+        Note that, unfortunately, we have to keep the name of "id" for the
+        last kwarg, although it conflicts with a Python builtin. This is
+        because the name is an existing part of the API defined at
+        https://elasticsearch-py.readthedocs.io/en/v7.10.1/api.html
+
+        Args:
+            index_name: str. The name of the index to create.
+            document: dict. The document to store.
+            id: str. The unique identifier of the document.
+
+        Returns:
+            dict. A dict representing the ElasticSearch API response.
+
+        Raises:
+            elasticsearch.RequestError. An index with the given name already
+                exists.
+        """
+        if index_name not in self._DB:
+            raise self._generate_index_not_found_error(index_name)
+        self._DB[index_name] = [
+            d for d in self._DB[index_name] if d['id'] != id]
+        self._DB[index_name].append(document)
+        return {
+            '_index': index_name,
+            '_shards': {
+                'total': 2,
+                'successful': 1,
+                'failed': 0,
+            },
+            '_seq_no': 96,
+            '_primary_term': 1,
+            'result': 'created',
+            '_id': id,
+            '_version': 1,
+            '_type': '_doc',
+        }
+
+    def mock_exists(self, index_name, doc_id):
+        """Checks whether a document with the given ID exists in the mock
+        database.
+
+        Args:
+            index_name: str. The name of the index to check.
+            doc_id: str. The document id to check.
+
+        Returns:
+            bool. Whether the document exists in the index.
+
+        Raises:
+            elasticsearch.NotFoundError: The given index name was not found.
+        """
+        if index_name not in self._DB:
+            raise self._generate_index_not_found_error(index_name)
+        return any([d['id'] == doc_id for d in self._DB[index_name]])
+
+    def mock_delete(self, index_name, doc_id):
+        """Deletes a document from an index in the mock database. Does nothing
+        if the document is not in the index.
+
+        Args:
+            index_name: str. The name of the index to delete the document from.
+            doc_id: str. The document id to be deleted from the index.
+
+        Returns:
+            dict. A dict representing the ElasticSearch API response.
+
+        Raises:
+            Exception. The document does not exist in the index.
+            elasticsearch.NotFoundError. The given index name was not found, or
+                the given doc_id was not found in the given index.
+        """
+        if index_name not in self._DB:
+            raise self._generate_index_not_found_error(index_name)
+        docs = [d for d in self._DB[index_name] if d['id'] != doc_id]
+        if len(self._DB[index_name]) != len(docs):
+            self._DB[index_name] = docs
+            return {
+                '_type': '_doc',
+                '_seq_no': 99,
+                '_shards': {
+                    'total': 2,
+                    'successful': 1,
+                    'failed': 0
+                },
+                'result': 'deleted',
+                '_primary_term': 1,
+                '_index': index_name,
+                '_version': 4,
+                '_id': '0'
+            }
+
+        raise elasticsearch.NotFoundError(
+            404, {
+                '_index': index_name,
+                '_type': '_doc',
+                '_id': doc_id,
+                '_version': 1,
+                'result': 'not_found',
+                '_shards': {
+                    'total': 2,
+                    'successful': 1,
+                    'failed': 0
+                },
+                '_seq_no': 103,
+                '_primary_term': 1
+            })
+
+    def mock_delete_by_query(self, index_name, query):
+        """Deletes documents from an index based on the given query.
+
+        Note that this mock only supports a specific for the query, i.e. the
+        one which clears the entire index. It asserts that all calls to this
+        function use that query format.
+
+        Args:
+            index_name: str. The name of the index to delete the documents from.
+            query: dict. The query that defines which documents to delete.
+
+        Returns:
+            dict. A dict representing the ElasticSearch response.
+
+        Raises:
+            AssertionError. The query is not in the correct form.
+            elasticsearch.NotFoundError. The given index name was not found.
+        """
+        assert query.keys() == ['query']
+        assert query['query'] == {
+            'match_all': {}
+        }
+        if index_name not in self._DB:
+            raise self._generate_index_not_found_error(index_name)
+        index_size = len(self._DB[index_name])
+        del self._DB[index_name][:]
+        return {
+            'took': 72,
+            'version_conflicts': 0,
+            'noops': 0,
+            'throttled_until_millis': 0,
+            'failures': [],
+            'throttled_millis': 0,
+            'total': index_size,
+            'batches': 1,
+            'requests_per_second': -1.0,
+            'retries': {u'search': 0, u'bulk': 0},
+            'timed_out': False,
+            'deleted': index_size
+        }
+
+    def mock_search(self, body=None, index=None, params=None):
+        """Searches and returns documents that match the given query.
+
+        Args:
+            body: dict. A dictionary search definition that uses Query DSL.
+            index: str. The name of the index to search.
+            params: dict. A dict with two keys: `size` and `from`. The
+                corresponding values are ints which represent the number of
+                results to fetch, and the offset from which to fetch them,
+                respectively.
+
+        Returns:
+            dict. A dict representing the ElasticSearch response.
+
+        Raises:
+            AssertionError. The given arguments are not supported by this mock.
+            elasticsearch.NotFoundError. The given index name was not found.
+        """
+        assert body is not None
+        # "_all" and "" are special index names that are used to search across
+        # all indexes. We do not allow their use.
+        assert index not in ['_all', '', None]
+        assert sorted(params.keys()) == ['from', 'size']
+
+        if index not in self._DB:
+            raise self._generate_index_not_found_error(index)
+
+        result_docs = []
+        result_doc_ids = set([])
+        for doc in self._DB[index]:
+            if not doc['id'] in result_doc_ids:
+                result_docs.append(doc)
+                result_doc_ids.add(doc['id'])
+
+        filters = body['query']['bool']['filter']
+        terms = body['query']['bool']['must']
+
+        for f in filters:
+            for k, v in f['match'].items():
+                result_docs = [doc for doc in result_docs if doc[k] in v]
+
+        if terms:
+            filtered_docs = []
+            for term in terms:
+                for _, v in term.items():
+                    values = v['query'].split(' ')
+                    for doc in result_docs:
+                        strs = [val for val in doc.values() if isinstance(
+                            val, python_utils.BASESTRING)]
+                        words = []
+                        for s in strs:
+                            words += s.split(' ')
+                        if all([value in words for value in values]):
+                            filtered_docs.append(doc)
+            result_docs = filtered_docs
+
+        formatted_result_docs = [{
+            '_id': doc['id'],
+            '_score': 0.0,
+            '_type': '_doc',
+            '_index': index,
+            '_source': doc
+        } for doc in result_docs[
+            params['from']: params['from'] + params['size']
+        ]]
+
+        return {
+            'timed_out': False,
+            '_shards': {
+                'failed': 0,
+                'total': 1,
+                'successful': 1,
+                'skipped': 0
+            },
+            'took': 4,
+            'hits': {
+                'hits': formatted_result_docs
+            },
+            'total': {
+                'value': len(formatted_result_docs),
+                'relation': 'eq'
+            },
+            'max_score': max(
+                [0.0] + [d['_score'] for d in formatted_result_docs]),
+        }
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -431,6 +751,48 @@ class TestBase(unittest.TestCase):
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
+    def capture_logging(self, min_level=logging.NOTSET):
+        """Context manager that captures logs into a list.
+
+        Strips whitespace from messages for convenience.
+
+        https://docs.python.org/3/howto/logging-cookbook.html#using-a-context-manager-for-selective-logging
+
+        Args:
+            min_level: int. The minimum logging level captured by the context
+                manager. By default, all logging levels are captured. Values
+                should be one of the following values from the logging module:
+                NOTSET, DEBUG, INFO, WARNING, ERROR, CRITICAL.
+
+        Yields:
+            list(str). A live-feed of the logging messages captured so-far.
+        """
+        captured_logs = []
+
+        class ListStream(python_utils.OBJECT):
+            """Stream-like object that appends writes to the captured logs."""
+
+            def write(self, msg):
+                """Appends stripped messages to captured logs."""
+                captured_logs.append(msg.strip())
+
+            def flush(self):
+                """Does nothing."""
+                pass
+
+        list_stream_handler = logging.StreamHandler(stream=ListStream())
+
+        logger = logging.getLogger()
+        old_level = logger.level
+        logger.addHandler(list_stream_handler)
+        logger.setLevel(min_level)
+        try:
+            yield captured_logs
+        finally:
+            logger.setLevel(old_level)
+            logger.removeHandler(list_stream_handler)
+
+    @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a 'with'
         statement. The object can be anything that supports getattr and setattr,
@@ -443,13 +805,13 @@ class TestBase(unittest.TestCase):
                 print math.sqrt(16.0) # prints 42
             print math.sqrt(16.0) # prints 4 as expected.
 
-        Note that this does not work directly for classmethods. In this case,
-        you will need to import the 'types' module, as follows:
+        To mock class methods, pass the function to the classmethod decorator
+        first, for example:
 
             import types
             with self.swap(
                 SomePythonClass, 'some_classmethod',
-                types.MethodType(new_classmethod, SomePythonClass)):
+                classmethod(new_classmethod)):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This
@@ -463,6 +825,24 @@ class TestBase(unittest.TestCase):
             yield
         finally:
             setattr(obj, attr, original)
+
+    @contextlib.contextmanager
+    def swap_to_always_return(self, obj, attr, value=None):
+        """Swap obj.attr with a function that always returns the given value."""
+        def function_that_always_returns(*unused_args, **unused_kwargs):
+            """Returns the input value."""
+            return value
+        with self.swap(obj, attr, function_that_always_returns):
+            yield
+
+    @contextlib.contextmanager
+    def swap_to_always_raise(self, obj, attr, error=Exception):
+        """Swap obj.attr with a function that always raises the given error."""
+        def function_that_always_raises(*unused_args, **unused_kwargs):
+            """Raises the input exception."""
+            raise error
+        with self.swap(obj, attr, function_that_always_raises):
+            yield
 
     @contextlib.contextmanager
     def swap_with_checks(
@@ -570,6 +950,45 @@ class TestBase(unittest.TestCase):
         return super(TestBase, self).assertRaisesRegexp(
             expected_exception, expected_regexp,
             callable_obj=callable_obj, *args, **kwargs)
+
+    def assert_matches_regexps(self, items, regexps):
+        """Asserts that each item is a full match of the corresponding regexp.
+
+        Every regexp in the list must be a full match, substring matches are
+        still treated as errors.
+
+        If there are any missing or extra items that do not correspond to a
+        regexp element, then that is also an error.
+
+        Args:
+            items: list(str). The string elements being matched.
+            regexps: list(str|RegexObject). The patterns that each item is
+                expected to match.
+
+        Raises:
+            AssertionError. At least one item does not match its corresponding
+                pattern, or the number of items does not match the number of
+                regexp patterns.
+        """
+        differences = [
+            '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
+            for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
+            if re.match(regexp, item) is None
+        ]
+        if len(items) < len(regexps):
+            extra_regexps = regexps[len(items):]
+            differences.extend(
+                '- [i=%d]:\tmissing item expected to match: %r' % (i, regexp)
+                for i, regexp in enumerate(extra_regexps, start=len(items)))
+        if len(regexps) < len(items):
+            extra_items = items[len(regexps):]
+            differences.extend(
+                '+ [i=%d]:\textra item %r' % (i, item)
+                for i, item in enumerate(extra_items, start=len(regexps)))
+
+        if differences:
+            error_message = 'Lists differ:\n\t%s' % '\n\t'.join(differences)
+            raise AssertionError(error_message)
 
 
 class AppEngineTestBase(TestBase):
@@ -1004,6 +1423,7 @@ tags: []
         # while minimizing the swap's scope. We accomplish this by using a
         # context manager over run().
         self._taskqueue_services_stub = TaskqueueServicesStub(self)
+        self._es_stub = ElasticSearchStub()
 
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
@@ -1024,8 +1444,28 @@ tags: []
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
+                elastic_search_services.ES.indices, 'create',
+                self._es_stub.mock_create_index))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'index',
+                self._es_stub.mock_index))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'exists',
+                self._es_stub.mock_exists))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'delete',
+                self._es_stub.mock_delete))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'delete_by_query',
+                self._es_stub.mock_delete_by_query))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'search',
+                self._es_stub.mock_search))
+
+            stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self._taskqueue_services_stub.create_http_task))
+
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
                 memory_cache_services_stub.flush_cache))
@@ -1078,6 +1518,7 @@ tags: []
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
         self.signup_superadmin_user()
+        self._es_stub.reset()
 
     def tearDown(self):
         datastore_services.delete_multi(
@@ -2344,10 +2785,10 @@ tags: []
             suggestion_id = (
                 feedback_models.GeneralFeedbackThreadModel.
                 generate_new_thread_id(
-                    suggestion_models.TARGET_TYPE_SKILL, skill_id))
+                    feconf.ENTITY_TYPE_SKILL, skill_id))
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             suggestion_models.STATUS_IN_REVIEW, author_id, None, change,
             score_category, suggestion_id, language_code)
 

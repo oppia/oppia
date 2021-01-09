@@ -193,7 +193,7 @@ export class Interaction {
         value: Object[] | Object
     ): void => {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
-        contentIds.push(value.getContentId());
+        contentIds.push(value.contentId);
       } else if (value instanceof Array) {
         value.forEach(
           element => traverseValueAndRetrieveContentIdsFromSubtitled(element));
@@ -439,7 +439,9 @@ export class InteractionObjectFactory {
 
   createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
     return new Interaction(
-      this.createAnswerGroupsFromBackendDict(interactionDict.answer_groups),
+      this.createAnswerGroupsFromBackendDict(
+        interactionDict.answer_groups,
+        interactionDict.id),
       interactionDict.confirmed_unclassified_answers,
       this.convertFromCustomizationArgsBackendDict(
         interactionDict.id, interactionDict.customization_args),
@@ -452,12 +454,13 @@ export class InteractionObjectFactory {
   }
 
   createAnswerGroupsFromBackendDict(
-      answerGroupBackendDicts: readonly AnswerGroupBackendDict[]
+      answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
+      interactionId: string
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map((
         answerGroupBackendDict) => {
       return this.answerGroupFactory.createFromBackendDict(
-        answerGroupBackendDict);
+        answerGroupBackendDict, interactionId);
     });
   }
 

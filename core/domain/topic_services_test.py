@@ -1081,8 +1081,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self._create_valid_question_data('dest'),
             [self.skill_id_1])
         suggestion = suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_TOPIC,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_TOPIC,
             self.TOPIC_ID,
             1,
             self.user_id_admin,

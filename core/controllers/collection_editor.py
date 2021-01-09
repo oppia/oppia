@@ -27,10 +27,7 @@ from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import summary_services
-from core.platform import models
 import feconf
-
-current_user_services = models.Registry.import_current_user_services()
 
 
 def _require_valid_version(version_from_payload, collection_version):
@@ -217,15 +214,15 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
         """Handles GET requests."""
         query_string = base64.b64decode(self.request.get('q'))
 
-        search_cursor = self.request.get('cursor', None)
+        search_offset = self.request.get('cursor', None)
 
-        collection_node_metadata_list, new_search_cursor = (
+        collection_node_metadata_list, new_search_offset = (
             summary_services.get_exp_metadata_dicts_matching_query(
-                query_string, search_cursor, self.user))
+                query_string, search_offset, self.user))
 
         self.values.update({
             'collection_node_metadata_list': collection_node_metadata_list,
-            'search_cursor': new_search_cursor,
+            'search_cursor': new_search_offset,
         })
 
         self.render_json(self.values)

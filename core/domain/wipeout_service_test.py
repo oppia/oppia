@@ -309,7 +309,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
     def test_pre_delete_user_without_activities_works_correctly(self):
         user_models.UserSubscriptionsModel(
-            id=self.user_1_id, activity_ids=[], collection_ids=[]
+            id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
 
         user_settings = user_services.get_user_settings(self.user_1_id)
@@ -1772,8 +1772,8 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.FEEDBACK_1_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.EXP_1_ID,
             target_version_at_submission=1,
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -1984,8 +1984,8 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         suggestion_models.GeneralSuggestionModel(
             id=self.FEEDBACK_1_ID,
             suggestion_type=(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.EXP_1_ID,
             target_version_at_submission=1,
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -3561,7 +3561,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         suggestion_models.GeneralVoiceoverApplicationModel(
             id=self.VOICEOVER_1_ID,
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.EXP_1_ID,
             language_code='en',
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -3572,7 +3572,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
         ).put()
         suggestion_models.GeneralVoiceoverApplicationModel(
             id=self.VOICEOVER_2_ID,
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.EXP_2_ID,
             language_code='en',
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -3633,7 +3633,7 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
         suggestion_models.GeneralVoiceoverApplicationModel(
             id=self.VOICEOVER_1_ID,
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.EXP_1_ID,
             language_code='en',
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -3644,7 +3644,7 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
         ).put()
         suggestion_models.GeneralVoiceoverApplicationModel(
             id=self.VOICEOVER_2_ID,
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.EXP_2_ID,
             language_code='en',
             status=suggestion_models.STATUS_IN_REVIEW,
@@ -3668,7 +3668,7 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
 
         suggestion_models.GeneralVoiceoverApplicationModel(
             id=self.VOICEOVER_1_ID,
-            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.EXP_1_ID,
             language_code='en',
             status=suggestion_models.STATUS_IN_REVIEW,
