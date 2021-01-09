@@ -47,6 +47,9 @@ require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 require(
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/layout-directives/content-language-selector.component.ts');
+require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 

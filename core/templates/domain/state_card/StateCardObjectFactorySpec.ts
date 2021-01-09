@@ -30,12 +30,15 @@ import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 
 
 describe('State card object factory', () => {
   let stateCardObjectFactory = null;
   let interactionObjectFactory = null;
   let recordedVoiceoversObjectFactory = null;
+  let writtenTranslationsObjectFactory = null;
   let voiceoverObjectFactory = null;
   let _sampleCard = null;
 
@@ -50,6 +53,8 @@ describe('State card object factory', () => {
       TestBed.get(RecordedVoiceoversObjectFactory));
     voiceoverObjectFactory =
       TestBed.get(VoiceoverObjectFactory);
+    writtenTranslationsObjectFactory = TestBed.get(
+      WrittenTranslationsObjectFactory);
 
     let interactionDict = {
       answer_groups: [],
@@ -97,6 +102,7 @@ describe('State card object factory', () => {
           }
         }
       }),
+      writtenTranslationsObjectFactory.createEmpty(),
       'content');
   });
 

@@ -264,6 +264,8 @@ import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
+import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
+import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 import { ContextService } from 'services/context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
@@ -372,6 +374,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
+  ['ContentTranslationLanguageService', ContentTranslationLanguageService],
+  ['ContentTranslationManagerService', ContentTranslationManagerService],
   ['ContextService', ContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],

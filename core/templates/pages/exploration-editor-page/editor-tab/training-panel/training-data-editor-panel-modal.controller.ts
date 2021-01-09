@@ -48,7 +48,7 @@ angular.module('oppia').controller(
         ResponsesService.getActiveAnswerGroupIndex());
       var FOCUS_LABEL_TEST_INTERACTION_INPUT = 'testInteractionInput';
 
-      $scope.stateContent = _state.content.getHtml();
+      $scope.stateContent = _state.content.html;
       $scope.trainingData = [];
       $scope.answerGroupHasNonEmptyRules = (
         ResponsesService.getAnswerGroup(

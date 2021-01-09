@@ -160,8 +160,8 @@ angular.module('oppia').directive('outcomeEditor', [
           ctrl.saveThisFeedback = function(fromClickSaveFeedbackButton) {
             ctrl.feedbackEditorIsOpen = false;
             var contentHasChanged = (
-              ctrl.savedOutcome.feedback.getHtml() !==
-              ctrl.outcome.feedback.getHtml());
+              ctrl.savedOutcome.feedback.html !==
+              ctrl.outcome.feedback.html);
             ctrl.savedOutcome.feedback = angular.copy(
               ctrl.outcome.feedback);
 
@@ -174,7 +174,7 @@ angular.module('oppia').directive('outcomeEditor', [
               ctrl.savedOutcome.dest = StateEditorService.getActiveStateName();
             }
             if (fromClickSaveFeedbackButton && contentHasChanged) {
-              var contentId = ctrl.savedOutcome.feedback.getContentId();
+              var contentId = ctrl.savedOutcome.feedback.contentId;
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired([contentId]);
             }
             ctrl.getOnSaveFeedbackFn()(ctrl.savedOutcome);

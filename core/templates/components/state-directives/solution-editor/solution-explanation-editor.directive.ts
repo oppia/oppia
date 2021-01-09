@@ -59,11 +59,11 @@ angular.module('oppia').directive('solutionExplanationEditor', [
 
           ctrl.saveThisExplanation = function() {
             var contentHasChanged = (
-              StateSolutionService.displayed.explanation.getHtml() !==
-              StateSolutionService.savedMemento.explanation.getHtml());
+              StateSolutionService.displayed.explanation.html !==
+              StateSolutionService.savedMemento.explanation.html);
             if (contentHasChanged) {
               var solutionContentId = StateSolutionService.displayed.explanation
-                .getContentId();
+                .contentId;
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
                 [solutionContentId]);
             }

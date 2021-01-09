@@ -523,10 +523,10 @@ describe('Skill update service', () => {
     const newWorkedExamples = oldWorkedExamples.map((workedExample, index) => {
       workedExample
         .getQuestion()
-        .setHtml(`new question ${index + 1}`);
+        .html = `new question ${index + 1}`;
       workedExample
         .getExplanation()
-        .setHtml(`new explanation ${index + 1}`);
+        .html = `new explanation ${index + 1}`;
       return workedExample;
     });
 

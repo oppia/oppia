@@ -28,7 +28,7 @@ interface SubscriptionSummary {
 }
 
 export interface PreferencesBackendDict {
-  'preferred_language_codes': string;
+  'preferred_language_codes': string[];
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
   'profile_picture_data_url': string;

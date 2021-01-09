@@ -95,7 +95,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
+    expect(hasms.displayHint(0).html).toBe('one');
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
 
@@ -106,8 +106,8 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
-    expect(hasms.displayHint(1).getHtml()).toBe('two');
+    expect(hasms.displayHint(0).html).toBe('one');
+    expect(hasms.displayHint(1).html).toBe('two');
     expect(hasms.displayHint(3)).toBeNull();
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(true);
@@ -133,7 +133,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
+    expect(hasms.displayHint(0).html).toBe('one');
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
 
@@ -142,7 +142,7 @@ describe('HintsAndSolutionManager service', () => {
 
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
+    expect(hasms.displayHint(0).html).toBe('one');
     expect(hasms.displayHint(1)).toBeNull();
     expect(hasms.isHintConsumed(0)).toBe(true);
     expect(hasms.isHintConsumed(1)).toBe(false);
@@ -186,7 +186,7 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isHintViewable(2)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
+    expect(hasms.displayHint(0).html).toBe('one');
 
     tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
@@ -194,8 +194,8 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isHintViewable(2)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
-    expect(hasms.displayHint(1).getHtml()).toBe('two');
+    expect(hasms.displayHint(0).html).toBe('one');
+    expect(hasms.displayHint(1).html).toBe('two');
 
     tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
@@ -203,9 +203,9 @@ describe('HintsAndSolutionManager service', () => {
     expect(hasms.isHintViewable(1)).toBe(true);
     expect(hasms.isHintViewable(2)).toBe(true);
     expect(hasms.isSolutionViewable()).toBe(false);
-    expect(hasms.displayHint(0).getHtml()).toBe('one');
-    expect(hasms.displayHint(1).getHtml()).toBe('two');
-    expect(hasms.displayHint(2).getHtml()).toBe('three');
+    expect(hasms.displayHint(0).html).toBe('one');
+    expect(hasms.displayHint(1).html).toBe('two');
+    expect(hasms.displayHint(2).html).toBe('three');
 
     tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 

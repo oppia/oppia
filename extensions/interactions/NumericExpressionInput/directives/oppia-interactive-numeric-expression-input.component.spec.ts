@@ -47,7 +47,7 @@ describe('NumericExpressionInputInteractive', function() {
     getValuesFromAttributes: function(interactionId, attrs) {
       return {
         placeholder: {
-          getUnicode: function() {}
+          unicode: null
         }
       };
     }

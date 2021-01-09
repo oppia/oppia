@@ -57,11 +57,11 @@ export class SubtopicPageContents {
   }
 
   getHtml(): string {
-    return this._subtitledHtml.getHtml();
+    return this._subtitledHtml.html;
   }
 
   setHtml(html: string): void {
-    this._subtitledHtml.setHtml(html);
+    this._subtitledHtml.html = html;
   }
 
   getRecordedVoiceovers(): RecordedVoiceovers {

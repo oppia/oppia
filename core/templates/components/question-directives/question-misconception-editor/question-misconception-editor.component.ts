@@ -92,7 +92,7 @@ angular.module('oppia').component('questionMisconceptionEditor', {
         ctrl.misconceptionName = ctrl.selectedMisconception.getName();
         var outcome = angular.copy(ctrl.outcome);
         if (ctrl.feedbackIsUsed) {
-          outcome.feedback.setHtml(
+          outcome.feedback.html = (
             ctrl.selectedMisconception.getFeedback());
           ctrl.getOnSaveAnswerGroupFeedbackFn()(outcome);
           ExternalSaveService.onExternalSave.emit();

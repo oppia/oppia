@@ -24,7 +24,7 @@ import { BrowserCheckerService } from
   'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
-interface ExplorationLanguageInfo {
+export interface ExplorationLanguageInfo {
   /**
    * This inteface is used to keep track of the audio language code (value)
    * and the audio language description to display (displayed) for the

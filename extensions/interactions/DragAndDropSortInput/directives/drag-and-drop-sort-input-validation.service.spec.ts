@@ -255,7 +255,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
   it('should expect all choices to be nonempty', () => {
     // Set the first choice to empty.
-    customizationArgs.choices.value[0].setHtml('');
+    customizationArgs.choices.value[0].html = '';
 
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, [], goodDefaultOutcome);

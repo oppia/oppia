@@ -87,7 +87,7 @@ export class StateInteractionStatsService {
         <MultipleChoiceInputCustomizationArgs>
         state.interaction.customizationArgs);
       return customizationArgs.choices.value[
-        <MultipleChoiceAnswer> answer].getHtml();
+        <MultipleChoiceAnswer> answer].html;
     }
     return answer;
   }

@@ -52,7 +52,7 @@ export class ExtractImageFilenamesFromStateService {
      *                         should be returned.
      */
     _getStateContentHtml(state: State): string {
-      return state.content.getHtml();
+      return state.content.html;
     }
 
     /**
@@ -64,12 +64,12 @@ export class ExtractImageFilenamesFromStateService {
     _getOutcomesHtml(state: State): string {
       let outcomesHtml = '';
       state.interaction.answerGroups.forEach(function(answerGroup) {
-        let answerGroupHtml = answerGroup.outcome.feedback.getHtml();
+        let answerGroupHtml = answerGroup.outcome.feedback.html;
         outcomesHtml = outcomesHtml.concat(answerGroupHtml);
       });
       if (state.interaction.defaultOutcome !== null) {
         outcomesHtml = outcomesHtml.concat(
-          state.interaction.defaultOutcome.feedback.getHtml());
+          state.interaction.defaultOutcome.feedback.html);
       }
       return outcomesHtml;
     }
@@ -81,7 +81,7 @@ export class ExtractImageFilenamesFromStateService {
     _getHintsHtml(state: State): string {
       let hintsHtml = '';
       state.interaction.hints.forEach(function(hint) {
-        let hintHtml = hint.hintContent.getHtml();
+        let hintHtml = hint.hintContent.html;
         hintsHtml = hintsHtml.concat(hintHtml);
       });
       return hintsHtml;
@@ -93,7 +93,7 @@ export class ExtractImageFilenamesFromStateService {
      *                         returned.
      */
     _getSolutionHtml(state: State): string {
-      return state.interaction.solution.explanation.getHtml();
+      return state.interaction.solution.explanation.html;
     }
 
     /**
@@ -116,7 +116,7 @@ export class ExtractImageFilenamesFromStateService {
         (<CustomizationArgsWithChoices> state.interaction.customizationArgs)
           .choices.value.forEach(function(value) {
             customizationArgsHtml = (
-              customizationArgsHtml.concat(value.getHtml()));
+              customizationArgsHtml.concat(value.html));
           });
         _allHtmlInTheState.push(customizationArgsHtml);
       }

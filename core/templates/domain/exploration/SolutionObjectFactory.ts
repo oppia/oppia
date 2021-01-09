@@ -126,7 +126,7 @@ export class Solution {
           this.correctAnswer));
     }
     var explanation = (
-      (new ConvertToPlainTextPipe()).transform(this.explanation.getHtml()));
+      (new ConvertToPlainTextPipe()).transform(this.explanation.html));
     return (
       solutionType + ' solution is "' + correctAnswer +
       '". ' + explanation + '.');
@@ -149,7 +149,7 @@ export class Solution {
   }
 
   getOppiaSolutionExplanationResponseHtml(): string {
-    return this.explanation.getHtml();
+    return this.explanation.html;
   }
 }
 

@@ -120,6 +120,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/user.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
 
 import { Subscription } from 'rxjs';
 

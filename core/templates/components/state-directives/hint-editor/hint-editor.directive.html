@@ -15,7 +15,7 @@
 
         <strong>Hint #<[$ctrl.getIndexPlusOne()]> is...</strong>
         <span>
-          <angular-html-bind class="oppia-rte-editor" html-data="$ctrl.hint.hintContent.getHtml()">
+          <angular-html-bind class="oppia-rte-editor" html-data="$ctrl.hint.hintContent.html">
           </angular-html-bind>
         </span>
       </div>
@@ -45,7 +45,7 @@
         </button>
         <button type="button"
                 class="btn btn-success protractor-test-save-hint-edit"
-                ng-disabled="!$ctrl.hint.hintContent.getHtml() || $ctrl.editHintForm.$invalid"
+                ng-disabled="!$ctrl.hint.hintContent.html || $ctrl.editHintForm.$invalid"
                 ng-click="$ctrl.saveThisHint()">
           Save
         </button>

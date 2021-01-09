@@ -30,6 +30,8 @@ import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 
 import { Subscription } from 'rxjs';
 
@@ -47,6 +49,7 @@ describe('Display Hint Modal Controller', function() {
   var recordedVoiceoversObjectFactory = null;
   var stateCardObjectFactory = null;
   var subtitledHtmlObjectFactory = null;
+  var writtenTranslationsObjectFactory = null;
 
   var card = null;
   var hintContent = null;
@@ -63,6 +66,8 @@ describe('Display Hint Modal Controller', function() {
       RecordedVoiceoversObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    writtenTranslationsObjectFactory = TestBed.get(
+      WrittenTranslationsObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -95,9 +100,10 @@ describe('Display Hint Modal Controller', function() {
       id: null
     });
     var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
+    var writtenTranslations = writtenTranslationsObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,
-      recordedVoiceovers, 'content_id');
+      recordedVoiceovers, writtenTranslations, 'content_id');
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
     testSubscriptions = new Subscription();

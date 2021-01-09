@@ -83,7 +83,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
 
       // Next, the content is evaluated.
       ExpressionInterpolationService.getParamsFromString(
-        state.content.getHtml()).forEach(
+        state.content.html).forEach(
         function(paramName) {
           result.push(ParamMetadata.createWithGetAction(
             paramName, PARAM_SOURCE_CONTENT, null));
@@ -97,7 +97,7 @@ angular.module('oppia').factory('ParameterMetadataService', [
       // Finally, the rule feedback strings are evaluated.
       state.interaction.answerGroups.forEach(function(group) {
         ExpressionInterpolationService.getParamsFromString(
-          group.outcome.feedback.getHtml()).forEach(function(paramName, index) {
+          group.outcome.feedback.html).forEach(function(paramName, index) {
           result.push(ParamMetadata.createWithGetAction(
             paramName, PARAM_SOURCE_FEEDBACK, index));
         });

@@ -67,8 +67,8 @@
                  ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
                 <summary-list-header index="$index"
                                      disable-sorting="bindableFieldsDict.displayedWorkedExamples.length === 1"
-                                     summary="getWorkedExampleSummary(workedExample.getQuestion().getHtml())"
-                                     short-summary="getWorkedExampleSummary(workedExample.getQuestion().getHtml())"
+                                     summary="getWorkedExampleSummary(workedExample.getQuestion().html)"
+                                     short-summary="getWorkedExampleSummary(workedExample.getQuestion().html)"
                                      is-active="$index === activeWorkedExampleIndex"
                                      is-delete-available="isEditable"
                                      on-delete-fn="deleteWorkedExample">

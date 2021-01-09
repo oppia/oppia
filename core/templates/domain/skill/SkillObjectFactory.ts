@@ -226,7 +226,7 @@ export class Skill {
   }
   getValidationIssues(): string[] {
     var issues = [];
-    if (this.getConceptCard().getExplanation().getHtml() === '') {
+    if (this.getConceptCard().getExplanation().html === '') {
       issues.push(
         'There should be review material in the concept card.');
     }

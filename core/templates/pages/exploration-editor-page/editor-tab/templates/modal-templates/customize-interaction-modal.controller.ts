@@ -279,8 +279,8 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         );
 
         if (schemaIsSubtitledHtml || schemaIsSubtitledUnicode) {
-          if ((<SubtitledHtml|SubtitledUnicode>value).getContentId() === null) {
-            (<SubtitledHtml|SubtitledUnicode>value).setContentId(
+          if ((<SubtitledHtml|SubtitledUnicode>value).contentId === null) {
+            (<SubtitledHtml|SubtitledUnicode>value).contentId = (
               `${contentIdPrefix}_${StateNextContentIdIndexService.displayed}`
             );
             StateNextContentIdIndexService.displayed += 1;
@@ -344,13 +344,13 @@ angular.module('oppia').controller('CustomizeInteractionModalController', [
         if (schemaIsSubtitledHtml) {
           const subtitledHtmlValue = <SubtitledHtml> value;
           contentIdToContent[
-            subtitledHtmlValue.getContentId()
-          ] = subtitledHtmlValue.getHtml();
+            subtitledHtmlValue.contentId
+          ] = subtitledHtmlValue.html;
         } else if (schemaIsSubtitledUnicode) {
           const subtitledUnicodeValue = <SubtitledUnicode> value;
           contentIdToContent[
-            subtitledUnicodeValue.getContentId()
-          ] = subtitledUnicodeValue.getUnicode();
+            subtitledUnicodeValue.contentId
+          ] = subtitledUnicodeValue.unicode;
         } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
           for (let i = 0; i < (<Object[]> value).length; i++) {
             traverseSchemaAndCollectContent(value[i], <Schema> schema.items);

@@ -71,7 +71,7 @@ angular.module('oppia').component('skillPreviewTab', {
             INTERACTION_TYPES[interaction]);
         }
         ctrl.skill = SkillEditorStateService.getSkill();
-        ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().getHtml();
+        ctrl.htmlData = ctrl.skill.getConceptCard().getExplanation().html;
 
         QuestionBackendApiService.fetchQuestions(
           [ctrl.skillId], QUESTION_COUNT, false).then((response) => {

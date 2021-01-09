@@ -86,6 +86,14 @@ export class LanguageUtilService {
     return supportedAudioLanguages;
   }
 
+  getSupportedContentLanguages(): {[languageCode: string]: ContentLanguage} {
+    const supportedContentLanguages = {};
+    this.SUPPORTED_CONTENT_LANGUAGES.forEach(contentLanguageDict => {
+      supportedContentLanguages[contentLanguageDict.code] = contentLanguageDict;
+    });
+    return supportedContentLanguages;
+  }
+
   getAllAudioLanguageCodes(): string[] {
     var allAudioLanguageCodes = (
       this.SUPPORTED_AUDIO_LANGUAGES.map(audioLanguage => {
@@ -146,6 +154,11 @@ export class LanguageUtilService {
   }
   getAudioLanguageDescription(audioLanguageCode: string): string {
     const language = this.getSupportedAudioLanguages()[audioLanguageCode];
+    return language ? language.description : null;
+  }
+
+  getContentLanguageDescription(contentLanguageCode: string): string {
+    const language = this.getSupportedContentLanguages()[contentLanguageCode];
     return language ? language.description : null;
   }
 

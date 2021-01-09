@@ -122,7 +122,7 @@ describe('Subtopic viewer page', function() {
     ctrl.$onInit();
     $scope.$apply();
 
-    expect(ctrl.pageContents.getHtml()).toBe('This is a html');
+    expect(ctrl.pageContents.html).toBe('This is a html');
     expect(ctrl.subtopicTitle).toBe(subtopicTitle);
     expect(
       OppiaAngularRootComponent.pageTitleService.setPageTitle

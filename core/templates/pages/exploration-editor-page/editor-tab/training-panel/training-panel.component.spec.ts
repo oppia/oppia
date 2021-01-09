@@ -207,7 +207,7 @@ describe('Training Panel Component', function() {
   it('should start to add new response and then cancel it', function() {
     $scope.beginAddingNewResponse();
     expect(ctrl.addingNewResponse).toBe(true);
-    expect(ctrl.classification.newOutcome.feedback.getContentId()).toBe(
+    expect(ctrl.classification.newOutcome.feedback.contentId).toBe(
       'feedback_1');
 
     $scope.cancelAddingNewResponse();

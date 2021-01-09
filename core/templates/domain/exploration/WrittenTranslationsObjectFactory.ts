@@ -51,7 +51,7 @@ export class WrittenTranslations {
     this._writtenTranslationObjectFactory = writtenTranslationObjectFactory;
   }
 
-  getAllContentId(): string[] {
+  getAllContentIds(): string[] {
     return Object.keys(this.translationsMapping);
   }
 
@@ -68,7 +68,7 @@ export class WrittenTranslations {
     }
   }
 
-  getTranslationsLanguageCodes(contentId: string): string[] {
+  getLanguageCodes(contentId: string): string[] {
     return Object.keys(this.translationsMapping[contentId]);
   }
 
@@ -76,7 +76,7 @@ export class WrittenTranslations {
     if (!this.translationsMapping.hasOwnProperty(contentId)) {
       return false;
     }
-    return this.getTranslationsLanguageCodes(
+    return this.getLanguageCodes(
       contentId).indexOf(languageCode) !== -1;
   }
 

@@ -64,7 +64,7 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
               'TextInput',
               $attrs
             );
-            ctrl.placeholder = placeholder.getUnicode();
+            ctrl.placeholder = placeholder.unicode;
             ctrl.rows = rows;
             ctrl.answer = '';
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;

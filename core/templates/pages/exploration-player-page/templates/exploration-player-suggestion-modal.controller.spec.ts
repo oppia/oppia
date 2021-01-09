@@ -26,6 +26,8 @@ import { RecordedVoiceoversObjectFactory } from
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 
 // TODO(#7222): Remove usage of importAllAngularServices once upgraded to
 // Angular 8.
@@ -45,6 +47,7 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   var recordedVoiceoversObjectFactory = null;
   var stateCardObjectFactory = null;
   var suggestionModalService = null;
+  var writtenTranslationsObjectFactory = null;
 
   var card = null;
 
@@ -58,6 +61,8 @@ describe('Exploration Player Suggestion Modal Controller', function() {
       RecordedVoiceoversObjectFactory);
     stateCardObjectFactory = TestBed.get(StateCardObjectFactory);
     suggestionModalService = TestBed.get(SuggestionModalService);
+    writtenTranslationsObjectFactory = TestBed.get(
+      WrittenTranslationsObjectFactory);
   });
 
   beforeEach(angular.mock.inject(function($injector, $controller) {
@@ -80,10 +85,10 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     });
 
     var recordedVoiceovers = recordedVoiceoversObjectFactory.createEmpty();
-
+    var writtenTranslations = writtenTranslationsObjectFactory.createEmpty();
     card = stateCardObjectFactory.createNewCard(
       'Card 1', 'Content html', 'Interaction text', interaction,
-      recordedVoiceovers, 'content_id');
+      recordedVoiceovers, writtenTranslations, 'content_id');
 
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'Introduction');

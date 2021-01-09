@@ -40,7 +40,7 @@ angular.module('oppia').factory('TranslationTabActiveContentIdService', [
       },
       setActiveContent: function(contentId, dataFormat) {
         var allContentIds = (
-          StateRecordedVoiceoversService.displayed.getAllContentId());
+          StateRecordedVoiceoversService.displayed.getAllContentIds());
         if (allContentIds.indexOf(contentId) === -1) {
           throw new Error('Invalid active content id: ' + contentId);
         }

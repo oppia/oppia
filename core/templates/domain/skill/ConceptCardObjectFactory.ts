@@ -79,8 +79,8 @@ export class ConceptCard {
       workedExamples: WorkedExample[]): Set<string> {
     let contentIds: Set<string> = new Set();
     workedExamples.forEach((workedExample: WorkedExample) => {
-      contentIds.add(workedExample.getQuestion().getContentId());
-      contentIds.add(workedExample.getExplanation().getContentId());
+      contentIds.add(workedExample.getQuestion().contentId);
+      contentIds.add(workedExample.getExplanation().contentId);
     });
     return contentIds;
   }
