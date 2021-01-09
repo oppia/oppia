@@ -166,7 +166,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
     def _set_user_fragile(self, uid, disabled):
         """Sets the given properties for the corresponding user.
 
-        FRAGILE! The dict keys used in the UserRecord constructor is an
+        FRAGILE! The dict keys used by the UserRecord constructor are an
         implementation detail that may break in future versions of the SDK.
 
         Args:
