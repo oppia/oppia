@@ -159,7 +159,7 @@ describe('Creator dashboard functionality', function() {
 
     await users.login('user5@creatorDashboard.com');
     await creatorDashboardPage.get();
-
+    debugger;
     var titles = await creatorDashboardPage.getExpSummaryTileTitles();
     expect(titles.length).toEqual(2);
     expect(await titles[0].getText()).toEqual(EXPLORATION_TITLE_4);
