@@ -208,7 +208,7 @@ def delete_external_auth_associations(user_id):
         logging.exception(e)
 
 
-def are_external_auth_associations_deleted(user_id):
+def verify_external_auth_associations_are_deleted(user_id):
     """Returns whether all associations outside of Oppia referring to the given
     user have been deleted.
 

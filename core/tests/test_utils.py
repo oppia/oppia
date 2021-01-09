@@ -552,8 +552,8 @@ class AuthServicesStub(python_utils.OBJECT):
                 auth_services, 'delete_external_auth_associations',
                 stub.delete_external_auth_associations))
             stack.enter_context(test.swap(
-                auth_services, 'are_external_auth_associations_deleted',
-                stub.are_external_auth_associations_deleted))
+                auth_services, 'verify_external_auth_associations_are_deleted',
+                stub.verify_external_auth_associations_are_deleted))
             stack.enter_context(test.swap(
                 auth_services, 'get_auth_id_from_user_id',
                 stub.get_auth_id_from_user_id))
@@ -640,7 +640,7 @@ class AuthServicesStub(python_utils.OBJECT):
         """
         self._external_user_id_associations.discard(user_id)
 
-    def are_external_auth_associations_deleted(self, user_id):
+    def verify_external_auth_associations_are_deleted(self, user_id):
         """Returns whether all associations outside of Oppia referring to the
         given user have been deleted.
 

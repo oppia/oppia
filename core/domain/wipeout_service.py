@@ -357,7 +357,7 @@ def verify_user_deleted(user_id, include_delete_at_end_models=False):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    if not auth_services.are_external_auth_associations_deleted(user_id):
+    if not auth_services.verify_external_auth_associations_are_deleted(user_id):
         return False
 
     policies_not_to_verify = [

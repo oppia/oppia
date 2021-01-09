@@ -99,7 +99,7 @@ def delete_external_auth_associations(unused_user_id):
     pass
 
 
-def are_external_auth_associations_deleted(unused_user_id):
+def verify_external_auth_associations_are_deleted(unused_user_id):
     """Returns whether all associations outside of Oppia referring to the given
     user have been deleted.
 

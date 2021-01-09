@@ -550,8 +550,9 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         # Pre-deleted auth associations will return None.
         self.assertIsNone(
             auth_services.get_auth_id_from_user_id(self.user_1_id))
-        self.assertTrue(auth_services.are_external_auth_associations_deleted(
-            self.user_1_id))
+        self.assertTrue(
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.user_1_id))
 
     def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
@@ -4070,8 +4071,9 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
 
         self.assertIsNone(
             auth_services.get_auth_id_from_user_id(self.profile_user_id))
-        self.assertTrue(auth_services.are_external_auth_associations_deleted(
-            self.profile_user_id))
+        self.assertTrue(
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.profile_user_id))
 
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(
@@ -4105,8 +4107,9 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.assertIsNone(
             auth_services.get_auth_id_from_user_id(self.user_1_id))
         # External auth associations should not have been deleted yet.
-        self.assertFalse(auth_services.are_external_auth_associations_deleted(
-            self.user_1_id))
+        self.assertFalse(
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.user_1_id))
 
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(
@@ -4419,8 +4422,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
 
     def test_verify_user_delete_when_external_auth_associations_are_not_deleted(
             self):
-        self.assertFalse(auth_services.are_external_auth_associations_deleted(
-            self.user_1_id))
+        self.assertFalse(
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.user_1_id))
 
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
