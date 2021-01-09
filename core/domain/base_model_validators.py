@@ -25,6 +25,7 @@ import re
 
 from core.domain import cron_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
@@ -97,9 +98,20 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
                 'When fetching instances of UserSettingsModel, please use ' +
                 'UserSettingsModelFetcherDetails instead of ' +
                 'ExternalModelFetcherDetails')
+        filtered_model_ids = []
+        for model_id in model_ids:
+            if not bool(
+                    re.match(
+                        '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH,
+                        model_id)):
+                raise utils.ValidationError(
+                    'The model id %s in the field \'%s\' '
+                    'is invalid' % (model_id, field_name))
+            else:
+                filtered_model_ids.append(model_id)
         self.field_name = field_name
         self.model_class = model_class
-        self.model_ids = model_ids
+        self.model_ids = filtered_model_ids
 
 
 class UserSettingsModelFetcherDetails(python_utils.OBJECT):
@@ -151,6 +163,11 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'The field \'%s\' should not contain '
                     'pseudonymous IDs' % field_name)
+        for model_id in filtered_model_ids:
+            if not user_services.is_user_id_valid(model_id):
+                raise utils.ValidationError(
+                    'The user id %s in the field \'%s\' is '
+                    'invalid' % (model_id, field_name))
         self.field_name = field_name
         self.model_class = user_models.UserSettingsModel
         self.model_ids = filtered_model_ids
