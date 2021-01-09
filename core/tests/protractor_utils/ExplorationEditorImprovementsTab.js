@@ -17,6 +17,7 @@
  * in the exploration editor.
  */
 
+var waitFor = require('../protractor_utils/waitFor.js');
 var ExplorationEditorImprovementsTab = function() {
   /*
    * Interactive elements
