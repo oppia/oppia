@@ -19,7 +19,6 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-
 import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
@@ -34,6 +33,8 @@ import { Hint } from 'domain/exploration/HintObjectFactory';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { WrittenTranslations } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
 
 export interface InputResponsePair {
   learnerInput: string,
@@ -48,6 +49,7 @@ export class StateCard {
   _interaction: Interaction;
   _inputResponsePairs: InputResponsePair[];
   _recordedVoiceovers: RecordedVoiceovers;
+  _writtenTranslations: WrittenTranslations;
   _contentId: string;
   _completed: boolean;
   audioTranslationLanguageService: AudioTranslationLanguageService;
@@ -55,7 +57,9 @@ export class StateCard {
       stateName: string, contentHtml: string,
       interactionHtml: string, interaction: Interaction,
       inputResponsePairs: InputResponsePair[],
-      recordedVoiceovers: RecordedVoiceovers, contentId: string,
+      recordedVoiceovers: RecordedVoiceovers,
+      writtenTranslations: WrittenTranslations,
+      contentId: string,
       audioTranslationLanguageService: AudioTranslationLanguageService) {
     this._stateName = stateName;
     this._contentHtml = contentHtml;
@@ -63,9 +67,15 @@ export class StateCard {
     this._inputResponsePairs = inputResponsePairs;
     this._interaction = interaction;
     this._recordedVoiceovers = recordedVoiceovers;
+    this._writtenTranslations = writtenTranslations;
     this._contentId = contentId;
     this._completed = false;
     this.audioTranslationLanguageService = audioTranslationLanguageService;
+  }
+
+  // Restore everything immutably so that Angular can detect changes.
+  restoreImmutable(stateCard: StateCard): void {
+    Object.assign(this, stateCard);
   }
 
   getStateName(): string {
@@ -216,6 +226,22 @@ export class StateCard {
   setInteractionHtml(interactionHtml: string): void {
     this._interactionHtml = interactionHtml;
   }
+
+  get writtenTranslations(): WrittenTranslations {
+    return cloneDeep(this._writtenTranslations);
+  }
+
+  get contentHtml(): string {
+    return this._contentHtml;
+  }
+
+  set contentHtml(html: string) {
+    this._contentHtml = html;
+  }
+
+  get contentId(): string {
+    return this._contentId;
+  }
 }
 
 @Injectable({
@@ -239,10 +265,12 @@ export class StateCardObjectFactory {
   createNewCard(
       stateName: string, contentHtml: string, interactionHtml: string,
       interaction: Interaction, recordedVoiceovers: RecordedVoiceovers,
-      contentId: string): StateCard {
+      writtenTranslations: WrittenTranslations, contentId: string): StateCard {
     return new StateCard(
-      stateName, contentHtml, interactionHtml, interaction, [],
-      recordedVoiceovers, contentId, this.audioTranslationLanguageService);
+      stateName, contentHtml, interactionHtml,
+      cloneDeep(interaction), [],
+      recordedVoiceovers, writtenTranslations, contentId,
+      this.audioTranslationLanguageService);
   }
 }
 
