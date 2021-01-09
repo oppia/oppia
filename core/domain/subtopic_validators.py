@@ -24,7 +24,6 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.platform import models
 import python_utils
-
 (
     base_models, exp_models,
     subtopic_models, user_models
@@ -32,7 +31,6 @@ import python_utils
     models.NAMES.base_model, models.NAMES.exploration,
     models.NAMES.subtopic, models.NAMES.user
 ])
-
 
 class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SubtopicPageModel."""
@@ -64,7 +62,9 @@ class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 subtopic_models.SubtopicPageSnapshotContentModel,
-                snapshot_model_ids)]
+                snapshot_model_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'topic_ids', topic_models.TopicModel, [item.topic_id])]
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -92,9 +92,11 @@ class SubtopicPageSnapshotMetadataModelValidator(
                 'subtopic_page_ids',
                 subtopic_models.SubtopicPageModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class SubtopicPageSnapshotContentModelValidator(
@@ -147,4 +149,9 @@ class SubtopicPageCommitLogEntryModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'subtopic_page_ids',
                 subtopic_models.SubtopicPageModel,
-                [item.subtopic_page_id])]
+                [item.subtopic_page_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
