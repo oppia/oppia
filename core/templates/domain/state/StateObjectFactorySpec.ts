@@ -77,7 +77,9 @@ describe('State Object Factory', () => {
       written_translations: {
         translations_mapping: {
           content: {},
-          default_outcome: {}
+          default_outcome: {},
+          hint_1: {},
+          rule_input_2: {}
         }
       }
     });
@@ -129,7 +131,9 @@ describe('State Object Factory', () => {
       written_translations: {
         translations_mapping: {
           content: {},
-          default_outcome: {}
+          default_outcome: {},
+          hint_1: {},
+          rule_input_2: {}
         }
       }
     };
@@ -187,5 +191,25 @@ describe('State Object Factory', () => {
 
     expect(stateObjectDefault).toEqual(otherState);
     expect(stateObjectDefault.name).toEqual('Other state');
+  });
+
+  it('should correctly get required written translation content ids', () => {
+    const state = sof.createFromBackendDict('State name', stateObject);
+    state.interaction.id = null;
+    expect(
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content']));
+
+    state.writtenTranslations.addContentId('feedback_1');
+    state.writtenTranslations.addWrittenTranslation(
+      'feedback_1', 'fr', 'html', '<p>Translation</p>');
+    expect(
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content', 'feedback_1']));
+
+    state.interaction.id = 'TextInput';
+    expect(
+      state.getRequiredWrittenTranslationContentIds()
+    ).toEqual(new Set(['content', 'feedback_1', 'hint_1', 'default_outcome']));
   });
 });
