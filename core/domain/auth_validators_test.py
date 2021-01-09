@@ -27,6 +27,7 @@ from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
@@ -115,7 +116,7 @@ class AuthValidatorTestBase(test_utils.AuditJobsTestBase):
         ]
 
         if entity_id_order is not None:
-            by_entity_id_order = lambda output_str: next(
+            by_entity_id_order = lambda output_str: python_utils.NEXT(
                 (
                     i for i, entity_id in enumerate(entity_id_order)
                     if output_str.startswith('Entity id %s' % entity_id)),

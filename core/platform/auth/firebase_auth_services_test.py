@@ -671,7 +671,7 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
         self.assert_firebase_account_is_deleted()
         self.assert_external_auth_associations_are_deleted()
 
-    def test_delete_external_auth_associations_retry_after_failed_attempt(self):
+    def test_delete_external_auth_associations_after_failed_attempt(self):
         with self.swap_initialize_sdk_to_always_fail():
             self.delete_external_auth_associations()
 
@@ -683,7 +683,7 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
         self.assert_firebase_account_is_deleted()
         self.assert_external_auth_associations_are_deleted()
 
-    def test_delete_external_auth_associations_retry_after_unverified_successful_attempt(
+    def test_verify_delete_external_auth_associations_after_failed_attempt(
             self):
         self.delete_external_auth_associations()
 
@@ -714,7 +714,8 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
 
         self.assert_external_auth_associations_are_deleted()
 
-    def test_delete_external_auth_associations_when_init_fails_during_delete(self):
+    def test_delete_external_auth_associations_when_init_fails_during_delete(
+            self):
         with self.swap_initialize_sdk_to_always_fail():
             self.delete_external_auth_associations()
 
@@ -722,7 +723,8 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
 
         self.assert_external_auth_associations_are_not_deleted()
 
-    def test_delete_external_auth_associations_when_init_fails_during_verify(self):
+    def test_delete_external_auth_associations_when_init_fails_during_verify(
+            self):
         self.delete_external_auth_associations()
 
         self.assert_firebase_account_is_deleted()

@@ -667,7 +667,7 @@ class AuthServicesStub(python_utils.OBJECT):
             str|None. The auth ID associated with the given user ID, or None if
             no association exists.
         """
-        return next(
+        return python_utils.NEXT(
             (a for a, u in self._user_id_by_auth_id.items() if u == user_id),
             None)
 
