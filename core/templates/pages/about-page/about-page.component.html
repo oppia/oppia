@@ -3,6 +3,7 @@
   <div class="oppia-about-page-section-one" dir="auto">
     <div class="oppia-about-section-one-image">
       <source type="image/webp" [srcset]="getStaticImageUrl('/about/study.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl('/about/study.png')">
       <img [src]="getStaticImageUrl('/about/study.png')" class="about-study-image" alt="">
     </div>
     <div class="oppia-about-page-section-one-left">
@@ -49,6 +50,7 @@
   <div class="oppia-about-page-section-three">
     <div class="oppia-about-section-three-image">
       <source type="image/webp" [srcset]="getStaticImageUrl('/about/graph1.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl('/about/graph1.png')">
       <img [src]="getStaticImageUrl('/about/graph1.png')" class="about-graph-image" alt="">
     </div>
     <div class="oppia-about-section-three-left">
@@ -59,6 +61,7 @@
   <div class="oppia-about-page-section-four" ng-style="{'background-image': '<[$ctrl.getCommunityBackgroundUrl()]>'}">
     <div class="about-page-image-container">
       <source type="image/webp" [srcset]="getStaticImageUrl('/about/testimg.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl('/about/testimg.png')">
       <img [src]="getStaticImageUrl('/about/testimg.png')" class="about-study-image" alt="">
     </div>
     <div class="oppia-about-section-four-left">
@@ -77,6 +80,7 @@
   <div class="oppia-about-page-section-five">
     <div class="about-page-image-container">
       <source type="image/webp" [srcset]="getStaticImageUrl('/about/lesson.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl('/about/lesson.png')">
       <img [src]="getStaticImageUrl('/about/lesson.png')" class="about-lesson-image" alt="">
     </div>
     <div class="oppia-about-section-five-left">
@@ -95,6 +99,7 @@
   <div class="oppia-about-page-section-six" ng-style="{'background-image': '<[$ctrl.getCommunityBackgroundUrl()]>'}">
     <div class="oppia-about-section-six-image-left">
       <source type="image/webp" [srcset]="getStaticImageUrl('/about/books_dsk.webp')">
+      <source type="image/png" [srcset]="getStaticImageUrl('/about/books_dsk.png')">
       <img [src]="getStaticImageUrl('/about/books_dsk.png')" class="about-study-image" alt="">
     </div>
     <div class="oppia-about-section-six-right">
@@ -463,19 +468,13 @@
 
   @media (min-width: 768px) {
     .oppia-about-button-browse {
-      left: -webkit-calc(50% - 200px);
-      left: -moz-calc(50% - 200px);
-      left: -o-calc(50% - 200px);
       left: calc(50% - 200px);
     }
   }
 
   @media (min-width: 575px) {
     .oppia-about-button {
-      left: -webkit-calc(130px - -15%);
-      left: -moz-calc(130px - -15%);
-      left: -o-calc(130px - -15%);
-      left: calc(130px - -15%);
+      left: calc(130px + 15%);
     }
   }
 
@@ -624,7 +623,6 @@
       align-content: center;
       margin: 0px;
       padding-bottom: 20px;
-      /*padding-left: 100px;*/
       padding-top: 2vw;
       text-align: center;
       width: 100%;

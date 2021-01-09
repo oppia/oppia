@@ -26,7 +26,7 @@ import { WindowRef } from
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 import { LoaderService } from 'services/loader.service.ts';
-import splashConstants from 'assets/constants';
+import constants from 'assets/constants';
 
 @Component({
   selector: 'about-page',
@@ -50,53 +50,40 @@ export class AboutPageComponent implements OnInit {
 
   onClickVisitClassroomButton(): void {
     this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.classroomUrl;
-    }, 150);
-    return;
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
   }
 
   onClickBrowseLibraryButton(): void {
     this.siteAnalyticsService.
       registerClickBrowseLibraryButtonEvent();
-    setTimeout(
-      () => this.windowRef.nativeWindow.location.href =
-       '/community-library', 150);
-    return;
+    this.windowRef.nativeWindow.location.href = ('/community-library');
   }
 
   onClickCreateLessonButton(): void {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
     if (this.userIsLoggedIn === null) {
-      setTimeout(() => window.location.replace('/_ah/login'), 150);
+      this.windowRef.nativeWindow.location.href = ('/_ah/login');
     } else {
-      setTimeout(() => window.location.replace(
-        '/creator-dashboard?mode=create'), 150);
+      this.windowRef.nativeWindow.location.href = (
+        '/creator-dashboard?mode=create');
     }
-    return;
   }
 
   onClickGuideForTeacherButton(): void {
     this.siteAnalyticsService.registerClickGuideForTeacherButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = '/teach';
-    }, 150);
-    return;
+    this.windowRef.nativeWindow.location.href = ('/teach');
   }
 
   onClickTipsForParentsButton(): void {
     this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = '/teach';
-    }, 150);
-    return;
+    this.windowRef.nativeWindow.location.href = ('/teach');
   }
 
   ngOnInit(): void {
     this.userIsLoggedIn = null;
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+        classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT
       });
     this.loaderService.showLoadingScreen('Loading');
     this.userService.getUserInfoAsync().then((userInfo) => {
