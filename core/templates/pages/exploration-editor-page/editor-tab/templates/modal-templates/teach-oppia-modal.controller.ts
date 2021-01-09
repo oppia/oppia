@@ -129,7 +129,7 @@ angular.module('oppia').controller('TeachOppiaModalController', [
               answer, StateInteractionIdService.savedMemento,
               StateCustomizationArgsService.savedMemento));
           var feedbackHtml = (
-            classificationResult.outcome.feedback.getHtml());
+            classificationResult.outcome.feedback.html);
           $scope.unresolvedAnswers.push({
             answer: answer,
             answerTemplate: answerTemplate,
