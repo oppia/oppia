@@ -25,12 +25,13 @@ from core.domain import subtopic_page_services
 from core.platform import models
 import python_utils
 (
-    base_models, exp_models,
-    subtopic_models, user_models
+    base_models, exp_models, subtopic_models,
+    topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration,
-    models.NAMES.subtopic, models.NAMES.user
+    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.subtopic,
+    models.NAMES.topic, models.NAMES.user
 ])
+
 
 class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
     """Class for validating SubtopicPageModel."""
