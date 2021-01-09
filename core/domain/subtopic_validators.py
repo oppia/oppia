@@ -24,6 +24,7 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.platform import models
 import python_utils
+
 (
     base_models, exp_models, subtopic_models,
     topic_models, user_models
