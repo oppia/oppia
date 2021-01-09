@@ -83,30 +83,30 @@ describe('Language util service', function() {
 
   it('should get the correct language direction given a content language code',
     () => {
-      expect(lus.getContentLanguageDirection('en')).toEqual('ltr');
-      expect(lus.getContentLanguageDirection('ar')).toEqual('rtl');
-      expect(lus.getContentLanguageDirection('bg')).toEqual('ltr');
+      expect(lus.getLanguageDirection('en')).toEqual('ltr');
+      expect(lus.getLanguageDirection('ar')).toEqual('rtl');
+      expect(lus.getLanguageDirection('bg')).toEqual('ltr');
     }
   );
 
   it('should get throw an error when given an invalid content language code',
     () => {
-      expect(() => lus.getContentLanguageDirection('invalid code'))
+      expect(() => lus.getLanguageDirection('invalid code'))
         .toThrowError('Invalid language code: invalid code');
     }
   );
 
   it('should get the correct language direction given a audio language code',
     () => {
-      expect(lus.getAudioLanguageDirection('en')).toEqual('ltr');
-      expect(lus.getAudioLanguageDirection('es')).toEqual('ltr');
-      expect(lus.getAudioLanguageDirection('hi-en')).toEqual('ltr');
+      expect(lus.getLanguageDirection('en')).toEqual('ltr');
+      expect(lus.getLanguageDirection('es')).toEqual('ltr');
+      expect(lus.getLanguageDirection('hi-en')).toEqual('ltr');
     }
   );
 
   it('should get throw an error when given an invalid content language code',
     () => {
-      expect(() => lus.getAudioLanguageDirection('invalid code')).toThrowError(
+      expect(() => lus.getLanguageDirection('invalid code')).toThrowError(
         'Invalid language code: invalid code');
     }
   );

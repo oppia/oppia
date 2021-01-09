@@ -149,17 +149,13 @@ export class LanguageUtilService {
     return language ? language.description : null;
   }
 
-  getContentLanguageDirection(languageCode: string): string {
+  getLanguageDirection(languageCode: string): string {
     for (let i = 0; i < this.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
       const language = this.SUPPORTED_CONTENT_LANGUAGES[i];
       if (language.code === languageCode) {
         return language.direction;
       }
     }
-    throw new Error('Invalid language code: ' + languageCode);
-  }
-
-  getAudioLanguageDirection(languageCode: string): string {
     for (let i = 0; i < this.SUPPORTED_AUDIO_LANGUAGES.length; i++) {
       const language = this.SUPPORTED_AUDIO_LANGUAGES[i];
       if (language.id === languageCode) {
