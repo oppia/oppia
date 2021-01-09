@@ -87,9 +87,9 @@ export class TeachPageComponent implements OnInit {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
-      imageUrl: '/splash/mira.png',
-      imageUrlWebp: '/splash/mira.webp',
-      borderPresent: false
+      imageUrl: '/teach/riya.jpg',
+      imageUrlWebp: '/teach/riya.webp',
+      borderPresent: true
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_2',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
