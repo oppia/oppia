@@ -166,12 +166,16 @@ class UserAuthDetails(python_utils.OBJECT):
         """
         return self.gae_id is not None or self.firebase_auth_id is not None
 
-    def to_dict(self):
-        """Returns a dict matching the properties of UserAuthDetailsModel.
+    def to_dict_with_changes(self):
+        """Returns the properties in self with explicitly-assigned values.
 
         Intended to provide syntax sugar when assigning values to models:
 
-            user_auth_details_model.populate(**user_auth_details.to_dict())
+            user_auth_details_model.populate(
+                **user_auth_details.to_dict_with_changes())
+
+        To prevent changing fields to be None unintentionally, the dict returned
+        will only include values that are not None.
 
         Note that the dict does not include user_id because that value functions
         as UserAuthDetailsModel's key. Keys are distinct from properties, and
@@ -181,10 +185,10 @@ class UserAuthDetails(python_utils.OBJECT):
             dict(str: *). A dict with UserAuthDetailsModel property names as
             keys and values from self.
         """
-        property_values = [
+        property_changes = [
             ('gae_id', self.gae_id),
             ('firebase_auth_id', self.firebase_auth_id),
             ('parent_user_id', self.parent_user_id),
             ('deleted', self.deleted),
         ]
-        return {name: val for name, val in property_values if val is not None}
+        return {name: val for name, val in property_changes if val is not None}

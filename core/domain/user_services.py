@@ -1276,7 +1276,8 @@ def _save_existing_users_auth_details(user_auth_details_list):
     for user_auth_details_model, user_auth_details in python_utils.ZIP(
             user_auth_models, user_auth_details_list):
         user_auth_details.validate()
-        user_auth_details_model.populate(**user_auth_details.to_dict())
+        user_auth_details_model.populate(
+            **user_auth_details.to_dict_with_changes())
     auth_models.UserAuthDetailsModel.update_timestamps_multi(user_auth_models)
     auth_models.UserAuthDetailsModel.put_multi(user_auth_models)
 
@@ -1294,7 +1295,7 @@ def _save_user_auth_details(user_auth_details):
     # a new one.
     user_auth_details_model = auth_models.UserAuthDetailsModel.get_by_id(
         user_auth_details.user_id)
-    user_auth_details_dict = user_auth_details.to_dict()
+    user_auth_details_dict = user_auth_details.to_dict_with_changes()
     if user_auth_details_model is not None:
         user_auth_details_model.populate(**user_auth_details_dict)
         user_auth_details_model.update_timestamps()
