@@ -147,10 +147,22 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
         else:
             if any(
                     utils.is_pseudonymous_id(model_id)
-                    for model_id in filtered_model_ids):
+                    for model_id in filtered_model_ids
+            ):
                 raise utils.ValidationError(
                     'The field \'%s\' should not contain '
                     'pseudonymous IDs' % field_name)
+
+        if not all(
+                utils.is_user_id_valid(
+                    model_id,
+                    allow_system_user_id=False,
+                    allow_pseudonymous_id=False
+                ) for model_id in filtered_model_ids
+        ):
+            raise utils.ValidationError(
+                'The field \'%s\' contains IDs in wrong format.' % field_name)
+
         self.field_name = field_name
         self.model_class = user_models.UserSettingsModel
         self.model_ids = filtered_model_ids
@@ -355,7 +367,9 @@ class BaseModelValidator(python_utils.OBJECT):
                         external_model_fetcher_details.model_class,
                         external_model_fetcher_details.model_ids)
         except utils.ValidationError as err:
-            cls._add_error(ERROR_CATEGORY_INVALID_USER_SETTING_IDS, err)
+            cls._add_error(
+                ERROR_CATEGORY_INVALID_USER_SETTING_IDS,
+                'Entity id %s: %s' % (item.id, err.message))
         else:
             fetched_model_instances_for_all_ids = (
                 datastore_services.fetch_multiple_entities_by_ids_and_models(
