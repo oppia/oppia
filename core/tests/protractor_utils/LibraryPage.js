@@ -99,9 +99,7 @@ var LibraryPage = function() {
     await browser.actions().mouseMove(element(by.css(
       '.protractor-test-exp-summary-tile-title'))).perform();
 
-    await waitFor.elementToBeClickable(
-      addToPlaylistButton, 'Add to playlist Icon taking too long to load');
-    await addToPlaylistButton.click();
+    await action.click('Add to playlist Icon taking too long to load',addToPlaylistButton);
   };
 
   this.selectLanguages = async function(languages) {
@@ -151,7 +149,7 @@ var LibraryPage = function() {
     await waitFor.visibilityOf(
       allCollectionsTitled(collectionName).first(),
       'Unable to find collection ' + collectionName);
-    await allCollectionsTitled(collectionName).first().click();
+    await action.click('collection name',allCollectionsTitled(collectionName).first());
     await waitFor.pageToFullyLoad();
   };
 
@@ -164,7 +162,7 @@ var LibraryPage = function() {
     var explorationCard = await allExplorationsTitled(explorationName).first();
     await waitFor.visibilityOf(
       explorationCard, 'Unable to find exploration ' + explorationName);
-    await explorationCard.click();
+    await action.click('exploration card',explorationCard);
     await waitFor.pageToFullyLoad();
   };
 
@@ -184,15 +182,12 @@ var LibraryPage = function() {
   };
 
   this.clickCreateActivity = async function() {
-    await createActivityButton.click();
+    await action.click('create activity button',createActivityButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.clickExplorationObjective = async function() {
-    await waitFor.elementToBeClickable(
-      explorationObjective,
-      'Exploration Objective takes too long to be clickable');
-    await explorationObjective.click();
+    await action.click('Exploration Objective takes too long to be clickable',explorationObjective);
   };
 
   this.findExploration = async function(explorationTitle) {
