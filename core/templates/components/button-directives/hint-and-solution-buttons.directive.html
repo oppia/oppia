@@ -38,7 +38,6 @@
 </div>
 
 <style>
-
   .close {
     bottom: 10px;
     font-size: 22px;
@@ -48,23 +47,23 @@
   }
 
   .hint-box {
+    -webkit-animation: bounce 4s infinite;
+    animation: bounce 4s infinite;
     background-color: #f0ffff;
     border: 1px solid #2d4a9d;
-    bottom: 65px !important;
     border-radius: 5px;
+    bottom: 65px;
     box-shadow: 0px 0px 6px #2d4a9d;
     color: #2d4a9d;
     font-size: 17px;
     height: 40px;
-    left: -3px !important;
+    left: -3px;
     padding: 20px 0px 20px 10px;
     position: relative;
     text-align: center;
     white-space: nowrap;
     width: 395px;
     z-index: 2;
-    -webkit-animation: bounce 4s infinite;
-    animation: bounce 4s infinite;
   }
 
   .remove-hint-box {
@@ -73,11 +72,11 @@
 
   .hint-box::after,
   .hint-box::before {
-    content: " ";
-    top: 100%;
-    left: 50%;
     border: solid transparent;
+    content: " ";
+    left: 50%;
     position: absolute;
+    top: 100%;
   }
 
   .hint-box::after {
