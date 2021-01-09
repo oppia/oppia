@@ -83,6 +83,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             promise.result.then(null, function() {
               ctrl.activeHintIndex = null;
             });
+            ctrl.isVisible = false;
           };
 
           ctrl.onClickSolutionButton = function() {
@@ -134,6 +135,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.displayedCard = null;
             ctrl.solutionModalIsActive = false;
             ctrl.currentlyOnLatestCard = true;
+            ctrl.isVisible = true;
             resetLocalHintsArray();
             ctrl.directiveSubscriptions.add(
               PlayerPositionService.onNewCardOpened.subscribe(
