@@ -59,9 +59,11 @@ class GeneralFeedbackThreadModelValidator(
                 user_services.is_user_id_valid(item.original_author_id)
         ):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'author_ids', user_models.UserSettingsModel,
-                    [item.original_author_id]))
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'author_ids', [item.original_author_id],
+                    may_contain_system_ids=False,
+                    may_contain_pseudonymous_ids=True
+                ))
         if item.has_suggestion:
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(
@@ -79,10 +81,12 @@ class GeneralFeedbackThreadModelValidator(
                     item.last_nonempty_message_author_id)
         ):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
+                base_model_validators.UserSettingsModelFetcherDetails(
                     'last_nonempty_message_author_ids',
-                    user_models.UserSettingsModel,
-                    [item.last_nonempty_message_author_id]))
+                    [item.last_nonempty_message_author_id],
+                    may_contain_system_ids=False,
+                    may_contain_pseudonymous_ids=True
+                ))
         return field_name_to_external_model_references
 
     @classmethod
@@ -190,10 +194,10 @@ class GeneralFeedbackMessageModelValidator(
                 user_services.is_user_id_valid(item.author_id)
         ):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'author_ids',
-                    user_models.UserSettingsModel,
-                    [item.author_id]
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'author_ids', [item.author_id],
+                    may_contain_system_ids=False,
+                    may_contain_pseudonymous_ids=True
                 )
             )
         return field_name_to_external_model_references
@@ -285,7 +289,7 @@ class GeneralFeedbackThreadUserModelValidator(
             ('|').join(feconf.SUGGESTION_TARGET_TYPE_CHOICES),
             base_models.ID_LENGTH)
         regex_string = '^%s\\.%s$' % (
-            base_model_validators.USER_ID_REGEX, thread_id_string)
+            feconf.USER_ID_REGEX, thread_id_string)
         return regex_string
 
     @classmethod
@@ -302,8 +306,10 @@ class GeneralFeedbackThreadUserModelValidator(
             base_model_validators.ExternalModelFetcherDetails(
                 'message_ids',
                 feedback_models.GeneralFeedbackMessageModel, message_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_ids', user_models.UserSettingsModel, user_ids)]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_ids', user_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
 
 class FeedbackAnalyticsModelValidator(base_model_validators.BaseModelValidator):
@@ -322,7 +328,7 @@ class UnsentFeedbackEmailModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^%s$' % base_model_validators.USER_ID_REGEX
+        return '^%s$' % feconf.USER_ID_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -338,8 +344,10 @@ class UnsentFeedbackEmailModelValidator(
                     'Entity id %s: Invalid feedback reference: %s' % (
                         item.id, reference))
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_ids', user_models.UserSettingsModel, [item.id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_ids', [item.id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'message_ids', feedback_models.GeneralFeedbackMessageModel,
                 message_ids)]

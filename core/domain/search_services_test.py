@@ -118,63 +118,63 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
     def test_search_explorations(self):
         expected_query_string = 'a query string'
-        expected_cursor = 'cursor'
+        expected_offset = '0'
         expected_size = 30
-        expected_result_cursor = 'rcursor'
+        expected_result_offset = '30'
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, categories, language_codes, cursor=None,
+                query_string, index, categories, language_codes, offset=None,
                 size=20, ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(categories, [])
             self.assertEqual(language_codes, [])
-            self.assertEqual(cursor, expected_cursor)
+            self.assertEqual(offset, expected_offset)
             self.assertEqual(size, expected_size)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
-            return doc_ids, expected_result_cursor
+            return doc_ids, expected_result_offset
 
         with self.swap(gae_search_services, 'search', mock_search):
-            result, result_cursor = search_services.search_explorations(
+            result, result_offset = search_services.search_explorations(
                 expected_query_string, [], [], expected_size,
-                cursor=expected_cursor,
+                offset=expected_offset,
             )
 
-        self.assertEqual(result_cursor, expected_result_cursor)
+        self.assertEqual(result_offset, expected_result_offset)
         self.assertEqual(result, doc_ids)
 
     def test_search_collections(self):
         expected_query_string = 'a query string'
-        expected_cursor = 'cursor'
+        expected_offset = '0'
         expected_size = 30
-        expected_result_cursor = 'rcursor'
+        expected_result_offset = '30'
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, categories, language_codes, cursor=None,
+                query_string, index, categories, language_codes, offset=None,
                 size=20, ids_only=False, retries=3):
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)
             self.assertEqual(categories, [])
             self.assertEqual(language_codes, [])
-            self.assertEqual(cursor, expected_cursor)
+            self.assertEqual(offset, expected_offset)
             self.assertEqual(size, expected_size)
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
-            return doc_ids, expected_result_cursor
+            return doc_ids, expected_result_offset
 
         with self.swap(gae_search_services, 'search', mock_search):
-            result, result_cursor = search_services.search_collections(
+            result, result_offset = search_services.search_collections(
                 expected_query_string, [], [], expected_size,
-                cursor=expected_cursor,
+                offset=expected_offset,
             )
 
-        self.assertEqual(result_cursor, expected_result_cursor)
+        self.assertEqual(result_offset, expected_result_offset)
         self.assertEqual(result, doc_ids)
 
     def test_demo_collections_are_added_to_search_index(self):
