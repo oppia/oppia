@@ -290,6 +290,11 @@ describe('Question object factory', function() {
     interaction.id = null;
     expect(sampleQuestion.getValidationErrorMessage()).toEqual(
       'An interaction must be specified');
+
+    var questionContent = sampleQuestion.getStateData().content;
+    questionContent.html = '';
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      'Please enter a question.');
   });
 
   it('should correctly create a Default Question', function() {

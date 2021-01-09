@@ -42,7 +42,7 @@
                      can-edit-question="canEditQuestion"
                      question-changed="questionChanged">
     </question-editor>
-    <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && question.getValidationErrorMessage()">
+    <div class="alert alert-danger" ng-if="question.getValidationErrorMessage()">
       <[question.getValidationErrorMessage()]>
     </div>
   </div>
