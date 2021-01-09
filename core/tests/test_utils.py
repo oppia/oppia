@@ -595,7 +595,8 @@ class AuthServicesStub(python_utils.OBJECT):
         self._external_user_id_associations.add(user_id)
         return auth_domain.UserAuthDetails(user_id, firebase_auth_id=auth_id)
 
-    def get_auth_claims_from_request(self, unused_request):
+    @classmethod
+    def get_auth_claims_from_request(cls, unused_request):
         """Authenticates request and returns claims about its authorizer.
 
         This stub obtains authorization information from os.environ. To make the
