@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for TopicEditorStateService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// topic-editor-state.service.ts is upgraded to Angular 8.
+
 import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { SubtopicPageObjectFactory, SubtopicPageBackendDict, SubtopicPage } from
   'domain/topic/SubtopicPageObjectFactory';

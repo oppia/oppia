@@ -23,7 +23,7 @@ import { CollectionPermissionsCard } from
 import { async } from '@angular/core/testing';
 require('./collection-permissions-card.directive.ts');
 
-fdescribe('Collection Permissions Card component', () => {
+describe('Collection Permissions Card component', () => {
   var $rootScope = null;
   var ctrl = null;
   var $scope = null;

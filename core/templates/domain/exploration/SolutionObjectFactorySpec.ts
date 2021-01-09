@@ -183,7 +183,7 @@ describe('Solution object factory', () => {
 
       expect(solution.explanation).toBe(newExplanation);
       expect(solution.getOppiaSolutionExplanationResponseHtml()).toBe(
-        newExplanation.getHtml());
+        newExplanation.html);
       expect(solution.getSummary('TestInput')).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the new explanation to the answer.');
