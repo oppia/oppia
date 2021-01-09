@@ -141,7 +141,7 @@ angular.module('oppia').factory('ExplorationStatesService', [
       answer_groups: function(answerGroups) {
         var contentIds = new Set();
         answerGroups.forEach(function(answerGroup) {
-          contentIds.add(answerGroup.outcome.feedback.getContentId());
+          contentIds.add(answerGroup.outcome.feedback.contentId);
           answerGroup.rules.forEach(rule => {
             Object.keys(rule.inputs).forEach(inputName => {
               if (rule.inputTypes[inputName].indexOf('Translatable') === 0) {
@@ -155,21 +155,21 @@ angular.module('oppia').factory('ExplorationStatesService', [
       default_outcome: function(defaultOutcome) {
         var contentIds = new Set();
         if (defaultOutcome) {
-          contentIds.add(defaultOutcome.feedback.getContentId());
+          contentIds.add(defaultOutcome.feedback.contentId);
         }
         return contentIds;
       },
       hints: function(hints) {
         var contentIds = new Set();
         hints.forEach(function(hint) {
-          contentIds.add(hint.hintContent.getContentId());
+          contentIds.add(hint.hintContent.contentId);
         });
         return contentIds;
       },
       solution: function(solution) {
         var contentIds = new Set();
         if (solution) {
-          contentIds.add(solution.explanation.getContentId());
+          contentIds.add(solution.explanation.contentId);
         }
         return contentIds;
       },
