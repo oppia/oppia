@@ -275,8 +275,9 @@ var ExplorationPlayerPage = function() {
     await browser.waitForAngularEnabled(false);
     await waitFor.visibilityOf(
       conversationContent.last(), 'Ending message not visible');
-    await waitFor.textToBePresentInElement(conversationContent.last(),
-      'Congratulations, you have finished!', 'Ending Message Not Visible');
+    await waitFor.textToBePresentInElement(
+      conversationContent.last(), 'Congratulations, you have finished!',
+      'Ending Message Not Visible');
     expect(
       await (conversationContent.last().getText())
     ).toEqual('Congratulations, you have finished!');
