@@ -35,6 +35,7 @@ import constants from 'assets/constants';
 export class AboutPageComponent implements OnInit {
   classroomUrlFragment: string;
   classroomUrl :string;
+  loginUrl: string;
   userIsLoggedIn: boolean | null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -62,7 +63,7 @@ export class AboutPageComponent implements OnInit {
   onClickCreateLessonButton(): void {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
     if (this.userIsLoggedIn === null) {
-      this.windowRef.nativeWindow.location.href = ('/_ah/login');
+      this.windowRef.nativeWindow.location.href = this.loginUrl;
     } else {
       this.windowRef.nativeWindow.location.href = (
         '/creator-dashboard?mode=create');
@@ -81,6 +82,7 @@ export class AboutPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.userIsLoggedIn = null;
+    this.loginUrl = '/_ah/login';
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
         classroomUrlFragment: constants.DEFAULT_CLASSROOM_URL_FRAGMENT

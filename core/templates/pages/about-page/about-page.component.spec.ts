@@ -121,10 +121,40 @@ describe('About Page', () => {
       '/assets/images/path/to/image');
   });
 
+  it('should check user is not logged in and navigate to create lesson page',
+    fakeAsync(() => {
+      const UserInfoObject = {
+        is_moderator: false,
+        is_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: false,
+        preferred_site_language_code: null,
+        username: '',
+        email: '',
+        user_is_logged_in: null
+      };
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
+        UserInfo.createFromBackendDict(UserInfoObject))
+      );
+      component.ngOnInit();
+      flushMicrotasks();
+      expect(component.userIsLoggedIn).toBe(null);
+      spyOn(
+        siteAnalyticsServiceStub, 'registerCreateLessonButtonEvent')
+        .and.callThrough();
+      spyOn(global, 'setTimeout');
+      component.onClickCreateLessonButton();
+      expect(siteAnalyticsServiceStub.registerCreateLessonButtonEvent)
+        .toHaveBeenCalledWith();
+      expect(component.loginUrl).toBe('/_ah/login');
+    }));
+
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
     expect(component.userIsLoggedIn).toBe(null);
     expect(component.classroomUrl).toBe('/learn/math');
+    expect(component.loginUrl).toBe('/_ah/login');
   });
 
   it('should check if loader screen is working', () =>
