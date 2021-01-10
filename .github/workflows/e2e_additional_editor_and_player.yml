@@ -58,7 +58,7 @@ jobs:
           
           if [[ "$target_branch" == null ]]
           then
-            git pull git@github.com:oppia/oppia.git develop --no-edit
+            git pull https://github.com/oppia/oppia.git develop --no-edit
           else
             git pull origin $target_branch --no-edit
           fi
