@@ -54,6 +54,8 @@ jobs:
             curl "$url" | ./jq '.base.ref' | tr -d '"'
           )
 
+          echo "$target_branch"
+
           rm jq
           
           if [[ "$target_branch" == null ]]
