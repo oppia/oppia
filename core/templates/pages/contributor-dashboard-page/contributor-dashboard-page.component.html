@@ -4,6 +4,7 @@
       <li ng-class="{'oppia-active-opportunities-tab': tabName === $ctrl.activeTabName}"
           class="oppia-opportunities-tab-item"
           ng-repeat="(tabName, tabDetails) in $ctrl.tabsDetails"
+          ng-if="tabDetails.enabled"
           aria-label="<[tabDetails.ariaLabel]>"
           role="button">
         <a ng-click="$ctrl.onTabClick(tabName)" href="" class="oppia-opportunities-tabs-text protractor-test-<[tabName]>"><[tabDetails.tabName]></a>

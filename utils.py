@@ -213,7 +213,7 @@ def dict_from_yaml(yaml_str):
         retrieved_dict = yaml.safe_load(yaml_str)
         assert isinstance(retrieved_dict, dict)
         return retrieved_dict
-    except yaml.YAMLError as e:
+    except (AssertionError, yaml.YAMLError) as e:
         raise InvalidInputException(e)
 
 

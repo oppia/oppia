@@ -52,7 +52,7 @@ export class ItemSelectionInputValidationService {
     var numChoices = customizationArgs.choices.value.length;
 
     for (var i = 0; i < numChoices; i++) {
-      var choice = customizationArgs.choices.value[i].getHtml();
+      var choice = customizationArgs.choices.value[i].html;
       if (choice.trim().length === 0) {
         areAnyChoicesEmpty = true;
       }
@@ -136,7 +136,7 @@ export class ItemSelectionInputValidationService {
     if (maxAllowedCount === 1) {
       var answerChoiceToIndex = {};
       seenChoices.forEach((seenChoice, choiceIndex) => {
-        answerChoiceToIndex[seenChoice.getContentId()] = choiceIndex;
+        answerChoiceToIndex[seenChoice.contentId] = choiceIndex;
       });
 
       answerGroups.forEach((answerGroup, answerIndex) => {
@@ -188,7 +188,7 @@ export class ItemSelectionInputValidationService {
     }
 
     const choicesContentIds = new Set(customizationArgs.choices.value.map(
-      choice => choice.getContentId()));
+      choice => choice.contentId));
 
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;

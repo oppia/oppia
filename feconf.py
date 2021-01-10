@@ -414,6 +414,11 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch Host
+# and Port when switching to prod server.
+ES_HOST = 'localhost'
+ES_PORT = 9200
+
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
@@ -425,6 +430,12 @@ REDISPORT = 6379
 # project id when switching to the prod server.
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
+
+# Used by the Admin SDK to connect with the Firebase Authentication emulator.
+# NOTE: this name is is NOT a typo despite the inclusion of the port number, it
+# is the environment variable expected to be set:
+# https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks.
+FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -1245,7 +1256,7 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
 
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
-USER_ID_REGEX = r'^uid_[a-z]{%s}$' % USER_ID_RANDOM_PART_LENGTH
+USER_ID_REGEX = r'uid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
 
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5

@@ -56,7 +56,10 @@ angular.module('oppia').controller('TranslationModalController', [
     $scope.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
-        hide_complex_extensions: 'true'
+        hide_complex_extensions: 'true',
+        activeLanguage: (TranslationLanguageService.getActiveLanguageCode()),
+        activeLanguageDirection: (
+          TranslationLanguageService.getActiveLanguageDirection())
       }
     };
     $scope.subheading = opportunity.subheading;
