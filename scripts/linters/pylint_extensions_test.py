@@ -2950,24 +2950,24 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
 
     def test_disallowed_replacements(self):
         self.checker_test_object.checker.config.disallowed_functions = [
-            b'now=>datetime.datetime.utcnow()',
-            b'assertEquals=>self.assertEqual()',
-            b'StringIO=>python_utils.string_io()',
-            b'urlsplit=>python_utils.url_split()',
-            b'urlparse=>python_utils.url_parse()',
-            b'urlunsplit=>python_utils.url_unsplit()',
-            b'parse_qs=>python_utils.parse_query_string()',
-            b'unquote=>python_utils.urllib_unquote()',
-            b'urljoin=>python_utils.url_join()',
-            b'next=>python_utils.NEXT()',
-            b'range=>python_utils.RANGE()',
-            b'round=>python_utils.ROUND()',
-            b'str=>python_utils.convert_to_bytes() or python_utils.UNICODE()',
-            b'zip=>python_utils.ZIP()',
-            b'basestring=>python_utils.BASESTRING()',
-            b'iteritems=>items()',
-            b'itervalues=>values()',
-            b'iterkeys=>keys()',
+            b'now=>datetime.datetime.utcnow',
+            b'assertEquals=>self.assertEqual',
+            b'StringIO=>python_utils.string_io',
+            b'urlsplit=>python_utils.url_split',
+            b'urlparse=>python_utils.url_parse',
+            b'urlunsplit=>python_utils.url_unsplit',
+            b'parse_qs=>python_utils.parse_query_string',
+            b'unquote=>python_utils.urllib_unquote',
+            b'urljoin=>python_utils.url_join',
+            b'next=>python_utils.NEXT',
+            b'range=>python_utils.RANGE',
+            b'round=>python_utils.ROUND',
+            b'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
+            b'zip=>python_utils.ZIP',
+            b'basestring=>python_utils.BASESTRING',
+            b'iteritems=>items',
+            b'itervalues=>values',
+            b'iterkeys=>keys',
         ]
 
         (
@@ -3000,7 +3000,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             node=call1,
             args=(
                 b'now',
-                b'datetime.datetime.utcnow()')
+                b'datetime.datetime.utcnow')
         )
 
         message_replace_disallowed_assert_equals = testutils.Message(
@@ -3008,7 +3008,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             node=call2,
             args=(
                 b'assertEquals',
-                b'self.assertEqual()')
+                b'self.assertEqual')
         )
 
         message_replace_disallowed_stringio = testutils.Message(
@@ -3016,7 +3016,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             node=call3,
             args=(
                 b'StringIO',
-                b'python_utils.string_io()')
+                b'python_utils.string_io')
         )
 
         message_replace_disallowed_urlsplit = testutils.Message(
@@ -3024,7 +3024,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             node=call4,
             args=(
                 b'urlsplit',
-                b'python_utils.url_split()')
+                b'python_utils.url_split')
         )
 
         message_replace_disallowed_itervalues = testutils.Message(
@@ -3032,7 +3032,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             node=call5,
             args=(
                 b'itervalues',
-                b'values()')
+                b'values')
         )
 
         message_replace_disallowed_str = testutils.Message(
@@ -3040,7 +3040,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             node=call6,
             args=(
                 b'str',
-                b'python_utils.convert_to_bytes() or python_utils.UNICODE()')
+                b'python_utils.convert_to_bytes or python_utils.UNICODE')
         )
 
         message_replace_disallowed_next = testutils.Message(
@@ -3048,7 +3048,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             node=call7,
             args=(
                 b'next',
-                b'python_utils.NEXT()')
+                b'python_utils.NEXT')
         )
 
         message_replace_disallowed_unquote = testutils.Message(
@@ -3056,7 +3056,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             node=call8,
             args=(
                 b'unquote',
-                b'python_utils.urllib_unquote()')
+                b'python_utils.urllib_unquote')
         )
 
         with self.checker_test_object.assertAddsMessages(

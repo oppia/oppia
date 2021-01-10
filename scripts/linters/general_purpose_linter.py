@@ -468,20 +468,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_files': (),
         'excluded_dirs': ()
     },
-    {
-        'regexp': re.compile(r'\.put_async\('),
-        'message': (
-            'Please use put() instead.'),
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'\.put_multi_async\('),
-        'message': (
-            'Please use put_multi() instead.'),
-        'excluded_files': (),
-        'excluded_dirs': ()
-    }
 ]
 
 BAD_PATTERNS_MAP = {
