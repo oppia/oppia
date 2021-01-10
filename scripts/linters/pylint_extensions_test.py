@@ -2917,19 +2917,19 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_compare(compare_node)
 
 
-class RemoveDisallowedFunctionsCheckerTests(unittest.TestCase):
-    """Unit tests for RemoveDisallowedFunctionsChecker
+class DisallowedFunctionsCheckerTests(unittest.TestCase):
+    """Unit tests for DisallowedFunctionsChecker
     """
 
     def setUp(self):
-        super(RemoveDisallowedFunctionsCheckerTests, self).setUp()
+        super(DisallowedFunctionsCheckerTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.RemoveDisallowedFunctionsChecker)
+            pylint_extensions.DisallowedFunctionsChecker)
         self.checker_test_object.setup_method()
 
     def test_disallowed_removals(self):
-        self.checker_test_object.checker.config.disallowed_func_remove = [
+        self.checker_test_object.checker.config.disallowed_functions = [
             b'example_func'
         ]
 
@@ -2948,59 +2948,26 @@ class RemoveDisallowedFunctionsCheckerTests(unittest.TestCase):
             message_remove_example):
             self.checker_test_object.checker.visit_call(call1)
 
-
-class ReplaceDisallowedFunctionsCheckerTests(unittest.TestCase):
-    """Unit tests for ReplaceDisallowedFunctionsChecker
-    """
-
-    def setUp(self):
-        super(ReplaceDisallowedFunctionsCheckerTests, self).setUp()
-        self.checker_test_object = testutils.CheckerTestCase()
-        self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.ReplaceDisallowedFunctionsChecker)
-        self.checker_test_object.setup_method()
-
     def test_disallowed_replacements(self):
-        self.checker_test_object.checker.config.disallowed_func_replace = [
-            b'now',
-            b'assertEquals',
-            b'StringIO',
-            b'urlsplit',
-            b'urlparse',
-            b'urlunsplit',
-            b'parse_qs',
-            b'unquote',
-            b'urljoin',
-            b'next',
-            b'range',
-            b'round',
-            b'str',
-            b'zip',
-            b'basestring',
-            b'iteritems',
-            b'itervalues',
-            b'iterkeys',
-        ]
-
-        self.checker_test_object.checker.config.disallowed_func_replacements = [
-            b'datetime.datetime.utcnow()',
-            b'self.assertEqual()',
-            b'python_utils.string_io()',
-            b'python_utils.url_split()',
-            b'python_utils.url_parse()',
-            b'python_utils.url_unsplit()',
-            b'python_utils.parse_query_string()',
-            b'python_utils.urllib_unquote()',
-            b'python_utils.url_join()',
-            b'python_utils.NEXT()',
-            b'python_utils.RANGE()',
-            b'python_utils.ROUND()',
-            b'python_utils.convert_to_bytes() or python_utils.UNICODE()',
-            b'python_utils.ZIP()',
-            b'python_utils.BASESTRING()',
-            b'items()',
-            b'values()',
-            b'keys()',
+        self.checker_test_object.checker.config.disallowed_functions = [
+            b'now=>datetime.datetime.utcnow()',
+            b'assertEquals=>self.assertEqual()',
+            b'StringIO=>python_utils.string_io()',
+            b'urlsplit=>python_utils.url_split()',
+            b'urlparse=>python_utils.url_parse()',
+            b'urlunsplit=>python_utils.url_unsplit()',
+            b'parse_qs=>python_utils.parse_query_string()',
+            b'unquote=>python_utils.urllib_unquote()',
+            b'urljoin=>python_utils.url_join()',
+            b'next=>python_utils.NEXT()',
+            b'range=>python_utils.RANGE()',
+            b'round=>python_utils.ROUND()',
+            b'str=>python_utils.convert_to_bytes() or python_utils.UNICODE()',
+            b'zip=>python_utils.ZIP()',
+            b'basestring=>python_utils.BASESTRING()',
+            b'iteritems=>items()',
+            b'itervalues=>values()',
+            b'iterkeys=>keys()',
         ]
 
         (
