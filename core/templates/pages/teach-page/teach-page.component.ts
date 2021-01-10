@@ -51,7 +51,8 @@ export class TeachPageComponent implements OnInit {
   ngOnInit(): void {
     this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.displayedTestimonialId = 0;
-    this.testimonialCount = 4;
+    // Change count after all testimonials are available.
+    this.testimonialCount = 2;
     this.testimonials = this.getTestimonials();
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
@@ -63,7 +64,7 @@ export class TeachPageComponent implements OnInit {
       this.loaderService.hideLoadingScreen();
     });
   }
-
+  // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
   // 0 to (testimonialCount - 1) for displayedTestimonialId.
   incrementDisplayedTestimonialId(): void {
@@ -83,7 +84,7 @@ export class TeachPageComponent implements OnInit {
       this.testimonialCount;
   }
 
-  getTestimonials():[{}, {}, {}, {}] {
+  getTestimonials():[{}, {}] {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
@@ -95,18 +96,6 @@ export class TeachPageComponent implements OnInit {
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
       imageUrl: '/teach/awad.jpg',
       imageUrlWebp: '/teach/awad.webp',
-      borderPresent: true
-    }, {
-      quote: 'I18N_TEACH_TESTIMONIAL_3',
-      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
-      imageUrl: '/splash/sama.png',
-      imageUrlWebp: '/splash/sama.webp',
-      borderPresent: false
-    }, {
-      quote: 'I18N_TEACH_TESTIMONIAL_4',
-      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_4',
-      imageUrl: '/splash/Gaurav_2.png',
-      imageUrlWebp: '/splash/Gaurav_2.webp',
       borderPresent: true
     }];
   }
