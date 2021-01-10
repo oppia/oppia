@@ -19,8 +19,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
-
 from core.domain import base_model_validators
 from core.domain import recommendations_services
 from core.platform import models
@@ -89,16 +87,15 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
                 to validate.
         """
 
-        content = ast.literal_eval(item.content)
-        all_topics = list(content.keys())
+        all_topics = list(item.content.keys())
         data = '%s\n' % ','.join(all_topics)
 
         for topics_to_compare in all_topics:
             similarity_list = []
-            for topic in content[topics_to_compare]:
+            for topic in item.content[topics_to_compare]:
                 similarity_list.append(
                     python_utils.UNICODE(
-                        content[topics_to_compare][topic]))
+                        item.content[topics_to_compare][topic]))
             if len(similarity_list):
                 data = data + '%s\n' % ','.join(similarity_list)
 
