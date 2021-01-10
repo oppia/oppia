@@ -45,116 +45,107 @@ class UserQuery(python_utils.OBJECT):
         self, query_id, query_params, submitter_id, query_status, user_ids,
         sent_email_model_id=None, created_on=None, deleted=False
     ):
-        self._id = query_id
-        self._params = query_params
-        self._submitter_id = submitter_id
-        self._status = query_status
-        self._user_ids = user_ids
-        self._sent_email_model_id = sent_email_model_id
-        self._created_on = created_on
-        self._deleted = deleted
-
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def params(self):
-        return self._params
-
-    @property
-    def submitter_id(self):
-        return self._submitter_id
-
-    @property
-    def status(self):
-        return self._status
-
-    @property
-    def user_ids(self):
-        return self._user_ids
-
-    @property
-    def sent_email_model_id(self):
-        return self._sent_email_model_id
-
-    @property
-    def deleted(self):
-        return self._deleted
+        self.id = query_id
+        self.params = query_params
+        self.submitter_id = submitter_id
+        self.status = query_status
+        self.user_ids = user_ids
+        self.sent_email_model_id = sent_email_model_id
+        self.created_on = created_on
+        self.deleted = deleted
 
     def validate(self):
-        """Validates various properties of the ExplorationSummary.
+        """Validates various properties of the UserQuery.
 
         Raises:
-            ValidationError. One or more attributes of the ExplorationSummary
-                are invalid.
+            ValidationError. Expected ID to be a string.
+            ValidationError. Expected params to be of type UserQueryParams.
+            ValidationError. Expected objective to be a string.
+            ValidationError. Expected submitter ID to be a valid user ID.
+            ValidationError. Expected status to be a string.
+            ValidationError. Invalid status.
+            ValidationError. Expected user_ids to be a list.
+            ValidationError. Expected each user ID in user_ids to be a string.
+            ValidationError. Expected user ID in user_ids to be a valid user ID.
+            ValidationError. Expected sent_email_model_id to be a string.
         """
-        if not isinstance(self._id, python_utils.BASESTRING):
+        if not isinstance(self.id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % self._id)
+                'Expected ID to be a string, received %s' % self.id)
 
-        if not isinstance(self._params, UserQueryParams):
+        if not isinstance(self.params, tuple):
             raise utils.ValidationError(
-                'Expected params to be of type UserQueryParams, received %s'
-                % type(self._params))
+                'Expected params to be of type tuple, received %s'
+                % type(self.params))
 
-        if not isinstance(self._submitter_id, python_utils.BASESTRING):
+        if not isinstance(self.submitter_id, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected objective to be a string, received %s' %
-                self._submitter_id)
-        if not utils.is_user_id_valid(self._submitter_id):
+                'Expected submitter ID to be a string, received %s' %
+                self.submitter_id)
+        if not utils.is_user_id_valid(self.submitter_id):
             raise utils.ValidationError(
                 'Expected submitter ID to be a valid user ID, received %s' %
-                self._submitter_id)
+                self.submitter_id)
 
-        if not isinstance(self._status, python_utils.BASESTRING):
+        if not isinstance(self.status, python_utils.BASESTRING):
             raise utils.ValidationError(
-                'Expected status to be a string, received %s' %
-                self._status)
-        if self._status not in feconf.ALLOWED_USER_QUERY_STATUSES:
-            raise utils.ValidationError(
-                'Invalid status: %s' % self._status)
+                'Expected status to be a string, received %s' % self.status)
+        if self.status not in feconf.ALLOWED_USER_QUERY_STATUSES:
+            raise utils.ValidationError('Invalid status: %s' % self.status)
 
-        if not isinstance(self._user_ids, list):
+        if not isinstance(self.user_ids, list):
             raise utils.ValidationError(
-                'Expected \'user_ids\' to be a list, received %s' %
-                type(self._user_ids))
-        for user_id in self._user_ids:
+                'Expected user_ids to be a list, received %s' %
+                type(self.user_ids))
+        for user_id in self.user_ids:
             if not isinstance(user_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
-                    'Expected each user ID in \'user_ids\' to be a string, '
-                    'received \'%s\'' % user_id)
+                    'Expected each user ID in user_ids to be a string, '
+                    'received %s' % user_id)
 
             if not utils.is_user_id_valid(user_id):
                 raise utils.ValidationError(
-                    'Expected user ID in \'user_ids\' to be a valid user ID, '
+                    'Expected user ID in user_ids to be a valid user ID, '
                     'received %s' % user_id)
 
-        if self._sent_email_model_id:
+        if self.sent_email_model_id:
             if not isinstance(
-                    self._sent_email_model_id, python_utils.BASESTRING):
+                    self.sent_email_model_id, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected sent_email_model_id to be a string, received %s'
-                    % self._sent_email_model_id)
+                    % self.sent_email_model_id)
 
     def to_dict(self):
         return {
-            'id': self._id,
-            'submitter_id': self._submitter_id,
-            'created_on': self._created_on.strftime('%d-%m-%y %H:%M:%S'),
-            'status': self._status,
-            'num_qualified_users': len(self._user_ids)
+            'id': self.id,
+            'submitter_id': self.submitter_id,
+            'created_on': self.created_on.strftime('%d-%m-%y %H:%M:%S'),
+            'status': self.status,
+            'num_qualified_users': len(self.user_ids)
         }
 
     @classmethod
     def create_default(cls, query_id, query_params, submitter_id):
+        """Create default user query.
+
+        Returns:
+            UserQuery. The default user query.
+        """
         return cls(
             query_id, query_params, submitter_id,
             feconf.USER_QUERY_STATUS_PROCESSING, []
         )
 
     def archive(self, sent_email_model_id=None):
+        """Archive the query.
+
+        Args:
+            sent_email_model_id: str|None. The send email model ID that was sent
+                to the users. Can be None if the query was archived without
+                sending email.
+        """
         if sent_email_model_id:
-            self._sent_email_model_id = sent_email_model_id
-        self._status = feconf.USER_QUERY_STATUS_ARCHIVED
-        self._deleted = True
+            self.sent_email_model_id = sent_email_model_id
+
+        self.status = feconf.USER_QUERY_STATUS_ARCHIVED
+        self.deleted = True
