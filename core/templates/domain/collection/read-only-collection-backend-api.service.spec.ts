@@ -98,27 +98,6 @@ describe('Read only collection backend API service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an existing collection from the backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      readOnlyCollectionBackendApiService.fetchCollectionAsync('0').then(
-        successHandler, failHandler);
-      var req = httpTestingController.expectOne('/collection_handler/data/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
-
-      flushMicrotasks();
-
-      var collectionObject = Collection.create(
-        sampleDataResults.collection);
-
-      expect(successHandler).toHaveBeenCalledWith(collectionObject);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
   it('should load a cached collection after fetching it from the backend',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
