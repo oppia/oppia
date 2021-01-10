@@ -43,25 +43,30 @@
       <[question.getValidationErrorMessage()]>
     </div>
   </div>
-  <div class="modal-footer">
+  <div class="modal-footer question-editor-footer">
     <button class="btn btn-secondary" ng-click="back()">Back</button>
-    <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
-    <button ng-if="newQuestionIsBeingCreated"
-            title="To Save please add: interaction, hint, solution and address all misconceptions"
-            class="btn btn-success protractor-test-save-question-button"
-            ng-click="done()"
-            ng-disabled="!isQuestionValid()">
-      Done
-    </button>
-    <button ng-if="!newQuestionIsBeingCreated"
-            class="btn btn-success protractor-test-save-question-button"
-            ng-click="saveAndCommit()"
-            ng-disabled="isSaveAndCommitButtonDisabled()">
-      Save and Commit
-    </button>
+    <div>
+      <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
+      <button ng-if="newQuestionIsBeingCreated"
+              title="To Save please add: interaction, hint, solution and address all misconceptions"
+              class="btn btn-success protractor-test-save-question-button"
+              ng-click="done()"
+              ng-disabled="!isQuestionValid()">
+        Done
+      </button>
+      <button ng-if="!newQuestionIsBeingCreated"
+              class="btn btn-success protractor-test-save-question-button"
+              ng-click="saveAndCommit()"
+              ng-disabled="isSaveAndCommitButtonDisabled()">
+        Save and Commit
+      </button>
+    </div>
   </div>
 </div>
 <style>
+  .modal-footer.question-editor-footer {
+    justify-content: space-between;
+  }
   .oppia-question-editor-container .question-skill-id {
     background-color: #efefef;
     margin-left: 0;
