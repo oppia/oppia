@@ -28,11 +28,11 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
-
-USER_ID_REGEX = 'uid_[a-z]{32}'
 
 ERROR_CATEGORY_COMMIT_CMD_CHECK = 'commit cmd check'
 ERROR_CATEGORY_COMMIT_STATUS_CHECK = 'post commit status check'
@@ -62,6 +62,7 @@ ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
 ERROR_CATEGORY_TYPE_CHECK = 'type check'
 ERROR_CATEGORY_VERSION_CHECK = 'version check'
 ERROR_CATEGORY_STALE_CHECK = 'stale check'
+ERROR_CATEGORY_INVALID_USER_SETTING_IDS = 'invalid user setting ids'
 
 VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
@@ -69,10 +70,12 @@ VALIDATION_MODE_NON_STRICT = 'non-strict'
 
 
 class ExternalModelFetcherDetails(python_utils.OBJECT):
-    """Value object providing the class and ids to fetch an external model."""
+    """Value object providing the class and ids to fetch an external model.
+    NOTE TO DEVELOPERS: For UserSettingsModel, use the
+    UserSettingsModelFetcherDetails class instead of this one.
+    """
 
-    def __init__(
-            self, field_name, model_class, model_ids):
+    def __init__(self, field_name, model_class, model_ids):
         """Initializes an ExternalModelFetcherDetails domain object.
 
         Args:
@@ -84,10 +87,73 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
             model_class: ClassObject. The external model class.
             model_ids: list(str). The list of external model ids to fetch the
                 external models.
+
+        Raises:
+            Exception. This class was used instead of
+                UserSettingsModelFetcherDetails for the UserSettingsModel.
         """
+        if model_class == user_models.UserSettingsModel:
+            raise Exception(
+                'When fetching instances of UserSettingsModel, please use ' +
+                'UserSettingsModelFetcherDetails instead of ' +
+                'ExternalModelFetcherDetails')
         self.field_name = field_name
         self.model_class = model_class
         self.model_ids = model_ids
+
+
+class UserSettingsModelFetcherDetails(python_utils.OBJECT):
+    """Value object providing ids to fetch the user settings model."""
+
+    def __init__(
+            self, field_name, model_ids,
+            may_contain_system_ids, may_contain_pseudonymous_ids):
+        """Initializes the UserSettingsModelFetcherDetails domain object.
+
+        Args:
+            field_name: str. A specific name used as an identifier by the
+                storage model which is used to identify the user settings model
+                reference. For example: `'committer_id': UserSettingsModel`
+                means that committer_id is a field which contains a user_id
+                used to identify the external model UserSettingsModel.
+            model_ids: list(str). The list of user settings model IDs for which
+                to fetch the UserSettingsModels.
+            may_contain_system_ids: bool. Whether the model IDs contain
+                system IDs which should be omitted before attempting to fetch
+                the corresponding models. Set may_contain_system_ids to True if
+                and only if this field can contain admin or bot IDs.
+            may_contain_pseudonymous_ids: bool. Whether the model ids contain
+                pseudonymous IDs which should be omitted before attempting to
+                fetch the corresponding models. Set may_contain_pseudonymous_ids
+                to True if and only if this field can contain user IDs that
+                are pseudonymized as part of Wipeout. In other words, these
+                fields can only be in models that have LOCALLY_PSEUDONYMIZE as
+                their DELETION_POLICY.
+        """
+        filtered_model_ids = model_ids
+        if may_contain_system_ids:
+            filtered_model_ids = list(
+                set(filtered_model_ids) - set(feconf.SYSTEM_USERS.values()))
+        else:
+            if set(filtered_model_ids) & set(feconf.SYSTEM_USERS.values()):
+                raise utils.ValidationError(
+                    'The field \'%s\' should not contain '
+                    'system IDs' % field_name)
+        if may_contain_pseudonymous_ids:
+            filtered_model_ids = [
+                model_id for model_id in filtered_model_ids
+                if not utils.is_pseudonymous_id(model_id)
+            ]
+        else:
+            if any(
+                    utils.is_pseudonymous_id(model_id)
+                    for model_id in filtered_model_ids):
+                raise utils.ValidationError(
+                    'The field \'%s\' should not contain '
+                    'pseudonymous IDs' % field_name)
+        self.field_name = field_name
+        self.model_class = user_models.UserSettingsModel
+        self.model_ids = filtered_model_ids
 
 
 class ExternalModelReference(python_utils.OBJECT):
@@ -281,26 +347,34 @@ class BaseModelValidator(python_utils.OBJECT):
         """
         multiple_models_ids_to_fetch = {}
 
-        for external_model_fetcher_details in (
-                cls._get_external_id_relationships(item)):
-            multiple_models_ids_to_fetch[
-                external_model_fetcher_details.field_name] = (
-                    external_model_fetcher_details.model_class,
-                    external_model_fetcher_details.model_ids)
+        try:
+            for external_model_fetcher_details in (
+                    cls._get_external_id_relationships(item)):
+                multiple_models_ids_to_fetch[
+                    external_model_fetcher_details.field_name] = (
+                        external_model_fetcher_details.model_class,
+                        external_model_fetcher_details.model_ids)
+        except utils.ValidationError as err:
+            cls._add_error(
+                ERROR_CATEGORY_INVALID_USER_SETTING_IDS,
+                'Entity id %s: %s' % (item.id, python_utils.UNICODE(err)))
+        else:
+            fetched_model_instances_for_all_ids = (
+                datastore_services.fetch_multiple_entities_by_ids_and_models(
+                    list(multiple_models_ids_to_fetch.values())))
 
-        fetched_model_instances_for_all_ids = (
-            datastore_services.fetch_multiple_entities_by_ids_and_models(
-                list(multiple_models_ids_to_fetch.values())))
+            for index, field_name in enumerate(multiple_models_ids_to_fetch):
+                (model_class, model_ids) = (
+                    multiple_models_ids_to_fetch[field_name])
+                fetched_model_instances = fetched_model_instances_for_all_ids[
+                    index]
 
-        for index, field_name in enumerate(multiple_models_ids_to_fetch):
-            (model_class, model_ids) = multiple_models_ids_to_fetch[field_name]
-            fetched_model_instances = fetched_model_instances_for_all_ids[index]
-
-            for (model_id, model_instance) in python_utils.ZIP(
-                    model_ids, fetched_model_instances):
-                cls.field_name_to_external_model_references[field_name].append(
-                    ExternalModelReference(
-                        model_class, model_id, model_instance))
+                for (model_id, model_instance) in python_utils.ZIP(
+                        model_ids, fetched_model_instances):
+                    cls.field_name_to_external_model_references[
+                        field_name].append(
+                            ExternalModelReference(
+                                model_class, model_id, model_instance))
 
     @classmethod
     def _validate_model_time_fields(cls, item):
@@ -772,7 +846,7 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return r'^%s$' % USER_ID_REGEX
+        return r'^%s$' % feconf.USER_ID_REGEX
 
     @classmethod
     def _validate_explorations_are_public(

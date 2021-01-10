@@ -26,8 +26,11 @@ from core.domain import base_model_validators
 from core.domain import prod_validation_jobs_one_off
 from core.platform import models
 from core.tests import test_utils
+import feconf
+import utils
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 
 class MockModel(base_models.BaseModel):
@@ -104,6 +107,36 @@ class MockBaseUserModelValidator(
             cls._validate_explorations_are_public,
             cls._validate_collections_are_public
         ]
+
+
+class MockCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    pass
+
+
+class MockCommitLogEntryModelValidator(
+        base_model_validators.BaseCommitLogEntryModelValidator):
+
+    EXTERNAL_MODEL_NAME = 'mockmodel'
+
+    @classmethod
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('mock'):
+            return MockCommitLogEntryModel
+        else:
+            cls._add_error(
+                'model %s' % base_model_validators.ERROR_CATEGORY_ID_CHECK,
+                'Entity id %s: Entity id does not match regex pattern' % (
+                    item.id))
+            return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            )]
 
 
 class BaseValidatorTests(test_utils.AuditJobsTestBase):
@@ -189,4 +222,99 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
                     'deleted is older than 8 weeks'
                 ]
             }
+        )
+
+    def test_external_model_fetcher_with_user_settings_raise_error(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'When fetching instances of UserSettingsModel, please use ' +
+            'UserSettingsModelFetcherDetails instead of ' +
+            'ExternalModelFetcherDetails'):
+            base_model_validators.ExternalModelFetcherDetails(
+                'committer_ids', user_models.UserSettingsModel,
+                [
+                    feconf.MIGRATION_BOT_USER_ID, 'User-1',
+                    self.PSEUDONYMOUS_ID
+                ]
+            )
+
+    def test_may_contain_system_users_filters_system_ids(self):
+        user_settings_model = (
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids',
+                [feconf.MIGRATION_BOT_USER_ID, 'User-1'],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=False
+            ))
+
+        self.assertItemsEqual(
+            user_settings_model.model_ids, ['User-1'])
+
+    def test_error_raised_if_model_ids_contain_system_ids(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The field \'committer_ids\' should not contain system IDs'):
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [feconf.MIGRATION_BOT_USER_ID, 'User-1'],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            )
+
+    def test_may_contain_pseudonymous_users_filters_pseudonymous_users(self):
+        user_settings_model = (
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', ['User-1', self.PSEUDONYMOUS_ID],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=True
+            ))
+
+        self.assertItemsEqual(
+            user_settings_model.model_ids, ['User-1'])
+
+    def test_error_raised_if_model_ids_contain_pseudonymous_ids(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The field \'committer_ids\' should not contain pseudonymous IDs'):
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [self.PSEUDONYMOUS_ID, 'User-1'],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False
+            )
+
+    def test_error_raised_when_fetching_external_model_with_system_ids(self):
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=feconf.MIGRATION_BOT_USER_ID,
+            commit_cmds=[])
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'invalid user setting ids': [
+                    'Entity id mock-12345: '
+                    'The field \'user_id\' should not contain system IDs'
+                ]
+            },
+            mock_validator.errors
+        )
+
+    def test_error_raised_when_fetching_external_model_with_pseudo_ids(self):
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id=self.PSEUDONYMOUS_ID,
+            commit_cmds=[])
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'invalid user setting ids': [
+                    'Entity id mock-12345: '
+                    'The field \'user_id\' should not contain pseudonymous IDs'
+                ]
+            },
+            mock_validator.errors
         )

@@ -50,7 +50,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         var state = ExplorationStatesService.getState(stateName);
         var recordedVoiceovers = state.recordedVoiceovers;
         var availableAudioLanguages = (
-          recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
+          recordedVoiceovers.getLanguageCodes(contentId));
         if (availableAudioLanguages.indexOf(languageCode) !== -1) {
           var voiceover = recordedVoiceovers.getVoiceover(
             contentId, languageCode);
@@ -167,7 +167,13 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
         $scope.HTML_SCHEMA = {
-          type: 'html'
+          type: 'html',
+          ui_config: {
+            activeLanguage: (
+              TranslationLanguageService.getActiveLanguageCode()),
+            activeLanguageDirection: (
+              TranslationLanguageService.getActiveLanguageDirection())
+          }
         };
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'
