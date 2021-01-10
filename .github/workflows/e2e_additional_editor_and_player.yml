@@ -39,7 +39,7 @@ jobs:
       - name: Merge to Target Branch
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
-          git config --global user.email "$( git log --format='%ae' $GITHUB_SHA^! )"
+          git config --global pull.rebase false user.email "$( git log --format='%ae' $GITHUB_SHA^! )"
           git config --global user.name "$( git log --format='%an' $GITHUB_SHA^! )"
 
           curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" -o jq
@@ -54,15 +54,14 @@ jobs:
             curl "$url" | ./jq '.base.ref' | tr -d '"'
           )
 
-          echo "$target_branch"
-
           rm jq
           
           if [[ "$target_branch" == null ]]
           then
-            git pull https://github.com/oppia/oppia.git develop --no-edit --allow-unrelated-histories
+            git remote add upstream https://github.com/oppia/oppia.git
+            git pull upstream develop --no-edit
           else
-            git pull origin $target_branch --no-edit --allow-unrelated-histories
+            git pull origin $target_branch --no-edit
           fi
       - name: Run Additional Editor E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
