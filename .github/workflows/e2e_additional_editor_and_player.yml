@@ -21,6 +21,31 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - name: Merge to Target Branch
+        run: |
+          git config --global user.email "$( git log --format='%ae' $GITHUB_SHA^! )"
+          git config --global user.name "$( git log --format='%an' $GITHUB_SHA^! )"
+
+          curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" -o jq
+          chmod +x jq
+
+          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          REPO_NAME=${{ github.event.repository.name }}
+
+          url="https://api.github.com/repos/$GITHUB_ACTOR/$REPO_NAME/pulls/$PR_NUMBER?access_token=$GITHUB_TOKEN"
+
+          target_branch=$(
+            curl "$url" | ./jq '.base.ref' | tr -d '"'
+          )
+
+          rm jq
+          
+          if [[ "$target_branch" == null ]]
+          then
+            git pull https://github.com/oppia/oppia.git develop --no-edit
+          else
+            git pull origin $target_branch --no-edit
+          fi
       - name: Setup python by installing wheel
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install wheel==0.35.0
