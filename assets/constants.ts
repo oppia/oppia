@@ -5117,7 +5117,7 @@ export default {
     "id": "no",
     "description": "Norwegian",
     "relatedLanguages": ["no"],
-    "direction": "AUDIO_ltr"
+    "direction": "ltr"
   }, {
     "id": "fa",
     "description": "Persian",
