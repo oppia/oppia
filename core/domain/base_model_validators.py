@@ -100,12 +100,10 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
                 'ExternalModelFetcherDetails')
         filtered_model_ids = []
         for model_id in model_ids:
-            if not re.compile(
-                    '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH).match(
-                        model_id):
+            if not model_id:
                 raise Exception(
-                    'The model id %s in the field \'%s\' '
-                    'is invalid' % (model_id, field_name))
+                    'A model id in the field \'%s\' '
+                    'is empty' % field_name)
             else:
                 filtered_model_ids.append(model_id)
         self.field_name = field_name
