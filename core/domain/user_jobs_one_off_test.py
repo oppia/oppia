@@ -45,8 +45,10 @@ import feconf
 import python_utils
 import utils
 
-(user_models, feedback_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
+auth_models, user_models, feedback_models, exp_models = (
+    models.Registry.import_models(
+        [models.NAMES.auth, models.NAMES.user, models.NAMES.feedback,
+         models.NAMES.exploration]))
 
 auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -1884,7 +1886,7 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         user_auth_details = (
             auth_services.create_user_auth_details(self.USER_ID_1, 'auth_id'))
 
-        user_auth_details_model = user_models.UserAuthDetailsModel(
+        user_auth_details_model = auth_models.UserAuthDetailsModel(
             id=self.USER_ID_1, **user_auth_details.to_dict_with_changes())
         user_auth_details_model.update_timestamps()
         user_auth_details_model.put()
