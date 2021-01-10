@@ -17,8 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import base64
 import json
+import logging
 import re
 import zipfile
 
@@ -32,12 +32,9 @@ from core.domain import summary_services
 from core.domain import takeout_service
 from core.domain import user_services
 from core.domain import wipeout_service
-from core.platform import models
 import feconf
 import python_utils
 import utils
-
-current_user_services = models.Registry.import_current_user_services()
 
 
 class ProfilePage(base.BaseHandler):
@@ -379,15 +376,26 @@ class ExportAccountHandler(base.BaseHandler):
         user_data = user_takeout_object.user_data
         user_images = user_takeout_object.user_images
 
+        # Ensure that the exported data does not contain a user ID.
+        user_data_json_string = json.dumps(user_data)
+        if re.search(feconf.USER_ID_REGEX, user_data_json_string):
+            logging.error(
+                '[TAKEOUT] User ID found in the JSON generated for user %s'
+                % self.user_id)
+            user_data_json_string = (
+                'There was an error while exporting ' +
+                'data. Please contact %s to export your data.'
+                % feconf.ADMIN_EMAIL_ADDRESS)
+            user_images = []
+
         # Create zip file.
         temp_file = python_utils.string_io()
         with zipfile.ZipFile(
             temp_file, mode='w', compression=zipfile.ZIP_DEFLATED) as zfile:
-            zfile.writestr('oppia_takeout_data.json', json.dumps(user_data))
+            zfile.writestr('oppia_takeout_data.json', user_data_json_string)
             for image in user_images:
-                b64_png_no_header = image.b64_image_data.split(',')[1]
-                decoded_png = base64.b64decode(
-                    python_utils.url_unquote_plus(b64_png_no_header))
+                decoded_png = utils.convert_png_data_url_to_binary(
+                    image.b64_image_data)
                 zfile.writestr('images/' + image.image_export_path, decoded_png)
 
         # Render file for download.
@@ -462,7 +470,7 @@ class UserInfoHandler(base.BaseHandler):
                     user_services.is_at_least_moderator(self.user_id)),
                 'is_admin': user_services.is_admin(self.user_id),
                 'is_super_admin': (
-                    current_user_services.is_current_user_super_admin()),
+                    user_services.is_current_user_super_admin()),
                 'is_topic_manager': (
                     user_services.is_topic_manager(self.user_id)),
                 'can_create_collections': bool(
@@ -486,14 +494,12 @@ class UrlHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
-        login_url = None
         if self.user_id:
             self.render_json({'login_url': None})
         else:
             if self.request and self.request.get('current_url'):
                 target_url = self.request.get('current_url')
-                login_url = (
-                    current_user_services.create_login_url(target_url))
+                login_url = user_services.create_login_url(target_url)
                 self.render_json({'login_url': login_url})
             else:
                 raise self.InvalidInputException(

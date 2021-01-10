@@ -119,8 +119,8 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     def test_delete_threads_for_multiple_entities(self):
         self.save_new_default_exploration(self.EXP_1_ID, self.EXP_1_ID)
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_1_ID,
             1,
             self.user_id,
@@ -176,8 +176,8 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
 
         self.save_new_default_exploration(self.EXP_1_ID, self.user_id)
         suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_1_ID,
             1,
             self.user_id,
@@ -1222,7 +1222,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Check that reply_to id is created for user A.
             queried_object = (
                 email_services
-                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                .get_feedback_thread_reply_info_by_user_and_thread(
                     self.user_id_a, thread_id))
             self.assertEqual(queried_object.user_id, self.user_id_a)
             self.assertEqual(queried_object.thread_id, thread_id)
@@ -1232,7 +1232,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             # Check that reply_to id is created for user B.
             queried_object = (
                 email_services
-                .get_feedback_thread_reply_info_by_user_and_thread_ids(
+                .get_feedback_thread_reply_info_by_user_and_thread(
                     self.user_id_b, thread_id))
             self.assertEqual(queried_object.user_id, self.user_id_b)
             self.assertEqual(queried_object.thread_id, thread_id)

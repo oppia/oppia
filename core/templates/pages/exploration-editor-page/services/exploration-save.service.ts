@@ -396,7 +396,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/modal-templates/' +
               'exploration-save-modal.template.html'),
-            backdrop: true,
+            backdrop: 'static',
             resolve: {
               isExplorationPrivate: function() {
                 return ExplorationRightsService.isPrivate();

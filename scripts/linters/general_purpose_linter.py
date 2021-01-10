@@ -42,7 +42,6 @@ EXCLUDED_PATHS = (
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
-    'auth.json.enc',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -269,7 +268,8 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'core/templates/pages/exploration-editor-page/translation-tab/'
             'audio-translation-bar/audio-translation-bar.directive.spec.ts',
             'core/templates/pages/library-page/search-bar/'
-            'search-bar.component.spec.ts'),
+            'search-bar.component.spec.ts',
+            'core/templates/pages/splash-page/splash-page.component.spec.ts'),
         'excluded_dirs': ()
     },
     {
@@ -288,6 +288,7 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
             'api services.'),
         'excluded_files': (
             'backend-api.service.ts',
+            'core/templates/services/auth-interceptor.service.spec.ts',
             'core/templates/services/request-interceptor.service.spec.ts',),
         'excluded_dirs': ()
     }
@@ -580,6 +581,20 @@ BAD_PATTERNS_PYTHON_REGEXP = [
     {
         'regexp': re.compile(r'iterkeys'),
         'message': 'Please use keys() instead.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\.put_async\('),
+        'message': (
+            'Please use put() instead.'),
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\.put_multi_async\('),
+        'message': (
+            'Please use put_multi() instead.'),
         'excluded_files': (),
         'excluded_dirs': ()
     }
