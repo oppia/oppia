@@ -96,9 +96,9 @@ angular.module('oppia').directive('workedExampleEditor', [
             $scope.explanationEditorIsOpen = false;
             $scope.container = {
               workedExampleQuestionHtml:
-                $scope.workedExample.getQuestion().getHtml(),
+                $scope.workedExample.getQuestion().html,
               workedExampleExplanationHtml:
-                $scope.workedExample.getExplanation().getHtml()
+                $scope.workedExample.getExplanation().html
             };
 
             $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
