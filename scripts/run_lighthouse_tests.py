@@ -212,7 +212,6 @@ def main(args=None):
 
     with contextlib2.ExitStack() as stack:
         stack.enter_context(common.managed_elasticsearch_dev_server())
-        stack.enter_context(common.managed_firebase_auth_emulator())
         stack.enter_context(managed_dev_appserver)
 
         # Wait for the servers to come up.

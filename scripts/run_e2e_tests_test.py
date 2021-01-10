@@ -918,9 +918,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_elasticsearch_dev_server',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
-                common, 'managed_firebase_auth_emulator',
-                value=contextlib2.nullcontext()),
-            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -1035,9 +1032,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=contextlib2.nullcontext()),
-            self.swap_to_always_return(
-                common, 'managed_firebase_auth_emulator',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
@@ -1385,9 +1379,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_elasticsearch_dev_server',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
-                common, 'managed_firebase_auth_emulator',
-                value=contextlib2.nullcontext()),
-            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -1559,9 +1550,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'managed_elasticsearch_dev_server',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
-                common, 'managed_firebase_auth_emulator',
-                value=contextlib2.nullcontext()),
-            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -1682,9 +1670,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
                 common, 'managed_elasticsearch_dev_server',
-                value=contextlib2.nullcontext()),
-            self.swap_to_always_return(
-                common, 'managed_firebase_auth_emulator',
                 value=contextlib2.nullcontext()),
             self.swap_to_always_return(
                 common, 'managed_dev_appserver',
