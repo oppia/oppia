@@ -37,11 +37,13 @@ interface SupportedAudioLanguageBackendDict {
   'id': string;
   'description': string;
   'relatedLanguages': readonly string[];
+  'direction': string;
 }
 
 interface SupportedContentLanguageBackendDict {
   'code': string;
   'description': string;
+  'direction': string;
 }
 
 interface LanguageIdAndText {
@@ -52,6 +54,7 @@ interface LanguageIdAndText {
 interface ContentLanguage {
   code: string;
   description: string;
+  direction: string;
 }
 
 @Injectable({
@@ -81,6 +84,14 @@ export class LanguageUtilService {
         AudioLanguage.createFromDict(audioLanguageDict);
     });
     return supportedAudioLanguages;
+  }
+
+  getSupportedContentLanguages(): {[languageCode: string]: ContentLanguage} {
+    const supportedContentLanguages = {};
+    this.SUPPORTED_CONTENT_LANGUAGES.forEach(contentLanguageDict => {
+      supportedContentLanguages[contentLanguageDict.code] = contentLanguageDict;
+    });
+    return supportedContentLanguages;
   }
 
   getAllAudioLanguageCodes(): string[] {
@@ -145,6 +156,33 @@ export class LanguageUtilService {
     const language = this.getSupportedAudioLanguages()[audioLanguageCode];
     return language ? language.description : null;
   }
+
+  getContentLanguageDescription(contentLanguageCode: string): string {
+    const language = this.getSupportedContentLanguages()[contentLanguageCode];
+    return language ? language.description : null;
+  }
+
+  getContentLanguageDirection(languageCode: string): string {
+    let languageDirection = 'auto'; // Default auto for invalid languageCode
+    this.SUPPORTED_CONTENT_LANGUAGES.forEach((lang: ContentLanguage) => {
+      if (lang.code === languageCode) {
+        languageDirection = lang.direction;
+      }
+    });
+    return languageDirection;
+  }
+
+  getAudioLanguageDirection(languageCode: string): string {
+    let languageDirection = 'auto'; // Default auto for invalid languageCode
+    this.SUPPORTED_AUDIO_LANGUAGES.forEach(
+      (audioLanguage: SupportedAudioLanguageBackendDict) => {
+        if (audioLanguage.id === languageCode) {
+          languageDirection = audioLanguage.direction;
+        }
+      });
+    return languageDirection;
+  }
+
   // Given a list of audio language codes, returns the complement list, i.e.
   // the list of audio language codes not in the input list.
   getComplementAudioLanguageCodes(
