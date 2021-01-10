@@ -58,9 +58,9 @@ jobs:
           
           if [[ "$target_branch" == null ]]
           then
-            git pull https://github.com/oppia/oppia.git develop --no-edit
+            git pull https://github.com/oppia/oppia.git develop --no-edit --allow-unrelated-histories
           else
-            git pull origin $target_branch --no-edit
+            git pull origin $target_branch --no-edit --allow-unrelated-histories
           fi
       - name: Run Additional Editor E2E Test
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
