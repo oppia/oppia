@@ -175,13 +175,13 @@ angular.module('oppia').component('contributionsAndReview', {
         var questionHeader = contributionDetails.skill_description;
         var question = QuestionObjectFactory.createFromBackendDict(
           suggestion.change.question_dict);
-        var contentHtml = question.getStateData().content.getHtml();
+        var contentHtml = question.getStateData().content.html;
         var skillRubrics = contributionDetails.skill_rubrics;
         var skillDifficulty = suggestion.change.skill_difficulty;
 
         $uibModal.open({
           templateUrl: _templateUrl,
-          backdrop: true,
+          backdrop: 'static',
           size: 'lg',
           resolve: {
             authorName: function() {
@@ -229,7 +229,7 @@ angular.module('oppia').component('contributionsAndReview', {
 
         $uibModal.open({
           templateUrl: _templateUrl,
-          backdrop: true,
+          backdrop: 'static',
           size: 'lg',
           resolve: {
             suggestionIdToSuggestion: function() {
@@ -336,11 +336,13 @@ angular.module('oppia').component('contributionsAndReview', {
         ctrl.contributionTabs = [
           {
             suggestionType: SUGGESTION_TYPE_QUESTION,
-            text: 'Questions'
+            text: 'Questions',
+            enabled: false
           },
           {
             suggestionType: SUGGESTION_TYPE_TRANSLATE,
-            text: 'Translations'
+            text: 'Translations',
+            enabled: true
           }
         ];
 
@@ -355,11 +357,22 @@ angular.module('oppia').component('contributionsAndReview', {
                     .can_review_translation_for_language_codes);
                 var userCanReviewQuestionSuggestions = (
                   userContributionRights.can_review_questions);
+                var userReviewableSuggestionTypes = [];
+                var userCanSuggestQuestions = (
+                  userContributionRights.can_suggest_questions);
+                for (var index in ctrl.contributionTabs) {
+                  if (ctrl.contributionTabs[index].suggestionType === (
+                    SUGGESTION_TYPE_QUESTION)) {
+                    ctrl.contributionTabs[index].enabled = (
+                      userCanSuggestQuestions);
+                  }
+                }
                 if (userCanReviewQuestionSuggestions) {
                   ctrl.reviewTabs.push({
                     suggestionType: SUGGESTION_TYPE_QUESTION,
                     text: 'Review Questions'
                   });
+                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_QUESTION);
                 }
                 if (
                   userCanReviewTranslationSuggestionsInLanguages
@@ -368,13 +381,17 @@ angular.module('oppia').component('contributionsAndReview', {
                     suggestionType: SUGGESTION_TYPE_TRANSLATE,
                     text: 'Review Translations'
                   });
+                  userReviewableSuggestionTypes.push(SUGGESTION_TYPE_TRANSLATE);
                 }
-                if (ctrl.reviewTabs.length > 0) {
+                if (userReviewableSuggestionTypes.length > 0) {
                   ctrl.switchToTab(
-                    ctrl.TAB_TYPE_REVIEWS, ctrl.reviewTabs[0].suggestionType);
-                } else {
+                    ctrl.TAB_TYPE_REVIEWS, userReviewableSuggestionTypes[0]);
+                } else if (userCanSuggestQuestions) {
                   ctrl.switchToTab(
                     ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_QUESTION);
+                } else {
+                  ctrl.switchToTab(
+                    ctrl.TAB_TYPE_CONTRIBUTIONS, SUGGESTION_TYPE_TRANSLATE);
                 }
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.

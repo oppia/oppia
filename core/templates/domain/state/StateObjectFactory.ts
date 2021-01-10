@@ -41,7 +41,9 @@ import {
   WrittenTranslationsObjectFactory
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
 
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import constants from 'assets/constants';
+import { AppConstants } from 'app.constants';
 
 export interface StateBackendDict {
   'classifier_model_id': string;
@@ -108,6 +110,42 @@ export class State {
     this.solicitAnswerDetails = otherState.solicitAnswerDetails;
     this.writtenTranslations = otherState.writtenTranslations;
     this.nextContentIdIndex = otherState.nextContentIdIndex;
+  }
+
+  getRequiredWrittenTranslationContentIds(): Set<string> {
+    let interactionId = this.interaction.id;
+
+    let allContentIds = new Set(this.writtenTranslations.getAllContentIds());
+
+    // As of now we do not delete interaction.hints when a user deletes
+    // interaction, so these hints' written translations are not counted in
+    // checking status of a state.
+    if (!interactionId ||
+      INTERACTION_SPECS[interactionId].is_linear ||
+      INTERACTION_SPECS[interactionId].is_terminal) {
+      allContentIds.forEach(contentId => {
+        if (contentId.indexOf(AppConstants.COMPONENT_NAME_HINT) === 0) {
+          // eslint-disable-next-line dot-notation
+          allContentIds.delete(contentId);
+        }
+      });
+      // Excluding default_outcome content status as default outcome's
+      // content is left empty so the translation or voiceover is not
+      // required.
+      // eslint-disable-next-line dot-notation
+      allContentIds.delete('default_outcome');
+    }
+
+    // TODO(#11581): Add rule translation support for TextInput and SetInput
+    // interactions. Delete below when completed.
+    allContentIds.forEach(contentId => {
+      if (contentId.indexOf(AppConstants.COMPONENT_NAME_RULE_INPUT) === 0) {
+        // eslint-disable-next-line dot-notation
+        allContentIds.delete(contentId);
+      }
+    });
+
+    return allContentIds;
   }
 }
 
