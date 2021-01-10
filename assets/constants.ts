@@ -5117,7 +5117,7 @@ export default {
     "id": "no",
     "description": "Norwegian",
     "relatedLanguages": ["no"],
-    "direction": "ltr"
+    "direction": "AUDIO_ltr"
   }, {
     "id": "fa",
     "description": "Persian",
@@ -5133,6 +5133,11 @@ export default {
     "description": "Portuguese",
     "relatedLanguages": ["pt"],
     "direction": "ltr"
+  }, {
+    "id": "ps",
+    "description": "Pashto",
+    "relatedLanguages": ["ps"],
+    "direction": "rtl"
   }, {
     "id": "ro",
     "description": "Romanian",
