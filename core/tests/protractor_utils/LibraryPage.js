@@ -99,8 +99,9 @@ var LibraryPage = function() {
     await browser.actions().mouseMove(element(by.css(
       '.protractor-test-exp-summary-tile-title'))).perform();
 
-    await action.click('Add to playlist Icon taking too long to load',
-                       addToPlaylistButton);
+    await action.click(
+      'Add to playlist Icon taking too long to load',
+      addToPlaylistButton);
   };
 
   this.selectLanguages = async function(languages) {
@@ -150,8 +151,9 @@ var LibraryPage = function() {
     await waitFor.visibilityOf(
       allCollectionsTitled(collectionName).first(),
       'Unable to find collection ' + collectionName);
-    await action.click('collection name',
-       allCollectionsTitled(collectionName).first());
+    await action.click(
+      'collection name',
+      allCollectionsTitled(collectionName).first());
     await waitFor.pageToFullyLoad();
   };
 
@@ -163,8 +165,8 @@ var LibraryPage = function() {
 
     var explorationCard = await allExplorationsTitled(explorationName).first();
     await waitFor.visibilityOf(
-      explorationCard ,'Unable to find exploration ' + explorationName);
-    await action.click('exploration card' ,explorationCard);
+      explorationCard, 'Unable to find exploration ' + explorationName);
+    await action.click('exploration card', explorationCard);
     await waitFor.pageToFullyLoad();
   };
 
@@ -184,7 +186,7 @@ var LibraryPage = function() {
   };
 
   this.clickCreateActivity = async function() {
-    await action.click('create activity button',createActivityButton);
+    await action.click('create activity button', createActivityButton);
     await waitFor.pageToFullyLoad();
   };
 
