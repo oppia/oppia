@@ -119,7 +119,7 @@ describe('Teach Page', () => {
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
-    expect(component.testimonialCount).toBe(4);
+    expect(component.testimonialCount).toBe(2);
     expect(component.classroomUrl).toBe('/learn/math');
     expect(component.isWindowNarrow).toBe(true);
   });
@@ -213,14 +213,15 @@ describe('Teach Page', () => {
     component.incrementDisplayedTestimonialId();
     expect(component.displayedTestimonialId).toBe(1);
     component.incrementDisplayedTestimonialId();
-    component.incrementDisplayedTestimonialId();
-    component.incrementDisplayedTestimonialId();
+    // Add back after testimonials are complete.
+    // component.incrementDisplayedTestimonialId();
+    // component.incrementDisplayedTestimonialId();
     expect(component.displayedTestimonialId).toBe(0);
 
     component.decrementDisplayedTestimonialId();
-    expect(component.displayedTestimonialId).toBe(3);
+    expect(component.displayedTestimonialId).toBe(1);
     component.decrementDisplayedTestimonialId();
-    expect(component.displayedTestimonialId).toBe(2);
+    expect(component.displayedTestimonialId).toBe(0);
   });
 
   it('should get testimonials correctly', function() {
