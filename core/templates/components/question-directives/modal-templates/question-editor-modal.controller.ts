@@ -26,10 +26,10 @@ require(
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/skill-editor-page/services/question-creation.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
-require('pages/skill-editor-page/services/question-creation.service.ts');
 
 angular.module('oppia').controller('QuestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
@@ -38,7 +38,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
   'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
-  'rubric', 'skillName', 'untriagedSkillSummaries','QuestionCreationService',
+  'rubric', 'skillName', 'untriagedSkillSummaries', 'QuestionCreationService',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
       ImageLocalStorageService, QuestionUndoRedoService,
@@ -61,10 +61,10 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
     $scope.skillName = skillName;
     $scope.rubric = rubric;
-    
+
     $scope.back = function() {
       QuestionCreationService.createQuestion();
-      $uibModalInstance.close()
+      $uibModalInstance.close();
     };
 
     $scope.getSkillEditorUrl = function(skillId) {
@@ -179,7 +179,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
         QuestionUndoRedoService.hasChanges() || (
           returnModalObject.skillLinkageModificationsArray.length) > 0) ||
           !$scope.isQuestionValid();
-    };    
+    };
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
         return;
