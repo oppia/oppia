@@ -2930,7 +2930,7 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
 
     def test_disallowed_removals(self):
         self.checker_test_object.checker.config.disallowed_functions = [
-            b'example_func'
+            b'example_func',
         ]
 
         call1 = astroid.extract_node(

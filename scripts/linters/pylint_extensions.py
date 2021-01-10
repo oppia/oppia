@@ -1956,6 +1956,13 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
                         'remove-disallowed-function-calls',
                         node=node, args=func_name)
                 else:
+                    replacement_msg = splits[1]
+                    if (
+                            'python_utils' in node.root().file
+                            and 'python_utils' in replacement_msg):
+                        # Allow python_utils to use disallowed function
+                        # in implementing the allowed function.
+                        return
                     self.add_message(
                         'replace-disallowed-function-calls',
                         node=node, args=(func_name, splits[1]))
