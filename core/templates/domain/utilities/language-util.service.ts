@@ -158,18 +158,20 @@ export class LanguageUtilService {
   }
 
   getLanguageDirection(languageCode: string): string {
-    for (let i = 0; i < this.SUPPORTED_CONTENT_LANGUAGES.length; i++) {
-      const language = this.SUPPORTED_CONTENT_LANGUAGES[i];
-      if (language.code === languageCode) {
-        return language.direction;
-      }
+    // Any overlap between Content Languages and Audio Languages should be
+    // identical. Each list should contain one entry per language code.
+    const matchingContentLanguage = this.SUPPORTED_CONTENT_LANGUAGES.find(
+      (language) => language.code === languageCode);
+    if (matchingContentLanguage !== undefined) {
+      return matchingContentLanguage.direction;
     }
-    for (let i = 0; i < this.SUPPORTED_AUDIO_LANGUAGES.length; i++) {
-      const language = this.SUPPORTED_AUDIO_LANGUAGES[i];
-      if (language.id === languageCode) {
-        return language.direction;
-      }
+
+    const matchingAudioLanguage = this.SUPPORTED_AUDIO_LANGUAGES.find(
+      (language) => language.id === languageCode);
+    if (matchingAudioLanguage !== undefined) {
+      return matchingAudioLanguage.direction;
     }
+
     throw new Error('Invalid language code: ' + languageCode);
   }
 
