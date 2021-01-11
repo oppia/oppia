@@ -77,37 +77,90 @@ class AuthClaims(python_utils.OBJECT):
 
 
 class UserAuthDetails(python_utils.OBJECT):
-    """Value object representing a user's authentication details information.
+    """Value object representing changes being made to a user's auth details.
 
-    Attributes:
-        user_id: str. The unique ID of the user.
-        gae_id: str or None. The ID of the user retrieved from GAE.
-        firebase_auth_id: str or None. The Firebase account ID of the user.
-        parent_user_id: str or None. For profile users, the user ID of the full
-            user associated with that profile. None for full users.
-        deleted: bool. Whether the user is marked as deleted and will be fully
-            deleted soon.
+    Invariants:
+        ((gae_id or firebase_auth_id) is not None) iff (parent_user_id is None).
+        or, equivalently:
+        (parent_user_id is not None) iff ((gae_id or firebase_auth_id) is None).
+
+    To enforce these invariants, client code should use the class methods:
+    from_auth_id, from_parent_user_id, and from_user_auth_details_model to
+    construct new instances.
     """
 
     def __init__(
-            self, user_id, gae_id=None, firebase_auth_id=None,
-            parent_user_id=None, deleted=False):
+            self, user_id, gae_id, firebase_auth_id, parent_user_id,
+            deleted=False):
         """Constructs a UserAuthDetails domain object.
 
         Args:
             user_id: str. The unique ID of the user.
-            gae_id: str or None. The ID of the user retrieved from GAE.
-            firebase_auth_id: str or None. The Firebase account ID of the user.
-            parent_user_id: str or None. For profile users, the user ID of the
-                full user associated with that profile. None for full users.
-            deleted: bool. Whether the user has requested removal of their
-                account.
+            gae_id: str. The ID of the user retrieved from GAE.
+            firebase_auth_id: str. The Firebase account ID of the user.
+            parent_user_id: str. For profile users, the user ID of the full user
+                associated with that profile. None for full users.
+            deleted: bool or None. Whether the user has requested removal of
+                their account.
         """
         self.user_id = user_id
         self.gae_id = gae_id
         self.firebase_auth_id = firebase_auth_id
         self.parent_user_id = parent_user_id
         self.deleted = deleted
+
+    @classmethod
+    def from_auth_id(cls, user_id, gae_id=None, firebase_auth_id=None):
+        """Constructs a new keychain with an auth_id from an identity provider.
+
+        Args:
+            user_id: str. A user ID produced by Oppia.
+            gae_id: str|None. An auth ID produced by Google AppEngine's user
+                auth services that corresponds to the given user_id.
+            firebase_auth_id: str|None. An auth ID produced by Firebase auth
+                servers that corresponds to the given user_id.
+
+        Returns:
+            UserKeychain. The new keychain object.
+
+        Raises:
+            ValueError. Did not provide exactly one value for auth_id.
+        """
+        num_auth_ids = sum(i is not None for i in (gae_id, firebase_auth_id))
+        if num_auth_ids != 1:
+            raise ValueError(
+                'want exactly one auth ID, got gae_id=%r and '
+                'firebase_auth_id=%r' % (gae_id, firebase_auth_id))
+        return cls(user_id, gae_id, firebase_auth_id, None)
+
+    @classmethod
+    def from_parent_user_id(cls, user_id, parent_user_id):
+        """Constructs a new keychain with a parent user account.
+
+        Args:
+            user_id: str. A user ID produced by Oppia.
+            parent_user_id: str. A user ID produced by Oppia. This user will be
+                treated as the parent account.
+
+        Returns:
+            UserKeychain. The new keychain object.
+
+        Raises:
+            ValueError. When the user's parent is itself.
+        """
+        if user_id == parent_user_id:
+            raise ValueError('profile user cannot be parent of itself')
+        return cls(user_id, None, None, parent_user_id)
+
+    @classmethod
+    def from_user_auth_details_model(cls, user_auth_details_model):
+        """Constructs a new keychain with values from a UserAuthDetailsModel."""
+        return cls(
+            user_auth_details_model.id,
+            user_auth_details_model.gae_id,
+            user_auth_details_model.firebase_auth_id,
+            user_auth_details_model.parent_user_id,
+            deleted=user_auth_details_model.deleted)
 
     def validate(self):
         """Checks that user_id, gae_id, firebase_auth_id, and parent_user_id
@@ -150,11 +203,11 @@ class UserAuthDetails(python_utils.OBJECT):
             raise utils.ValidationError(
                 'parent_user_id=%r has the wrong format' % self.parent_user_id)
 
-        if self.is_full_user() and self.parent_user_id:
+        if self.is_full_user() and self.parent_user_id is not None:
             raise utils.ValidationError(
                 'parent_user_id must not be set for a full user')
 
-        if not self.is_full_user() and not self.parent_user_id:
+        if not self.is_full_user() and self.parent_user_id is None:
             raise utils.ValidationError(
                 'parent_user_id must be set for a profile user')
 
@@ -166,13 +219,15 @@ class UserAuthDetails(python_utils.OBJECT):
         """
         return self.gae_id is not None or self.firebase_auth_id is not None
 
-    def to_dict_with_changes(self):
-        """Returns the properties in self with explicitly-assigned values.
+    def to_dict(self):
+        """Returns values corresponding to properties of UserAuthDetailsModel.
 
         Intended to provide syntax sugar when assigning values to models:
 
+            user_auth_details_changes.merge_with_model(user_auth_details_model)
+            user_auth_details_changes.validate()
             user_auth_details_model.populate(
-                **user_auth_details.to_dict_with_changes())
+                **user_auth_details_changes.to_dict())
 
         To prevent changing fields to be None unintentionally, the dict returned
         will only include values that are not None.
@@ -185,10 +240,9 @@ class UserAuthDetails(python_utils.OBJECT):
             dict(str: *). A dict with UserAuthDetailsModel property names as
             keys and values from self.
         """
-        property_changes = [
-            ('gae_id', self.gae_id),
-            ('firebase_auth_id', self.firebase_auth_id),
-            ('parent_user_id', self.parent_user_id),
-            ('deleted', self.deleted),
-        ]
-        return {name: val for name, val in property_changes if val is not None}
+        return {
+            'gae_id': self.gae_id,
+            'firebase_auth_id': self.firebase_auth_id,
+            'parent_user_id': self.parent_user_id,
+            'deleted': self.deleted,
+        }

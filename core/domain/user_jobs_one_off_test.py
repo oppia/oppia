@@ -1887,7 +1887,7 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
             auth_services.create_user_auth_details(self.USER_ID_1, 'auth_id'))
 
         user_auth_details_model = auth_models.UserAuthDetailsModel(
-            id=self.USER_ID_1, **user_auth_details.to_dict_with_changes())
+            id=self.USER_ID_1, **user_auth_details.to_dict())
         user_auth_details_model.update_timestamps()
         user_auth_details_model.put()
 

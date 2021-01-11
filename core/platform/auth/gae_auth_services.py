@@ -40,7 +40,7 @@ def create_user_auth_details(user_id, auth_id):
     Returns:
         UserAuthDetails. A UserAuthDetails domain object.
     """
-    return auth_domain.UserAuthDetails(user_id, gae_id=auth_id)
+    return auth_domain.UserAuthDetails.from_auth_id(user_id, gae_id=auth_id)
 
 
 def get_auth_claims_from_request(unused_request):

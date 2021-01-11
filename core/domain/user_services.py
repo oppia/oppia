@@ -1099,7 +1099,8 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
         raise Exception('Parent user not found.')
 
     return [
-        _get_user_auth_details_from_model(model) for model in
+        auth_domain.UserAuthDetails.from_user_auth_details_model(model)
+        for model in
         auth_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
             parent_user_id) if not model.deleted
     ]
@@ -1186,8 +1187,8 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
             pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 
-        user_auth_details = (
-            auth_domain.UserAuthDetails(user_id, parent_user_id=parent_user_id))
+        user_auth_details = auth_domain.UserAuthDetails.from_parent_user_id(
+            user_id, parent_user_id)
 
         # Each new profile user must be written to the datastore first and
         # because if we convert it into a batch write request, then calling
@@ -1276,8 +1277,7 @@ def _save_existing_users_auth_details(user_auth_details_list):
     for user_auth_details_model, user_auth_details in python_utils.ZIP(
             user_auth_models, user_auth_details_list):
         user_auth_details.validate()
-        user_auth_details_model.populate(
-            **user_auth_details.to_dict_with_changes())
+        user_auth_details_model.populate(**user_auth_details.to_dict())
     auth_models.UserAuthDetailsModel.update_timestamps_multi(user_auth_models)
     auth_models.UserAuthDetailsModel.put_multi(user_auth_models)
 
@@ -1295,7 +1295,7 @@ def _save_user_auth_details(user_auth_details):
     # a new one.
     user_auth_details_model = auth_models.UserAuthDetailsModel.get_by_id(
         user_auth_details.user_id)
-    user_auth_details_dict = user_auth_details.to_dict_with_changes()
+    user_auth_details_dict = user_auth_details.to_dict()
     if user_auth_details_model is not None:
         user_auth_details_model.populate(**user_auth_details_dict)
         user_auth_details_model.update_timestamps()
@@ -1322,7 +1322,7 @@ def get_multiple_user_auth_details(user_ids):
     """
     user_settings_models = auth_models.UserAuthDetailsModel.get_multi(user_ids)
     return [
-        _get_user_auth_details_from_model(model)
+        auth_domain.UserAuthDetails.from_user_auth_details_model(model)
         for model in user_settings_models if model is not None
     ]
 
@@ -1346,30 +1346,13 @@ def get_auth_details_by_user_id(user_id, strict=False):
     user_auth_details_model = (
         auth_models.UserAuthDetailsModel.get(user_id, strict=False))
     if user_auth_details_model is not None:
-        return _get_user_auth_details_from_model(user_auth_details_model)
+        return auth_domain.UserAuthDetails.from_user_auth_details_model(
+            user_auth_details_model)
     elif strict:
         logging.error('Could not find user with id %s' % user_id)
         raise Exception('User not found.')
     else:
         return None
-
-
-def _get_user_auth_details_from_model(user_auth_details_model):
-    """Transform user auth details storage model to domain object.
-
-    Args:
-        user_auth_details_model: UserAuthDetailsModel. The model to be
-            converted.
-
-    Returns:
-        UserAuthDetails. Domain object for user auth details.
-    """
-    return auth_domain.UserAuthDetails(
-        user_id=user_auth_details_model.id,
-        gae_id=user_auth_details_model.gae_id,
-        firebase_auth_id=user_auth_details_model.firebase_auth_id,
-        parent_user_id=user_auth_details_model.parent_user_id,
-        deleted=user_auth_details_model.deleted)
 
 
 def get_pseudonymous_username(pseudonymous_id):
@@ -1651,8 +1634,9 @@ def mark_user_for_deletion(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-    user_auth_details = _get_user_auth_details_from_model(
-        auth_models.UserAuthDetailsModel.get(user_id))
+    user_auth_details = (
+        auth_domain.UserAuthDetails.from_user_auth_details_model(
+            auth_models.UserAuthDetailsModel.get(user_id)))
     user_auth_details.deleted = True
     _save_user_auth_details(user_auth_details)
     auth_services.mark_user_for_deletion(user_id)
