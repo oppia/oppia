@@ -65,7 +65,7 @@ var ExplorationEditorSettingsTab = function() {
   this.deleteExploration = async function() {
     await waitFor.elementToBeClickable(
       deleteExplorationButton, 'Delete Exploration button is not clickable');
-    await action.click('delete Exploration Button', deleteExplorationButton);
+    await action.click('Delete Exploration Button', deleteExplorationButton);
 
     await waitFor.elementToBeClickable(
       confirmDeleteExplorationButton,
