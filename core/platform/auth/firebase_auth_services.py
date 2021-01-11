@@ -210,8 +210,8 @@ def delete_external_auth_associations(user_id):
 
 
 def verify_external_auth_associations_are_deleted(user_id):
-    """Returns whether all associations outside of Oppia referring to the given
-    user have been deleted.
+    """Returns true if and only if we have verified that all external auth
+    accounts have been deleted.
 
     Args:
         user_id: str. The unique ID of the user whose associations should be

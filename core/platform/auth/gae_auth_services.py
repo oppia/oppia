@@ -101,8 +101,8 @@ def delete_external_auth_associations(unused_user_id):
 
 
 def verify_external_auth_associations_are_deleted(unused_user_id):
-    """Returns whether all associations outside of Oppia referring to the given
-    user have been deleted.
+    """Returns true if and only if we have verified that all external auth
+    accounts have been deleted.
 
     There are no associations to GAE models managed outside of Oppia, so always
     returns True.

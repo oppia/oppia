@@ -642,8 +642,8 @@ class AuthServicesStub(python_utils.OBJECT):
         self._external_user_id_associations.discard(user_id)
 
     def verify_external_auth_associations_are_deleted(self, user_id):
-        """Returns whether all associations outside of Oppia referring to the
-        given user have been deleted.
+        """Returns true if and only if we have verified that all external auth
+        accounts have been deleted.
 
         This stub does not emulate an external association, so this operation
         always returns True.
