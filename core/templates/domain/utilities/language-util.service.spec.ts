@@ -194,4 +194,22 @@ describe('Language Constants', () => {
       }
     });
   });
+  describe('Content Languages', () => {
+    it('should have no duplicate entries for a given language code', () => {
+      const languageCodes = {};
+      CONSTANTS.SUPPORTED_CONTENT_LANGUAGES.forEach((contentLanguage) => {
+        expect(languageCodes[contentLanguage.code]).toBeUndefined();
+        languageCodes[contentLanguage.code] = true;
+      });
+    });
+  });
+  describe('Audio Languages', () => {
+    it('should have no duplicate entries for a given language code', () => {
+      const languageCodes = {};
+      CONSTANTS.SUPPORTED_AUDIO_LANGUAGES.forEach((audioLanguage) => {
+        expect(languageCodes[audioLanguage.id]).toBeUndefined();
+        languageCodes[audioLanguage.id] = true;
+      });
+    });
+  });
 });
