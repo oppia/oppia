@@ -41,14 +41,16 @@
     "REPO_SPECIFIC_CHANGE_MODULE_TARGET": "scripts.release_scripts.repo_specific_changes_fetcher",
     "SCHEMA_CONFIG_PATH": "feconf.py",
     "SCHEMA_VERSIONS_TO_JOBS_MAPPING": {
-        "CURRENT_COLLECTION_SCHEMA_VERSION": "CollectionMigrationOneOffJob",
-        "CURRENT_STATE_SCHEMA_VERSION": "ExplorationMigrationJobManager",
-        "CURRENT_SKILL_CONTENTS_SCHEMA_VERSION": "SkillMigrationOneOffJob",
-        "CURRENT_MISCONCEPTIONS_SCHEMA_VERSION": "SkillMigrationOneOffJob",
-        "CURRENT_RUBRIC_SCHEMA_VERSION": "SkillMigrationOneOffJob",
-        "CURRENT_STORY_CONTENTS_SCHEMA_VERSION": "StoryMigrationOneOffJob",
-        "CURRENT_SUBTOPIC_SCHEMA_VERSION": "TopicMigrationOneOffJob",
-        "CURRENT_STORY_REFERENCE_SCHEMA_VERSION": "TopicMigrationOneOffJob"
+        "CURRENT_COLLECTION_SCHEMA_VERSION": ["CollectionMigrationOneOffJob"],
+        "CURRENT_STATE_SCHEMA_VERSION": [
+            "ExplorationMigrationJobManager", "QuestionMigrationOneOffJob",
+            "QuestionSuggestionMigrationJobManager"],
+        "CURRENT_SKILL_CONTENTS_SCHEMA_VERSION": ["SkillMigrationOneOffJob"],
+        "CURRENT_MISCONCEPTIONS_SCHEMA_VERSION": ["SkillMigrationOneOffJob"],
+        "CURRENT_RUBRIC_SCHEMA_VERSION": ["SkillMigrationOneOffJob"],
+        "CURRENT_STORY_CONTENTS_SCHEMA_VERSION": ["StoryMigrationOneOffJob"],
+        "CURRENT_SUBTOPIC_SCHEMA_VERSION": ["TopicMigrationOneOffJob"],
+        "CURRENT_STORY_REFERENCE_SCHEMA_VERSION": ["TopicMigrationOneOffJob"]
     },
     "THIRD_PARTY_DIR": "third_party",
     "UPDATE_CONFIGS_MODULE_TARGET": "scripts.release_scripts.update_configs"
