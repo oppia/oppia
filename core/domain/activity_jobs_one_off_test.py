@@ -2095,6 +2095,10 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         ] = sorted(expected_results_dict['GREATER_THAN_375'])
         self.assertDictEqual(one_off_results_dict, expected_results_dict)
 
+    def test_job_can_run_multiple_times(self):
+        NUM_RUNS = 5
+        for i in range(NUM_RUNS):
+            self.test_message_counts_correct()
 
 class SnapshotMetadataCommitMsgShrinkOneOffJob(
         test_utils.GenericTestBase):
