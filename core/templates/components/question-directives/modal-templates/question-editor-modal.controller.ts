@@ -33,20 +33,22 @@ require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('QuestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
-  'ImageLocalStorageService', 'QuestionUndoRedoService',
+  'ImageLocalStorageService', 'QuestionCreationService',
+  'QuestionUndoRedoService',
   'QuestionValidationService', 'ShortSkillSummaryObjectFactory',
   'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
   'newQuestionIsBeingCreated', 'question', 'questionId', 'questionStateData',
-  'rubric', 'skillName', 'untriagedSkillSummaries', 'QuestionCreationService',
+  'rubric', 'skillName', 'untriagedSkillSummaries',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
-      ImageLocalStorageService, QuestionUndoRedoService,
+      ImageLocalStorageService, QuestionCreationService,
+      QuestionUndoRedoService,
       QuestionValidationService, ShortSkillSummaryObjectFactory,
       UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData,
-      rubric, skillName, untriagedSkillSummaries, QuestionCreationService) {
+      rubric, skillName, untriagedSkillSummaries) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
       commitMessage: ''
