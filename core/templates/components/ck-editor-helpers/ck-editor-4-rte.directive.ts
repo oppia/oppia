@@ -37,6 +37,24 @@ interface CkeditorCustomScope extends ng.IScope {
 angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
   function(CkEditorCopyContentService, ContextService, RteHelperService) {
+
+    /** Update a CKEditor config to include a UiConfig */
+    function _updateConfig(config: CKEDITOR.config, uiConfig: UiConfig) {
+
+      if (uiConfig.language) {
+        config.language = uiConfig.language;
+        config.contentsLanguage = uiConfig.language;
+      }
+      if (uiConfig.languageDirection) {
+        config.contentsLangDirection = (
+          uiConfig.languageDirection);
+      }
+      if (uiConfig.startupFocusEnabled !== undefined) {
+        config.startupFocus = uiConfig.startupFocusEnabled;
+      }
+      return config;
+    }
+
     return {
       restrict: 'E',
       scope: {
@@ -125,7 +143,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         CKEDITOR.plugins.addExternal(
           'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
 
-        const ckConfig:CKEDITOR.config = {
+        let ckConfig: CKEDITOR.config = {
           extraPlugins: 'pre,sharedspace,' + pluginNames,
           startupFocus: true,
           removePlugins: 'indentblock',
@@ -167,17 +185,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         };
 
         if (scope.uiConfig()) {
-          if (scope.uiConfig().language) {
-            ckConfig.language = scope.uiConfig().language;
-            ckConfig.contentsLanguage = scope.uiConfig().language;
-          }
-          if (scope.uiConfig().languageDirection) {
-            ckConfig.contentsLangDirection = (
-              scope.uiConfig().languageDirection);
-          }
-          if (scope.uiConfig().startupFocusEnabled !== undefined) {
-            ckConfig.startupFocus = scope.uiConfig().startupFocusEnabled;
-          }
+          ckConfig = _updateConfig(ckConfig, scope.uiConfig());
         }
 
         // Initialize CKEditor.
