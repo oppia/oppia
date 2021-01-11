@@ -52,7 +52,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         config.startupFocus = uiConfig.startupFocusEnabled;
       }
       return config;
-    }
+    };
 
     return {
       restrict: 'E',
