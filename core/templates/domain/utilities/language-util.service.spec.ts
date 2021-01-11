@@ -184,7 +184,7 @@ describe('Language util service', function() {
 });
 
 describe('Language Constants', () => {
-  it('should have no directional descrepencies between Content and Audio' +
+  it('should have no directional discrepancies between Content and Audio ' +
   'languages', () => {
     CONSTANTS.SUPPORTED_CONTENT_LANGUAGES.forEach((contentLanguage) => {
       const matchingLanguage = CONSTANTS.SUPPORTED_AUDIO_LANGUAGES.find(
