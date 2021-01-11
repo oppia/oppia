@@ -342,7 +342,6 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = async function(ratingValue) {
-    await browser.waitForAngularEnabled(false);
     await waitFor.elementToBeClickable(ratingStars.get(ratingValue - 1));
     await action.click('Submit Button', ratingStars.get(ratingValue - 1));
     await waitFor.visibilityOfSuccessToast(
@@ -351,7 +350,6 @@ var ExplorationPlayerPage = function() {
     await action.click('Feedback Close Button', feedbackCloseButton);
     await waitFor.invisibilityOf(
       feedbackCloseButton, 'Close Feedback button does not disappear');
-    await browser.waitForAngularEnabled(true);
   };
 
   // `answerData` is a variable that is passed to the
