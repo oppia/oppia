@@ -132,7 +132,7 @@ angular.module('oppia').component('explorationEditorTab', {
 
           var content = ExplorationStatesService.getStateContentMemento(
             ctrl.stateName);
-          if (content.getHtml() || stateData.interaction.id) {
+          if (content.html || stateData.interaction.id) {
             ctrl.interactionIsShown = true;
           }
 
