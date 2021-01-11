@@ -194,6 +194,7 @@ describe('Language Constants', () => {
       }
     });
   });
+
   describe('Content Languages', () => {
     it('should have no duplicate entries for a given language code', () => {
       const languageCodes = {};
@@ -203,6 +204,7 @@ describe('Language Constants', () => {
       });
     });
   });
+
   describe('Audio Languages', () => {
     it('should have no duplicate entries for a given language code', () => {
       const languageCodes = {};
