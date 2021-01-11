@@ -40,7 +40,7 @@ angular.module('oppia').controller('DisplaySolutionModalController', [
     $scope.isHint = false;
 
     var solution = HintsAndSolutionManagerService.displaySolution();
-    var solutionContentId = solution.explanation.getContentId();
+    var solutionContentId = solution.explanation.contentId;
     var displayedCard = PlayerTranscriptService.getCard(
       PlayerPositionService.getDisplayedCardIndex());
     var recordedVoiceovers = displayedCard.getRecordedVoiceovers();
@@ -48,7 +48,7 @@ angular.module('oppia').controller('DisplaySolutionModalController', [
     AudioTranslationManagerService.setSecondaryAudioTranslations(
       recordedVoiceovers.getBindableVoiceovers(
         solutionContentId),
-      solution.explanation.getHtml(), COMPONENT_NAME_SOLUTION);
+      solution.explanation.html, COMPONENT_NAME_SOLUTION);
 
     AudioPlayerService.onAutoplayAudio.emit();
 
