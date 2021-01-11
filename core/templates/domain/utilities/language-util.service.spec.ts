@@ -19,6 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import CONSTANTS from 'assets/constants';
 
 describe('Language util service', function() {
   var lus: LanguageUtilService = null;
@@ -179,5 +180,18 @@ describe('Language util service', function() {
       id: 'bg',
       text: 'български'
     }]);
+  });
+});
+
+describe('Language Constants', () => {
+  it('should have no directional descrepencies between Content and Audio' +
+  'languages', () => {
+    CONSTANTS.SUPPORTED_CONTENT_LANGUAGES.forEach((contentLanguage) => {
+      const matchingLanguage = CONSTANTS.SUPPORTED_AUDIO_LANGUAGES.find(
+        (audioLanguage) => audioLanguage.id === contentLanguage.code);
+      if (matchingLanguage !== undefined) {
+        expect(matchingLanguage.direction).toEqual(contentLanguage.direction);
+      }
+    });
   });
 });
