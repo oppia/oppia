@@ -56,7 +56,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
           currentContent: () => {
             let stateName = activeThread.getSuggestionStateName();
             let state = ExplorationStatesService.getState(stateName);
-            return state && state.content.getHtml();
+            return state && state.content.html;
           },
           newContent: () => activeThread.getReplacementHtmlFromSuggestion(),
           suggestionIsHandled: () => isSuggestionHandled(),
@@ -79,11 +79,11 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               let stateDict = ExplorationDataService.data.states[stateName];
               let state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
-              state.content.setHtml(
+              state.content.html = (
                 activeThread.getReplacementHtmlFromSuggestion());
               if (result.audioUpdateRequired) {
                 state.recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
-                  state.content.getContentId());
+                  state.content.contentId);
               }
               ExplorationDataService.data.version += 1;
               ExplorationStatesService.setState(stateName, state);

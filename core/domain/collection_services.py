@@ -567,9 +567,9 @@ def get_collection_summaries_where_user_has_role(user_id):
 
 
 def get_collection_ids_matching_query(
-        query_string, categories, language_codes, cursor=None):
+        query_string, categories, language_codes, offset=None):
     """Returns a list with all collection ids matching the given search query
-    string, as well as a search cursor for future fetches.
+    string, as well as a search offset for future fetches.
 
     Args:
         query_string: str. The search query string.
@@ -581,29 +581,29 @@ def get_collection_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        cursor: str or None. Cursor indicating where, in the list of
+        offset: str or None. Offset indicating where, in the list of
             collections, to start the search from.
 
     Returns:
-        2-tuple of (returned_collection_ids, search_cursor). Where:
+        2-tuple of (returned_collection_ids, search_offset). Where:
             returned_collection_ids : list(str). A list with all collection ids
                 matching the given search query string, as well as a search
-                cursor for future fetches. The list contains exactly
+                offset for future fetches. The list contains exactly
                 feconf.SEARCH_RESULTS_PAGE_SIZE results if there are at least
                 that many, otherwise it contains all remaining results. (If this
                 behaviour does not occur, an error will be logged.)
-            search_cursor: str. Search cursor for future fetches.
+            search_offset: str. Search offset for future fetches.
     """
     returned_collection_ids = []
-    search_cursor = cursor
+    search_offset = offset
 
     for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_collection_ids)
 
-        collection_ids, search_cursor = search_services.search_collections(
+        collection_ids, search_offset = search_services.search_collections(
             query_string, categories, language_codes, remaining_to_fetch,
-            cursor=search_cursor)
+            offset=search_offset)
 
         # Collection model cannot be None as we are fetching the collection ids
         # through query and there cannot be a collection id for which there is
@@ -613,13 +613,13 @@ def get_collection_ids_matching_query(
                     collection_ids)):
             returned_collection_ids.append(collection_ids[ind])
 
-        # The number of collections in a page is always lesser or equal to
+        # The number of collections in a page is always less than or equal to
         # feconf.SEARCH_RESULTS_PAGE_SIZE.
         if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
-                search_cursor is None):
+                search_offset is None):
             break
 
-    return (returned_collection_ids, search_cursor)
+    return (returned_collection_ids, search_offset)
 
 
 # Repository SAVE and DELETE methods.
