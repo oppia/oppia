@@ -22,7 +22,6 @@ import { SubtopicPageObjectFactory, SubtopicPageBackendDict, SubtopicPage } from
   'domain/topic/SubtopicPageObjectFactory';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-// ^^^ This block is to be removed.
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory.ts';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service.ts';
 import { Subscription } from 'rxjs';
@@ -478,7 +477,6 @@ describe('Topic editor state service', () => {
       expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
       topicEditorStateService.loadTopic('5');
-      // Expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
       tick(1000);
       expect(topicEditorStateService.hasLoadedTopic()).toBe(true);
