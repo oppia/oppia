@@ -27,6 +27,14 @@ from core.platform import models
 
 
 def _get_user_query_from_model(user_query_model):
+    """Transform user query model to domain object.
+
+    Args:
+        user_query_model: UserQueryModel. The model to be converted.
+
+    Returns:
+        UserQuery. User query domain object.
+    """
     user_query_params = user_query_domain.UserQueryParams(
         user_query_model.inactive_in_last_n_days,
         user_query_model.has_not_logged_in_for_n_days,
@@ -48,6 +56,15 @@ def _get_user_query_from_model(user_query_model):
 
 
 def get_user_query(query_id, strict=False):
+    """Gets the user query with some ID.
+
+    Args:
+        query_id: str. The ID of the query to get.
+        strict: bool. Whether to raise an error if the user query doesn't exist.
+
+    Returns:
+        UserQuery. The user query.
+    """
     user_query_model = user_models.UserQueryModel.get(query_id, strict=strict)
     return (
         _get_user_query_from_model(user_query_model)
@@ -56,6 +73,16 @@ def get_user_query(query_id, strict=False):
 
 
 def get_recent_user_queries(num_queries_to_fetch, cursor):
+    """Get recent user queries.
+
+    Args:
+        num_queries_to_fetch: int. Number of user queries to fetch.
+        cursor: str or None. The list of returned entities starts from this
+                datastore cursor.
+
+    Returns:
+        (list(QueryModel), str). The list of user queries.
+    """
     user_query_models, next_cursor, _ = user_models.UserQueryModel.fetch_page(
         num_queries_to_fetch, cursor)
 
@@ -66,6 +93,14 @@ def get_recent_user_queries(num_queries_to_fetch, cursor):
 
 
 def _save_user_query(user_query):
+    """Save the user query into the datastore.
+
+    Args:
+        user_query: UserQuery. The user query to save.
+
+    Returns:
+        UserQuery. The user query that was saved.
+    """
     user_query.validate()
 
     user_query_dict = {
@@ -103,7 +138,7 @@ def save_new_user_query(
         has_not_logged_in_for_n_days=None, created_at_least_n_exps=None,
         created_fewer_than_n_exps=None, edited_at_least_n_exps=None,
         edited_fewer_than_n_exps=None):
-    """Saves a new UserQueryModel instance in user_models.
+    """Save a new user query.
 
     Args:
         submitter_id: str. ID of the UserQueryModel instance.
@@ -118,7 +153,8 @@ def save_new_user_query(
         edited_fewer_than_n_exps: int|None. Maximum number of
             explorations edited by user.
 
-    Returns: UserQuery. The newly created UserQuery.
+    Returns:
+        UserQuery. The newly created UserQuery.
     """
     query_id = user_models.UserQueryModel.get_new_id('')
     user_query_params = user_query_domain.UserQueryParams(
@@ -136,6 +172,11 @@ def save_new_user_query(
 
 
 def archive_user_query(user_query):
+    """Archive the user query.
+
+    Args:
+        user_query: The user query to archive.
+    """
     user_query.archive()
     _save_user_query(user_query)
 
