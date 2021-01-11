@@ -141,6 +141,8 @@ class MockCommitLogEntryModelValidator(
 
 class BaseValidatorTests(test_utils.AuditJobsTestBase):
 
+    USER_ID = 'uid_%s' % ('a' * 32)
+
     def setUp(self):
         super(BaseValidatorTests, self).setUp()
         self.invalid_model = MockModel(id='mockmodel')
@@ -233,7 +235,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             base_model_validators.ExternalModelFetcherDetails(
                 'committer_ids', user_models.UserSettingsModel,
                 [
-                    feconf.MIGRATION_BOT_USER_ID, 'uid_%s' % ('a' * 32),
+                    feconf.MIGRATION_BOT_USER_ID, self.USER_ID,
                     self.PSEUDONYMOUS_ID
                 ]
             )
@@ -262,13 +264,13 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         user_settings_model = (
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids',
-                [feconf.MIGRATION_BOT_USER_ID, 'uid_%s' % ('a' * 32)],
+                [feconf.MIGRATION_BOT_USER_ID, self.USER_ID],
                 may_contain_system_ids=True,
                 may_contain_pseudonymous_ids=False
             ))
 
         self.assertItemsEqual(
-            user_settings_model.model_ids, ['uid_%s' % ('a' * 32)])
+            user_settings_model.model_ids, [self.USER_ID])
 
     def test_error_raised_if_model_ids_contain_system_ids(self):
         with self.assertRaisesRegexp(
@@ -276,7 +278,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             'The field \'committer_ids\' should not contain system IDs'):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', [
-                    feconf.MIGRATION_BOT_USER_ID, 'uid_%s' % ('a' * 32)],
+                    feconf.MIGRATION_BOT_USER_ID, self.USER_ID],
                 may_contain_system_ids=False,
                 may_contain_pseudonymous_ids=False
             )
@@ -284,20 +286,20 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
     def test_may_contain_pseudonymous_users_filters_pseudonymous_users(self):
         user_settings_model = (
             base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids', ['uid_%s' % ('a' * 32), self.PSEUDONYMOUS_ID],
+                'committer_ids', [self.USER_ID, self.PSEUDONYMOUS_ID],
                 may_contain_system_ids=False,
                 may_contain_pseudonymous_ids=True
             ))
 
         self.assertItemsEqual(
-            user_settings_model.model_ids, ['uid_%s' % ('a' * 32)])
+            user_settings_model.model_ids, [self.USER_ID])
 
     def test_error_raised_if_model_ids_contain_pseudonymous_ids(self):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'The field \'committer_ids\' should not contain pseudonymous IDs'):
             base_model_validators.UserSettingsModelFetcherDetails(
-                'committer_ids', [self.PSEUDONYMOUS_ID, 'uid_%s' % ('a' * 32)],
+                'committer_ids', [self.PSEUDONYMOUS_ID, self.USER_ID],
                 may_contain_system_ids=False,
                 may_contain_pseudonymous_ids=False
             )

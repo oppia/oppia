@@ -98,17 +98,13 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
                 'When fetching instances of UserSettingsModel, please use ' +
                 'UserSettingsModelFetcherDetails instead of ' +
                 'ExternalModelFetcherDetails')
-        filtered_model_ids = []
-        for model_id in model_ids:
-            if not model_id:
-                raise Exception(
-                    'A model id in the field \'%s\' '
-                    'is empty' % field_name)
-            else:
-                filtered_model_ids.append(model_id)
+        if not all(model_ids):
+            raise Exception(
+                'A model id in the field \'%s\' '
+                'is empty' % field_name)
         self.field_name = field_name
         self.model_class = model_class
-        self.model_ids = filtered_model_ids
+        self.model_ids = model_ids
 
 
 class UserSettingsModelFetcherDetails(python_utils.OBJECT):
