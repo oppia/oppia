@@ -131,7 +131,7 @@ def create_user_auth_details(user_id, auth_id):
     Returns:
         UserAuthDetails. A UserAuthDetails domain object.
     """
-    return auth_domain.UserAuthDetails.from_auth_id(
+    return auth_domain.UserAuthDetails.for_new_full_user(
         user_id, firebase_auth_id=auth_id)
 
 

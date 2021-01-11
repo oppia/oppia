@@ -77,31 +77,45 @@ class AuthClaims(python_utils.OBJECT):
 
 
 class UserAuthDetails(python_utils.OBJECT):
-    """Value object representing changes being made to a user's auth details.
+    """Domain object representing a user's authentication details.
 
-    Invariants:
-        ((gae_id or firebase_auth_id) is not None) iff (parent_user_id is None).
-        or, equivalently:
-        (parent_user_id is not None) iff ((gae_id or firebase_auth_id) is None).
+    There are two distinct types of user accounts: "profile" and "full".
+        Profile: An account that depends on its "parent user" for
+            authentication. These accounts are not directly associated with any
+            identiy providers.
+        Full: An account that is directly associated with an identity provider.
+            The provider's auth_id value will be kept in a corresponding
+            property (e.g., gae_id for Google AppEngine authentication and
+            firebase_auth_id for Firebase authentication).
 
-    To enforce these invariants, client code should use the class methods:
-    from_auth_id, from_parent_user_id, and from_user_auth_details_model to
-    construct new instances.
+    The distinction between profile and full user accounts are enforced by
+    invariants on the auth-related properties: gae_id, firebase_auth_id, and
+    parent_user_id. Specifically: parent_user_id is not None if and only if
+    auth_id is None (where auth_id is: gae_id or firebase_auth_id).
+
+    To maintain these invariants, client code should **always** use the class
+    methods: for_new_full_user, for_new_profile_user, and for_existing_user; to
+    create new UserAuthDetails instances.
     """
 
     def __init__(
             self, user_id, gae_id, firebase_auth_id, parent_user_id,
             deleted=False):
-        """Constructs a UserAuthDetails domain object.
+        """Initializes a new UserAuthDetails domain object.
+
+        DO NOT USE DIRECTLY! This domain object has invariants that need to be
+        met, so use one of the "from_*" class methods to ensure a valid value is
+        being used.
 
         Args:
             user_id: str. The unique ID of the user.
-            gae_id: str. The ID of the user retrieved from GAE.
-            firebase_auth_id: str. The Firebase account ID of the user.
-            parent_user_id: str. For profile users, the user ID of the full user
-                associated with that profile. None for full users.
-            deleted: bool or None. Whether the user has requested removal of
-                their account.
+            gae_id: str. The ID of the user provided by GAE auth services.
+            firebase_auth_id: str. The ID of the user provided by Firebase auth
+                services.
+            parent_user_id: str|None. For profile users, the user ID of the full
+                user account that owns the profile. Otherwise this value should
+                be None.
+            deleted: bool. Whether the user has requested an account deletion.
         """
         self.user_id = user_id
         self.gae_id = gae_id
@@ -110,51 +124,50 @@ class UserAuthDetails(python_utils.OBJECT):
         self.deleted = deleted
 
     @classmethod
-    def from_auth_id(cls, user_id, gae_id=None, firebase_auth_id=None):
-        """Constructs a new keychain with an auth_id from an identity provider.
+    def for_new_full_user(cls, user_id, gae_id=None, firebase_auth_id=None):
+        """Returns a domain object for a new full user's account.
 
         Args:
             user_id: str. A user ID produced by Oppia.
-            gae_id: str|None. An auth ID produced by Google AppEngine's user
-                auth services that corresponds to the given user_id.
-            firebase_auth_id: str|None. An auth ID produced by Firebase auth
-                servers that corresponds to the given user_id.
+            gae_id: str|None. The ID of the user provided by GAE auth services.
+            firebase_auth_id: str|None. The ID of the user provided by Firebase
+                auth services.
 
         Returns:
-            UserKeychain. The new keychain object.
+            UserAuthDetails. The new domain object.
 
         Raises:
-            ValueError. Did not provide exactly one value for auth_id.
+            ValueError. The number of provided auth IDs is not exactly 1.
         """
         num_auth_ids = sum(i is not None for i in (gae_id, firebase_auth_id))
         if num_auth_ids != 1:
             raise ValueError(
-                'want exactly one auth ID, got gae_id=%r and '
+                'want exactly one auth ID, but got gae_id=%r and '
                 'firebase_auth_id=%r' % (gae_id, firebase_auth_id))
         return cls(user_id, gae_id, firebase_auth_id, None)
 
     @classmethod
-    def from_parent_user_id(cls, user_id, parent_user_id):
-        """Constructs a new keychain with a parent user account.
+    def for_new_profile_user(cls, user_id, parent_user_id):
+        """Returns a domain object for a new profile user's account.
 
         Args:
-            user_id: str. A user ID produced by Oppia.
-            parent_user_id: str. A user ID produced by Oppia. This user will be
-                treated as the parent account.
+            user_id: str. A user ID produced by Oppia for the new profile user.
+            parent_user_id: str. The user ID of the full user account which owns
+                the new profile account.
 
         Returns:
-            UserKeychain. The new keychain object.
+            UserAuthDetails. The new domain object.
 
         Raises:
             ValueError. When the user's parent is itself.
         """
         if user_id == parent_user_id:
-            raise ValueError('profile user cannot be parent of itself')
+            raise ValueError('user cannot be its own parent')
         return cls(user_id, None, None, parent_user_id)
 
     @classmethod
-    def from_user_auth_details_model(cls, user_auth_details_model):
-        """Constructs a new keychain with values from a UserAuthDetailsModel."""
+    def for_existing_user(cls, user_auth_details_model):
+        """Returns a domain object for an existing user account."""
         return cls(
             user_auth_details_model.id,
             user_auth_details_model.gae_id,
@@ -163,8 +176,8 @@ class UserAuthDetails(python_utils.OBJECT):
             deleted=user_auth_details_model.deleted)
 
     def validate(self):
-        """Checks that user_id, gae_id, firebase_auth_id, and parent_user_id
-        fields of this UserAuthDetails domain object are valid.
+        """Checks whether user_id, gae_id, firebase_auth_id, and parent_user_id
+        are valid.
 
         Raises:
             ValidationError. The user_id is not specified.
@@ -212,33 +225,24 @@ class UserAuthDetails(python_utils.OBJECT):
                 'parent_user_id must be set for a profile user')
 
     def is_full_user(self):
-        """Returns whether the user is a full user (not a profile user).
-
-        Returns:
-            bool. Whether the user is a full user (not a profile user).
-        """
+        """Returns whether self refers to a full user account."""
         return self.gae_id is not None or self.firebase_auth_id is not None
 
     def to_dict(self):
-        """Returns values corresponding to properties of UserAuthDetailsModel.
+        """Returns values corresponding to UserAuthDetailsModel's properties.
 
-        Intended to provide syntax sugar when assigning values to models:
+        Intended to provide syntax sugar for assigning data to a model:
+            user_auth_details.validate()
+            user_auth_details_model.populate(**user_auth_details.to_dict())
 
-            user_auth_details_changes.merge_with_model(user_auth_details_model)
-            user_auth_details_changes.validate()
-            user_auth_details_model.populate(
-                **user_auth_details_changes.to_dict())
-
-        To prevent changing fields to be None unintentionally, the dict returned
-        will only include values that are not None.
-
-        Note that the dict does not include user_id because that value functions
-        as UserAuthDetailsModel's key. Keys are distinct from properties, and
-        cannot be re-assigned with `populate()`.
+        NOTE: The dict returned does not include user_id because that value is
+        UserAuthDetailsModel's key. Keys are distinct from normal properties and
+        cannot be re-assigned using the `populate()` method; trying to do so
+        will raise an exception.
 
         Returns:
-            dict(str: *). A dict with UserAuthDetailsModel property names as
-            keys and values from self.
+            dict(str:*). A dict of values taken from self using
+            UserAuthDetailsModel property names as keys.
         """
         return {
             'gae_id': self.gae_id,

@@ -593,7 +593,7 @@ class AuthServicesStub(python_utils.OBJECT):
             UserAuthDetails. A UserAuthDetails domain object.
         """
         self._external_user_id_associations.add(user_id)
-        return auth_domain.UserAuthDetails.from_auth_id(
+        return auth_domain.UserAuthDetails.for_new_full_user(
             user_id, firebase_auth_id=auth_id)
 
     @classmethod

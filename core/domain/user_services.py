@@ -1099,7 +1099,7 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
         raise Exception('Parent user not found.')
 
     return [
-        auth_domain.UserAuthDetails.from_user_auth_details_model(model)
+        auth_domain.UserAuthDetails.for_existing_user(model)
         for model in
         auth_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
             parent_user_id) if not model.deleted
@@ -1187,7 +1187,7 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
             pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 
-        user_auth_details = auth_domain.UserAuthDetails.from_parent_user_id(
+        user_auth_details = auth_domain.UserAuthDetails.for_new_profile_user(
             user_id, parent_user_id)
 
         # Each new profile user must be written to the datastore first and
@@ -1322,7 +1322,7 @@ def get_multiple_user_auth_details(user_ids):
     """
     user_settings_models = auth_models.UserAuthDetailsModel.get_multi(user_ids)
     return [
-        auth_domain.UserAuthDetails.from_user_auth_details_model(model)
+        auth_domain.UserAuthDetails.for_existing_user(model)
         for model in user_settings_models if model is not None
     ]
 
@@ -1346,7 +1346,7 @@ def get_auth_details_by_user_id(user_id, strict=False):
     user_auth_details_model = (
         auth_models.UserAuthDetailsModel.get(user_id, strict=False))
     if user_auth_details_model is not None:
-        return auth_domain.UserAuthDetails.from_user_auth_details_model(
+        return auth_domain.UserAuthDetails.for_existing_user(
             user_auth_details_model)
     elif strict:
         logging.error('Could not find user with id %s' % user_id)
@@ -1634,9 +1634,8 @@ def mark_user_for_deletion(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-    user_auth_details = (
-        auth_domain.UserAuthDetails.from_user_auth_details_model(
-            auth_models.UserAuthDetailsModel.get(user_id)))
+    user_auth_details = auth_domain.UserAuthDetails.for_existing_user(
+        auth_models.UserAuthDetailsModel.get(user_id))
     user_auth_details.deleted = True
     _save_user_auth_details(user_auth_details)
     auth_services.mark_user_for_deletion(user_id)

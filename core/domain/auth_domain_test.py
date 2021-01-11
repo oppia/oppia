@@ -89,14 +89,13 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_auth_details_model = (
             auth_models.UserAuthDetailsModel.get(self.owner_id))
-        self.user_auth_details = (
-            auth_domain.UserAuthDetails.from_user_auth_details_model(
-                self.user_auth_details_model))
+        self.user_auth_details = auth_domain.UserAuthDetails.for_existing_user(
+            self.user_auth_details_model)
         self.auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)
         self.user_auth_details.validate()
 
-    def test_from_gae_auth_id(self):
-        gae_user_auth_details = auth_domain.UserAuthDetails.from_auth_id(
+    def test_for_new_full_user_with_gae_auth_id(self):
+        gae_user_auth_details = auth_domain.UserAuthDetails.for_new_full_user(
             'uid', gae_id='aid')
 
         self.assertEqual(gae_user_auth_details.user_id, 'uid')
@@ -105,9 +104,10 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.assertIsNone(gae_user_auth_details.parent_user_id)
         self.assertFalse(gae_user_auth_details.deleted)
 
-    def test_from_firebase_auth_id(self):
-        firebase_user_auth_details = auth_domain.UserAuthDetails.from_auth_id(
-            'uid', firebase_auth_id='aid')
+    def test_for_new_full_user_with_firebase_auth_id(self):
+        firebase_user_auth_details = (
+            auth_domain.UserAuthDetails.for_new_full_user(
+                'uid', firebase_auth_id='aid'))
 
         self.assertEqual(firebase_user_auth_details.user_id, 'uid')
         self.assertEqual(firebase_user_auth_details.firebase_auth_id, 'aid')
@@ -115,17 +115,17 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.assertIsNone(firebase_user_auth_details.parent_user_id)
         self.assertFalse(firebase_user_auth_details.deleted)
 
-    def test_from_auth_id_with_too_many_providers_is_error(self):
+    def test_for_new_full_user_with_too_many_auth_ids_is_error(self):
         with self.assertRaisesRegexp(ValueError, 'want exactly one auth ID'):
-            auth_domain.UserAuthDetails.from_auth_id(
+            auth_domain.UserAuthDetails.for_new_full_user(
                 'uid', gae_id='aid1', firebase_auth_id='aid2')
 
-    def test_from_auth_id_without_any_providers_is_error(self):
+    def test_for_new_full_user_without_any_auth_ids_is_error(self):
         with self.assertRaisesRegexp(ValueError, 'want exactly one auth ID'):
-            auth_domain.UserAuthDetails.from_auth_id('uid')
+            auth_domain.UserAuthDetails.for_new_full_user('uid')
 
-    def test_from_parent_user_id(self):
-        user_auth_details = auth_domain.UserAuthDetails.from_parent_user_id(
+    def test_for_new_profile_user(self):
+        user_auth_details = auth_domain.UserAuthDetails.for_new_profile_user(
             'uid', 'pid')
 
         self.assertEqual(user_auth_details.user_id, 'uid')
@@ -134,9 +134,9 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.assertIsNone(user_auth_details.firebase_auth_id)
         self.assertFalse(user_auth_details.deleted)
 
-    def test_from_parent_user_id_with_user_as_its_own_parent_is_error(self):
-        with self.assertRaisesRegexp(ValueError, 'cannot be parent of itself'):
-            auth_domain.UserAuthDetails.from_parent_user_id('uid', 'uid')
+    def test_for_new_profile_user_with_user_as_its_own_parent_is_error(self):
+        with self.assertRaisesRegexp(ValueError, 'cannot be its own parent'):
+            auth_domain.UserAuthDetails.for_new_profile_user('uid', 'uid')
 
     def test_validate_non_str_user_id(self):
         self.user_auth_details.user_id = 123
