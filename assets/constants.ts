@@ -5509,5 +5509,10 @@ export default {
   "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
     "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
 
-  "DEV_MODE": true
+  "DEV_MODE": true,
+
+  // Maximum allowed commit message length. 375 characters because indexed
+  // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
+  // up to 4 bytes long.
+  "MAX_COMMIT_MESSAGE_LENGTH": 375
 } as const;
