@@ -28,7 +28,7 @@ angular.module('oppia').controller('SuggestionModalForCreatorViewController', [
       canReviewActiveThread, description, newContent, oldContent,
       stateName, suggestionIsHandled, suggestionStatus,
       suggestionType, ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
-      MAX_COMMIT_MESSAGE_LENGTH,
+      MAX_COMMIT_MESSAGE_LENGTH
   ) {
     $scope.isNotHandled = !suggestionIsHandled;
     $scope.canReject = $scope.isNotHandled;

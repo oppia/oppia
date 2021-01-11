@@ -45,7 +45,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
       UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
       newQuestionIsBeingCreated, question, questionId, questionStateData,
-      rubric, skillName, untriagedSkillSummaries, MAX_COMMIT_MESSAGE_LENGTH,) {
+      rubric, skillName, untriagedSkillSummaries, MAX_COMMIT_MESSAGE_LENGTH) {
     var returnModalObject = {
       skillLinkageModificationsArray: [],
       commitMessage: ''

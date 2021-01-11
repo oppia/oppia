@@ -62,7 +62,7 @@ angular.module('oppia').component('storyEditorPage', {
         PageTitleService, StoryEditorNavigationService,
         StoryEditorStateService, StoryValidationService, UndoRedoService,
         UrlInterpolationService, UrlService, WindowRef,
-        MAX_COMMIT_MESSAGE_LENGTH,) {
+        MAX_COMMIT_MESSAGE_LENGTH) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
       ctrl.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;

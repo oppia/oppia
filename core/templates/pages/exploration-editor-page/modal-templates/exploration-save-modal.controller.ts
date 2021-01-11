@@ -25,7 +25,7 @@ angular.module('oppia').controller('ExplorationSaveModalController', [
   'diffData', 'isExplorationPrivate', 'MAX_COMMIT_MESSAGE_LENGTH',
   function(
       $controller, $scope, $uibModalInstance,
-      diffData, isExplorationPrivate, MAX_COMMIT_MESSAGE_LENGTH,) {
+      diffData, isExplorationPrivate, MAX_COMMIT_MESSAGE_LENGTH) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
       $uibModalInstance: $uibModalInstance

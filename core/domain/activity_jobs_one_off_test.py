@@ -2097,7 +2097,7 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
 
     def test_job_can_run_multiple_times(self):
         NUM_RUNS = 5
-        for i in range(NUM_RUNS):
+        for _ in python_utils.RANGE(NUM_RUNS):
             self.test_message_counts_correct()
 
 class SnapshotMetadataCommitMsgShrinkOneOffJob(
