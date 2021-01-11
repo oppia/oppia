@@ -37,9 +37,15 @@ interface CkeditorCustomScope extends ng.IScope {
 angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
   function(CkEditorCopyContentService, ContextService, RteHelperService) {
-    /** Update a CKEditor config to include a UiConfig */
+    /**
+     * Takes in a CKEditor configuration and parameters to add to that
+     * configuration and returns the new CKeditor configuration.
+     * @param config CKEditor config to add to
+     * @param uiConfig Parameters to add to CKEditor config
+     * @modifies config
+     */
     const _updateConfig = function(
-        config: CKEDITOR.config, uiConfig: UiConfig) {
+        config: CKEDITOR.config, uiConfig: UiConfig): CKEDITOR.config {
       if (uiConfig.language) {
         config.language = uiConfig.language;
         config.contentsLanguage = uiConfig.language;
