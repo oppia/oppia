@@ -23,7 +23,8 @@ require(
 angular.module('oppia').controller('TopicEditorSaveModalController', [
   '$controller', '$scope', '$uibModalInstance', 'topicIsPublished',
   'MAX_COMMIT_MESSAGE_LENGTH',
-  function($controller, $scope, $uibModalInstance, topicIsPublished,
+  function(
+    $controller, $scope, $uibModalInstance, topicIsPublished,
     MAX_COMMIT_MESSAGE_LENGTH)
   {
     $controller('ConfirmOrCancelModalController', {
