@@ -395,7 +395,7 @@ var StoryEditorPage = function() {
     await action.click('Chapter Title Button', chapterTitleButton);
   };
 
-  this.expectNodeOutlineToMatch = function(nodeOutline) {
+  this.expectNodeOutlineToMatch = async function(nodeOutline) {
     await waitFor.visibilityOf(
       nodeOutlineEditorRteContent.first(),
       'NodeOutlineEditorRteContent takes too long to appear');
