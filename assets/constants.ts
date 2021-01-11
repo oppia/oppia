@@ -5237,6 +5237,7 @@ export default {
       "ImageClickInput",
       "ItemSelectionInput",
       "MultipleChoiceInput",
+      "NumericInput",
       "TextInput",
       "DragAndDropSortInput"
     ]

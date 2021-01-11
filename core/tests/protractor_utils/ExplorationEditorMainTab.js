@@ -614,10 +614,12 @@ var ExplorationEditorMainTab = function() {
       ImageClickInput: 'General',
       ItemSelectionInput: 'General',
       MultipleChoiceInput: 'General',
+      NumericInput: 'General',
       TextInput: 'General',
       FractionInput: 'Math',
       GraphInput: 'Math',
       LogicProof: 'Math',
+      // eslint-disable-next-line no-dupe-keys
       NumericInput: 'Math',
       SetInput: 'Math',
       AlgebraicExpressionInput: 'Math',

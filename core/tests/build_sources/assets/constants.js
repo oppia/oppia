@@ -461,6 +461,7 @@ var constants = {
         "ImageClickInput",
         "ItemSelectionInput",
         "MultipleChoiceInput",
+        "NumericInput",
         "TextInput",
         "DragAndDropSortInput"
     ]
