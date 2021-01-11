@@ -22,13 +22,13 @@ import { SubtopicPageObjectFactory, SubtopicPageBackendDict, SubtopicPage } from
   'domain/topic/SubtopicPageObjectFactory';
 import { TopicRights } from 'domain/topic/topic-rights.model';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-// ^^^ This block is to be removed.
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory.ts';
+import { TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory.ts';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service.ts';
 import { Subscription } from 'rxjs';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { StorySummaryBackendDict } from 'domain/story/story-summary.model';
 
 
 describe('Topic editor state service', () => {
@@ -50,12 +50,12 @@ describe('Topic editor state service', () => {
   const topicReinitializedSpy = jasmine.createSpy('topicReinitialized');
 
   class MockEditableTopicBackendApiService {
-    newBackendSubtopicPageObject= {};
-    newBackendTopicObject = {};
-    backendStorySummariesObject = [];
+    newBackendSubtopicPageObject: Record<string, SubtopicPageBackendDict>= {};
+    newBackendTopicObject: Record<string, TopicBackendDict> = {};
+    backendStorySummariesObject: StorySummaryBackendDict | undefined[] = [];
     failure: null;
 
-    fetchTopic():Promise<unknown> {
+    fetchTopic():Promise<Record<string, TopicBackendDict>> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(this.newBackendTopicObject);
@@ -64,7 +64,7 @@ describe('Topic editor state service', () => {
         }
       });
     }
-    updateTopic():Promise<unknown> {
+    updateTopic():Promise<Record<string, TopicBackendDict>> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(this.newBackendTopicObject);
@@ -73,7 +73,7 @@ describe('Topic editor state service', () => {
         }
       });
     }
-    fetchStories():Promise<unknown> {
+    fetchStories():Promise<StorySummaryBackendDict | undefined[]> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(this.backendStorySummariesObject);
@@ -83,7 +83,7 @@ describe('Topic editor state service', () => {
       });
     }
 
-    fetchSubtopicPage():Promise<unknown> {
+    fetchSubtopicPage():Promise<Record<string, SubtopicPageBackendDict>> {
       return new Promise((resolve, reject) => {
         if (!this.failure) {
           resolve(this.newBackendSubtopicPageObject);
@@ -478,7 +478,6 @@ describe('Topic editor state service', () => {
       expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
       topicEditorStateService.loadTopic('5');
-      // Expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
       tick(1000);
       expect(topicEditorStateService.hasLoadedTopic()).toBe(true);

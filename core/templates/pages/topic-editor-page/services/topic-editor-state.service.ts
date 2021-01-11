@@ -74,10 +74,12 @@ export class TopicEditorStateService {
   };
   private _classroomUrlFragment = 'staging';
   private _storySummariesInitializedEventEmitter = new EventEmitter();
-  private _subtopicPageLoadedEventEmitter = new EventEmitter();
-
-  private _topicInitializedEventEmitter = new EventEmitter();
-  private _topicReinitializedEventEmitter = new EventEmitter();
+  private _subtopicPageLoadedEventEmitter: EventEmitter<void> =
+   new EventEmitter();
+  private _topicInitializedEventEmitter: EventEmitter<void> =
+   new EventEmitter();
+  private _topicReinitializedEventEmitter: EventEmitter<void> =
+   new EventEmitter();
 
   private _getSubtopicPageId(topicId: string, subtopicId: number):string {
     return topicId + '-' + subtopicId.toString();
@@ -483,11 +485,11 @@ export class TopicEditorStateService {
     return this._topicIsBeingSaved;
   }
 
-  get onTopicInitialized(): EventEmitter<unknown> {
+  get onTopicInitialized(): EventEmitter<void> {
     return this._topicInitializedEventEmitter;
   }
 
-  get onTopicReinitialized(): EventEmitter<unknown> {
+  get onTopicReinitialized(): EventEmitter<void> {
     return this._topicReinitializedEventEmitter;
   }
   /**
@@ -548,11 +550,11 @@ export class TopicEditorStateService {
       });
   }
 
-  get onStorySummariesInitialized(): EventEmitter<unknown> {
+  get onStorySummariesInitialized(): EventEmitter<void> {
     return this._storySummariesInitializedEventEmitter;
   }
 
-  get onSubtopicPageLoaded(): EventEmitter<unknown> {
+  get onSubtopicPageLoaded(): EventEmitter<void> {
     return this._subtopicPageLoadedEventEmitter;
   }
 }
