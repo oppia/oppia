@@ -87,7 +87,7 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
                 $attrs
               );
 
-              return choices[ctrl.choices.indexOf(html)].getContentId();
+              return choices[ctrl.choices.indexOf(html)].contentId;
             };
 
             const htmlAnswers = Object.keys(ctrl.userSelections).filter(
@@ -110,7 +110,7 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
               'ItemSelectionInput',
               $attrs
             );
-            ctrl.choices = choices.map(choice => choice.getHtml());
+            ctrl.choices = choices.map(choice => choice.html);
             ctrl.maxAllowableSelectionCount = maxAllowableSelectionCount;
             ctrl.minAllowableSelectionCount = minAllowableSelectionCount;
 

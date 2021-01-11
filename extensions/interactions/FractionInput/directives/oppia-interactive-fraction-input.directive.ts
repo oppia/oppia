@@ -158,7 +158,7 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
               $attrs
             );
             ctrl.allowNonzeroIntegerPart = allowNonzeroIntegerPart;
-            ctrl.customPlaceholder = customPlaceholder.getUnicode();
+            ctrl.customPlaceholder = customPlaceholder.unicode;
 
             ctrl.FRACTION_INPUT_FORM_SCHEMA = {
               type: 'unicode',
