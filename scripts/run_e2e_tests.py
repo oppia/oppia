@@ -44,8 +44,7 @@ PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
 # Path relative to current working directory where portserver socket
 # file will be created.
-PORTSERVER_SOCKET_FILEPATH = os.path.join(
-    os.getcwd(), 'portserver.socket')
+PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
 KILL_TIMEOUT_SECS = 10
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
@@ -180,12 +179,14 @@ def cleanup():
     """
     google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     webdriver_download_path = '%s/selenium' % WEBDRIVER_HOME_PATH
+    elasticsearch_path = '%s/' % common.ES_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
     processes_to_kill = [
         '.*%s.*' % re.escape(google_app_engine_path),
-        '.*%s.*' % re.escape(webdriver_download_path)
+        '.*%s.*' % re.escape(webdriver_download_path),
+        '.*%s.*' % re.escape(elasticsearch_path),
     ]
     for p in SUBPROCESSES:
         _kill_process(p)
@@ -544,7 +545,7 @@ def run_tests(args):
         common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
         python_utils.PRINT(
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
+            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
             'core/tests/protractor.conf.js, you can view screenshots'
             'of the failed tests in ../protractor-screenshots/')
         commands = [common.NODE_BIN_PATH]
