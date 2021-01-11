@@ -1312,7 +1312,7 @@ span.sort-explorations-select .sort-order {
 /* Rules for the tiles in the creator dashboard. */
 
 .oppia-dashboard-intro-button {
-   background-color: #00645c;
+  background-color: #00645c;
   border-radius: 4px;
   color: #fff;
   font-family: "Roboto", Arial, sans-serif;
