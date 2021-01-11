@@ -52,13 +52,13 @@ export class DateTimeFormatService {
   }
   /**
    * This function converts a millisecond date to a date in the
-   * format 'MMM D HH:mm A' along with time.
+   * format 'MMM D YYYY HH:mm A' along with time.
    * @param {number} millisSinceEpoch - The millisecond date to be converted
    * @returns {string} a date and time string
    */
   getLocaleDateTimeHourString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
-    return dayjs(date).format('MMM D hh:mm A');
+    return dayjs(date).format('MMM D YYYY hh:mm A');
   }
   /**
    * This function converts a millisecond date to a date string, using locale

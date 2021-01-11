@@ -73,7 +73,7 @@ describe('datetimeformatter', () => {
 
   it('should provide date time hour string', function() {
     expect(df.getLocaleDateTimeHourString(NOW_MILLIS)).toBe(
-      dayjs(new Date(NOW_MILLIS)).format('MMM D hh:mm A')
+      dayjs(new Date(NOW_MILLIS)).format('MMM D YYYY hh:mm A')
     );
   });
 
