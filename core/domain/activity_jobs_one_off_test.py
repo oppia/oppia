@@ -2096,9 +2096,10 @@ class SnapshotMetadataCommitMsgAuditOneOffJob(
         self.assertDictEqual(one_off_results_dict, expected_results_dict)
 
     def test_job_can_run_multiple_times(self):
-        NUM_RUNS = 5
-        for _ in python_utils.RANGE(NUM_RUNS):
+        num_test_runs = 5
+        for _ in python_utils.RANGE(num_test_runs):
             self.test_message_counts_correct()
+
 
 class SnapshotMetadataCommitMsgShrinkOneOffJob(
         test_utils.GenericTestBase):
