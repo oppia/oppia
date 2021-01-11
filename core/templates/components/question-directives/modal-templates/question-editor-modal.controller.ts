@@ -66,7 +66,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
 
     $scope.back = function() {
       QuestionCreationService.createQuestion();
-      $uibModalInstance.close();
+      $uibModalInstance.dismiss();
     };
 
     $scope.getSkillEditorUrl = function(skillId) {

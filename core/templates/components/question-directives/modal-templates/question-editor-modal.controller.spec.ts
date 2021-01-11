@@ -182,7 +182,7 @@ describe('Question Editor Modal Controller', function() {
       var questionSpy = spyOn(QuestionCreationService, 'createQuestion');
       $scope.back();
       expect(questionSpy).toHaveBeenCalled();
-      expect($uibModalInstance.close).toHaveBeenCalled();
+      expect($uibModalInstance.dismiss).toHaveBeenCalled();
     });
 
     it('should initialize $scope properties after controller is initialized',
