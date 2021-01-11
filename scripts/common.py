@@ -845,13 +845,13 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         for proc in procs_to_kill:
             if proc.is_running():
                 procs_still_alive.append(proc)
+                logging.info('Terminating %s...' % get_debug_info(proc))
                 try:
                     proc.terminate()
                 except psutil.NoSuchProcess:
                     logging.info(
                         'Could not terminate process %s: no such process' %
                         proc.pid)
-                logging.info('Terminating %s...' % get_debug_info(proc))
             else:
                 logging.info('%s has ended.' % get_debug_info(proc))
 
