@@ -83,7 +83,7 @@ def _acquire_firebase_context():
 
 
 def _verify_id_token(auth_header):
-    """Verifies whether auth_header has a valid Firebase-provided ID token.
+    """Verifies whether the auth_header has a valid Firebase-provided ID token.
 
     Oppia's authorization headers use OAuth 2.0's Bearer authentication scheme.
 
@@ -162,7 +162,7 @@ def mark_user_for_deletion(user_id):
     """Marks the user and all of their associated auth-details as deleted.
 
     This function also disables the user's Firebase account so that they cannot
-    use it to sign in any more.
+    be used to sign in.
 
     Args:
         user_id: str. The unique ID of the user whose associations should be
@@ -311,7 +311,9 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
     assoc_by_user_id_model = (
         auth_models.UserAuthDetailsModel.get(user_id, strict=False))
     # Do not depend on the non-platform layers to create these models because
-    # they are required by firebase_auth_services.
+    # they are required by firebase_auth_services. These models are also used by
+    # user_services to represent the relationship between full user accounts and
+    # profile user accounts.
     if (assoc_by_user_id_model is None or
             assoc_by_user_id_model.firebase_auth_id is None):
         assoc_by_user_id_model = auth_models.UserAuthDetailsModel(
@@ -358,7 +360,9 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
             assoc_by_user_id_model.firebase_auth_id is None)
     ]
     # Do not depend on the non-platform layers to create these models because
-    # they are required by firebase_auth_services.
+    # they are required by firebase_auth_services. These models are also used by
+    # user_services to represent the relationship between full user accounts and
+    # profile user accounts.
     if assoc_by_user_id_models:
         auth_models.UserAuthDetailsModel.update_timestamps_multi(
             assoc_by_user_id_models)

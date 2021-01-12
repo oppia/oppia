@@ -135,7 +135,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
                 argument cannot be made into a positional argument because the
                 Firebase Admin SDK generates a value when it is None. Non-test
                 code will always pass a uid, however, so this stub enforces that
-                too.
+                they are not None.
             disabled: bool. Whether the user account is to be disabled.
 
         Raises:
@@ -207,7 +207,7 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
 
 
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
-    """Test base for firebase-specific tests with helpful default behavior."""
+    """Test base for Firebase-specific tests with helpful default behavior."""
 
     def setUp(self):
         super(FirebaseAuthServicesTestBase, self).setUp()
@@ -242,7 +242,7 @@ class AuthenticateRequestTests(FirebaseAuthServicesTestBase):
         """Returns a webapp2.Request with the given authorization claims.
 
         Args:
-            auth_header: str or None. Contents of the Authorization header. If
+            auth_header: str|None. Contents of the Authorization header. If
                 None, then the header will be omitted from the request.
 
         Returns:

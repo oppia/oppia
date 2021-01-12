@@ -1931,19 +1931,19 @@ tags: []
 
     @classmethod
     def get_auth_id_from_email(cls, email):
-        """Returns a mock GAE user ID corresponding to the given email.
+        """Returns a mock auth ID corresponding to the given email.
 
         This method can use any algorithm to produce results as long as, during
         the runtime of each test case/method, it is:
         1.  Pure (same input always returns the same output).
         2.  One-to-one (no two distinct inputs return the same output).
-        3.  An integer byte-string (to match the behavior of actual GAE IDs).
+        3.  An integer byte-string (integers are always valid in auth IDs).
 
         Args:
             email: str. The email address of the user.
 
         Returns:
-            bytes. The mock GAE ID of a user possessing the given email.
+            bytes. The mock auth ID of a user possessing the given email.
         """
         # Although the hash function doesn't guarantee a one-to-one mapping, in
         # practice it is sufficient for our tests.

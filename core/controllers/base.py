@@ -28,6 +28,7 @@ import sys
 import time
 import traceback
 
+from core.domain import auth_services
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import user_services
@@ -166,7 +167,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.payload = None
         self.iframed = False
 
-        auth_claims = user_services.get_auth_claims_from_request(request)
+        auth_claims = auth_services.get_auth_claims_from_request(request)
         self.current_user_is_super_admin = (
             auth_claims is not None and auth_claims.role_is_super_admin)
 

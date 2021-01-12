@@ -82,30 +82,22 @@ class UserAuthDetails(python_utils.OBJECT):
     There are two distinct types of user accounts: "profile" and "full".
         Profile: An account that depends on its "parent user" for
             authentication. These accounts are not directly associated with any
-            identiy providers.
+            identity providers.
         Full: An account that is directly associated with an identity provider.
             The provider's auth_id value will be kept in a corresponding
             property (e.g., gae_id for Google AppEngine authentication and
             firebase_auth_id for Firebase authentication).
 
-    The distinction between profile and full user accounts are enforced by
-    invariants on the auth-related properties: gae_id, firebase_auth_id, and
+    The distinction between profile and full user accounts are enforced as
+    invariants in auth-related properties: gae_id, firebase_auth_id, and
     parent_user_id. Specifically: parent_user_id is not None if and only if
     auth_id is None (where auth_id is: gae_id or firebase_auth_id).
-
-    To maintain these invariants, client code should **always** use the class
-    methods: for_new_full_user, for_new_profile_user, and for_existing_user; to
-    create new UserAuthDetails instances.
     """
 
     def __init__(
             self, user_id, gae_id, firebase_auth_id, parent_user_id,
             deleted=False):
         """Initializes a new UserAuthDetails domain object.
-
-        DO NOT USE DIRECTLY! This domain object has invariants that need to be
-        met, so use one of the "from_*" class methods to ensure a valid value is
-        being used.
 
         Args:
             user_id: str. The unique ID of the user.

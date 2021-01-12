@@ -33,17 +33,18 @@ class UserAuthDetailsModel(base_models.BaseModel):
     Instances of this class are keyed by user id.
     """
 
-    # Authentication detail for sign-in using google id (GAE). Exists only
-    # for full users. None for profile users.
+    # Authentication identifier from Google AppEngine (GAE). Exists only for
+    # full users. None for profile users.
     gae_id = datastore_services.StringProperty(indexed=True)
-    # Authentication detail for sign-in using Firebase authentication.
+    # Authentication detail for sign in using Firebase authentication.
     # TODO(#11462): This will exist for all users after the Firebase migration,
     # so update this description once it has succeeded.
     firebase_auth_id = datastore_services.StringProperty(indexed=True)
     # For profile users, the user ID of the full user associated with that
-    # profile. None for full users. Required for profiles because gae_id
-    # attribute is None for them, hence this attribute stores their association
-    # with a full user who do have a gae_id.
+    # profile. None for full users. Required for profiles because
+    # gae_id/firebase_auth_id attribute is None for them, hence this
+    # attribute stores their association with a full user who do have a
+    # gae_id/firebase_auth_id.
     parent_user_id = (
         datastore_services.StringProperty(indexed=True, default=None))
 
@@ -55,7 +56,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id, gae_id,
-         and parent_user_id fields.
+        firebase_auth_id, and parent_user_id fields.
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
@@ -69,8 +70,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_field_names_for_takeout():
-        """We do not want to export the internal user id for the parent, so
-        we export the username instead.
+        """We do not want to export the internal user id for the parent, so we
+        export the username instead.
         """
         return {
             'parent_user_id': 'parent_username'
@@ -80,8 +81,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model doesn't contain any data directly corresponding to a user.
         Currently, the model holds authentication details relevant only for
-        backend, and no exportable user data. It may contain user data in
-        the future.
+        backend, and no exportable user data. It may contain user data in the
+        future.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -150,13 +151,13 @@ class UserIdentifiersModel(base_models.BaseModel):
     Instances of this class are keyed by GAE ID.
     """
 
-    # The main user ID that is used in the datastore.
+    # The main user ID that is used by Oppia.
     user_id = datastore_services.StringProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """Model contains data to delete corresponding to a user: id,
-         and user_id fields.
+        """Model contains data to delete corresponding to a user: id, and
+        user_id fields.
         """
         return base_models.DELETION_POLICY.DELETE_AT_END
 
@@ -171,8 +172,8 @@ class UserIdentifiersModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model doesn't contain any data directly corresponding to a user.
         Currently, the model holds authentication details relevant only for
-        backend, and no exportable user data. It may contain user data in
-        the future.
+        backend, and no exportable user data. It may contain user data in the
+        future.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE

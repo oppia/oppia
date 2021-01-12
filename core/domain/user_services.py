@@ -1229,9 +1229,8 @@ def update_multiple_users_data(modifiable_user_data_list):
     user_ids = [user.user_id for user in modifiable_user_data_list]
     user_settings_list = get_users_settings(user_ids)
     user_auth_details_list = get_multiple_user_auth_details(user_ids)
-    for modifiable_user_data, user_settings in (
-            python_utils.ZIP(
-                modifiable_user_data_list, user_settings_list)):
+    for modifiable_user_data, user_settings in python_utils.ZIP(
+            modifiable_user_data_list, user_settings_list):
         user_id = modifiable_user_data.user_id
         if user_id is None:
             raise Exception('Missing user ID.')
@@ -2579,11 +2578,6 @@ def log_username_change(committer_id, old_username, new_username):
     audit_models.UsernameChangeAuditModel(
         id=model_id, committer_id=committer_id, old_username=old_username,
         new_username=new_username).put()
-
-
-def get_auth_claims_from_request(request):
-    """Returns AuthClaims associated to the user who authorized the request."""
-    return auth_services.get_auth_claims_from_request(request)
 
 
 def create_login_url(target_url):

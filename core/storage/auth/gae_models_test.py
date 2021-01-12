@@ -32,16 +32,16 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
 
     NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
     NONEXISTENT_USER_ID = 'id_x'
-    NONREGISTERED_GAE_ID = 'gae_id_x'
+    NONREGISTERED_GAE_ID = 'auth_id_x'
     USER_ID = 'user_id'
-    USER_GAE_ID = 'gae_id'
+    USER_GAE_ID = 'auth_id'
     FIREBASE_USER_ID = 'firebase_user_id'
     FIREBASE_AUTH_ID = 'firebase_auth_id'
     PROFILE_ID = 'profile_id'
     PROFILE_2_ID = 'profile_2_id'
 
     def setUp(self):
-        """Set up user models in datastore for use in testing."""
+        """Set up user models in storage for use in testing."""
         super(UserAuthDetailsModelTests, self).setUp()
 
         auth_models.UserAuthDetailsModel(
@@ -111,13 +111,13 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
         )
 
     def test_get_by_auth_id_with_invalid_auth_method_name_is_none(self):
-        # For registered gae_id.
+        # For registered auth ID.
         self.assertIsNone(
             auth_models.UserAuthDetailsModel.get_by_auth_id(
                 self.NONEXISTENT_AUTH_METHOD_NAME, self.USER_GAE_ID)
         )
 
-        # For non registered gae_id.
+        # For non registered auth ID.
         self.assertIsNone(
             auth_models.UserAuthDetailsModel.get_by_auth_id(
                 self.NONEXISTENT_AUTH_METHOD_NAME, self.NONREGISTERED_GAE_ID)
@@ -154,14 +154,14 @@ class UserIdentifiersModelTests(test_utils.GenericTestBase):
 
     NONEXISTENT_AUTH_METHOD_NAME = 'auth_method_x'
     NONEXISTENT_USER_ID = 'id_x'
-    NONREGISTERED_GAE_ID = 'gae_id_x'
+    NONREGISTERED_GAE_ID = 'auth_id_x'
     USER_ID = 'user_id'
-    USER_GAE_ID = 'gae_id'
+    USER_GAE_ID = 'auth_id'
     PROFILE_ID = 'profile_id'
     PROFILE_2_ID = 'profile_2_id'
 
     def setUp(self):
-        """Set up user models in datastore for use in testing."""
+        """Set up user models in storage for use in testing."""
         super(UserIdentifiersModelTests, self).setUp()
 
         auth_models.UserIdentifiersModel(
@@ -224,7 +224,7 @@ class UserIdByFirebaseAuthIdModelTests(test_utils.GenericTestBase):
     PROFILE_2_ID = 'profile_2_id'
 
     def setUp(self):
-        """Set up user models in datastore for use in testing."""
+        """Set up user models in storage for use in testing."""
         super(UserIdByFirebaseAuthIdModelTests, self).setUp()
 
         auth_models.UserIdByFirebaseAuthIdModel(
