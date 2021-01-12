@@ -49,6 +49,9 @@ import { SocialButtonsComponent } from
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
+import { PromoBarComponent } from
+  './common-layout-directives/common-elements/promo-bar.component';
+
 import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
@@ -68,6 +71,7 @@ import { TakeBreakModalComponent } from
     KeyboardShortcutHelpModalComponent,
     LazyLoadingComponent,
     LoadingDotsComponent,
+    PromoBarComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
     SharingLinksComponent,
@@ -84,7 +88,7 @@ import { TakeBreakModalComponent } from
     SharingLinksComponent,
     SkillMasteryViewerComponent, AttributionGuideComponent,
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    ProfileLinkImageComponent, ProfileLinkTextComponent,
+    PromoBarComponent, ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
     TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
