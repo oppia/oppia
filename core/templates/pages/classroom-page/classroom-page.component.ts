@@ -37,11 +37,11 @@ angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),
   controller: [
     '$filter', 'AlertsService', 'LoaderService',
-    'UrlInterpolationService', 'SiteAnalyticsService',
+    'SiteAnalyticsService', 'UrlInterpolationService',
     'UrlService', 'FATAL_ERROR_CODES',
     function(
         $filter, AlertsService, LoaderService,
-        UrlInterpolationService, SiteAnalyticsService,
+        SiteAnalyticsService, UrlInterpolationService,
         UrlService, FATAL_ERROR_CODES) {
       var ctrl = this;
 
