@@ -27,6 +27,7 @@ from core.domain import suggestion_services
 from core.domain import voiceover_services
 from core.platform import models
 import feconf
+import utils
 
 (
     base_models, exp_models, feedback_models, question_models,
@@ -79,16 +80,14 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
         field_name_to_external_model_references = [
             base_model_validators.ExternalModelFetcherDetails(
                 'feedback_thread_ids',
-                feedback_models.GeneralFeedbackThreadModel, [item.id])
-        ]
-        if item.author_id:
-            field_name_to_external_model_references.append(
-                base_model_validators.UserSettingsModelFetcherDetails(
-                    'author_ids', [item.author_id],
-                    may_contain_system_ids=True,
-                    may_contain_pseudonymous_ids=True
-                )
+                feedback_models.GeneralFeedbackThreadModel, [item.id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'author_ids', [item.author_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
             )
+        ]
+
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
             field_name_to_external_model_references.append(
                 base_model_validators.ExternalModelFetcherDetails(

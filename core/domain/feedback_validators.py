@@ -24,6 +24,7 @@ from core.domain import prod_validators
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (
     base_models, exp_models, feedback_models, suggestion_models, user_models
