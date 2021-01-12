@@ -25,6 +25,7 @@ jobs:
         run: |
           git config --global user.email "$( git log --format='%ae' $GITHUB_SHA^! )"
           git config --global user.name "$( git log --format='%an' $GITHUB_SHA^! )"
+          git config --global pull.rebase false
 
           curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" -o jq
           chmod +x jq
@@ -39,6 +40,8 @@ jobs:
           )
 
           rm jq
+
+          echo "Merging now, jq done"
           
           if [[ "$target_branch" == null ]]
           then
