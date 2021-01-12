@@ -101,6 +101,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             proc_args = stylelint_cmd_args + [filepath]
             proc = subprocess.Popen(
                 proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
             encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
             linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
             linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
