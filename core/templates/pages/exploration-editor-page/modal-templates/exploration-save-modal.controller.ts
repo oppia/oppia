@@ -40,6 +40,6 @@ angular.module('oppia').controller('ExplorationSaveModalController', [
 
     $scope.earlierVersionHeader = 'Last saved';
     $scope.laterVersionHeader = 'New changes';
-    $scope.MAX_COMMIT_MESSAGE_LENGTH = MAX_COMMIT_MESSAGE_LENGTH;
+    $scope.MAX_COMMIT_MESSAGE_LENGTH = String(MAX_COMMIT_MESSAGE_LENGTH);
   }
 ]);
