@@ -54,8 +54,35 @@ describe('Guest collection progress service', () => {
     _expId2 = 'exp_id2';
     _expTitle2 = 'Exp 2';
     _collection0 = _createCollection(_collectionId0, 'a title');
+
     _collection0.addCollectionNode(
-      CollectionNode.createFromExplorationId(_expId0));
+      new CollectionNode({
+        exploration_id: _expId0,
+        exploration_summary: {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cd672b',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Exp 0'
+        }
+      }));
   });
 
   afterEach(() => {

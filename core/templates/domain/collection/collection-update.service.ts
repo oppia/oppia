@@ -97,10 +97,10 @@ angular.module('oppia').factory('CollectionUpdateService', [
         }, function(changeDict, collection) {
           // Apply.
           var explorationId = _getExplorationIdFromChangeDict(changeDict);
-          var collectionNode = (
-            CollectionNode.createFromExplorationId(
-              explorationId));
-          collectionNode.setExplorationSummaryObject(oldSummaryBackendObject);
+          var collectionNode = CollectionNode.create({
+            exploration_id: explorationId,
+            exploration_summary: oldSummaryBackendObject
+          });
           collection.addCollectionNode(collectionNode);
         }, function(changeDict, collection) {
           // Undo.

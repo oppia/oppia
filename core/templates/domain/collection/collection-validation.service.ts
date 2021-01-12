@@ -29,14 +29,6 @@ import { Collection } from 'domain/collection/collection.model';
   providedIn: 'root'
 })
 export class CollectionValidationService {
-  _getNonexistentExplorationIds(collection: Collection): string[] {
-    return collection.getCollectionNodes().filter((collectionNode) => {
-      return !collectionNode.doesExplorationExist();
-    }).map((collectionNode) => {
-      return collectionNode.getExplorationId();
-    });
-  }
-
   _getPrivateExplorationIds(collection: Collection): string[] {
     return collection.getCollectionNodes().filter((collectionNode) => {
       return collectionNode.isExplorationPrivate();
@@ -80,14 +72,6 @@ export class CollectionValidationService {
     if (!collectionHasNodes) {
       issues.push(
         'There should be at least 1 exploration in the collection.');
-    }
-
-    var nonexistentExpIds = this._getNonexistentExplorationIds(collection);
-    if (nonexistentExpIds.length !== 0) {
-      issues.push(
-        'The following exploration(s) either do not exist, or you do not ' +
-        'have edit access to add them to this collection: ' +
-        nonexistentExpIds.join(', '));
     }
 
     if (isPublic) {

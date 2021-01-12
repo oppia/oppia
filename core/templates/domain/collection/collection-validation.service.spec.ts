@@ -30,8 +30,6 @@ describe('Collection validation service', function() {
   let sampleCollectionBackendObject: CollectionBackendDict = null;
   let _sampleCollection: Collection = null;
 
-  let EXISTS: boolean = true;
-  let DOES_NOT_EXIST: boolean = false;
   let PUBLIC_STATUS: boolean = true;
   let PRIVATE_STATUS: boolean = false;
 
@@ -59,14 +57,13 @@ describe('Collection validation service', function() {
     };
     _sampleCollection = Collection.create(
       sampleCollectionBackendObject);
-    _addCollectionNode('exp_id0', EXISTS, PRIVATE_STATUS);
+    _addCollectionNode('exp_id0', PRIVATE_STATUS);
   });
 
-  var _addCollectionNode = (explorationId, exists, isPublic) => {
-    var collectionNode = CollectionNode.createFromExplorationId(
-      explorationId);
-    if (exists) {
-      collectionNode.setExplorationSummaryObject({
+  var _addCollectionNode = (explorationId, isPublic) => {
+    var collectionNodeBackendDict = {
+      exploration_id: explorationId,
+      exploration_summary: {
         last_updated_msec: 1591296737470.528,
         community_owned: false,
         objective: 'Test Objective',
@@ -89,8 +86,9 @@ describe('Collection validation service', function() {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title'
-      });
-    }
+      }
+    };
+    var collectionNode = CollectionNode.create(collectionNodeBackendDict);
     return _sampleCollection.addCollectionNode(collectionNode);
   };
 
@@ -122,23 +120,10 @@ describe('Collection validation service', function() {
       'There should be at least 1 exploration in the collection.']);
   });
 
-  it('should detect nonexistent/inaccessible explorations', () => {
-    expect(_addCollectionNode(
-      'exp_id1', DOES_NOT_EXIST, PRIVATE_STATUS)).toBe(true);
-    _getCollectionNode('exp_id0');
-    _getCollectionNode('exp_id1');
-
-    var issues = _findPrivateValidationIssues();
-    expect(issues).toEqual([
-      'The following exploration(s) either do not exist, or you do not have ' +
-      'edit access to add them to this collection: exp_id1'
-    ]);
-  });
-
   it('should allow private and public explorations in a private collection',
     () => {
-      expect(_addCollectionNode('exp_id1', EXISTS, PRIVATE_STATUS)).toBe(true);
-      expect(_addCollectionNode('exp_id2', EXISTS, PUBLIC_STATUS)).toBe(true);
+      expect(_addCollectionNode('exp_id1', PRIVATE_STATUS)).toBe(true);
+      expect(_addCollectionNode('exp_id2', PUBLIC_STATUS)).toBe(true);
       _getCollectionNode('exp_id0');
       _getCollectionNode('exp_id1');
       _getCollectionNode('exp_id2');
@@ -150,7 +135,7 @@ describe('Collection validation service', function() {
 
   it('should not allow private explorations in a public collection',
     () => {
-      expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
+      expect(_addCollectionNode('exp_id1', PUBLIC_STATUS)).toBe(true);
       _getCollectionNode('exp_id1');
       _getCollectionNode('exp_id0');
 
@@ -166,8 +151,8 @@ describe('Collection validation service', function() {
   );
 
   it('should be able to detect multiple validation issues', () => {
-    expect(_addCollectionNode('exp_id1', EXISTS, PUBLIC_STATUS)).toBe(true);
-    expect(_addCollectionNode('exp_id2', EXISTS, PRIVATE_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id1', PUBLIC_STATUS)).toBe(true);
+    expect(_addCollectionNode('exp_id2', PRIVATE_STATUS)).toBe(true);
 
     _getCollectionNode('exp_id0');
     _getCollectionNode('exp_id1');

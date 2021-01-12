@@ -19,6 +19,10 @@
 import { CollectionNode } from
   'domain/collection/collection-node.model';
 
+interface SummaryObject {
+  category?: string
+}
+
 describe('Collection node model', () => {
   it('should provide an immutable exploration summary', () => {
     var explorationSummaryBackendObject = {
@@ -45,30 +49,20 @@ describe('Collection node model', () => {
       category: 'Algebra',
       title: 'exp title'
     };
-    var collectionNodeBackendObject = {
+
+    var collectionNode = CollectionNode.create({
       exploration_id: 'exp_id0',
       exploration_summary: explorationSummaryBackendObject
-    };
-
-    var collectionNode = CollectionNode.create(
-      collectionNodeBackendObject);
+    });
     expect(collectionNode.getExplorationId()).toEqual('exp_id0');
     expect(collectionNode.getExplorationTitle()).toEqual('exp title');
 
-    var summaryObject = collectionNode.getExplorationSummaryObject();
+    var summaryObject: SummaryObject =
+      collectionNode.getExplorationSummaryObject();
     expect(summaryObject).toEqual(explorationSummaryBackendObject);
 
     delete summaryObject.category;
     expect(summaryObject).not.toEqual(
       collectionNode.getExplorationSummaryObject());
   });
-
-  it('should be able to create a new collection node by exploration ID',
-    () => {
-      var collectionNode = CollectionNode.createFromExplorationId(
-        'exp_id0');
-      expect(collectionNode.getExplorationId()).toEqual('exp_id0');
-      expect(collectionNode.doesExplorationExist()).toBe(false);
-    }
-  );
 });
