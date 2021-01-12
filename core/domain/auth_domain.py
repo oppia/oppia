@@ -98,18 +98,6 @@ class UserAuthDetails(python_utils.OBJECT):
     def __init__(
             self, user_id, gae_id, firebase_auth_id, parent_user_id,
             deleted=False):
-        """Initializes a new UserAuthDetails domain object.
-
-        Args:
-            user_id: str. The unique ID of the user.
-            gae_id: str|None. The ID of the user provided by GAE auth services.
-            firebase_auth_id: str|None. The ID of the user provided by Firebase
-                auth services.
-            parent_user_id: str|None. For profile users, the user ID of the full
-                user account that owns the profile. Otherwise this value should
-                be None.
-            deleted: bool. Whether the user has requested an account deletion.
-        """
         self.user_id = user_id
         self.gae_id = gae_id
         self.firebase_auth_id = firebase_auth_id
