@@ -26,12 +26,12 @@ require(
 require('components/summary-tile/topic-summary-tile.directive.ts');
 
 require('filters/string-utility-filters/capitalize.filter.ts');
+require('pages/library-page/search-bar/search-bar.component.ts');
 require('services/alerts.service.ts');
-require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/page-title.service.ts');
 require('services/site-analytics.service.ts');
-require('pages/library-page/search-bar/search-bar.component.ts');
 
 angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),
