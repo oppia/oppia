@@ -96,8 +96,9 @@ describe('Language util service', function() {
   it('should throw an error when given an invalid content language code',
     () => {
       expect(() => lus.getLanguageDirection('invalid code'))
-        .toThrowError('Could not find language direction for the supplied ' +
-          'language code: : invalid code');
+        .toThrowError(
+          'Could not find language direction for the supplied language code: ' +
+          'invalid code');
     }
   );
 
@@ -111,8 +112,10 @@ describe('Language util service', function() {
 
   it('should throw an error when given an invalid content language code',
     () => {
-      expect(() => lus.getLanguageDirection('invalid code')).toThrowError(
-        'Invalid language code: invalid code');
+      expect(() => lus.getLanguageDirection('invalid code'))
+        .toThrowError(
+          'Could not find language direction for the supplied language code: ' +
+          'invalid code');
     }
   );
 
