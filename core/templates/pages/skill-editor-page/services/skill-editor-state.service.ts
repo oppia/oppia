@@ -58,7 +58,7 @@ export class SkillEditorStateService {
   private assignedSkillTopicData = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
-  private _skillDescriptionExists: boolean = false;
+  private _skillDescriptionExists: boolean = true;
   private _groupedSkillSummaries: GroupedSkillSummaries = {
     current: [],
     others: []
@@ -224,23 +224,16 @@ export class SkillEditorStateService {
     return true;
   }
   /**
-   * Attempts to save the current skill given a commit message. This
-   * function cannot be called until after a skill has been initialized
-   * in this service. Returns false if a save is not performed due to no
-   * changes pending, or true if otherwise. This function, upon success,
-   * will clear the UndoRedoService of pending changes. This function also
-   * shares behavior with setSkill(), when it succeeds.
+   * Checks if the skill description exists and updates class
+   * variable. `create-new-skill-modal.controller` will search
+   * for that variable.
    */
   updateExistenceOfSkillDescription(
-      description: string,
-      successCallback: (value?: Object) => void): void {
+      description: string): void {
     this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
       description).then(
       (skillDescriptionExists) => {
         this._updateSkillDescriptionExists(skillDescriptionExists);
-        if (successCallback) {
-          successCallback();
-        }
       }, (error) => {
         this.alertsService.addWarning(
           error ||

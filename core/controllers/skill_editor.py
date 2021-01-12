@@ -277,7 +277,7 @@ class SkillDescriptionHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_create_skill
     def get(self, skill_description):
         """Handler that receives a skill description and checks whether
         a skill with the same description exists.

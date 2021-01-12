@@ -160,11 +160,7 @@ def get_skill_by_description(description):
     """
     skill_model = (
         skill_models.SkillModel.get_by_description(description))
-    if skill_model is None:
-        return None
-
-    skill = get_skill_from_model(skill_model)
-    return skill
+    return get_skill_from_model(skill_model) is skill_model else None
 
 
 def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):

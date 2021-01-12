@@ -433,12 +433,15 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
 
     def setUp(self):
         super(SkillDescriptionHandlerTest, self).setUp()
+        self.skill_description = "Adding Fractions"
         self.url = '%s/%s' % (
-            feconf.SKILL_DESCRIPTION_HANDLER, self.skill_id)
+            feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description)
 
     def test_skill_description_handler(self):
         self.login(self.ADMIN_EMAIL)
-        # Check that admins can access two skills data at the same time.
         json_response = self.get_json(self.url)
         self.assertEqual(json_response['skill_description_exists'], False)
+        
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['skill_description_exists'], True)
         self.logout()
