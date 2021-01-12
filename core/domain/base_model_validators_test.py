@@ -290,9 +290,15 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)
-        self.assertEqual(
-            mock_validator.errors['invalid user setting ids'][0].message,
-            'The field \'user_id\' should not contain system IDs')
+        self.assertDictContainsSubset(
+            {
+                'invalid user setting ids': [
+                    'Entity id mock-12345: '
+                    'The field \'user_id\' should not contain system IDs'
+                ]
+            },
+            mock_validator.errors
+        )
 
     def test_error_raised_when_fetching_external_model_with_pseudo_ids(self):
         model = MockCommitLogEntryModel(
@@ -303,6 +309,12 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         mock_validator = MockCommitLogEntryModelValidator()
         mock_validator.errors.clear()
         mock_validator.validate(model)
-        self.assertEqual(
-            mock_validator.errors['invalid user setting ids'][0].message,
-            'The field \'user_id\' should not contain pseudonymous IDs')
+        self.assertDictContainsSubset(
+            {
+                'invalid user setting ids': [
+                    'Entity id mock-12345: '
+                    'The field \'user_id\' should not contain pseudonymous IDs'
+                ]
+            },
+            mock_validator.errors
+        )
