@@ -315,7 +315,7 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         mock_validator.validate(model)
         self.assertDictContainsSubset(
             {
-                'invalid user setting ids': [
+                'invalid ids in field': [
                     'Entity id mock-12345: '
                     'The field \'user_id\' should not contain system IDs'
                 ]
@@ -334,9 +334,29 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
         mock_validator.validate(model)
         self.assertDictContainsSubset(
             {
-                'invalid user setting ids': [
+                'invalid ids in field': [
                     'Entity id mock-12345: '
                     'The field \'user_id\' should not contain pseudonymous IDs'
+                ]
+            },
+            mock_validator.errors
+        )
+
+    def test_error_raised_when_user_id_is_invalid(self):
+        model = MockCommitLogEntryModel(
+            id='mock-12345',
+            user_id='invalid_user_id',
+            commit_cmds=[])
+        model.update_timestamps()
+        mock_validator = MockCommitLogEntryModelValidator()
+        mock_validator.errors.clear()
+        mock_validator.validate(model)
+        self.assertDictContainsSubset(
+            {
+                'invalid ids in field': [
+                    'Entity id mock-12345: '
+                    'The user id invalid_user_id in the field \'user_id\' is '
+                    'invalid'
                 ]
             },
             mock_validator.errors

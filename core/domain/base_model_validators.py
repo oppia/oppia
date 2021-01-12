@@ -63,7 +63,7 @@ ERROR_CATEGORY_TIME_FIELD_CHECK = 'time field relation check'
 ERROR_CATEGORY_TYPE_CHECK = 'type check'
 ERROR_CATEGORY_VERSION_CHECK = 'version check'
 ERROR_CATEGORY_STALE_CHECK = 'stale check'
-ERROR_CATEGORY_INVALID_USER_SETTING_IDS = 'invalid user setting ids'
+ERROR_CATEGORY_INVALID_IDS_IN_FIELD = 'invalid ids in field'
 
 VALIDATION_MODE_NEUTRAL = 'neutral'
 VALIDATION_MODE_STRICT = 'strict'
@@ -98,13 +98,17 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
                 'When fetching instances of UserSettingsModel, please use ' +
                 'UserSettingsModelFetcherDetails instead of ' +
                 'ExternalModelFetcherDetails')
-        if not all(model_ids):
-            raise Exception(
-                'A model id in the field \'%s\' '
-                'is empty' % field_name)
+        filtered_model_ids = []
+        for model_id in model_ids:
+            if not model_id:
+                raise utils.ValidationError(
+                    'A model id in the field \'%s\' '
+                    'is empty' % field_name)
+            else:
+                filtered_model_ids.append(model_id)
         self.field_name = field_name
         self.model_class = model_class
-        self.model_ids = model_ids
+        self.model_ids = filtered_model_ids
 
 
 class UserSettingsModelFetcherDetails(python_utils.OBJECT):
@@ -156,14 +160,17 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'The field \'%s\' should not contain '
                     'pseudonymous IDs' % field_name)
+        validated_model_ids = []
         for model_id in filtered_model_ids:
             if not user_services.is_user_id_valid(model_id):
-                raise Exception(
+                raise utils.ValidationError(
                     'The user id %s in the field \'%s\' is '
                     'invalid' % (model_id, field_name))
+            else:
+                validated_model_ids.append(model_id)
         self.field_name = field_name
         self.model_class = user_models.UserSettingsModel
-        self.model_ids = filtered_model_ids
+        self.model_ids = validated_model_ids
 
 
 class ExternalModelReference(python_utils.OBJECT):
@@ -366,7 +373,7 @@ class BaseModelValidator(python_utils.OBJECT):
                         external_model_fetcher_details.model_ids)
         except utils.ValidationError as err:
             cls._add_error(
-                ERROR_CATEGORY_INVALID_USER_SETTING_IDS,
+                ERROR_CATEGORY_INVALID_IDS_IN_FIELD,
                 'Entity id %s: %s' % (item.id, python_utils.UNICODE(err)))
         else:
             fetched_model_instances_for_all_ids = (
