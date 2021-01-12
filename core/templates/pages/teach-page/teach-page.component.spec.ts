@@ -119,7 +119,7 @@ describe('Teach Page', () => {
   it('should set component properties when ngOnInit() is called', () => {
     component.ngOnInit();
     expect(component.displayedTestimonialId).toBe(0);
-    expect(component.testimonialCount).toBe(2);
+    expect(component.testimonialCount).toBe(3);
     expect(component.classroomUrl).toBe('/learn/math');
     expect(component.isWindowNarrow).toBe(true);
   });
