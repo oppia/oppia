@@ -184,7 +184,7 @@
             <span>Name</span>
             <span class="number-skills-header"># of Questions</span>
           </div>
-          <div class="subtopic-name-header" ng-if="uncategorizedSkillSummaries.length" ng-class="{'skills-invalid': uncategorizedSkillSummaries.length}">
+          <div class="subtopic-name-header skills-invalid" ng-if="uncategorizedSkillSummaries.length">
             <span>Uncategorized Skills</span>
           </div>
           <div ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index" class="subtopic-skill skills-list-item protractor-test-skill-item">
