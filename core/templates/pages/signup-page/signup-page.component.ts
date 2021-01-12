@@ -170,7 +170,7 @@ angular.module('oppia').component('signupPage', {
           setTimeout(() => {
             $window.location.href = decodeURIComponent(
               UrlService.getUrlParams().return_url);
-          }, 150);
+          }, SiteAnalyticsService.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
         }, function(rejection) {
           if (rejection.data && rejection.data.status_code === 401) {
             ctrl.showRegistrationSessionExpiredModal();
