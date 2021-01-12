@@ -38,13 +38,13 @@ angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
   function(CkEditorCopyContentService, ContextService, RteHelperService) {
     /**
-     * Takes in a CKEditor configuration and parameters to add to that
-     * configuration and returns the new CKeditor configuration.
+     * Returns a CKEditor configuration updated with the supplied UI
+     * configuration.
      * @param config CKEditor config to add to
      * @param uiConfig Parameters to add to CKEditor config
      * @modifies config
      */
-    const _updateConfig = function(
+    const _updateCKEditorConfig = function(
         config: CKEDITOR.config, uiConfig: UiConfig): CKEDITOR.config {
       if (uiConfig.language) {
         config.language = uiConfig.language;
@@ -190,7 +190,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         };
 
         if (scope.uiConfig()) {
-          ckConfig = _updateConfig(ckConfig, scope.uiConfig());
+          ckConfig = _updateCKEditorConfig(ckConfig, scope.uiConfig());
         }
 
         // Initialize CKEditor.
