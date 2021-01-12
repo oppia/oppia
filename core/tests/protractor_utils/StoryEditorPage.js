@@ -223,7 +223,7 @@ var StoryEditorPage = function() {
     await this.expectNumberOfChaptersToBe(chapters.length);
     for (var i = 0; i < chapters.length; i++) {
       await waitFor.visibilityOf(
-        await chapterTitles.get(i),
+        chapterTitles.get(i),
         'ChapterTitles is taking too long to be visible');
       expect(await chapterTitles.get(i).getText()).toEqual(chapters[i]);
     }
@@ -257,7 +257,7 @@ var StoryEditorPage = function() {
 
   this.expectDestinationToBe = async function(chapterName) {
     await waitFor.visibilityOf(
-      await nextChapterCard,
+      nextChapterCard,
       'Next Chapter card is taking too long too appear');
     var pattern = '\s*' + chapterName + '\s*';
     return expect(await nextChapterCard.getText()).toMatch(pattern);
@@ -273,14 +273,14 @@ var StoryEditorPage = function() {
 
   this.expectTitleToBe = async function(title) {
     await waitFor.visibilityOf(
-      await storyTitleField,
+      storyTitleField,
       'Story Title Field is taking too long to be visible');
     expect(await storyTitleField.getAttribute('value')).toEqual(title);
   };
 
   this.expectDescriptionToBe = async function(description) {
     await waitFor.visibilityOf(
-      await storyDescriptionField,
+      storyDescriptionField,
       'Story Description Field taking too long to be visible');
     expect(await storyDescriptionField.getAttribute('value')).toEqual(
       description);
@@ -336,7 +336,7 @@ var StoryEditorPage = function() {
 
   this.expectSaveStoryDisabled = async function() {
     await waitFor.visibilityOf(
-      await saveStoryButton,
+      saveStoryButton,
       'Save Story Button taking too long to appear');
     return expect(
       await saveStoryButton.getAttribute('disabled')).toEqual('true');
@@ -371,7 +371,11 @@ var StoryEditorPage = function() {
       .toMatch(nodeDescription);
   };
 
-  this.expectChapterExplorationIdToBe = function(id) {
+  this.expectChapterExplorationIdToBe = async function(id) {
+    await waitFor.visibilityOf(
+      explorationIdInput,
+      'ExplorationIdInput takes too long to appear'
+    );
     expect(explorationIdInput.getAttribute('value')).toEqual(id);
   };
 
@@ -398,7 +402,7 @@ var StoryEditorPage = function() {
   this.expectNodeOutlineToMatch = async function(nodeOutline) {
     await waitFor.visibilityOf(
       nodeOutlineEditorRteContent.first(),
-      'NodeOutlineEditorRteContent takes too long to appear');
+      'First NodeOutlineEditorRteContent takes too long to appear');
     expect(
       nodeOutlineEditorRteContent.first().getText()).toEqual(nodeOutline);
   };
@@ -459,14 +463,14 @@ var StoryEditorPage = function() {
 
   this.deleteAcquiredSkillByIndex = async function(index) {
     await action.click(
-      'Delete Acquired Skill Button of Index' + index,
+      'Delete Acquired Skill Button of Index ' + index,
       deleteAcquiredSkillButton.get(index)
     );
   };
 
   this.deletePrerequisiteSkillByIndex = async function(index) {
     await action.click(
-      'Delete PrerequisiteSkill Button of index' + index,
+      'Delete PrerequisiteSkill Button of index ' + index,
       deletePrerequisiteSkillButton.get(index)
     );
   };
