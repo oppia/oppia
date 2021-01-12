@@ -734,7 +734,7 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
         user_services.create_new_user(
-            self.get_gae_id_from_email(self.VIEWER_EMAIL), self.VIEWER_EMAIL)
+            self.get_auth_id_from_email(self.VIEWER_EMAIL), self.VIEWER_EMAIL)
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1061,7 +1061,7 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
         self.signup('abc@example.com', 'abc')
 
         user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
+            self.get_auth_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
