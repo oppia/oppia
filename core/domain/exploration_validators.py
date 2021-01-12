@@ -34,7 +34,6 @@ from core.domain import rights_domain
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, 
     models.NAMES.story, models.NAMES.suggestion, models.NAMES.user
-
 ])
 
 TARGET_TYPE_TO_TARGET_MODEL = {
