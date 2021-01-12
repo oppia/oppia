@@ -162,7 +162,9 @@ export class LanguageUtilService {
     if (languageDirection !== undefined) {
       return languageDirection;
     }
-    throw new Error('Invalid language code: ' + languageCode);
+    throw new Error(
+      'Could not find language direction for the supplied language code: ' +
+        languageCode);
   }
 
   getContentLanguageDescription(contentLanguageCode: string): string {
