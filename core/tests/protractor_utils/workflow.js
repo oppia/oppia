@@ -129,8 +129,12 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
+  await waitFor.elementToBeClickable(element(by.css(
+    '.protractor-test-publish-exploration')));
   await element(by.css('.protractor-test-publish-exploration')).isDisplayed();
   await element(by.css('.protractor-test-publish-exploration')).click();
+  await waitFor.elementToBeClickable(element(by.css(
+    '.protractor-test-confirm-pre-publication')));
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   await prePublicationButtonElem.isPresent();
