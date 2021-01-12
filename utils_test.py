@@ -557,13 +557,21 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_is_user_id_valid(self):
         self.assertTrue(
-            utils.is_user_id_valid(feconf.SYSTEM_COMMITTER_ID))
+            utils.is_user_id_valid(
+                feconf.SYSTEM_COMMITTER_ID, allow_system_user_id=True))
         self.assertTrue(
-            utils.is_user_id_valid(feconf.MIGRATION_BOT_USER_ID))
+            utils.is_user_id_valid(
+                feconf.MIGRATION_BOT_USER_ID, allow_system_user_id=True))
         self.assertTrue(
-            utils.is_user_id_valid(feconf.SUGGESTION_BOT_USER_ID))
+            utils.is_user_id_valid(
+                feconf.SUGGESTION_BOT_USER_ID, allow_system_user_id=True))
+        self.assertTrue(
+            utils.is_user_id_valid(
+                'pid_%s' % ('a' * 32), allow_pseudonymous_id=True))
         self.assertTrue(
             utils.is_user_id_valid('uid_%s' % ('a' * 32)))
+        self.assertFalse(
+            utils.is_user_id_valid('pid_%s' % ('a' * 32)))
         self.assertFalse(
             utils.is_user_id_valid('uid_%s%s' % ('a' * 31, 'A')))
         self.assertFalse(
@@ -648,12 +656,3 @@ class UtilsTests(test_utils.GenericTestBase):
             os.environ['SERVER_SOFTWARE'] = saved_server_software
         else:
             del os.environ['SERVER_SOFTWARE']
-
-    def test_is_user_id_valid(self):
-        self.assertTrue(utils.is_user_id_valid(feconf.SYSTEM_COMMITTER_ID))
-        self.assertTrue(utils.is_user_id_valid(feconf.MIGRATION_BOT_USER_ID))
-        self.assertTrue(utils.is_user_id_valid(feconf.SUGGESTION_BOT_USER_ID))
-        self.assertTrue(utils.is_user_id_valid('uid_%s' % ('a' * 32)))
-        self.assertFalse(utils.is_user_id_valid('uid_%s%s' % ('a' * 31, 'A')))
-        self.assertFalse(utils.is_user_id_valid('uid_%s' % ('a' * 31)))
-        self.assertFalse(utils.is_user_id_valid('a' * 36))

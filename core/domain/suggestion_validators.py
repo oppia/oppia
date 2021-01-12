@@ -27,7 +27,6 @@ from core.domain import suggestion_services
 from core.domain import voiceover_services
 from core.platform import models
 import feconf
-import utils
 
 (
     base_models, exp_models, feedback_models, question_models,
