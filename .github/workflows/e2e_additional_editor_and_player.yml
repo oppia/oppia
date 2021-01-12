@@ -45,6 +45,8 @@ jobs:
 
           git remote -v
 
+          git branch --show-current
+
           git fetch https://github.com/oppia/oppia.git develop
 
           echo "done fetching"
