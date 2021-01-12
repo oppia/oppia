@@ -1094,7 +1094,8 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
     Raises:
         Exception. Parent user with the given parent_user_id not found.
     """
-    if auth_services.has_reference_to_user_id(parent_user_id) is False:
+    if auth_models.UserAuthDetailsModel.has_reference_to_user_id(
+            parent_user_id) is False:
         raise Exception('Parent user not found.')
 
     return [

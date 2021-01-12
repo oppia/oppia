@@ -27,18 +27,6 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 platform_auth_services = models.Registry.import_auth_services()
 
 
-def has_reference_to_user_id(user_id):
-    """Check whether UserIdentifiersModel exists for the given user.
-
-    Args:
-        user_id: str. The ID of the user whose data should be checked.
-
-    Returns:
-        bool. Whether any UserIdentifiersModel refers to the given user ID.
-    """
-    return auth_models.UserAuthDetailsModel.get_by_id(user_id) is not None
-
-
 def get_all_profiles_by_parent_user_id(parent_user_id):
     """Fetch all user entries with the given parent_user_id.
 
@@ -151,6 +139,19 @@ def get_auth_id_from_user_id(user_id):
         association exists.
     """
     return platform_auth_services.get_auth_id_from_user_id(user_id)
+
+
+def get_multi_auth_ids_from_user_ids(user_ids):
+    """Returns the auth IDs associated with the given user IDs.
+
+    Args:
+        user_ids: list(str). The user IDs.
+
+    Returns:
+        list(str|None). The auth IDs associated with each of the given user IDs,
+        or None for associations which don't exist.
+    """
+    return platform_auth_services.get_multi_auth_ids_from_user_ids(user_ids)
 
 
 def get_user_id_from_auth_id(auth_id):

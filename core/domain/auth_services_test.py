@@ -113,18 +113,6 @@ class AuthServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(
             auth_services.get_auth_id_from_user_id(self.full_user_id))
 
-    def test_has_reference_to_existing_user_id_is_true(self):
-        self.assertTrue(
-            auth_services.has_reference_to_user_id(self.full_user_id))
-        self.assertTrue(
-            auth_services.has_reference_to_user_id(self.profile_user_1_id))
-        self.assertTrue(
-            auth_services.has_reference_to_user_id(self.profile_user_2_id))
-
-    def test_has_reference_to_non_existing_user_id_is_false(self):
-        self.assertFalse(
-            auth_services.has_reference_to_user_id('non_existing_user_id'))
-
     def test_get_association_that_is_present(self):
         auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
