@@ -107,8 +107,8 @@ export class TeachPageComponent implements OnInit {
     }, {
       quote: 'I18N_TEACH_TESTIMONIAL_3',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
-      imageUrl: '/teach/yamama.jpg',
-      imageUrlWebp: '/teach/yamama.webp',
+      imageUrl: '/teach/awad.jpg',
+      imageUrlWebp: '/teach/awad.webp',
       borderPresent: true
     }];
   }
