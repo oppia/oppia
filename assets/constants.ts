@@ -5134,6 +5134,11 @@ export default {
     "relatedLanguages": ["pt"],
     "direction": "ltr"
   }, {
+    "id": "ps",
+    "description": "Pashto",
+    "relatedLanguages": ["ps"],
+    "direction": "rtl"
+  }, {
     "id": "ro",
     "description": "Romanian",
     "relatedLanguages": ["ro"],
