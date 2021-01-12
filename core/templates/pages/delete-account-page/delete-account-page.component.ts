@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { SiteAnalyticsService } from "services/site-analytics.service";
+
 /**
  * @fileoverview Component for the Oppia 'edit preferences' page.
  */
@@ -24,11 +26,16 @@ require(
   'pages/delete-account-page/templates/delete-account-modal.controller.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').component('deleteAccountPage', {
   template: require('./delete-account-page.component.html'),
-  controller: ['$http', '$uibModal', '$window', 'UrlInterpolationService',
-    function($http, $uibModal, $window, UrlInterpolationService) {
+  controller: [
+    '$http', '$uibModal', '$window', 'SiteAnalyticsService',
+    'UrlInterpolationService',
+    function(
+        $http, $uibModal, $window, SiteAnalyticsService,
+        UrlInterpolationService) {
       var ctrl = this;
       ctrl.deleteAccount = function() {
         $uibModal.open({
@@ -39,8 +46,11 @@ angular.module('oppia').component('deleteAccountPage', {
           controller: 'DeleteAccountModalController'
         }).result.then(function() {
           $http['delete']('/delete-account-handler').then(function() {
-            $window.location = (
-              '/logout?redirect_url=pending-account-deletion');
+            SiteAnalyticsService.registerAccountDeletion();
+            setTimeout(() => {
+              $window.location = (
+                '/logout?redirect_url=pending-account-deletion');
+            }, 150);
           });
         }, function() {
           // Note to developers:

@@ -30,16 +30,19 @@ require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/site-analytics.service.ts');
 require('pages/library-page/search-bar/search-bar.component.ts');
 
 angular.module('oppia').component('classroomPage', {
   template: require('./classroom-page.component.html'),
   controller: [
     '$filter', 'AlertsService', 'LoaderService',
-    'UrlInterpolationService', 'UrlService', 'FATAL_ERROR_CODES',
+    'UrlInterpolationService', 'SiteAnalyticsService',
+    'UrlService', 'FATAL_ERROR_CODES',
     function(
         $filter, AlertsService, LoaderService,
-        UrlInterpolationService, UrlService, FATAL_ERROR_CODES) {
+        UrlInterpolationService, SiteAnalyticsService,
+        UrlService, FATAL_ERROR_CODES) {
       var ctrl = this;
 
       ctrl.classroomBackendApiService = (
@@ -67,6 +70,7 @@ angular.module('oppia').component('classroomPage', {
             `Learn ${ctrl.classroomDisplayName} with Oppia | Oppia`);
           LoaderService.hideLoadingScreen();
           ctrl.classroomBackendApiService.onInitializeTranslation.emit();
+          SiteAnalyticsService.registerClassroomPageViewed();
         }, function(errorResponse) {
           if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
             AlertsService.addWarning('Failed to get dashboard data');
