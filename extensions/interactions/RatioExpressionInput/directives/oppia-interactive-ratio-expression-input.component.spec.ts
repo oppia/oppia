@@ -50,9 +50,7 @@ describe('RatioExpressionInputInteractive', function() {
       mockInteractionAttributesExtractorService);
     $provide.value('$attrs', {
       placeholder: {
-        getUnicode: function() {
-          return 'Enter ratio here';
-        }
+        unicode: 'Enter ratio here'
       },
       numberOfTerms: 3,
       labelForFocusTarget: 'label'

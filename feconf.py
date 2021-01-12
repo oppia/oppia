@@ -414,6 +414,11 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch Host
+# and Port when switching to prod server.
+ES_HOST = 'localhost'
+ES_PORT = 9200
+
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in

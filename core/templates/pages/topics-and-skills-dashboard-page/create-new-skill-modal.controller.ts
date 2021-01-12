@@ -81,7 +81,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
         COMPONENT_NAME_EXPLANATION);
       $scope.newExplanationObject = explanationObject.toBackendDict();
       $scope.bindableDict.displayedConceptCardExplanation = (
-        explanationObject.getHtml());
+        explanationObject.html);
     };
 
     $scope.createNewSkill = function() {

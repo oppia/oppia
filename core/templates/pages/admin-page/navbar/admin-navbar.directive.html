@@ -69,10 +69,10 @@
     <div ng-cloak class="navbar-header float-right">
       <ul class="nav oppia-navbar-nav oppia-navbar-profile-admin">
         <li>
-          <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown" uib-dropdown>
+          <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown" uib-dropdown ng-class="{'open' : $ctrl.dropdownMenuisActive}">
             <li uib-dropdown-toggle class="nav-item oppia-clickable-navbar-element"
-                ng-mouseover="$ctrl.onMouseoverDropdownIconOrMenu($event)"
-                ng-mouseleave="$ctrl.onMouseoutDropdownIconOrMenu($event)">
+                ng-mouseover="$ctrl.activateDropdownMenu()"
+                ng-mouseleave="$ctrl.deactivateDropdownMenu()">
               <a class="nav-link oppia-navbar-tab"
                  uib-tooltip="Menu"
                  tooltip-placement="bottom">
@@ -81,8 +81,8 @@
             </li>
             <li>
               <ul class="uib-dropdown-menu dropdown-menu oppia-admin-page-dropdown-menu"
-                  ng-mouseover="$ctrl.onMouseoverDropdownIconOrMenu($event)"
-                  ng-mouseleave="$ctrl.onMouseoutDropdownIconOrMenu($event)"
+                  ng-mouseover="$ctrl.activateDropdownMenu()"
+                  ng-mouseleave="$ctrl.deactivateDropdownMenu()"
                   ng-show="$ctrl.dropdownMenuisActive"
                   role="menu">
                 <li ng-repeat="(tabName, url) in $ctrl.ADMIN_TAB_URLS">
@@ -155,11 +155,11 @@
         </li>
         <li>
           <ul class="nav oppia-navbar-tabs-admin">
-            <li uib-dropdown class="nav-item uib-dropdown float-right">
+            <li uib-dropdown class="nav-item uib-dropdown float-right" ng-class="{'open' : $ctrl.profileDropdownIsActive}">
               <a uib-dropdown-toggle class="nav-link uib-dropdown-toggle oppia-navbar-dropdown-toggle"
                  data-toggle="dropdown"
-                 ng-mouseover="$ctrl.onMouseoverProfilePictureOrDropdown($event)"
-                 ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)">
+                 ng-mouseover="$ctrl.activateProfileDropdown()"
+                 ng-mouseleave="$ctrl.deactivateProfileDropdown()">
                 <div class="oppia-navbar-profile-picture-container float-left" ng-cloak>
                   <div ng-if="$ctrl.profilePictureDataUrl">
                     <!--
@@ -181,9 +181,8 @@
               </a>
               <ul uib-dropdown-menu class="dropdown-menu uib-dropdown-menu ng-cloak oppia-navbar-dropdown"
                   role="menu"
-                  ng-mouseover="$ctrl.onMouseoverProfilePictureOrDropdown($event)"
-                  ng-mouseleave="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
-                  ng-show="$ctrl.profileDropdownIsActive">
+                  ng-mouseover="$ctrl.activateProfileDropdown()"
+                  ng-mouseleave="$ctrl.deactivateProfileDropdown()">
                 <li>
                   <a ng-click="$ctrl.onMouseoutProfilePictureOrDropdown($event)"
                      ng-href="<[$ctrl.profileUrl]>"

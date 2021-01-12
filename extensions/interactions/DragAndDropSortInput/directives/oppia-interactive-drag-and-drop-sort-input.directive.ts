@@ -53,7 +53,7 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               $attrs
             );
 
-            return choices[ctrl.choices.indexOf(html)].getContentId();
+            return choices[ctrl.choices.indexOf(html)].contentId;
           };
 
           ctrl.submitAnswer = function() {
@@ -79,7 +79,7 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
               'DragAndDropSortInput',
               $attrs
             );
-            ctrl.choices = choices.map(choice => choice.getHtml());
+            ctrl.choices = choices.map(choice => choice.html);
 
             ctrl.list = [];
             ctrl.dataMaxDepth = 1;
