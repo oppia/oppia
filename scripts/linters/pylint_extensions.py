@@ -1903,11 +1903,11 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0031': (
-            'Please refrain from using test_only in function names '
-            'in case of non-test files.',
+            'Please change the name of the function so that it does not use '
+            '"test_only" as its prefix in non-test files.',
             'non-test-files-function-name-checker',
-            'Try using a different name for the function that does not have'
-            'test_only as its prefix.'
+            'Prohibit use of "test_only" prefix in function names of non-test '
+            'files.'
         )
     }
 

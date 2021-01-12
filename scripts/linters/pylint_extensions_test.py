@@ -2926,8 +2926,6 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
             pylint_extensions.NonTestFilesFunctionNameChecker)
         self.checker_test_object.setup_method()
 
-    # TODO(#11617): Refactor all the tests in this class using the same approach
-    # used to fix this issue.
     def test_function_def_for_test_file_with_test_only_adds_no_msg(self):
         def_node = astroid.extract_node(
             """
@@ -2957,7 +2955,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
                 pass
             """
         )
-        def_node.root().name = 'random_module_file'
+        def_node.root().name = 'random_module_nontest'
         non_test_function_name_message = testutils.Message(
             msg_id='non-test-files-function-name-checker', node=def_node)
         with self.checker_test_object.assertAddsMessages(
@@ -2972,6 +2970,6 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
                 pass
             """
         )
-        def_node.root().name = 'random_module_file'
+        def_node.root().name = 'random_module_nontest'
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
