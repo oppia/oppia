@@ -26,11 +26,19 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
 import { LoaderService } from 'services/loader.service.ts';
 import { UserService } from 'services/user.service';
+export interface testimonial {
+  quote: string,
+  studentDetails: string,
+  imageUrl: string,
+  imageUrlWebp: string,
+  borderPresent: boolean
+}
 @Component({
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
   styleUrls: []
 })
+
 export class TeachPageComponent implements OnInit {
   isWindowNarrow: boolean = false;
   classroomUrlFragment: string;
@@ -45,14 +53,14 @@ export class TeachPageComponent implements OnInit {
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
     private userService: UserService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
   ) {}
 
   ngOnInit(): void {
     this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
     this.displayedTestimonialId = 0;
     // Change count after all testimonials are available.
-    this.testimonialCount = 2;
+    this.testimonialCount = 3;
     this.testimonials = this.getTestimonials();
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>', {
@@ -83,8 +91,7 @@ export class TeachPageComponent implements OnInit {
       this.displayedTestimonialId + this.testimonialCount - 1) %
       this.testimonialCount;
   }
-
-  getTestimonials():[{}, {}] {
+  getTestimonials(): [testimonial, testimonial, testimonial] {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
@@ -96,6 +103,12 @@ export class TeachPageComponent implements OnInit {
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
       imageUrl: '/teach/awad.jpg',
       imageUrlWebp: '/teach/awad.webp',
+      borderPresent: true
+    }, {
+      quote: 'I18N_TEACH_TESTIMONIAL_3',
+      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
+      imageUrl: '/teach/yamama.jpg',
+      imageUrlWebp: '/teach/yamama.webp',
       borderPresent: true
     }];
   }

@@ -214,14 +214,14 @@ describe('Teach Page', () => {
     expect(component.displayedTestimonialId).toBe(1);
     component.incrementDisplayedTestimonialId();
     // Add back after testimonials are complete.
-    // component.incrementDisplayedTestimonialId();
+    component.incrementDisplayedTestimonialId();
     // component.incrementDisplayedTestimonialId();
     expect(component.displayedTestimonialId).toBe(0);
 
     component.decrementDisplayedTestimonialId();
-    expect(component.displayedTestimonialId).toBe(1);
+    expect(component.displayedTestimonialId).toBe(2);
     component.decrementDisplayedTestimonialId();
-    expect(component.displayedTestimonialId).toBe(0);
+    expect(component.displayedTestimonialId).toBe(1);
   });
 
   it('should get testimonials correctly', function() {
