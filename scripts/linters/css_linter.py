@@ -67,10 +67,7 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             # "x"(\u2716) and a message-id in the end. We are capturing these
             # and then replacing them with empty string('').
             if re.search(r'^\d+:\d+', line.lstrip()):
-                # Replacing message-id with an empty string('').
-                line = re.sub(r'(\w+-*)+$', '', line)
-                unicode_x = re.search(r'\u2716', line).group(0)
-                error_message = line.replace(unicode_x, '', 1)
+                error_message = line.replace(u'\u2716 ', '')
             else:
                 error_message = line
             trimmed_error_messages.append(error_message)
@@ -104,7 +101,6 @@ class ThirdPartyCSSLintChecksManager(python_utils.OBJECT):
             proc_args = stylelint_cmd_args + [filepath]
             proc = subprocess.Popen(
                 proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
             encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
             linter_stdout = encoded_linter_stdout.decode(encoding='utf-8')
             linter_stderr = encoded_linter_stderr.decode(encoding='utf-8')
