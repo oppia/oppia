@@ -95,6 +95,25 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)
         self.user_auth_details.validate()
 
+    def test_repr(self):
+        self.assertEqual(
+            repr(auth_domain.UserAuthDetails(
+                'uid', 'g_auth_id', 'f_auth_id', 'pid', True)),
+            'UserAuthDetails(user_id=%r, gae_id=%r, firebase_auth_id=%r, '
+            'parent_user_id=%r, deleted=%r)' % (
+                'uid', 'g_auth_id', 'f_auth_id', 'pid', True))
+
+    def test_to_dict(self):
+        self.assertEqual(
+            auth_domain.UserAuthDetails(
+                'uid', 'g_auth_id', 'f_auth_id', 'pid', True).to_dict(),
+            {
+                'gae_id': 'g_auth_id',
+                'firebase_auth_id': 'f_auth_id',
+                'parent_user_id': 'pid',
+                'deleted': True,
+            })
+
     def test_validate_non_str_user_id(self):
         self.user_auth_details.user_id = 123
         self.assertRaisesRegexp(

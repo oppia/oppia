@@ -34,15 +34,15 @@ import feconf
 import utils
 
 (
-    auth_models, base_models, collection_models,
-    email_models, exp_models, feedback_models,
-    question_models, skill_models, story_models,
-    suggestion_models, topic_models, user_models
+    base_models, collection_models, email_models,
+    exp_models, feedback_models, question_models,
+    skill_models, story_models, suggestion_models,
+    topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.auth, models.NAMES.base_model, models.NAMES.collection,
-    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
+    models.NAMES.skill, models.NAMES.story, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
 ])
 
 

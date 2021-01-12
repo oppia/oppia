@@ -43,8 +43,9 @@ class AuthClaims(python_utils.OBJECT):
     phone number).
 
     Attributes:
-        auth_id: str. A unique identifier associated with the user. The ID is
-            only unique with respect to the Identity Provider that produced it.
+        auth_id: str. A unique identifier provided by an identity provider that
+            is associated with the user. The ID is only unique with respect to
+            the identity provider that produced it.
         email: str|None. The email address associated with the user, if any.
         role_is_super_admin: bool. Whether the user has super admin privileges.
     """
@@ -79,19 +80,19 @@ class AuthClaims(python_utils.OBJECT):
 class UserAuthDetails(python_utils.OBJECT):
     """Domain object representing a user's authentication details.
 
-    There are two distinct types of user accounts: "profile" and "full".
-        Profile: An account that depends on its "parent user" for
-            authentication. These accounts are not directly associated with any
-            identity providers.
-        Full: An account that is directly associated with an identity provider.
-            The provider's auth_id value will be kept in a corresponding
-            property (e.g., gae_id for Google AppEngine authentication and
+    There are two distinct types of user accounts: "full" and "profile".
+        full: An account that is directly associated with an identity provider.
+            The provider's auth_id value will be kept in its corresponding
+            property (e.g. gae_id for Google AppEngine authentication and
             firebase_auth_id for Firebase authentication).
+        profile: An account that depends on its parent user for authentication.
+            These accounts are not directly associated with an identity
+            provider.
 
-    The distinction between profile and full user accounts are enforced as
-    invariants in auth-related properties: gae_id, firebase_auth_id, and
-    parent_user_id. Specifically: parent_user_id is not None if and only if
-    auth_id is None (where auth_id is: gae_id or firebase_auth_id).
+    The distinction between profile and full user accounts are enforced through
+    invariants on the properties: auth_id and parent_user_id (where auth_id is:
+    gae_id or firebase_auth_id).
+    Specifically: (parent_user_id is not None) if and only if (auth_id is None).
     """
 
     def __init__(
@@ -101,9 +102,9 @@ class UserAuthDetails(python_utils.OBJECT):
 
         Args:
             user_id: str. The unique ID of the user.
-            gae_id: str. The ID of the user provided by GAE auth services.
-            firebase_auth_id: str. The ID of the user provided by Firebase auth
-                services.
+            gae_id: str|None. The ID of the user provided by GAE auth services.
+            firebase_auth_id: str|None. The ID of the user provided by Firebase
+                auth services.
             parent_user_id: str|None. For profile users, the user ID of the full
                 user account that owns the profile. Otherwise this value should
                 be None.
@@ -114,6 +115,13 @@ class UserAuthDetails(python_utils.OBJECT):
         self.firebase_auth_id = firebase_auth_id
         self.parent_user_id = parent_user_id
         self.deleted = deleted
+
+    def __repr__(self):
+        return (
+            'UserAuthDetails(user_id=%r, gae_id=%r, firebase_auth_id=%r, '
+            'parent_user_id=%r, deleted=%r)' % (
+                self.user_id, self.gae_id, self.firebase_auth_id,
+                self.parent_user_id, self.deleted))
 
     def validate(self):
         """Checks whether user_id, gae_id, firebase_auth_id, and parent_user_id
@@ -172,11 +180,11 @@ class UserAuthDetails(python_utils.OBJECT):
     def auth_id(self):
         """Returns the auth ID corresponding to the user account, if any.
 
-        Helper intended to simplify logic that doesn't care about where the auth
-        ID came from.
+        This method is a utility for simplifying code that doesn't care about
+        which identity provider the auth ID came from.
 
         Returns:
-            str. The firebase_auth_id if it is not None, otherwise the gae_id.
+            str. Returns firebase_auth_id if it is not None, otherwise gae_id.
         """
         return self.firebase_auth_id or self.gae_id
 
@@ -187,18 +195,18 @@ class UserAuthDetails(python_utils.OBJECT):
     def to_dict(self):
         """Returns values corresponding to UserAuthDetailsModel's properties.
 
-        Intended to provide syntax sugar for assigning data to a model:
+        This method is a utility for assigning values to UserAuthDetailsModel:
             user_auth_details.validate()
             user_auth_details_model.populate(**user_auth_details.to_dict())
 
         NOTE: The dict returned does not include user_id because that value is
-        UserAuthDetailsModel's key. Keys are distinct from normal properties and
-        cannot be re-assigned using the `populate()` method; trying to do so
-        will raise an exception.
+        UserAuthDetailsModel's key. Keys are distinct from normal properties,
+        and cannot be re-assigned using the `populate()` method; trying to
+        assign to it will raise an exception.
 
         Returns:
-            dict(str:*). A dict of values taken from self using
-            UserAuthDetailsModel property names as keys.
+            dict(str:*). A dict of values from self using UserAuthDetailsModel
+            property names as keys.
         """
         return {
             'gae_id': self.gae_id,

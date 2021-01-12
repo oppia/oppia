@@ -36,15 +36,14 @@ class UserAuthDetailsModel(base_models.BaseModel):
     # Authentication identifier from Google AppEngine (GAE). Exists only for
     # full users. None for profile users.
     gae_id = datastore_services.StringProperty(indexed=True)
-    # Authentication detail for sign in using Firebase authentication.
+    # Authentication identifier from the Firebase authentication server.
     # TODO(#11462): This will exist for all users after the Firebase migration,
     # so update this description once it has succeeded.
     firebase_auth_id = datastore_services.StringProperty(indexed=True)
-    # For profile users, the user ID of the full user associated with that
-    # profile. None for full users. Required for profiles because
-    # gae_id/firebase_auth_id attribute is None for them, hence this
-    # attribute stores their association with a full user who do have a
-    # gae_id/firebase_auth_id.
+    # For profile users, the user ID of the full user associated with them.
+    # None for full users. Required for profiles because gae_id/firebase_auth_id
+    # attribute is None for them, hence this attribute stores their association
+    # with a full user who do have a gae_id/firebase_auth_id.
     parent_user_id = (
         datastore_services.StringProperty(indexed=True, default=None))
 
@@ -146,12 +145,11 @@ class UserAuthDetailsModel(base_models.BaseModel):
 
 
 class UserIdentifiersModel(base_models.BaseModel):
-    """Stores the relation between GAE ID and user ID.
+    """Stores the relationship between user ID and GAE ID.
 
     Instances of this class are keyed by GAE ID.
     """
 
-    # The main user ID that is used by Oppia.
     user_id = datastore_services.StringProperty(required=True, indexed=True)
 
     @staticmethod
@@ -200,19 +198,6 @@ class UserIdentifiersModel(base_models.BaseModel):
             bool. Whether any UserIdentifiersModel refers to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
-
-    @classmethod
-    def get_by_gae_id(cls, gae_id):
-        """Get an entry by GAE ID.
-
-        Args:
-            gae_id: str. The GAE ID.
-
-        Returns:
-            UserIdentifiersModel. The model with ID field equal to gae_id
-            argument.
-        """
-        return cls.get_by_id(gae_id)
 
     @classmethod
     def get_by_user_id(cls, user_id):

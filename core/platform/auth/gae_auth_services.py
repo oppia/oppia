@@ -50,7 +50,7 @@ def get_auth_claims_from_request(unused_request):
 
 
 def mark_user_for_deletion(user_id):
-    """Deletes all associations that refer to the user outside of Oppia.
+    """Marks the user, and all of their auth associations, as deleted.
 
     Args:
         user_id: str. The unique ID of the user whose associations should be
@@ -110,10 +110,10 @@ def get_auth_id_from_user_id(user_id):
     """Returns the auth ID associated with the given user ID.
 
     Args:
-        user_id: str. The auth ID.
+        user_id: str. The user ID.
 
     Returns:
-        str|None. The user ID associated with the given auth ID, or None if no
+        str|None. The auth ID associated with the given user ID, or None if no
         association exists.
     """
     assoc_by_user_id_model = (
@@ -179,7 +179,7 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
             commit.
 
     Raises:
-        Exception. The auth ID is already associated with a user ID.
+        Exception. The IDs are already associated with a value.
     """
     auth_id, user_id = auth_id_user_id_pair
 
@@ -201,11 +201,11 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
     assoc_by_auth_id_model.put()
 
     # The {user_id: auth_id} mapping needs to be created, but the model used to
-    # store the relationship might already exist because other services also use
-    # it (e.g., user_services uses UserAuthDetailsModel.parent_user_id). In such
-    # situations, the return value of get_auth_id_from_user_id would return
-    # None, so it isn't strong enough of a check to determine if we need to
-    # create a new model rather than update an existing one.
+    # store the relationship might already exist because other services use it
+    # as well (e.g. user_services uses UserAuthDetailsModel.parent_user_id). In
+    # such situations, the return value of get_auth_id_from_user_id would be
+    # None, so that isn't strong enough to determine whether we need to create a
+    # new model rather than update an existing one.
     assoc_by_user_id_model = (
         auth_models.UserAuthDetailsModel.get(user_id, strict=False))
     if assoc_by_user_id_model is None or assoc_by_user_id_model.gae_id is None:
@@ -223,7 +223,7 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
             associations to commit.
 
     Raises:
-        Exception. One or more auth ID associations already exist.
+        Exception. One or more auth associations already exist.
     """
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
     auth_ids, user_ids = python_utils.ZIP(*auth_id_user_id_pairs)
@@ -257,10 +257,10 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
     auth_models.UserIdentifiersModel.put_multi(assoc_by_auth_id_models)
 
     # The {user_id: auth_id} mapping needs to be created, but the model used to
-    # store the relationship might already exist because other services also use
-    # it (e.g., user_services uses UserAuthDetailsModel.parent_user_id). In such
-    # situations, the return value of get_auth_id_from_user_id would return
-    # None, so it isn't strong enough of a check to determine if we need to
+    # store the relationship might already exist because other services use it
+    # as well (e.g. user_services uses UserAuthDetailsModel.parent_user_id). In
+    # such situations, the return value of get_multi_auth_ids_from_user_ids
+    # would be None, so that isn't strong enough to determine whether we need to
     # create a new model rather than update an existing one.
     assoc_by_user_id_models = [
         auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id)

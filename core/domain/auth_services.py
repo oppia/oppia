@@ -27,39 +27,38 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 platform_auth_services = models.Registry.import_auth_services()
 
 
-def get_all_profiles_by_parent_user_id(parent_user_id):
-    """Fetch all user entries with the given parent_user_id.
-
-    Args:
-        parent_user_id: str. User id of the parent_user whose associated
-            profiles we are querying for.
-
-    Returns:
-        list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
-        mapped to the queried parent_user_id.
-    """
-    return auth_models.UserAuthDetailsModel.query(
-        auth_models.UserAuthDetailsModel.parent_user_id == parent_user_id
-    ).fetch()
-
-
 def create_profile_user_auth_details(user_id, parent_user_id):
-    """Returns a domain object for a new profile-user.
+    """Returns a domain object for a new profile user.
 
     Args:
         user_id: str. A user ID produced by Oppia for the new profile user.
-        parent_user_id: str. The user ID of the full user account which owns
+        parent_user_id: str. The user ID of the full user account which will own
             the new profile account.
 
     Returns:
-        UserAuthDetails. The new domain object.
+        UserAuthDetails. Auth details for the new user.
 
     Raises:
-        ValueError. When the user's parent is itself.
+        ValueError. The new user's parent is itself.
     """
     if user_id == parent_user_id:
         raise ValueError('user cannot be its own parent')
     return auth_domain.UserAuthDetails(user_id, None, None, parent_user_id)
+
+
+def get_all_profiles_by_parent_user_id(parent_user_id):
+    """Fetch the auth details of all profile users with the given parent user.
+
+    Args:
+        parent_user_id: str. The user ID of the parent user.
+
+    Returns:
+        list(UserAuthDetailsModel). List of UserAuthDetailsModel instances
+        with the given parent user.
+    """
+    return auth_models.UserAuthDetailsModel.query(
+        auth_models.UserAuthDetailsModel.parent_user_id == parent_user_id
+    ).fetch()
 
 
 def get_user_auth_details_from_model(user_auth_details_model):
@@ -93,7 +92,7 @@ def get_auth_claims_from_request(request):
 
 
 def mark_user_for_deletion(user_id):
-    """Marks the user and all of their associated auth-details as deleted.
+    """Marks the user, and all of their auth associations, as deleted.
 
     Args:
         user_id: str. The unique ID of the user whose associations should be
@@ -188,7 +187,7 @@ def associate_auth_id_with_user_id(auth_id_user_id_pair):
             commit.
 
     Raises:
-        Exception. The auth ID is already associated with a user ID.
+        Exception. The IDs are already associated with a value.
     """
     platform_auth_services.associate_auth_id_with_user_id(auth_id_user_id_pair)
 
@@ -201,7 +200,7 @@ def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
             associations to commit.
 
     Raises:
-        Exception. One or more auth ID associations already exist.
+        Exception. One or more auth associations already exist.
     """
     platform_auth_services.associate_multi_auth_ids_with_user_ids(
         auth_id_user_id_pairs)

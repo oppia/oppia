@@ -605,7 +605,7 @@ class AuthServicesStub(python_utils.OBJECT):
         return None
 
     def mark_user_for_deletion(self, user_id):
-        """Deletes all associations that refer to the user outside of Oppia.
+        """Marks the user, and all of their auth associations, as deleted.
 
         Since the stub does not use models, this operation actually deletes the
         user's association. The "external" associations, however, are not
@@ -696,15 +696,14 @@ class AuthServicesStub(python_utils.OBJECT):
     def associate_auth_id_with_user_id(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID.
 
-        This method also updates the "external" user ID associations just in
-        case it was wrong.
+        This method also adds the user to the "external" set of associations.
 
         Args:
             auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association
                 to commit.
 
         Raises:
-            Exception. The auth ID is already associated with a user ID.
+            Exception. The IDs are already associated with a value.
         """
         auth_id, user_id = auth_id_user_id_pair
         if auth_id in self._user_id_by_auth_id:
@@ -719,15 +718,14 @@ class AuthServicesStub(python_utils.OBJECT):
     def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs.
 
-        This method also updates the "external" user ID associations just in
-        case it was wrong.
+        This method also adds the users to the "external" set of associations.
 
         Args:
             auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
                 associations to commit.
 
         Raises:
-            Exception. One or more auth ID associations already exist.
+            Exception. One or more auth associations already exist.
         """
         collisions = ', '.join(
             '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a])

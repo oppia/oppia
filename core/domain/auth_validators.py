@@ -68,8 +68,6 @@ class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
     def _get_model_id_regex(cls, unused_item):
         """Returns a regex for model id.
 
-        This method can be overridden by subclasses, if needed.
-
         Args:
             unused_item: datastore_services.Model. Entity to validate.
 
@@ -99,8 +97,6 @@ class UserIdByFirebaseAuthIdModelValidator(
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         """Returns a regex for model id.
-
-        This method can be overridden by subclasses, if needed.
 
         Args:
             unused_item: datastore_services.Model. Entity to validate.
