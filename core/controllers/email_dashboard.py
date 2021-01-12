@@ -147,8 +147,8 @@ class EmailDashboardResultPage(base.BaseHandler):
     def get(self, query_id):
         user_query = user_query_services.get_user_query(query_id)
         if (
-            user_query is None or
-            user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
+                user_query is None or
+                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
         ):
             raise self.InvalidInputException('400 Invalid query id.')
 
@@ -162,8 +162,8 @@ class EmailDashboardResultPage(base.BaseHandler):
     def post(self, query_id):
         user_query = user_query_services.get_user_query(query_id)
         if (
-            user_query is None or
-            user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
+                user_query is None or
+                user_query.status != feconf.USER_QUERY_STATUS_COMPLETED
         ):
             raise self.InvalidInputException('400 Invalid query id.')
 

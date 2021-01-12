@@ -23,7 +23,6 @@ import logging
 
 from constants import constants
 from core import jobs
-from core.controllers import cron
 from core.domain import config_services
 from core.domain import cron_services
 from core.domain import email_manager

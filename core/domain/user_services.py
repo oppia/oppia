@@ -28,7 +28,6 @@ import re
 from constants import constants
 from core.domain import role_services
 from core.domain import user_domain
-from utils import is_user_id_valid
 from core.platform import models
 import feconf
 import python_utils
@@ -192,7 +191,7 @@ class UserSettings(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not is_user_id_valid(self.user_id):
+        if not utils.is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if not isinstance(self.role, python_utils.BASESTRING):
@@ -447,7 +446,7 @@ class UserAuthDetails(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not is_user_id_valid(self.user_id):
+        if not utils.is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if (self.gae_id is not None and
@@ -458,7 +457,7 @@ class UserAuthDetails(python_utils.OBJECT):
             )
 
         if (self.parent_user_id is not None and
-                not is_user_id_valid(self.parent_user_id)):
+                not utils.is_user_id_valid(self.parent_user_id)):
             raise utils.ValidationError(
                 'The parent user ID is in a wrong format.')
 
@@ -517,7 +516,7 @@ class UserIdentifiers(python_utils.OBJECT):
                 'Expected user_id to be a string, received %s' % self.user_id)
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
-        if not is_user_id_valid(self.user_id):
+        if not utils.is_user_id_valid(self.user_id):
             raise utils.ValidationError('The user ID is in a wrong format.')
 
         if not self.gae_id:

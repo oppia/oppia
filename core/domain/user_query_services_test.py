@@ -19,10 +19,10 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import feconf
 from core.domain import user_query_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -82,7 +82,8 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             user_query.params.edited_fewer_than_n_exps)
         self.assertEqual(
             self.user_query_model_1.submitter_id, user_query.submitter_id)
-        self.assertEqual(self.user_query_model_1.query_status, user_query.status)
+        self.assertEqual(
+            self.user_query_model_1.query_status, user_query.status)
         self.assertEqual(self.user_query_model_1.user_ids, user_query.user_ids)
         self.assertEqual(
             self.user_query_model_1.sent_email_model_id,

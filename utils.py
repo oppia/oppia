@@ -854,6 +854,8 @@ def is_user_id_valid(
 
     Args:
         user_id: str. The user ID to be checked.
+        allow_system_user_id: bool. Whether to allow system user ID.
+        allow_pseudonymous_id: bool. Whether to allow pseudonymized ID.
 
     Returns:
         bool. True when the ID is in a correct format or if the ID belongs to

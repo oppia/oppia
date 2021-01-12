@@ -40,11 +40,26 @@ UserQueryParams = collections.namedtuple(
 
 
 class UserQuery(python_utils.OBJECT):
+    """Domain object for the UserQueryModel."""
 
     def __init__(
-        self, query_id, query_params, submitter_id, query_status, user_ids,
-        sent_email_model_id=None, created_on=None, deleted=False
+            self, query_id, query_params, submitter_id, query_status, user_ids,
+            sent_email_model_id=None, created_on=None, deleted=False
     ):
+        """Create user query domain object.
+
+        Args:
+            query_id: str. The id of the query.
+            query_params: UserQueryParams. The params of this query.
+            submitter_id: str. The ID of the user that submitted the query.
+            query_status: str. The status of the query. Can only contain values
+                from feconf.ALLOWED_USER_QUERY_STATUSES.
+            user_ids: list(str). The IDs of users that the query applies to.
+            sent_email_model_id: str|None. The send email model ID that was sent
+                to the users.
+            created_on: DateTime. The time when the query was created.
+            deleted: bool. Whether the query is deleted.
+        """
         self.id = query_id
         self.params = query_params
         self.submitter_id = submitter_id
@@ -116,6 +131,11 @@ class UserQuery(python_utils.OBJECT):
                     % self.sent_email_model_id)
 
     def to_dict(self):
+        """Create a dict from the user query.
+
+        Returns:
+            dict. The dict from the user query.
+        """
         return {
             'id': self.id,
             'submitter_id': self.submitter_id,

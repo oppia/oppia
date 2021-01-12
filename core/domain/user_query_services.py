@@ -78,7 +78,7 @@ def get_recent_user_queries(num_queries_to_fetch, cursor):
     Args:
         num_queries_to_fetch: int. Number of user queries to fetch.
         cursor: str or None. The list of returned entities starts from this
-                datastore cursor.
+            datastore cursor.
 
     Returns:
         (list(QueryModel), str). The list of user queries.
@@ -175,7 +175,7 @@ def archive_user_query(user_query):
     """Archive the user query.
 
     Args:
-        user_query: The user query to archive.
+        user_query: UserQuery. The user query to archive.
     """
     user_query.archive()
     _save_user_query(user_query)

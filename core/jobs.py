@@ -78,6 +78,7 @@ NUM_JOBS_IN_DASHBOARD_LIMIT = 100
 # The default retention time is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
 
+
 class BaseJobManager(python_utils.OBJECT):
     """Base class for managing long-running jobs.
 
@@ -1463,7 +1464,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
         """
         # This is not an ancestor query, so it must be run outside a
         # transaction.
-        do_unfinished_jobs_exist = (
+        unfinished_jobs_exist = (
             job_models.JobModel.do_unfinished_jobs_exist(
                 cls._get_batch_job_manager_class().__name__))
 
@@ -1475,7 +1476,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
             # If there is no job currently running, go to IDLE immediately.
             new_status_code = (
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING if
-                do_unfinished_jobs_exist else
+                unfinished_jobs_exist else
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
             cc_model.status_code = new_status_code
             cc_model.last_stopped_msec = utils.get_current_time_in_millisecs()
@@ -1487,7 +1488,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
         # The cancellation must be done after the continuous computation
         # status update.
-        if do_unfinished_jobs_exist:
+        if unfinished_jobs_exist:
             unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
                 cls._get_batch_job_manager_class().__name__)
             for job_model in unfinished_job_models:
@@ -1703,8 +1704,10 @@ def cleanup_old_jobs_pipelines():
 
     job_instances = job_models.JobModel.get_recent_jobs(1000, max_age_msec)
     for job_instance in job_instances:
-        if (job_instance.time_started_msec < max_start_time_msec and not
-        job_instance.has_been_cleaned_up):
+        if (
+                job_instance.time_started_msec < max_start_time_msec and
+                not job_instance.has_been_cleaned_up
+        ):
             if 'root_pipeline_id' in job_instance.metadata:
                 pipeline_id = job_instance.metadata['root_pipeline_id']
                 pipeline_id_to_job_instance[pipeline_id] = job_instance
@@ -1713,13 +1716,15 @@ def cleanup_old_jobs_pipelines():
     for pline in pipeline.get_root_list()['pipelines']:
         pipeline_id = pline['pipelineId']
         job_definitely_terminated = (
-                pline['status'] == 'done' or
-                pline['status'] == 'aborted' or
-                pline['currentAttempt'] > pline['maxAttempts'])
+            pline['status'] == 'done' or
+            pline['status'] == 'aborted' or
+            pline['currentAttempt'] > pline['maxAttempts']
+        )
         have_start_time = 'startTimeMs' in pline
         job_started_too_long_ago = (
-                have_start_time and
-                pline['startTimeMs'] < max_start_time_msec)
+            have_start_time and
+            pline['startTimeMs'] < max_start_time_msec
+        )
 
         if (job_started_too_long_ago or
                 (not have_start_time and job_definitely_terminated)):
