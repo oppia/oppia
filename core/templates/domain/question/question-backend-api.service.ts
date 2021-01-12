@@ -191,7 +191,7 @@ export class QuestionBackendApiService {
     });
   }
 
-  async fetchTotalQuestionCountForSkillIdsAsync(skillIds: string[]): Promise<number> {
+  async fetchTotalQuestionCountForSkillIdsAsync (skillIds: string[]): Promise<number> {
     return new Promise((resolve, reject) => {
       this._fetchTotalQuestionCountForSkillIds(skillIds, resolve, reject);
     });
