@@ -33,12 +33,6 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
 
     ENABLE_AUTH_SERVICES_STUB = False
 
-    def test_create_user_auth_details(self):
-        user_auth_details = (
-            gae_auth_services.create_user_auth_details('uid', 'aid'))
-        self.assertEqual(user_auth_details.user_id, 'uid')
-        self.assertEqual(user_auth_details.gae_id, 'aid')
-
     def test_get_auth_claims_from_request_returns_none_if_not_logged_in(self):
         request = webapp2.Request.blank('/')
 
@@ -71,7 +65,7 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
         self.assertTrue(claims.role_is_super_admin)
 
     def test_get_association_that_is_present(self):
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertEqual(
@@ -86,11 +80,11 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
             gae_auth_services.get_auth_id_from_user_id('does_not_exist'))
 
     def test_get_multi_associations_with_all_present(self):
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid2', 'uid2'))
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
 
         self.assertEqual(
@@ -99,10 +93,10 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
             ['uid1', 'uid2', 'uid3'])
 
     def test_get_multi_associations_with_one_missing(self):
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
         # The aid2 <-> uid2 association is missing.
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
 
         self.assertEqual(
@@ -111,7 +105,7 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
             ['uid1', None, 'uid3'])
 
     def test_associate_without_collision(self):
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertEqual(
@@ -120,15 +114,15 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
             gae_auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
     def test_associate_with_collision_raises(self):
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         with self.assertRaisesRegexp(Exception, 'already associated'):
-            gae_auth_services.associate_auth_id_to_user_id(
+            gae_auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
     def test_associate_multi_without_collisions(self):
-        gae_auth_services.associate_multi_auth_ids_to_user_ids(
+        gae_auth_services.associate_multi_auth_ids_with_user_ids(
             [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
              auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
              auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
@@ -140,11 +134,11 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
             ['uid1', 'uid2', 'uid3'])
 
     def test_associate_multi_with_collision_raises(self):
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
 
         with self.assertRaisesRegexp(Exception, 'already associated'):
-            gae_auth_services.associate_multi_auth_ids_to_user_ids(
+            gae_auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
                  auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
@@ -157,7 +151,7 @@ class GaeAuthServicesTests(test_utils.GenericTestBase):
                 'uid'))
 
     def test_disable_association_marks_model_for_deletion(self):
-        gae_auth_services.associate_auth_id_to_user_id(
+        gae_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         gae_auth_services.mark_user_for_deletion('uid')
         self.assertIsNone(

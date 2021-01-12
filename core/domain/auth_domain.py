@@ -43,9 +43,9 @@ class AuthClaims(python_utils.OBJECT):
     phone number).
 
     Attributes:
-        auth_id: str. A unique identifier associated to the user. The ID is only
-            unique with respect to the Identity Provider that produced it.
-        email: str|None. The email address associated to the user, if any.
+        auth_id: str. A unique identifier associated with the user. The ID is
+            only unique with respect to the Identity Provider that produced it.
+        email: str|None. The email address associated with the user, if any.
         role_is_super_admin: bool. Whether the user has super admin privileges.
     """
 

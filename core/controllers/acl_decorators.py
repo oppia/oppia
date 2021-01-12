@@ -1553,7 +1553,7 @@ def can_manage_question_skill_status(handler):
 
 
 def require_user_id_else_redirect_to_homepage(handler):
-    """Decorator that checks if a user_id is associated to the current
+    """Decorator that checks if a user_id is associated with the current
     session. If not, the user is redirected to the main page.
     Note that the user may not yet have registered.
 
@@ -2438,7 +2438,7 @@ def can_access_story_viewer_page(handler):
         Args:
             classroom_url_fragment: str. The classroom url fragment.
             topic_url_fragment: str. The url fragment of the topic
-                associated to the story.
+                associated with the story.
             story_url_fragment: str. The story url fragment.
             *args: list(*). A list of arguments from the calling function.
             **kwargs: *. Keyword arguments.
@@ -2535,7 +2535,7 @@ def can_access_subtopic_viewer_page(handler):
         Args:
             classroom_url_fragment: str. The classroom url fragment.
             topic_url_fragment: str. The url fragment of the topic
-                associated to the subtopic.
+                associated with the subtopic.
             subtopic_url_fragment: str. The url fragment of the Subtopic.
             **kwargs: *. Keyword arguments.
 

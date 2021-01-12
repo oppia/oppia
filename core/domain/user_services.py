@@ -1138,11 +1138,9 @@ def _create_new_user_transactional(auth_id, user_settings):
         user_settings: UserSettings. The user settings domain object
             corresponding to the newly created user.
     """
-    _save_user_auth_details(auth_services.create_full_user_auth_details(
-        user_settings.user_id, auth_id))
     _save_user_settings(user_settings)
     create_user_contributions(user_settings.user_id, [], [])
-    auth_services.associate_auth_id_to_user_id(
+    auth_services.associate_auth_id_with_user_id(
         auth_domain.AuthIdUserIdPair(auth_id, user_settings.user_id))
 
 

@@ -365,14 +365,8 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
     ENABLE_AUTH_SERVICES_STUB = False
 
-    def test_create_user_auth_details(self):
-        user_auth_details = (
-            firebase_auth_services.create_user_auth_details('uid', 'aid'))
-        self.assertEqual(user_auth_details.user_id, 'uid')
-        self.assertEqual(user_auth_details.firebase_auth_id, 'aid')
-
     def test_get_association_that_is_present(self):
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertEqual(
@@ -387,11 +381,11 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_auth_id_from_user_id('does_not_exist'))
 
     def test_get_multi_associations_with_all_present(self):
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid2', 'uid2'))
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
 
         self.assertEqual(
@@ -400,10 +394,10 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             ['uid1', 'uid2', 'uid3'])
 
     def test_get_multi_associations_with_one_missing(self):
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
         # The aid2 <-> uid2 association is missing.
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
 
         self.assertEqual(
@@ -412,7 +406,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             ['uid1', None, 'uid3'])
 
     def test_associate_without_collision(self):
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertEqual(
@@ -421,15 +415,15 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
     def test_associate_with_collision_raises(self):
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         with self.assertRaisesRegexp(Exception, 'already associated'):
-            firebase_auth_services.associate_auth_id_to_user_id(
+            firebase_auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
     def test_associate_multi_without_collisions(self):
-        firebase_auth_services.associate_multi_auth_ids_to_user_ids(
+        firebase_auth_services.associate_multi_auth_ids_with_user_ids(
             [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
              auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
              auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
@@ -441,18 +435,18 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             ['uid1', 'uid2', 'uid3'])
 
     def test_associate_multi_with_collision_raises(self):
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
 
         with self.assertRaisesRegexp(Exception, 'already associated'):
-            firebase_auth_services.associate_multi_auth_ids_to_user_ids(
+            firebase_auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
                  auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
 
     def test_present_association_is_not_considered_to_be_deleted(self):
         firebase_admin.auth.create_user(uid='aid')
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertFalse(
@@ -466,7 +460,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
     def test_delete_association_when_it_is_present(self):
         firebase_admin.auth.create_user(uid='aid')
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         self.assertFalse(
             firebase_auth_services
@@ -485,7 +479,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
     def test_disable_association_marks_user_for_deletion(self):
         firebase_admin.auth.create_user(uid='aid')
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertIsNotNone(
@@ -500,7 +494,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
     def test_disable_association_warns_when_firebase_fails_to_init(self):
         firebase_admin.auth.create_user(uid='aid')
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         init_swap = self.swap_to_always_raise(
             firebase_admin, 'initialize_app',
@@ -520,7 +514,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
     def test_disable_association_warns_when_firebase_fails_to_update_user(self):
         firebase_admin.auth.create_user(uid='aid')
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         update_user_swap = self.swap_to_always_raise(
             firebase_admin.auth, 'update_user',
@@ -550,7 +544,7 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
     def setUp(self):
         super(FirebaseSpecificAssociationTests, self).setUp()
         firebase_admin.auth.create_user(uid=self.AUTH_ID)
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.USER_ID))
 
     def test_delete_user_without_firebase_initialization_returns_false(self):
@@ -619,7 +613,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         firebase_admin.auth.create_user(uid=self.AUTH_ID)
         self.signup(self.EMAIL, self.USERNAME)
         self.user_id = self.get_user_id_from_email(self.EMAIL)
-        firebase_auth_services.associate_auth_id_to_user_id(
+        firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.user_id))
 
     def delete_external_auth_associations(self):

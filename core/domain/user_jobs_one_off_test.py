@@ -23,7 +23,6 @@ import ast
 import datetime
 import re
 
-from core.domain import auth_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
@@ -1883,18 +1882,18 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
             migrated_user_model.created_on, final_created_on_timestamp)
 
     def test_time_difference_less_than_time_delta_does_not_update(self):
-        user_auth_details = auth_services.create_full_user_auth_details(
-            self.USER_ID_1, 'auth_id')
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
-        user_auth_details_model = auth_models.UserAuthDetailsModel(
-            id=self.USER_ID_1, **user_auth_details.to_dict())
+        user_auth_details_model = (
+            auth_models.UserAuthDetailsModel.get(user_id))
         user_auth_details_model.update_timestamps()
         user_auth_details_model.put()
 
         user_settings_model = (
             user_models.UserSettingsModel(
-                id=self.USER_ID_1,
-                email=self.EMAIL_1,
+                id=user_id,
+                email=self.NEW_USER_EMAIL,
             )
         )
         user_settings_model.update_timestamps()
@@ -1910,7 +1909,7 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
         actual_output = self._run_one_off_job()
         self.assertItemsEqual(expected_output, actual_output)
         migrated_user_model = (
-            user_models.UserSettingsModel.get_by_id(self.USER_ID_1))
+            user_models.UserSettingsModel.get_by_id(user_id))
         self.assertNotEqual(
             migrated_user_model.created_on, user_auth_details_model.created_on)
 

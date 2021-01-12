@@ -61,15 +61,6 @@ class AuthServicesTests(test_utils.GenericTestBase):
         self.profile_user_1_id = profile_users[0].user_id
         self.profile_user_2_id = profile_users[1].user_id
 
-    def test_create_full_user_auth_details(self):
-        gae_user_auth_details = auth_services.create_full_user_auth_details(
-            'uid', 'aid')
-
-        self.assertEqual(gae_user_auth_details.user_id, 'uid')
-        self.assertEqual(gae_user_auth_details.auth_id, 'aid')
-        self.assertIsNone(gae_user_auth_details.parent_user_id)
-        self.assertFalse(gae_user_auth_details.deleted)
-
     def test_create_profile_user_auth_details(self):
         user_auth_details = auth_services.create_profile_user_auth_details(
             'uid', 'pid')
@@ -135,8 +126,8 @@ class AuthServicesTests(test_utils.GenericTestBase):
             auth_services.has_reference_to_user_id('non_existing_user_id'))
 
     def test_get_association_that_is_present(self):
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid', 'uid'))
+        auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertEqual(auth_services.get_user_id_from_auth_id('aid'), 'uid')
         self.assertEqual(auth_services.get_auth_id_from_user_id('uid'), 'aid')
@@ -148,12 +139,12 @@ class AuthServicesTests(test_utils.GenericTestBase):
             auth_services.get_auth_id_from_user_id('does_not_exist'))
 
     def test_get_multi_associations_with_all_present(self):
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid1', 'uid1'))
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid2', 'uid2'))
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid3', 'uid3'))
+        auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+        auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid2', 'uid2'))
+        auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
 
         self.assertEqual(
             auth_services.get_multi_user_ids_from_auth_ids(
@@ -161,34 +152,34 @@ class AuthServicesTests(test_utils.GenericTestBase):
             ['uid1', 'uid2', 'uid3'])
 
     def test_get_multi_associations_with_one_missing(self):
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid1', 'uid1'))
+        auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
         # The aid2 <-> uid2 association is missing.
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid3', 'uid3'))
+        auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid3', 'uid3'))
 
         self.assertEqual(
             auth_services.get_multi_user_ids_from_auth_ids(
                 ['aid1', 'aid2', 'aid3']),
             ['uid1', None, 'uid3'])
 
-    def test_associate_auth_id_to_user_id_without_collision(self):
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid', 'uid'))
+    def test_associate_auth_id_with_user_id_without_collision(self):
+        auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         self.assertEqual(auth_services.get_user_id_from_auth_id('aid'), 'uid')
         self.assertEqual(auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
-    def test_associate_auth_id_to_user_id_with_collision_raises(self):
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid', 'uid'))
+    def test_associate_auth_id_with_user_id_with_collision_raises(self):
+        auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
         with self.assertRaisesRegexp(Exception, 'already associated'):
-            auth_services.associate_auth_id_to_user_id(
+            auth_services.associate_auth_id_with_user_id(
                 auth_domain.AuthIdUserIdPair('aid', 'uid'))
 
-    def test_associate_multi_auth_ids_to_user_ids_without_collisions(self):
-        auth_services.associate_multi_auth_ids_to_user_ids(
+    def test_associate_multi_auth_ids_with_user_ids_without_collisions(self):
+        auth_services.associate_multi_auth_ids_with_user_ids(
             [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
              auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
              auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
@@ -199,21 +190,18 @@ class AuthServicesTests(test_utils.GenericTestBase):
              auth_services.get_user_id_from_auth_id('aid3')],
             ['uid1', 'uid2', 'uid3'])
 
-    def test_associate_multi_auth_ids_to_user_ids_with_collision_raises(self):
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid1', 'uid1'))
+    def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(self):
+        auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
 
         with self.assertRaisesRegexp(Exception, 'already associated'):
-            auth_services.associate_multi_auth_ids_to_user_ids(
+            auth_services.associate_multi_auth_ids_with_user_ids(
                 [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
                  auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
                  auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
 
     def test_present_association_is_not_considered_to_be_deleted(self):
-        # This operation creates the external auth association.
-        auth_services.create_full_user_auth_details('uid', 'aid')
-
-        auth_services.associate_auth_id_to_user_id(
+        auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
         self.assertFalse(
             auth_services.verify_external_auth_associations_are_deleted('uid'))
@@ -224,18 +212,15 @@ class AuthServicesTests(test_utils.GenericTestBase):
                 'does_not_exist'))
 
     def test_delete_association_when_it_is_present(self):
-        # This operation creates the external auth association.
-        auth_services.create_full_user_auth_details('uid', 'aid')
-
-        auth_services.associate_auth_id_to_user_id(auth_domain.AuthIdUserIdPair(
-            'aid', 'uid'))
         self.assertFalse(
-            auth_services.verify_external_auth_associations_are_deleted('uid'))
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.full_user_id))
 
-        auth_services.delete_external_auth_associations('uid')
+        auth_services.delete_external_auth_associations(self.full_user_id)
 
         self.assertTrue(
-            auth_services.verify_external_auth_associations_are_deleted('uid'))
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.full_user_id))
 
     def test_delete_association_when_it_is_missing_does_not_raise(self):
         # Should not raise.

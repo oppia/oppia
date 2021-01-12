@@ -79,10 +79,10 @@ from google.appengine.ext import testbed
 import webtest
 
 (
-    exp_models, feedback_models, question_models, skill_models, story_models,
-    suggestion_models, topic_models,) = (
+    auth_models, exp_models, feedback_models, question_models, skill_models,
+    story_models, suggestion_models, topic_models,) = (
         models.Registry.import_models([
-            models.NAMES.exploration, models.NAMES.feedback,
+            models.NAMES.auth, models.NAMES.exploration, models.NAMES.feedback,
             models.NAMES.question, models.NAMES.skill, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic]))
 
@@ -540,9 +540,6 @@ class AuthServicesStub(python_utils.OBJECT):
             stub = cls()
 
             stack.enter_context(test.swap(
-                platform_auth_services, 'create_user_auth_details',
-                stub.create_user_auth_details))
-            stack.enter_context(test.swap(
                 platform_auth_services, 'get_auth_claims_from_request',
                 stub.get_auth_claims_from_request))
             stack.enter_context(test.swap(
@@ -565,11 +562,15 @@ class AuthServicesStub(python_utils.OBJECT):
                 platform_auth_services, 'get_multi_user_ids_from_auth_ids',
                 stub.get_multi_user_ids_from_auth_ids))
             stack.enter_context(test.swap(
-                platform_auth_services, 'associate_auth_id_to_user_id',
-                stub.associate_auth_id_to_user_id))
+                platform_auth_services, 'get_multi_auth_ids_from_user_ids',
+                stub.get_multi_auth_ids_from_user_ids))
             stack.enter_context(test.swap(
-                platform_auth_services, 'associate_multi_auth_ids_to_user_ids',
-                stub.associate_multi_auth_ids_to_user_ids))
+                platform_auth_services, 'associate_auth_id_with_user_id',
+                stub.associate_auth_id_with_user_id))
+            stack.enter_context(test.swap(
+                platform_auth_services,
+                'associate_multi_auth_ids_with_user_ids',
+                stub.associate_multi_auth_ids_with_user_ids))
 
             # Standard usage of ExitStack: enter a bunch of context managers
             # from the safety of an ExitStack's context. Once they've all been
@@ -578,23 +579,6 @@ class AuthServicesStub(python_utils.OBJECT):
             # in reverse order.
             # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
             return stack.pop_all().close
-
-    def create_user_auth_details(self, user_id, auth_id):
-        """Returns a UserAuthDetails object configured with Firebase properties.
-
-        The stub pretends to use Firebase auth IDs. To make the operation more
-        authentic, this method also creates a new "external" association for the
-        user to simulate a genuine provided value.
-
-        Args:
-            user_id: str. The unique ID of the user.
-            auth_id: str|None. The ID of the user retrieved from Firebase.
-
-        Returns:
-            UserAuthDetails. A UserAuthDetails domain object.
-        """
-        self._external_user_id_associations.add(user_id)
-        return auth_domain.UserAuthDetails(user_id, None, auth_id, None)
 
     @classmethod
     def get_auth_claims_from_request(cls, unused_request):
@@ -696,7 +680,20 @@ class AuthServicesStub(python_utils.OBJECT):
         """
         return [self._user_id_by_auth_id.get(a, None) for a in auth_ids]
 
-    def associate_auth_id_to_user_id(self, auth_id_user_id_pair):
+    def get_multi_auth_ids_from_user_ids(self, user_ids):
+        """Returns the auth IDs associated with the given user IDs.
+
+        Args:
+            user_ids: list(str). The user IDs.
+
+        Returns:
+            list(str|None). The auth IDs associated with each of the given user
+            IDs, or None for associations which don't exist.
+        """
+        user_ids = set(user_ids)
+        return [a for a, u in self._user_id_by_auth_id.items() if u in user_ids]
+
+    def associate_auth_id_with_user_id(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID.
 
         This method also updates the "external" user ID associations just in
@@ -711,11 +708,15 @@ class AuthServicesStub(python_utils.OBJECT):
         """
         auth_id, user_id = auth_id_user_id_pair
         if auth_id in self._user_id_by_auth_id:
-            raise Exception('auth_id=%r is already associated to user_id=%r' % (
-                auth_id, self._user_id_by_auth_id[auth_id]))
+            raise Exception(
+                'auth_id=%r is already associated with user_id=%r' % (
+                    auth_id, self._user_id_by_auth_id[auth_id]))
+        auth_models.UserAuthDetailsModel(
+            id=user_id, firebase_auth_id=auth_id).put()
+        self._external_user_id_associations.add(user_id)
         self._user_id_by_auth_id[auth_id] = user_id
 
-    def associate_multi_auth_ids_to_user_ids(self, auth_id_user_id_pairs):
+    def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs):
         """Commits the associations between auth IDs and user IDs.
 
         This method also updates the "external" user ID associations just in
@@ -733,6 +734,12 @@ class AuthServicesStub(python_utils.OBJECT):
             for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
         if collisions:
             raise Exception('already associated: %s' % collisions)
+        datastore_services.put_multi(
+            [auth_models.UserAuthDetailsModel(
+                id=user_id, firebase_auth_id=auth_id)
+             for auth_id, user_id in auth_id_user_id_pairs])
+        self._external_user_id_associations.add(
+            u for _, u in auth_id_user_id_pairs)
         self._user_id_by_auth_id.update(auth_id_user_id_pairs)
 
 
@@ -1792,11 +1799,11 @@ tags: []
         """Log in with the given email under the context of a 'with' statement.
 
         Args:
-            email: str. An email associated to a user account.
+            email: str. An email associated with a user account.
             is_super_admin: bool. Whether the user is a super admin.
 
         Yields:
-            str. The id of the user associated to the given email, who is now
+            str. The id of the user associated with the given email, who is now
             'logged in'.
         """
         self.login(email, is_super_admin=is_super_admin)
@@ -1810,7 +1817,7 @@ tags: []
         """Log in as a global admin under the context of a 'with' statement.
 
         Yields:
-            str. The id of the user associated to the given email, who is now
+            str. The id of the user associated with the given email, who is now
             'logged in'.
         """
         email = self.SUPER_ADMIN_EMAIL
@@ -1946,8 +1953,10 @@ tags: []
             bytes. The mock auth ID of a user possessing the given email.
         """
         # Although the hash function doesn't guarantee a one-to-one mapping, in
-        # practice it is sufficient for our tests.
-        return python_utils.convert_to_bytes(hash(email))
+        # practice it is sufficient for our tests. The absolute value isn't
+        # necessary, but makes inspecting values easier (since there's no
+        # leading '-').
+        return python_utils.convert_to_bytes(abs(hash(email)))
 
     def _get_response(
             self, url, expected_content_type, params=None,

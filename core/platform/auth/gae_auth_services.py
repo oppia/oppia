@@ -30,19 +30,6 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 transaction_services = models.Registry.import_transaction_services()
 
 
-def create_user_auth_details(user_id, auth_id):
-    """Returns a UserAuthDetails object configured with GAE properties.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        auth_id: str. The ID of the user retrieved from GAE.
-
-    Returns:
-        UserAuthDetails. A UserAuthDetails domain object.
-    """
-    return auth_domain.UserAuthDetails(user_id, auth_id, None, None)
-
-
 def get_auth_claims_from_request(unused_request):
     """Authenticates the request and returns claims about its authorizer.
 
@@ -136,6 +123,22 @@ def get_auth_id_from_user_id(user_id):
         assoc_by_user_id_model.gae_id)
 
 
+def get_multi_auth_ids_from_user_ids(user_ids):
+    """Returns the auth IDs associated with the given user IDs.
+
+    Args:
+        user_ids: list(str). The user IDs.
+
+    Returns:
+        list(str|None). The auth IDs associated with each of the given user IDs,
+        or None for associations which don't exist.
+    """
+    return [
+        None if model is None else model.gae_id
+        for model in auth_models.UserAuthDetailsModel.get_multi(user_ids)
+    ]
+
+
 def get_user_id_from_auth_id(auth_id):
     """Returns the user ID associated with the given auth ID.
 
@@ -168,7 +171,7 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
     return [None if m is None else m.user_id for m in assoc_by_auth_id_models]
 
 
-def associate_auth_id_to_user_id(auth_id_user_id_pair):
+def associate_auth_id_with_user_id(auth_id_user_id_pair):
     """Commits the association between auth ID and user ID.
 
     Args:
@@ -180,20 +183,31 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
     """
     auth_id, user_id = auth_id_user_id_pair
 
-    collision = get_user_id_from_auth_id(auth_id)
-    if collision is not None:
-        raise Exception('auth_id=%r is already associated to user_id=%r' % (
-            auth_id, collision))
+    user_id_collision = get_user_id_from_auth_id(auth_id)
+    if user_id_collision is not None:
+        raise Exception('auth_id=%r is already associated with user_id=%r' % (
+            auth_id, user_id_collision))
 
+    auth_id_collision = get_auth_id_from_user_id(user_id)
+    if auth_id_collision is not None:
+        raise Exception('user_id=%r is already associated with auth_id=%r' % (
+            user_id, auth_id_collision))
+
+    # A new {auth_id: user_id} mapping needs to be created. We know the model
+    # doesn't exist because get_auth_id_from_user_id returned None.
     assoc_by_auth_id_model = (
         auth_models.UserIdentifiersModel(id=auth_id, user_id=user_id))
     assoc_by_auth_id_model.update_timestamps()
     assoc_by_auth_id_model.put()
 
+    # The {user_id: auth_id} mapping needs to be created, but the model used to
+    # store the relationship might already exist because other services also use
+    # it (e.g., user_services uses UserAuthDetailsModel.parent_user_id). In such
+    # situations, the return value of get_auth_id_from_user_id would return
+    # None, so it isn't strong enough of a check to determine if we need to
+    # create a new model rather than update an existing one.
     assoc_by_user_id_model = (
         auth_models.UserAuthDetailsModel.get(user_id, strict=False))
-    # Do not depend on the non-platform layers to create these models because
-    # they are required by gae_auth_services.
     if assoc_by_user_id_model is None or assoc_by_user_id_model.gae_id is None:
         assoc_by_user_id_model = (
             auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id))
@@ -201,7 +215,7 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
         assoc_by_user_id_model.put()
 
 
-def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
+def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
     """Commits the associations between auth IDs and user IDs.
 
     Args:
@@ -214,14 +228,26 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
     # Turn list(pair) to pair(list): https://stackoverflow.com/a/7558990/4859885
     auth_ids, user_ids = python_utils.ZIP(*auth_id_user_id_pairs)
 
-    collisions = get_multi_user_ids_from_auth_ids(auth_ids)
-    if any(user_id is not None for user_id in collisions):
-        collisions = ', '.join(
+    user_id_collisions = get_multi_user_ids_from_auth_ids(auth_ids)
+    if any(user_id is not None for user_id in user_id_collisions):
+        user_id_collisions = ', '.join(
             '{auth_id=%r: user_id=%r}' % (auth_id, user_id)
-            for auth_id, user_id in python_utils.ZIP(auth_ids, collisions)
+            for auth_id, user_id in python_utils.ZIP(
+                auth_ids, user_id_collisions)
             if user_id is not None)
-        raise Exception('already associated: %s' % collisions)
+        raise Exception('already associated: %s' % user_id_collisions)
 
+    auth_id_collisions = get_multi_auth_ids_from_user_ids(user_ids)
+    if any(auth_id is not None for auth_id in auth_id_collisions):
+        auth_id_collisions = ', '.join(
+            '{user_id=%r: auth_id=%r}' % (user_id, auth_id)
+            for user_id, auth_id in python_utils.ZIP(
+                user_ids, auth_id_collisions)
+            if auth_id is not None)
+        raise Exception('already associated: %s' % auth_id_collisions)
+
+    # A new {auth_id: user_id} mapping needs to be created. We know the model
+    # doesn't exist because get_auth_id_from_user_id returned None.
     assoc_by_auth_id_models = [
         auth_models.UserIdentifiersModel(id=auth_id, user_id=user_id)
         for auth_id, user_id in python_utils.ZIP(auth_ids, user_ids)
@@ -230,6 +256,12 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
         assoc_by_auth_id_models)
     auth_models.UserIdentifiersModel.put_multi(assoc_by_auth_id_models)
 
+    # The {user_id: auth_id} mapping needs to be created, but the model used to
+    # store the relationship might already exist because other services also use
+    # it (e.g., user_services uses UserAuthDetailsModel.parent_user_id). In such
+    # situations, the return value of get_auth_id_from_user_id would return
+    # None, so it isn't strong enough of a check to determine if we need to
+    # create a new model rather than update an existing one.
     assoc_by_user_id_models = [
         auth_models.UserAuthDetailsModel(id=user_id, gae_id=auth_id)
         for auth_id, user_id, assoc_by_user_id_model in python_utils.ZIP(
@@ -238,8 +270,6 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
         if (assoc_by_user_id_model is None or
             assoc_by_user_id_model.gae_id is None)
     ]
-    # Do not depend on the non-platform layers to create these models because
-    # they are required by gae_auth_services.
     if assoc_by_user_id_models:
         auth_models.UserAuthDetailsModel.update_timestamps_multi(
             assoc_by_user_id_models)

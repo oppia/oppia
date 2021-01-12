@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Services for working with user authentication."""
+"""Services for managing user authentication."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -55,23 +55,6 @@ def get_all_profiles_by_parent_user_id(parent_user_id):
     ).fetch()
 
 
-def get_user_auth_details_from_model(user_auth_details_model):
-    """Returns a UserAuthDetails domain object from the given model.
-
-    Args:
-        user_auth_details_model: UserAuthDetailsModel. The source model.
-
-    Returns:
-        UserAuthDetails. The domain object with values taken from the model.
-    """
-    return auth_domain.UserAuthDetails(
-        user_auth_details_model.id,
-        user_auth_details_model.gae_id,
-        user_auth_details_model.firebase_auth_id,
-        user_auth_details_model.parent_user_id,
-        deleted=user_auth_details_model.deleted)
-
-
 def create_profile_user_auth_details(user_id, parent_user_id):
     """Returns a domain object for a new profile-user.
 
@@ -91,20 +74,21 @@ def create_profile_user_auth_details(user_id, parent_user_id):
     return auth_domain.UserAuthDetails(user_id, None, None, parent_user_id)
 
 
-def create_full_user_auth_details(user_id, auth_id):
-    """Returns a domain object for a new full-user.
+def get_user_auth_details_from_model(user_auth_details_model):
+    """Returns a UserAuthDetails domain object from the given model.
 
     Args:
-        user_id: str. A user ID produced by Oppia.
-        auth_id: str. The auth_id of the newly created user.
+        user_auth_details_model: UserAuthDetailsModel. The source model.
 
     Returns:
-        UserAuthDetails. The new domain object.
-
-    Raises:
-        ValueError. The number of provided auth IDs is not exactly 1.
+        UserAuthDetails. The domain object with values taken from the model.
     """
-    return platform_auth_services.create_user_auth_details(user_id, auth_id)
+    return auth_domain.UserAuthDetails(
+        user_auth_details_model.id,
+        user_auth_details_model.gae_id,
+        user_auth_details_model.firebase_auth_id,
+        user_auth_details_model.parent_user_id,
+        deleted=user_auth_details_model.deleted)
 
 
 def get_auth_claims_from_request(request):
@@ -195,7 +179,7 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
     return platform_auth_services.get_multi_user_ids_from_auth_ids(auth_ids)
 
 
-def associate_auth_id_to_user_id(auth_id_user_id_pair):
+def associate_auth_id_with_user_id(auth_id_user_id_pair):
     """Commits the association between auth ID and user ID.
 
     Args:
@@ -205,10 +189,10 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
     Raises:
         Exception. The auth ID is already associated with a user ID.
     """
-    platform_auth_services.associate_auth_id_to_user_id(auth_id_user_id_pair)
+    platform_auth_services.associate_auth_id_with_user_id(auth_id_user_id_pair)
 
 
-def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
+def associate_multi_auth_ids_with_user_ids(auth_id_user_id_pairs):
     """Commits the associations between auth IDs and user IDs.
 
     Args:
@@ -218,5 +202,5 @@ def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
     Raises:
         Exception. One or more auth ID associations already exist.
     """
-    platform_auth_services.associate_multi_auth_ids_to_user_ids(
+    platform_auth_services.associate_multi_auth_ids_with_user_ids(
         auth_id_user_id_pairs)
