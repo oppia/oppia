@@ -41,7 +41,13 @@ jobs:
 
           rm jq
 
-          echo "Merging now, jq done"
+          echo "jq done"
+
+          git remote -v
+
+          git fetch https://github.com/oppia/oppia.git develop
+
+          echo "done fetching"
           
           if [[ "$target_branch" == null ]]
           then
