@@ -46,6 +46,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
      */
     const _updateCKEditorConfig = function(
         config: CKEDITOR.config, uiConfig: UiConfig): CKEDITOR.config {
+      // Language configs use default language when undefined.
       if (uiConfig.language) {
         config.language = uiConfig.language;
         config.contentsLanguage = uiConfig.language;
