@@ -37,13 +37,11 @@ interface SupportedAudioLanguageBackendDict {
   'id': string;
   'description': string;
   'relatedLanguages': readonly string[];
-  'direction': string;
 }
 
 interface SupportedContentLanguageBackendDict {
   'code': string;
   'description': string;
-  'direction': string;
 }
 
 interface LanguageIdAndText {
@@ -54,7 +52,6 @@ interface LanguageIdAndText {
 interface ContentLanguage {
   code: string;
   description: string;
-  direction: string;
 }
 
 @Injectable({
@@ -72,6 +69,9 @@ export class LanguageUtilService {
   get SUPPORTED_CONTENT_LANGUAGES():
       readonly SupportedContentLanguageBackendDict[] {
     return CONSTANTS.SUPPORTED_CONTENT_LANGUAGES;
+  }
+  get LANGUAGE_DIRECTIONS(): { [key: string]: string; } {
+    return CONSTANTS.LANGUAGE_DIRECTIONS;
   }
 
   constructor(
@@ -158,20 +158,10 @@ export class LanguageUtilService {
   }
 
   getLanguageDirection(languageCode: string): string {
-    // The Karma tests guarantee that Content Languages and Audio Languages do
-    // not conflict and contain at most one entry per language code.
-    const matchingContentLanguage = this.SUPPORTED_CONTENT_LANGUAGES.find(
-      (language) => language.code === languageCode);
-    if (matchingContentLanguage !== undefined) {
-      return matchingContentLanguage.direction;
+    const languageDirection = this.LANGUAGE_DIRECTIONS[languageCode];
+    if (languageDirection !== undefined) {
+      return languageDirection;
     }
-
-    const matchingAudioLanguage = this.SUPPORTED_AUDIO_LANGUAGES.find(
-      (language) => language.id === languageCode);
-    if (matchingAudioLanguage !== undefined) {
-      return matchingAudioLanguage.direction;
-    }
-
     throw new Error('Invalid language code: ' + languageCode);
   }
 
