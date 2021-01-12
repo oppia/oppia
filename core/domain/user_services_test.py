@@ -24,6 +24,7 @@ import logging
 import os
 
 from constants import constants
+from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_domain
@@ -42,8 +43,6 @@ import utils
 
 auth_models, user_models = (
     models.Registry.import_models([models.NAMES.auth, models.NAMES.user]))
-
-auth_services = models.Registry.import_auth_services()
 
 
 class MockUserStatsAggregator(
@@ -811,8 +810,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'auth_id': model.gae_id,
                 'parent_user_id': model.parent_user_id
             } for model in
-            auth_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
-                user_id)
+            auth_services.get_all_profiles_by_parent_user_id(user_id)
         ]
 
         expected_user_auth_output = [

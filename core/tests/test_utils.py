@@ -86,11 +86,11 @@ import webtest
             models.NAMES.question, models.NAMES.skill, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic]))
 
-auth_services = models.Registry.import_auth_services()
 current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
+platform_auth_services = models.Registry.import_auth_services()
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 # Prefix to append to all lines printed by tests to the console.
@@ -540,34 +540,35 @@ class AuthServicesStub(python_utils.OBJECT):
             stub = cls()
 
             stack.enter_context(test.swap(
-                auth_services, 'create_user_auth_details',
+                platform_auth_services, 'create_user_auth_details',
                 stub.create_user_auth_details))
             stack.enter_context(test.swap(
-                auth_services, 'get_auth_claims_from_request',
+                platform_auth_services, 'get_auth_claims_from_request',
                 stub.get_auth_claims_from_request))
             stack.enter_context(test.swap(
-                auth_services, 'mark_user_for_deletion',
+                platform_auth_services, 'mark_user_for_deletion',
                 stub.mark_user_for_deletion))
             stack.enter_context(test.swap(
-                auth_services, 'delete_external_auth_associations',
+                platform_auth_services, 'delete_external_auth_associations',
                 stub.delete_external_auth_associations))
             stack.enter_context(test.swap(
-                auth_services, 'verify_external_auth_associations_are_deleted',
+                platform_auth_services,
+                'verify_external_auth_associations_are_deleted',
                 stub.verify_external_auth_associations_are_deleted))
             stack.enter_context(test.swap(
-                auth_services, 'get_auth_id_from_user_id',
+                platform_auth_services, 'get_auth_id_from_user_id',
                 stub.get_auth_id_from_user_id))
             stack.enter_context(test.swap(
-                auth_services, 'get_user_id_from_auth_id',
+                platform_auth_services, 'get_user_id_from_auth_id',
                 stub.get_user_id_from_auth_id))
             stack.enter_context(test.swap(
-                auth_services, 'get_multi_user_ids_from_auth_ids',
+                platform_auth_services, 'get_multi_user_ids_from_auth_ids',
                 stub.get_multi_user_ids_from_auth_ids))
             stack.enter_context(test.swap(
-                auth_services, 'associate_auth_id_to_user_id',
+                platform_auth_services, 'associate_auth_id_to_user_id',
                 stub.associate_auth_id_to_user_id))
             stack.enter_context(test.swap(
-                auth_services, 'associate_multi_auth_ids_to_user_ids',
+                platform_auth_services, 'associate_multi_auth_ids_to_user_ids',
                 stub.associate_multi_auth_ids_to_user_ids))
 
             # Standard usage of ExitStack: enter a bunch of context managers
@@ -593,12 +594,11 @@ class AuthServicesStub(python_utils.OBJECT):
             UserAuthDetails. A UserAuthDetails domain object.
         """
         self._external_user_id_associations.add(user_id)
-        return auth_domain.UserAuthDetails.for_new_full_user(
-            user_id, firebase_auth_id=auth_id)
+        return auth_domain.UserAuthDetails(user_id, None, auth_id, None)
 
     @classmethod
     def get_auth_claims_from_request(cls, unused_request):
-        """Authenticates request and returns claims about its authorizer.
+        """Authenticates the request and returns claims about its authorizer.
 
         This stub obtains authorization information from os.environ. To make the
         operation more authentic, this method also creates a new "external"
@@ -606,10 +606,12 @@ class AuthServicesStub(python_utils.OBJECT):
 
         Args:
             unused_request: webapp2.Request. The HTTP request to authenticate.
+                Unused because auth-details are extracted from environment
+                variables.
 
         Returns:
-            AuthClaims|None. Claims about the user who authorized the request,
-            or None if a user could not be authenticated.
+            AuthClaims|None. Claims about the currently signed in user. If no
+            user is signed in, then returns None.
         """
         auth_id = os.environ.get('USER_ID', '')
         email = os.environ.get('USER_EMAIL', '')
@@ -619,21 +621,22 @@ class AuthServicesStub(python_utils.OBJECT):
         return None
 
     def mark_user_for_deletion(self, user_id):
-        """Set the 'deleted' property of the user with given user_id to True.
+        """Deletes all associations that refer to the user outside of Oppia.
 
         Since the stub does not use models, this operation actually deletes the
         user's association. The "external" associations, however, are not
         deleted yet.
 
         Args:
-            user_id: str. The unique ID of the user who should be deleted.
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
         """
         self._user_id_by_auth_id = {
             a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
         }
 
     def delete_external_auth_associations(self, user_id):
-        """Deletes associations outside of Oppia that refer to the given user.
+        """Deletes all associations that refer to the user outside of Oppia.
 
         Args:
             user_id: str. The unique ID of the user whose associations should be
@@ -642,19 +645,16 @@ class AuthServicesStub(python_utils.OBJECT):
         self._external_user_id_associations.discard(user_id)
 
     def verify_external_auth_associations_are_deleted(self, user_id):
-        """Returns true if and only if we have verified that all external auth
-        accounts have been deleted.
-
-        This stub does not emulate an external association, so this operation
-        always returns True.
+        """Returns true if and only if we have successfully verified that all
+        external associations have been deleted.
 
         Args:
             user_id: str. The unique ID of the user whose associations should be
-                deleted.
+                checked.
 
         Returns:
-            bool. Whether all associations outside of Oppia referring to the
-            given user have been deleted.
+            bool. True if and only if we have successfully verified that all
+            external associations have been deleted.
         """
         return user_id not in self._external_user_id_associations
 
@@ -1193,7 +1193,7 @@ class TestBase(unittest.TestCase):
         differences = [
             '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
             for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
-            if get_match(regexp, item) is None
+            if get_match(regexp, item, re.DOTALL) is None
         ]
         if len(items) < len(regexps):
             extra_regexps = regexps[len(items):]

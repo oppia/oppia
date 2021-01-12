@@ -21,6 +21,7 @@ import datetime
 import logging
 
 from constants import constants
+from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import question_domain
@@ -58,7 +59,6 @@ import python_utils
     models.NAMES.topic, models.NAMES.user
 ])
 
-auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
 
 

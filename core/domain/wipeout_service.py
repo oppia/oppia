@@ -21,6 +21,7 @@ import datetime
 import logging
 import re
 
+from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_fetchers
@@ -50,7 +51,6 @@ import python_utils
     models.NAMES.user,
 ])
 
-auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 

@@ -14,12 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for auth_domain objects."""
+"""Tests for core.domain.auth_domain"""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import auth_domain
+from core.domain import auth_services
 from core.platform import models
 from core.tests import test_utils
 import utils
@@ -89,54 +90,10 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_auth_details_model = (
             auth_models.UserAuthDetailsModel.get(self.owner_id))
-        self.user_auth_details = auth_domain.UserAuthDetails.for_existing_user(
+        self.user_auth_details = auth_services.get_user_auth_details_from_model(
             self.user_auth_details_model)
         self.auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL)
         self.user_auth_details.validate()
-
-    def test_for_new_full_user_with_gae_auth_id(self):
-        gae_user_auth_details = auth_domain.UserAuthDetails.for_new_full_user(
-            'uid', gae_id='aid')
-
-        self.assertEqual(gae_user_auth_details.user_id, 'uid')
-        self.assertEqual(gae_user_auth_details.gae_id, 'aid')
-        self.assertIsNone(gae_user_auth_details.firebase_auth_id)
-        self.assertIsNone(gae_user_auth_details.parent_user_id)
-        self.assertFalse(gae_user_auth_details.deleted)
-
-    def test_for_new_full_user_with_firebase_auth_id(self):
-        firebase_user_auth_details = (
-            auth_domain.UserAuthDetails.for_new_full_user(
-                'uid', firebase_auth_id='aid'))
-
-        self.assertEqual(firebase_user_auth_details.user_id, 'uid')
-        self.assertEqual(firebase_user_auth_details.firebase_auth_id, 'aid')
-        self.assertIsNone(firebase_user_auth_details.gae_id)
-        self.assertIsNone(firebase_user_auth_details.parent_user_id)
-        self.assertFalse(firebase_user_auth_details.deleted)
-
-    def test_for_new_full_user_with_too_many_auth_ids_is_error(self):
-        with self.assertRaisesRegexp(ValueError, 'want exactly one auth ID'):
-            auth_domain.UserAuthDetails.for_new_full_user(
-                'uid', gae_id='aid1', firebase_auth_id='aid2')
-
-    def test_for_new_full_user_without_any_auth_ids_is_error(self):
-        with self.assertRaisesRegexp(ValueError, 'want exactly one auth ID'):
-            auth_domain.UserAuthDetails.for_new_full_user('uid')
-
-    def test_for_new_profile_user(self):
-        user_auth_details = auth_domain.UserAuthDetails.for_new_profile_user(
-            'uid', 'pid')
-
-        self.assertEqual(user_auth_details.user_id, 'uid')
-        self.assertEqual(user_auth_details.parent_user_id, 'pid')
-        self.assertIsNone(user_auth_details.gae_id)
-        self.assertIsNone(user_auth_details.firebase_auth_id)
-        self.assertFalse(user_auth_details.deleted)
-
-    def test_for_new_profile_user_with_user_as_its_own_parent_is_error(self):
-        with self.assertRaisesRegexp(ValueError, 'cannot be its own parent'):
-            auth_domain.UserAuthDetails.for_new_profile_user('uid', 'uid')
 
     def test_validate_non_str_user_id(self):
         self.user_auth_details.user_id = 123

@@ -123,58 +123,6 @@ class UserAuthDetails(python_utils.OBJECT):
         self.parent_user_id = parent_user_id
         self.deleted = deleted
 
-    @classmethod
-    def for_new_full_user(cls, user_id, gae_id=None, firebase_auth_id=None):
-        """Returns a domain object for a new full user's account.
-
-        Args:
-            user_id: str. A user ID produced by Oppia.
-            gae_id: str|None. The ID of the user provided by GAE auth services.
-            firebase_auth_id: str|None. The ID of the user provided by Firebase
-                auth services.
-
-        Returns:
-            UserAuthDetails. The new domain object.
-
-        Raises:
-            ValueError. The number of provided auth IDs is not exactly 1.
-        """
-        num_auth_ids = sum(i is not None for i in (gae_id, firebase_auth_id))
-        if num_auth_ids != 1:
-            raise ValueError(
-                'want exactly one auth ID, but got gae_id=%r and '
-                'firebase_auth_id=%r' % (gae_id, firebase_auth_id))
-        return cls(user_id, gae_id, firebase_auth_id, None)
-
-    @classmethod
-    def for_new_profile_user(cls, user_id, parent_user_id):
-        """Returns a domain object for a new profile user's account.
-
-        Args:
-            user_id: str. A user ID produced by Oppia for the new profile user.
-            parent_user_id: str. The user ID of the full user account which owns
-                the new profile account.
-
-        Returns:
-            UserAuthDetails. The new domain object.
-
-        Raises:
-            ValueError. When the user's parent is itself.
-        """
-        if user_id == parent_user_id:
-            raise ValueError('user cannot be its own parent')
-        return cls(user_id, None, None, parent_user_id)
-
-    @classmethod
-    def for_existing_user(cls, user_auth_details_model):
-        """Returns a domain object for an existing user account."""
-        return cls(
-            user_auth_details_model.id,
-            user_auth_details_model.gae_id,
-            user_auth_details_model.firebase_auth_id,
-            user_auth_details_model.parent_user_id,
-            deleted=user_auth_details_model.deleted)
-
     def validate(self):
         """Checks whether user_id, gae_id, firebase_auth_id, and parent_user_id
         are valid.
@@ -218,15 +166,31 @@ class UserAuthDetails(python_utils.OBJECT):
 
         if self.is_full_user() and self.parent_user_id is not None:
             raise utils.ValidationError(
-                'parent_user_id must not be set for a full user')
+                'parent_user_id must not be set for a full user, but got '
+                'gae_id=%r, firebase_auth_id=%r, parent_user_id=%r' % (
+                    self.gae_id, self.firebase_auth_id, self.parent_user_id))
 
         if not self.is_full_user() and self.parent_user_id is None:
             raise utils.ValidationError(
-                'parent_user_id must be set for a profile user')
+                'parent_user_id must be set for a profile user, but got '
+                'gae_id=%r, firebase_auth_id=%r, parent_user_id=%r' % (
+                    self.gae_id, self.firebase_auth_id, self.parent_user_id))
+
+    @property
+    def auth_id(self):
+        """Returns the auth ID corresponding to the user account, if any.
+
+        Helper intended to simplify logic that doesn't care about where the auth
+        ID came from.
+
+        Returns:
+            str. The firebase_auth_id if it is not None, otherwise the gae_id.
+        """
+        return self.firebase_auth_id or self.gae_id
 
     def is_full_user(self):
         """Returns whether self refers to a full user account."""
-        return self.gae_id is not None or self.firebase_auth_id is not None
+        return self.auth_id is not None
 
     def to_dict(self):
         """Returns values corresponding to UserAuthDetailsModel's properties.

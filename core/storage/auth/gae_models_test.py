@@ -148,17 +148,6 @@ class UserAuthDetailsModelTests(test_utils.GenericTestBase):
             auth_models.UserAuthDetailsModel.get_by_auth_id(
                 feconf.FIREBASE_AUTH_PROVIDER_ID, self.FIREBASE_AUTH_ID))
 
-    def test_get_all_profiles_for_parent_user_id_returns_all_profiles(self):
-        user_auth_details_models = [
-            auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_ID),
-            auth_models.UserAuthDetailsModel.get_by_id(self.PROFILE_2_ID)
-        ]
-        fetched_output = (
-            auth_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
-                self.USER_ID)
-        )
-        self.assertItemsEqual(user_auth_details_models, fetched_output)
-
 
 class UserIdentifiersModelTests(test_utils.GenericTestBase):
     """Tests for UserIdentifiersModel."""

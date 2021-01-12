@@ -131,12 +131,11 @@ def create_user_auth_details(user_id, auth_id):
     Returns:
         UserAuthDetails. A UserAuthDetails domain object.
     """
-    return auth_domain.UserAuthDetails.for_new_full_user(
-        user_id, firebase_auth_id=auth_id)
+    return auth_domain.UserAuthDetails(user_id, None, auth_id, None)
 
 
 def get_auth_claims_from_request(request):
-    """Authenticates request and returns claims about its authorizer.
+    """Authenticates the request and returns claims about its authorizer.
 
     Oppia specifically expects the request to have a Subject Identifier for the
     user (Claim Name: 'sub'), and an optional custom claim for super-admin users
@@ -146,8 +145,8 @@ def get_auth_claims_from_request(request):
         request: webapp2.Request. The HTTP request to authenticate.
 
     Returns:
-        AuthClaims|None. Claims about the user who authorized the request, or
-        None if the request could not be authenticated.
+        AuthClaims|None. Claims about the currently signed in user. If no user
+        is signed in, then returns None.
     """
     claims = _verify_id_token(request.headers.get('Authorization', ''))
     auth_id = claims.get('sub', None)
@@ -160,11 +159,14 @@ def get_auth_claims_from_request(request):
 
 
 def mark_user_for_deletion(user_id):
-    """Set the 'deleted' property of the user with given user_id to True, and
-    disables the user's Firebase account so that they cannot use it to sign in.
+    """Marks the user and all of their associated auth-details as deleted.
+
+    This function also disables the user's Firebase account so that they cannot
+    use it to sign in any more.
 
     Args:
-        user_id: str. The unique ID of the user who should be deleted.
+        user_id: str. The unique ID of the user whose associations should be
+            deleted.
     """
     assoc_by_user_id_model = (
         auth_models.UserAuthDetailsModel.get(user_id, strict=False))
@@ -193,7 +195,7 @@ def mark_user_for_deletion(user_id):
 
 
 def delete_external_auth_associations(user_id):
-    """Deletes associations outside of Oppia that refer to the given user.
+    """Deletes all associations that refer to the user outside of Oppia.
 
     Args:
         user_id: str. The unique ID of the user whose associations should be
@@ -210,16 +212,16 @@ def delete_external_auth_associations(user_id):
 
 
 def verify_external_auth_associations_are_deleted(user_id):
-    """Returns true if and only if we have verified that all external auth
-    accounts have been deleted.
+    """Returns true if and only if we have successfully verified that all
+    external associations have been deleted.
 
     Args:
         user_id: str. The unique ID of the user whose associations should be
-            deleted.
+            checked.
 
     Returns:
-        bool. Whether all associations outside of Oppia referring to the given
-        user have been deleted.
+        bool. True if and only if we have successfully verified that all
+        external associations have been deleted.
     """
     auth_id = get_auth_id_from_user_id(user_id)
     if auth_id is None:
@@ -284,7 +286,6 @@ def get_multi_user_ids_from_auth_ids(auth_ids):
     ]
 
 
-@transaction_services.run_in_transaction_wrapper
 def associate_auth_id_to_user_id(auth_id_user_id_pair):
     """Commits the association between auth ID and user ID.
 
@@ -319,7 +320,6 @@ def associate_auth_id_to_user_id(auth_id_user_id_pair):
         assoc_by_user_id_model.put()
 
 
-@transaction_services.run_in_transaction_wrapper
 def associate_multi_auth_ids_to_user_ids(auth_id_user_id_pairs):
     """Commits the associations between auth IDs and user IDs.
 

@@ -23,6 +23,7 @@ import ast
 import datetime
 import re
 
+from core.domain import auth_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
@@ -50,7 +51,6 @@ auth_models, user_models, feedback_models, exp_models = (
         [models.NAMES.auth, models.NAMES.user, models.NAMES.feedback,
          models.NAMES.exploration]))
 
-auth_services = models.Registry.import_auth_services()
 datastore_services = models.Registry.import_datastore_services()
 search_services = models.Registry.import_search_services()
 
@@ -1883,8 +1883,8 @@ class FixUserSettingsCreatedOnOneOffJobTests(test_utils.GenericTestBase):
             migrated_user_model.created_on, final_created_on_timestamp)
 
     def test_time_difference_less_than_time_delta_does_not_update(self):
-        user_auth_details = (
-            auth_services.create_user_auth_details(self.USER_ID_1, 'auth_id'))
+        user_auth_details = auth_services.create_full_user_auth_details(
+            self.USER_ID_1, 'auth_id')
 
         user_auth_details_model = auth_models.UserAuthDetailsModel(
             id=self.USER_ID_1, **user_auth_details.to_dict())

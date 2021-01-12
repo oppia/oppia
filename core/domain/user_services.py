@@ -27,6 +27,7 @@ import re
 
 from constants import constants
 from core.domain import auth_domain
+from core.domain import auth_services
 from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
@@ -41,7 +42,6 @@ auth_models, user_models, audit_models, suggestion_models = (
         [models.NAMES.auth, models.NAMES.user, models.NAMES.audit,
          models.NAMES.suggestion]))
 
-auth_services = models.Registry.import_auth_services()
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -1094,14 +1094,12 @@ def get_all_profiles_auth_details_by_parent_user_id(parent_user_id):
     Raises:
         Exception. Parent user with the given parent_user_id not found.
     """
-    if auth_models.UserAuthDetailsModel.has_reference_to_user_id(
-            parent_user_id) is False:
+    if auth_services.has_reference_to_user_id(parent_user_id) is False:
         raise Exception('Parent user not found.')
 
     return [
-        auth_domain.UserAuthDetails.for_existing_user(model)
-        for model in
-        auth_models.UserAuthDetailsModel.get_all_profiles_by_parent_user_id(
+        auth_services.get_user_auth_details_from_model(model)
+        for model in auth_services.get_all_profiles_by_parent_user_id(
             parent_user_id) if not model.deleted
     ]
 
@@ -1140,8 +1138,8 @@ def _create_new_user_transactional(auth_id, user_settings):
         user_settings: UserSettings. The user settings domain object
             corresponding to the newly created user.
     """
-    _save_user_auth_details(
-        auth_services.create_user_auth_details(user_settings.user_id, auth_id))
+    _save_user_auth_details(auth_services.create_full_user_auth_details(
+        user_settings.user_id, auth_id))
     _save_user_settings(user_settings)
     create_user_contributions(user_settings.user_id, [], [])
     auth_services.associate_auth_id_to_user_id(
@@ -1187,7 +1185,7 @@ def create_new_profiles(auth_id, email, modifiable_user_data_list):
             pin=modifiable_user_data.pin)
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
 
-        user_auth_details = auth_domain.UserAuthDetails.for_new_profile_user(
+        user_auth_details = auth_services.create_profile_user_auth_details(
             user_id, parent_user_id)
 
         # Each new profile user must be written to the datastore first and
@@ -1322,7 +1320,7 @@ def get_multiple_user_auth_details(user_ids):
     """
     user_settings_models = auth_models.UserAuthDetailsModel.get_multi(user_ids)
     return [
-        auth_domain.UserAuthDetails.for_existing_user(model)
+        auth_services.get_user_auth_details_from_model(model)
         for model in user_settings_models if model is not None
     ]
 
@@ -1346,7 +1344,7 @@ def get_auth_details_by_user_id(user_id, strict=False):
     user_auth_details_model = (
         auth_models.UserAuthDetailsModel.get(user_id, strict=False))
     if user_auth_details_model is not None:
-        return auth_domain.UserAuthDetails.for_existing_user(
+        return auth_services.get_user_auth_details_from_model(
             user_auth_details_model)
     elif strict:
         logging.error('Could not find user with id %s' % user_id)
@@ -1634,7 +1632,7 @@ def mark_user_for_deletion(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.deleted = True
     _save_user_settings(user_settings)
-    user_auth_details = auth_domain.UserAuthDetails.for_existing_user(
+    user_auth_details = auth_services.get_user_auth_details_from_model(
         auth_models.UserAuthDetailsModel.get(user_id))
     user_auth_details.deleted = True
     _save_user_auth_details(user_auth_details)

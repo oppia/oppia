@@ -206,16 +206,37 @@ class FirebaseAdminSdkStub(python_utils.OBJECT):
         del self._users[uid]
 
 
-class AuthenticateRequestTests(test_utils.TestBase):
-    """Test cases for authenticating requests with Firebase Admin SDK."""
+class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
+    """Test base for firebase-specific tests with helpful default behavior."""
 
     def setUp(self):
-        super(AuthenticateRequestTests, self).setUp()
+        super(FirebaseAuthServicesTestBase, self).setUp()
         self._uninstall_stub = FirebaseAdminSdkStub.install(self)
 
     def tearDown(self):
         self._uninstall_stub()
-        super(AuthenticateRequestTests, self).tearDown()
+        super(FirebaseAuthServicesTestBase, self).tearDown()
+
+    def capture_logging(self, min_level=logging.INFO):
+        """Context manager that captures logs into a list.
+
+        Overridden to set the minimum logging level as INFO.
+
+        Args:
+            min_level: int. The minimum logging level captured by the context
+                manager. By default, all logging levels are captured. Values
+                should be one of the following values from the logging module:
+                NOTSET, DEBUG, INFO, WARNING, ERROR, CRITICAL.
+
+        Returns:
+            Context manager. The context manager for capturing logging messages.
+        """
+        return super(FirebaseAuthServicesTestBase, self).capture_logging(
+            min_level=min_level)
+
+
+class AuthenticateRequestTests(FirebaseAuthServicesTestBase):
+    """Test cases for authenticating requests with Firebase Admin SDK."""
 
     def make_request(self, auth_header=None):
         """Returns a webapp2.Request with the given authorization claims.
@@ -340,17 +361,9 @@ class AuthenticateRequestTests(test_utils.TestBase):
         self.assertIsNone(auth_claims)
 
 
-class GenericAssociationTests(test_utils.GenericTestBase):
+class GenericAssociationTests(FirebaseAuthServicesTestBase):
 
     ENABLE_AUTH_SERVICES_STUB = False
-
-    def setUp(self):
-        super(GenericAssociationTests, self).setUp()
-        self._uninstall_stub = FirebaseAdminSdkStub.install(self)
-
-    def tearDown(self):
-        self._uninstall_stub()
-        super(GenericAssociationTests, self).tearDown()
 
     def test_create_user_auth_details(self):
         user_auth_details = (
@@ -497,7 +510,7 @@ class GenericAssociationTests(test_utils.GenericTestBase):
             auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
         self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
 
-        with init_swap, self.capture_logging(min_level=logging.WARN) as logs:
+        with init_swap, self.capture_logging() as logs:
             firebase_auth_services.mark_user_for_deletion('uid')
 
         self.assert_matches_regexps(logs, ['could not init'])
@@ -512,7 +525,7 @@ class GenericAssociationTests(test_utils.GenericTestBase):
         update_user_swap = self.swap_to_always_raise(
             firebase_admin.auth, 'update_user',
             error=firebase_exceptions.UnknownError('could not update'))
-        log_capturing_context = self.capture_logging(min_level=logging.WARN)
+        log_capturing_context = self.capture_logging()
 
         self.assertIsNotNone(
             auth_models.UserIdByFirebaseAuthIdModel.get('aid', strict=False))
@@ -527,7 +540,7 @@ class GenericAssociationTests(test_utils.GenericTestBase):
         self.assertFalse(firebase_admin.auth.get_user('aid').disabled)
 
 
-class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
+class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
 
     ENABLE_AUTH_SERVICES_STUB = False
 
@@ -536,22 +549,16 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FirebaseSpecificAssociationTests, self).setUp()
-        self._uninstall_stub = FirebaseAdminSdkStub.install(self)
-
         firebase_admin.auth.create_user(uid=self.AUTH_ID)
         firebase_auth_services.associate_auth_id_to_user_id(
             auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.USER_ID))
-
-    def tearDown(self):
-        self._uninstall_stub()
-        super(FirebaseSpecificAssociationTests, self).tearDown()
 
     def test_delete_user_without_firebase_initialization_returns_false(self):
         init_swap = self.swap_to_always_raise(
             firebase_admin, 'initialize_app',
             error=firebase_exceptions.UnknownError('could not init'))
 
-        with init_swap, self.capture_logging(min_level=logging.ERROR) as logs:
+        with init_swap, self.capture_logging() as logs:
             firebase_auth_services.delete_external_auth_associations(
                 self.USER_ID)
 
@@ -565,7 +572,7 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
             firebase_admin, 'initialize_app',
             error=firebase_exceptions.UnknownError('could not init'))
 
-        with init_swap, self.capture_logging(min_level=logging.ERROR) as logs:
+        with init_swap, self.capture_logging() as logs:
             self.assertFalse(
                 firebase_auth_services
                 .verify_external_auth_associations_are_deleted(self.USER_ID))
@@ -577,7 +584,7 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
             firebase_admin.auth, 'delete_user',
             error=firebase_exceptions.InternalError('could not connect'))
 
-        with delete_swap, self.capture_logging(min_level=logging.ERROR) as logs:
+        with delete_swap, self.capture_logging() as logs:
             firebase_auth_services.delete_external_auth_associations(
                 self.USER_ID)
 
@@ -587,7 +594,7 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
         self.assert_matches_regexps(logs, ['could not connect'])
 
     def test_delete_user_when_firebase_succeeds(self):
-        with self.capture_logging(min_level=logging.ERROR) as logs:
+        with self.capture_logging() as logs:
             firebase_auth_services.delete_external_auth_associations(
                 self.USER_ID)
 
@@ -597,7 +604,7 @@ class FirebaseSpecificAssociationTests(test_utils.GenericTestBase):
         self.assertEqual(logs, [])
 
 
-class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
+class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
     ENABLE_AUTH_SERVICES_STUB = False
 
@@ -609,18 +616,11 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DeleteAuthAssociationsTests, self).setUp()
-
-        self._uninstall_stub = FirebaseAdminSdkStub.install(self)
-
         firebase_admin.auth.create_user(uid=self.AUTH_ID)
         self.signup(self.EMAIL, self.USERNAME)
         self.user_id = self.get_user_id_from_email(self.EMAIL)
         firebase_auth_services.associate_auth_id_to_user_id(
             auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.user_id))
-
-    def tearDown(self):
-        self._uninstall_stub()
-        super(DeleteAuthAssociationsTests, self).tearDown()
 
     def delete_external_auth_associations(self):
         """Runs delete_external_auth_associations on the test user."""
@@ -637,18 +637,6 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
         user = firebase_admin.auth.get_user(self.AUTH_ID)
         self.assertIsNotNone(user)
         self.assertEqual(user.uid, self.AUTH_ID)
-
-    def assert_external_auth_associations_are_deleted(self):
-        """Asserts that the Firebase auth associations have been deleted."""
-        self.assertTrue(
-            firebase_auth_services
-            .verify_external_auth_associations_are_deleted(self.user_id))
-
-    def assert_external_auth_associations_are_not_deleted(self):
-        """Asserts that the Firebase auth associations have been not deleted."""
-        self.assertFalse(
-            firebase_auth_services
-            .verify_external_auth_associations_are_deleted(self.user_id))
 
     def swap_initialize_sdk_to_always_fail(self):
         """Swaps the initialize_app function so that it always fails."""
@@ -669,19 +657,25 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
         self.delete_external_auth_associations()
 
         self.assert_firebase_account_is_deleted()
-        self.assert_external_auth_associations_are_deleted()
+        self.assertTrue(
+            firebase_auth_services
+            .verify_external_auth_associations_are_deleted(self.user_id))
 
     def test_delete_external_auth_associations_after_failed_attempt(self):
         with self.swap_initialize_sdk_to_always_fail():
             self.delete_external_auth_associations()
 
         self.assert_firebase_account_is_not_deleted()
-        self.assert_external_auth_associations_are_not_deleted()
+        self.assertFalse(
+            firebase_auth_services
+            .verify_external_auth_associations_are_deleted(self.user_id))
 
         self.delete_external_auth_associations()
 
         self.assert_firebase_account_is_deleted()
-        self.assert_external_auth_associations_are_deleted()
+        self.assertTrue(
+            firebase_auth_services
+            .verify_external_auth_associations_are_deleted(self.user_id))
 
     def test_verify_delete_external_auth_associations_after_failed_attempt(
             self):
@@ -690,11 +684,15 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
         self.assert_firebase_account_is_deleted()
 
         with self.swap_initialize_sdk_to_always_fail():
-            self.assert_external_auth_associations_are_not_deleted()
+            self.assertFalse(
+                firebase_auth_services
+                .verify_external_auth_associations_are_deleted(self.user_id))
 
         self.delete_external_auth_associations()
 
-        self.assert_external_auth_associations_are_deleted()
+        self.assertTrue(
+            firebase_auth_services
+            .verify_external_auth_associations_are_deleted(self.user_id))
 
     def test_delete_external_auth_associations_when_delete_user_fails(self):
         with self.swap_delete_user_to_always_fail():
@@ -702,7 +700,9 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
 
         self.assert_firebase_account_is_not_deleted()
 
-        self.assert_external_auth_associations_are_not_deleted()
+        self.assertFalse(
+            firebase_auth_services
+            .verify_external_auth_associations_are_deleted(self.user_id))
 
     def test_delete_external_auth_associations_when_get_user_fails(self):
         self.delete_external_auth_associations()
@@ -710,9 +710,13 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
         self.assert_firebase_account_is_deleted()
 
         with self.swap_get_user_to_always_fail():
-            self.assert_external_auth_associations_are_not_deleted()
+            self.assertFalse(
+                firebase_auth_services
+                .verify_external_auth_associations_are_deleted(self.user_id))
 
-        self.assert_external_auth_associations_are_deleted()
+        self.assertTrue(
+            firebase_auth_services
+            .verify_external_auth_associations_are_deleted(self.user_id))
 
     def test_delete_external_auth_associations_when_init_fails_during_delete(
             self):
@@ -721,7 +725,9 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
 
         self.assert_firebase_account_is_not_deleted()
 
-        self.assert_external_auth_associations_are_not_deleted()
+        self.assertFalse(
+            firebase_auth_services
+            .verify_external_auth_associations_are_deleted(self.user_id))
 
     def test_delete_external_auth_associations_when_init_fails_during_verify(
             self):
@@ -730,6 +736,10 @@ class DeleteAuthAssociationsTests(test_utils.GenericTestBase):
         self.assert_firebase_account_is_deleted()
 
         with self.swap_initialize_sdk_to_always_fail():
-            self.assert_external_auth_associations_are_not_deleted()
+            self.assertFalse(
+                firebase_auth_services
+                .verify_external_auth_associations_are_deleted(self.user_id))
 
-        self.assert_external_auth_associations_are_deleted()
+        self.assertTrue(
+            firebase_auth_services
+            .verify_external_auth_associations_are_deleted(self.user_id))
