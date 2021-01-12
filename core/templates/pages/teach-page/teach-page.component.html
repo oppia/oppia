@@ -181,7 +181,9 @@
   <div class="oppia-teach-section-five" [ngStyle]="{'background-image': 'getTestimonialBackgroundUrl()'}">
     <div *ngIf="!isWindowNarrow" class="oppia-teach-section-five-left">
       <h2 [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
-      <h3>- <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3></h3>
+      <h3>-
+        <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
+      </h3>
       <div class="teach-arrows-container">
         <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
           arrow_back_ios
@@ -209,7 +211,9 @@
       </div>
       <div class="oppia-teach-section-five-left mobile">
         <h2 class="mobile-h2" [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></h2>
-       <h3>- <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3></h3>
+        <h3>-
+          <h3 [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></h3>
+        </h3>
         <div class="teach-arrows-container">
           <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
             arrow_back_ios
