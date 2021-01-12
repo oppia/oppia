@@ -28,6 +28,7 @@ from core.domain import config_services
 from core.domain import cron_services
 from core.domain import email_manager
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
@@ -41,8 +42,13 @@ import utils
 from mapreduce import model as mapreduce_model
 import webtest
 
-(job_models, suggestion_models, user_models) = models.Registry.import_models(
-    [models.NAMES.job, models.NAMES.suggestion, models.NAMES.user])
+(
+    exp_models, job_models,
+    suggestion_models, user_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.job,
+    models.NAMES.suggestion, models.NAMES.user
+])
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
@@ -343,7 +349,24 @@ class CronJobTests(test_utils.GenericTestBase):
         with self.testapp_swap:
             self.get_html_response('/cron/models/cleanup')
 
-        self.assertIsNone(completed_activities_model.get_by_id(admin_user_id))
+        self.assertIsNone(
+            user_models.CompletedActivitiesModel.get_by_id(admin_user_id))
+
+    def test_run_cron_to_hard_delete_versioned_models_marked_as_deleted(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        admin_user_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        with self.mock_datetime_utcnow(
+            datetime.datetime.utcnow() - self.NINE_WEEKS):
+            self.save_new_default_exploration('exp_id', admin_user_id)
+            exp_services.delete_exploration(admin_user_id, 'exp_id')
+
+        self.assertIsNotNone(exp_models.ExplorationModel.get_by_id('exp_id'))
+
+        with self.testapp_swap:
+            self.get_html_response('/cron/models/cleanup')
+
+        self.assertIsNone(exp_models.ExplorationModel.get_by_id('exp_id'))
 
     def test_run_cron_to_mark_old_models_as_deleted(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
@@ -388,8 +411,8 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description')
@@ -559,8 +582,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_translation_change_dict,
             'test description'
@@ -584,8 +607,8 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         }
 
         return suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL,
             self.skill_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, add_question_change_dict,
             'test description'
@@ -659,9 +682,9 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             ) for suggestion in [suggestion_1, suggestion_2, suggestion_3]
         ]
         self.expected_suggestion_types_needing_reviewers = {
-            suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'en', 'fr'},
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
         }
 
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)

@@ -84,6 +84,10 @@ describe('Exploration editor page component', function() {
   var tds = null;
   var ueps = null;
   var mockEnterEditorForTheFirstTime = null;
+  var registerAcceptTutorialModalEventSpy;
+  var registerSkipTutorialEventSpy;
+  var registerFinishTutorialEventSpy;
+  var registerDeclineTutorialModalEventSpy;
 
   var refreshGraphEmitter = new EventEmitter();
 
@@ -232,7 +236,7 @@ describe('Exploration editor page component', function() {
     sts = $injector.get('StateTutorialFirstTimeService');
     stass = $injector.get('StateTopAnswersStatsService');
     stfts = $injector.get('StateTutorialFirstTimeService');
-    tds = $injector.get('ThreadDataService');
+    tds = $injector.get('ThreadDataBackendApiService');
     ueps = $injector.get('UserExplorationPermissionsService');
 
     $scope = $rootScope.$new();
@@ -245,7 +249,13 @@ describe('Exploration editor page component', function() {
 
   describe('when user permission is true and draft changes not valid', () => {
     beforeEach(() => {
-      spyOnAllFunctions(sas);
+      registerAcceptTutorialModalEventSpy = (
+        spyOn(sas, 'registerAcceptTutorialModalEvent'));
+      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
+      registerFinishTutorialEventSpy = (
+        spyOn(sas, 'registerFinishTutorialEvent'));
+      registerDeclineTutorialModalEventSpy = (
+        spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
@@ -406,7 +416,13 @@ describe('Exploration editor page component', function() {
     var mockExplorationPropertyChangedEventEmitter = new EventEmitter();
 
     beforeEach(() => {
-      spyOnAllFunctions(sas);
+      registerAcceptTutorialModalEventSpy = (
+        spyOn(sas, 'registerAcceptTutorialModalEvent'));
+      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
+      registerFinishTutorialEventSpy = (
+        spyOn(sas, 'registerFinishTutorialEvent'));
+      registerDeclineTutorialModalEventSpy = (
+        spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());
@@ -519,7 +535,7 @@ describe('Exploration editor page component', function() {
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
 
-      expect(sas.registerAcceptTutorialModalEvent)
+      expect(registerAcceptTutorialModalEventSpy)
         .toHaveBeenCalledWith(explorationId);
       expect(rs.navigateToMainTab).toHaveBeenCalled();
       $timeout.flush();
@@ -527,7 +543,7 @@ describe('Exploration editor page component', function() {
       expect(ctrl.tutorialInProgress).toBeTrue();
 
       ctrl.onSkipTutorial();
-      expect(sas.registerSkipTutorialEvent)
+      expect(registerSkipTutorialEventSpy)
         .toHaveBeenCalledWith(explorationId);
       expect(ctrl.tutorialInProgress).toBeFalse();
     });
@@ -544,7 +560,7 @@ describe('Exploration editor page component', function() {
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
 
-      expect(sas.registerAcceptTutorialModalEvent)
+      expect(registerAcceptTutorialModalEventSpy)
         .toHaveBeenCalledWith(explorationId);
       expect(rs.navigateToMainTab).toHaveBeenCalled();
       $timeout.flush();
@@ -552,7 +568,7 @@ describe('Exploration editor page component', function() {
       expect(ctrl.tutorialInProgress).toBeTrue();
 
       ctrl.onFinishTutorial();
-      expect(sas.registerFinishTutorialEvent)
+      expect(registerFinishTutorialEventSpy)
         .toHaveBeenCalledWith(explorationId);
       expect(ctrl.tutorialInProgress).toBeFalse();
     });
@@ -567,7 +583,7 @@ describe('Exploration editor page component', function() {
       ctrl.showWelcomeExplorationModal();
       $scope.$apply();
 
-      expect(sas.registerDeclineTutorialModalEvent)
+      expect(registerDeclineTutorialModalEventSpy)
         .toHaveBeenCalled();
       expect(ctrl.tutorialInProgress).toBeFalse();
     });
@@ -791,8 +807,14 @@ describe('Exploration editor page component', function() {
 
   describe('Initializing improvements tab', () => {
     beforeEach(() => {
+      registerAcceptTutorialModalEventSpy = (
+        spyOn(sas, 'registerAcceptTutorialModalEvent'));
+      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
+      registerFinishTutorialEventSpy = (
+        spyOn(sas, 'registerFinishTutorialEvent'));
+      registerDeclineTutorialModalEventSpy = (
+        spyOn(sas, 'registerDeclineTutorialModalEvent'));
       mockEnterEditorForTheFirstTime = new EventEmitter();
-      spyOnAllFunctions(sas);
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures')
         .and.returnValue(Promise.resolve({}));
@@ -850,7 +872,13 @@ describe('Exploration editor page component', function() {
 
   describe('State-change registration', () => {
     beforeEach(() => {
-      spyOnAllFunctions(sas);
+      registerAcceptTutorialModalEventSpy = (
+        spyOn(sas, 'registerAcceptTutorialModalEvent'));
+      registerSkipTutorialEventSpy = spyOn(sas, 'registerSkipTutorialEvent');
+      registerFinishTutorialEventSpy = (
+        spyOn(sas, 'registerFinishTutorialEvent'));
+      registerDeclineTutorialModalEventSpy = (
+        spyOn(sas, 'registerDeclineTutorialModalEvent'));
       spyOn(cs, 'getExplorationId').and.returnValue(explorationId);
       spyOn(efbas, 'fetchExplorationFeatures').and.returnValue($q.resolve({}));
       spyOn(eis, 'initAsync').and.returnValue(Promise.resolve());

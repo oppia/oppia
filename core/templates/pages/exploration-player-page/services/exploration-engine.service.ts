@@ -57,16 +57,18 @@ require('pages/interaction-specs.constants.ajs.ts');
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
 angular.module('oppia').factory('ExplorationEngineService', [
-  'AlertsService', 'AnswerClassificationService',
-  'AudioPreloaderService', 'AudioTranslationLanguageService', 'ContextService',
+  '$rootScope', 'AlertsService', 'AnswerClassificationService',
+  'AudioPreloaderService', 'AudioTranslationLanguageService',
+  'ContentTranslationLanguageService', 'ContextService',
   'ExplorationFeaturesBackendApiService', 'ExplorationHtmlFormatterService',
   'ExplorationObjectFactory', 'ExpressionInterpolationService',
   'FocusManagerService', 'ImagePreloaderService', 'LearnerParamsService',
   'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
   'StateCardObjectFactory', 'StatsReportingService', 'UrlService',
   function(
-      AlertsService, AnswerClassificationService,
-      AudioPreloaderService, AudioTranslationLanguageService, ContextService,
+      $rootScope, AlertsService, AnswerClassificationService,
+      AudioPreloaderService, AudioTranslationLanguageService,
+      ContentTranslationLanguageService, ContextService,
       ExplorationFeaturesBackendApiService, ExplorationHtmlFormatterService,
       ExplorationObjectFactory, ExpressionInterpolationService,
       FocusManagerService, ImagePreloaderService, LearnerParamsService,
@@ -97,6 +99,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
         .loadExploration(_explorationId, version)
         .then(function(exploration) {
           version = exploration.version;
+          $rootScope.$applyAsync();
         });
     }
 
@@ -156,7 +159,7 @@ angular.module('oppia').factory('ExplorationEngineService', [
     // Evaluate question string.
     var makeQuestion = function(newState, envs) {
       return ExpressionInterpolationService.processHtml(
-        newState.content.getHtml(), envs);
+        newState.content.html, envs);
     };
 
     // This should only be called when 'exploration' is non-null.
@@ -203,7 +206,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
         StateCardObjectFactory.createNewCard(
           currentStateName, questionHtml, interactionHtml,
           interaction, initialState.recordedVoiceovers,
-          initialState.content.getContentId());
+          initialState.writtenTranslations,
+          initialState.content.contentId);
       successCallback(initialCard, nextFocusLabel);
     };
 
@@ -271,11 +275,12 @@ angular.module('oppia').factory('ExplorationEngineService', [
        */
       init: function(
           explorationDict, explorationVersion, preferredAudioLanguage,
-          autoTtsEnabled, successCallback) {
+          autoTtsEnabled, preferredContentLanguageCodes,
+          successCallback) {
+        exploration = ExplorationObjectFactory.createFromBackendDict(
+          explorationDict);
         answerIsBeingProcessed = false;
         if (_editorPreviewMode) {
-          exploration = ExplorationObjectFactory.createFromBackendDict(
-            explorationDict);
           exploration.setInitialStateName(initStateName);
           visitedStateNames = [exploration.getInitialState().name];
           initParams(manualParamChanges);
@@ -288,8 +293,6 @@ angular.module('oppia').factory('ExplorationEngineService', [
           AudioPreloaderService.kickOffAudioPreloader(initStateName);
           _loadInitialState(successCallback);
         } else {
-          exploration = ExplorationObjectFactory.createFromBackendDict(
-            explorationDict);
           visitedStateNames.push(exploration.getInitialState().name);
           version = explorationVersion;
           initParams([]);
@@ -307,6 +310,11 @@ angular.module('oppia').factory('ExplorationEngineService', [
           checkAlwaysAskLearnersForAnswerDetails();
           _loadInitialState(successCallback);
         }
+        ContentTranslationLanguageService.init(
+          exploration.getDisplayableWrittenTranslationLanguageCodes(),
+          preferredContentLanguageCodes,
+          exploration.getLanguageCode()
+        );
       },
       moveToExploration: function(successCallback) {
         _loadInitialState(successCallback);
@@ -347,9 +355,10 @@ angular.module('oppia').factory('ExplorationEngineService', [
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
         var recordedVoiceovers = oldState.recordedVoiceovers;
+        var oldStateCard = PlayerTranscriptService.getLastCard();
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
-            oldStateName, oldState.interaction, answer,
+            oldStateName, oldStateCard.getInteraction(), answer,
             interactionRulesService));
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
@@ -390,8 +399,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
         var oldParams = LearnerParamsService.getAllParams();
         oldParams.answer = answer;
         var feedbackHtml =
-          makeFeedback(outcome.feedback.getHtml(), [oldParams]);
-        var feedbackContentId = outcome.feedback.getContentId();
+          makeFeedback(outcome.feedback.html, [oldParams]);
+        var feedbackContentId = outcome.feedback.contentId;
         var feedbackAudioTranslations = (
           recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
         if (feedbackHtml === null) {
@@ -446,7 +455,8 @@ angular.module('oppia').factory('ExplorationEngineService', [
           nextStateName, questionHtml, nextInteractionHtml,
           exploration.getInteraction(nextStateName),
           exploration.getState(nextStateName).recordedVoiceovers,
-          exploration.getState(nextStateName).content.getContentId());
+          exploration.getState(nextStateName).writtenTranslations,
+          exploration.getState(nextStateName).content.contentId);
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, refresherExplorationId,

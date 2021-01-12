@@ -64,8 +64,8 @@ angular.module('oppia').directive('promoBar', [
           ctrl.$onInit = function() {
             PromoBarBackendApiService.getPromoBarDataAsync()
               .then(function(promoBar) {
-                ctrl.promoBarIsEnabled = promoBar.promoBarEnabled;
-                ctrl.promoBarMessage = promoBar.promoBarMessage;
+                ctrl.promoBarIsEnabled = promoBar.isPromoBarEnabled();
+                ctrl.promoBarMessage = promoBar.getPromoBarMessage();
               });
 
             ctrl.promoIsVisible = !isPromoDismissed();

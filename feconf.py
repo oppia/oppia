@@ -62,7 +62,7 @@ ISSUES_DIR = (
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
 INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
-    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs'))
+    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs_by_state_version'))
 INTERACTIONS_SPECS_FILE_PATH = (
     os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
@@ -95,17 +95,23 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions',
     'html_field_types_to_rule_specs.json')
+LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_FILE_PATH_FILE_DIR = os.path.join(
+    os.getcwd(), 'extensions', 'interactions',
+    'legacy_html_field_types_to_rule_specs_by_state_version')
+
 # A mapping of interaction ids to classifier properties.
+# TODO(#10217): As of now we support only one algorithm per interaction.
+# However, we do have the necessary storage infrastructure to support multiple
+# algorithms per interaction. Hence, whenever we find a secondary algorithm
+# candidate for any of the supported interactions, the logical functions to
+# support multiple algorithms need to be implemented.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
         'algorithm_id': 'TextClassifier',
-        'current_data_schema_version': 1
+        'algorithm_version': 1
     },
-    'CodeRepl': {
-        'algorithm_id': 'CodeClassifier',
-        'current_data_schema_version': 1
-    }
 }
+
 # Classifier job time to live (in mins).
 CLASSIFIER_JOB_TTL_MINS = 5
 TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
@@ -213,7 +219,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 40
+CURRENT_STATE_SCHEMA_VERSION = 42
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -266,9 +272,6 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
-# The default number of opportunities to show on contributor dashboard page.
-OPPORTUNITIES_PAGE_SIZE = 20
-
 # The maximum number of top unresolved answers which should be aggregated
 # from all of the submitted answers.
 TOP_UNRESOLVED_ANSWERS_LIMIT = 20
@@ -292,6 +295,9 @@ DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
+# Content id assigned to rule inputs that do not match any interaction
+# customization argument choices.
+INVALID_CONTENT_ID = 'invalid_content_id'
 # Default recorded_voiceovers dict for a default state template.
 DEFAULT_RECORDED_VOICEOVERS = {
     'voiceovers_mapping': {
@@ -408,6 +414,11 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
+# NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch Host
+# and Port when switching to prod server.
+ES_HOST = 'localhost'
+ES_PORT = 9200
+
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
@@ -419,6 +430,12 @@ REDISPORT = 6379
 # project id when switching to the prod server.
 OPPIA_PROJECT_ID = 'dev-project-id'
 GOOGLE_APP_ENGINE_REGION = 'us-central1'
+
+# Used by the Admin SDK to connect with the Firebase Authentication emulator.
+# NOTE: this name is is NOT a typo despite the inclusion of the port number, it
+# is the environment variable expected to be set:
+# https://firebase.google.com/docs/emulator-suite/connect_auth#admin_sdks.
+FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'
 
 # Committer id for system actions. The username for the system committer
 # (i.e. admin) is also 'admin'.
@@ -525,6 +542,7 @@ BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
 BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
 BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
 BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
+BULK_EMAIL_INTENT_ML_JOB_FAILURE = 'bulk_email_ml_job_failure'
 BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
 MESSAGE_TYPE_FEEDBACK = 'feedback'
@@ -661,7 +679,8 @@ DEMO_EXPLORATIONS = {
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
     u'17': 'audio_test',
-    u'18': 'code_classifier_test.yaml',
+    # Exploration with ID 18 was used for testing CodeClassifier functionality
+    # which has been removed (#10060).
     u'19': 'example_exploration_in_collection1.yaml',
     u'20': 'example_exploration_in_collection2.yaml',
     u'21': 'example_exploration_in_collection3.yaml',
@@ -883,7 +902,7 @@ MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with App.js.
+# NOTE TO DEVELOPERS: This should be synchronized with app.constants.ts.
 ENABLE_ML_CLASSIFIERS = False
 
 # The regular expression used to identify whether a string contains float value.
@@ -1237,6 +1256,7 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS = [{
 
 USER_ID_RANDOM_PART_LENGTH = 32
 USER_ID_LENGTH = 36
+USER_ID_REGEX = r'uid_[a-z]{%s}' % USER_ID_RANDOM_PART_LENGTH
 
 # Length of user PIN for different roles used on Android.
 FULL_USER_PIN_LENGTH = 5
@@ -1250,3 +1270,39 @@ MAX_NUMBER_OF_OPS_IN_TRANSACTION = 25
 # to go unrecorded.
 # https://cloud.google.com/appengine/docs/standard/python/outbound-requests#request_timeouts
 DEFAULT_TASKQUEUE_TIMEOUT_SECONDS = 30
+
+# Mapping from issue type to issue keyname in the issue customization dict. This
+# mapping is useful to uniquely identify issues by the combination of their
+# issue type and other type-specific information (such as the list of states
+# involved).
+CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
+    'EarlyQuit': 'state_name',
+    'MultipleIncorrectSubmissions': 'state_name',
+    'CyclicStateTransitions': 'state_names'
+}
+
+# Constants defining various suggestion types.
+SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
+SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
+
+# Suggestion fields that can be queried.
+ALLOWED_SUGGESTION_QUERY_FIELDS = [
+    'suggestion_type', 'target_type', 'target_id', 'status', 'author_id',
+    'final_reviewer_id', 'score_category', 'language_code'
+]
+
+# Possible targets that the suggestions can modify.
+SUGGESTION_TARGET_TYPE_CHOICES = [
+    ENTITY_TYPE_EXPLORATION,
+    ENTITY_TYPE_QUESTION,
+    ENTITY_TYPE_SKILL,
+    ENTITY_TYPE_TOPIC
+]
+
+# Possible suggestion types.
+SUGGESTION_TYPE_CHOICES = [
+    SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_TRANSLATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
+]

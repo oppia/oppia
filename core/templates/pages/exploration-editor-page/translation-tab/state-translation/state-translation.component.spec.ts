@@ -22,9 +22,6 @@ import { CkEditorCopyContentService } from
   'components/ck-editor-helpers/ck-editor-copy-content-service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -73,6 +70,8 @@ import { EventEmitter } from '@angular/core';
 import { ExternalSaveService } from 'services/external-save.service';
 import { SubtitledUnicodeObjectFactory } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -373,10 +372,15 @@ describe('State translation component', function() {
 
   importAllAngularServices();
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [WrapTextWithEllipsisPipe, ConvertToPlainTextPipe]
+    });
+  });
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
     $provide.value(
       'ContinueValidationService', TestBed.get(ContinueValidationService));
     $provide.value(
@@ -409,14 +413,12 @@ describe('State translation component', function() {
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(function() {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [WrapTextWithEllipsisPipe, ConvertToPlainTextPipe]
-    });
-
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.get(CkEditorCopyContentService);
     outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);

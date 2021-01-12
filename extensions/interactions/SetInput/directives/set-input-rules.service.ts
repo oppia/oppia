@@ -27,25 +27,34 @@ import { SetInputRuleInputs } from 'interactions/rule-input-defs';
 })
 export class SetInputRulesService {
   Equals(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return answer.length === inputs.x.length && inputs.x.every(function(val) {
-      return answer.indexOf(val) >= 0;
-    });
+    return (
+      answer.length === inputs.x.unicodeStrSet.length &&
+      inputs.x.unicodeStrSet.every(function(val) {
+        return answer.indexOf(val) >= 0;
+      })
+    );
   }
 
   IsSubsetOf(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return answer.length < inputs.x.length && answer.every(function(val) {
-      return inputs.x.indexOf(val) >= 0;
-    });
+    return (
+      answer.length < inputs.x.unicodeStrSet.length &&
+      answer.every(function(val) {
+        return inputs.x.unicodeStrSet.indexOf(val) >= 0;
+      })
+    );
   }
 
   IsSupersetOf(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return answer.length > inputs.x.length && inputs.x.every(function(val) {
-      return answer.indexOf(val) >= 0;
-    });
+    return (
+      answer.length > inputs.x.unicodeStrSet.length &&
+      inputs.x.unicodeStrSet.every(function(val) {
+        return answer.indexOf(val) >= 0;
+      })
+    );
   }
 
   HasElementsIn(answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return inputs.x.some(function(val) {
+    return inputs.x.unicodeStrSet.some(function(val) {
       return answer.indexOf(val) >= 0;
     });
   }
@@ -53,20 +62,20 @@ export class SetInputRulesService {
   HasElementsNotIn(
       answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
     return answer.some(function(val) {
-      return inputs.x.indexOf(val) === -1;
+      return inputs.x.unicodeStrSet.indexOf(val) === -1;
     });
   }
 
   OmitsElementsIn(
       answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return inputs.x.some(function(val) {
+    return inputs.x.unicodeStrSet.some(function(val) {
       return answer.indexOf(val) === -1;
     });
   }
 
   IsDisjointFrom(
       answer: SetInputAnswer, inputs: SetInputRuleInputs): boolean {
-    return inputs.x.every(function(val) {
+    return inputs.x.unicodeStrSet.every(function(val) {
       return answer.indexOf(val) === -1;
     });
   }

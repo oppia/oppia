@@ -40,11 +40,13 @@ require(
 angular.module('oppia').factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',
-  'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT', 'INTERACTION_SPECS',
+  'TranslationTabActiveModeService', 'COMPONENT_NAME_HINT',
+  'COMPONENT_NAME_RULE_INPUT', 'INTERACTION_SPECS',
   function(
       ExplorationStatesService, StateRecordedVoiceoversService,
       StateWrittenTranslationsService, TranslationLanguageService,
-      TranslationTabActiveModeService, COMPONENT_NAME_HINT, INTERACTION_SPECS) {
+      TranslationTabActiveModeService, COMPONENT_NAME_HINT,
+      COMPONENT_NAME_RULE_INPUT, INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
     var TRANSLATION_NEEDS_UPDATE_MESSAGE = ['Translation needs update!'];
     var ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
@@ -62,7 +64,7 @@ angular.module('oppia').factory('TranslationStatusService', [
         available: false,
         needsUpdate: false,
       };
-      var availableLanguages = recordedVoiceovers.getVoiceoverLanguageCodes(
+      var availableLanguages = recordedVoiceovers.getLanguageCodes(
         contentId);
       if (availableLanguages.indexOf(langCode) !== -1) {
         availabilityStatus.available = true;
@@ -80,7 +82,7 @@ angular.module('oppia').factory('TranslationStatusService', [
       };
       langCode = TranslationLanguageService.getActiveLanguageCode();
       var availableLanguages = (
-        writtenTranslations.getTranslationsLanguageCodes(contentId));
+        writtenTranslations.getLanguageCodes(contentId));
       if (availableLanguages.indexOf(langCode) !== -1) {
         var writtenTranslation = (
           writtenTranslations.getWrittenTranslation(contentId, langCode));
@@ -126,7 +128,7 @@ angular.module('oppia').factory('TranslationStatusService', [
           var noTranslationCount = 0;
           var recordedVoiceovers = (
             ExplorationStatesService.getRecordedVoiceoversMemento(stateName));
-          var allContentIds = recordedVoiceovers.getAllContentId();
+          var allContentIds = recordedVoiceovers.getAllContentIds();
           var interactionId = ExplorationStatesService.getInteractionIdMemento(
             stateName);
           // This is used to prevent users from adding unwanted hints audio, as
@@ -146,6 +148,16 @@ angular.module('oppia').factory('TranslationStatusService', [
               return contentIdToRemove.indexOf(contentId) < 0;
             });
           }
+
+          // As of now, there are no ways of contributing rule input
+          // translations. To have an accurate representation of the progress
+          // bar, we remove rule input content ids.
+          const contentIdsToRemove = _getContentIdListRelatedToComponent(
+            COMPONENT_NAME_RULE_INPUT, allContentIds);
+          allContentIds = allContentIds.filter(function(contentId) {
+            return contentIdsToRemove.indexOf(contentId) < 0;
+          });
+
           explorationContentRequiredCount += allContentIds.length;
           allContentIds.forEach(function(contentId) {
             var availabilityStatus = _getContentAvailabilityStatus(
@@ -227,10 +239,10 @@ angular.module('oppia').factory('TranslationStatusService', [
       var availableContentIds = [];
       if (TranslationTabActiveModeService.isTranslationModeActive()) {
         var writtenTranslations = StateWrittenTranslationsService.displayed;
-        availableContentIds = writtenTranslations.getAllContentId();
+        availableContentIds = writtenTranslations.getAllContentIds();
       } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
         var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
-        availableContentIds = recordedVoiceovers.getAllContentId();
+        availableContentIds = recordedVoiceovers.getAllContentIds();
       }
 
       return availableContentIds;

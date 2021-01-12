@@ -30,6 +30,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { PageTitleService } from 'services/page-title.service';
 
+import constants from 'assets/constants';
 
 interface LessonsQuality {
   title: string;
@@ -150,9 +151,10 @@ export class TopicLandingPageComponent implements OnInit {
     }, 150);
   }
 
-  onClickLearnMoreButton(): void {
+  goToClassroom(): void {
     setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = '/community-library';
+      this.windowRef.nativeWindow.location.href = (
+        `/learn/${constants.DEFAULT_CLASSROOM_URL_FRAGMENT}`);
     }, 150);
   }
 }

@@ -19,6 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
 import os
 
 from constants import constants
@@ -288,6 +289,98 @@ class TestUtilsTests(test_utils.GenericTestBase):
             Exception, 'Expected params to be a dict'):
             self.get_response_without_checking_for_errors(
                 'random_url', [200], params='invalid_params')
+
+    def test_capture_logging(self):
+        logging.info('0')
+        with self.capture_logging() as logs:
+            logging.info('1')
+            logging.debug('2')
+            logging.warn('3')
+            logging.error('4')
+            python_utils.PRINT('5')
+        logging.info('6')
+
+        self.assertEqual(logs, ['1', '2', '3', '4'])
+
+    def test_capture_logging_with_min_level(self):
+        logging.info('0')
+        with self.capture_logging(min_level=logging.WARN) as logs:
+            logging.info('1')
+            logging.debug('2')
+            logging.warn('3')
+            logging.error('4')
+            python_utils.PRINT('5')
+        logging.info('6')
+
+        self.assertEqual(logs, ['3', '4'])
+
+    def test_swap_to_always_return_uses_none_by_default(self):
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return self
+
+        mock = MockClass()
+        self.assertIs(mock.method(), mock)
+
+        with self.swap_to_always_return(mock, 'method'):
+            self.assertIsNone(mock.method())
+
+    def test_swap_to_always_return_with_value(self):
+        right_obj = python_utils.OBJECT()
+        wrong_obj = python_utils.OBJECT()
+        self.assertIsNot(right_obj, wrong_obj)
+
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return wrong_obj
+
+        mock = MockClass()
+        self.assertIs(mock.method(), wrong_obj)
+
+        with self.swap_to_always_return(mock, 'method', value=right_obj):
+            self.assertIs(mock.method(), right_obj)
+
+    def test_swap_to_always_raise_empty_exception_by_default(self):
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                return self
+
+        mock = MockClass()
+        self.assertIs(mock.method(), mock)
+
+        with self.swap_to_always_raise(mock, 'method'):
+            try:
+                mock.method()
+            except Exception:
+                pass
+            else:
+                self.fail(msg='Exception was not raise as expected')
+
+    def test_swap_to_always_raise_with_error(self):
+        right_error = Exception('right error')
+        wrong_error = Exception('wrong error')
+
+        class MockClass(python_utils.OBJECT):
+            """Test-only class."""
+
+            def method(self):
+                """Returns self."""
+                raise wrong_error
+
+        mock = MockClass()
+        self.assertRaisesRegexp(Exception, 'wrong error', mock.method)
+
+        with self.swap_to_always_raise(mock, 'method', error=right_error):
+            self.assertRaisesRegexp(Exception, 'right error', mock.method)
 
     def test_swap_with_check_on_method_called(self):
         def mock_getcwd():

@@ -25,9 +25,11 @@ import re
 import subprocess
 import sys
 
+import feconf
 import python_utils
 from scripts import build
 from scripts import common
+
 
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
@@ -168,25 +170,6 @@ def enable_webpages():
     common.inplace_replace_file(common.CONSTANTS_FILE_PATH, pattern, replace)
 
 
-def start_google_app_engine_server(server_mode):
-    """Start the Google App Engine server.
-
-    Args:
-        server_mode: str. Represents whether the server will be run in
-            dev mode or production mode.
-    """
-    app_yaml_filepath = APP_YAML_FILENAMES[server_mode]
-    p = subprocess.Popen(
-        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
-        '--clear_datastore=yes --dev_appserver_log_level=critical '
-        '--log_level=critical --skip_sdk_update_check=true %s' %
-        (
-            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_SDK_HOME,
-            GOOGLE_APP_ENGINE_PORT, app_yaml_filepath
-        ), shell=True)
-    SUBPROCESSES.append(p)
-
-
 def main(args=None):
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -220,10 +203,24 @@ def main(args=None):
             'from \'accessibility\' or \'performance\'' % lighthouse_mode)
 
     common.start_redis_server()
-    start_google_app_engine_server(server_mode)
-    common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
-    run_lighthouse_puppeteer_script()
-    run_lighthouse_checks(lighthouse_mode)
+
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+    managed_dev_appserver = common.managed_dev_appserver(
+        APP_YAML_FILENAMES[server_mode], port=GOOGLE_APP_ENGINE_PORT,
+        clear_datastore=True, log_level='critical', skip_sdk_update_check=True)
+
+    with contextlib2.ExitStack() as stack:
+        stack.enter_context(common.managed_elasticsearch_dev_server())
+        stack.enter_context(common.managed_firebase_auth_emulator())
+        stack.enter_context(managed_dev_appserver)
+
+        # Wait for the servers to come up.
+        common.wait_for_port_to_be_open(feconf.ES_PORT)
+        common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+
+        run_lighthouse_puppeteer_script()
+        run_lighthouse_checks(lighthouse_mode)
 
 
 if __name__ == '__main__':

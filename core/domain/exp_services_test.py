@@ -121,7 +121,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
         interaction_answer_groups = [{
             'rule_specs': [{
                 'rule_type': 'Equals',
-                'inputs': {'x': ['abc']},
+                'inputs': {
+                    'x': {
+                        'contentId': 'rule_input_4',
+                        'normalizedStrSet': ['abc']
+                    }
+                },
             }],
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
@@ -144,6 +149,12 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             'property_name': (
                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
             'new_value': interaction_answer_groups
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
+            'new_value': 4
         })]
 
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
@@ -153,8 +164,13 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                         self.owner_id, self.EXP_0_ID, change_list, '')
 
         exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        job = classifier_services.get_classifier_training_jobs(
-            self.EXP_0_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        interaction_id = exp.states[
+            feconf.DEFAULT_INIT_STATE_NAME].interaction.id
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_id']
+        job = classifier_services.get_classifier_training_job(
+            self.EXP_0_ID, exp.version, feconf.DEFAULT_INIT_STATE_NAME,
+            algorithm_id)
         self.assertIsNotNone(job)
 
         change_list = [exp_domain.ExplorationChange({
@@ -175,9 +191,9 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                         self.owner_id, self.EXP_0_ID, exp.version,
                         exp.version - 1)
 
-        exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        new_job = classifier_services.get_classifier_training_jobs(
-            self.EXP_0_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+        new_job = classifier_services.get_classifier_training_job(
+            self.EXP_0_ID, exp.version, feconf.DEFAULT_INIT_STATE_NAME,
+            algorithm_id)
         self.assertIsNotNone(new_job)
         self.assertEqual(job.job_id, new_job.job_id)
 
@@ -329,36 +345,15 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
-    def _create_search_query(self, terms, categories, languages):
-        """Creates search query from list of arguments.
-
-        Args:
-            terms: list(str). A list of terms to be added in the query.
-            categories: list(str). A list of categories to be added in the
-                query.
-            languages: list(str). A list of languages to be added in the query.
-
-        Returns:
-            str. A search query string.
-        """
-        query = ' '.join(terms)
-        if categories:
-            query += ' category=(' + ' OR '.join([
-                '"%s"' % category for category in categories]) + ')'
-        if languages:
-            query += ' language_code=(' + ' OR '.join([
-                '"%s"' % language for language in languages]) + ')'
-        return query
-
     def test_get_exploration_summaries_with_no_query(self):
         # An empty query should return all explorations.
-        (exp_ids, search_cursor) = (
-            exp_services.get_exploration_ids_matching_query(''))
+        (exp_ids, search_offset) = (
+            exp_services.get_exploration_ids_matching_query('', [], []))
         self.assertEqual(sorted(exp_ids), [
             self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6
         ])
-        self.assertIsNone(search_cursor)
+        self.assertIsNone(search_offset)
 
     def test_get_exploration_summaries_with_deleted_explorations(self):
         # Ensure a deleted exploration does not show up in search results.
@@ -369,7 +364,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_6)
 
         exp_ids = (
-            exp_services.get_exploration_ids_matching_query(''))[0]
+            exp_services.get_exploration_ids_matching_query('', [], []))[0]
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_4])
 
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_2)
@@ -378,7 +373,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         # If no explorations are loaded, a blank query should not get any
         # explorations.
         self.assertEqual(
-            exp_services.get_exploration_ids_matching_query(''),
+            exp_services.get_exploration_ids_matching_query('', [], []),
             ([], None))
 
     def test_get_exploration_summaries_with_deleted_explorations_multi(self):
@@ -389,7 +384,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
              self.EXP_ID_5, self.EXP_ID_6])
 
         exp_ids = (
-            exp_services.get_exploration_ids_matching_query(''))[0]
+            exp_services.get_exploration_ids_matching_query('', [], []))[0]
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_4])
 
         exp_services.delete_explorations(
@@ -398,7 +393,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         # If no explorations are loaded, a blank query should not get any
         # explorations.
         self.assertEqual(
-            exp_services.get_exploration_ids_matching_query(''),
+            exp_services.get_exploration_ids_matching_query('', [], []),
             ([], None))
 
     def test_get_subscribed_users_activity_ids_with_deleted_explorations(self):
@@ -420,45 +415,45 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     def test_search_exploration_summaries(self):
         # Search within the 'Architecture' category.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query([], ['Architecture'], []))
+            '', ['Architecture'], [])
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_1])
 
         # Search for explorations in Finnish.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query([], [], ['fi']))
+            '', [], ['fi'])
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_1, self.EXP_ID_5])
 
         # Search for Finnish explorations in the 'Architecture' category.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query([], ['Architecture'], ['fi']))
+            '', ['Architecture'], ['fi'])
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_1])
 
         # Search for explorations containing 'Oppia'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['Oppia'], [], []))
+            'Oppia', [], [])
         self.assertEqual(
             sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5])
 
         # Search for explorations containing 'Oppia' and 'Introduce'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['Oppia', 'Introduce'], [], []))
+            'Oppia Introduce', [], [])
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3])
 
         # Search for explorations containing 'England' in English.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['England'], [], ['en']))
+            'England', [], ['en'])
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0])
 
         # Search for explorations containing 'in'.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['in'], [], []))
+            'in', [], [])
         self.assertEqual(
             sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3, self.EXP_ID_6])
 
         # Search for explorations containing 'in' in the 'Architecture' and
         # 'Welcome' categories.
         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['in'], ['Architecture', 'Welcome'], []))
+            'in', ['Architecture', 'Welcome'], [])
         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3])
 
     def test_exploration_summaries_pagination_in_filled_search_results(self):
@@ -472,27 +467,27 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             found_exp_ids = []
 
             # Page 1: 3 initial explorations.
-            (exp_ids, search_cursor) = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
-                    ''))
+                    '', [], []))
             self.assertEqual(len(exp_ids), 3)
-            self.assertIsNotNone(search_cursor)
+            self.assertIsNotNone(search_offset)
             found_exp_ids += exp_ids
 
             # Page 2: 3 more explorations.
-            (exp_ids, search_cursor) = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', cursor=search_cursor))
+                    '', [], [], offset=search_offset))
             self.assertEqual(len(exp_ids), 3)
-            self.assertIsNotNone(search_cursor)
+            self.assertIsNotNone(search_offset)
             found_exp_ids += exp_ids
 
             # Page 3: 1 final exploration.
-            (exp_ids, search_cursor) = (
+            (exp_ids, search_offset) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', cursor=search_cursor))
+                    '', [], [], offset=search_offset))
             self.assertEqual(len(exp_ids), 1)
-            self.assertIsNone(search_cursor)
+            self.assertIsNone(search_offset)
             found_exp_ids += exp_ids
 
             # Validate all explorations were seen.
@@ -528,7 +523,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
         with logging_swap, search_results_page_size_swap, max_iterations_swap:
             (exp_ids, _) = (
-                exp_services.get_exploration_ids_matching_query(''))
+                exp_services.get_exploration_ids_matching_query('', [], []))
 
         self.assertEqual(
             observed_log_messages,
@@ -1059,30 +1054,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(explorations['exp_id_2'].category, 'category 2')
         self.assertEqual(
             explorations['exp_id_2'].objective, 'objective 2')
-
-    def test_get_state_classifier_mapping(self):
-        yaml_path = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        with python_utils.open_file(
-            yaml_path, 'rb', encoding=None) as yaml_file:
-            yaml_content = yaml_file.read()
-
-        exploration = exp_fetchers.get_exploration_by_id('exp_id', strict=False)
-        self.assertIsNone(exploration)
-
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, 'exp_id', [])
-
-        state_classifier_mapping = exp_services.get_user_exploration_data(
-            'user_id', 'exp_id')['state_classifier_mapping']
-
-        self.assertEqual(len(state_classifier_mapping), 1)
-
-        self.assertEqual(
-            state_classifier_mapping['Home']['data_schema_version'], 1)
-        self.assertEqual(
-            state_classifier_mapping['Home']['algorithm_id'], 'TextClassifier')
 
     def test_cannot_get_multiple_explorations_by_version_with_invalid_handler(
             self):
@@ -3939,13 +3910,15 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 })
             ],
             'Changed title.')
-        exp_services.regenerate_exploration_summary(self.EXP_ID_1, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.EXP_ID_1)
 
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1, self.bob_id: 1})
 
         user_services.mark_user_for_deletion(self.bob_id)
-        exp_services.regenerate_exploration_summary(self.EXP_ID_1, None)
+        exp_services.regenerate_exploration_and_contributors_summaries(
+            self.EXP_ID_1)
 
         self._check_contributors_summary(
             self.EXP_ID_1, {self.albert_id: 1})

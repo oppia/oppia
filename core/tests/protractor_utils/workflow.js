@@ -21,6 +21,7 @@ var forms = require('./forms.js');
 var path = require('path');
 var users = require('./users.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
@@ -31,6 +32,8 @@ var imageSubmitButton = element(
   by.css('.protractor-test-photo-upload-submit'));
 var thumbnailResetButton = element(by.css(
   '.protractor-thumbnail-reset-button'));
+var stateNameText = element(
+  by.css('.oppia-state-name-text'));
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -88,11 +91,11 @@ var createExplorationAndStartTutorial = async function() {
       'ActivityCreationModal takes too long to be visible.');
     var createExplorationButton = element(
       by.css('.protractor-test-create-exploration'));
-    await waitFor.elementToBeClickable(
-      createExplorationButton,
-      'createExplorationButton takes too long to be clickable.');
-    await createExplorationButton.click();
+    await action.click('Create Exploration Button', createExplorationButton);
   }
+
+  await waitFor.visibilityOf(
+    stateNameText, 'State name text takes too long to appear.');
 };
 
 /**

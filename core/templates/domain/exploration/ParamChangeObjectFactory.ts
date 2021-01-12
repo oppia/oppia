@@ -22,7 +22,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-var DEFAULT_CUSTOMIZATION_ARGS = {
+interface CustomizationArgs {
+  [generatorId: string]: ParamChangeCustomizationArgs;
+}
+
+var DEFAULT_CUSTOMIZATION_ARGS: CustomizationArgs = {
   Copier: {
     parse_with_jinja: true,
     value: '5'

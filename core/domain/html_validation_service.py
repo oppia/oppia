@@ -34,6 +34,7 @@ from extensions.objects.models import objects
 from extensions.rich_text_components import components
 import feconf
 import python_utils
+import utils
 
 
 def escape_html(unescaped_html_data):
@@ -936,7 +937,7 @@ def validate_math_content_attribute_in_html(html_string):
             components.Math.validate({
                 'math_content-with-value': math_content_dict
             })
-        except Exception as e:
+        except utils.ValidationError as e:
             error_list.append({
                 'invalid_tag': python_utils.UNICODE(math_tag),
                 'error': python_utils.UNICODE(e)
@@ -963,7 +964,8 @@ def does_svg_tag_contains_xmlns_attribute(svg_string):
     # SVGs having non-ascii unicode characters and raises a UnicodeDecodeError.
     soup = bs4.BeautifulSoup(svg_string, 'html.parser')
     return all(
-        svg_tag.get('xmlns') != None for svg_tag in soup.findAll(name='svg'))
+        svg_tag.get('xmlns') is not None for svg_tag in soup.findAll(name='svg')
+    )
 
 
 def get_svg_with_xmlns_attribute(svg_string):

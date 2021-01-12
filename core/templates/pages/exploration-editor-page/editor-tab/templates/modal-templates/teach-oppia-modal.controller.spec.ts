@@ -18,6 +18,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { StateCustomizationArgsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -32,9 +33,8 @@ import { OutcomeObjectFactory } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { StateEditorRefreshService } from
@@ -82,7 +82,10 @@ describe('Teach Oppia Modal Controller', function() {
       answer_groups: [{
         rule_specs: [{
           rule_type: 'Equals',
-          inputs: { x: ['Correct Answer'] }
+          inputs: { x: {
+            contentId: 'rule_input',
+            normalizedStrSet: ['Correct Answer']
+          }}
         }],
         outcome: {
           dest: 'outcome 1',
@@ -122,6 +125,12 @@ describe('Teach Oppia Modal Controller', function() {
     }
   };
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+  });
+
   beforeEach(function() {
     angularNameService = TestBed.get(AngularNameService);
     stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
@@ -131,8 +140,6 @@ describe('Teach Oppia Modal Controller', function() {
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', angularNameService);
-    $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
@@ -148,6 +155,9 @@ describe('Teach Oppia Modal Controller', function() {
     $provide.value('ExternalSaveService', {
       onExternalSave: mockExternalSaveEventEmitter
     });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   describe('when successfully fetching top unresolved answers', function() {
