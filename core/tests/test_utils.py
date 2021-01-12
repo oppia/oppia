@@ -690,8 +690,8 @@ class AuthServicesStub(python_utils.OBJECT):
             list(str|None). The auth IDs associated with each of the given user
             IDs, or None for associations which don't exist.
         """
-        user_ids = set(user_ids)
-        return [a for a, u in self._user_id_by_auth_id.items() if u in user_ids]
+        auth_id_by_user_id = {u: a for a, u in self._user_id_by_auth_id.items()}
+        return [auth_id_by_user_id.get(u, None) for u in user_ids]
 
     def associate_auth_id_with_user_id(self, auth_id_user_id_pair):
         """Commits the association between auth ID and user ID.
@@ -1953,9 +1953,8 @@ tags: []
             bytes. The mock auth ID of a user possessing the given email.
         """
         # Although the hash function doesn't guarantee a one-to-one mapping, in
-        # practice it is sufficient for our tests. The absolute value isn't
-        # necessary, but makes inspecting values easier (since there's no
-        # leading '-').
+        # practice it is sufficient for our tests. We make it a positive integer
+        # because those are always valid auth IDs.
         return python_utils.convert_to_bytes(abs(hash(email)))
 
     def _get_response(

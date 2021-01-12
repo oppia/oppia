@@ -76,7 +76,7 @@ class UserIdentifiersModelValidator(base_model_validators.BaseModelValidator):
         Returns:
             str. A regex pattern to be followed by the model id.
         """
-        return '^[0-9-]{1,24}$'
+        return '^[0-9]{1,24}$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):

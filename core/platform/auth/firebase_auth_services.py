@@ -121,19 +121,6 @@ def _verify_id_token(auth_header):
         return {}
 
 
-def create_user_auth_details(user_id, auth_id):
-    """Returns a UserAuthDetails object configured with Firebase properties.
-
-    Args:
-        user_id: str. The unique ID of the user.
-        auth_id: str. The ID of the user retrieved from Firebase.
-
-    Returns:
-        UserAuthDetails. A UserAuthDetails domain object.
-    """
-    return auth_domain.UserAuthDetails(user_id, None, auth_id, None)
-
-
 def get_auth_claims_from_request(request):
     """Authenticates the request and returns claims about its authorizer.
 

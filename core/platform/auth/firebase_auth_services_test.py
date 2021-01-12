@@ -392,6 +392,10 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_multi_user_ids_from_auth_ids(
                 ['aid1', 'aid2', 'aid3']),
             ['uid1', 'uid2', 'uid3'])
+        self.assertEqual(
+            firebase_auth_services.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']),
+            ['aid1', 'aid2', 'aid3'])
 
     def test_get_multi_associations_with_one_missing(self):
         firebase_auth_services.associate_auth_id_with_user_id(
@@ -404,6 +408,10 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.get_multi_user_ids_from_auth_ids(
                 ['aid1', 'aid2', 'aid3']),
             ['uid1', None, 'uid3'])
+        self.assertEqual(
+            firebase_auth_services.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']),
+            ['aid1', None, 'aid3'])
 
     def test_associate_without_collision(self):
         firebase_auth_services.associate_auth_id_with_user_id(
@@ -414,9 +422,19 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         self.assertEqual(
             firebase_auth_services.get_auth_id_from_user_id('uid'), 'aid')
 
-    def test_associate_with_collision_raises(self):
+    def test_associate_with_user_id_collision_raises(self):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid'))
+
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            firebase_auth_services.associate_auth_id_with_user_id(
+                auth_domain.AuthIdUserIdPair('aid', 'uid'))
+
+    def test_associate_with_auth_id_collision_raises(self):
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid', 'uid'))
+        # Erase the user_id collision, but leave the auth_id collision.
+        auth_models.UserIdByFirebaseAuthIdModel.delete_by_id('aid')
 
         with self.assertRaisesRegexp(Exception, 'already associated'):
             firebase_auth_services.associate_auth_id_with_user_id(
@@ -434,9 +452,21 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
              firebase_auth_services.get_user_id_from_auth_id('aid3')],
             ['uid1', 'uid2', 'uid3'])
 
-    def test_associate_multi_with_collision_raises(self):
+    def test_associate_multi_with_user_id_collision_raises(self):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+
+        with self.assertRaisesRegexp(Exception, 'already associated'):
+            firebase_auth_services.associate_multi_auth_ids_with_user_ids(
+                [auth_domain.AuthIdUserIdPair('aid1', 'uid1'),
+                 auth_domain.AuthIdUserIdPair('aid2', 'uid2'),
+                 auth_domain.AuthIdUserIdPair('aid3', 'uid3')])
+
+    def test_associate_multi_with_auth_id_collision_raises(self):
+        firebase_auth_services.associate_auth_id_with_user_id(
+            auth_domain.AuthIdUserIdPair('aid1', 'uid1'))
+        # Erase the user_id collision, but leave the auth_id collision.
+        auth_models.UserIdByFirebaseAuthIdModel.delete_by_id('aid1')
 
         with self.assertRaisesRegexp(Exception, 'already associated'):
             firebase_auth_services.associate_multi_auth_ids_with_user_ids(

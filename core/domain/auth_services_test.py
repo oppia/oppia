@@ -138,6 +138,10 @@ class AuthServicesTests(test_utils.GenericTestBase):
             auth_services.get_multi_user_ids_from_auth_ids(
                 ['aid1', 'aid2', 'aid3']),
             ['uid1', 'uid2', 'uid3'])
+        self.assertEqual(
+            auth_services.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']),
+            ['aid1', 'aid2', 'aid3'])
 
     def test_get_multi_associations_with_one_missing(self):
         auth_services.associate_auth_id_with_user_id(
@@ -150,6 +154,10 @@ class AuthServicesTests(test_utils.GenericTestBase):
             auth_services.get_multi_user_ids_from_auth_ids(
                 ['aid1', 'aid2', 'aid3']),
             ['uid1', None, 'uid3'])
+        self.assertEqual(
+            auth_services.get_multi_auth_ids_from_user_ids(
+                ['uid1', 'uid2', 'uid3']),
+            ['aid1', None, 'aid3'])
 
     def test_associate_auth_id_with_user_id_without_collision(self):
         auth_services.associate_auth_id_with_user_id(
