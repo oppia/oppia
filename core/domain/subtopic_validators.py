@@ -65,8 +65,6 @@ class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
                 'snapshot_content_ids',
                 subtopic_models.SubtopicPageSnapshotContentModel,
                 snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'topic_ids', topic_models.TopicModel, [item.topic_id])]
 
     @classmethod
     def _get_custom_validation_functions(cls):
