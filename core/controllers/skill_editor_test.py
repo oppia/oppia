@@ -436,7 +436,7 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
 
     def setUp(self):
         super(SkillDescriptionHandlerTest, self).setUp()
-        self.skill_description = "Adding Fractions"
+        self.skill_description = 'Adding Fractions'
         self.url = '%s/%s' % (
             feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description)
 

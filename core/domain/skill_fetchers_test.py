@@ -216,11 +216,11 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_skill_from_model_with_description(self):
         self.assertEqual(
-            skill_fetchers.get_skill_by_description("Description").to_dict(),
+            skill_fetchers.get_skill_by_description('Description').to_dict(),
             self.skill.to_dict()
         )
         self.assertEqual(
-            skill_fetchers.get_skill_by_description("Does not exist"),
+            skill_fetchers.get_skill_by_description('Does not exist'),
             None
         )
 
