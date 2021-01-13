@@ -17,8 +17,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
+
 from core.domain import caching_services
 from core.domain import role_services
+from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -441,7 +444,20 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         json_response = self.get_json(self.url)
         self.assertEqual(json_response['skill_description_exists'], False)
-        
+
+        # Publish the skill.
+        new_skill_id = skill_services.get_new_skill_id()
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill(
+            new_skill_id, self.skill_description, rubrics)
+        skill_services.save_new_skill(self.admin_id, skill)
+
+        # Skill description exists since we've already published it.
         json_response = self.get_json(self.url)
         self.assertEqual(json_response['skill_description_exists'], True)
-        self.logout()
