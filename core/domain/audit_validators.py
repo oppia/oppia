@@ -20,9 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
-from core.platform import models
-
-(user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
 class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
@@ -37,8 +34,10 @@ class RoleQueryAuditModelValidator(base_model_validators.BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_ids', user_models.UserSettingsModel, [item.user_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_ids', [item.user_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
 
 
 class UsernameChangeAuditModelValidator(
@@ -55,6 +54,7 @@ class UsernameChangeAuditModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids', user_models.UserSettingsModel,
-                [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False)]
