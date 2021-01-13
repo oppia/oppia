@@ -43,11 +43,8 @@ from core.domain import stats_services
 from core.domain import story_fetchers
 from core.domain import summary_services
 from core.domain import user_services
-from core.platform import models
 import feconf
 import utils
-
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -160,20 +157,23 @@ class ExplorationHandler(base.BaseHandler):
         version = self.request.get('v')
         version = int(version) if version else None
 
-        try:
-            exploration = exp_fetchers.get_exploration_by_id(
-                exploration_id, version=version)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False, version=version)
+        if exploration is None:
+            raise self.PageNotFoundException()
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         user_settings = user_services.get_user_settings(self.user_id)
 
         preferred_audio_language_code = None
+        preferred_language_codes = None
+
         if user_settings is not None:
             preferred_audio_language_code = (
                 user_settings.preferred_audio_language_code)
+            preferred_language_codes = (
+                user_settings.preferred_language_codes)
 
         self.values.update({
             'can_edit': (
@@ -185,6 +185,7 @@ class ExplorationHandler(base.BaseHandler):
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
             'preferred_audio_language_code': preferred_audio_language_code,
+            'preferred_language_codes': preferred_language_codes,
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'correctness_feedback_enabled': (
                 exploration.correctness_feedback_enabled),
@@ -243,72 +244,13 @@ class StorePlaythroughHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        exp_issues = stats_services.get_exp_issues_from_model(
-            stats_models.ExplorationIssuesModel.get_model(
-                exploration_id, playthrough.exp_version))
+        exp_issues = stats_services.get_exp_issues(
+            exploration_id, playthrough.exp_version)
 
-        if self._assign_playthrough_to_corresponding_issue(
+        if stats_services.assign_playthrough_to_corresponding_issue(
                 playthrough, exp_issues, issue_schema_version):
             stats_services.save_exp_issues_model(exp_issues)
         self.render_json({})
-
-    def _get_corresponding_exp_issue(
-            self, playthrough, exp_issues, issue_schema_version):
-        """Returns the unique exploration issue model expected to own the given
-        playthrough. If it does not exist yet, then it will be created.
-
-        Args:
-            playthrough: Playthrough. The playthrough domain object.
-            exp_issues: ExplorationIssues. The exploration issues domain object
-                which manages each individual exploration issue.
-            issue_schema_version: int. The version of the issue schema.
-
-        Returns:
-            ExplorationIssue. The corresponding exploration issue.
-        """
-        for issue in exp_issues.unresolved_issues:
-            if issue.issue_type == playthrough.issue_type:
-                issue_customization_args = issue.issue_customization_args
-                identifying_arg = (
-                    stats_models.CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE[
-                        issue.issue_type])
-                # NOTE TO DEVELOPERS: When identifying_arg is 'state_names', the
-                # ordering of the list is important (i.e. [a, b, c] is different
-                # from [b, c, a]).
-                if (issue_customization_args[identifying_arg] ==
-                        playthrough.issue_customization_args[identifying_arg]):
-                    return issue
-        issue = stats_domain.ExplorationIssue(
-            playthrough.issue_type, playthrough.issue_customization_args,
-            [], issue_schema_version, is_valid=True)
-        exp_issues.unresolved_issues.append(issue)
-        return issue
-
-    def _assign_playthrough_to_corresponding_issue(
-            self, playthrough, exp_issues, issue_schema_version):
-        """Stores the given playthrough as a new model into its corresponding
-        exploration issue. When the corresponding exploration issue does not
-        exist, a new one is created.
-
-        Args:
-            playthrough: Playthrough. The playthrough domain object.
-            exp_issues: ExplorationIssues. The exploration issues domain object.
-            issue_schema_version: int. The version of the issue schema.
-
-        Returns:
-            bool. Whether the playthrough was stored successfully.
-        """
-        issue = self._get_corresponding_exp_issue(
-            playthrough, exp_issues, issue_schema_version)
-        if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
-            issue.playthrough_ids.append(
-                stats_models.PlaythroughModel.create(
-                    playthrough.exp_id, playthrough.exp_version,
-                    playthrough.issue_type,
-                    playthrough.issue_customization_args,
-                    [action.to_dict() for action in playthrough.actions]))
-            return True
-        return False
 
 
 class StatsEventsHandler(base.BaseHandler):

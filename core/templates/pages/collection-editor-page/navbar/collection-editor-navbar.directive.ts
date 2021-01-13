@@ -120,7 +120,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/collection-editor-page/templates/' +
                 'collection-editor-save-modal.directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 isPrivate: () => isPrivate
               },
@@ -145,7 +145,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/collection-editor-page/templates/' +
                   'collection-editor-pre-publish-modal.directive.html'),
-                backdrop: true,
+                backdrop: 'static',
                 controllerAs: '$ctrl',
                 controller: 'CollectionEditorPrePublishModalController'
               }).result.then(function(metadataList) {

@@ -18,23 +18,29 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import collections
 import contextlib
 import getpass
 import http.server
 import os
 import re
 import shutil
+import signal
 import socketserver
 import stat
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 
 import constants
 from core.tests import test_utils
-
-import psutil
+import feconf
 import python_utils
+
+import contextlib2
+import psutil
 
 from . import common
 
@@ -371,6 +377,36 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertTrue(common.is_port_open(4444))
         httpd.server_close()
+
+    def test_wait_for_port_to_be_closed_port_never_closes(self):
+        def mock_sleep(unused_seconds):
+            return
+        def mock_is_port_open(unused_port_number):
+            return True
+
+        sleep_swap = self.swap_with_checks(
+            time, 'sleep', mock_sleep, expected_args=[(1,)] * 60)
+        is_port_open_swap = self.swap(
+            common, 'is_port_open', mock_is_port_open)
+
+        with sleep_swap, is_port_open_swap:
+            success = common.wait_for_port_to_be_closed(9999)
+        self.assertFalse(success)
+
+    def test_wait_for_port_to_be_closed_port_closes(self):
+        def mock_sleep(unused_seconds):
+            raise AssertionError('mock_sleep should not be called.')
+        def mock_is_port_open(unused_port_number):
+            return False
+
+        sleep_swap = self.swap(
+            time, 'sleep', mock_sleep)
+        is_port_open_swap = self.swap(
+            common, 'is_port_open', mock_is_port_open)
+
+        with sleep_swap, is_port_open_swap:
+            success = common.wait_for_port_to_be_closed(9999)
+        self.assertTrue(success)
 
     def test_permissions_of_file(self):
         root_temp_dir = tempfile.mkdtemp()
@@ -847,3 +883,324 @@ class CommonTests(test_utils.GenericTestBase):
         # Asserts that imports from problematic modules do not error.
         from google.cloud import tasks_v2 # pylint: disable=unused-variable
         from google.appengine.api import app_identity # pylint: disable=unused-variable
+
+    def test_swap_env_when_var_had_a_value(self):
+        os.environ['ABC'] = 'Hard as Rocket Science'
+        with common.swap_env('ABC', 'Easy as 123') as old_value:
+            self.assertEqual(old_value, 'Hard as Rocket Science')
+            self.assertEqual(os.environ['ABC'], 'Easy as 123')
+        self.assertEqual(os.environ['ABC'], 'Hard as Rocket Science')
+
+    def test_swap_env_when_var_did_not_exist(self):
+        self.assertNotIn('DEF', os.environ)
+        with common.swap_env('DEF', 'Easy as 123') as old_value:
+            self.assertIsNone(old_value)
+            self.assertEqual(os.environ['DEF'], 'Easy as 123')
+        self.assertNotIn('DEF', os.environ)
+
+
+class ManagedProcessTests(test_utils.TestBase):
+
+    # Helper class for improving the readability of tests.
+    POPEN_CALL = (
+        collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs']))
+
+    def assert_proc_was_managed_as_expected(
+            self, logs, pid,
+            manager_should_have_sent_terminate_signal=True,
+            manager_should_have_sent_kill_signal=False):
+        """Asserts that the process ended as expected.
+
+        Args:
+            logs: list(str). The logs emitted during the process's lifetime.
+            pid: int. The process ID to inspect.
+            manager_should_have_sent_terminate_signal: bool. Whether the manager
+                should have sent a terminate signal to the process.
+            manager_should_have_sent_kill_signal: bool. Whether the manager
+                should have sent a kill signal to the process.
+        """
+        proc_pattern = r'Process\((name=\'python\', )?pid=%d\)' % (pid,)
+
+        expected_patterns = []
+        if manager_should_have_sent_terminate_signal:
+            expected_patterns.append(r'Terminating %s\.\.\.' % proc_pattern)
+        if manager_should_have_sent_kill_signal:
+            expected_patterns.append(r'Forced to kill %s!' % proc_pattern)
+        else:
+            expected_patterns.append(r'%s has ended\.' % proc_pattern)
+
+        logs_with_pid = [msg for msg in logs if re.search(proc_pattern, msg)]
+        if expected_patterns and not logs_with_pid:
+            self.fail(msg='%r has no match in logs=%r' % (proc_pattern, logs))
+
+        self.assert_matches_regexps(logs_with_pid, expected_patterns)
+
+    @contextlib.contextmanager
+    def _swap_popen(
+            self, make_procs_unresponsive=False, num_children=0, delay_secs=30):
+        """Returns values for inspecting and mocking calls to psutil.Popen.
+
+        Args:
+            make_procs_unresponsive: bool. Whether the processes created by
+                the mock will stall when asked to terminate. Processes will
+                always terminate within ~1 minute regardless of this choice.
+            num_children: int. The number of child processes the process created
+                by the mock should create. Children inherit the same termination
+                behavior.
+            delay_secs: int. The number of seconds before the process ends
+                naturally.
+
+        Returns:
+            Context manager. A context manager in which calls to psutil.Popen
+            create a simple program that simply waits and then exits.
+
+        Yields:
+            list(POPEN_CALL). A list with the most up-to-date arguments passed
+            to psutil.Popen from within the context manager returned.
+        """
+        popen_calls = []
+
+        def popen_mock(program_args, **kwargs):
+            """Mock of psutil.Popen that creates processes using os.fork().
+
+            The processes created will always terminate within ~1 minute.
+
+            Args:
+                program_args: list(*). Unused program arguments that would
+                    otherwise be used by psutil.Popen.
+                **kwargs: dict(str: *). Unused keyword arguments that would
+                    otherwise be used by psutil.Popen.
+
+            Returns:
+                psutil.Process. Handle for the parent of the new process tree.
+            """
+            child_pid = os.fork()
+            if child_pid != 0:
+                popen_calls.append(self.POPEN_CALL(program_args, kwargs))
+                time.sleep(1) # Give child a chance to start running.
+                return psutil.Process(pid=child_pid)
+
+            for _ in python_utils.RANGE(num_children):
+                if os.fork() == 0:
+                    break
+
+            if make_procs_unresponsive:
+                # Register an unresponsive function as the SIGTERM handler.
+                signal.signal(signal.SIGTERM, lambda *_: time.sleep(delay_secs))
+
+            time.sleep(delay_secs)
+            sys.exit()
+
+        with self.swap(psutil, 'Popen', popen_mock):
+            yield popen_calls
+
+    def test_does_not_raise_when_psutil_not_in_path(self):
+        with contextlib2.ExitStack() as stack:
+            stack.enter_context(self.swap(sys, 'path', []))
+            stack.enter_context(self._swap_popen())
+
+            # Entering the context should not raise.
+            stack.enter_context(common.managed_process(['a'], timeout_secs=10))
+
+    def test_concats_command_args_when_shell_is_true(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            proc = stack.enter_context(
+                common.managed_process(['a', 1], shell=True, timeout_secs=10))
+
+        self.assert_proc_was_managed_as_expected(logs, proc.pid)
+        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
+
+    def test_passes_command_args_as_list_of_strings_when_shell_is_false(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            proc = stack.enter_context(
+                common.managed_process(['a', 1], shell=False, timeout_secs=10))
+
+        self.assert_proc_was_managed_as_expected(logs, proc.pid)
+        self.assertEqual(
+            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
+
+    def test_filters_empty_strings_from_command_args_when_shell_is_true(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            proc = stack.enter_context(common.managed_process(
+                ['', 'a', '', 1], shell=True, timeout_secs=10))
+
+        self.assert_proc_was_managed_as_expected(logs, proc.pid)
+        self.assertEqual(popen_calls, [self.POPEN_CALL('a 1', {'shell': True})])
+
+    def test_filters_empty_strings_from_command_args_when_shell_is_false(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            proc = stack.enter_context(common.managed_process(
+                ['', 'a', '', 1], shell=False, timeout_secs=10))
+
+        self.assert_proc_was_managed_as_expected(logs, proc.pid)
+        self.assertEqual(
+            popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
+
+    def test_reports_killed_processes_as_warnings(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            stack.enter_context(self._swap_popen(make_procs_unresponsive=True))
+
+            proc = stack.enter_context(
+                common.managed_process(['a'], timeout_secs=10))
+
+        self.assert_proc_was_managed_as_expected(
+            logs, proc.pid,
+            manager_should_have_sent_terminate_signal=True,
+            manager_should_have_sent_kill_signal=True)
+
+    def test_terminates_child_processes(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            stack.enter_context(self._swap_popen(num_children=3))
+
+            proc = stack.enter_context(
+                common.managed_process(['a'], timeout_secs=10))
+            pids = [c.pid for c in proc.children()] + [proc.pid]
+
+        self.assertEqual(len(set(pids)), 4)
+        for pid in pids:
+            self.assert_proc_was_managed_as_expected(logs, pid)
+
+    def test_kills_child_processes(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            stack.enter_context(self._swap_popen(
+                num_children=3, make_procs_unresponsive=True))
+
+            proc = stack.enter_context(
+                common.managed_process(['a'], timeout_secs=10))
+            pids = [c.pid for c in proc.children()] + [proc.pid]
+
+        self.assertEqual(len(set(pids)), 4)
+        for pid in pids:
+            self.assert_proc_was_managed_as_expected(
+                logs, pid,
+                manager_should_have_sent_terminate_signal=True,
+                manager_should_have_sent_kill_signal=True)
+
+    def test_respects_processes_that_are_killed_early(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            stack.enter_context(self._swap_popen())
+
+            proc = stack.enter_context(common.managed_process(
+                ['a'], timeout_secs=10))
+            time.sleep(1)
+            proc.kill()
+            proc.wait()
+
+        self.assert_proc_was_managed_as_expected(
+            logs, proc.pid,
+            manager_should_have_sent_terminate_signal=False)
+
+    def test_respects_processes_that_are_killed_after_delay(self):
+        with contextlib2.ExitStack() as stack:
+            logs = stack.enter_context(self.capture_logging())
+            stack.enter_context(self._swap_popen(make_procs_unresponsive=True))
+
+            proc = stack.enter_context(common.managed_process(
+                ['a'], timeout_secs=10))
+
+            def _kill_after_delay():
+                """Kills the targeted process after a short delay."""
+                time.sleep(5)
+                proc.kill()
+
+            assassin_thread = threading.Thread(target=_kill_after_delay)
+            assassin_thread.start()
+
+        assassin_thread.join()
+
+        self.assert_proc_was_managed_as_expected(
+            logs, proc.pid,
+            manager_should_have_sent_terminate_signal=True,
+            manager_should_have_sent_kill_signal=False)
+
+    def test_managed_firebase_emulator(self):
+        os.environ['GCLOUD_PROJECT'] = 'foo'
+        os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = ''
+        with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(common.managed_firebase_auth_emulator())
+            self.assertEqual(
+                os.environ['GCLOUD_PROJECT'], feconf.OPPIA_PROJECT_ID)
+            self.assertEqual(
+                os.environ['FIREBASE_AUTH_EMULATOR_HOST'],
+                feconf.FIREBASE_AUTH_EMULATOR_HOST)
+
+        self.assertEqual(os.environ['GCLOUD_PROJECT'], 'foo')
+        self.assertEqual(os.environ['FIREBASE_AUTH_EMULATOR_HOST'], '')
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn('firebase', popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+
+    def test_managed_dev_appserver(self):
+        with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+
+            stack.enter_context(
+                common.managed_dev_appserver('app.yaml', env=None))
+
+        self.assertEqual(len(popen_calls), 1)
+        self.assertIn('dev_appserver.py', popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True, 'env': None})
+
+    def test_managed_elasticsearch_dev_server(self):
+        with contextlib2.ExitStack() as stack:
+            popen_calls = stack.enter_context(self._swap_popen())
+            stack.enter_context(common.managed_elasticsearch_dev_server())
+
+        self.assertIn(
+            '%s/bin/elasticsearch' % common.ES_PATH,
+            popen_calls[0].program_args)
+        self.assertEqual(popen_calls[0].kwargs, {'shell': True})
+
+    def test_start_server_removes_elasticsearch_data(self):
+        check_function_calls = {
+            'shutil_rmtree_is_called': False
+        }
+
+        old_os_path_exists = os.path.exists
+
+        def mock_os_remove_files(file_path): # pylint: disable=unused-argument
+            check_function_calls['shutil_rmtree_is_called'] = True
+
+        def mock_os_path_exists(file_path): # pylint: disable=unused-argument
+            if file_path == common.ES_PATH_DATA_DIR:
+                return True
+            return old_os_path_exists(file_path)
+
+        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
+
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    """Return required method."""
+                    return '', ''
+            return Ret()
+
+        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_os_remove = self.swap(shutil, 'rmtree', mock_os_remove_files)
+        swap_os_path_exists = self.swap(os.path, 'exists', mock_os_path_exists)
+        stack = contextlib2.ExitStack()
+        with swap_call, swap_os_remove, swap_os_path_exists, stack:
+            stack.enter_context(self._swap_popen())
+            stack.enter_context(common.managed_elasticsearch_dev_server())
+
+        self.assertTrue(check_function_calls['shutil_rmtree_is_called'])

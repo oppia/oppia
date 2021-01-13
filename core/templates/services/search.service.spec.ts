@@ -13,90 +13,58 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests that average ratings are being computed correctly.
+ * @fileoverview Tests that search service gets correct collections.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-// The import below is to successfully mock Jquery.
-import $ from 'jquery';
-
 import { EventEmitter } from '@angular/core';
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { SearchService, SelectionDetails, SelectionList } from 'services/search.service';
 import { Subscription } from 'rxjs';
 
-require('services/search.service.ts');
-
-describe('Search service', function() {
-  var SearchService = null;
-  var $httpBackend = null;
-  var $log = null;
-  var $translate = null;
-  var CsrfService = null;
-  var results = null;
-  var testSubscriptions: Subscription;
-  const initialSearchResultsLoadedSpy = jasmine.createSpy(
-    'initialSearchResultsLoadedSpy');
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    SearchService = $injector.get('SearchService');
-    $log = $injector.get('$log');
-    $httpBackend = $injector.get('$httpBackend');
-    $translate = $injector.get('$translate');
-
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
-
-    spyOn($translate, 'refresh').and.callThrough();
-
-    results = {
-      categories: {
-        description: '',
-        itemsName: 'categories',
-        masterList: [],
-        numSelections: 0,
-        selections: {},
-        summary: ''
-      },
-      languageCodes: {
-        description: '',
-        itemsName: 'languages',
-        masterList: [],
-        numSelections: 0,
-        selections: {},
-        summary: ''
-      }
-    };
-  }));
+describe('Search Service', () => {
+  let searchService: SearchService;
+  let results: SelectionDetails;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    testSubscriptions = new Subscription();
-    testSubscriptions.add(SearchService.onInitialSearchResultsLoaded.subscribe(
-      initialSearchResultsLoadedSpy));
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [SearchService]
+    });
+    searchService = TestBed.get(SearchService);
   });
 
-  afterEach(() => {
-    testSubscriptions.unsubscribe();
-  });
+  describe('updateSearchFieldsBasedOnUrlQuery', () => {
+    let urlComponent;
+    beforeEach(() => {
+      results = {
+        categories: {
+          description: '',
+          itemsName: 'categories',
+          masterList: [],
+          numSelections: 0,
+          selections: {},
+          summary: ''
+        },
+        languageCodes: {
+          description: '',
+          itemsName: 'languages',
+          masterList: [],
+          numSelections: 0,
+          selections: {},
+          summary: ''
+        }
+      };
+    });
 
-  it('should find two categories and two languages if given in url search',
-    function() {
-      var urlComponent = '?q=test&category=("Architecture"%20OR%20' +
-                         '"Mathematics")&language_code=("en"%20OR%20"ar")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
+    // eslint-disable-next-line max-len
+    it('should identify two categories and two languages given in url search query', () => {
+      urlComponent = '?q=test&category=("Architecture"%20OR%20' +
+        '"Mathematics")&language_code=("en"%20OR%20"ar")';
+      expect(searchService.updateSearchFieldsBasedOnUrlQuery(
         urlComponent, results)).toBe('test');
       expect(results.languageCodes.selections).toEqual({
         ar: true,
@@ -107,366 +75,286 @@ describe('Search service', function() {
         Mathematics: true
       });
     });
+    it('should find one category and two languages if given in url search',
+      () => {
+        urlComponent = '?q=test&category=("Mathematics")&' +
+          'language_code=("en"%20OR%20"ar")';
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe('test');
+        expect(results.languageCodes.selections).toEqual({
+          ar: true,
+          en: true
+        });
+        expect(results.categories.selections).toEqual({
+          Mathematics: true
+        });
+      }
+    );
+    it('should find one category and one language if given in url search',
+      () => {
+        urlComponent =
+          '?q=test&category=("Mathematics")&language_code=("en")';
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe('test');
+        expect(results.languageCodes.selections).toEqual({
+          en: true
+        });
+        expect(results.categories.selections).toEqual({
+          Mathematics: true
+        });
+      }
+    );
+    it('should find no categories and one language if given in url search',
+      () => {
+        urlComponent = '?q=test&language_code=("en")';
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe('test');
+        expect(results.languageCodes.selections).toEqual({
+          en: true
+        });
+        expect(results.categories.selections).toEqual({});
+      }
+    );
 
-  it('should find one category and two languages if given in url search',
-    function() {
-      var urlComponent = '?q=test&category=("Mathematics")&' +
-                         'language_code=("en"%20OR%20"ar")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent, results)).toBe('test');
-      expect(results.languageCodes.selections).toEqual({
-        ar: true,
-        en: true
-      });
-      expect(results.categories.selections).toEqual({
-        Mathematics: true
-      });
-    }
-  );
+    it('should find as many keywords as provided in search query',
+      () => {
+        urlComponent = '?q=protractor%20test&language_code=("en")';
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe('protractor test');
+        expect(results.languageCodes.selections).toEqual({
+          en: true
+        });
+        expect(results.categories.selections).toEqual({});
+      }
+    );
 
-  it('should find one category and one language if given in url search',
-    function() {
-      var urlComponent =
-        '?q=test&category=("Mathematics")&language_code=("en")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent, results)).toBe('test');
-      expect(results.languageCodes.selections).toEqual({
-        en: true
-      });
-      expect(results.categories.selections).toEqual({
-        Mathematics: true
-      });
-    }
-  );
+    it('should not find languages nor categories when ampersand is escaped',
+      () => {
+        urlComponent = '?q=protractor%20test%26category=("Mathematics")' +
+          '%26language_code=("en"%20OR%20"ar")';
+        expect(searchService.updateSearchFieldsBasedOnUrlQuery(
+          urlComponent, results)).toBe(
+          'protractor test&category=("Mathematics")' +
+            '&language_code=("en" OR "ar")');
+        expect(results.languageCodes.selections).toEqual({});
+        expect(results.categories.selections).toEqual({});
+      }
+    );
 
-  it('should find no categories and one language if given in url search',
-    function() {
-      var urlComponent = '?q=test&language_code=("en")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent, results)).toBe('test');
-      expect(results.languageCodes.selections).toEqual({
-        en: true
-      });
-      expect(results.categories.selections).toEqual({});
-    }
-  );
+    it('should only use correct fields when ampersand is not escaped anywhere',
+      () => {
+        urlComponent = '?q=protractor&test&category=("Mathematics")' +
+          '&language_code=("en"%20OR%20"ar")';
+        expect(
+          searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+        ).toBe('protractor');
+        expect(results.languageCodes.selections).toEqual({
+          en: true,
+          ar: true
+        });
+        expect(results.categories.selections).toEqual({ Mathematics: true });
+      }
+    );
 
-  it('should find as many keywords as provided in search query',
-    function() {
-      var urlComponent = '?q=protractor%20test&language_code=("en")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent, results)).toBe('protractor test');
-      expect(results.languageCodes.selections).toEqual({
-        en: true
-      });
-      expect(results.categories.selections).toEqual({});
-    }
-  );
+    it('should omit url component if it is malformed',
+      () => {
+        // In the two cases below, language_code param is not wrapped in
+        // parentheses. However, the category param is defined correctly.
+        // updateSearchFieldsBasedOnUrlQuery is expected to clean language_code.
+        urlComponent = (
+          '?q=protractor%20test&category=("Mathematics")&' +
+          'language_code="en" OR "ar")');
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        expect(results.languageCodes.selections).toEqual({});
+        expect(results.categories.selections).toEqual({
+          Mathematics: true
+        });
 
-  it('should not find languages nor categories when ampersand is escaped',
-    function() {
-      var urlComponent = '?q=protractor%20test%26category=("Mathematics")' +
-                         '%26language_code=("en"%20OR%20"ar")';
-      expect(SearchService.updateSearchFieldsBasedOnUrlQuery(
-        urlComponent, results)).toBe(
-        'protractor test&category=("Mathematics")' +
-        '&language_code=("en" OR "ar")');
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({});
-    }
-  );
+        urlComponent = (
+          '?q=protractor%20test&category=("Mathematics")&' +
+          'language_code="en" OR "ar"');
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        expect(results.languageCodes.selections).toEqual({});
+        expect(results.categories.selections).toEqual({
+          Mathematics: true
+        });
 
-  it('should only use correct fields when ampersand is not escaped anywhere',
-    function() {
-      var urlComponent = '?q=protractor&test&category=("Mathematics")' +
-                         '&language_code=("en"%20OR%20"ar")';
-      expect(
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
-      ).toBe('protractor');
-      expect(results.languageCodes.selections).toEqual({
-        en: true,
-        ar: true
-      });
-      expect(results.categories.selections).toEqual({Mathematics: true});
-    }
-  );
-
-  it('should omit url component if it is malformed',
-    function() {
-      // In the two cases below, language_code param is not wrapped in
-      // parentheses. However, the category param is defined correctly.
-      // updateSearchFieldsBasedOnUrlQuery is expected to clean language_code.
-      var urlComponent = (
-        '?q=protractor%20test&category=("Mathematics")&' +
-        'language_code="en" OR "ar")');
-      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({
-        Mathematics: true
-      });
-
-      var urlComponent = (
-        '?q=protractor%20test&category=("Mathematics")&' +
-        'language_code="en" OR "ar"');
-      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({
-        Mathematics: true
-      });
-
-      // In this case, neither of the params are wrapped in parentheses.
-      // updateSearchFieldsBasedOnUrlQuery is expected to clean category and
-      // language_code.
-      var urlComponent = (
-        '?q=protractor%20test&category="Mathematics"&' +
-        'language_code="en" OR "ar"');
-      SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      expect(results.languageCodes.selections).toEqual({});
-      expect(results.categories.selections).toEqual({});
-    }
-  );
-
-  it('should successfully get search url query string', function() {
-    var searchQuery = '["1", "2"]';
-    var categories = {
-      exploration: true,
-      feedback: true
-    };
-    var languageCodes = {
-      en: true,
-      hi: true
-    };
-
-    expect(SearchService.getSearchUrlQueryString(
-      searchQuery, categories, languageCodes)).toBe(
-      '%5B%221%22%2C%20%222%22%5D&category=("exploration" OR "feedback")' +
-      '&language_code=("en" OR "hi")');
+        // In this case, neither of the params are wrapped in parentheses.
+        // updateSearchFieldsBasedOnUrlQuery is expected to clean category and
+        // language_code.
+        urlComponent = (
+          '?q=protractor%20test&category="Mathematics"&' +
+          'language_code="en" OR "ar"');
+        searchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
+        expect(results.languageCodes.selections).toEqual({});
+        expect(results.categories.selections).toEqual({});
+      }
+    );
   });
 
-  it('should successfully get search url query string when there is no' +
-    ' category or language_code query params', function() {
-    var searchQuery = '["1", "2"]';
-    var categories = {};
-    var languageCodes = {};
-
-    expect(SearchService.getSearchUrlQueryString(
-      searchQuery, categories, languageCodes)).toBe(
-      '%5B%221%22%2C%20%222%22%5D');
-  });
-
-  it('should successfully execute search query with match', function() {
-    var successHandler = jasmine.createSpy('success');
-    var searchQuery = 'example';
-    var categories = {
-      exploration: true
-    };
-    var languageCodes = {
-      en: true,
-      hi: true
-    };
-    var mockInput = document.createElement('input');
-    var jquerySpy = spyOn(window, '$');
-    jquerySpy.withArgs('.oppia-search-bar-input').and.returnValue(
-      $(mockInput).val(searchQuery));
-    jquerySpy.withArgs(mockInput).and.callThrough();
-
-    $httpBackend.expect(
-      'GET', '/searchhandler/data?q=example&category=' +
-      '("exploration")&language_code=("en" OR "hi")')
-      .respond(200, {
-        search_cursor: 'notempty',
-        activity_list: []
-      });
-    SearchService.executeSearchQuery(
-      searchQuery, categories, languageCodes, successHandler);
-    expect(SearchService.isSearchInProgress()).toBe(true);
-    $httpBackend.flush();
-
-    expect(SearchService.isSearchInProgress()).toBe(false);
-    expect(initialSearchResultsLoadedSpy).toHaveBeenCalled();
-    expect($translate.refresh).toHaveBeenCalled();
-    expect(successHandler).toHaveBeenCalled();
-  });
-
-  it('should successfully execute search query with no match', function() {
-    var logErrorSpy = spyOn($log, 'error').and.callThrough();
-    var successHandler = jasmine.createSpy('success');
-    var searchQuery = 'example';
-    var categories = {
-      exploration: true
-    };
-    var languageCodes = {
-      en: true,
-      hi: true
-    };
-    var mockInput = document.createElement('input');
-    var jquerySpy = spyOn(window, '$');
-
-    jquerySpy.withArgs('.oppia-search-bar-input').and.returnValue(
-      $(mockInput).val('mismatch'));
-    jquerySpy.withArgs(mockInput).and.callThrough();
-
-    $httpBackend.expect(
-      'GET', '/searchhandler/data?q=example&category=' +
-      '("exploration")&language_code=("en" OR "hi")')
-      .respond({
-        search_cursor: 'notempty',
-        activity_list: []
-      });
-    SearchService.executeSearchQuery(
-      searchQuery, categories, languageCodes, successHandler);
-    expect(SearchService.isSearchInProgress()).toBe(true);
-    $httpBackend.flush();
-
-    expect(SearchService.isSearchInProgress()).toBe(false);
-    expect(initialSearchResultsLoadedSpy).toHaveBeenCalled();
-    expect(logErrorSpy).toHaveBeenCalled();
-    expect($translate.refresh).toHaveBeenCalled();
-    expect(successHandler).toHaveBeenCalled();
-  });
-
-  it('should use reject handler when fetching query url fails', function() {
-    var successHandler = jasmine.createSpy('success');
-    var searchQuery = 'example';
-    var categories = {
-      exploration: true
-    };
-    var languageCodes = {
-      en: true,
-      hi: true
-    };
-
-    $httpBackend.expect(
-      'GET', '/searchhandler/data?q=example&category=' +
-      '("exploration")&language_code=("en" OR "hi")')
-      .respond(500, 'Error on getting query url');
-    expect(SearchService.executeSearchQuery(
-      searchQuery, categories, languageCodes, successHandler));
-    expect(SearchService.isSearchInProgress()).toBe(true);
-    $httpBackend.flush();
-
-    expect(SearchService.isSearchInProgress()).toBe(false);
-    expect($translate.refresh).toHaveBeenCalled();
-    expect(successHandler).toHaveBeenCalled();
-  });
-
-  it('should successfully load more data', function() {
-    var successHandler = jasmine.createSpy('success');
-    var searchQuery = 'example';
-    var categories = {
-      exploration: true
-    };
-    var languageCodes = {
-      en: true,
-      hi: true
-    };
-    var response = {
-      search_cursor: 'newcursor'
-    };
-
-    // Set _last variables.
-    $httpBackend.expect(
-      'GET', '/searchhandler/data?q=example&category=' +
-      '("exploration")&language_code=("en" OR "hi")')
-      .respond(200, {
-        search_cursor: 'notempty',
-        activity_list: []
-      });
-    SearchService.executeSearchQuery(
-      searchQuery, categories, languageCodes, successHandler);
-    $httpBackend.flush();
-
-    var successHandler = jasmine.createSpy('sucess');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'GET', '/searchhandler/data?q=example&category=' +
-      '("exploration")&language_code=("en" OR "hi")&cursor=notempty')
-      .respond(200, response);
-    SearchService.loadMoreData(successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).toHaveBeenCalledWith(response, false);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should not load more data when a new query is still being sent',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var searchQuery = 'example';
-      var categories = {
-        exploration: true
+  describe('getSearchUrlQueryString', () => {
+    it('should successfully get search url query string', () => {
+      const searchQuery = '["1", "2"]';
+      const categories:SelectionList = {
+        exploration: true,
+        feedback: true
       };
-      var languageCodes = {
+      const languageCodes:SelectionList = {
         en: true,
         hi: true
       };
 
-      // Set _last variables.
-      $httpBackend.expect(
-        'GET', '/searchhandler/data?q=example&category=' +
-        '("exploration")&language_code=("en" OR "hi")')
-        .respond(200, {
-          search_cursor: 'notempty',
-          activity_list: []
-        });
-      SearchService.executeSearchQuery(
-        searchQuery, categories, languageCodes, successHandler);
-      $httpBackend.flush();
-
-      SearchService.loadMoreData(function() {}, function() {});
-
-      var successHandler = jasmine.createSpy('sucess');
-      var failHandler = jasmine.createSpy('fail');
-      SearchService.loadMoreData(successHandler, failHandler);
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(false);
+      expect(searchService.getSearchUrlQueryString(
+        searchQuery, categories, languageCodes)).toBe(
+        '%5B%221%22%2C%20%222%22%5D&category=("exploration" OR "feedback")' +
+        '&language_code=("en" OR "hi")');
     });
 
-  it('should not load more data when the end of page has been reached',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var searchQuery = 'example';
-      var categories = {
+    it('should successfully get search url query string when there is no' +
+      ' category or language_code query params', () => {
+      const searchQuery = '["1", "2"]';
+      const categories = {};
+      const languageCodes = {};
+
+      expect(searchService.getSearchUrlQueryString(
+        searchQuery, categories, languageCodes)).toBe(
+        '%5B%221%22%2C%20%222%22%5D');
+    });
+  });
+
+  describe('executeSearchQuery', () => {
+    let successHandler;
+    let errorHandler;
+    let searchQuery;
+    let categories;
+    let languageCodes;
+    let initialSearchResultsLoadedSpy;
+    let testSubscriptions: Subscription;
+    const SAMPLE_RESULTS = {
+      search_cursor: 'notempty',
+      activity_list: []
+    };
+    const SAMPLE_QUERY = '/searchhandler/data?q=example&category=' +
+    '("exploration")&language_code=("en" OR "hi")';
+    beforeEach(() => {
+      successHandler = jasmine.createSpy('success');
+      errorHandler = jasmine.createSpy('error');
+      searchQuery = 'example';
+      categories = {
         exploration: true
       };
-      var languageCodes = {
+      languageCodes = {
         en: true,
         hi: true
       };
-
-      // Set _last variables.
-      $httpBackend.expect(
-        'GET', '/searchhandler/data?q=example&category=' +
-        '("exploration")&language_code=("en" OR "hi")')
-        .respond(200, {
-          search_cursor: 'notempty',
-          activity_list: []
-        });
-      SearchService.executeSearchQuery(
-        searchQuery, categories, languageCodes, successHandler);
-      $httpBackend.flush();
-
-      $httpBackend.expect(
-        'GET', '/searchhandler/data?q=example&category=' +
-        '("exploration")&language_code=("en" OR "hi")&cursor=notempty')
-        .respond(200, {
-          search_cursor: null
-        });
-      SearchService.loadMoreData(function() {}, function() {});
-      $httpBackend.flush();
-
-      var successHandler = jasmine.createSpy('sucess');
-      var failHandler = jasmine.createSpy('fail');
-      SearchService.loadMoreData(successHandler, failHandler);
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(true);
+      initialSearchResultsLoadedSpy = jasmine.createSpy(
+        'initialSearchResultsLoadedSpy');
+      testSubscriptions = new Subscription();
+      testSubscriptions.add(
+        searchService.onInitialSearchResultsLoaded.subscribe(
+          initialSearchResultsLoadedSpy
+        ));
+      httpTestingController = TestBed.get(HttpTestingController);
     });
 
-  it('should fetch searchBarLoaded EventEmitter', function() {
+
+    afterEach(() => {
+      httpTestingController.verify();
+    });
+
+    it('should successfully execute search query', fakeAsync(() => {
+      searchService.executeSearchQuery(
+        searchQuery, categories, languageCodes, successHandler);
+      expect(searchService.isSearchInProgress()).toBe(true);
+      const req = httpTestingController.expectOne(SAMPLE_QUERY);
+      expect(req.request.method).toEqual('GET');
+      req.flush(SAMPLE_RESULTS);
+      flushMicrotasks();
+
+      expect(searchService.isSearchInProgress()).toBe(false);
+      expect(initialSearchResultsLoadedSpy).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalled();
+    }));
+
+    it('should use reject handler when fetching query url fails',
+      fakeAsync(() => {
+        searchService.executeSearchQuery(
+          searchQuery, categories, languageCodes, successHandler, errorHandler);
+        expect(searchService.isSearchInProgress()).toBe(true);
+        const req = httpTestingController.expectOne(SAMPLE_QUERY);
+        expect(req.request.method).toEqual('GET');
+        req.error(new ErrorEvent('network error'));
+        flushMicrotasks();
+
+        expect(searchService.isSearchInProgress()).toBe(false);
+        expect(errorHandler).toHaveBeenCalled();
+      }));
+
+    describe('loadMoreData', () => {
+      const MORE_DATA_REQUEST = '/searchhandler/data?q=example&category=' +
+      '("exploration")&language_code=("en" OR "hi")&cursor=notempty';
+      const MORE_DATA_RESPONSE = {
+        search_cursor: 'newcursor'
+      };
+
+      it('should successfully load more data', fakeAsync(() => {
+        searchService.executeSearchQuery(
+          searchQuery, categories, languageCodes, successHandler, errorHandler);
+        const req = httpTestingController.expectOne(SAMPLE_QUERY);
+        expect(req.request.method).toEqual('GET');
+        req.flush(SAMPLE_RESULTS);
+        flushMicrotasks();
+
+        searchService.loadMoreData(successHandler, errorHandler);
+        const moreDataReq = httpTestingController.expectOne(MORE_DATA_REQUEST);
+        moreDataReq.flush(MORE_DATA_RESPONSE);
+        flushMicrotasks();
+
+        expect(successHandler).toHaveBeenCalledWith(MORE_DATA_RESPONSE, false);
+        expect(errorHandler).not.toHaveBeenCalled();
+      }));
+
+      it('should not load more data when a new query is still being sent',
+        fakeAsync(() => {
+          searchService.executeSearchQuery(
+            searchQuery, categories, languageCodes, successHandler);
+          const req = httpTestingController.expectOne(SAMPLE_QUERY);
+          expect(req.request.method).toEqual('GET');
+          req.flush(SAMPLE_RESULTS);
+          flushMicrotasks();
+
+          searchService.loadMoreData(() => { }, () => { });
+          searchService.loadMoreData(successHandler, errorHandler);
+          const moreDataReq = httpTestingController.expectOne(
+            MORE_DATA_REQUEST);
+          moreDataReq.flush(MORE_DATA_RESPONSE);
+          flushMicrotasks();
+          expect(errorHandler).toHaveBeenCalledWith(false);
+        }));
+
+      it('should not load more data when the end of page has been reached',
+        fakeAsync(() => {
+          searchService.executeSearchQuery(
+            searchQuery, categories, languageCodes, successHandler);
+          const req = httpTestingController.expectOne(SAMPLE_QUERY);
+          expect(req.request.method).toEqual('GET');
+          req.flush(SAMPLE_RESULTS);
+          flushMicrotasks();
+
+          searchService.loadMoreData(() => { }, () => { });
+          const moreDataReq = httpTestingController.expectOne(
+            SAMPLE_QUERY + '&cursor=notempty');
+          moreDataReq.flush({search_cursor: null});
+          flushMicrotasks();
+          searchService.loadMoreData(successHandler, errorHandler);
+
+          expect(errorHandler).toHaveBeenCalledWith(true);
+        }));
+    });
+  });
+
+  it('should fetch searchBarLoaded EventEmitter', () => {
     let searchBarLoadedEmitter = new EventEmitter();
-    expect(SearchService.onSearchBarLoaded).toEqual(searchBarLoadedEmitter);
+    expect(searchService.onSearchBarLoaded).toEqual(searchBarLoadedEmitter);
   });
 });

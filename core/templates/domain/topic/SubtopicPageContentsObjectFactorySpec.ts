@@ -83,10 +83,10 @@ describe('Subtopic page contents object factory', () => {
     const sampleSubtopicPageContents = (
       subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
 
-    expect(sampleSubtopicPageContents.getSubtitledHtml().getHtml())
+    expect(sampleSubtopicPageContents.getSubtitledHtml().html)
       .toEqual('test content');
     expect(sampleSubtopicPageContents.getHtml()).toEqual('test content');
-    expect(sampleSubtopicPageContents.getSubtitledHtml().getContentId())
+    expect(sampleSubtopicPageContents.getSubtitledHtml().contentId)
       .toEqual('content');
     expect(sampleSubtopicPageContents.getRecordedVoiceovers().getVoiceover(
       'content', 'en').toBackendDict()).toEqual({
@@ -107,13 +107,13 @@ describe('Subtopic page contents object factory', () => {
     const sampleSubtopicPageContents = (
       subtopicPageContentsObjectFactory.createFromBackendDict(backendDict));
 
-    expect(sampleSubtopicPageContents.getSubtitledHtml().getHtml())
+    expect(sampleSubtopicPageContents.getSubtitledHtml().html)
       .toEqual('test content');
     expect(sampleSubtopicPageContents.getHtml()).toEqual('test content');
 
     sampleSubtopicPageContents.setHtml('new html content');
 
-    expect(sampleSubtopicPageContents.getSubtitledHtml().getHtml())
+    expect(sampleSubtopicPageContents.getSubtitledHtml().html)
       .toEqual('new html content');
     expect(sampleSubtopicPageContents.getHtml()).toEqual('new html content');
   });

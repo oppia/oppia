@@ -43,8 +43,9 @@ describe('Create New Chapter Modal Controller', function() {
   var explorationIdValidationService = null;
   var nodeTitles = ['title 1', 'title 2', 'title 3'];
 
-  beforeEach(angular.mock.module('oppia'));
   importAllAngularServices();
+
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]

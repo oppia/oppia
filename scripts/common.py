@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import getpass
+import logging
 import os
 import platform
 import re
@@ -48,7 +49,6 @@ PYLINT_QUOTES_VERSION = '0.1.8'
 PYGITHUB_VERSION = '1.45'
 WEBTEST_VERSION = '2.0.35'
 PIP_TOOLS_VERSION = '5.4.0'
-SIMPLE_CRYPT_VERSION = '4.1.7'
 GRPCIO_VERSION = '1.0.0'
 ENUM_VERSION = '1.1.10'
 PROTOBUF_VERSION = '3.13.0'
@@ -89,6 +89,7 @@ PROTOC_VERSION = PROTOBUF_VERSION
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.0.5'
+ELASTICSEARCH_VERSION = '7.10.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -101,6 +102,8 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
+DEV_APPSERVER_PATH = (
+    os.path.join(GOOGLE_APP_ENGINE_SDK_HOME, 'dev_appserver.py'))
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
@@ -111,6 +114,8 @@ PYLINT_QUOTES_PATH = os.path.join(
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
+FIREBASE_PATH = os.path.join(
+    NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
@@ -121,6 +126,13 @@ REDIS_CLI_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-cli')
 
+ES_PATH = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
+ES_PATH_CONFIG_DIR = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config')
+ES_PATH_DATA_DIR = os.path.join(
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data')
+
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
@@ -129,7 +141,8 @@ USER_PREFERENCES = {'open_new_tab_in_browser': None}
 
 FECONF_PATH = os.path.join('feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 60
+MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
 REDIS_CONF_PATH = os.path.join('redis.conf')
 # Path for the dump file the redis server autogenerates. It contains data
 # used by the Redis server.
@@ -528,6 +541,7 @@ def kill_processes_based_on_regex(pattern):
         pattern: str. Pattern for searching processes.
     """
     regex = re.compile(pattern)
+    # TODO(#11549): Move this to top of the file.
     if PSUTIL_DIR not in sys.path:
         sys.path.insert(1, PSUTIL_DIR)
     import psutil
@@ -608,7 +622,7 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
 
 def wait_for_port_to_be_open(port_number):
     """Wait until the port is open and exit if port isn't open after
-    1000 seconds.
+    MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
 
     Args:
         port_number: int. The port number to wait.
@@ -624,6 +638,47 @@ def wait_for_port_to_be_open(port_number):
             'Failed to start server on port %s, exiting ...' %
             port_number)
         sys.exit(1)
+
+
+@contextlib.contextmanager
+def managed_elasticsearch_dev_server():
+    """Returns a context manager for ElasticSearch server for running tests
+    in development mode and running a local dev server. This is only required
+    in a development environment.
+
+    Yields:
+        psutil.Process. The ElasticSearch server process.
+    """
+    # Clear previous data stored in the local cluster.
+    if os.path.exists(ES_PATH_DATA_DIR):
+        shutil.rmtree(ES_PATH_DATA_DIR)
+
+    # Override the default path to ElasticSearch config files.
+    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
+    es_args = [
+        '%s/bin/elasticsearch' % ES_PATH,
+        '-d'
+    ]
+    with managed_process(es_args, shell=True) as proc:
+        yield proc
+
+
+def wait_for_port_to_be_closed(port_number):
+    """Wait until the port is closed or
+    MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
+
+    Args:
+        port_number: int. The port number to wait.
+
+    Returns:
+        bool. Whether the port closed in time.
+    """
+    waited_seconds = 0
+    while (is_port_open(port_number)
+           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
+        time.sleep(1)
+        waited_seconds += 1
+    return not is_port_open(port_number)
 
 
 def start_redis_server():
@@ -713,3 +768,176 @@ class CD(python_utils.OBJECT):
 
     def __exit__(self, etype, value, traceback):
         os.chdir(self.saved_path)
+
+
+@contextlib.contextmanager
+def swap_env(key, value):
+    """Context manager that temporarily changes the value of os.environ[key].
+
+    Args:
+        key: str. The name of the environment variable to change.
+        value: str. The value to give the environment variable.
+
+    Yields:
+        str|None. The old value of the environment variable, or None if it did
+        not exist.
+    """
+    old_value = os.environ.get(key, None)
+    os.environ[key] = value
+    try:
+        yield old_value
+    finally:
+        if old_value is None:
+            del os.environ[key]
+        else:
+            os.environ[key] = old_value
+
+
+@contextlib.contextmanager
+def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
+    """Context manager for starting and stopping a process gracefully.
+
+    Args:
+        command_args: list(int|str). A sequence of program arguments, where the
+            program to execute is the first item. Ints are allowed in order to
+            accomodate e.g. port numbers.
+        shell: bool. Whether the command should be run inside of its own shell.
+            WARNING: Executing shell commands that incorporate unsanitized input
+            from an untrusted source makes a program vulnerable to
+            [shell injection](https://w.wiki/_Ac2), a serious security flaw
+            which can result in arbitrary command execution. For this reason,
+            the use of `shell=True` is **strongly discouraged** in cases where
+            the command string is constructed from external input.
+        timeout_secs: int. The time allotted for the managed process and its
+            descendants to terminate themselves. After the timeout, any
+            remaining processes will be killed abruptly.
+        **kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
+
+    Yields:
+        psutil.Process. The process managed by the context manager.
+    """
+    # TODO(#11549): Move this to top of the file.
+    if PSUTIL_DIR not in sys.path:
+        sys.path.insert(1, PSUTIL_DIR)
+    import psutil
+
+    stripped_args = (('%s' % arg).strip() for arg in command_args)
+    non_empty_args = (s for s in stripped_args if s)
+
+    command = ' '.join(non_empty_args) if shell else list(non_empty_args)
+    popen_proc = psutil.Popen(command, shell=shell, **kwargs)
+
+    try:
+        yield popen_proc
+    finally:
+        procs_to_kill = (
+            popen_proc.children(recursive=True) if popen_proc.is_running() else
+            [])
+        # Children must be terminated before the parent, otherwise they risk
+        # becoming zombies.
+        procs_to_kill.append(popen_proc)
+
+        get_debug_info = lambda proc: (
+            'Process(name=%r, pid=%d)' % (proc.name(), proc.pid)
+            if proc.is_running() else 'Process(pid=%d)' % (proc.pid,))
+
+        procs_still_alive = []
+        for proc in procs_to_kill:
+            if proc.is_running():
+                procs_still_alive.append(proc)
+                proc.terminate()
+                logging.info('Terminating %s...' % get_debug_info(proc))
+            else:
+                logging.info('%s has ended.' % get_debug_info(proc))
+
+        procs_gone, procs_still_alive = (
+            psutil.wait_procs(procs_still_alive, timeout=timeout_secs))
+        for proc in procs_gone:
+            logging.info('%s has ended.' % get_debug_info(proc))
+        for proc in procs_still_alive:
+            proc.kill()
+            logging.warn('Forced to kill %s!' % get_debug_info(proc))
+
+
+@contextlib.contextmanager
+def managed_dev_appserver(
+        app_yaml_path, env=None, log_level='info',
+        host='0.0.0.0', port=8080, admin_host='0.0.0.0', admin_port=8000,
+        clear_datastore=False, enable_console=False, enable_host_checking=True,
+        automatic_restart=True, skip_sdk_update_check=False):
+    """Returns a context manager to start up and shut down a GAE dev appserver.
+
+    Args:
+        app_yaml_path: str. Path to the app.yaml file which defines the
+            structure of the server.
+        env: dict(str: str) or None. Defines the environment variables for the
+            new process.
+        log_level: str. The lowest log level generated by the application code
+            and the development server. Expected values are: debug, info,
+            warning, error, critical.
+        host: str. The host name to which the app server should bind.
+        port: int. The lowest port to which application modules should bind.
+        admin_host: str. The host name to which the admin server should bind.
+        admin_port: int. The port to which the admin server should bind.
+        clear_datastore: bool. Whether to clear the datastore on startup.
+        enable_console: bool. Whether to enable interactive console in admin
+            view.
+        enable_host_checking: bool. Whether to enforce HTTP Host checking for
+            application modules, API server, and admin server. Host checking
+            protects against DNS rebinding attacks, so only disable after
+            understanding the security implications.
+        automatic_restart: bool. Whether to restart instances automatically when
+            files relevant to their module are changed.
+        skip_sdk_update_check: bool. Whether to skip checking for SDK updates.
+            If false, uses .appcfg_nag to decide.
+
+    Yields:
+        psutil.Process. The dev_appserver process.
+    """
+    dev_appserver_args = [
+        CURRENT_PYTHON_BIN,
+        DEV_APPSERVER_PATH,
+        '--host', host,
+        '--port', port,
+        '--admin_host', admin_host,
+        '--admin_port', admin_port,
+        '--clear_datastore', 'true' if clear_datastore else 'false',
+        '--enable_console', 'true' if enable_console else 'false',
+        '--enable_host_checking', 'true' if enable_host_checking else 'false',
+        '--automatic_restart', 'true' if automatic_restart else 'false',
+        '--skip_sdk_update_check', 'true' if skip_sdk_update_check else 'false',
+        '--log_level', log_level,
+        '--dev_appserver_log_level', log_level,
+        app_yaml_path
+    ]
+    # OK to use shell=True here because we are not passing anything that came
+    # from an untrusted user, only other callers of the script, so there's no
+    # risk of shell-injection attacks.
+    with managed_process(dev_appserver_args, shell=True, env=env) as proc:
+        yield proc
+
+
+@contextlib.contextmanager
+def managed_firebase_auth_emulator():
+    """Returns a context manager to manage the Firebase auth emulator.
+
+    Yields:
+        psutil.Process. The Firebase emulator process.
+    """
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+
+    emulator_args = [
+        FIREBASE_PATH, 'emulators:start', '--only', 'auth',
+        '--project', feconf.OPPIA_PROJECT_ID
+    ]
+    with contextlib2.ExitStack() as stack:
+        # These two environment values allow the Firebase SDKs to acknowledge
+        # the existence of the Firebase emulator.
+        stack.enter_context(swap_env('GCLOUD_PROJECT', feconf.OPPIA_PROJECT_ID))
+        stack.enter_context(swap_env(
+            'FIREBASE_AUTH_EMULATOR_HOST', feconf.FIREBASE_AUTH_EMULATOR_HOST))
+
+        # OK to use shell=True here because we are passing string literals and
+        # constants, so no risk of shell-injection attacks.
+        yield stack.enter_context(managed_process(emulator_args, shell=True))

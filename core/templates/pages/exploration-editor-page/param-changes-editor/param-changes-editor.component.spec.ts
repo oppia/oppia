@@ -37,15 +37,12 @@ import { ParamSpecsObjectFactory } from
   'domain/exploration/ParamSpecsObjectFactory';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { AlertsService } from 'services/alerts.service';
-import { setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
+import { importAllAngularServices, setupAndGetUpgradedComponent } from 'tests/unit-test-utils';
 import { ParamChangesEditorDirective } from './param-changes-editor.component';
 
 describe('Param Changes Editor Component', function() {
@@ -65,6 +62,8 @@ describe('Param Changes Editor Component', function() {
 
   var mockExternalSaveEventEmitter = null;
 
+  importAllAngularServices();
+
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(function() {
@@ -79,8 +78,6 @@ describe('Param Changes Editor Component', function() {
     });
 
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
-    $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
     $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));

@@ -26,8 +26,6 @@ describe('Create new subtopic modal', function() {
 
   beforeEach(angular.mock.module('oppia'));
 
-  importAllAngularServices();
-
   var $scope = null;
   var ctrl = null;
   var $uibModalInstance = null;
@@ -49,12 +47,13 @@ describe('Create new subtopic modal', function() {
       $uibModalInstance: $uibModalInstance,
       topic: topic
     });
+    ctrl.$onInit();
   }));
 
 
   it('should initialize controller properties after its initialization',
     function() {
-      ctrl.init();
+      ctrl.$onInit();
       expect(ctrl.topic).toEqual(topic);
       expect(ctrl.SUBTOPIC_PAGE_SCHEMA).toEqual({
         type: 'html',

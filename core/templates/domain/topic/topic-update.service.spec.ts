@@ -104,7 +104,6 @@ describe('Topic update service', function() {
     language_code: 'en'
   };
 
-
   beforeEach(() => {
     recordedVoiceoversObjectFactory = TestBed.get(
       RecordedVoiceoversObjectFactory);
@@ -310,6 +309,29 @@ describe('Topic update service', function() {
     }]);
   });
 
+  it('should set/unset changes to a topic\'s page title', function() {
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
+    topicUpdateService.setPageTitleFragmentForWeb(
+      _sampleTopic, 'new page title');
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toEqual(
+      'new page title');
+
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
+  });
+
+  it('should create a proper backend change dict ' +
+    'for changing a topic\'s page title', function() {
+    topicUpdateService.setPageTitleFragmentForWeb(
+      _sampleTopic, 'new page title');
+    expect(undoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'page_title_fragment_for_web',
+      new_value: 'new page title',
+      old_value: null
+    }]);
+  });
+
   it('should set/unset changes to a topic\'s practice tab is ' +
     'displayed property', () => {
     expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();
@@ -424,7 +446,7 @@ describe('Topic update service', function() {
     'when the subtopic does not exist', () => {
     expect(() => {
       topicUpdateService.setSubtopicTitle(_sampleTopic, 10, 'whatever');
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -458,7 +480,7 @@ describe('Topic update service', function() {
     expect(() => {
       topicUpdateService
         .setSubtopicThumbnailFilename(_sampleTopic, 10, 'whatever');
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -496,7 +518,7 @@ describe('Topic update service', function() {
     expect(() => {
       topicUpdateService
         .setSubtopicThumbnailBgColor(_sampleTopic, 10, 'whatever');
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -516,7 +538,7 @@ describe('Topic update service', function() {
     'url fragment when the subtopic does not exist', () => {
     expect(() => {
       topicUpdateService.setSubtopicUrlFragment(_sampleTopic, 10, 'whatever');
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -747,7 +769,7 @@ describe('Topic update service', function() {
     'when an error is encountered', () => {
     expect(() => {
       topicUpdateService.deleteSubtopic(_sampleTopic, 10);
-    }).toThrowError('Subtopic doesn\'t exist');
+    }).toThrowError('Subtopic with id 10 doesn\'t exist');
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 

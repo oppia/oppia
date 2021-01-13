@@ -31,6 +31,8 @@ require('services/alerts.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
+import { Subscription } from 'rxjs';
+
 angular.module('oppia').directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -38,12 +40,15 @@ angular.module('oppia').directive('skillEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService', 'SkillEditorRoutingService',
-        'SkillEditorStateService', 'UndoRedoService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'SkillEditorRoutingService', 'SkillEditorStateService',
+        'UndoRedoService',
         function(
-            $scope, $uibModal, AlertsService, SkillEditorRoutingService,
-            SkillEditorStateService, UndoRedoService) {
+            $rootScope, $scope, $uibModal, AlertsService,
+            SkillEditorRoutingService, SkillEditorStateService,
+            UndoRedoService) {
           var ctrl = this;
+          ctrl.directiveSubscriptions = new Subscription();
           var ACTIVE_TAB_EDITOR = 'Editor';
           var ACTIVE_TAB_QUESTIONS = 'Questions';
           var ACTIVE_TAB_PREVIEW = 'Preview';
@@ -83,11 +88,12 @@ angular.module('oppia').directive('skillEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/skill-editor-page/modal-templates/' +
                 'skill-editor-save-modal.directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: 'ConfirmOrCancelModalController'
             }).result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage, () => {
                 AlertsService.addSuccessMessage('Changes Saved.');
+                $rootScope.$applyAsync();
               });
             }, function() {
               // Note to developers:
@@ -137,6 +143,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
           ctrl.$onInit = function() {
             $scope.activeTab = ACTIVE_TAB_EDITOR;
             ctrl.skill = SkillEditorStateService.getSkill();
+            ctrl.directiveSubscriptions.add(
+              SkillEditorStateService.onSkillChange.subscribe(
+                () => $rootScope.$applyAsync()));
           };
         }]
     };

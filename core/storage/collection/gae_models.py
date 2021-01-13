@@ -42,9 +42,7 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionSnapshotContentModel doesn't contain any data directly
-        corresponding to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
 
@@ -88,9 +86,7 @@ class CollectionModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionModel doesn't contain any data directly corresponding
-        to a user.
-        """
+        """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
@@ -100,7 +96,7 @@ class CollectionModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model does not contain user data."""
+        """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'category': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -189,7 +185,7 @@ class CollectionModel(base_models.VersionedModel):
                 commit_log_models.append(collection_commit_log)
             CollectionCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
-            datastore_services.put_multi_async(commit_log_models)
+            datastore_services.put_multi(commit_log_models)
 
 
 class CollectionRightsSnapshotMetadataModel(
@@ -205,8 +201,8 @@ class CollectionRightsSnapshotContentModel(
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionRightsSnapshotContentModel contains data corresponding to
-        a user: inside the content field there are owner_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: inside the content field there are owner_ids, editor_ids,
         voice_artist_ids, and viewer_ids fields.
 
         The pseudonymization of this model is handled in the wipeout_service
@@ -280,8 +276,8 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionRightsModel contains data to pseudonymize/delete
-        corresponding to a user: viewer_ids, voice_artist_ids, editor_ids,
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: viewer_ids, voice_artist_ids, editor_ids,
         and owner_ids fields.
         """
         return (
@@ -312,7 +308,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model contains user data."""
+        """Model contains data to export/delete corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             'owner_ids': base_models.EXPORT_POLICY.EXPORTED,
             'editor_ids': base_models.EXPORT_POLICY.EXPORTED,
@@ -445,9 +441,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         # Create and delete events will already be recorded in the
         # CollectionModel.
         if commit_type not in ['create', 'delete']:
-            # TODO(msl): Test if put_async() leads to any problems (make
-            # sure summary dicts get updated correctly when collections
-            # are changed).
             CollectionCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -460,7 +453,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            ).put()
 
         snapshot_metadata_model = self.SNAPSHOT_METADATA_CLASS.get(
             self.get_snapshot_id(self.id, self.version))
@@ -534,8 +527,8 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionCommitLogEntryModel contains data corresponding to a user
-        that requires pseudonymization/deletion: user_id field.
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: user_id field.
         """
         return (
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
@@ -544,14 +537,15 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     @staticmethod
     def get_model_association_to_user():
         """The history of commits is not relevant for the purposes of
-        Takeout.
+        Takeout, since commits do not contain any personal user data.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls):
-        """The history of commits is not relevant for the purposes of
-        Takeout.
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits is not relevant for the purposes of
+        Takeout, since commits do not contain any personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'collection_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
@@ -695,9 +689,9 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """CollectionSummaryModel contains data to pseudonymize/delete
-        corresponding to a user: viewer_ids, editor_ids, owner_ids,
-        contributor_ids, and contributors_summary fields.
+        """Model contains data to pseudonymize or delete corresponding
+        to a user: viewer_ids, editor_ids, owner_ids, contributor_ids,
+        and contributors_summary fields.
         """
         return (
             base_models.DELETION_POLICY.PSEUDONYMIZE_IF_PUBLIC_DELETE_IF_PRIVATE
@@ -713,9 +707,9 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls):
-        """Model data has already been exported as a part of the
-        CollectionRightsModel, and thus does not need an export_data
-        function.
+        """Model contains data corresponding to a user, but this isn't exported
+        because noteworthy details that belong to this model have already been
+        exported as a part of the CollectionRightsModel.
         """
         return dict(super(cls, cls).get_export_policy(), **{
             'title': base_models.EXPORT_POLICY.NOT_APPLICABLE,
