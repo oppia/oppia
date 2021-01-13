@@ -11,12 +11,11 @@
 
         <div ng-if="$ctrl.showChapters()" class="d-md-block oppia-story-viewer-card-container">
           <a ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes();"
-             ng-href="<[$ctrl.getExplorationUrl(node)]>"
-             ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+             ng-href="<[$ctrl.getExplorationUrl(node)]>">
 
             <div>
               <div class="fx-row">
-                <div class="oppia-lesson-track">
+                <div class="oppia-lesson-track protractor-test-lesson-track">
                   <svg ng-if="!$last"
                        width="9px"
                        height="530px"
@@ -30,19 +29,19 @@
                     </path>
                   </svg>
 
-                  <img class="oppia-lesson-icon-completed"
+                  <img class="oppia-lesson-icon-completed protractor-test-lesson-icon-completed"
                        ng-src="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>"
                        ng-if="node.isCompleted()">
                   <div ng-if="!node.isCompleted() && (node.getId() === $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted">
+                       class="oppia-lesson-icon-uncompleted protractor-test-lesson-icon-uncompleted">
                   </div>
                   <div ng-if="!node.isCompleted() && (node.getId() !== $ctrl.storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable">
+                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable protractor-test-lesson-icon-uncompleted">
                   </div>
                 </div>
 
                 <div class="oppia-story-viewer-card">
-                  <span class="oppia-chapter-title protractor-chapter-title" ng-class="{'locked-chapter protractor-locked-chapter': $ctrl.isChapterLocked(node)}" aria-live="assertive">
+                  <span class="oppia-chapter-title protractor-chapter-title" aria-live="assertive">
                     <span translate="I18N_TOPIC_VIEWER_CHAPTER"></span> {{$index + 1}}: <[node.getTitle()]>
                   </span>
 
@@ -72,14 +71,12 @@
                           <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
                         </filter>
                       </defs>
-                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>">
                         <rect width="320"
                               height="180"
                               fill="url(#image<[$index]>)"
-                              filter="<[$ctrl.isChapterLocked(node) ? 'url(#blur)' : '']>"
                               rx="4">
                         </rect>
-                        <path transform="scale(3) translate(43, 20)" visibility="<[$ctrl.isChapterLocked(node) ? 'visible' : 'hidden']>" fill="#FFF" d="M16.07 8H15V5s0-5-5-5-5 5-5 5v3H3.93A1.93 1.93 0 0 0 2 9.93v8.15A1.93 1.93 0 0 0 3.93 20h12.14A1.93 1.93 0 0 0 18 18.07V9.93A1.93 1.93 0 0 0 16.07 8zM10 16a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm3-8H7V5.5C7 4 7 2 10 2s3 2 3 3.5z"/>
                       </a>
                     </svg>
 
@@ -113,13 +110,11 @@
                           <feGaussianBlur in="SourceGraphic" stdDeviation="20"/>
                         </filter>
                       </defs>
-                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>" ng-class="{'disabled-link': $ctrl.isChapterLocked(node)}">
+                      <a xlink:href="<[$ctrl.getExplorationUrl(node)]>">
                         <rect width="192"
                               height="108"
                               fill="url(#image2<[$index]>)"
-                              filter="<[$ctrl.isChapterLocked(node) ? 'url(#blur-mobile)' : '']>"
                         ></rect>
-                        <path transform="scale(2) translate(37, 18)" visibility="<[$ctrl.isChapterLocked(node) ? 'visible' : 'hidden']>" fill="#FFF" d="M16.07 8H15V5s0-5-5-5-5 5-5 5v3H3.93A1.93 1.93 0 0 0 2 9.93v8.15A1.93 1.93 0 0 0 3.93 20h12.14A1.93 1.93 0 0 0 18 18.07V9.93A1.93 1.93 0 0 0 16.07 8zM10 16a2 2 0 1 1 2-2 2 2 0 0 1-2 2zm3-8H7V5.5C7 4 7 2 10 2s3 2 3 3.5z"/>
                       </a>
                     </svg>
 
@@ -156,16 +151,6 @@
 
   story-viewer-page .oppia-story-viewer-container a:hover, a:hover span {
     color: #0844aa;
-  }
-
-  story-viewer-page .disabled-link {
-    cursor: default;
-    pointer-events: none;
-    touch-action: none;
-  }
-
-  story-viewer-page .locked-chapter {
-    text-decoration: unset;
   }
 
   story-viewer-page .oppia-story-description-text {

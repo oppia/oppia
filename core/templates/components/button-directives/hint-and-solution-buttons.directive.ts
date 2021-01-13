@@ -25,6 +25,7 @@ require(
   'pages/exploration-player-page/services/hint-and-solution-modal.service.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/context.service.ts');
