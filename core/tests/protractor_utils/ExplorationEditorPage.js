@@ -218,13 +218,15 @@ var ExplorationEditorPage = function() {
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
+    await waitFor.visibilityOf(
+      toastSuccessElement,
+      'Toast message is taking too long to appear after saving changes');
 
     // This is necessary to give the page time to record the changes,
     // so that it does not attempt to stop the user leaving.
     await waitFor.invisibilityOf(
       toastSuccessElement,
-      'Toast message taking too long to disappear after saving changes');
-    expect(await toastSuccessElement.isPresent()).toBe(false);
+      'Toast message is taking too long to disappear after saving changes');
   };
 
   this.discardChanges = async function() {
