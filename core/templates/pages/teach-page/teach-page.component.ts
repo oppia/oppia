@@ -26,13 +26,15 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
 import { LoaderService } from 'services/loader.service.ts';
 import { UserService } from 'services/user.service';
-export interface testimonial {
+
+export interface Testimonial {
   quote: string,
   studentDetails: string,
   imageUrl: string,
   imageUrlWebp: string,
   borderPresent: boolean
 }
+
 @Component({
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
