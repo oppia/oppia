@@ -21,11 +21,14 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
       - name: Merge to Target Branch
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
           git config --global user.email "$( git log --format='%ae' $GITHUB_SHA^! )"
           git config --global user.name "$( git log --format='%an' $GITHUB_SHA^! )"
+          git config --global pull.rebase false
 
           curl -L "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" -o jq
           chmod +x jq
@@ -51,6 +54,8 @@ jobs:
           git remote add upstream https://github.com/oppia/oppia.git
 
           git remote -v
+
+          echo "${{ github.ref }}"
 
           git fetch origin github-actions-merge
           git fetch upstream develop
