@@ -496,14 +496,12 @@ var ExplorationEditorMainTab = function() {
       stateEditorTag, 'State editor tag not showing up');
     var stateContentEditor = stateEditorTag.element(
       by.css('.protractor-test-state-content-editor'));
-    await browser.waitForAngularEnabled(false);
     await waitFor.visibilityOf(
       stateContentEditor,
       'stateContentEditor taking too long to appear to set content');
     var richTextEditor = await forms.RichTextEditor(stateContentEditor);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
-    await browser.waitForAngularEnabled(true);
     expect(await saveStateContentButton.isDisplayed()).toBe(true);
     await waitFor.elementToBeClickable(saveStateContentButton);
     await saveStateContentButton.click();
