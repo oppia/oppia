@@ -93,7 +93,7 @@ export class TeachPageComponent implements OnInit {
       this.displayedTestimonialId + this.testimonialCount - 1) %
       this.testimonialCount;
   }
-  getTestimonials(): [testimonial, testimonial, testimonial] {
+  getTestimonials(): [Testimonial, Testimonial, Testimonial] {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
