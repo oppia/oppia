@@ -36,12 +36,12 @@ import utils
 (
     base_models, collection_models, exp_models,
     feedback_models, question_models,
-    skill_models, story_models, subtopic_models,
+    skill_models, story_models,
     suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.collection, models.NAMES.exploration,
     models.NAMES.feedback, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.subtopic,
+    models.NAMES.skill, models.NAMES.story,
     models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
 
