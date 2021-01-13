@@ -1903,24 +1903,24 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0031': (
-            'Please do not use %s.',
+            'Please remove the call to %s.',
             'remove-disallowed-function-calls',
-            'Please remove disallowed function calls.',
+            (
+                'Disallows usage of black-listed functions that '
+                'should be removed.'),
         ),
         'C0032': (
             'Please replace the call to %s with %s.',
             'replace-disallowed-function-calls',
             (
-                'Please replace disallowed function'
-                'calls with allowed alternative.'),
+                'Disallows usage of black-listed functions that '
+                'should be replaced by allowed alternatives.'),
         ),
     }
-    python_utils_file = b'python_utils.py'
-    python_utils_test_file = b'python_utils_test.py'
 
     options = (
         (
-            'disallowed-functions',
+            'disallowed-functions-and-replacements',
             {
                 'default': (),
                 'type': 'csv',
@@ -1934,38 +1934,49 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
             }
         ),)
 
+    def _parse_config_entry(self, entry):
+        """Parse a config entry for replacements of disallowed
+        functions.
+
+        Args:
+            entry: str. Config entry in the format of Name=>Replacement or
+                just Name.
+
+        Returns:
+            list(str). The parsed function name and an optional replacement.
+        """
+        splits = [s.strip() for s in entry.split('=>')]
+        assert len(splits) == 1 or len(splits) == 2
+        if len(splits) == 1:
+            return splits[0], None
+        return splits[0], splits[1]
+
     def visit_call(self, node):
         """Visit a function call to ensure that the call is
-        not using any disallowed functions.
+        not using any disallowed functions
 
         Args:
             node: astroid.nodes.Call. Node to access call content.
         """
-        disallowed_entries = self.config.disallowed_functions
+        disallowed_entries = self.config.disallowed_functions_and_replacements
 
         func = node.func
         for entry in disallowed_entries:
-            splits = [s.strip() for s in entry.split('=>')]
-            assert len(splits) > 0 and len(splits) <= 2
-            func_name = splits[0]
+            func_name, replacement_msg = self._parse_config_entry(entry)
+            # The call will either be a direct call or a call as an attribute
+            # of an object (e.g. obj.do_something()). In the case that the
+            # call is an attribute, then it will use the attrname field.
             if (
                     (hasattr(func, 'attrname') and func.attrname == func_name)
                     or (hasattr(func, 'name') and func.name == func_name)):
-                if len(splits) == 1:
+                if replacement_msg is None:
                     self.add_message(
                         'remove-disallowed-function-calls',
                         node=node, args=func_name)
                 else:
-                    replacement_msg = splits[1]
-                    if (
-                            'python_utils' in node.root().file
-                            and 'python_utils' in replacement_msg):
-                        # Allow python_utils to use disallowed function
-                        # in implementing the allowed function.
-                        return
                     self.add_message(
                         'replace-disallowed-function-calls',
-                        node=node, args=(func_name, splits[1]))
+                        node=node, args=(func_name, replacement_msg))
 
 
 def register(linter):

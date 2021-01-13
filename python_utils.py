@@ -38,6 +38,7 @@ import past.builtins  # isort:skip  pylint: disable=wrong-import-position, wrong
 import past.utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import six  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
+# pylint: disable=single-line-pragma, disallowed-function-calls
 
 BASESTRING = past.builtins.basestring
 INPUT = builtins.input

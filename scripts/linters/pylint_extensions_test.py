@@ -2918,8 +2918,7 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
 
 
 class DisallowedFunctionsCheckerTests(unittest.TestCase):
-    """Unit tests for DisallowedFunctionsChecker
-    """
+    """Unit tests for DisallowedFunctionsChecker"""
 
     def setUp(self):
         super(DisallowedFunctionsCheckerTests, self).setUp()
@@ -2929,9 +2928,11 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
         self.checker_test_object.setup_method()
 
     def test_disallowed_removals(self):
-        self.checker_test_object.checker.config.disallowed_functions = [
-            b'example_func',
-        ]
+        (
+            self.checker_test_object
+            .checker.config.disallowed_functions_and_replacements) = [
+                b'example_func',
+            ]
 
         call1 = astroid.extract_node(
             """
@@ -2949,50 +2950,31 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_call(call1)
 
     def test_disallowed_replacements(self):
-        self.checker_test_object.checker.config.disallowed_functions = [
-            b'now=>datetime.datetime.utcnow',
-            b'assertEquals=>self.assertEqual',
-            b'StringIO=>python_utils.string_io',
-            b'urlsplit=>python_utils.url_split',
-            b'urlparse=>python_utils.url_parse',
-            b'urlunsplit=>python_utils.url_unsplit',
-            b'parse_qs=>python_utils.parse_query_string',
-            b'unquote=>python_utils.urllib_unquote',
-            b'urljoin=>python_utils.url_join',
-            b'next=>python_utils.NEXT',
-            b'range=>python_utils.RANGE',
-            b'round=>python_utils.ROUND',
-            b'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
-            b'zip=>python_utils.ZIP',
-            b'basestring=>python_utils.BASESTRING',
-            b'iteritems=>items',
-            b'itervalues=>values',
-            b'iterkeys=>keys',
-        ]
+        (
+            self.checker_test_object
+            .checker.config.disallowed_functions_and_replacements) = [
+                b'now=>datetime.datetime.utcnow',
+                b'assertEquals=>self.assertEqual',
+                b'next=>python_utils.NEXT',
+                b'str=>python_utils.convert_to_bytes or python_utils.UNICODE',
+            ]
 
         (
             call1, call2, call3,
-            call4, call5, call6,
-            call7, call8,
+            call4,
             ) = astroid.extract_node(
                 """
         datetime.datetime.now() #@
         self.assertEquals() #@
-        StringIO() #@
-        urlsplit() #@
-        itervalues() #@
 
         class Temp:
             def str(self):
                 return 1
             def next(self):
                 return 1
-            def unquote(self):
-                return 1
         b = Temp()
         b.str() #@
         b.next() #@
-        b.unquote() #@
         """)
 
         message_replace_disallowed_datetime = testutils.Message(
@@ -3011,33 +2993,9 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
                 b'self.assertEqual')
         )
 
-        message_replace_disallowed_stringio = testutils.Message(
-            msg_id='replace-disallowed-function-calls',
-            node=call3,
-            args=(
-                b'StringIO',
-                b'python_utils.string_io')
-        )
-
-        message_replace_disallowed_urlsplit = testutils.Message(
-            msg_id='replace-disallowed-function-calls',
-            node=call4,
-            args=(
-                b'urlsplit',
-                b'python_utils.url_split')
-        )
-
-        message_replace_disallowed_itervalues = testutils.Message(
-            msg_id='replace-disallowed-function-calls',
-            node=call5,
-            args=(
-                b'itervalues',
-                b'values')
-        )
-
         message_replace_disallowed_str = testutils.Message(
             msg_id='replace-disallowed-function-calls',
-            node=call6,
+            node=call3,
             args=(
                 b'str',
                 b'python_utils.convert_to_bytes or python_utils.UNICODE')
@@ -3045,34 +3003,18 @@ class DisallowedFunctionsCheckerTests(unittest.TestCase):
 
         message_replace_disallowed_next = testutils.Message(
             msg_id='replace-disallowed-function-calls',
-            node=call7,
+            node=call4,
             args=(
                 b'next',
                 b'python_utils.NEXT')
         )
 
-        message_replace_disallowed_unquote = testutils.Message(
-            msg_id='replace-disallowed-function-calls',
-            node=call8,
-            args=(
-                b'unquote',
-                b'python_utils.urllib_unquote')
-        )
-
         with self.checker_test_object.assertAddsMessages(
             message_replace_disallowed_datetime,
             message_replace_disallowed_assert_equals,
-            message_replace_disallowed_stringio,
-            message_replace_disallowed_urlsplit,
-            message_replace_disallowed_itervalues,
             message_replace_disallowed_str,
-            message_replace_disallowed_next,
-            message_replace_disallowed_unquote):
+            message_replace_disallowed_next):
             self.checker_test_object.checker.visit_call(call1)
             self.checker_test_object.checker.visit_call(call2)
             self.checker_test_object.checker.visit_call(call3)
             self.checker_test_object.checker.visit_call(call4)
-            self.checker_test_object.checker.visit_call(call5)
-            self.checker_test_object.checker.visit_call(call6)
-            self.checker_test_object.checker.visit_call(call7)
-            self.checker_test_object.checker.visit_call(call8)
