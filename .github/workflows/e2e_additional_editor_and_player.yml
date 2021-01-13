@@ -21,8 +21,6 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
       - name: Merge to Target Branch
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: |
@@ -60,13 +58,11 @@ jobs:
           git fetch origin github-actions-merge
           git fetch upstream develop
 
-          git diff origin/github-actions-merge upstream/develop
-
           if [[ "$target_branch" == null ]]
           then
-            git pull https://github.com/oppia/oppia.git develop --no-edit
+            git pull upstream develop --no-edit --allow-unrelated-histories
           else
-            git pull origin $target_branch --no-edit
+            git pull origin $target_branch --no-edit --allow-unrelated-histories
           fi
       - name: Setup python by installing wheel
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
