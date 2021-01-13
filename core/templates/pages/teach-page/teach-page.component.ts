@@ -26,13 +26,15 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
 import { LoaderService } from 'services/loader.service.ts';
 import { UserService } from 'services/user.service';
-export interface testimonial {
+
+export interface Testimonial {
   quote: string,
   studentDetails: string,
   imageUrl: string,
   imageUrlWebp: string,
   borderPresent: boolean
 }
+
 @Component({
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
@@ -91,7 +93,7 @@ export class TeachPageComponent implements OnInit {
       this.displayedTestimonialId + this.testimonialCount - 1) %
       this.testimonialCount;
   }
-  getTestimonials(): [testimonial, testimonial, testimonial] {
+  getTestimonials(): [Testimonial, Testimonial, Testimonial] {
     return [{
       quote: 'I18N_TEACH_TESTIMONIAL_1',
       studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
