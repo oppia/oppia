@@ -1010,7 +1010,7 @@ class UserAuthDetailsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserAuthDetailsModel]
+        return [auth_models.UserAuthDetailsModel]
 
 
 class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -1018,7 +1018,7 @@ class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserIdentifiersModel]
+        return [auth_models.UserIdentifiersModel]
 
 
 class UserIdByFirebaseAuthIdModelAuditOneOffJob(ProdValidationAuditOneOffJob):
