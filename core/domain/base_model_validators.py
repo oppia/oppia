@@ -25,7 +25,6 @@ import re
 
 from core.domain import cron_services
 from core.domain import rights_manager
-from core.domain import user_services
 from core.platform import models
 import feconf
 import python_utils
@@ -162,7 +161,7 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
                     'pseudonymous IDs' % field_name)
         validated_model_ids = []
         for model_id in filtered_model_ids:
-            if not user_services.is_user_id_valid(model_id):
+            if not utils.is_user_id_valid(model_id):
                 raise utils.ValidationError(
                     'The user id %s in the field \'%s\' is '
                     'invalid' % (model_id, field_name))
