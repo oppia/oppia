@@ -143,7 +143,7 @@ describe('Topic and Story viewer functionality', function() {
     await storyEditorPage.publishStory();
   });
 
-  it('should play through a story and save progress on login.', async function() {
+  it('should play through story and save progress on login.', async function() {
     await users.logout();
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
@@ -158,7 +158,7 @@ describe('Topic and Story viewer functionality', function() {
       'math', 'topic-tasv-one', 'story-player-tasv-one');
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
-  });  
+  });
 
   it('should show descrption of a topic.', async function() {
     await topicViewerPage.get('math', 'topic-tasv-one');
