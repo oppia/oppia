@@ -102,7 +102,7 @@ angular.module('oppia').directive('questionEditor', [
             if (stateData) {
               StateEditorService.onStateEditorInitialized.emit(stateData);
 
-              if (stateData.content.getHtml() || stateData.interaction.id) {
+              if (stateData.content.html || stateData.interaction.id) {
                 ctrl.interactionIsShown = true;
               }
 
