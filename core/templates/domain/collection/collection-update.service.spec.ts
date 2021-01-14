@@ -26,12 +26,9 @@ import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exp
 describe('Collection update service', () => {
   let collectionUpdateService: CollectionUpdateService = null;
   let undoRedoService: UndoRedoService = null;
-  let learnerExplorationSummaryBackendDict: LearnerExplorationSummaryBackendDict = null;
+  let learnerExplorationSummaryBackendDict:
+    LearnerExplorationSummaryBackendDict = null;
   let _sampleCollection = null;
-  let _sampleExplorationSummaryBackendObject = {
-    title: 'Title',
-    status: 'public'
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -43,28 +40,28 @@ describe('Collection update service', () => {
 
   beforeEach(() => {
     learnerExplorationSummaryBackendDict = {
-      'activity_type': 'exploration',
-      'category': 'a category',
-      'community_owned': false,
-      'created_on_msec': 1591296635736.666,
-      'id': 'collection_id',
-      'last_updated_msec': 1591296737470.528,
-      'ratings': {
+      activity_type: 'exploration',
+      category: 'a category',
+      community_owned: false,
+      created_on_msec: 1591296635736.666,
+      id: 'collection_id',
+      last_updated_msec: 1591296737470.528,
+      ratings: {
         1: 0,
         2: 0,
         3: 0,
         4: 0,
         5: 0
       },
-      'human_readable_contributors_summary': {},
-      'language_code': 'en',
-      'num_views': 0,
-      'objective': 'Test Objective',
-      'status': 'public',
-      'tags': [],
-      'thumbnail_bg_color': '#cd672b',
-      'thumbnail_icon_url': '/subjects/Algebra.svg',
-      'title': 'a title'
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      num_views: 0,
+      objective: 'Test Objective',
+      status: 'public',
+      tags: [],
+      thumbnail_bg_color: '#cd672b',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      title: 'a title'
     };
     let sampleCollectionBackendObject: CollectionBackendDict = {
       id: 'collection_id',
@@ -85,7 +82,7 @@ describe('Collection update service', () => {
       }
     };
     _sampleCollection = Collection.create(
-     sampleCollectionBackendObject);
+      sampleCollectionBackendObject);
   });
 
   it('should add/remove a new collection node to/from a collection',

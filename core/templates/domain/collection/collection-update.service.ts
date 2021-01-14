@@ -21,18 +21,19 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-
+import cloneDeep from 'lodash/cloneDeep';
 import { CollectionDomainConstants } from
   'domain/collection/collection-domain.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionNode } from './collection-node.model';
 import { Change, CollectionChange } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { cloneDeep } from 'lodash';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 
-type CollectionUpdateApply = (collectionChange: CollectionChange, collection: Collection) => void;
-type CollectionUpdateReverse = (collectionChange: CollectionChange, collection: Collection) => void;
+type CollectionUpdateApply = (
+  collectionChange: CollectionChange, collection: Collection) => void;
+type CollectionUpdateReverse = (
+  collectionChange: CollectionChange, collection: Collection) => void;
 
 @Injectable({
   providedIn: 'root'
@@ -41,10 +42,10 @@ export class CollectionUpdateService {
   constructor(private undoRedoService: UndoRedoService) {}
 
   private _applyChange(
-    collection: Collection,
-    command: string, params,
-    apply: CollectionUpdateApply,
-    reverse: CollectionUpdateReverse): void {
+      collection: Collection,
+      command: string, params,
+      apply: CollectionUpdateApply,
+      reverse: CollectionUpdateReverse): void {
     let changeDict = cloneDeep(params);
     changeDict.cmd = command;
     let changeObj = new Change(changeDict, apply, reverse);
@@ -91,7 +92,8 @@ export class CollectionUpdateService {
   addCollectionNode(
       collection: Collection,
       explorationId: string,
-      explorationSummaryBackendObject: LearnerExplorationSummaryBackendDict): void {
+      explorationSummaryBackendObject: LearnerExplorationSummaryBackendDict)
+      : void {
     let oldSummaryBackendObject = cloneDeep(explorationSummaryBackendObject);
     this._applyChange(
       collection,
@@ -113,9 +115,9 @@ export class CollectionUpdateService {
   }
 
   swapNodes(
-    collection: Collection,
-    firstIndex: number,
-    secondIndex: number): void {
+      collection: Collection,
+      firstIndex: number,
+      secondIndex: number): void {
     this._applyChange(
       collection,
       CollectionDomainConstants.CMD_SWAP_COLLECTION_NODES, {
@@ -164,8 +166,8 @@ export class CollectionUpdateService {
    * undo/redo service.
    */
   setCollectionTitle(
-    collection: Collection,
-    title: string): void {
+      collection: Collection,
+      title: string): void {
     let oldTitle = collection.getTitle();
     this._applyPropertyChange(
       collection,
@@ -185,8 +187,8 @@ export class CollectionUpdateService {
    * undo/redo service.
    */
   setCollectionCategory(
-    collection: Collection,
-    category: string): void {
+      collection: Collection,
+      category: string): void {
     let oldCategory = collection.getCategory();
     this._applyPropertyChange(
       collection,
@@ -261,7 +263,7 @@ export class CollectionUpdateService {
    * Returns whether the given change object constructed by this service
    * is adding a new collection node to a collection.
    */
-  isAddingCollectionNode(changeObject): boolean {
+  isAddingCollectionNode(changeObject: Change): boolean {
     let backendChangeObject = changeObject.getBackendChangeObject();
     return backendChangeObject.cmd === (
       CollectionDomainConstants.CMD_ADD_COLLECTION_NODE);
@@ -273,7 +275,7 @@ export class CollectionUpdateService {
    * exploration ID. The change object is expected to be one constructed
    * by this service.
    */
-  getExplorationIdFromChangeObject(changeObject): string {
+  getExplorationIdFromChangeObject(changeObject: Change): string {
     return this._getExplorationIdFromChangeDict(
       changeObject.getBackendChangeObject());
   }
