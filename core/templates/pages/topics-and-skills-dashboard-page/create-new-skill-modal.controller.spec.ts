@@ -19,7 +19,7 @@
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('Create new skill modal', function() {
+describe('Create new skill modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDifficulties = null;
