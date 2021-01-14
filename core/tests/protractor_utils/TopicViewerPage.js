@@ -22,21 +22,22 @@ var waitFor = require('./waitFor.js');
 
 var TopicViewerPage = function() {
   var topicDescription = element(by.css('.protractor-topic-description'));
-  var storySummaryTitleList = element.all(by.css('.protractor-story-summary-title'));
-  
+  var storySummaryTitleList =
+    element.all(by.css('.protractor-story-summary-title'));
+
   this.get = async function(classroomUrlFragment, topicUrlFragment) {
     await browser.get(`/learn/${classroomUrlFragment}/${topicUrlFragment}`);
     await waitFor.pageToFullyLoad();
-  }
+  };
 
-  this.expectedTopicInformationToBe = async function(description){
+  this.expectedTopicInformationToBe = async function(description) {
     var text = await topicDescription.getText();
     expect(text).toEqual(description);
   };
 
-  this.expectedStoryCountToBe = async function(count){
+  this.expectedStoryCountToBe = async function(count) {
     await expect(await storySummaryTitleList.count()).toEqual(count);
-  }
+  };
 };
 
 exports.TopicViewerPage = TopicViewerPage;

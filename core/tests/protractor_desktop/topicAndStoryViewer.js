@@ -27,7 +27,7 @@ var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicAndStoryViewerPage = require(
   '../protractor_utils/TopicAndStoryViewerPage.js');
-var TopicViewerPage = require('../protractor_utils/TopicViewerPage.js')
+var TopicViewerPage = require('../protractor_utils/TopicViewerPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
@@ -35,7 +35,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 const { browser } = require('protractor');
 
-fdescribe('Topic and Story viewer functionality', function() {
+describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
   var topicAndStoryViewerPage = null;
   var topicViewerPage = null;
@@ -64,7 +64,7 @@ fdescribe('Topic and Story viewer functionality', function() {
     }
   };
 
-  beforeAll(async function(){
+  beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     topicAndStoryViewerPage = (
@@ -82,67 +82,65 @@ fdescribe('Topic and Story viewer functionality', function() {
       'Boolean', async function(elem) {
         await elem.setValue(true);
       });
-      await createDummyExplorations();
-      var handle = await browser.getWindowHandle();
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.createTopic(
-        'Topic TASV1', 'topic-tasv-one', 'Description', false);
-      await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
-      await topicEditorPage.updateMetaTagContent('topic meta tag');
-      await topicEditorPage.updatePageTitleFragment('topic page title');
-      await topicEditorPage.saveTopic('Added thumbnail.');
-      var url = await browser.getCurrentUrl();
-      var topicId = url.split('/')[4].slice(0, -1);
-      await general.closeCurrentTabAndSwitchTo(handle);
-      await adminPage.editConfigProperty(
-        'The details for each classroom page.',
-        'List',
-        async function(elem) {
-          elem = await elem.editItem(0, 'Dictionary');
-          elem = await elem.editEntry(4, 'List');
-          elem = await elem.addItem('Unicode');
-          await elem.setValue(topicId);
-        });
-  
-      await topicsAndSkillsDashboardPage.get();
-      (
-        await
-        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-          'Skill TASV1', 'Concept card explanation', false));
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-      await topicsAndSkillsDashboardPage.assignSkillToTopic(
-        'Skill TASV1', 'Topic TASV1');
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
-      await topicEditorPage.addSubtopic(
-        'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
-        'Subtopic content');
-      await topicEditorPage.saveTopic('Added subtopic.');
-  
-      await topicEditorPage.navigateToTopicEditorTab();
-      await topicEditorPage.navigateToReassignModal();
-  
-      await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
-      await topicEditorPage.saveRearrangedSkills();
-      await topicEditorPage.saveTopic('Added skill to subtopic.');
-      await topicEditorPage.publishTopic();
-      await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
-      await topicEditorPage.createStory(
-        'Story TASV1', 'story-player-tasv-one', 'Story description',
-        Constants.TEST_SVG_PATH);
-      await storyEditorPage.updateMetaTagContent('story meta tag');
-      for (var i = 0; i < 3; i++) {
-        await storyEditorPage.createNewChapter(
-          `Chapter ${i}`, dummyExplorationIds[i], Constants.TEST_SVG_PATH);
-        await storyEditorPage.navigateToChapterWithName(`Chapter ${i}`);
-        await storyEditorPage.changeNodeDescription('Chapter description');
-        await storyEditorPage.changeNodeOutline(
-          await forms.toRichText(`outline ${i}`));
-        await storyEditorPage.navigateToStoryEditorTab();
-      }
-      await storyEditorPage.saveStory('First save');
-      await storyEditorPage.publishStory();
+    await createDummyExplorations();
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic TASV1', 'topic-tasv-one', 'Description', false);
+    await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
+    await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.saveTopic('Added thumbnail.');
+    var url = await browser.getCurrentUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
+    await adminPage.editConfigProperty(
+      'The details for each classroom page.',
+      'List',
+      async function(elem) {
+        elem = await elem.editItem(0, 'Dictionary');
+        elem = await elem.editEntry(4, 'List');
+        elem = await elem.addItem('Unicode');
+        await elem.setValue(topicId);
+      });
+
+    await topicsAndSkillsDashboardPage.get();
+    (
+      await
+      topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+        'Skill TASV1', 'Concept card explanation', false));
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic(
+      'Skill TASV1', 'Topic TASV1');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.addSubtopic(
+      'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
+      'Subtopic content');
+    await topicEditorPage.saveTopic('Added subtopic.');
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.navigateToReassignModal();
+    await topicEditorPage.dragSkillToSubtopic('Skill TASV1', 0);
+    await topicEditorPage.saveRearrangedSkills();
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
+    await topicEditorPage.publishTopic();
+    await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
+    await topicEditorPage.createStory(
+      'Story TASV1', 'story-player-tasv-one', 'Story description',
+      Constants.TEST_SVG_PATH);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
+    for (var i = 0; i < 3; i++) {
+      await storyEditorPage.createNewChapter(
+        `Chapter ${i}`, dummyExplorationIds[i], Constants.TEST_SVG_PATH);
+      await storyEditorPage.navigateToChapterWithName(`Chapter ${i}`);
+      await storyEditorPage.changeNodeDescription('Chapter description');
+      await storyEditorPage.changeNodeOutline(
+        await forms.toRichText(`outline ${i}`));
+      await storyEditorPage.navigateToStoryEditorTab();
+    }
+    await storyEditorPage.saveStory('First save');
+    await storyEditorPage.publishStory();
   });
 
   it('should play through a story and save progress on login.', async function() {
@@ -164,17 +162,15 @@ fdescribe('Topic and Story viewer functionality', function() {
 
   it('should show descrption of a topic.', async function() {
     await topicViewerPage.get('math', 'topic-tasv-one');
-    console.log("HERE");
     await topicViewerPage.expectedTopicInformationToBe('Description');
-    
   });
 
-  it('should show all published stories.', async function(){
+  it('should show all published stories.', async function() {
     await topicViewerPage.get('math', 'topic-tasv-one');
     await topicViewerPage.expectedStoryCountToBe(1);
   });
 
-  it('should show list of revision cards.', async function(){
+  it('should show list of revision cards.', async function() {
     await subTopicViewerPage.get('math', 'topic-tasv-one');
     await subTopicViewerPage.expectedRevisionCardCountToBe(1);
   });

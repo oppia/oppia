@@ -22,16 +22,16 @@ var waitFor = require('./waitFor.js');
 
 var SubTopicViewerPage = function() {
   var subTopicTileList = element.all(by.css('.protractor-subtopic-tile'));
-  
+
   this.get = async function(classroomUrlFragment, topicUrlFragment) {
     await browser.get(
-        `/learn/${classroomUrlFragment}/${topicUrlFragment}/revision`);
+      `/learn/${classroomUrlFragment}/${topicUrlFragment}/revision`);
     await waitFor.pageToFullyLoad();
-  }
+  };
 
-  this.expectedRevisionCardCountToBe = async function(count){
+  this.expectedRevisionCardCountToBe = async function(count) {
     await expect(await subTopicTileList.count()).toEqual(count);
-  }
+  };
 };
 
 exports.SubTopicViewerPage = SubTopicViewerPage;
