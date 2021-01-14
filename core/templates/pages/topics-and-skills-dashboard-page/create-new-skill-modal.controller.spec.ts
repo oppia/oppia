@@ -119,6 +119,12 @@ describe('Create new skill modal', function() {
       expect($scope.errorMsg).toEqual(errorString);
     });
 
+  it('should correctly call callback function for skill description exists',
+    function() {
+      $scope.skillDescriptionExists = false;
+      $scope._skillDescriptionExistsCallback(true);
+      expect($scope.skillDescriptionExists).toBe(true);
+    });
   it('should add error message text when skill description is duplicate',
     function() {
       $scope.skillDescriptionExists = true;
