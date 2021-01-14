@@ -184,7 +184,7 @@
             <span>Name</span>
             <span class="number-skills-header"># of Questions</span>
           </div>
-          <div class="subtopic-name-header" ng-class="{'skills-valid': !uncategorizedSkillSummaries.length, 'skills-invalid': uncategorizedSkillSummaries.length}">
+          <div class="subtopic-name-header skills-invalid" ng-if="uncategorizedSkillSummaries.length">
             <span>Uncategorized Skills</span>
           </div>
           <div ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index" class="subtopic-skill skills-list-item protractor-test-skill-item">
@@ -587,11 +587,6 @@
     display: flex;
     justify-content: space-between;
     position: relative;
-  }
-
-  .topic-editor .skills-valid {
-    background-color: #009C8A33;
-    border: 2px solid #009C8A;
   }
 
   .topic-editor .skills-invalid {
