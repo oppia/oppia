@@ -12,7 +12,7 @@
       </i>
     </div>
 
-    <div class="oppia-mobile-collapsible-card-content" ng-if="$ctrl.basicSettingIsShown">
+    <div class="oppia-mobile-collapsible-card-content protractor-test-settings-container" ng-if="$ctrl.basicSettingIsShown">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div ng-if="$ctrl.EditabilityService.isEditable()">
           <div role="form" class="form-horizontal">
@@ -343,7 +343,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-settings-card-container oppia-editor-card oppia-permissions-card oppia-mobile-collapsible-card">
+  <md-card class="oppia-settings-card-container oppia-editor-card oppia-permissions-card oppia-mobile-collapsible-card" ng-if="$ctrl.EditabilityService.isEditable()">
     <div>
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" ng-click="$ctrl.toggleCards('permissions')">
         <h3>Permissions</h3>
@@ -519,7 +519,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-settings-card-container oppia-editor-card oppia-parameters-card" ng-if="$ctrl.areParametersEnabled()">
+  <md-card class="oppia-settings-card-container oppia-editor-card oppia-parameters-card" ng-if="$ctrl.areParametersEnabled() && $ctrl.EditabilityService.isEditable()">
     <h3>Parameters used in this exploration</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
