@@ -149,7 +149,8 @@ fdescribe('Topic and Story viewer functionality', function() {
     await users.logout();
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
-    await topicAndStoryViewerPage.expectLockedChaptersCountToBe(2);
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.login(
@@ -157,7 +158,8 @@ fdescribe('Topic and Story viewer functionality', function() {
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
-    await topicAndStoryViewerPage.expectLockedChaptersCountToBe(0);
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
   });  
 
   it('should show descrption of a topic.', async function() {

@@ -175,7 +175,7 @@ angular.module('oppia').component('contributionsAndReview', {
         var questionHeader = contributionDetails.skill_description;
         var question = QuestionObjectFactory.createFromBackendDict(
           suggestion.change.question_dict);
-        var contentHtml = question.getStateData().content.getHtml();
+        var contentHtml = question.getStateData().content.html;
         var skillRubrics = contributionDetails.skill_rubrics;
         var skillDifficulty = suggestion.change.skill_difficulty;
 
