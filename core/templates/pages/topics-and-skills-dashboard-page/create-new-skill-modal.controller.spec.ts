@@ -19,7 +19,7 @@
 import { importAllAngularServices } from 'tests/unit-test-utils';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Create new skill modal', function() {
+fdescribe('Create new skill modal', function() {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDifficulties = null;
@@ -77,7 +77,9 @@ describe('Create new skill modal', function() {
 
   it('should update the rubrics explanation and clear error message when' +
     ' changing skill description', function() {
+    $scope.skillDescriptionExists = false;
     $scope.errorMsg = 'Please enter a valid description';
+
     $scope.newSkillDescription = 'Addition';
     expect($scope.rubrics[1].getExplanations()).toEqual(['']);
     expect($scope.errorMsg).toEqual('Please enter a valid description');
@@ -94,61 +96,44 @@ describe('Create new skill modal', function() {
 
   it('should add error message text when skill description is invalid',
     function() {
+      $scope.skillDescriptionExists = false;
       var errorString = (
         'Please use a non-empty description consisting of ' +
         'alphanumeric characters, spaces and/or hyphens.');
 
       $scope.newSkillDescription = '';
+      $scope.updateSkillDescriptionAndCheckIfExists();
       $scope.createNewSkill();
       expect($scope.errorMsg).toEqual(errorString);
       $scope.resetErrorMsg();
 
       $scope.newSkillDescription = 'valid';
+      $scope.updateSkillDescriptionAndCheckIfExists();
       $scope.createNewSkill();
       expect($scope.errorMsg).toEqual('');
       $scope.resetErrorMsg();
 
       $scope.newSkillDescription = 'invalidvalid>>';
+      $scope.updateSkillDescriptionAndCheckIfExists();
       $scope.createNewSkill();
       expect($scope.errorMsg).toEqual(errorString);
     });
 
   it('should add error message text when skill description is duplicate',
     function() {
+      $scope.skillDescriptionExists = true;
       var errorString = (
         'This description already exists. Please choose a ' +
-        'new name or modify the existing skill.');
+          'new name or modify the existing skill.');
 
       $scope.newSkillDescription = 'Adding';
-      $scope.skillDescriptionExists = false;
+      $scope.updateSkillDescriptionAndCheckIfExists();
       $scope.createNewSkill();
-      expect($scope.isSkillDescriptionValid()).toBe(true);
-      expect($scope.skillDescriptionExists).toBe(false);
-
-      $scope.newSkillDescription = 'Adding';
-      $scope.skillDescriptionExists = true;
-      $scope.createNewSkill();
-      expect($scope.isSkillDescriptionValid()).toBe(false);
       expect($scope.errorMsg).toEqual(errorString);
     });
 
-  it('should run callback to update skill description exists value',
-    function() {
-      $scope.newSkillDescription = 'Adding';
-      $scope._SkillEditorStateServiceCallback();
-      expect($scope.skillDescriptionExists).toBe(false);
-    });
-
-  it('should return if the skill description is valid', function() {
-    $scope.newSkillDescription = 'valid';
-    expect($scope.isSkillDescriptionValid()).toBe(true);
-    $scope.newSkillDescription = 'invalid{{}}';
-    expect($scope.isSkillDescriptionValid()).toBe(false);
-    $scope.newSkillDescription = 'valid';
-    expect($scope.isSkillDescriptionValid()).toBe(true);
-  });
-
   it('should close the modal with skill input values', function() {
+    $scope.skillDescriptionExists = false;
     var rubrics = [
       RubricObjectFactory.create(skillDifficulties[0], []),
       RubricObjectFactory.create(skillDifficulties[1], ['Large addition']),

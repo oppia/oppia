@@ -43,6 +43,7 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     $scope.newSkillDescription = '';
     $scope.rubrics = rubrics;
     $scope.errorMsg = '';
+    $scope.skillDescriptionExists = true;
     $scope.conceptCardExplanationEditorIsShown = false;
     $scope.bindableDict = {
       displayedConceptCardExplanation: ''
@@ -58,17 +59,35 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
       $scope.conceptCardExplanationEditorIsShown = true;
     };
 
+    $scope.setErrorMessageIfNeeded = function() {
+      if (
+        !SkillObjectFactory.hasValidDescription(
+          $scope.newSkillDescription)) {
+        $scope.errorMsg = (
+          'Please use a non-empty description consisting of ' +
+          'alphanumeric characters, spaces and/or hyphens.');
+      }
+      if ($scope.skillDescriptionExists) {
+        $scope.errorMsg = (
+          'This description already exists. Please choose a ' +
+            'new name or modify the existing skill.');
+      }
+    };
+
     $scope.updateSkillDescriptionAndCheckIfExists = function() {
       $scope.resetErrorMsg();
+      SkillEditorStateService.updateExistenceOfSkillDescription(
+        $scope.newSkillDescription, (skillDescriptionExists) => {
+          $scope.skillDescriptionExists = skillDescriptionExists;
+          $scope.setErrorMessageIfNeeded();
+        }
+      );
       if (
         SkillCreationService.getSkillDescriptionStatus() !==
           SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED) {
         $scope.rubrics[1].setExplanations([$scope.newSkillDescription]);
         SkillCreationService.markChangeInSkillDescription();
       }
-      SkillEditorStateService.updateExistenceOfSkillDescription(
-        $scope.newSkillDescription
-      );
     };
 
     $scope.resetErrorMsg = function() {
@@ -85,18 +104,8 @@ angular.module('oppia').controller('CreateNewSkillModalController', [
     };
 
     $scope.createNewSkill = function() {
-      if (
-        !SkillObjectFactory.hasValidDescription(
-          $scope.newSkillDescription)) {
-        $scope.errorMsg = (
-          'Please use a non-empty description consisting of ' +
-          'alphanumeric characters, spaces and/or hyphens.');
-        return;
-      }
-      if (SkillEditorStateService.getSkillDescriptionExists()) {
-        $scope.errorMsg = (
-          'This description already exists. Please choose a ' +
-            'new name or modify the existing skill.');
+      $scope.setErrorMessageIfNeeded();
+      if ($scope.errorMsg !== '') {
         return;
       }
       $scope.saveConceptCardExplanation();

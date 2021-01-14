@@ -58,7 +58,6 @@ export class SkillEditorStateService {
   private assignedSkillTopicData = null;
   private _skillIsBeingLoaded: boolean = false;
   private _skillIsBeingSaved: boolean = false;
-  private _skillDescriptionExists: boolean = true;
   private _groupedSkillSummaries: GroupedSkillSummaries = {
     current: [],
     others: []
@@ -113,10 +112,6 @@ export class SkillEditorStateService {
 
   private _updateSkillRights = (newSkillRightsObject: SkillRights) => {
     this._setSkillRights(newSkillRightsObject);
-  };
-
-  private _updateSkillDescriptionExists = (skillDescriptionExists: boolean) => {
-    this._skillDescriptionExists = skillDescriptionExists;
   };
 
   /**
@@ -223,11 +218,11 @@ export class SkillEditorStateService {
    * for that variable.
    */
   updateExistenceOfSkillDescription(
-      description: string): void {
+      description: string, cb: (value?: Object) => void): void {
     this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
       description).then(
       (skillDescriptionExists) => {
-        this._updateSkillDescriptionExists(skillDescriptionExists);
+        cb(skillDescriptionExists);
       }, (error) => {
         this.alertsService.addWarning(
           error ||
@@ -250,10 +245,6 @@ export class SkillEditorStateService {
 
   setSkillRights(skillRights: SkillRights): void {
     this._setSkillRights(skillRights);
-  }
-
-  getSkillDescriptionExists(): boolean {
-    return this._skillDescriptionExists;
   }
 }
 
