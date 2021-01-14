@@ -18,7 +18,7 @@
 
 import { NeedsGuidingResponsesTask } from
   'domain/improvements/needs-guiding-response-task.model';
-import { AnswerStats } from 'domain/exploration/AnswerStatsObjectFactory';
+import { AnswerStats } from 'domain/exploration/answerstats-object.model';
 
 describe('Needs guiding responses task model', function() {
   beforeEach(() => {
