@@ -1097,7 +1097,14 @@ AVAILABLE_LANDING_PAGES = {
 CLASSROOM_PAGES = ['math']
 
 # Authentication method using GAE ID (google sign in).
-AUTH_METHOD_GAE = 'gae'
+GAE_AUTH_PROVIDER_ID = 'gae'
+# Authentication method using Firebase authentication. Firebase signs its ID
+# Tokens with iss='Firebase' (iss: issuer, public API refers to this as
+# "provider id"), so using this naming convention helps us stay consistent with
+# the status quo.
+FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
+# Firebase-specific role specified for users with super admin privileges.
+FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 
 # TODO(#10501): Once domain objects can be imported by the storage layer, move
 # these back to appropriate places (rights_domain, topic_domain).
