@@ -269,4 +269,12 @@ describe('Exploration save and publish buttons component', function() {
     spyOn(editabilityService, 'isTranslatable').and.returnValue(false);
     expect($scope.isEditableOutsideTutorialMode()).toBe(false);
   });
+
+  it('should display publish button', function() {
+    $scope.showPublishButton();
+    $scope.$apply();
+    spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
+    expect($scope.canPublish).toBe(true);
+    expect($scope.showPublishButton()).toEqual(true);
+  });
 });

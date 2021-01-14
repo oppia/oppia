@@ -645,12 +645,14 @@ describe('Settings Tab Component', function() {
     });
     it('should display Unpublish button', function() {
       ctrl.showUnpublishButton();
+      $scope.$apply();
       expect(ctrl.canUnpublish).toBe(true);
       expect(ctrl.showUnpublishButton()).toEqual(true);
     });
 
     it('should display Transfer ownership button', function() {
-      ctrl.showUnpublishButton();
+      ctrl.showReleaseOwnershipButton();
+      $scope.$apply();
       expect(ctrl.canReleaseOwnership).toBe(true);
       expect(ctrl.showReleaseOwnershipButton()).toEqual(true);
     });
