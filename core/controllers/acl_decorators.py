@@ -568,7 +568,7 @@ def can_access_admin_page(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not user_services.is_current_user_super_admin():
+        if not self.current_user_is_super_admin:
             raise self.UnauthorizedUserException(
                 '%s is not a super admin of this application' % self.user_id)
         return handler(self, **kwargs)
@@ -605,7 +605,7 @@ def can_upload_exploration(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if not user_services.is_current_user_super_admin():
+        if not self.current_user_is_super_admin:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to upload explorations.')
         return handler(self, **kwargs)
@@ -1468,7 +1468,7 @@ def can_perform_cron_tasks(handler):
                 credentials to access the page.
         """
         if (self.request.headers.get('X-AppEngine-Cron') is None and
-                not self.is_super_admin):
+                not self.current_user_is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
         else:
@@ -1553,7 +1553,7 @@ def can_manage_question_skill_status(handler):
 
 
 def require_user_id_else_redirect_to_homepage(handler):
-    """Decorator that checks if a user_id is associated to the current
+    """Decorator that checks if a user_id is associated with the current
     session. If not, the user is redirected to the main page.
     Note that the user may not yet have registered.
 
@@ -2438,7 +2438,7 @@ def can_access_story_viewer_page(handler):
         Args:
             classroom_url_fragment: str. The classroom url fragment.
             topic_url_fragment: str. The url fragment of the topic
-                associated to the story.
+                associated with the story.
             story_url_fragment: str. The story url fragment.
             *args: list(*). A list of arguments from the calling function.
             **kwargs: *. Keyword arguments.
@@ -2535,7 +2535,7 @@ def can_access_subtopic_viewer_page(handler):
         Args:
             classroom_url_fragment: str. The classroom url fragment.
             topic_url_fragment: str. The url fragment of the topic
-                associated to the subtopic.
+                associated with the subtopic.
             subtopic_url_fragment: str. The url fragment of the Subtopic.
             **kwargs: *. Keyword arguments.
 
