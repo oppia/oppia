@@ -277,4 +277,14 @@ describe('Exploration save and publish buttons component', function() {
     expect($scope.canPublish).toBe(true);
     expect($scope.showPublishButton()).toEqual(true);
   });
+
+  it('should call confirm before leaving', function() {
+    spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
+    spyOn(window, 'addEventListener');
+    ctrl.saveBeforeUnload();
+    //ctrl.confirmBeforeLeaving({returnValue: ''});
+    expect(ctrl.confirmBeforeLeaving({returnValue: ''})).toBe(false);
+    expect(window.addEventListener).toHaveBeenCalledWith(
+    'beforeunload', ctrl.confirmBeforeLeaving);
+  });
 });

@@ -37,10 +37,12 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
     '$rootScope', '$scope', 'ChangeListService', 'EditabilityService',
     'ExplorationRightsService', 'ExplorationSaveService',
     'ExplorationWarningsService', 'UserExplorationPermissionsService',
+    'WindowRef',
     function(
         $rootScope, $scope, ChangeListService, EditabilityService,
         ExplorationRightsService, ExplorationSaveService,
-        ExplorationWarningsService, UserExplorationPermissionsService) {
+        ExplorationWarningsService, UserExplorationPermissionsService,
+        WindowRef,) {
       var ctrl = this;
       $scope.isPrivate = function() {
         return ExplorationRightsService.isPrivate();
@@ -125,6 +127,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         $scope.saveIsInProcess = false;
         $scope.publishIsInProcess = false;
         $scope.loadingDotsAreShown = false;
+        ctrl.saveBeforeUnload();
       };
 
       $scope.canPublish = true;
@@ -137,6 +140,22 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
           });
 
         return $scope.canPublish && $scope.isPrivate();
+      };
+
+      //ctrl.saveBeforeUnload() mention this in the init function.
+
+      ctrl.saveBeforeUnload = function() {
+        WindowRef.nativeWindow.addEventListener(
+          'beforeunload', ctrl.confirmBeforeLeaving);
+      };
+
+      ctrl.confirmBeforeLeaving = function(e) {
+        if($scope.getChangeListLength() > 50) {
+          // This message is irrelevant, but is needed to trigger the
+          // confirmation before leaving.
+          e.returnValue = 'Sure?';
+          return false;
+        }
       };
     }
   ]
