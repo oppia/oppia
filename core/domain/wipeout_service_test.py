@@ -21,6 +21,7 @@ import datetime
 import logging
 
 from constants import constants
+from core.domain import auth_services
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import question_domain
@@ -45,17 +46,17 @@ import feconf
 import python_utils
 
 (
-    collection_models, config_models, email_models,
-    exp_models, feedback_models, improvements_models,
-    question_models, skill_models, story_models,
-    subtopic_models, suggestion_models, topic_models,
-    user_models
+    auth_models, collection_models, config_models,
+    email_models, exp_models, feedback_models,
+    improvements_models, question_models, skill_models,
+    story_models, subtopic_models, suggestion_models,
+    topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
-    models.NAMES.question, models.NAMES.skill, models.NAMES.story,
-    models.NAMES.subtopic, models.NAMES.suggestion, models.NAMES.topic,
-    models.NAMES.user
+    models.NAMES.auth, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.improvements, models.NAMES.question, models.NAMES.skill,
+    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
+    models.NAMES.topic, models.NAMES.user
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -184,12 +185,12 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.set_user_role(self.USER_1_USERNAME, feconf.ROLE_ID_TOPIC_MANAGER)
-        self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         self.user_1_actions = user_services.UserActionsInfo(self.user_1_id)
 
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -218,7 +219,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.modifiable_user_data.display_alias = 'name'
         self.modifiable_user_data.pin = '123'
         self.profile_user_id = user_services.create_new_profiles(
-            self.user_1_gae_id, self.USER_1_EMAIL,
+            self.user_1_auth_id, self.USER_1_EMAIL,
             [self.modifiable_new_user_data]
         )[0].user_id
 
@@ -264,26 +265,21 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     def test_pre_delete_profile_users_works_correctly(self):
         user_settings = user_services.get_user_settings(self.profile_user_id)
         self.assertFalse(user_settings.deleted)
-        user_auth_details = user_services.get_auth_details_by_user_id(
-            self.profile_user_id)
         self.assertFalse(user_settings.deleted)
-        self.assertFalse(user_auth_details.deleted)
 
         wipeout_service.pre_delete_user(self.profile_user_id)
         self.process_and_flush_pending_tasks()
         user_settings = user_models.UserSettingsModel.get_by_id(
             self.profile_user_id)
         self.assertTrue(user_settings.deleted)
-        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
-            self.profile_user_id)
+
+        user_auth_details = (
+            auth_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
         self.assertTrue(user_auth_details.deleted)
 
     def test_pre_delete_user_for_full_user_also_deletes_all_profiles(self):
         user_settings = user_services.get_user_settings(self.user_1_id)
         self.assertFalse(user_settings.deleted)
-        user_auth_details = user_services.get_auth_details_by_user_id(
-            self.user_1_id)
-        self.assertFalse(user_auth_details.deleted)
         profile_user_settings = user_services.get_user_settings(
             self.profile_user_id)
         self.assertFalse(profile_user_settings.deleted)
@@ -294,17 +290,16 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
-        user_settings = user_services.get_user_settings_by_gae_id(
-            self.user_1_gae_id)
+        user_settings = user_models.UserSettingsModel.get_by_id(self.user_1_id)
         self.assertTrue(user_settings.deleted)
-        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
-            self.user_1_id)
+        user_auth_details = (
+            auth_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
         self.assertTrue(user_auth_details.deleted)
         profile_user_settings = user_models.UserSettingsModel.get_by_id(
             self.profile_user_id)
         self.assertTrue(profile_user_settings.deleted)
-        profile_auth_details = user_models.UserAuthDetailsModel.get_by_id(
-            self.profile_user_id)
+        profile_auth_details = (
+            auth_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
         self.assertTrue(profile_auth_details.deleted)
 
     def test_pre_delete_user_without_activities_works_correctly(self):
@@ -314,19 +309,16 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
         user_settings = user_services.get_user_settings(self.user_1_id)
         self.assertFalse(user_settings.deleted)
-        user_auth_details = user_services.get_auth_details_by_user_id(
-            self.user_1_id)
+        user_auth_details = auth_models.UserAuthDetailsModel.get(self.user_1_id)
         self.assertFalse(user_auth_details.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
-        user_settings = user_services.get_user_settings_by_gae_id(
-            self.user_1_gae_id)
+        user_settings = user_models.UserSettingsModel.get_by_id(self.user_1_id)
         self.assertTrue(user_settings.deleted)
-        user_auth_details = user_models.UserAuthDetailsModel.get_by_id(
-            self.user_1_id)
-        self.assertTrue(user_auth_details.deleted)
+        self.assertIsNone(
+            auth_services.get_auth_id_from_user_id(self.user_1_id))
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(pending_deletion_model)
@@ -533,13 +525,10 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.assertEqual(
             wipeout_service.run_user_deletion_completion(
                 self.pending_deletion_request),
-            wipeout_domain.USER_VERIFICATION_NOT_DELETED
-        )
+            wipeout_domain.USER_VERIFICATION_NOT_DELETED)
 
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id))
-        self.assertIsNotNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
@@ -556,9 +545,14 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id))
         self.assertIsNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
-        self.assertIsNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
+
+        # Pre-deleted auth associations will return None.
+        self.assertIsNone(
+            auth_services.get_auth_id_from_user_id(self.user_1_id))
+        self.assertTrue(
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.user_1_id))
 
     def test_run_user_deletion_completion_with_user_wrongly_deleted(self):
         wipeout_service.run_user_deletion(self.pending_deletion_request)
@@ -570,13 +564,12 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.assertEqual(
             wipeout_service.run_user_deletion_completion(
                 self.pending_deletion_request),
-            wipeout_domain.USER_VERIFICATION_FAILURE
-        )
+            wipeout_domain.USER_VERIFICATION_FAILURE)
 
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
+            auth_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
@@ -4028,7 +4021,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         user_models.LearnerPlaylistModel(
             id=self.user_2_id, exploration_ids=[], collection_ids=[]
         ).put()
-        self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -4058,7 +4051,7 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.display_alias = 'name'
         self.modifiable_new_user_data.pin = '123'
         self.profile_user_id = user_services.create_new_profiles(
-            self.user_1_gae_id, self.USER_1_EMAIL,
+            self.user_1_auth_id, self.USER_1_EMAIL,
             [self.modifiable_new_user_data]
         )[0].user_id
 
@@ -4076,8 +4069,12 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.profile_user_id)
         self.process_and_flush_pending_tasks()
 
-        self.assertIsNotNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
+        self.assertIsNone(
+            auth_services.get_auth_id_from_user_id(self.profile_user_id))
+        self.assertTrue(
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.profile_user_id))
+
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(
                 self.profile_user_id)
@@ -4107,20 +4104,21 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
-        self.assertIsNotNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.profile_user_id))
+        self.assertIsNone(
+            auth_services.get_auth_id_from_user_id(self.user_1_id))
+        # External auth associations should not have been deleted yet.
+        self.assertFalse(
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.user_1_id))
+
         self.assertIsNotNone(
             user_models.CompletedActivitiesModel.get_by_id(
-                self.profile_user_id)
-        )
+                self.profile_user_id))
         self.assertIsNotNone(
             user_models.IncompleteActivitiesModel.get_by_id(
-                self.profile_user_id)
-        )
+                self.profile_user_id))
         self.assertIsNotNone(
             user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id))
-        self.assertIsNotNone(
-            user_models.UserAuthDetailsModel.get_by_id(self.user_1_id))
         self.assertIsNotNone(
             user_models.UserEmailPreferencesModel.get_by_id(self.user_1_id))
 
@@ -4131,12 +4129,10 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
 
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(
-                self.profile_user_id)
-        )
+                self.profile_user_id))
         self.assertIsNone(
             user_models.IncompleteActivitiesModel.get_by_id(
-                self.profile_user_id)
-        )
+                self.profile_user_id))
         self.assertIsNone(
             user_models.LearnerPlaylistModel.get_by_id(self.profile_user_id))
         self.assertIsNone(
@@ -4321,7 +4317,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
-        self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
+        self.user_1_auth_id = self.get_auth_id_from_email(self.USER_1_EMAIL)
         user_data_dict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -4351,7 +4347,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
         self.modifiable_new_user_data.display_alias = 'name'
         self.modifiable_new_user_data.pin = '123'
         self.profile_user_id = user_services.create_new_profiles(
-            self.user_1_gae_id, self.USER_1_EMAIL,
+            self.user_1_auth_id, self.USER_1_EMAIL,
             [self.modifiable_new_user_data]
         )[0].user_id
         wipeout_service.pre_delete_user(self.user_2_id)
@@ -4423,3 +4419,20 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.profile_user_id))
         self.assertTrue(
             wipeout_service.verify_user_deleted(self.profile_user_id))
+
+    def test_verify_user_delete_when_external_auth_associations_are_not_deleted(
+            self):
+        self.assertFalse(
+            auth_services.verify_external_auth_associations_are_deleted(
+                self.user_1_id))
+
+        wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
+        delete_external_auth_associations_swap = self.swap_to_always_return(
+            auth_services, 'delete_external_auth_associations')
+
+        with delete_external_auth_associations_swap:
+            wipeout_service.delete_user(
+                wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
