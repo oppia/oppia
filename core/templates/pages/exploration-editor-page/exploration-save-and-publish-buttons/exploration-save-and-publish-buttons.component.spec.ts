@@ -282,9 +282,8 @@ describe('Exploration save and publish buttons component', function() {
     spyOn(changeListService, 'getChangeList').and.returnValue(new Array(51));
     spyOn(window, 'addEventListener');
     ctrl.saveBeforeUnload();
-    //ctrl.confirmBeforeLeaving({returnValue: ''});
-    expect(ctrl.confirmBeforeLeaving({returnValue: ''})).toBe(false);
+    expect(ctrl.confirmBeforeLeaving({ returnValue: '' })).toBe(false);
     expect(window.addEventListener).toHaveBeenCalledWith(
-    'beforeunload', ctrl.confirmBeforeLeaving);
+      'beforeunload', ctrl.confirmBeforeLeaving);
   });
 });
