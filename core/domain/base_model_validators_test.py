@@ -239,16 +239,16 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             )
 
     def test_may_contain_system_users_filters_system_ids(self):
-        user_settings_model = (
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The field \'committer_ids\' contains IDs in wrong format'
+        ):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids',
                 [feconf.MIGRATION_BOT_USER_ID, 'User-1'],
                 may_contain_system_ids=True,
                 may_contain_pseudonymous_ids=False
-            ))
-
-        self.assertItemsEqual(
-            user_settings_model.model_ids, ['User-1'])
+            )
 
     def test_error_raised_if_model_ids_contain_system_ids(self):
         with self.assertRaisesRegexp(
@@ -261,15 +261,15 @@ class BaseValidatorTests(test_utils.AuditJobsTestBase):
             )
 
     def test_may_contain_pseudonymous_users_filters_pseudonymous_users(self):
-        user_settings_model = (
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'The field \'committer_ids\' contains IDs in wrong format'
+        ):
             base_model_validators.UserSettingsModelFetcherDetails(
                 'committer_ids', ['User-1', self.PSEUDONYMOUS_ID],
                 may_contain_system_ids=False,
                 may_contain_pseudonymous_ids=True
-            ))
-
-        self.assertItemsEqual(
-            user_settings_model.model_ids, ['User-1'])
+            )
 
     def test_error_raised_if_model_ids_contain_pseudonymous_ids(self):
         with self.assertRaisesRegexp(

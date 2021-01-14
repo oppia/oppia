@@ -134,11 +134,10 @@ class TaskEntryModelValidatorTests(test_utils.AuditJobsTestBase):
             resolver_id='invalid_user_id',
             resolved_on=CURRENT_DATETIME)
         self.run_job_and_check_output(
-            ['failed validation check for resolver_ids field check of '
+            ['failed validation check for invalid user setting ids of '
              'TaskEntryModel',
-             ['Entity id %s: based on field resolver_ids having value '
-              'invalid_user_id, expected model UserSettingsModel with id '
-              'invalid_user_id but it doesn\'t exist' % (task_id,)]])
+             ['Entity id %s: The field \'resolver_ids\' contains IDs '
+              'in wrong format.' % task_id]])
 
     def test_invalid_id(self):
         improvements_models.TaskEntryModel(
