@@ -21,13 +21,14 @@ require(
   'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/alerts.service.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').factory('ChangeListService', [
   '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',
-  'ExplorationDataService', 'LoaderService',
+  'EditabilityService', 'ExplorationDataService', 'LoaderService',
   function(
       $log, $rootScope, AlertsService, AutosaveInfoModalsService,
-      ExplorationDataService, LoaderService) {
+      EditabilityService, ExplorationDataService, LoaderService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
     // TODO(sll): Allow the user to view the list of changes made so far, as
@@ -89,6 +90,7 @@ angular.module('oppia').factory('ChangeListService', [
       // opened):
       // - Version Mismatch.
       // - Non-strict Validation Fail.
+      EditabilityService.markNotEditable();
       ExplorationDataService.autosaveChangeList(
         explorationChangeList,
         function(response) {
@@ -98,6 +100,7 @@ angular.module('oppia').factory('ChangeListService', [
                 explorationChangeList);
             }
           }
+          EditabilityService.markEditable();
           $rootScope.$applyAsync();
         },
         function() {
@@ -108,6 +111,7 @@ angular.module('oppia').factory('ChangeListService', [
           if (!AutosaveInfoModalsService.isModalOpen()) {
             AutosaveInfoModalsService.showNonStrictValidationFailModal();
           }
+          EditabilityService.markEditable();
           $rootScope.$applyAsync();
         }
       );

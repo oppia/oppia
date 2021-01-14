@@ -14,7 +14,7 @@
       </i>
     </div>
     <div class="oppia-add-interaction-button-container" ng-if="!interactionId">
-      <button type="button" class="btn btn-secondary oppia-add-interaction-button protractor-test-open-add-interaction-modal" ng-click="openInteractionCustomizerModal()">
+      <button ng-if="EditabilityService.isEditable()" type="button" class="btn btn-secondary oppia-add-interaction-button protractor-test-open-add-interaction-modal" ng-click="openInteractionCustomizerModal()">
         + ADD INTERACTION
       </button>
     </div>
