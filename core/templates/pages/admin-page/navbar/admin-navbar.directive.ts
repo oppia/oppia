@@ -75,14 +75,6 @@ angular.module('oppia').directive('adminNavbar', [
           };
           ctrl.$onInit = function() {
             ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-            UserService.getProfileImageDataUrlAsync().then(
-              function(dataUrl) {
-                ctrl.profilePictureDataUrl = dataUrl;
-                // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the controller is migrated to angular.
-                $rootScope.$applyAsync();
-              });
-
             ctrl.getStaticImageUrl = function(imagePath) {
               return UrlInterpolationService.getStaticImageUrl(imagePath);
             };
@@ -96,8 +88,6 @@ angular.module('oppia').directive('adminNavbar', [
             ctrl.isModerator = userInfo.isModerator();
             ctrl.isSuperAdmin = userInfo.isSuperAdmin();
             if (ctrl.username) {
-              ctrl.profilePictureUrl = (
-                UrlInterpolationService.getProfilePictureUrl(ctrl.username))
               ctrl.profileUrl = (
                 UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
                   username: ctrl.username
@@ -109,7 +99,6 @@ angular.module('oppia').directive('adminNavbar', [
           });
 
             ctrl.logoutUrl = LOGOUT_URL;
-
             ctrl.profileDropdownIsActive = false;
             ctrl.dropdownMenuisActive = false;
           };

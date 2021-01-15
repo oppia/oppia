@@ -513,6 +513,14 @@ p:last-child {
   text-decoration: none;
 }
 
+.oppia-rounded-profile-picture {
+  border-radius: 50% !important;
+  display: inline-block;
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
 .oppia-sidebar-footer a:hover {
   background: none;
 }
@@ -2725,10 +2733,8 @@ div#ng-curtain {
 }
 
 .oppia-navbar-profile-picture {
-  display: inline-block;
   height: 34px;
   width: 34px;
-  overflow: hidden;
 }
 
 .oppia-select {
@@ -3663,6 +3669,7 @@ oppia-noninteractive-link {
 
 .oppia-subscription-card-profile-picture {
   float: left;
+  height: 60px;
   margin-left: 14px;
   margin-top: 14px;
   width: 60px;

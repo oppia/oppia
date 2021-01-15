@@ -161,19 +161,9 @@
                  ng-mouseover="$ctrl.activateProfileDropdown()"
                  ng-mouseleave="$ctrl.deactivateProfileDropdown()">
                 <div class="oppia-navbar-profile-picture-container float-left" ng-cloak>
-                  <div ng-if="$ctrl.profilePictureUrl">
-                    <!--
-                      Lighthouse flags <img> elements that don't have alt attributes:
-                      If the image acts as decoration and does not provide any useful content, give it an empty alt=""
-                      https://web.dev/image-alt/?utm_source=lighthouse&utm_medium=devtools#how-to-add-alternative-text-to-images
-                    -->
-                    <img ng-src="<[$ctrl.profilePictureUrl]>"
-                         class="dropdown-toggle oppia-navbar-profile-picture rounded-circle"
-                         alt="">
-                  </div>
-                  <div ng-if="!$ctrl.profilePictureUrl" class="dropdown-toggle">
-                    <i class="material-icons md-40 oppia-dropdown-toggle-icon">&#xE853;</i>
-                  </div>
+                   <profile-picture class="dropdown-toggle oppia-rounded-profile-picture oppia-navbar-profile-picture"
+                                    username="<[$ctrl.username]>">
+                   </profile-picture>
                   <div class="oppia-user-email oppia-user-email-text">
                     <[$ctrl.getUserEmail()]>
                   </div>

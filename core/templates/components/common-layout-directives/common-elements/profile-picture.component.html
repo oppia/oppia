@@ -1,9 +1,21 @@
-<img [hidden]="!profilePictureLoaded"
-     [src]="profilePictureUrl"
-     (error)="setDefaultPicture()"
-     (load)="showPicture()"
-     alt="User profile picture">
+<style>
+  .oppia-profile-picture {
+      align-items: center;
+      display: flex;
+      height: 100%;
+      justify-content: center;
+  }
+</style>
 
-<mat-spinner *ngIf="!profilePictureLoaded"></mat-spinner>
+<div #parentDiv class="oppia-profile-picture">
+  <img *ngIf="profilePictureIsLoading"
+       [hidden]="!profilePictureIsLoaded"
+       [src]="profilePictureUrl"
+       (error)="setDefaultPicture()"
+       (load)="showPicture()"
+       alt="User profile picture">
 
-
+  <mat-spinner *ngIf="!profilePictureIsLoaded"
+               [diameter]="spinnerDiameter">
+  </mat-spinner>
+</div>

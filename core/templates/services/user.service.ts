@@ -58,24 +58,25 @@ export class UserService {
         });
     }
 
-    return {
-      setProfilePictureBlobAsync: function(newProfilePictureBlob) {
-        return $http.put(PREFERENCES_DATA_URL, {
-          update_type: 'profile_picture_blob',
-          data: newProfilePictureBlob
+    async setProfilePictureBlobAsync(
+        newProfilePictureBlob: string
+    ): Promise<PreferencesBackendDict> {
+      return this.userBackendApiService.setProfilePictureBlobAsync(
+        newProfilePictureBlob);
+    }
 
-    async getProfileImageDataUrlAsync(): Promise<string> {
+    async getProfilePictureBlobAsync(): Promise<string> {
       let defaultUrl = (
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
       return this.getUserInfoAsync().then(
         (userInfo) => {
           if (userInfo.isLoggedIn()) {
-            return this.userBackendApiService.getProfileImageDataUrlAsync(
+            return this.userBackendApiService.getProfilePictureBlobAsync(
               defaultUrl
             );
           } else {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve, _) => {
               resolve(defaultUrl);
             });
           }
@@ -95,7 +96,7 @@ export class UserService {
     async getUserContributionRightsDataAsync():
       Promise<UserContributionRightsDataBackendDict> {
       if (this.userContributionRightsInfo) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _) => {
           resolve(this.userContributionRightsInfo);
         });
       }
@@ -108,5 +109,4 @@ export class UserService {
 }
 
 angular.module('oppia').factory(
-  'UserService',
-  downgradeInjectable(UserService));
+  'UserService', downgradeInjectable(UserService));

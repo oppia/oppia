@@ -135,8 +135,6 @@ angular.module('oppia').component('contributorDashboardPage', {
           if (userInfo.isLoggedIn()) {
             ctrl.userIsLoggedIn = true;
             ctrl.username = userInfo.getUsername();
-            ctrl.profilePictureUrl = (
-              UrlInterpolationService.getProfilePictureUrl(ctrl.username))
           } else {
             ctrl.userIsLoggedIn = false;
             ctrl.username = '';

@@ -17,7 +17,9 @@
  * exist.
  */
 
-import { Component, Input, OnChanges } from "@angular/core";
+import {
+  Component, ElementRef, Input, OnChanges, ViewChild
+} from "@angular/core";
 import { UrlInterpolationService } from "domain/utilities/url-interpolation.service";
 import { downgradeComponent } from "@angular/upgrade/static";
 
@@ -29,31 +31,50 @@ import { downgradeComponent } from "@angular/upgrade/static";
 export class ProfilePictureComponent implements OnChanges {
   @Input() username: string;
   profilePictureUrl: string;
-  profilePictureLoaded: boolean;
+  profilePictureIsLoaded: boolean = false;
+  profilePictureIsLoading: boolean = false;
+
+  spinnerDiameter: number = 1;
+  @ViewChild('parentDiv') parentDiv: ElementRef;
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-  ) {
-    this.profilePictureLoaded = false;
-    this.profilePictureUrl = 'data:,'
-  }
+  ) {}
 
   ngOnChanges(): void {
     if (this.username) {
       this.profilePictureUrl = (
         this.urlInterpolationService.getProfilePictureUrl(this.username))
+      this.profilePictureIsLoading = true;
     }
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.adjustSpinnerSize(), 100);
+  }
+
+  adjustSpinnerSize(): void {
+    let offsetHeight = 0;
+    const refreshInterval = setInterval(() => {
+      if (offsetHeight === 0) {
+        offsetHeight = this.parentDiv.nativeElement.offsetHeight;
+        this.spinnerDiameter = offsetHeight - (offsetHeight/10);
+      } else {
+        clearInterval(refreshInterval);
+      }
+    }, 100);
   }
 
   setDefaultPicture(): void {
-    if (this.username) {
-      const DEFAULT_PROFILE_PICTURE_PATH = (
-        this.urlInterpolationService.getStaticImageUrl('/avatar/user_blue_150px.png'));
-      this.profilePictureUrl = DEFAULT_PROFILE_PICTURE_PATH;
-    }
+    this.profilePictureUrl = (
+      this.urlInterpolationService.getStaticImageUrl(
+        '/avatar/user_blue_150px.png'
+      )
+    );
   }
 
   showPicture(): void {
-    this.profilePictureLoaded = true;
+    this.profilePictureIsLoaded = true;
   }
 }
 

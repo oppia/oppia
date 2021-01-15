@@ -24,7 +24,7 @@
                  aria-label="Edit profile picture button">
             </div>
             <i class="material-icons oppia-editor-edit-icon oppia-editor-edit-icon-pos">&#xE254;</i>
-            <profile-picture class="img-thumbnail protractor-test-custom-photo"
+            <profile-picture class="oppia-profile-picture-thumbnail img-thumbnail protractor-test-custom-photo"
                              [username]="$ctrl.username">
             </profile-picture>
           </div>
@@ -317,5 +317,11 @@
   }
   preferences-page .oppia-form-text {
     font-size: smaller;
+  }
+
+  preferences-page .oppia-profile-picture-thumbnail {
+    display: inline-block;
+    width: 150px;
+    height: 150px;
   }
 </style>

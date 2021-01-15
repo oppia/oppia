@@ -74,7 +74,7 @@ export class UserBackendApiService {
       });
   }
 
-  async getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
+  async getProfilePictureBlobAsync(defaultUrl: string): Promise<string> {
     return this.http.get<PreferencesBackendDict>(
       this.PROFILE_PICTURE_URL).toPromise().then(
       (backendDict) => {
@@ -82,11 +82,11 @@ export class UserBackendApiService {
       });
   }
 
-  async setProfileImageDataUrlAsync(
-      newProfileImageDataUrl: string): Promise<PreferencesBackendDict> {
+  async setProfilePictureBlobAsync(
+      newProfilePictureBlob: string): Promise<PreferencesBackendDict> {
     const profileImageUpdateUrlData = {
       update_type: 'profile_picture_data_url',
-      data: newProfileImageDataUrl
+      data: newProfilePictureBlob
     };
     return this.http.put<PreferencesBackendDict>(
       this.PREFERENCES_DATA_URL, profileImageUpdateUrlData).toPromise();

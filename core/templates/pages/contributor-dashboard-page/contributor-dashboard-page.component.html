@@ -15,12 +15,8 @@
   <div class="oppia-opportunities-tab-custmization-container">
     <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName === 'myContributionTab'">
       <div class="oppia-profile-details-container">
-        <span ng-if="$ctrl.profilePictureUrl">
-          <img ng-src="<[$ctrl.profilePictureUrl]>" class="rounded-circle" alt="User Avatar">
-        </span>
-        <span ng-if="!$ctrl.profilePictureUrl">
-          <i class="material-icons oppia-profile-picture-icon">&#xE853;</i>
-        </span>
+        <profile-picture class="oppia-rounded-profile-picture oppia-profile-picture" username="<[$ctrl.username]>">
+        </profile-picture>
       </div>
       <div class="oppia-contributor-username-container" data-tab-name="username">
         <lazy-loading ng-show="$ctrl.userInfoIsLoading"></lazy-loading>
@@ -132,15 +128,13 @@
   }
   .oppia-mascot-avatar-container,
   .oppia-profile-details-container {
+    height: 62%;
     margin-right: 20px;
-    max-width: 130px;
-    padding: 2% 1%;
-    width: 18%;
+    max-height: 110px;
+    max-width: 110px;
+    width: 10%;
   }
-  .oppia-profile-picture-icon {
-    color: #009688;
-    font-size: 120px;
-  }
+
   .oppia-opportunities-tabs {
     background-color: #ffffff;
     padding-top: 5px;
@@ -154,7 +148,7 @@
     text-align: center;
     width: 80%;
   }
-.oppia-opportunities-tab-item {
+  .oppia-opportunities-tab-item {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -180,9 +174,6 @@
   .oppia-opportunities-tabs-list li {
     display: flex;
     max-width: 250px;
-    width: -webkit-calc(100% / 3);
-    width: -moz-calc(100% / 3);
-    width: -o-calc(100% / 3);
     width: calc(100% / 3);
   }
   .oppia-opportunities-tabs-text {
