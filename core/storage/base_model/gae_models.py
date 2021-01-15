@@ -105,6 +105,27 @@ class BaseModel(datastore_services.Model):
         super(BaseModel, self).__init__(*args, **kwargs)
         self._last_updated_timestamp_is_fresh = False
 
+    def clone(self, **new_values):
+        """Clones the entity, adding or overriding constructor attributes.
+
+        The cloned entity will have exactly the same property values as the
+        original entity, except where overridden. By default, it will have no
+        parent entity or key name, unless supplied.
+
+        Args:
+            **new_values: dict(str: *). Keyword arguments to override when
+                invoking the cloned entity's constructor.
+
+        Returns:
+            *. A cloned, and possibly modified, copy of self. Subclasses of
+            BaseModel will return a clone with the same type.
+        """
+        # Reference implementation: https://stackoverflow.com/a/2712401/4859885.
+        cls = self.__class__
+        props = {k: v.__get__(self, cls) for k, v in cls._properties.items()} # pylint: disable=protected-access
+        props.update(new_values)
+        return cls(**props)
+
     def _pre_put_hook(self):
         """Operations to perform just before the model is `put` into storage.
 

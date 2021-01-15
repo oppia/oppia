@@ -30,6 +30,8 @@ import python_utils
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
+datastore_services = models.Registry.import_datastore_services()
+
 
 class BaseModelUnitTests(test_utils.GenericTestBase):
     """Test the generic base model."""
@@ -117,6 +119,54 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.EntityNotFoundError,
             'Entity for class BaseModel with id 1 not found'):
             model.get(model_id)
+
+    def test_clone(self):
+        model = base_models.BaseModel(deleted=True)
+        clone = model.clone()
+
+        self.assertEqual(model, clone)
+        self.assertIsNot(model, clone)
+        self.assertIsInstance(clone, base_models.BaseModel)
+
+    def test_clone_with_changes(self):
+        model = base_models.BaseModel(deleted=True)
+        clone = model.clone(deleted=False)
+
+        self.assertNotEqual(model, clone)
+        self.assertIsNot(model, clone)
+        self.assertIsInstance(clone, base_models.BaseModel)
+        self.assertTrue(model.deleted)
+        self.assertFalse(clone.deleted)
+
+    def test_clone_sub_class(self):
+        class DerivedModel(base_models.BaseModel):
+            """Simple model with an extra 'field' string property."""
+
+            field = datastore_services.StringProperty()
+
+        model = DerivedModel(field='original')
+        clone = model.clone()
+
+        self.assertEqual(model, clone)
+        self.assertIsNot(model, clone)
+        self.assertIsInstance(clone, DerivedModel)
+        self.assertEqual(model.field, 'original')
+        self.assertEqual(clone.field, 'original')
+
+    def test_clone_sub_class_with_changes(self):
+        class DerivedModel(base_models.BaseModel):
+            """Simple model with an extra 'field' string property."""
+
+            field = datastore_services.StringProperty()
+
+        model = DerivedModel(field='original')
+        clone = model.clone(field='updated')
+
+        self.assertNotEqual(model, clone)
+        self.assertIsNot(model, clone)
+        self.assertIsInstance(clone, DerivedModel)
+        self.assertEqual(model.field, 'original')
+        self.assertEqual(clone.field, 'updated')
 
     def test_put(self):
         model = base_models.BaseModel()
