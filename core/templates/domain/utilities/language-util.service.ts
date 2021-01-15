@@ -158,8 +158,9 @@ export class LanguageUtilService {
   }
 
   getLanguageDirection(languageCode: string): string {
-    // The Karma tests guarantee that Content Languages and Audio Languages do
-    // not conflict and contain at most one entry per language code.
+    // The backend constants tests guarantee that SUPPORTED_CONTENT_LANGUAGES
+    // and SUPPORTED_AUDIO_LANGUAGES do not conflict and contain at most one
+    // entry per language code.
     const matchingContentLanguage = this.SUPPORTED_CONTENT_LANGUAGES.find(
       (language) => language.code === languageCode);
     if (matchingContentLanguage !== undefined) {

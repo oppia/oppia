@@ -19,7 +19,6 @@
 import { TestBed } from '@angular/core/testing';
 
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import CONSTANTS from 'assets/constants';
 
 describe('Language util service', function() {
   var lus: LanguageUtilService = null;
@@ -184,38 +183,5 @@ describe('Language util service', function() {
       id: 'bg',
       text: 'български'
     }]);
-  });
-});
-
-describe('Language Constants', () => {
-  it('should have no directional discrepancies between Content and Audio ' +
-  'languages', () => {
-    CONSTANTS.SUPPORTED_CONTENT_LANGUAGES.forEach((contentLanguage) => {
-      const matchingLanguage = CONSTANTS.SUPPORTED_AUDIO_LANGUAGES.find(
-        (audioLanguage) => audioLanguage.id === contentLanguage.code);
-      if (matchingLanguage !== undefined) {
-        expect(matchingLanguage.direction).toEqual(contentLanguage.direction);
-      }
-    });
-  });
-
-  describe('Content Languages', () => {
-    it('should have no duplicate entries for a given language code', () => {
-      const languageCodes = {};
-      CONSTANTS.SUPPORTED_CONTENT_LANGUAGES.forEach((contentLanguage) => {
-        expect(languageCodes[contentLanguage.code]).toBeUndefined();
-        languageCodes[contentLanguage.code] = true;
-      });
-    });
-  });
-
-  describe('Audio Languages', () => {
-    it('should have no duplicate entries for a given language code', () => {
-      const languageCodes = {};
-      CONSTANTS.SUPPORTED_AUDIO_LANGUAGES.forEach((audioLanguage) => {
-        expect(languageCodes[audioLanguage.id]).toBeUndefined();
-        languageCodes[audioLanguage.id] = true;
-      });
-    });
   });
 });
