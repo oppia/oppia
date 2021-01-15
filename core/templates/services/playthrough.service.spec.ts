@@ -21,8 +21,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import { LearnerActionModel } from
+  'domain/statistics/learner-action.model';
 import { Playthrough } from 'domain/statistics/PlaythroughObjectFactory';
 import { PlaythroughService } from 'services/playthrough.service';
 import { PlaythroughBackendApiService } from
@@ -31,7 +31,6 @@ import { Stopwatch } from 'domain/utilities/stopwatch.model';
 
 describe('PlaythroughService', () => {
   let explorationFeaturesService: ExplorationFeaturesService = null;
-  let learnerActionObjectFactory: LearnerActionObjectFactory = null;
   let playthroughBackendApiService: PlaythroughBackendApiService = null;
   let playthroughService: PlaythroughService = null;
 
@@ -96,7 +95,6 @@ describe('PlaythroughService', () => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
     explorationFeaturesService = TestBed.get(ExplorationFeaturesService);
-    learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
     playthroughBackendApiService = TestBed.get(PlaythroughBackendApiService);
     playthroughService = TestBed.get(PlaythroughService);
   });
@@ -112,10 +110,10 @@ describe('PlaythroughService', () => {
       it('should record actions', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.actions).toEqual([
-            learnerActionObjectFactory.createNewExplorationStartAction({
+            LearnerActionModel.createNewExplorationStartAction({
               state_name: {value: 'A'},
             }),
-            learnerActionObjectFactory.createNewAnswerSubmitAction({
+            LearnerActionModel.createNewAnswerSubmitAction({
               state_name: {value: 'A'},
               dest_state_name: {value: 'B'},
               interaction_id: {value: 'TextInput'},
@@ -123,7 +121,7 @@ describe('PlaythroughService', () => {
               feedback: {value: 'Wrong!'},
               time_spent_state_in_msecs: {value: 30000},
             }),
-            learnerActionObjectFactory.createNewExplorationQuitAction({
+            LearnerActionModel.createNewExplorationQuitAction({
               state_name: {value: 'B'},
               time_spent_in_state_in_msecs: {value: 40000},
             }),
@@ -143,10 +141,10 @@ describe('PlaythroughService', () => {
       it('should ignore extraneous actions', () => {
         const storePlaythroughSpy = spyOnStorePlaythrough(playthrough => {
           expect(playthrough.actions).toEqual([
-            learnerActionObjectFactory.createNewExplorationStartAction({
+            LearnerActionModel.createNewExplorationStartAction({
               state_name: {value: 'A'},
             }),
-            learnerActionObjectFactory.createNewAnswerSubmitAction({
+            LearnerActionModel.createNewAnswerSubmitAction({
               state_name: {value: 'A'},
               dest_state_name: {value: 'B'},
               interaction_id: {value: 'TextInput'},
@@ -154,7 +152,7 @@ describe('PlaythroughService', () => {
               feedback: {value: 'Wrong!'},
               time_spent_state_in_msecs: {value: 30000},
             }),
-            learnerActionObjectFactory.createNewExplorationQuitAction({
+            LearnerActionModel.createNewExplorationQuitAction({
               state_name: {value: 'B'},
               time_spent_in_state_in_msecs: {value: 40000},
             }),

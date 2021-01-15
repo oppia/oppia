@@ -20,8 +20,8 @@ import { TestBed } from '@angular/core/testing';
 
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import { LearnerActionModel } from
+  'domain/statistics/learner-action.model';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -29,7 +29,6 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 describe('Multiple Incorrect Submissions Issue Component', function() {
   var ctrl = null;
   var explorationStatesService = null;
-  var learnerActionObjectFactory = null;
   var subtitledHtmlObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -42,7 +41,6 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
   }));
 
   beforeEach(function() {
-    learnerActionObjectFactory = TestBed.get(LearnerActionObjectFactory);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
   });
 
@@ -101,26 +99,26 @@ describe('Multiple Incorrect Submissions Issue Component', function() {
 
   it('should render leaner action html according to action customization args',
     function() {
-      var learnerAction = learnerActionObjectFactory.createFromBackendDict({
+      var learnerAction = LearnerActionModel.createFromBackendDict({
         action_type: 'AnswerSubmit',
         action_customization_args: {
-          interaction_id: {
-            value: 'Continue'
-          },
-          time_spent_in_state_in_msecs: {
-            value: 100
-          },
-          time_spent_state_in_msecs: {
-            value: 100
+          state_name: {
+            value: 'Introduction'
           },
           dest_state_name: {
             value: 'Final'
           },
+          interaction_id: {
+            value: 'Continue'
+          },
           submitted_answer: {
             value: ''
           },
-          state_name: {
-            value: 'Introduction'
+          feedback: {
+            value: 'feedback'
+          },
+          time_spent_state_in_msecs: {
+            value: 100
           }
         },
         schema_version: 1

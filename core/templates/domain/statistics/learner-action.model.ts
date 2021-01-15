@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Learner
+ * @fileoverview Model class for creating new frontend instances of Learner
  *     Action domain objects.
  */
-
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
 
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
@@ -105,11 +102,8 @@ export type LearnerAction = (
   AnswerSubmitLearnerAction |
   ExplorationQuitLearnerAction);
 
-@Injectable({
-  providedIn: 'root'
-})
-export class LearnerActionObjectFactory {
-  createNewExplorationStartAction(
+export class LearnerActionModel {
+  static createNewExplorationStartAction(
       actionCustomizationArgs: ExplorationStartCustomizationArgs
   ): ExplorationStartLearnerAction {
     return new ExplorationStartLearnerAction(
@@ -117,7 +111,7 @@ export class LearnerActionObjectFactory {
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
-  createNewAnswerSubmitAction(
+  static createNewAnswerSubmitAction(
       actionCustomizationArgs: AnswerSubmitCustomizationArgs
   ): AnswerSubmitLearnerAction {
     return new AnswerSubmitLearnerAction(
@@ -125,7 +119,7 @@ export class LearnerActionObjectFactory {
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
-  createNewExplorationQuitAction(
+  static createNewExplorationQuitAction(
       actionCustomizationArgs: ExplorationQuitCustomizationArgs
   ): ExplorationQuitLearnerAction {
     return new ExplorationQuitLearnerAction(
@@ -133,20 +127,7 @@ export class LearnerActionObjectFactory {
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
   }
 
-  /**
-   * @typedef LearnerActionBackendDict
-   * @property {string} actionType - type of an action.
-   * @property {Object.<string, *>} actionCustomizationArgs - customization
-   *   dict for an action.
-   * @property {number} schemaVersion - schema version of the class instance.
-   *   Defaults to the latest schema version.
-   */
-
-  /**
-   * @param {LearnerActionBackendDict} learnerActionBackendDict
-   * @returns {LearnerAction}
-   */
-  createFromBackendDict(
+  static createFromBackendDict(
       learnerActionBackendDict: LearnerActionBackendDict): LearnerAction {
     switch (learnerActionBackendDict.action_type) {
       case 'ExplorationStart':
@@ -170,10 +151,6 @@ export class LearnerActionObjectFactory {
     const invalidBackendDict: never = learnerActionBackendDict;
     throw new Error(
       'Backend dict does not match any known action type: ' +
-      angular.toJson(invalidBackendDict));
+    angular.toJson(invalidBackendDict));
   }
 }
-
-angular.module('oppia').factory(
-  'LearnerActionObjectFactory',
-  downgradeInjectable(LearnerActionObjectFactory));

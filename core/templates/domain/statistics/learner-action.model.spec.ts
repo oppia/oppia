@@ -13,34 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the LearnerActionObjectFactory.
+ * @fileoverview Unit tests for the LearnerActionModel.
  */
 
-import { TestBed } from '@angular/core/testing';
-
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import { LearnerActionModel } from
+  'domain/statistics/learner-action.model';
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants';
 
-describe('Learner Action Object Factory', () => {
-  var learnerActionObjectFactory: LearnerActionObjectFactory;
-
+describe('Learner Action Model', () => {
   const LEARNER_ACTION_SCHEMA_LATEST_VERSION =
       StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [LearnerActionObjectFactory]
-    });
-
-    learnerActionObjectFactory =
-      TestBed.get(LearnerActionObjectFactory);
-  });
-
   it('should create a new learner action', () => {
     var answerSubmitlearnerActionObject =
-      learnerActionObjectFactory.createNewAnswerSubmitAction({
+      LearnerActionModel.createNewAnswerSubmitAction({
         state_name: {
           value: 'state'
         },
@@ -61,13 +48,13 @@ describe('Learner Action Object Factory', () => {
         }
       });
     var explorationStartlearnerActionObject =
-      learnerActionObjectFactory.createNewExplorationStartAction({
+      LearnerActionModel.createNewExplorationStartAction({
         state_name: {
           value: 'state'
         }
       });
     var explorationQuitlearnerActionObject =
-      learnerActionObjectFactory.createNewExplorationQuitAction({
+      LearnerActionModel.createNewExplorationQuitAction({
         state_name: {
           value: 'state'
         },
@@ -126,7 +113,7 @@ describe('Learner Action Object Factory', () => {
 
   it('should create a new learner action from a backend dict', () => {
     var learnerActionObject =
-        learnerActionObjectFactory.createFromBackendDict({
+        LearnerActionModel.createFromBackendDict({
           action_type: 'ExplorationQuit',
           action_customization_args: {
             state_name: {
@@ -153,7 +140,7 @@ describe('Learner Action Object Factory', () => {
 
   it('should convert a learner action to a backend dict', () => {
     var learnerActionObject =
-        learnerActionObjectFactory.createNewAnswerSubmitAction({
+        LearnerActionModel.createNewAnswerSubmitAction({
           state_name: {
             value: 'state'
           },
@@ -214,7 +201,7 @@ describe('Learner Action Object Factory', () => {
       // invalid value of 'action_type' property. We need to do that in order
       // to test validations.
       // @ts-expect-error
-      learnerActionObjectFactory.createFromBackendDict(playthroughDict);
+      LearnerActionModel.createFromBackendDict(playthroughDict);
     }).toThrowError(
       'Backend dict does not match any known action type: ' +
       JSON.stringify(playthroughDict));

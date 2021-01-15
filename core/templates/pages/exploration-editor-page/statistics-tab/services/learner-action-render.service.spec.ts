@@ -24,8 +24,8 @@
 import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import { LearnerActionModel } from
+  'domain/statistics/learner-action.model';
 import { SubtitledUnicode } from
   'domain/exploration/SubtitledUnicodeObjectFactory';
 import { SubtitledHtml } from
@@ -38,13 +38,11 @@ require(
 
 describe('Learner Action Render Service', function() {
   let explorationStatesService = null;
-  let learnerActionObjectFactory: LearnerActionObjectFactory = null;
   let learnerActionRenderService = null;
 
   importAllAngularServices();
   beforeEach(angular.mock.inject(function($injector) {
     explorationStatesService = $injector.get('ExplorationStatesService');
-    learnerActionObjectFactory = $injector.get('LearnerActionObjectFactory');
     learnerActionRenderService = $injector.get('LearnerActionRenderService');
   }));
 
@@ -85,10 +83,10 @@ describe('Learner Action Render Service', function() {
   describe('Test learner action render service functions', () => {
     it('should render correct learner actions', () => {
       let actions = [
-        learnerActionObjectFactory.createNewExplorationStartAction({
+        LearnerActionModel.createNewExplorationStartAction({
           state_name: {value: 'stateName1'},
         }),
-        learnerActionObjectFactory.createNewAnswerSubmitAction({
+        LearnerActionModel.createNewAnswerSubmitAction({
           state_name: {value: 'stateName1'},
           dest_state_name: {value: 'stateName2'},
           interaction_id: {value: 'Continue'},
@@ -96,7 +94,7 @@ describe('Learner Action Render Service', function() {
           feedback: {value: 'Welcome'},
           time_spent_state_in_msecs: {value: 30000},
         }),
-        learnerActionObjectFactory.createNewAnswerSubmitAction({
+        LearnerActionModel.createNewAnswerSubmitAction({
           state_name: {value: 'stateName2'},
           dest_state_name: {value: 'stateName2'},
           interaction_id: {value: 'TextInput'},
@@ -104,7 +102,7 @@ describe('Learner Action Render Service', function() {
           feedback: {value: 'Try again'},
           time_spent_state_in_msecs: {value: 30000},
         }),
-        learnerActionObjectFactory.createNewExplorationQuitAction({
+        LearnerActionModel.createNewExplorationQuitAction({
           state_name: {value: 'stateName2'},
           time_spent_in_state_in_msecs: {value: 120000},
         }),

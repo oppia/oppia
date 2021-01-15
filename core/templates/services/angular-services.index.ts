@@ -117,7 +117,6 @@ import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StateCardObjectFactory } from 'domain/state_card/StateCardObjectFactory';
-import { LearnerActionObjectFactory } from 'domain/statistics/LearnerActionObjectFactory';
 import { PlaythroughIssueObjectFactory } from 'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from 'domain/statistics/PlaythroughObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
@@ -469,7 +468,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
   ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageUtilService', LanguageUtilService],
-  ['LearnerActionObjectFactory', LearnerActionObjectFactory],
   ['LearnerAnswerDetailsBackendApiService',
     LearnerAnswerDetailsBackendApiService],
   ['LearnerDashboardBackendApiService', LearnerDashboardBackendApiService],

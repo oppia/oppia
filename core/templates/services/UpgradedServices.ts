@@ -221,8 +221,8 @@ import { ItemSelectionInputValidationService } from
   // eslint-disable-next-line max-len
   'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
+import { LearnerActionModel } from
+  'domain/statistics/learner-action.model';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerDashboardBackendApiService } from
@@ -611,8 +611,8 @@ export class UpgradedServices {
     upgradedServices['InteractionSpecsService'] = new InteractionSpecsService();
     upgradedServices['ItemSelectionInputRulesService'] =
       new ItemSelectionInputRulesService();
-    upgradedServices['LearnerActionObjectFactory'] =
-      new LearnerActionObjectFactory();
+    upgradedServices['LearnerActionModel'] =
+      new LearnerActionModel();
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
@@ -811,7 +811,7 @@ export class UpgradedServices {
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
     upgradedServices['PlaythroughObjectFactory'] = new PlaythroughObjectFactory(
-      upgradedServices['LearnerActionObjectFactory']);
+    );
     upgradedServices['PythonProgramTokenizer'] = new PythonProgramTokenizer(
       upgradedServices['LoggerService']);
     upgradedServices['QuestionSummaryForOneSkillObjectFactory'] =

@@ -232,8 +232,6 @@ import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionI
 import { KeyboardShortcutService } from
   'services/keyboard-shortcut.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { LearnerActionObjectFactory } from
-  'domain/statistics/LearnerActionObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from
   'domain/statistics/learner-answer-details-backend-api.service';
 import { LearnerDashboardBackendApiService } from
@@ -615,7 +613,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static itemSelectionInputValidationService:
     ItemSelectionInputValidationService;
   static languageUtilService: LanguageUtilService;
-  static learnerActionObjectFactory: LearnerActionObjectFactory;
   static learnerAnswerDetailsBackendApiService:
     LearnerAnswerDetailsBackendApiService;
   static learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
@@ -909,7 +906,6 @@ private itemSelectionInputRulesService: ItemSelectionInputRulesService,
 private itemSelectionInputValidationService:
   ItemSelectionInputValidationService,
 private languageUtilService: LanguageUtilService,
-private learnerActionObjectFactory: LearnerActionObjectFactory,
 private learnerAnswerDetailsBackendApiService:
   LearnerAnswerDetailsBackendApiService,
 private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
@@ -1276,8 +1272,6 @@ private writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory
     OppiaAngularRootComponent.itemSelectionInputValidationService = (
       this.itemSelectionInputValidationService);
     OppiaAngularRootComponent.languageUtilService = this.languageUtilService;
-    OppiaAngularRootComponent.learnerActionObjectFactory = (
-      this.learnerActionObjectFactory);
     OppiaAngularRootComponent.learnerAnswerDetailsBackendApiService = (
       this.learnerAnswerDetailsBackendApiService);
     OppiaAngularRootComponent.learnerDashboardBackendApiService = (
