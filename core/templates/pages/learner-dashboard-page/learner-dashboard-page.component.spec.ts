@@ -855,10 +855,11 @@ describe('Learner dashboard page', function() {
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));
 
-      spyOn(UrlInterpolationService, 'getProfilePictureUrl').and.returnValue(
-        $q.resolve(profilePictureUrl));
-      spyOn(UserService, 'getUserInfoAsync').and.returnValue($q.resolve(
-        userInfo));
+      spyOn(
+        UrlInterpolationService, 'getProfilePictureUrl'
+      ).and.returnValue($q.resolve(profilePictureUrl));
+      spyOn(UserService, 'getUserInfoAsync').and.returnValue(
+        $q.resolve(userInfo));
       spyOn(LearnerDashboardBackendApiService, 'fetchLearnerDashboardDataAsync')
         .and.returnValue($q.reject({
           status: 404

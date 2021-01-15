@@ -49,26 +49,26 @@ require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 angular.module('oppia').component('learnerDashboardPage', {
   template: require('./learner-dashboard-page.component.html'),
   controller: [
-    '$http', '$q', '$scope', '$uibModal', 'AlertsService',
+    '$http', '$q', '$rootScope', '$scope', '$uibModal', 'AlertsService',
     'DateTimeFormatService', 'DeviceInfoService',
     'LearnerDashboardBackendApiService', 'LoaderService',
     'SuggestionModalForLearnerDashboardService',
-    'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
-    'ACTIVITY_TYPE_COLLECTION', 'ACTIVITY_TYPE_EXPLORATION',
-    'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
-    'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
+    'ThreadStatusDisplayService', 'UrlInterpolationService',
+    'UserService', 'ACTIVITY_TYPE_COLLECTION',
+    'ACTIVITY_TYPE_EXPLORATION', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
+    'FATAL_ERROR_CODES', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
     'LEARNER_DASHBOARD_SECTION_I18N_IDS',
     'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS',
     'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS',
     function(
-        $http, $q, $scope, $uibModal, AlertsService,
+        $http, $q, $rootScope, $scope, $uibModal, AlertsService,
         DateTimeFormatService, DeviceInfoService,
         LearnerDashboardBackendApiService, LoaderService,
         SuggestionModalForLearnerDashboardService,
-        ThreadStatusDisplayService, UrlInterpolationService, UserService,
-        ACTIVITY_TYPE_COLLECTION, ACTIVITY_TYPE_EXPLORATION,
-        EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
-        FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
+        ThreadStatusDisplayService, UrlInterpolationService,
+        UserService, ACTIVITY_TYPE_COLLECTION,
+        ACTIVITY_TYPE_EXPLORATION, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
+        FATAL_ERROR_CODES, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
         LEARNER_DASHBOARD_SECTION_I18N_IDS,
         LEARNER_DASHBOARD_SUBSECTION_I18N_IDS,
         SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS) {
@@ -444,6 +444,9 @@ angular.module('oppia').component('learnerDashboardPage', {
             ctrl.profilePictureUrl = (
               UrlInterpolationService.getProfilePictureUrl(ctrl.username))
           }
+          // TODO(#8521): Remove the use of $rootScope.$apply()
+          // once the controller is migrated to angular.
+          $rootScope.$applyAsync();
         });
 
         var dashboardDataPromise = (

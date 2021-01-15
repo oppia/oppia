@@ -12,78 +12,101 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Service for user data.
  */
+
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
 import { UserInfo } from 'domain/user/user-info.model';
-require('services/contextual/url.service.ts');
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { PreferencesBackendDict, UserBackendApiService, UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
 
-angular.module('oppia').factory('UserService', [
-  '$http', '$q', '$window', 'UrlInterpolationService', 'UrlService',
-  'DEFAULT_PROFILE_PICTURE_PATH',
-  function(
-      $http, $q, $window, UrlInterpolationService, UrlService,
-      DEFAULT_PROFILE_PICTURE_PATH) {
-    var PREFERENCES_DATA_URL = '/preferenceshandler/data';
-    var USER_CONTRIBUTION_RIGHTS_DATA_URL = '/usercontributionrightsdatahandler'; // eslint-disable-line max-len
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private urlService: UrlService,
+    private windowRef: WindowRef,
+    private userBackendApiService: UserBackendApiService
+  ) {}
 
-    var userInfo = null;
-    var userContributionRightsInfo = null;
-    var returnUrl = '';
+    private userContributionRightsInfo = null;
+    private userInfo = null;
+    private returnUrl = '';
 
-    var getUserInfoAsync = function() {
-      if (UrlService.getPathname() === '/signup') {
-        return $q.resolve(UserInfo.createDefault());
+    async getUserInfoAsync(): Promise<UserInfo> {
+      if (this.urlService.getPathname() === '/signup') {
+        return new Promise((resolve, reject) => {
+          resolve(UserInfo.createDefault());
+        });
       }
-      if (userInfo) {
-        return $q.resolve(userInfo);
+      if (this.userInfo) {
+        return new Promise((resolve, reject) => {
+          resolve(this.userInfo);
+        });
       }
-      return $http.get(
-        '/userinfohandler'
-      ).then(function(response) {
-        if (response.data.user_is_logged_in) {
-          userInfo = UserInfo.createFromBackendDict(response.data);
-          return $q.resolve(userInfo);
-        } else {
-          return $q.resolve(UserInfo.createDefault());
-        }
-      });
-    };
+      return this.userBackendApiService.getUserInfoAsync().then(
+        (userInfo) => {
+          this.userInfo = userInfo;
+          return this.userInfo;
+        });
+    }
 
     return {
-      setprofilePictureBlobAsync: function(newprofilePictureBlob) {
+      setProfilePictureBlobAsync: function(newProfilePictureBlob) {
         return $http.put(PREFERENCES_DATA_URL, {
           update_type: 'profile_picture_blob',
-          data: newprofilePictureBlob
-        });
-      },
-      setReturnUrl: function(newReturnUrl) {
-        returnUrl = newReturnUrl;
-      },
-      getLoginUrlAsync: function() {
-        var urlParameters = {
-          current_url: returnUrl || $window.location.pathname
-        };
-        return $http.get('/url_handler', {params: urlParameters}).then(
-          function(response) {
-            return response.data.login_url;
+          data: newProfilePictureBlob
+
+    async getProfileImageDataUrlAsync(): Promise<string> {
+      let defaultUrl = (
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
+      return this.getUserInfoAsync().then(
+        (userInfo) => {
+          if (userInfo.isLoggedIn()) {
+            return this.userBackendApiService.getProfileImageDataUrlAsync(
+              defaultUrl
+            );
+          } else {
+            return new Promise((resolve, reject) => {
+              resolve(defaultUrl);
+            });
           }
-        );
-      },
-      getUserContributionRightsData: function() {
-        if (userContributionRightsInfo) {
-          return $q.resolve(userContributionRightsInfo);
-        } else {
-          return $http.get(USER_CONTRIBUTION_RIGHTS_DATA_URL).then(
-            function(response) {
-              userContributionRightsInfo = response.data;
-              return $q.resolve(userContributionRightsInfo);
-            }
-          );
-        }
-      },
-      getUserInfoAsync: getUserInfoAsync
-    };
-  }
-]);
+        });
+    }
+
+    async getLoginUrlAsync(): Promise<string> {
+      return this.userBackendApiService.getLoginUrlAsync(
+        this.returnUrl ||
+        this.windowRef.nativeWindow.location.pathname);
+    }
+
+    setReturnUrl(newReturnUrl: string): void {
+      this.returnUrl = newReturnUrl;
+    }
+
+    async getUserContributionRightsDataAsync():
+      Promise<UserContributionRightsDataBackendDict> {
+      if (this.userContributionRightsInfo) {
+        return new Promise((resolve, reject) => {
+          resolve(this.userContributionRightsInfo);
+        });
+      }
+      return this.userBackendApiService.getUserContributionRightsDataAsync()
+        .then((userContributionRightsInfo) => {
+          this.userContributionRightsInfo = userContributionRightsInfo;
+          return this.userContributionRightsInfo;
+        });
+    }
+}
+
+angular.module('oppia').factory(
+  'UserService',
+  downgradeInjectable(UserService));

@@ -54,12 +54,20 @@ export class AssetsBackendApiService {
       private csrfTokenService: CsrfTokenService,
       private http: HttpClient,
       private urlInterpolationService: UrlInterpolationService) {
-    if (!AppConstants.DEV_MODE && !AppConstants.GCS_RESOURCE_BUCKET_NAME) {
+    if (!AssetsBackendApiService.DEV_MODE &&
+        !AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME) {
       throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
     const urlPrefix = urlInterpolationService.getGcsUrl();
     this.downloadUrlTemplate = (
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>');
+  }
+
+  static get DEV_MODE(): boolean {
+    return AppConstants.DEV_MODE;
+  }
+  static get GCS_RESOURCE_BUCKET_NAME(): string {
+    return AppConstants.GCS_RESOURCE_BUCKET_NAME;
   }
 
   async loadAudio(explorationId: string, filename: string): Promise<AudioFile> {

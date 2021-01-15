@@ -47,7 +47,7 @@ import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 
-const INTERACTION_SPECS = require('interactions/interaction_specs.json');
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 export interface ExplorationBackendDict {
   'init_state_name': string;
@@ -180,7 +180,7 @@ export class Exploration {
   }
 
   getUninterpolatedContentHtml(stateName: string): string {
-    return this.getState(stateName).content.getHtml();
+    return this.getState(stateName).content.html;
   }
 
   getVoiceovers(stateName: string): BindableVoiceovers {
@@ -190,7 +190,7 @@ export class Exploration {
       return null;
     }
     let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.getContentId();
+    let contentId = state.content.contentId;
     return recordedVoiceovers.getBindableVoiceovers(
       contentId);
   }
@@ -203,7 +203,7 @@ export class Exploration {
       return null;
     }
     let recordedVoiceovers = state.recordedVoiceovers;
-    let contentId = state.content.getContentId();
+    let contentId = state.content.contentId;
     const voiceovers = recordedVoiceovers.getVoiceover(contentId, languageCode);
     return voiceovers || null;
   }
@@ -218,6 +218,17 @@ export class Exploration {
 
   getAllVoiceoverLanguageCodes(): string[] {
     return this.states.getAllVoiceoverLanguageCodes();
+  }
+
+  getDisplayableWrittenTranslationLanguageCodes(): string[] {
+    const allLanguageCodes = (
+      this.states.getAllWrittenTranslationLanguageCodes());
+
+    const displayableLanguageCodes = allLanguageCodes.filter(
+      languageCode => this.states.areWrittenTranslationsDisplayable(
+        languageCode));
+
+    return displayableLanguageCodes;
   }
 }
 

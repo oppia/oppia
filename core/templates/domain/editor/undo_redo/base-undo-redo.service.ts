@@ -20,7 +20,7 @@
 import { EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { BackendChangeObject, Change } from './change.model';
+import { BackendChangeObject, Change, DomainObject } from './change.model';
 
 /**
  * Stores a stack of changes to a domain object. Please note that only one
@@ -28,6 +28,9 @@ import { BackendChangeObject, Change } from './change.model';
  * not currently supported.
  */
 export class BaseUndoRedo {
+  constructor() {
+    this.init();
+  }
   private _appliedChanges: Change[] = [];
   private _undoneChanges: Change[] = [];
   _undoRedoChangeEventEmitter: EventEmitter<void> = new EventEmitter();
@@ -37,13 +40,13 @@ export class BaseUndoRedo {
   }
 
   private _applyChange(
-      Change: Change, domainObject: BackendChangeObject): void {
+      Change: Change, domainObject: DomainObject): void {
     Change.applyChange(domainObject);
     this._dispatchMutation();
   }
 
   private _reverseChange(
-      Change: Change, domainObject: BackendChangeObject): void {
+      Change: Change, domainObject: DomainObject): void {
     Change.reverseChange(domainObject);
     this._dispatchMutation();
   }
@@ -58,7 +61,7 @@ export class BaseUndoRedo {
    * provided domain object. When a new change is applied, all undone changes
    * are lost and cannot be redone. This fires mutation event.
    */
-  applyChange(change: Change, domainObject: BackendChangeObject): void {
+  applyChange(change: Change, domainObject: DomainObject): void {
     this._applyChange(change, domainObject);
     this._appliedChanges.push(change);
     this._undoneChanges = [];
@@ -69,7 +72,7 @@ export class BaseUndoRedo {
    * returns false if there are no changes to undo, and true otherwise. This
    * fires mutation event.
    */
-  undoChange(domainObject: BackendChangeObject): boolean {
+  undoChange(domainObject: DomainObject): boolean {
     if (this._appliedChanges.length !== 0) {
       var change = this._appliedChanges.pop();
       this._undoneChanges.push(change);
@@ -84,7 +87,7 @@ export class BaseUndoRedo {
    * object. This list will not contain undone actions. Changes to the
    * returned list will not be reflected in this class instance.
    */
-  redoChange(domainObject: BackendChangeObject): boolean {
+  redoChange(domainObject: DomainObject): boolean {
     if (this._undoneChanges.length !== 0) {
       var change = this._undoneChanges.pop();
       this._appliedChanges.push(change);

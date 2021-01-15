@@ -20,7 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
-import { SkillChange } from 'domain/editor/undo_redo/change.model';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { Skill, SkillBackendDict, SkillObjectFactory } from
   'domain/skill/SkillObjectFactory';
@@ -126,7 +126,8 @@ export class SkillBackendApiService {
 
   updateSkill(
       skillId: string, skillVersion: number,
-      commitMessage: string, changeList: SkillChange): Promise<Skill> {
+      commitMessage: string,
+      changeList: BackendChangeObject[]): Promise<Skill> {
     return new Promise((resolve, reject) => {
       const editableSkillDataUrl = this.urlInterpolationService.interpolateUrl(
         SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE, {

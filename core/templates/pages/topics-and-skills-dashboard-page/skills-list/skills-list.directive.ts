@@ -113,7 +113,27 @@ angular.module('oppia').directive('skillsList', [
                   }, 100);
                   $rootScope.$apply();
                 }
-              );
+              // eslint-disable-next-line dot-notation
+              ).catch(errorMessage => {
+                var errorToast = null;
+                // This error is thrown as part of a final validation check in
+                // the backend, hence the message does not include instructions
+                // for the user to follow.
+                if (errorMessage.includes('does not have any skills linked')) {
+                  errorToast = (
+                    'The skill is assigned to a subtopic in a published ' +
+                    'topic. Please unpublish the topic before deleting ' +
+                    'this skill.');
+                } else {
+                  errorToast = errorMessage;
+                }
+                setTimeout(() => {
+                  TopicsAndSkillsDashboardBackendApiService.
+                    onTopicsAndSkillsDashboardReinitialized.emit();
+                }, 100);
+                AlertsService.addInfoMessage(errorToast, 5000);
+                $rootScope.$apply();
+              });
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
@@ -127,7 +147,7 @@ angular.module('oppia').directive('skillsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                   'unassign-skill-from-topics-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skillId: () => skillId
               },
@@ -176,7 +196,7 @@ angular.module('oppia').directive('skillsList', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/templates/' +
                 'assign-skill-to-topic-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               windowClass: 'assign-skill-to-topic-modal',
               resolve: {
                 topicSummaries: () => topicSummaries
@@ -224,7 +244,7 @@ angular.module('oppia').directive('skillsList', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/skill-selector/select-skill-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 skill: () => skill,
                 skillSummaries: () => skillSummaries,
@@ -240,7 +260,7 @@ angular.module('oppia').directive('skillsList', [
               var skill = result.skill;
               var supersedingSkillId = result.supersedingSkillId;
               // Transfer questions from the old skill to the new skill.
-              TopicsAndSkillsDashboardBackendApiService.mergeSkills(
+              TopicsAndSkillsDashboardBackendApiService.mergeSkillsAsync(
                 skill.id, supersedingSkillId).then(function() {
                 // Broadcast will update the skills list in the dashboard so
                 // that the merged skills are not shown anymore.

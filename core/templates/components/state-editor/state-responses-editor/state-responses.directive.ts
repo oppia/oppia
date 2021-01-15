@@ -324,6 +324,10 @@ angular.module('oppia').directive('stateResponses', [
               windowClass: 'add-answer-group-modal',
               controller: 'AddAnswerGroupModalController'
             }).result.then(function(result) {
+              StateNextContentIdIndexService.saveDisplayedValue();
+              $scope.onSaveNextContentIdIndex(
+                StateNextContentIdIndexService.displayed);
+
               // Create a new answer group.
               $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
                 [result.tmpRule], result.tmpOutcome, [],
@@ -337,10 +341,6 @@ angular.module('oppia').directive('stateResponses', [
                 });
               $scope.changeActiveAnswerGroupIndex(
                 $scope.answerGroups.length - 1);
-
-              StateNextContentIdIndexService.saveDisplayedValue();
-              $scope.onSaveNextContentIdIndex(
-                StateNextContentIdIndexService.displayed);
 
               // After saving it, check if the modal should be reopened right
               // away.
@@ -505,8 +505,8 @@ angular.module('oppia').directive('stateResponses', [
             if (hasFeedback) {
               summary += (
                 shortenRule ?
-                  $filter('truncate')(outcome.feedback.getHtml(), 30) :
-                  $filter('convertToPlainText')(outcome.feedback.getHtml()));
+                  $filter('truncate')(outcome.feedback.html, 30) :
+                  $filter('convertToPlainText')(outcome.feedback.html));
             }
             return summary;
           };
@@ -539,7 +539,7 @@ angular.module('oppia').directive('stateResponses', [
               summary +=
                 $filter(
                   'convertToPlainText'
-                )(defaultOutcome.feedback.getHtml());
+                )(defaultOutcome.feedback.html);
             }
             return summary;
           };

@@ -18,9 +18,6 @@
 
 import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -44,6 +41,8 @@ import { UserExplorationPermissionsService } from
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { ReadOnlyExplorationBackendApiService } from
+  'domain/exploration/read-only-exploration-backend-api.service';
 
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils';
@@ -118,8 +117,6 @@ describe('Settings Tab Component', function() {
     $provide.value('WindowDimensionsService', TestBed.get(
       WindowDimensionsService));
     $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
-    $provide.value(
       'TextInputRulesService',
       TestBed.get(TextInputRulesService));
     $provide.value(
@@ -137,6 +134,9 @@ describe('Settings Tab Component', function() {
       getData: () => $q.resolve(),
       autosaveChangeList: () => {}
     });
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   afterEach(() => {

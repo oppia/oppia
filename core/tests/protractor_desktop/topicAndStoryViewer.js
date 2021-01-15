@@ -85,6 +85,7 @@ describe('Story viewer functionality', function() {
       'Topic TASV1', 'topic-tasv-one', 'Description', false);
     await topicEditorPage.submitTopicThumbnail(Constants.TEST_SVG_PATH, true);
     await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
     await topicEditorPage.saveTopic('Added thumbnail.');
     var url = await browser.getCurrentUrl();
     var topicId = url.split('/')[4].slice(0, -1);
@@ -141,7 +142,8 @@ describe('Story viewer functionality', function() {
     await users.logout();
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
-    await topicAndStoryViewerPage.expectLockedChaptersCountToBe(2);
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(3);
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.login(
@@ -149,7 +151,8 @@ describe('Story viewer functionality', function() {
     await explorationPlayerPage.submitAnswer('Continue', null);
     await topicAndStoryViewerPage.get(
       'math', 'topic-tasv-one', 'story-player-tasv-one');
-    await topicAndStoryViewerPage.expectLockedChaptersCountToBe(0);
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
+    await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
   });
 
   afterEach(async function() {

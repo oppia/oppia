@@ -35,7 +35,9 @@ install_third_party_libs.main()
 from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
+import feconf # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 import python_utils # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -115,16 +117,6 @@ def main(args=None):
             'running at port %s.'
             % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
 
-    clear_datastore_arg = (
-        '' if parsed_args.save_datastore else '--clear_datastore=true')
-    enable_console_arg = (
-        '--enable_console=true' if parsed_args.enable_console else '')
-    disable_host_checking_arg = (
-        '--enable_host_checking=false'
-        if parsed_args.disable_host_checking else '')
-    no_auto_restart = (
-        '--automatic_restart=no' if parsed_args.no_auto_restart else '')
-
     build_args = ['--prod_env'] if parsed_args.prod_env else []
     if parsed_args.maintenance_mode:
         build_args.append('--maintenance_mode')
@@ -156,65 +148,72 @@ def main(args=None):
 
     common.start_redis_server()
 
-    python_utils.PRINT('Starting GAE development server')
-    background_processes.append(subprocess.Popen(
-        'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 '
-        '--admin_port 8000 --host 0.0.0.0 --port %s %s --skip_sdk_update_check '
-        'true %s' % (
-            common.GOOGLE_APP_ENGINE_SDK_HOME, clear_datastore_arg,
-            enable_console_arg, disable_host_checking_arg, no_auto_restart,
-            python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            app_yaml_filepath), shell=True))
+    # TODO(#11549): Move this to top of the file.
+    import contextlib2
+    managed_dev_appserver = common.managed_dev_appserver(
+        app_yaml_filepath, clear_datastore=not parsed_args.save_datastore,
+        enable_console=parsed_args.enable_console,
+        enable_host_checking=not parsed_args.disable_host_checking,
+        automatic_restart=not parsed_args.no_auto_restart,
+        skip_sdk_update_check=True, port=PORT_NUMBER_FOR_GAE_SERVER)
 
-    # Wait for the servers to come up.
-    while not common.is_port_open(PORT_NUMBER_FOR_GAE_SERVER):
-        time.sleep(1)
+    with contextlib2.ExitStack() as stack:
+        python_utils.PRINT('Starting ElasticSearch development server.')
+        stack.enter_context(common.managed_elasticsearch_dev_server())
+        python_utils.PRINT('Starting Firebase emulators')
+        stack.enter_context(common.managed_firebase_auth_emulator())
+        python_utils.PRINT('Starting GAE development server')
+        stack.enter_context(managed_dev_appserver)
 
-    # Launch a browser window.
-    if common.is_linux_os() and not parsed_args.no_browser:
-        detect_virtualbox_pattern = re.compile('.*VBOX.*')
-        if list(filter(
-                detect_virtualbox_pattern.match,
-                os.listdir('/dev/disk/by-id/'))):
-            common.print_each_string_after_two_new_lines([
-                'INFORMATION',
-                'Setting up a local development server. You can access this '
-                'server',
-                'by navigating to localhost:%s in a browser window.'
-                % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
-        else:
+        # Wait for the servers to come up.
+        common.wait_for_port_to_be_open(PORT_NUMBER_FOR_GAE_SERVER)
+        common.wait_for_port_to_be_open(feconf.ES_PORT)
+
+        # Launch a browser window.
+        if common.is_linux_os() and not parsed_args.no_browser:
+            detect_virtualbox_pattern = re.compile('.*VBOX.*')
+            if list(filter(
+                    detect_virtualbox_pattern.match,
+                    os.listdir('/dev/disk/by-id/'))):
+                common.print_each_string_after_two_new_lines([
+                    'INFORMATION',
+                    'Setting up a local development server. You can access '
+                    'this server',
+                    'by navigating to localhost:%s in a browser window.'
+                    % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
+            else:
+                common.print_each_string_after_two_new_lines([
+                    'INFORMATION',
+                    'Setting up a local development server at localhost:%s. '
+                    % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
+                    'Opening a default browser window pointing to this server'])
+                time.sleep(5)
+                background_processes.append(
+                    subprocess.Popen([
+                        'xdg-open', 'http://localhost:%s/'
+                        % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
+        elif common.is_mac_os() and not parsed_args.no_browser:
             common.print_each_string_after_two_new_lines([
                 'INFORMATION',
                 'Setting up a local development server at localhost:%s. '
                 % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-                'Opening a default browser window pointing to this server'])
+                'Opening a default browser window pointing to this server.'])
             time.sleep(5)
             background_processes.append(
                 subprocess.Popen([
-                    'xdg-open', 'http://localhost:%s/'
+                    'open', 'http://localhost:%s/'
                     % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
-    elif common.is_mac_os() and not parsed_args.no_browser:
-        common.print_each_string_after_two_new_lines([
-            'INFORMATION',
-            'Setting up a local development server at localhost:%s. '
-            % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER),
-            'Opening a default browser window pointing to this server.'])
-        time.sleep(5)
-        background_processes.append(
-            subprocess.Popen([
-                'open', 'http://localhost:%s/'
-                % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)]))
-    else:
-        common.print_each_string_after_two_new_lines([
-            'INFORMATION',
-            'Setting up a local development server. You can access this server',
-            'by navigating to localhost:%s in a browser window.'
-            % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
+        else:
+            common.print_each_string_after_two_new_lines([
+                'INFORMATION',
+                'Setting up a local development server. You can access this ',
+                'server by navigating to localhost:%s in a browser window.'
+                % python_utils.UNICODE(PORT_NUMBER_FOR_GAE_SERVER)])
 
-    python_utils.PRINT('Done!')
+        python_utils.PRINT('Done!')
 
-    for process in background_processes:
-        process.wait()
+        for process in background_processes:
+            process.wait()
 
 
 if __name__ == '__main__':

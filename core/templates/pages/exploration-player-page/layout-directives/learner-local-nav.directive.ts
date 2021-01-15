@@ -51,16 +51,16 @@ angular.module('oppia').directive('learnerLocalNav', [
         'learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$uibModal', 'AlertsService', 'AttributionService',
-        'ExplorationEngineService',
+        '$http', '$rootScope', '$uibModal', 'AlertsService',
+        'AttributionService', 'ExplorationEngineService',
         'LoaderService', 'ReadOnlyExplorationBackendApiService',
         'SuggestionModalForExplorationPlayerService',
         'UrlInterpolationService', 'UserService',
         'ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS', 'FEEDBACK_POPOVER_PATH',
         'FLAG_EXPLORATION_URL_TEMPLATE',
         function(
-            $http, $uibModal, AlertsService, AttributionService,
-            ExplorationEngineService,
+            $http, $rootScope, $uibModal, AlertsService,
+            AttributionService, ExplorationEngineService,
             LoaderService, ReadOnlyExplorationBackendApiService,
             SuggestionModalForExplorationPlayerService,
             UrlInterpolationService, UserService,
@@ -81,7 +81,7 @@ angular.module('oppia').directive('learnerLocalNav', [
               template: require(
                 'pages/exploration-player-page/templates/' +
                 'flag-exploration-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: 'FlagExplorationModalController',
             }).result.then(function(result) {
               var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
@@ -129,6 +129,7 @@ angular.module('oppia').directive('learnerLocalNav', [
               .loadExploration(ctrl.explorationId)
               .then(function(exploration) {
                 ctrl.canEdit = exploration.can_edit;
+                $rootScope.$applyAsync();
               });
             ctrl.username = '';
             ctrl.feedbackOptionIsShown = true;
@@ -141,6 +142,9 @@ angular.module('oppia').directive('learnerLocalNav', [
                 ctrl.feedbackOptionIsShown = false;
               }
               LoaderService.hideLoadingScreen();
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the controller is migrated to angular.
+              $rootScope.$applyAsync();
             });
           };
         }

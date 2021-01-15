@@ -37,54 +37,55 @@ angular.module('oppia').directive('adminNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/navbar/admin-navbar.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['UserService', function(UserService) {
-        var ctrl = this;
-        ctrl.showTab = function() {
-          return AdminRouterService.showTab();
-        };
-        ctrl.isActivitiesTabOpen = function() {
-          return AdminRouterService.isActivitiesTabOpen();
-        };
-        ctrl.isJobsTabOpen = function() {
-          return AdminRouterService.isJobsTabOpen();
-        };
-        ctrl.isConfigTabOpen = function() {
-          return AdminRouterService.isConfigTabOpen();
-        };
-        ctrl.isFeaturesTabOpen = function() {
-          return AdminRouterService.isFeaturesTabOpen();
-        };
-        ctrl.isRolesTabOpen = function() {
-          return AdminRouterService.isRolesTabOpen();
-        };
-        ctrl.isMiscTabOpen = function() {
-          return AdminRouterService.isMiscTabOpen();
-        };
-        ctrl.onMouseoverProfilePictureOrDropdown = function(evt) {
-          angular.element(evt.currentTarget).parent().addClass('open');
-          ctrl.profileDropdownIsActive = true;
-        };
-
-        ctrl.onMouseoutProfilePictureOrDropdown = function(evt) {
-          angular.element(evt.currentTarget).parent().removeClass('open');
-          ctrl.profileDropdownIsActive = false;
-        };
-        ctrl.onMouseoverDropdownIconOrMenu = function(evt) {
-          angular.element(evt.currentTarget).parent().addClass('open');
-          ctrl.dropdownMenuisActive = true;
-        };
-
-        ctrl.onMouseoutDropdownIconOrMenu = function(evt) {
-          angular.element(evt.currentTarget).parent().removeClass('open');
-          ctrl.dropdownMenuisActive = false;
-        };
-
-        ctrl.$onInit = function() {
-          ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
+      controller: ['$rootScope', 'UserService',
+        function($rootScope, UserService) {
+          var ctrl = this;
+          ctrl.showTab = function() {
+            return AdminRouterService.showTab();
           };
+          ctrl.isActivitiesTabOpen = function() {
+            return AdminRouterService.isActivitiesTabOpen();
+          };
+          ctrl.isJobsTabOpen = function() {
+            return AdminRouterService.isJobsTabOpen();
+          };
+          ctrl.isConfigTabOpen = function() {
+            return AdminRouterService.isConfigTabOpen();
+          };
+          ctrl.isFeaturesTabOpen = function() {
+            return AdminRouterService.isFeaturesTabOpen();
+          };
+          ctrl.isRolesTabOpen = function() {
+            return AdminRouterService.isRolesTabOpen();
+          };
+          ctrl.isMiscTabOpen = function() {
+            return AdminRouterService.isMiscTabOpen();
+          };
+          ctrl.activateProfileDropdown = function() {
+            return ctrl.profileDropdownIsActive = true;
+          };
+          ctrl.deactivateProfileDropdown = function() {
+            return ctrl.profileDropdownIsActive = false;
+          };
+          ctrl.activateDropdownMenu = function() {
+            return ctrl.dropdownMenuisActive = true;
+          };
+          ctrl.deactivateDropdownMenu = function() {
+            return ctrl.dropdownMenuisActive = false;
+          };
+          ctrl.$onInit = function() {
+            ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
+            UserService.getProfileImageDataUrlAsync().then(
+              function(dataUrl) {
+                ctrl.profilePictureDataUrl = dataUrl;
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$applyAsync();
+              });
+
+            ctrl.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
 
           ctrl.username = '';
           ctrl.isModerator = null;
@@ -102,15 +103,17 @@ angular.module('oppia').directive('adminNavbar', [
                   username: ctrl.username
                 })
               );
-            }
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the controller is migrated to angular.
+            $rootScope.$applyAsync();}
           });
 
-          ctrl.logoutUrl = LOGOUT_URL;
+            ctrl.logoutUrl = LOGOUT_URL;
 
-          ctrl.profileDropdownIsActive = false;
-          ctrl.dropdownMenuisActive = false;
-        };
-      }]
+            ctrl.profileDropdownIsActive = false;
+            ctrl.dropdownMenuisActive = false;
+          };
+        }]
     };
   }
 ]);

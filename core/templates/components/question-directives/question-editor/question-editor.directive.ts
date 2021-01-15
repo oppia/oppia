@@ -28,6 +28,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/editability.service.ts');
@@ -99,7 +102,7 @@ angular.module('oppia').directive('questionEditor', [
             if (stateData) {
               StateEditorService.onStateEditorInitialized.emit(stateData);
 
-              if (stateData.content.getHtml() || stateData.interaction.id) {
+              if (stateData.content.html || stateData.interaction.id) {
                 ctrl.interactionIsShown = true;
               }
 

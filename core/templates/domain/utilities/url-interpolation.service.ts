@@ -25,6 +25,7 @@ import { AlertsService } from 'services/alerts.service';
 import { UrlService } from 'services/contextual/url.service';
 import { UtilsService } from 'services/utils.service';
 
+import Constants from 'assets/constants';
 const hashes = require('hashes.json');
 
 // This makes the InterpolationValuesType like a dict whose keys and values both
@@ -41,6 +42,10 @@ export class UrlInterpolationService {
     private alertsService: AlertsService,
     private urlService: UrlService,
     private utilsService: UtilsService) {}
+
+  get DEV_MODE(): boolean {
+    return Constants.DEV_MODE;
+  }
 
   validateResourcePath(resourcePath: string): void {
     if (!resourcePath) {
@@ -60,7 +65,7 @@ export class UrlInterpolationService {
    * returns resource path with cache slug.
    */
   _getUrlWithSlug(resourcePath: string): string {
-    if (!AppConstants.DEV_MODE) {
+    if (!this.DEV_MODE) {
       if (hashes[resourcePath]) {
         let index = resourcePath.lastIndexOf('.');
         return (
@@ -77,7 +82,7 @@ export class UrlInterpolationService {
    * depending on dev/prod mode.
    */
   _getCompleteUrl(prefix: string, path: string): string {
-    if (AppConstants.DEV_MODE) {
+    if (this.DEV_MODE) {
       return prefix + this._getUrlWithSlug(path);
     } else {
       return '/build' + prefix + this._getUrlWithSlug(path);
@@ -206,7 +211,7 @@ export class UrlInterpolationService {
 
   getFullStaticAssetUrl(path: string): string {
     this.validateResourcePath(path);
-    if (AppConstants.DEV_MODE) {
+    if (this.DEV_MODE) {
       return this.urlService.getOrigin() + path;
     } else {
       return this.urlService.getOrigin() + '/build' + path;
@@ -232,7 +237,7 @@ export class UrlInterpolationService {
    */
   getDirectiveTemplateUrl(path: string): string {
     this.validateResourcePath(path);
-    if (AppConstants.DEV_MODE) {
+    if (this.DEV_MODE) {
       return '/templates' + this._getUrlWithSlug(path);
     } else {
       return '/build/templates' + this._getUrlWithSlug(path);

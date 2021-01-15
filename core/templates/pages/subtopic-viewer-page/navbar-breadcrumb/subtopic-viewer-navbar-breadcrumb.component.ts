@@ -52,7 +52,7 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
     this.subtopicUrlFragment = (
       this.urlService.getSubtopicUrlFragmentFromLearnerUrl());
-    this.subtopicViewerBackendApiService.fetchSubtopicData(
+    this.subtopicViewerBackendApiService.fetchSubtopicDataAsync(
       this.topicUrlFragment,
       this.classroomUrlFragment,
       this.subtopicUrlFragment).then(

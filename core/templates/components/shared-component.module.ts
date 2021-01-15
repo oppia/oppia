@@ -55,6 +55,8 @@ import { ProfileLinkPictureComponent } from
   'components/profile-link-directives/profile-link-picture.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
+import { TakeBreakModalComponent } from
+  'pages/exploration-player-page/templates/take-break-modal.component';
 
 
 
@@ -78,6 +80,7 @@ import { ProfileLinkTextComponent } from
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
     TranslatePipe,
+    TakeBreakModalComponent
   ],
 
   entryComponents: [
@@ -92,6 +95,7 @@ import { ProfileLinkTextComponent } from
     ProfileLinkPictureComponent,
     ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
@@ -108,6 +112,7 @@ import { ProfileLinkTextComponent } from
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    TakeBreakModalComponent,
     TranslatePipe
   ],
 })

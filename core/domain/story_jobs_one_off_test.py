@@ -221,17 +221,18 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_skips_updated_story_failing_validation(self):
-
-        def _mock_get_story_by_id(unused_story_id):
-            """Mocks get_story_by_id()."""
-            return 'invalid_story'
-
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
             'title-three')
         story_services.save_new_story(self.albert_id, story)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, story.id)
+        story.description = 123
+
+        def _mock_get_story_by_id(unused_story_id):
+            """Mocks get_story_by_id()."""
+            return story
+
         get_story_by_id_swap = self.swap(
             story_fetchers, 'get_story_by_id', _mock_get_story_by_id)
 
@@ -241,14 +242,14 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
             self.process_and_flush_pending_mapreduce_tasks()
 
-        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(
-            job_id)
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(job_id)
 
         # If the story had been successfully migrated, this would include a
         # 'successfully migrated' message. Its absence means that the story
         # could not be processed.
         for x in output:
-            self.assertRegexpMatches(x, 'object has no attribute \'validate\'')
+            self.assertRegexpMatches(
+                x, 'Expected description to be a string, received 123')
 
 
 class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
@@ -411,301 +412,3 @@ class RegenerateStorySummaryOneOffJobTests(test_utils.GenericTestBase):
         for x in output:
             self.assertRegexpMatches(
                 x, 'object has no attribute \'story_contents\'')
-
-
-class DeleteOrphanStoriesOneOffJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    STORY_ID = 'story_id'
-
-    def setUp(self):
-        super(DeleteOrphanStoriesOneOffJobTests, self).setUp()
-
-        # Setup user who will own the test stories.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.TOPIC_ID = topic_services.get_new_topic_id()
-        self.story_id_1 = 'story_id_1'
-        self.story_id_2 = 'story_id_2'
-        self.story_id_3 = 'story_id_3'
-        self.skill_id_1 = 'skill_id_1'
-        self.skill_id_2 = 'skill_id_2'
-        self.save_new_topic(
-            self.TOPIC_ID, self.albert_id, name='Name',
-            description='Description',
-            canonical_story_ids=[self.story_id_1, self.story_id_2],
-            additional_story_ids=[self.story_id_3],
-            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-    def test_job_skips_deleted_story(self):
-        """Tests that the delete orphaned stories job skips previously
-        deleted stories.
-        """
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
-            'title-four')
-        story_services.save_new_story(self.albert_id, story)
-        topic_services.add_canonical_story(
-            self.albert_id, self.TOPIC_ID, story.id)
-
-        story_services.delete_story(
-            self.albert_id, self.STORY_ID)
-
-        # Ensure the story is deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_fetchers.get_story_by_id(self.STORY_ID)
-
-        # Start migration job on sample story.
-        job_id = (
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.create_new())
-        story_jobs_one_off.DeleteOrphanStoriesOneOffJob.enqueue(job_id)
-
-        # This running without errors indicates the deleted story is
-        # being ignored.
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        # Ensure the story is still deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_fetchers.get_story_by_id(self.STORY_ID)
-
-        output = (
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.get_output(
-                job_id))
-        expected = [[u'story_deleted',
-                     [u'Encountered 1 deleted stories.']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_deletion_if_corresponding_topic_does_not_exist(self):
-        """Tests that the one off job deletes stories that does not correspond
-        to a topic.
-        """
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', 'invalidtopic',
-            'title-six')
-        story_services.save_new_story(self.albert_id, story)
-
-        # Start migration job.
-        job_id = (
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.create_new())
-        story_jobs_one_off.DeleteOrphanStoriesOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.get_output(
-                job_id))
-        expected = [[u'successfully_deleted_stories', [self.STORY_ID]]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_deletion_if_corresponding_topic_does_not_contain_story(self):
-        """Tests that the one off job deletes stories that are not listed in
-        the canonical stories field in the corresponding topic.
-        """
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
-            'title-seven')
-        story_services.save_new_story(self.albert_id, story)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        # Start migration job.
-        job_id = (
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.create_new())
-        story_jobs_one_off.DeleteOrphanStoriesOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.get_output(
-                job_id))
-        expected = [[u'successfully_deleted_stories', [self.STORY_ID]]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_report_story_deletion_errors(self):
-        """Tests that the one off job reports errors if deletion fails."""
-        def _mock_delete_story(unused_committer_id, unused_story_id):
-            """Mocks delete_story()."""
-            raise Exception('Cannot delete this story.')
-
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', 'invalidtopic',
-            'title-eight')
-        story_services.save_new_story(self.albert_id, story)
-
-        # Start migration job.
-        delete_story_swap = self.swap(
-            story_services, 'delete_story', _mock_delete_story)
-
-        with delete_story_swap:
-            job_id = (
-                story_jobs_one_off.DeleteOrphanStoriesOneOffJob.create_new())
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.get_output(
-                job_id))
-        expected = [
-            [u'story_errored',
-             [u'Deletion of story story_id failed: Cannot delete this story.']]
-        ]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_report_skipped_stories(self):
-        """Tests that the one off job skips stories which have a valid
-        reference in the corresponding topic.
-        """
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
-            'title-nine')
-        story_services.save_new_story(self.albert_id, story)
-        topic_services.add_canonical_story(
-            self.albert_id, self.TOPIC_ID, story.id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        # Start migration job.
-        job_id = (
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.create_new())
-        story_jobs_one_off.DeleteOrphanStoriesOneOffJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            story_jobs_one_off.DeleteOrphanStoriesOneOffJob.get_output(
-                job_id))
-        expected = [[u'story_skipped', [u'Skipped 1 valid stories.']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-
-class OrphanStoriesAuditJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    STORY_ID = 'story_id'
-
-    def setUp(self):
-        super(OrphanStoriesAuditJobTests, self).setUp()
-
-        # Setup user who will own the test stories.
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.TOPIC_ID = topic_services.get_new_topic_id()
-        self.story_id_1 = 'story_id_1'
-        self.story_id_2 = 'story_id_2'
-        self.story_id_3 = 'story_id_3'
-        self.skill_id_1 = 'skill_id_1'
-        self.skill_id_2 = 'skill_id_2'
-        self.save_new_topic(
-            self.TOPIC_ID, self.albert_id, name='Name',
-            description='Description',
-            canonical_story_ids=[self.story_id_1, self.story_id_2],
-            additional_story_ids=[self.story_id_3],
-            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-    def test_job_skips_deleted_story(self):
-        """Tests that the delete orphaned stories job skips previously
-        deleted stories.
-        """
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
-            'title-four')
-        story_services.save_new_story(self.albert_id, story)
-        topic_services.add_canonical_story(
-            self.albert_id, self.TOPIC_ID, story.id)
-
-        story_services.delete_story(
-            self.albert_id, self.STORY_ID)
-
-        # Ensure the story is deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_fetchers.get_story_by_id(self.STORY_ID)
-
-        # Start migration job on sample story.
-        job_id = (
-            story_jobs_one_off.OrphanStoriesAuditJob.create_new())
-        story_jobs_one_off.OrphanStoriesAuditJob.enqueue(job_id)
-
-        # This running without errors indicates the deleted story is
-        # being ignored.
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        # Ensure the story is still deleted.
-        with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            story_fetchers.get_story_by_id(self.STORY_ID)
-
-        output = (
-            story_jobs_one_off.OrphanStoriesAuditJob.get_output(
-                job_id))
-        expected = [[u'story_deleted',
-                     [u'Encountered 1 deleted stories.']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_deletion_if_corresponding_topic_does_not_exist(self):
-        """Tests that the audit job reports story ids of stories that
-        does not correspond to a topic.
-        """
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', 'invalidtopic',
-            'title-ten')
-        story_services.save_new_story(self.albert_id, story)
-
-        # Start migration job.
-        job_id = (
-            story_jobs_one_off.OrphanStoriesAuditJob.create_new())
-        story_jobs_one_off.OrphanStoriesAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            story_jobs_one_off.OrphanStoriesAuditJob.get_output(
-                job_id))
-        expected = [[u'orphaned_story_ids', [self.STORY_ID]]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_deletion_if_corresponding_topic_does_not_contain_story(self):
-        """Tests that the audit job reports story ids of stories that are not
-        listed in the canonical stories field in the corresponding topic.
-        """
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
-            'title-seven')
-        story_services.save_new_story(self.albert_id, story)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        # Start migration job.
-        job_id = (
-            story_jobs_one_off.OrphanStoriesAuditJob.create_new())
-        story_jobs_one_off.OrphanStoriesAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            story_jobs_one_off.OrphanStoriesAuditJob.get_output(
-                job_id))
-        expected = [[u'orphaned_story_ids', [self.STORY_ID]]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-    def test_report_skipped_stories(self):
-        """Tests that the audit job skips stories which have a valid
-        reference in the corresponding topic.
-        """
-        story = story_domain.Story.create_default_story(
-            self.STORY_ID, 'A title', 'Description', self.TOPIC_ID,
-            'title-nine')
-        story_services.save_new_story(self.albert_id, story)
-        topic_services.add_canonical_story(
-            self.albert_id, self.TOPIC_ID, story.id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        # Start migration job.
-        job_id = (
-            story_jobs_one_off.OrphanStoriesAuditJob.create_new())
-        story_jobs_one_off.OrphanStoriesAuditJob.enqueue(job_id)
-        self.process_and_flush_pending_mapreduce_tasks()
-
-        output = (
-            story_jobs_one_off.OrphanStoriesAuditJob.get_output(
-                job_id))
-        expected = [[u'story_skipped', [u'Skipped 1 valid stories.']]]
-        self.assertEqual(expected, [ast.literal_eval(x) for x in output])

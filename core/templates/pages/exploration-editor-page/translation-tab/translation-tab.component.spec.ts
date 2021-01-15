@@ -23,9 +23,6 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { LoaderService } from 'services/loader.service';
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerGroupsCacheService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -53,6 +50,7 @@ import { UserExplorationPermissionsService } from
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service.ts';
 import { ExternalSaveService } from 'services/external-save.service';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 
 import $ from 'jquery';
 
@@ -97,8 +95,6 @@ describe('Translation tab component', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AngularNameService', TestBed.get(AngularNameService));
     $provide.value(
-      'AnswerGroupsCacheService', TestBed.get(AnswerGroupsCacheService));
-    $provide.value(
       'ExplorationImprovementsTaskRegistryService',
       TestBed.get(ExplorationImprovementsTaskRegistryService));
     $provide.value(
@@ -123,6 +119,9 @@ describe('Translation tab component', function() {
     $provide.value(
       'StateWrittenTranslationsService',
       TestBed.get(StateWrittenTranslationsService));
+    $provide.value(
+      'ReadOnlyExplorationBackendApiService',
+      TestBed.get(ReadOnlyExplorationBackendApiService));
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {
