@@ -2915,3 +2915,65 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         compare_node = if_node.test
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_compare(compare_node)
+
+
+class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(NonTestFilesFunctionNameCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.NonTestFilesFunctionNameChecker)
+        self.checker_test_object.setup_method()
+
+    def test_function_def_for_test_file_with_test_only_adds_no_msg(self):
+        def_node = astroid.extract_node(
+            """
+            def test_only_some_random_function(param1, param2):
+                pass
+            """
+        )
+        def_node.root().name = 'random_module_test'
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(def_node)
+
+    def test_function_def_for_test_file_without_test_only_adds_no_msg(self):
+        def_node = astroid.extract_node(
+            """
+            def some_random_function(param1, param2):
+                pass
+            """
+        )
+        def_node.root().name = 'random_module_test'
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(def_node)
+
+    def test_function_def_for_non_test_file_with_test_only_adds_msg(self):
+        def_node = astroid.extract_node(
+            """
+            def test_only_some_random_function(param1, param2):
+                pass
+            """
+        )
+        def_node.root().name = 'random_module_nontest'
+        non_test_function_name_message = testutils.Message(
+            msg_id='non-test-files-function-name-checker', node=def_node)
+
+        with self.checker_test_object.assertAddsMessages(
+            non_test_function_name_message
+        ):
+            self.checker_test_object.checker.visit_functiondef(def_node)
+
+    def test_function_def_for_non_test_file_without_test_only_adds_no_msg(self):
+        def_node = astroid.extract_node(
+            """
+            def some_random_function(param1, param2):
+                pass
+            """
+        )
+        def_node.root().name = 'random_module_nontest'
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(def_node)

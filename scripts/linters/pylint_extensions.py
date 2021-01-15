@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Implements additional custom Pylint checkers to be used as part of
-presubmit checks. Next message id would be C0031.
+presubmit checks. Next message id would be C0032.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -1893,6 +1893,42 @@ class InequalityWithNoneChecker(checkers.BaseChecker):
                 self.add_message('inequality-with-none', node=node)
 
 
+class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
+    """Custom pylint checker prohibiting use of "test_only" prefix in function
+    names of non-test files.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'non-test-files-function-name-checker'
+    priority = -1
+    msgs = {
+        'C0031': (
+            'Please change the name of the function so that it does not use '
+            '"test_only" as its prefix in non-test files.',
+            'non-test-files-function-name-checker',
+            'Prohibit use of "test_only" prefix in function names of non-test '
+            'files.'
+        )
+    }
+
+    def visit_functiondef(self, node):
+        """Visit every function definition and ensure their name doesn't have
+        test_only as its prefix.
+
+        Args:
+            node: astroid.nodes.FunctionDef. A node for a function or method
+                definition in the AST.
+        """
+        modnode = node.root()
+        if modnode.name.endswith('_test'):
+            return
+        function_name = node.name
+        if function_name.startswith('test_only'):
+            self.add_message(
+                'non-test-files-function-name-checker', node=node)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1913,3 +1949,4 @@ def register(linter):
     linter.register_checker(SingleLinePragmaChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
     linter.register_checker(InequalityWithNoneChecker(linter))
+    linter.register_checker(NonTestFilesFunctionNameChecker(linter))
