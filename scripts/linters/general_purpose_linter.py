@@ -388,24 +388,12 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_dirs': ('scripts/',)
     },
     {
-        'regexp': re.compile(r'\sprint\('),
-        'message': 'Please use python_utils.PRINT().',
-        'excluded_files': ('python_utils.py',),
-        'excluded_dirs': ()
-    },
-    {
         'regexp': re.compile(r'# pylint:\s*disable=[A-Z][0-9]{4}'),
         'message': 'Please remove pylint exclusion if it is unnecessary, or '
                    'make it human readable with a sentence instead of an id. '
                    'The id-to-message list can be seen '
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'with open\(|= open\('),
-        'message': 'Please use python_utils.open_file() instead of open().',
-        'excluded_files': ('python_utils.py',),
         'excluded_dirs': ()
     },
     {
@@ -442,18 +430,6 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'regexp': re.compile(r'urllib(2)?\..*Request\('),
         'message': 'Please use python_utils.url_request().',
         'excluded_files': ('python_utils.py', 'python_utils_test.py'),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'[^.|\w]input\('),
-        'message': 'Please use python_utils.INPUT.',
-        'excluded_files': (),
-        'excluded_dirs': ()
-    },
-    {
-        'regexp': re.compile(r'[^.|\w|\s]map\('),
-        'message': 'Please use python_utils.MAP.',
-        'excluded_files': (),
         'excluded_dirs': ()
     },
     {

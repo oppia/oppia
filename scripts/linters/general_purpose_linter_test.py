@@ -86,56 +86,20 @@ INVALID_HTTP_CLIENT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_http_client_used.ts')
 
 # PY filepaths.
-INVALID_PUT_ASYNC_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_put_async.py')
-INVALID_PUT_MULTI_ASYNC_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_put_multi_async.py')
-INVALID_ITERKEY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_iterkeys.py')
-INVALID_ITERVALUES_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_itervalues.py')
-INVALID_ITERITEMS_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_iteritems.py')
 INVALID_METACLASS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_metaclass.py')
-INVALID_BASESTRING_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_basestring.py')
-INVALID_ZIP_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_zip.py')
-INVALID_STR_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_str.py')
-INVALID_ROUND_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_round.py')
-INVALID_RANGE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_range.py')
 INVALID_OBJECT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_object.py')
-INVALID_NEXT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_next.py')
-INVALID_MAP_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_map.py')
-INVALID_INPUT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_input.py')
 INVALID_REQUEST_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_request.py')
-INVALID_URLJOIN_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_urljoin.py')
-INVALID_UNQUOTE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_unquote.py')
 INVALID_NO_NEWLINE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_no_newline.py')
-INVALID_PARSE_QS_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_parse_qs.py')
-INVALID_URL_UNSPLIT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_urlunsplit.py')
-INVALID_URLPARSE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_urlparse.py')
-INVALID_URLSPLIT_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_urlsplit.py')
 INVALID_URLOPEN_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlopen.py')
 INVALID_URLRETRIEVE_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlretrieve.py')
 INVALID_AUTHOR_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_author.py')
-INVALID_DATETIME_NOW_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_datetime_now.py')
 INVALID_NDB_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_ndb.py')
-INVALID_PRINT_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_print.py')
 INVALID_PYLINT_ID_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_pylint_id.py')
-INVALID_ASSERT_EQUALS_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_assert_equals.py')
-INVALID_OPEN_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_open.py')
-INVALID_STRINGIO_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_stringio.py')
 INVALID_QUOTE_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'invalid_quote.py')
 INVALID_UNQUOTE_PLUS_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_urlunquote_plus.py')
@@ -433,16 +397,6 @@ class PythonLintTests(test_utils.LinterTestBase):
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
-    def test_invalid_use_of_print(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_PRINT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 42: Please use python_utils.PRINT().'
-            ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
     def test_invalid_use_of_pylint_id(self):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_PYLINT_ID_FILEPATH], FILE_CACHE)
@@ -453,16 +407,6 @@ class PythonLintTests(test_utils.LinterTestBase):
             'The id-to-message list can be seen '
             'here->http://pylint-messages.wikidot.com/all-codes'
             ], lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_open(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_OPEN_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements([
-            'Line 42: Please use python_utils.open_file() instead '
-            'of open().'], lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -522,26 +466,6 @@ class PythonLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             ['Line 47: Please use python_utils.url_request().'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_input(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_INPUT_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 42: Please use python_utils.INPUT.'],
-            lint_task_report.trimmed_messages)
-        self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed)
-
-    def test_invalid_use_of_map(self):
-        linter = general_purpose_linter.GeneralPurposeLinter(
-            [INVALID_MAP_FILEPATH], FILE_CACHE)
-        lint_task_report = linter.check_bad_patterns()
-        self.assert_same_list_elements(
-            ['Line 42: Please use python_utils.MAP.'],
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

@@ -1898,6 +1898,10 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
     regex checks of functions calls to be removed or replaced.
     """
 
+    def __init__(self, linter=None):
+        super(DisallowedFunctionsChecker, self).__init__(linter)
+        self.func_to_replacement = None
+
     __implements__ = interfaces.IAstroidChecker
     name = 'disallowed-function-calls'
     priority = -1
@@ -1934,22 +1938,20 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
             }
         ),)
 
-    def _parse_config_entry(self, entry):
-        """Parse a config entry for replacements of disallowed
+    def _populate_disallowed_functions_and_replacements(self):
+        """Parse pylint config entries for replacements of disallowed
         functions.
-
-        Args:
-            entry: str. Config entry in the format of Name=>Replacement or
-                just Name.
-
-        Returns:
-            list(str). The parsed function name and an optional replacement.
         """
-        splits = [s.strip() for s in entry.split('=>')]
-        assert len(splits) == 1 or len(splits) == 2
-        if len(splits) == 1:
-            return splits[0], None
-        return splits[0], splits[1]
+        disallowed_entries = self.config.disallowed_functions_and_replacements
+        func_to_replacement = {}
+        for entry in disallowed_entries:
+            splits = [s.strip() for s in entry.split('=>')]
+            assert len(splits) == 1 or len(splits) == 2
+            if len(splits) == 1:
+                func_to_replacement[splits[0]] = None
+            else:
+                func_to_replacement[splits[0]] = splits[1]
+        self.func_to_replacement = func_to_replacement
 
     def visit_call(self, node):
         """Visit a function call to ensure that the call is
@@ -1958,25 +1960,33 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
         Args:
             node: astroid.nodes.Call. Node to access call content.
         """
-        disallowed_entries = self.config.disallowed_functions_and_replacements
+        # We only want to read from the config once, and at the time of
+        # construction of the checker, the config is not yet set. Therefore,
+        # we test and set it here.
+        if self.func_to_replacement is None:
+            self._populate_disallowed_functions_and_replacements()
 
         func = node.func
-        for entry in disallowed_entries:
-            func_name, replacement_msg = self._parse_config_entry(entry)
-            # The call will either be a direct call or a call as an attribute
-            # of an object (e.g. obj.do_something()). In the case that the
-            # call is an attribute, then it will use the attrname field.
-            if (
-                    (hasattr(func, 'attrname') and func.attrname == func_name)
-                    or (hasattr(func, 'name') and func.name == func_name)):
-                if replacement_msg is None:
-                    self.add_message(
-                        'remove-disallowed-function-calls',
-                        node=node, args=func_name)
-                else:
-                    self.add_message(
-                        'replace-disallowed-function-calls',
-                        node=node, args=(func_name, replacement_msg))
+        replacement = None
+
+        # The call will either be a direct call or a call as an attribute
+        # of an object (e.g. obj.do_something()). In the case that the
+        # call is an attribute, then it will use the attrname field.
+        if hasattr(func, 'attrname'):
+            func_key = func.attrname
+        else:
+            # Only other case has to be using name as key.
+            func_key = func.name
+        if func_key in self.func_to_replacement:
+            replacement = self.func_to_replacement[func_key]
+            if replacement is None:
+                self.add_message(
+                    'remove-disallowed-function-calls',
+                    node=node, args=func_key)
+            else:
+                self.add_message(
+                    'replace-disallowed-function-calls',
+                    node=node, args=(func_key, replacement))
 
 
 def register(linter):
