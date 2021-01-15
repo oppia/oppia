@@ -125,6 +125,7 @@ var PreferencesPage = function() {
     await saveNewChanges('User Bio');
   };
 
+  // Here Newline Character is used as ENTER KEY.
   this.setUserInterests = async function(interests) {
     await action.click('User Interest Input', userInterestsInput);
     for (var i = 0; i < interests.length; i++) {
