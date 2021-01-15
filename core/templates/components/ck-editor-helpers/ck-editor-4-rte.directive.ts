@@ -44,21 +44,64 @@ angular.module('oppia').directive('ckEditor4Rte', [
      * @param uiConfig Parameters to add to CKEditor config
      * @modifies config
      */
-    const _updateCKEditorConfig = function(
-        config: CKEDITOR.config, uiConfig: UiConfig): CKEDITOR.config {
+    const _getCKEditorConfig = function(
+        uiConfig: UiConfig,
+        pluginNames: string,
+        buttonNames: string[],
+        extraAllowedContentRules,
+        sharedSpaces
+    ): CKEDITOR.config {
       // Language configs use default language when undefined.
+      let ckConfig: CKEDITOR.config = {
+        extraPlugins: 'pre,sharedspace,' + pluginNames,
+        startupFocus: true,
+        removePlugins: 'indentblock',
+        title: false,
+        floatSpaceDockedOffsetY: 15,
+        extraAllowedContent: extraAllowedContentRules,
+        sharedSpaces: sharedSpaces,
+        skin: (
+          'bootstrapck,' +
+          '/third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/'
+        ),
+        toolbar: [
+          {
+            name: 'basicstyles',
+            items: ['Bold', '-', 'Italic']
+          },
+          {
+            name: 'paragraph',
+            items: [
+              'NumberedList', '-',
+              'BulletedList', '-',
+              'Pre', '-',
+              'Blockquote', '-',
+              'Indent', '-',
+              'Outdent'
+            ]
+          },
+          {
+            name: 'rtecomponents',
+            items: buttonNames
+          },
+          {
+            name: 'document',
+            items: ['Source']
+          }
+        ]
+      };
       if (uiConfig.language) {
-        config.language = uiConfig.language;
-        config.contentsLanguage = uiConfig.language;
+        ckConfig.language = uiConfig.language;
+        ckConfig.contentsLanguage = uiConfig.language;
       }
       if (uiConfig.languageDirection) {
-        config.contentsLangDirection = (
+        ckConfig.contentsLangDirection = (
           uiConfig.languageDirection);
       }
       if (uiConfig.startupFocusEnabled !== undefined) {
-        config.startupFocus = uiConfig.startupFocusEnabled;
+        ckConfig.startupFocus = uiConfig.startupFocusEnabled;
       }
-      return config;
+      return ckConfig;
     };
 
     return {
@@ -149,50 +192,13 @@ angular.module('oppia').directive('ckEditor4Rte', [
         CKEDITOR.plugins.addExternal(
           'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
 
-        let ckConfig: CKEDITOR.config = {
-          extraPlugins: 'pre,sharedspace,' + pluginNames,
-          startupFocus: true,
-          removePlugins: 'indentblock',
-          title: false,
-          floatSpaceDockedOffsetY: 15,
-          extraAllowedContent: extraAllowedContentRules,
-          sharedSpaces: {
-            top: <HTMLElement>el[0].children[0].children[0]
-          },
-          skin: (
-            'bootstrapck,' +
-            '/third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/'
-          ),
-          toolbar: [
-            {
-              name: 'basicstyles',
-              items: ['Bold', '-', 'Italic']
-            },
-            {
-              name: 'paragraph',
-              items: [
-                'NumberedList', '-',
-                'BulletedList', '-',
-                'Pre', '-',
-                'Blockquote', '-',
-                'Indent', '-',
-                'Outdent'
-              ]
-            },
-            {
-              name: 'rtecomponents',
-              items: buttonNames
-            },
-            {
-              name: 'document',
-              items: ['Source']
-            }
-          ]
+        const sharedSpaces = {
+          top: <HTMLElement>el[0].children[0].children[0]
         };
 
-        if (scope.uiConfig()) {
-          ckConfig = _updateCKEditorConfig(ckConfig, scope.uiConfig());
-        }
+        const ckConfig = _getCKEditorConfig(
+          scope.uiConfig(), pluginNames, buttonNames, extraAllowedContentRules,
+          sharedSpaces);
 
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(
