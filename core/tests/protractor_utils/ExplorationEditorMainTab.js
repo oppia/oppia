@@ -609,13 +609,13 @@ var ExplorationEditorMainTab = function() {
     await action.click('Add Interaction button', addInteractionButton);
 
     var INTERACTION_ID_TO_TAB_NAME = {
-      Continue: 'General',
-      EndExploration: 'General',
-      ImageClickInput: 'General',
-      ItemSelectionInput: 'General',
-      MultipleChoiceInput: 'General',
-      NumericInput: ['General', 'Math'],
-      TextInput: 'General',
+      Continue: 'Commonly Used',
+      EndExploration: 'Commonly Used',
+      ImageClickInput: 'Commonly Used',
+      ItemSelectionInput: 'Commonly Used',
+      MultipleChoiceInput: 'Commonly Used',
+      NumericInput: ['Commonly Used', 'Math'],
+      TextInput: 'Commonly Used',
       FractionInput: 'Math',
       GraphInput: 'Math',
       LogicProof: 'Math',
