@@ -35,10 +35,10 @@ export class UserExplorationPermissionsService {
 
   static permissionsPromise: Promise<ExplorationPermissions> = null;
 
-  getPermissionsAsync(): Promise<ExplorationPermissions> {
+  async getPermissionsAsync(): Promise<ExplorationPermissions> {
     if (!UserExplorationPermissionsService.permissionsPromise) {
       UserExplorationPermissionsService.permissionsPromise = (
-        this.explorationPermissionsBackendApiService.getPermissions());
+        this.explorationPermissionsBackendApiService.getPermissionsAsync());
     }
     return UserExplorationPermissionsService.permissionsPromise;
   }
