@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the local navigation in the collection view.
+ * @fileoverview Component for the local navigation in the collection view.
  */
 
-import { Subscription } from 'rxjs';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+
+import { Subscription } from 'rxjs';
+
 import { ReadOnlyCollectionBackendApiService } from
   'domain/collection/read-only-collection-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -32,11 +34,13 @@ export class CollectionLocalNavComponent implements OnInit, OnDestroy {
   canEdit: boolean;
   collectionId: string = '';
   directiveSubscriptions = new Subscription();
+
   constructor(
       private readOnlyCollectionBackendApiService:
        ReadOnlyCollectionBackendApiService,
       private urlService: UrlService,
   ) {}
+
   ngOnInit(): void {
     this.collectionId = this.urlService.getCollectionIdFromUrl();
     this.directiveSubscriptions.add(
@@ -50,6 +54,7 @@ export class CollectionLocalNavComponent implements OnInit, OnDestroy {
       )
     );
   }
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
