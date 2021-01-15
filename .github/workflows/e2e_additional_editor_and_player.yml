@@ -61,6 +61,7 @@ jobs:
           if [[ "$target_branch" == null ]]
           then
             git pull upstream develop --no-edit --allow-unrelated-histories
+            git diff
           else
             git pull origin $target_branch --no-edit --allow-unrelated-histories
           fi
