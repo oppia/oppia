@@ -216,7 +216,7 @@ export class ExplorationImprovementsTaskRegistryService {
     }
   }
 
-  getExplorationStats(): ExplorationStats {
+  getExplorationStatsAsync(): ExplorationStats {
     return this.expStats;
   }
 

@@ -272,7 +272,7 @@ describe('Exploration improvements task registrar service', () => {
     taskRegistryService.initialize(
       config, makeStates(), expStats, [], new Map(), new Map(), []);
 
-    expect(taskRegistryService.getExplorationStats()).toBe(expStats);
+    expect(taskRegistryService.getExplorationStatsAsync()).toBe(expStats);
   });
 
   describe('Validating initialize arguments', () => {

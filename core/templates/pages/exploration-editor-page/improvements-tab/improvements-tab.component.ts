@@ -45,7 +45,8 @@ angular.module('oppia').component('improvementsTab', {
         };
 
         const expStats = (
-          ExplorationImprovementsTaskRegistryService.getExplorationStats());
+          ExplorationImprovementsTaskRegistryService.getExplorationStatsAsync()
+        );
         this.completionRate = (
           (expStats && expStats.numStarts > 0) ?
             (expStats.numCompletions / expStats.numStarts) : 0);
