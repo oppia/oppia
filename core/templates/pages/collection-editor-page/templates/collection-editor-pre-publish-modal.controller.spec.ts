@@ -95,8 +95,10 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
     it('should allow saving a collection when it has a title, objective and' +
       ' category', fakeAsync(() => {
       spyOn(collectionUpdateService, 'setCollectionTitle').and.callThrough();
-      spyOn(collectionUpdateService, 'setCollectionObjective').and.callThrough();
-      spyOn(collectionUpdateService, 'setCollectionCategory').and.callThrough();
+      spyOn(
+        collectionUpdateService, 'setCollectionObjective').and.callThrough();
+      spyOn(
+        collectionUpdateService, 'setCollectionCategory').and.callThrough();
       ctrl.newTitle = 'New title';
       ctrl.newObjective = 'New objective';
       ctrl.newCategory = 'Algorithm';
@@ -105,10 +107,10 @@ describe('Collection Editor Pre Publish Modal Controller', function() {
       ctrl.save();
 
       expect(collectionUpdateService.setCollectionTitle).toHaveBeenCalled();
-      expect(collectionUpdateService.setCollectionObjective)
-        .toHaveBeenCalled();
-      expect(collectionUpdateService.setCollectionCategory)
-        .toHaveBeenCalled();
+      expect(
+        collectionUpdateService.setCollectionObjective).toHaveBeenCalled();
+      expect(
+        collectionUpdateService.setCollectionCategory).toHaveBeenCalled();
 
       expect($uibModalInstance.close).toHaveBeenCalledWith([
         'title', 'objective', 'category']);
