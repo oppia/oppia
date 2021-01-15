@@ -928,14 +928,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             collection_mappings[self.COL_1_ID])
 
     def test_one_collection_with_missing_snapshot_is_pseudonymized(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
         collection_models.CollectionCommitLogEntryModel(
             id='collection-%s-1' % self.COL_2_ID,
             collection_id=self.COL_2_ID,
@@ -946,14 +938,14 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             version=1
         ).put()
 
-        with logging_swap:
+        with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.pre_delete_user(self.user_1_id)
             self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertItemsEqual(
-            observed_log_messages,
+            log_messages,
             [
                 '[WIPEOUT] The commit log model '
                 '\'CollectionCommitLogEntryModel\' and '
@@ -1334,14 +1326,6 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             commit_log_model_2.user_id, exploration_mappings[self.EXP_1_ID])
 
     def test_one_exploration_with_missing_snapshot_is_pseudonymized(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
         exp_models.ExplorationCommitLogEntryModel(
             id='exploration-%s-1' % self.EXP_2_ID,
             exploration_id=self.EXP_2_ID,
@@ -1352,14 +1336,14 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             version=1
         ).put()
 
-        with logging_swap:
+        with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.pre_delete_user(self.user_1_id)
             self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertItemsEqual(
-            observed_log_messages,
+            log_messages,
             [
                 '[WIPEOUT] The commit log model '
                 '\'ExplorationCommitLogEntryModel\' and '
@@ -2203,14 +2187,6 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, question_mappings[self.QUESTION_1_ID])
 
     def test_one_question_with_missing_snapshot_is_pseudonymized(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
         question_models.QuestionCommitLogEntryModel(
             id='question-%s-1' % self.QUESTION_2_ID,
             question_id=self.QUESTION_2_ID,
@@ -2221,12 +2197,12 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             version=1
         ).put()
 
-        with logging_swap:
+        with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertEqual(
-            observed_log_messages,
+            log_messages,
             ['[WIPEOUT] The commit log model \'QuestionCommitLogEntryModel\' '
              'and snapshot models [\'QuestionSnapshotMetadataModel\'] IDs '
              'differ. Snapshots without commit logs: [], '
@@ -2601,14 +2577,6 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, skill_mappings[self.SKILL_1_ID])
 
     def test_one_skill_with_missing_snapshot_is_pseudonymized(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
         skill_models.SkillCommitLogEntryModel(
             id='skill-%s-1' % self.SKILL_2_ID,
             skill_id=self.SKILL_2_ID,
@@ -2619,12 +2587,12 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
             version=1
         ).put()
 
-        with logging_swap:
+        with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertEqual(
-            observed_log_messages,
+            log_messages,
             ['[WIPEOUT] The commit log model \'SkillCommitLogEntryModel\' and '
              'snapshot models [\'SkillSnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
@@ -2913,14 +2881,6 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, story_mappings[self.STORY_1_ID])
 
     def test_one_story_with_missing_snapshot_is_pseudonymized(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
         story_models.StoryCommitLogEntryModel(
             id='story-%s-1' % self.STORY_2_ID,
             story_id=self.STORY_2_ID,
@@ -2931,12 +2891,12 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             version=1
         ).put()
 
-        with logging_swap:
+        with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertEqual(
-            observed_log_messages,
+            log_messages,
             ['[WIPEOUT] The commit log model \'StoryCommitLogEntryModel\' and '
              'snapshot models [\'StorySnapshotMetadataModel\'] IDs differ. '
              'Snapshots without commit logs: [], '
@@ -3240,14 +3200,6 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             subtopic_mappings['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)])
 
     def test_one_subtopic_with_missing_snapshot_is_pseudonymized(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
         subtopic_models.SubtopicPageCommitLogEntryModel(
             id='%s-%s-1' % (self.TOP_1_ID, self.SUBTOP_2_ID),
             subtopic_page_id=self.SUBTOP_2_ID,
@@ -3258,12 +3210,12 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             version=1
         ).put()
 
-        with logging_swap:
+        with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertEqual(
-            observed_log_messages,
+            log_messages,
             ['[WIPEOUT] The commit log model '
              '\'SubtopicPageCommitLogEntryModel\' and snapshot models '
              '[\'SubtopicPageSnapshotMetadataModel\'] IDs differ. '
@@ -3801,14 +3753,6 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             commit_log_model_1.user_id, topic_mappings[self.TOP_1_ID])
 
     def test_one_topic_with_missing_snapshot_is_pseudonymized(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg, *args):
-            """Mocks logging.warning()."""
-            observed_log_messages.append(msg % args)
-
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-
         topic_models.TopicCommitLogEntryModel(
             id='topic-%s-1' % self.TOP_2_ID,
             topic_id=self.TOP_2_ID,
@@ -3819,14 +3763,14 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             version=1
         ).put()
 
-        with logging_swap:
+        with self.capture_logging(min_level=logging.ERROR) as log_messages:
             wipeout_service.pre_delete_user(self.user_1_id)
             self.process_and_flush_pending_tasks()
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id))
 
         self.assertItemsEqual(
-            observed_log_messages,
+            log_messages,
             [
                 '[WIPEOUT] The commit log model \'TopicCommitLogEntryModel\' '
                 'and snapshot models [\'TopicSnapshotMetadataModel\', '
