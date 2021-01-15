@@ -2934,6 +2934,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
             """
         )
         def_node.root().name = 'random_module_test'
+
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
 
@@ -2945,6 +2946,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
             """
         )
         def_node.root().name = 'random_module_test'
+
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)
 
@@ -2958,6 +2960,7 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
         def_node.root().name = 'random_module_nontest'
         non_test_function_name_message = testutils.Message(
             msg_id='non-test-files-function-name-checker', node=def_node)
+
         with self.checker_test_object.assertAddsMessages(
             non_test_function_name_message
         ):
@@ -2971,5 +2974,6 @@ class NonTestFilesFunctionNameCheckerTests(unittest.TestCase):
             """
         )
         def_node.root().name = 'random_module_nontest'
+
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_functiondef(def_node)

@@ -1519,6 +1519,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
             node: astroid.node_classes.ImportFrom. Node for a import-from
                 statement in the AST.
         """
+
         modnode = node.root()
         if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
             if 'core.domain' in node.modname:
@@ -1919,7 +1920,6 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):
             node: astroid.nodes.FunctionDef. A node for a function or method
                 definition in the AST.
         """
-
         modnode = node.root()
         if modnode.name.endswith('_test'):
             return
