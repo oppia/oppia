@@ -1933,6 +1933,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
     """Custom pylint checker for language specific general purpose
     regex checks of functions calls to be removed or replaced.
     """
+
     __implements__ = interfaces.IAstroidChecker
     name = 'disallowed-function-calls'
     priority = -1
@@ -1969,6 +1970,11 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
             }
         ),)
 
+    def __init__(self, linter=None):
+        super(DisallowedFunctionsChecker, self).__init__(linter)
+        self.funcs_to_replace = {}
+        self.funcs_to_remove = set()
+
     def open(self):
         self._populate_disallowed_functions_and_replacements()
 
@@ -1977,11 +1983,9 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
         functions.
         """
         disallowed_entries = self.config.disallowed_functions_and_replacements
-        self.funcs_to_replace = {}
-        self.funcs_to_remove = set()
         for entry in disallowed_entries:
             splits = [s.strip() for s in entry.split('=>')]
-            assert len(splits) in (1,2)
+            assert len(splits) in (1, 2)
             if len(splits) == 1:
                 self.funcs_to_remove.add(splits[0])
             else:
@@ -2014,7 +2018,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
             self.add_message(
                 'remove-disallowed-function-calls',
                 node=node, args=func_key)
-                
+
 
 def register(linter):
     """Registers the checker with pylint.

@@ -117,6 +117,7 @@ INVALID_DEV_MODE_IN_CONSTANT_FILEPATH = 'constants.ts'
 VALID_PY_IGNORE_PRAGMA_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'valid_py_ignore_pragma.py')
 
+
 class HTMLLintTests(test_utils.LinterTestBase):
     """Test the HTML lint functions."""
 
