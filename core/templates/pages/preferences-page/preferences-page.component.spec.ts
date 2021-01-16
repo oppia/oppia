@@ -266,4 +266,14 @@ describe('Preferences Controller', function() {
 
     expect(mockWindow.location.reload).not.toHaveBeenCalled();
   });
+
+  it('should call confirm before leaving', function() {
+    ctrl.checkBioChanged();
+    expect(ctrl.allowreload).toBe(false);
+    spyOn(window, 'addEventListener');
+    ctrl.saveBeforeUnload();
+    expect(ctrl.confirmBeforeLeaving({ returnValue: '' })).toBe(false);
+    expect(window.addEventListener).toHaveBeenCalledWith(
+      'beforeunload', ctrl.confirmBeforeLeaving);
+  });
 });

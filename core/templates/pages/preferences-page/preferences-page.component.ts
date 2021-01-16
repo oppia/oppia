@@ -48,14 +48,14 @@ angular.module('oppia').component('preferencesPage', {
     '$http', '$q', '$rootScope', '$timeout', '$translate', '$uibModal',
     '$window', 'AlertsService', 'I18nLanguageCodeService',
     'LanguageUtilService', 'LoaderService', 'UrlInterpolationService',
-    'UserService', 'DASHBOARD_TYPE_CREATOR',
+    'UserService', 'WindowRef', 'DASHBOARD_TYPE_CREATOR',
     'DASHBOARD_TYPE_LEARNER', 'ENABLE_ACCOUNT_DELETION',
     'ENABLE_ACCOUNT_EXPORT', 'SUPPORTED_AUDIO_LANGUAGES',
     'SUPPORTED_SITE_LANGUAGES', function(
         $http, $q, $rootScope, $timeout, $translate, $uibModal,
         $window, AlertsService, I18nLanguageCodeService,
         LanguageUtilService, LoaderService, UrlInterpolationService,
-        UserService, DASHBOARD_TYPE_CREATOR,
+        UserService, WindowRef,DASHBOARD_TYPE_CREATOR,
         DASHBOARD_TYPE_LEARNER, ENABLE_ACCOUNT_DELETION,
         ENABLE_ACCOUNT_EXPORT, SUPPORTED_AUDIO_LANGUAGES,
         SUPPORTED_SITE_LANGUAGES) {
@@ -66,10 +66,13 @@ angular.module('oppia').component('preferencesPage', {
         return UrlInterpolationService.getStaticImageUrl(imagePath);
       };
       var _saveDataItem = function(updateType, data) {
+        ctrl.allowreload = false;
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
-        }).then(() => AlertsService.addInfoMessage('Saved!', 1000));
+        }).then(() => {ctrl.allowreload = true;
+          AlertsService.addInfoMessage('Saved!', 1000);
+        });
       };
 
       // Select2 dropdown cannot automatically refresh its display
@@ -85,6 +88,24 @@ angular.module('oppia').component('preferencesPage', {
 
       ctrl.saveUserBio = function(userBio) {
         _saveDataItem('user_bio', userBio);
+      };
+
+      ctrl.checkBioChanged = function() {
+        ctrl.allowreload = false;
+      }
+
+      ctrl.saveBeforeUnload = function() {
+        WindowRef.nativeWindow.addEventListener(
+          'beforeunload', ctrl.confirmBeforeLeaving);
+      };
+
+      ctrl.confirmBeforeLeaving = function(e) {
+        if (!ctrl.allowreload) {
+          // This message is irrelevant, but is needed to trigger the
+          // confirmation before leaving.
+          e.returnValue = 'Sure?';
+          return false;
+        }
       };
 
       ctrl.onSubjectInterestsSelectionChange = function(subjectInterests) {
@@ -217,6 +238,7 @@ angular.module('oppia').component('preferencesPage', {
             data.preferred_audio_language_code;
           ctrl.subscriptionList = data.subscription_list;
           ctrl.hasPageLoaded = true;
+          ctrl.allowreload = true;
           _forceSelect2Refresh();
         });
 
@@ -230,6 +252,7 @@ angular.module('oppia').component('preferencesPage', {
         ctrl.LANGUAGE_CHOICES =
         LanguageUtilService.getLanguageIdsAndTexts();
         ctrl.SITE_LANGUAGE_CHOICES = SUPPORTED_SITE_LANGUAGES;
+        ctrl.saveBeforeUnload();
       };
     }
   ]

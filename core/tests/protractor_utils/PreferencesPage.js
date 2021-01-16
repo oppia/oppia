@@ -120,6 +120,7 @@ var PreferencesPage = function() {
   this.setUserBio = async function(bio) {
     var inputFieldName = 'User bio input field';
     await action.clear(inputFieldName, userBioElement);
+    await saveNewChanges('User Bio');
     await action.sendKeys(inputFieldName, userBioElement, bio);
     await saveNewChanges('User Bio');
   };
