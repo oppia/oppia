@@ -27,11 +27,13 @@ import subprocess
 import sys
 import time
 
+import feconf
 import python_utils
 from scripts import build
 from scripts import common
 from scripts import flake_checker
 from scripts import install_third_party_libs
+
 
 MAX_RETRY_COUNT = 3
 RERUN_NON_FLAKY = True
@@ -42,8 +44,7 @@ PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
 # Path relative to current working directory where portserver socket
 # file will be created.
-PORTSERVER_SOCKET_FILEPATH = os.path.join(
-    os.getcwd(), 'portserver.socket')
+PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
 KILL_TIMEOUT_SECS = 10
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
@@ -178,12 +179,14 @@ def cleanup():
     """
     google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
     webdriver_download_path = '%s/selenium' % WEBDRIVER_HOME_PATH
+    elasticsearch_path = '%s/' % common.ES_PATH
     if common.is_windows_os():
         # In windows system, the java command line will use absolute path.
         webdriver_download_path = os.path.abspath(webdriver_download_path)
     processes_to_kill = [
         '.*%s.*' % re.escape(google_app_engine_path),
-        '.*%s.*' % re.escape(webdriver_download_path)
+        '.*%s.*' % re.escape(webdriver_download_path),
+        '.*%s.*' % re.escape(elasticsearch_path),
     ]
     for p in SUBPROCESSES:
         _kill_process(p)
@@ -526,20 +529,23 @@ def run_tests(args):
 
     # TODO(#11549): Move this to top of the file.
     import contextlib2
+    managed_dev_appserver = common.managed_dev_appserver(
+        'app.yaml' if args.prod_env else 'app_dev.yaml',
+        port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
+        clear_datastore=True, skip_sdk_update_check=True,
+        env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH})
 
     with contextlib2.ExitStack() as stack:
+        stack.enter_context(common.managed_elasticsearch_dev_server())
         stack.enter_context(common.managed_firebase_auth_emulator())
+        stack.enter_context(managed_dev_appserver)
 
-        stack.enter_context(common.managed_dev_appserver(
-            'app.yaml' if args.prod_env else 'app_dev.yaml',
-            port=GOOGLE_APP_ENGINE_PORT, log_level=args.server_log_level,
-            clear_datastore=True, skip_sdk_update_check=True,
-            env={'PORTSERVER_ADDRESS': PORTSERVER_SOCKET_FILEPATH}))
-
+        # Wait for the servers to come up.
+        common.wait_for_port_to_be_open(feconf.ES_PORT)
         common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
         python_utils.PRINT(
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
+            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
             'core/tests/protractor.conf.js, you can view screenshots'
             'of the failed tests in ../protractor-screenshots/')
         commands = [common.NODE_BIN_PATH]

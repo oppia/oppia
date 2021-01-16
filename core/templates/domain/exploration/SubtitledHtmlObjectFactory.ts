@@ -36,22 +36,6 @@ export class SubtitledHtml {
     this._contentId = contentId;
   }
 
-  getHtml(): string {
-    return this._html;
-  }
-
-  getContentId(): string {
-    return this._contentId;
-  }
-
-  setHtml(newHtml: string): void {
-    this._html = newHtml;
-  }
-
-  setContentId(newContentId: string): void {
-    this._contentId = newContentId;
-  }
-
   toBackendDict(): SubtitledHtmlBackendDict {
     return {
       html: this._html,
@@ -61,6 +45,22 @@ export class SubtitledHtml {
 
   isEmpty(): boolean {
     return !this._html;
+  }
+
+  get contentId(): string {
+    return this._contentId;
+  }
+
+  set contentId(contentId: string) {
+    this._contentId = contentId;
+  }
+
+  get html(): string {
+    return this._html;
+  }
+
+  set html(html: string) {
+    this._html = html;
   }
 }
 
