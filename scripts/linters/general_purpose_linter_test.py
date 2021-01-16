@@ -114,7 +114,8 @@ INVALID_COPYRIGHT_FILEPATH = os.path.join(
 INVALID_UNICODE_LITERAL_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_unicode_literal.py')
 INVALID_DEV_MODE_IN_CONSTANT_FILEPATH = 'constants.ts'
-
+VALID_PY_IGNORE_PRAGMA_FILEPATH = os.path.join(
+    LINTER_TESTS_DIR, 'valid_py_ignore_pragma.py')
 
 class HTMLLintTests(test_utils.LinterTestBase):
     """Test the HTML lint functions."""
@@ -641,3 +642,9 @@ class GeneralLintTests(test_utils.LinterTestBase):
             isinstance(
                 custom_linter, general_purpose_linter.GeneralPurposeLinter))
         self.assertEqual(third_party_linter, None)
+
+    def test_linter_ignore_pragma(self):
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [VALID_PY_IGNORE_PRAGMA_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assertFalse(lint_task_report.failed)
