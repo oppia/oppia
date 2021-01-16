@@ -136,7 +136,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
                 fs.isfile(filepath)
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
-                fs.open(filepath)
+                fs.open(filepath) # pylint: disable=disallowed-function-calls
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
                 fs.get(filepath)
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):

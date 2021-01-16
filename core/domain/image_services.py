@@ -46,7 +46,7 @@ def get_image_dimensions(file_content):
     Returns:
         tuple(int). Returns height and width of the image.
     """
-    image = Image.open(io.BytesIO(file_content))
+    image = Image.open(io.BytesIO(file_content)) # pylint: disable=disallowed-function-calls
     return _get_pil_image_dimensions(image)
 
 
@@ -65,7 +65,7 @@ def compress_image(image_content, scaling_factor):
         raise ValueError(
             'Scaling factor should be in the interval (0, 1], received %f.'
             % scaling_factor)
-    image = Image.open(io.BytesIO(image_content))
+    image = Image.open(io.BytesIO(image_content)) # pylint: disable=disallowed-function-calls
 
     image_format = image.format
     height, width = _get_pil_image_dimensions(image)

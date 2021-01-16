@@ -69,7 +69,7 @@ def main(args=None):
             python_utils.PRINT('Error downloading Google Cloud SDK. Exiting.')
             raise Exception('Error downloading Google Cloud SDK.')
         python_utils.PRINT('Download complete. Installing Google Cloud SDK...')
-        tar = tarfile.open(name='gcloud-sdk.tar.gz')
+        tar = tarfile.open(name='gcloud-sdk.tar.gz') # pylint: disable=disallowed-function-calls
         tar.extractall(
             path=os.path.join(
                 common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-304.0.0/'))

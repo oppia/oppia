@@ -159,7 +159,7 @@ class GcsFileSystem(GeneralFileSystem):
             gcs_file_url = (
                 '/%s/%s/%s' % (
                     bucket_name, self._assets_path, filepath))
-            gcs_file = cloudstorage.open(gcs_file_url)
+            gcs_file = cloudstorage.open(gcs_file_url) # pylint: disable=disallowed-function-calls
             data = gcs_file.read()
             gcs_file.close()
             return FileStream(data)
@@ -182,7 +182,7 @@ class GcsFileSystem(GeneralFileSystem):
         gcs_file_url = (
             '/%s/%s/%s' % (
                 bucket_name, self._assets_path, filepath))
-        gcs_file = cloudstorage.open(
+        gcs_file = cloudstorage.open( # pylint: disable=disallowed-function-calls
             gcs_file_url, mode='w', content_type=mimetype)
         gcs_file.write(raw_bytes)
         gcs_file.close()
@@ -333,7 +333,7 @@ class AbstractFileSystem(python_utils.OBJECT):
         Raises:
             IOError. The given file stream does not exist.
         """
-        file_stream = self.open(filepath)
+        file_stream = self.open(filepath) # pylint: disable=disallowed-function-calls
         if file_stream is None:
             raise IOError('File %s not found.' % (filepath))
         return file_stream.read()

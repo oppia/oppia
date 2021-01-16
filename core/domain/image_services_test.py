@@ -83,12 +83,12 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
     def test_compression_results_in_correct_format(self):
         compressed_image = (
             image_services.compress_image(self.jpeg_raw_image, 0.7))
-        pil_image = Image.open(io.BytesIO(compressed_image))
+        pil_image = Image.open(io.BytesIO(compressed_image)) # pylint: disable=disallowed-function-calls
         self.assertEqual(pil_image.format, 'JPEG')
 
         compressed_image = (
             image_services.compress_image(self.png_raw_image, 0.7))
-        pil_image = Image.open(io.BytesIO(compressed_image))
+        pil_image = Image.open(io.BytesIO(compressed_image)) # pylint: disable=disallowed-function-calls
         self.assertEqual(pil_image.format, 'PNG')
 
     def test_compression_results_in_identical_files(self):
@@ -107,7 +107,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         # image" (image that we compare the compressed image to) is saved using
         # PIL. This applies a slight quality change that won't appear unless we
         # save it using PIL.
-        temp_image = Image.open(io.BytesIO(compressed_image))
+        temp_image = Image.open(io.BytesIO(compressed_image)) # pylint: disable=disallowed-function-calls
         image_format = temp_image.format
         with io.BytesIO() as output:
             temp_image.save(output, format=image_format)
@@ -117,8 +117,8 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(correct_height, height)
         self.assertEqual(correct_width, width)
 
-        image1 = Image.open(io.BytesIO(correct_compressed_image)).convert('RGB')
-        image2 = Image.open(io.BytesIO(compressed_image_content)).convert('RGB')
+        image1 = Image.open(io.BytesIO(correct_compressed_image)).convert('RGB') # pylint: disable=disallowed-function-calls
+        image2 = Image.open(io.BytesIO(compressed_image_content)).convert('RGB') # pylint: disable=disallowed-function-calls
         diff = ImageChops.difference(image1, image2)
 
         # Function diff.getbbox() returns a bounding box on all islands or

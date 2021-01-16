@@ -363,7 +363,7 @@ class FailingMapReduceJobManager(jobs.BaseMapReduceJobManager):
 class TestUtilsTests(test_utils.GenericTestBase):
 
     def test_failing_job(self):
-        self.assertIsNone(FailingMapReduceJobManager.map())
+        self.assertIsNone(FailingMapReduceJobManager.map()) # pylint: disable=disallowed-function-calls
 
         job_id = FailingMapReduceJobManager.create_new()
         FailingMapReduceJobManager.enqueue(

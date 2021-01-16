@@ -183,7 +183,7 @@ def download_and_untar_files(
         common.ensure_directory_exists(target_parent_dir)
 
         python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
-        with contextlib.closing(tarfile.open(
+        with contextlib.closing(tarfile.open( # pylint: disable=disallowed-function-calls
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
         os.remove(TMP_UNZIP_PATH)
