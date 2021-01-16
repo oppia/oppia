@@ -27,7 +27,9 @@ describe('Skill editor main tab directive', function() {
   var ctrl = null;
   var $rootScope = null;
   var directive = null;
-  var QuestionCreationService = null;
+  var UndoRedoService = null;
+  var $uibModal = null;
+  var SkillEditorRoutingService = null;
   var SkillEditorStateService = null;
   var assignedSkillTopicData = {topic1: 'subtopic1', topic2: 'subtopic2'};
   beforeEach(angular.mock.module('oppia'));
@@ -37,9 +39,11 @@ describe('Skill editor main tab directive', function() {
   beforeEach(angular.mock.inject(function($injector) {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
+    $uibModal = $injector.get('$uibModal');
+    UndoRedoService = $injector.get('UndoRedoService');
     directive = $injector.get('skillEditorMainTabDirective')[0];
-    QuestionCreationService = $injector.get('QuestionCreationService');
     SkillEditorStateService = $injector.get('SkillEditorStateService');
+    SkillEditorRoutingService = $injector.get('SkillEditorRoutingService');
 
     ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope,
@@ -53,10 +57,13 @@ describe('Skill editor main tab directive', function() {
     expect($scope.subtopicName).toEqual(null);
   });
 
-  it('should call the Question Creation service', function() {
-    var questionSpy = spyOn(QuestionCreationService, 'createQuestion');
-    $scope.createQuestion();
-    expect(questionSpy).toHaveBeenCalled();
+  it('should navigate to questions tab when unsaved changes are not present',
+  function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
+    var routingSpy = spyOn(
+      SkillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
+      $scope.createQuestion()
+    expect(routingSpy).toHaveBeenCalled();
   });
 
   it('should return if skill has been loaded', function() {
