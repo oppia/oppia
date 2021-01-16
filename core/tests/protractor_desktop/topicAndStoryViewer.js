@@ -35,7 +35,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 const { browser } = require('protractor');
 
-describe('Topic and Story viewer functionality', function() {
+fdescribe('Topic and Story viewer functionality', function() {
   var adminPage = null;
   var topicAndStoryViewerPage = null;
   var topicViewerPage = null;
@@ -160,7 +160,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
   });
 
-  it('should show descrption of a topic.', async function() {
+  it('should show description of a topic.', async function() {
     await topicViewerPage.get('math', 'topic-tasv-one');
     await topicViewerPage.expectedTopicInformationToBe('Description');
   });

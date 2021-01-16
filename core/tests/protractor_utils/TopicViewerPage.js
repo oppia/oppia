@@ -21,9 +21,9 @@ const { by } = require('protractor');
 var waitFor = require('./waitFor.js');
 
 var TopicViewerPage = function() {
-  var topicDescription = element(by.css('.protractor-topic-description'));
+  var topicDescription = element(by.css('.protractor-test-topic-description'));
   var storySummaryTitleList =
-    element.all(by.css('.protractor-story-summary-title'));
+    element.all(by.css('.protractor-test-story-summary-title'));
 
   this.get = async function(classroomUrlFragment, topicUrlFragment) {
     await browser.get(`/learn/${classroomUrlFragment}/${topicUrlFragment}`);
@@ -31,11 +31,16 @@ var TopicViewerPage = function() {
   };
 
   this.expectedTopicInformationToBe = async function(description) {
+    await waitFor.visibilityOf(
+      topicDescription, 'Topic description takes too long to be visible.');
     var text = await topicDescription.getText();
     expect(text).toEqual(description);
   };
 
   this.expectedStoryCountToBe = async function(count) {
+    await waitFor.visibilityOf(
+      storySummaryTitleList.first(),
+      'Story summary tiles take too long to be visible.');
     await expect(await storySummaryTitleList.count()).toEqual(count);
   };
 };

@@ -21,7 +21,7 @@ const { by } = require('protractor');
 var waitFor = require('./waitFor.js');
 
 var SubTopicViewerPage = function() {
-  var subTopicTileList = element.all(by.css('.protractor-subtopic-tile'));
+  var subTopicTileList = element.all(by.css('.protractor-test-subtopic-tile'));
 
   this.get = async function(classroomUrlFragment, topicUrlFragment) {
     await browser.get(
@@ -30,6 +30,8 @@ var SubTopicViewerPage = function() {
   };
 
   this.expectedRevisionCardCountToBe = async function(count) {
+    await waitFor.visibilityOf(
+      subTopicTileList.first(), 'Revisions cards take too long to be visible.');
     await expect(await subTopicTileList.count()).toEqual(count);
   };
 };
