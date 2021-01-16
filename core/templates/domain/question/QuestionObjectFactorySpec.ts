@@ -136,7 +136,7 @@ describe('Question object factory', function() {
               dest: 'outcome 1',
               feedback: {
                 content_id: 'content_5',
-                html: ''
+                html: 'feedback'
               },
               labelled_as_correct: true,
               param_changes: [],
@@ -274,6 +274,18 @@ describe('Question object factory', function() {
     var interaction = sampleQuestion.getStateData().interaction;
 
     expect(sampleQuestion.getValidationErrorMessage()).toBeNull();
+
+    interaction.defaultOutcome.feedback.html = '';
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      'Please enter a feedback for the default outcome.');
+
+    interaction.defaultOutcome.feedback.html = 'feedback';
+
+    interaction.answerGroups[0].outcome.feedback.html = '';
+    expect(sampleQuestion.getValidationErrorMessage()).toEqual(
+      'All answer groups must contain a feedback.');
+
+    interaction.answerGroups[0].outcome.feedback.html = 'feedback';
 
     interaction.answerGroups[0].outcome.labelledAsCorrect = false;
     expect(sampleQuestion.getValidationErrorMessage()).toEqual(
