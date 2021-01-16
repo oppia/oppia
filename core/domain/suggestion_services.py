@@ -20,6 +20,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import heapq
+import logging
 import re
 
 from constants import constants
@@ -1243,6 +1244,9 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
 
     stats_model.update_timestamps()
     stats_model.put()
+
+    logging.info('Updated translation_suggestion_counts_by_lang_code: %s' % (
+        stats_model.translation_suggestion_counts_by_lang_code))
 
 
 def _update_suggestion_counts_in_community_contribution_stats(
