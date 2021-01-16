@@ -67,11 +67,13 @@
     <div class="oppia-teach-section-two-right" *ngIf="!isWindowNarrow" >
       <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
+        <img class="bullet-one"  [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
+        <div  class="benefits-one">
+          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
+        </div>
       </div>
       <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
+        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
         <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate" class="teach-benefits"></h2>
       </div>
       <div class="teach-benefits-section">
@@ -82,16 +84,20 @@
 
     <div class="oppia-teach-section-two-right" *ngIf="isWindowNarrow">
       <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
+        <img class="bullet-one" [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
+        <div  class="benefits-one">
+          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_ONE' | translate" class="teach-benefits"></h2>
+        </div>
       </div>
       <div class="teach-benefits-section">
-        <img [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
+        <img class="bullet-two" [src]="getStaticImageUrl('/splash/bullet2.svg')" alt="">
         <h2 [innerHTML]="'I18N_TEACH_BENEFITS_TWO' | translate" class="teach-benefits"></h2>
       </div>
       <div class="teach-benefits-section">
         <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
-        <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate" class="teach-benefits"></h2>
+        <div  class="benefits-one">
+          <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate" class="teach-benefits"></h2>
+        </div>>
       </div>
     </div>
   </div>
@@ -287,6 +293,18 @@
 </div>
 
 <style>
+  .teach-page .benefits-one {
+    display: inline-flex;
+    width: 24vw;
+  }
+  .teach-page .bullet-one {
+    padding-left: 1.5vw;
+  }
+
+  .teach-page .bullet-two {
+    padding-left: 0.9vw;
+  }
+
   .teach-page .image-mobile {
     display: inherit;
   }
@@ -526,13 +544,16 @@
   }
 
   .teach-page .oppia-teach-section-one-right {
+    display: contents;
     margin-left: auto;
+    text-align: center;
   }
 
   .teach-page .material-icons {
     color: #6d6d6d;
     cursor: pointer;
     font-size: 2.5em;
+    margin-bottom: 50px ;
     margin-top: 50px;
   }
 
@@ -548,8 +569,6 @@
     display: flex;
     margin-bottom: -1px;
     margin-top: -1px;
-    min-height: 105vh;
-    padding-bottom: 25vh;
     padding-top: 21vh;
     text-align: center;
     width: 100vw;
@@ -571,7 +590,7 @@
   .teach-page .oppia-teach-section-five-left {
     margin-bottom: auto;
     margin-left: 10vw;
-    margin-top: auto;
+    margin-top: 20px;
     text-align: left;
     width: 50vw;
   }
@@ -745,7 +764,16 @@
       max-width: 768px;
     }
   }
-
+  @media (max-width: 768px) {
+  .teach-page .benefits-one {
+    width: unset;
+  }
+  }
+  @media (max-width: 768px) {
+    .teach-page .oppia-teach-section-four-right {
+    filter: none
+    }
+  }
   @media (max-width: 768px) {
     .teach-page .oppia-teach-section-one ,
     .teach-page .oppia-teach-section-two,
@@ -864,10 +892,10 @@
 
 
     .teach-page .teach-benefits-section {
+      display: flex;
       margin-left: auto;
       margin-right: auto;
       width: 20em;
     }
-
   }
 </style>
