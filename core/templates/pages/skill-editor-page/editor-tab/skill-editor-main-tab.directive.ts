@@ -46,33 +46,35 @@ angular.module('oppia').directive('skillEditorMainTab', [
         '/pages/skill-editor-page/editor-tab/' +
         'skill-editor-main-tab.directive.html'),
       controller: [
-        '$scope','$uibModal', 'PageTitleService',
-        'SkillEditorStateService', 'UndoRedoService','SkillEditorRoutingService',
+        '$scope', '$uibModal', 'PageTitleService',
+        'SkillEditorRoutingService', 'SkillEditorStateService',
+        'UndoRedoService',
         function(
             $scope, $uibModal, PageTitleService,
-            SkillEditorStateService, UndoRedoService, SkillEditorRoutingService,) {
+            SkillEditorRoutingService, SkillEditorStateService,
+            UndoRedoService) {
           var ctrl = this;
           $scope.createQuestion = function() {
-              // This check is needed because if a skill has unsaved changes to
-              // misconceptions, then these will be reflected in the questions
-              // created at that time, but if page is refreshed/changes are
-              // discarded, the misconceptions won't be saved, but there will be
-              // some questions with these now non-existent misconceptions.
-              if (UndoRedoService.getChangeCount() > 0) {
-                $uibModal.open({
-                  templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                    '/pages/skill-editor-page/modal-templates/' +
-                    'save-pending-changes-modal.directive.html'),
-                  backdrop: true,
-                  controller: 'ConfirmOrCancelModalController'
-                }).result.then(null, function() {
-                  // Note to developers:
-                  // This callback is triggered when the Cancel button is clicked.
-                  // No further action is needed.
-                });
-              } else {
-                SkillEditorRoutingService.navigateToQuestionsTab();
-              }
+            // This check is needed because if a skill has unsaved changes to
+            // misconceptions, then these will be reflected in the questions
+            // created at that time, but if page is refreshed/changes are
+            // discarded, the misconceptions won't be saved, but there will be
+            // some questions with these now non-existent misconceptions.
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/skill-editor-page/modal-templates/' +
+                  'save-pending-changes-modal.directive.html'),
+                backdrop: true,
+                controller: 'ConfirmOrCancelModalController'
+              }).result.then(null, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
+            } else {
+              SkillEditorRoutingService.navigateToQuestionsTab();
+            }
           };
 
           $scope.getSubtopicName = function() {

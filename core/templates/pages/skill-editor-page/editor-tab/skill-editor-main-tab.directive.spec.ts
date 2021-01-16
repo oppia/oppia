@@ -58,18 +58,26 @@ describe('Skill editor main tab directive', function() {
   });
 
   it('should navigate to questions tab when unsaved changes are not present',
-  function() {
-    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
-    var routingSpy = spyOn(
-      SkillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
-      $scope.createQuestion()
-    expect(routingSpy).toHaveBeenCalled();
-  });
+    function() {
+      spyOn(UndoRedoService, 'getChangeCount').and.returnValue(0);
+      var routingSpy = spyOn(
+        SkillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
+      $scope.createQuestion(),
+      expect(routingSpy).toHaveBeenCalled();
+    });
 
   it('should return if skill has been loaded', function() {
     expect($scope.hasLoadedSkill()).toBe(false);
     spyOn(SkillEditorStateService, 'hasLoadedSkill').and.returnValue(true);
     expect($scope.hasLoadedSkill()).toBe(true);
+  });
+
+  it('should open save changes modal with $uibModal when unsaved changes are' +
+  ' present', function() {
+    spyOn(UndoRedoService, 'getChangeCount').and.returnValue(1);
+    var modalSpy = spyOn($uibModal, 'open').and.callThrough();
+    $scope.createQuestion(),
+    expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should return assigned Skill Topic Data', function() {
