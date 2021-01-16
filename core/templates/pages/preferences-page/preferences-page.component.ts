@@ -55,7 +55,7 @@ angular.module('oppia').component('preferencesPage', {
         $http, $q, $rootScope, $timeout, $translate, $uibModal,
         $window, AlertsService, I18nLanguageCodeService,
         LanguageUtilService, LoaderService, UrlInterpolationService,
-        UserService, WindowRef,DASHBOARD_TYPE_CREATOR,
+        UserService, WindowRef, DASHBOARD_TYPE_CREATOR,
         DASHBOARD_TYPE_LEARNER, ENABLE_ACCOUNT_DELETION,
         ENABLE_ACCOUNT_EXPORT, SUPPORTED_AUDIO_LANGUAGES,
         SUPPORTED_SITE_LANGUAGES) {
@@ -70,7 +70,8 @@ angular.module('oppia').component('preferencesPage', {
         $http.put(_PREFERENCES_DATA_URL, {
           update_type: updateType,
           data: data
-        }).then(() => {ctrl.allowreload = true;
+        }).then(() => {
+          ctrl.allowreload = true;
           AlertsService.addInfoMessage('Saved!', 1000);
         });
       };
@@ -92,7 +93,7 @@ angular.module('oppia').component('preferencesPage', {
 
       ctrl.checkBioChanged = function() {
         ctrl.allowreload = false;
-      }
+      };
 
       ctrl.saveBeforeUnload = function() {
         WindowRef.nativeWindow.addEventListener(
