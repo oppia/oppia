@@ -61,7 +61,6 @@ describe('Skill Editor Routing Service', function() {
 
   it('should open the question-editor directly', function() {
     sers.createNewQuestion();
-    expect(sers.createQuestion()).toBe(true)
+    expect(sers.createQuestion()).toBe(true);
   });
 });
-
