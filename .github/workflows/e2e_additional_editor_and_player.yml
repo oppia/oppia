@@ -37,31 +37,19 @@ jobs:
 
           url="https://api.github.com/repos/$GITHUB_ACTOR/$REPO_NAME/pulls/$PR_NUMBER?access_token=$REPO_TOKEN"
 
-          echo "$url"
-
           target_branch=$(
             curl "$url" | ./jq '.base.ref' | tr -d '"'
           )
 
           rm jq
           
-          echo "$target_branch"
-
-          git remote set-url origin https://github.com/krishnarao22/oppia.git
-
           git remote add upstream https://github.com/oppia/oppia.git
 
-          git remote -v
-
-          echo "${{ github.ref }}"
-
-          git fetch origin github-actions-merge
-          git fetch upstream develop
+          git log --graph --decorate --oneline
 
           if [[ "$target_branch" == null ]]
           then
             git pull upstream develop --no-edit --allow-unrelated-histories
-            git diff
           else
             git pull origin $target_branch --no-edit --allow-unrelated-histories
           fi
