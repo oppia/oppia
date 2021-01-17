@@ -841,7 +841,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertIn(
-            'Description should not be a duplicate',
+            'Skill description should not be a duplicate',
             response_dict['error'])
 
         self.logout()
