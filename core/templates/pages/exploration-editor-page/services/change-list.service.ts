@@ -17,6 +17,8 @@
  * committed to the server.
  */
 
+import { EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs';
 require(
   'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -49,7 +51,8 @@ angular.module('oppia').factory('ChangeListService', [
     var CMD_DELETE_STATE = 'delete_state';
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
     var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-
+    var autosaveInProgressEventEmitter: EventEmitter<boolean> = (
+      new EventEmitter<boolean>());
     var ALLOWED_EXPLORATION_BACKEND_NAMES = {
       category: true,
       init_state_name: true,
@@ -89,6 +92,7 @@ angular.module('oppia').factory('ChangeListService', [
       // opened):
       // - Version Mismatch.
       // - Non-strict Validation Fail.
+      autosaveInProgressEventEmitter.emit(true);
       ExplorationDataService.autosaveChangeList(
         explorationChangeList,
         function(response) {
@@ -98,6 +102,7 @@ angular.module('oppia').factory('ChangeListService', [
                 explorationChangeList);
             }
           }
+          autosaveInProgressEventEmitter.emit(false);
           $rootScope.$applyAsync();
         },
         function() {
@@ -108,6 +113,7 @@ angular.module('oppia').factory('ChangeListService', [
           if (!AutosaveInfoModalsService.isModalOpen()) {
             AutosaveInfoModalsService.showNonStrictValidationFailModal();
           }
+          autosaveInProgressEventEmitter.emit(false);
           $rootScope.$applyAsync();
         }
       );
@@ -239,6 +245,10 @@ angular.module('oppia').factory('ChangeListService', [
         var lastChange = explorationChangeList.pop();
         undoneChangeStack.push(lastChange);
         autosaveChangeListOnChange(explorationChangeList);
+      },
+
+      get autosaveIsInProgress$(): Observable<boolean> {
+        return autosaveInProgressEventEmitter.asObservable();
       }
     };
   }
