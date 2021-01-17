@@ -168,7 +168,7 @@ export class CollectionUpdateService {
   setCollectionTitle(
       collection: Collection,
       title: string): void {
-    let oldTitle = collection.getTitle();
+    const oldTitle = collection.getTitle();
     this._applyPropertyChange(
       collection,
       CollectionDomainConstants.COLLECTION_PROPERTY_TITLE, title, oldTitle,
@@ -195,8 +195,8 @@ export class CollectionUpdateService {
       CollectionDomainConstants.COLLECTION_PROPERTY_CATEGORY, category,
       oldCategory, (changeDict, collection) => {
         // Apply.
-        let category = this._getNewPropertyValueFromChangeDict(changeDict);
-        collection.setCategory(category);
+        const newCategory = this._getNewPropertyValueFromChangeDict(changeDict);
+        collection.setCategory(newCategory);
       }, (changeDict, collection) => {
         // Undo.
         collection.setCategory(oldCategory);
@@ -246,7 +246,7 @@ export class CollectionUpdateService {
    * the undo/redo service.
    */
   setCollectionTags(collection: Collection, tags: string[]): void {
-    let oldTags = collection.getTags();
+    const oldTags = collection.getTags();
     this._applyPropertyChange(
       collection, CollectionDomainConstants.COLLECTION_PROPERTY_TAGS,
       tags, oldTags, (changeDict, collection) => {

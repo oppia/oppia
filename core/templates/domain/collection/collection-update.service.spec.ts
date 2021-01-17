@@ -110,7 +110,7 @@ describe('Collection update service', () => {
     }
   );
 
-  it('should remove/add a collection node from/to a collection', function() {
+  it('should remove/add a collection node from/to a collection', ()=> {
     expect(_sampleCollection.getExplorationIds()).toEqual(['exp_id0']);
     collectionUpdateService.deleteCollectionNode(_sampleCollection, 'exp_id0');
     expect(_sampleCollection.getExplorationIds()).toEqual([]);
@@ -130,7 +130,7 @@ describe('Collection update service', () => {
     }
   );
 
-  it('should set/unset changes to a collection\'s title', function() {
+  it('should set/unset changes to a collection\'s title', () => {
     expect(_sampleCollection.getTitle()).toEqual('a title');
     collectionUpdateService.setCollectionTitle(_sampleCollection, 'new title');
     expect(_sampleCollection.getTitle()).toEqual('new title');
