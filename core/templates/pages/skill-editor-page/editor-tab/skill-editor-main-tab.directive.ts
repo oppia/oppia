@@ -35,7 +35,6 @@ require('components/rubrics-editor/rubrics-editor.directive.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-
 angular.module('oppia').directive('skillEditorMainTab', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -74,6 +73,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
               });
             } else {
               SkillEditorRoutingService.navigateToQuestionsTab();
+              SkillEditorRoutingService.createNewQuestion()
             }
           };
 

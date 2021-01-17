@@ -64,6 +64,11 @@ describe('Skill editor main tab directive', function() {
         SkillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
       $scope.createQuestion(),
       expect(routingSpy).toHaveBeenCalled();
+      var createQuestionEventSpyon = spyOn(
+        SkillEditorRoutingService, 'createNewQuestion')
+        .and.callThrough();
+      $scope.createQuestion();
+      expect(createQuestionEventSpyon).toHaveBeenCalled();
     });
 
   it('should return if skill has been loaded', function() {
