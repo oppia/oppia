@@ -18,7 +18,6 @@
  */
 
 var action = require('./action');
-var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
 var ExplorationEditorImprovementsTab = require(
@@ -117,7 +116,10 @@ var ExplorationEditorPage = function() {
 
   this.publishCardExploration = async function(
       title, objective, category, language, tags) {
-    await action.click('Publish button', publishExplorationButton);
+    await waitFor.elementToBeClickable(
+      publishExplorationButton,
+      'Publish button taking too long to be clickable.');
+    await publishExplorationButton.click();
 
     var expTitle = element(by.css(
       '.protractor-test-exploration-title-input'));
@@ -125,25 +127,32 @@ var ExplorationEditorPage = function() {
       '.protractor-test-exploration-objective-input'));
     var expTags = element(by.css('.protractor-test-tags'));
     var expInput = expTags.element(by.tagName('input'));
-    var expCategory = element(
-      by.css('.protractor-test-exploration-category-dropdown'));
-    var expLanguage = element(
-      by.css('.protractor-test-exploration-language-select'));
 
-    await action.sendKeys('Exploration title', expTitle, title);
-    await action.sendKeys('Exploration objective', expObjective, objective);
+    await waitFor.elementToBeClickable(
+      expTitle, 'Exploration Title input is taking too long to appear');
+    await waitFor.elementToBeClickable(
+      element(by.css(
+        '.protractor-test-exploration-title-input'))
+    );
 
-    await action.select2('Exploration Category', expCategory, category);
-    await (
-      await forms.AutocompleteDropdownEditor(expCategory)
-    ).setValue(category);
-    await action.select('Exploration Language', expLanguage, language);
+    await expTitle.sendKeys(title);
+    await expObjective.sendKeys(objective);
 
-    await action.click('Exploration tags', expTags);
-    await action.click('Exploration input', expInput);
+    await element(by.css('.select2-container')).click();
+    await element(by.css('.select2-dropdown')).element(
+      by.css('.select2-search input')).sendKeys(category + '\n');
+
+    await element(by.css('.protractor-test-exploration-language-select'))
+      .click();
+    await element(by.css('.protractor-test-exploration-language-select'))
+      .sendKeys(language + '\n');
+
+
+    await expTags.click();
+    await expInput.click();
 
     for (var elem of tags) {
-      await action.sendKeys('Exploration input', expInput, elem);
+      await expInput.sendKeys(elem, protractor.Key.ENTER);
     }
 
     const saveChangesButton = element(by.css(

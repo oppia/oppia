@@ -225,16 +225,11 @@ var createAndPublishTwoCardExploration = async function(
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = async function(roleName, username) {
-  await action.click(
-    'Edit roles', element(by.css('.protractor-test-edit-roles')));
-  await action.sendKeys(
-    'Username input',
-    element(by.css('.protractor-test-role-username')),
-    username);
-  await action.select(
-    'Role select', element(by.css('.protractor-test-role-select')), roleName);
-  await action.click(
-    'Save role', element(by.css('.protractor-test-save-role')));
+  await element(by.css('.protractor-test-edit-roles')).click();
+  await element(by.css('.protractor-test-role-username')).sendKeys(username);
+  await element(by.css('.protractor-test-role-select')).
+    element(by.cssContainingText('option', roleName)).click();
+  await element(by.css('.protractor-test-save-role')).click();
 };
 
 var addExplorationManager = async function(username) {
