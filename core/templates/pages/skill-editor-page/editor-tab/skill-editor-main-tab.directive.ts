@@ -73,7 +73,7 @@ angular.module('oppia').directive('skillEditorMainTab', [
               });
             } else {
               SkillEditorRoutingService.navigateToQuestionsTab();
-              SkillEditorRoutingService.createNewQuestion()
+              SkillEditorRoutingService.createNewQuestion();
             }
           };
 
