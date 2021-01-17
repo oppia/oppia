@@ -255,11 +255,11 @@ export class UrlInterpolationService {
   getProfilePictureUrl(username: string): string {
     let urlPrefix = this.getGcsUrl();
     return this.interpolateUrl(
-      urlPrefix + '/<entity_type>/<username>/assets/image/<filename>',
+      urlPrefix + '/<entity_type>/<username>/assets/<filepath>',
       {
         entity_type: AppConstants.ENTITY_TYPE.USER,
         username: username,
-        filename: AppConstants.PROFILE_PICTURE_FILENAME
+        filepath: AppConstants.PROFILE_PICTURE_FILEPATH
       }
     )
   }

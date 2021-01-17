@@ -245,7 +245,7 @@ describe('Preferences Controller', function() {
       result: $q.resolve(newPicture)
     });
     spyOn(
-      UserService, 'setProfileImageDataUrlAsync'
+      UserService, 'setProfilePictureBlobAsync'
     ).and.returnValue($q.resolve());
 
     ctrl.showEditProfilePictureModal();

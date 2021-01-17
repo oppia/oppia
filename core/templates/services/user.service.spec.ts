@@ -174,97 +174,6 @@ describe('User Api Service', () => {
     flushMicrotasks();
   }));
 
-  it('should return image data', fakeAsync(() => {
-    var requestUrl = '/preferenceshandler/profile_picture';
-    // Creating a test user for checking profile picture of user.
-    var sampleUserInfoBackendObject = {
-      is_moderator: false,
-      is_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: true,
-      preferred_site_language_code: null,
-      username: 'tester',
-      email: 'test@test.com',
-      user_is_logged_in: true
-    };
-
-    userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-      expect(dataUrl).toBe('image data');
-    });
-
-    const req1 = httpTestingController.expectOne('/userinfohandler');
-    expect(req1.request.method).toEqual('GET');
-    req1.flush(sampleUserInfoBackendObject);
-
-    flushMicrotasks();
-
-    const req2 = httpTestingController.expectOne(requestUrl);
-    expect(req2.request.method).toEqual('GET');
-    req2.flush({profile_picture_data_url: 'image data'});
-
-    flushMicrotasks();
-  }));
-
-  it('should return image data when second GET request returns 404',
-    fakeAsync(() => {
-      var requestUrl = '/preferenceshandler/profile_picture';
-      // Creating a test user for checking profile picture of user.
-      var sampleUserInfoBackendObject = {
-        is_moderator: false,
-        is_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: true,
-        preferred_site_language_code: null,
-        username: 'tester',
-        email: 'test@test.com',
-        user_is_logged_in: true
-      };
-
-      userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-        expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.webp'));
-      });
-      const req1 = httpTestingController.expectOne('/userinfohandler');
-      expect(req1.request.method).toEqual('GET');
-      req1.flush(sampleUserInfoBackendObject);
-
-      flushMicrotasks();
-
-      const req2 = httpTestingController.expectOne(requestUrl);
-      expect(req2.request.method).toEqual('GET');
-      req2.flush(404);
-
-      flushMicrotasks();
-    }));
-
-  it('should return the default profile image path when user is not logged',
-    fakeAsync(() => {
-      // Creating a test user for checking profile picture of user.
-      const sampleUserInfoBackendObject = {
-        is_moderator: false,
-        is_admin: false,
-        is_super_admin: false,
-        is_topic_manager: false,
-        can_create_collections: true,
-        preferred_site_language_code: null,
-        username: 'tester',
-        email: 'test@test.com',
-        user_is_logged_in: false
-      };
-
-      userService.getProfileImageDataUrlAsync().then((dataUrl) => {
-        expect(dataUrl).toBe(urlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.webp'));
-      });
-      const req = httpTestingController.expectOne('/userinfohandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleUserInfoBackendObject);
-
-      flushMicrotasks();
-    }));
-
   it('should return the login url', fakeAsync(() => {
     const loginUrl = '/login';
     const currentUrl = 'home';
@@ -298,20 +207,20 @@ describe('User Api Service', () => {
     }));
 
   it('should set a profile image data url', fakeAsync(() => {
-    var newProfileImageDataurl = '/avatar/x.png';
-    userService.setProfileImageDataUrlAsync(newProfileImageDataurl);
+    var newProfilePictureBlob = '/avatar/x.png';
+    userService.setProfilePictureBlobAsync(newProfilePictureBlob);
     const req = httpTestingController.expectOne('/preferenceshandler/data');
     expect(req.request.method).toEqual('PUT');
-    req.flush({profile_picture_data_url: newProfileImageDataurl});
+    req.flush({profile_picture_data_url: newProfilePictureBlob});
 
     flushMicrotasks();
   }));
 
   it('should handle when set profile image data url is reject',
     fakeAsync(() => {
-      const newProfileImageDataurl = '/avatar/x.png';
+      const newProfilePictureBlob = '/avatar/x.png';
       const errorMessage = 'It\'s not possible to set a new profile image data';
-      userService.setProfileImageDataUrlAsync(newProfileImageDataurl);
+      userService.setProfilePictureBlobAsync(newProfilePictureBlob);
       const req = httpTestingController.expectOne('/preferenceshandler/data');
       expect(req.request.method).toEqual('PUT');
       req.flush(errorMessage);

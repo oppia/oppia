@@ -18,7 +18,7 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
+// import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -42,12 +42,12 @@ export class UserService {
 
     async getUserInfoAsync(): Promise<UserInfo> {
       if (this.urlService.getPathname() === '/signup') {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _) => {
           resolve(UserInfo.createDefault());
         });
       }
       if (this.userInfo) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _) => {
           resolve(this.userInfo);
         });
       }
@@ -59,28 +59,13 @@ export class UserService {
     }
 
     async setProfilePictureBlobAsync(
-        newProfilePictureBlob: string
+        newProfilePictureDataUrl: string
     ): Promise<PreferencesBackendDict> {
+      //let newProfilePictureBlob = (
+      //  ImageUploadHelperService.convertImageDataToImageFile(
+      //    newProfilePictureDataurl))
       return this.userBackendApiService.setProfilePictureBlobAsync(
-        newProfilePictureBlob);
-    }
-
-    async getProfilePictureBlobAsync(): Promise<string> {
-      let defaultUrl = (
-        this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PATH));
-      return this.getUserInfoAsync().then(
-        (userInfo) => {
-          if (userInfo.isLoggedIn()) {
-            return this.userBackendApiService.getProfilePictureBlobAsync(
-              defaultUrl
-            );
-          } else {
-            return new Promise((resolve, _) => {
-              resolve(defaultUrl);
-            });
-          }
-        });
+        newProfilePictureDataUrl);
     }
 
     async getLoginUrlAsync(): Promise<string> {

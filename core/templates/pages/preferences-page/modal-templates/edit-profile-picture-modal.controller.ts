@@ -84,7 +84,7 @@ angular.module('oppia').controller('EditProfilePictureModalController', [
         cropper.getCroppedCanvas({
           height: 150,
           width: 150
-        }).toBlob);
+        }).toDataURL());
       $uibModalInstance.close($scope.croppedImageBlob);
     };
   }

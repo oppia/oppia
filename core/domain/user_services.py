@@ -1449,14 +1449,9 @@ def update_profile_picture(user_id, profile_picture_binary):
         user_id: str. The unique ID of the user.
         profile_picture_binary: str. New profile picture binary to be set.
     """
-    profile_picture_path = 'image/%s' % constants.PROFILE_PICTURE_FILENAME
     username = get_username(user_id)
-    if fs_services.image_exists(
-            profile_picture_path, feconf.ENTITY_TYPE_USER, username):
-        fs_services.delete_image(
-            profile_picture_path, feconf.ENTITY_TYPE_USER, username)
     fs_services.save_image(
-        profile_picture_path,
+        constants.PROFILE_PICTURE_FILEPATH,
         feconf.ENTITY_TYPE_USER,
         username,
         profile_picture_binary

@@ -180,8 +180,7 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         if (filenameRegex.exec(filename)) {
           return filename;
         } else {
-          throw new Error(
-            'The Math SVG filename format is invalid.');
+          throw new Error('The Math SVG filename format is invalid.');
         }
       }
     };

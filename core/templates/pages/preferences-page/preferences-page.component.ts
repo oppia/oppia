@@ -156,8 +156,8 @@ angular.module('oppia').component('preferencesPage', {
             'edit-profile-picture-modal.directive.html'),
           backdrop: 'static',
           controller: 'EditProfilePictureModalController'
-        }).result.then(function(newProfilePictureUrl) {
-          UserService.setprofilePictureBlobAsync(newProfilePictureUrl).then(
+        }).result.then(function(newProfilePictureDataUrl) {
+          UserService.setProfilePictureBlobAsync(newProfilePictureDataUrl).then(
             function() {
               // The reload is needed in order to update the profile picture
               // in the top-right corner.

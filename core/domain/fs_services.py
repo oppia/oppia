@@ -28,6 +28,13 @@ import utils
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
+def get_image(filepath, entity_type, entity_id):
+    """Get image file."""
+    file_system_class = get_entity_file_system_class()
+    fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
+    return fs.get(filepath.encode('utf-8'))
+
+
 def save_image(filepath, entity_type, entity_id, content):
     """Save image file."""
     filetype = filepath[filepath.rfind('.') + 1:]
@@ -44,13 +51,6 @@ def image_exists(filepath, entity_type, entity_id):
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
     return fs.isfile(filepath)
-
-
-def delete_image(filepath, entity_type, entity_id):
-    """Delete image file."""
-    file_system_class = get_entity_file_system_class()
-    fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
-    fs.delete(filepath.encode('utf-8'))
 
 
 def save_original_and_compressed_versions_of_image(

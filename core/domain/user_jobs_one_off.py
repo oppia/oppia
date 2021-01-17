@@ -22,13 +22,16 @@ import copy
 import datetime
 import imghdr
 
+from constants import constants
 from core import jobs
 from core.domain import exp_fetchers
+from core.domain import fs_services
 from core.domain import image_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
+import feconf
 import python_utils
 import utils
 
@@ -983,6 +986,119 @@ class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         except Exception:
             yield ('FAILURE - INVALID PROFILE PICTURE DATA URL', model.username)
             return
+
+        if imghdr.what(None, h=profile_picture_binary) != 'png':
+            yield ('FAILURE - PROFILE PICTURE NOT PNG', model.username)
+            return
+
+        try:
+            # Load the image to retrieve dimensions for later verification.
+            height, width = image_services.get_image_dimensions(
+                profile_picture_binary)
+        except Exception:
+            yield ('FAILURE - CANNOT LOAD PROFILE PICTURE', model.username)
+            return
+
+        if (
+                height != user_services.GRAVATAR_SIZE_PX or
+                width != user_services.GRAVATAR_SIZE_PX
+        ):
+            yield (
+                'FAILURE - PROFILE PICTURE NON STANDARD DIMENSIONS - %s,%s' % (
+                    height, width
+                ),
+                model.username
+            )
+            return
+
+        yield ('SUCCESS', model.username)
+
+    @staticmethod
+    def reduce(key, values):
+        if key.startswith('SUCCESS'):
+            yield (key, len(values))
+        else:
+            yield (key, values)
+
+
+class ProfilePictureMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates profile_picture_data_url to the GCS."""
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(ProfilePictureMigrationOneOffJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model):  # pylint: disable=too-many-return-statements
+        if model.deleted:
+            yield ('SUCCESS - DELETED', model.username)
+            return
+
+        if model.username is None:
+            yield ('SUCCESS - NOT REGISTERED', model.username)
+            return
+
+        if model.profile_picture_data_url is None:
+            user_services.generate_initial_profile_picture(model.id)
+            yield ('SUCCESS - GENERATED PROFILE PICTURE', model.username)
+            return
+
+        profile_picture_binary = utils.convert_png_data_url_to_binary(
+                model.profile_picture_data_url)
+        user_services.update_profile_picture(model.id, profile_picture_binary)
+        yield ('SUCCESS - MOVED PROFILE PICTURE TO GCS', model.username)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class ProfilePictureGCSAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that verifies various aspects of profile_picture_data_url in the
+    UserSettingsModel.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        # We can raise the number of shards for this job, since it goes only
+        # over one type of entity class.
+        super(ProfilePictureGCSAuditOneOffJob, cls).enqueue(
+            job_id, shard_count=32)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model):  # pylint: disable=too-many-return-statements
+        if model.deleted:
+            yield ('SUCCESS - DELETED', model.username)
+            return
+
+        if model.username is None:
+            yield ('SUCCESS - NOT REGISTERED', model.username)
+            return
+
+        if not fs_services.image_exists(
+                constants.PROFILE_PICTURE_FILEPATH,
+                feconf.ENTITY_TYPE_USER,
+                model.username
+        ):
+            yield ('FAILURE - MISSING PROFILE PICTURE', model.username)
+            return
+
+        profile_picture_binary = fs_services.get_image(
+                constants.PROFILE_PICTURE_FILEPATH,
+                feconf.ENTITY_TYPE_USER,
+                model.username
+        )
 
         if imghdr.what(None, h=profile_picture_binary) != 'png':
             yield ('FAILURE - PROFILE PICTURE NOT PNG', model.username)

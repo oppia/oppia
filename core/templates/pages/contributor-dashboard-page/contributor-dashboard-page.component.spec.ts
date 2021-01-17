@@ -32,7 +32,7 @@ describe('Contributor dashboard page', function() {
   var LocalStorageService = null;
   var UserService = null;
   var TranslationLanguageService = null;
-  var userProfileImage = 'profile-data-url';
+  var userProfilePicture = 'profile-data-url';
   var userContributionRights = {
     can_review_translation_for_language_codes: ['en', 'pt', 'hi'],
     can_review_voiceover_for_language_codes: ['en', 'pt', 'hi'],
@@ -69,7 +69,7 @@ describe('Contributor dashboard page', function() {
 
     beforeEach(function() {
       spyOn(UserService, 'getProfilePictureUrl')
-        .and.returnValue($q.resolve(userProfileImage));
+        .and.returnValue($q.resolve(userProfilePicture));
       spyOn(UserService, 'getUserContributionRightsDataAsync')
         .and.returnValue($q.resolve(userContributionRights));
       spyOn(UserService, 'getUserInfoAsync').and.returnValue(
@@ -97,7 +97,7 @@ describe('Contributor dashboard page', function() {
         'English', 'Portuguese', 'Hindi']);
       expect(ctrl.userCanReviewQuestions).toBe(true);
       expect(ctrl.userIsReviewer).toBe(true);
-      expect(ctrl.profilePictureUrl).toBe(userProfileImage);
+      expect(ctrl.profilePictureUrl).toBe(userProfilePicture);
     });
 
     it('should change active tab name when clicking on translate text tab',
@@ -139,9 +139,6 @@ describe('Contributor dashboard page', function() {
     };
 
     beforeEach(function() {
-      spyOn(
-        UrlInterpolationService, 'getProfilePictureUrl'
-      ).and.returnValue($q.resolve(userProfileImage));
       spyOn(
         UserService, 'getUserContributionRightsDataAsync'
       ).and.returnValue($q.resolve(userContributionRights));

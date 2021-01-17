@@ -41,7 +41,6 @@ describe('High bounce rate task', function() {
           issue_description: null,
           status: 'obsolete',
           resolver_username: null,
-          resolver_profile_picture_data_url: null,
           resolved_on_msecs: null,
         });
         task.refreshStatus(expStats, numEqPlaythroughs, this.config);
@@ -111,7 +110,6 @@ describe('High bounce rate task', function() {
         issue_description: '28% of learners had dropped off at this card.',
         status: 'open',
         resolver_username: null,
-        resolver_profile_picture_data_url: null,
         resolved_on_msecs: null,
       });
 
@@ -138,7 +136,6 @@ describe('High bounce rate task', function() {
           issue_description: '28% of learners had dropped off at this card.',
           status: 'open',
           resolver_username: null,
-          resolver_profile_picture_data_url: null,
           resolved_on_msecs: null,
         })
       ).toThrowError(
@@ -182,7 +179,6 @@ describe('High bounce rate task', function() {
           issue_description: '28% of learners had dropped off at this card.',
           status: 'open',
           resolver_username: null,
-          resolver_profile_picture_data_url: null,
           resolved_on_msecs: null,
         })
       ).toThrowError('backend dict has target_type "???" but expected "state"');
