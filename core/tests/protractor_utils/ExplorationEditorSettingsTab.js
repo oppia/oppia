@@ -104,13 +104,8 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setCategory = async function(category) {
-<<<<<<< HEAD
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
-=======
-    await action.select2(
-      'Exploration Category', explorationCategoryInput, category);
->>>>>>> parent of d7a92dce9... fix category input not visible error
     await (
       await forms.AutocompleteDropdownEditor(explorationCategoryInput)
     ).setValue(category);
