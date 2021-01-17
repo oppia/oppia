@@ -26,7 +26,6 @@ require(
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/skill/ShortSkillSummaryObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/skill-editor-page/services/question-creation.service.ts');
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/image-local-storage.service.ts');
@@ -175,7 +174,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           returnModalObject.skillLinkageModificationsArray.length) > 0) ||
           !$scope.isQuestionValid();
     };
-    
+
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
         return;
