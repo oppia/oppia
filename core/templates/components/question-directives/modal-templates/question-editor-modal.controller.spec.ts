@@ -70,7 +70,6 @@ describe('Question Editor Modal Controller', function() {
   }));
 
   describe('when question is valid', function() {
-    var QuestionCreationService = null;
     beforeEach(angular.mock.inject(function($injector, $controller) {
       $uibModal = $injector.get('$uibModal');
       $q = $injector.get('$q');
@@ -78,7 +77,6 @@ describe('Question Editor Modal Controller', function() {
       AlertsService = $injector.get('AlertsService');
       QuestionObjectFactory = $injector.get('QuestionObjectFactory');
       QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-      QuestionCreationService = $injector.get('QuestionCreationService');
       ShortSkillSummaryObjectFactory = $injector.get(
         'ShortSkillSummaryObjectFactory');
       StateEditorService = $injector.get('StateEditorService');
@@ -177,13 +175,6 @@ describe('Question Editor Modal Controller', function() {
         skillName: skillName
       });
     }));
-
-    it('should call the Question Creation service', function() {
-      var questionSpy = spyOn(QuestionCreationService, 'createQuestion');
-      $scope.back();
-      expect(questionSpy).toHaveBeenCalled();
-      expect($uibModalInstance.dismiss).toHaveBeenCalled();
-    });
 
     it('should initialize $scope properties after controller is initialized',
       function() {
