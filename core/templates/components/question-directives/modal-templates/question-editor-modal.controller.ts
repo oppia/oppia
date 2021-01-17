@@ -33,8 +33,7 @@ require('services/image-local-storage.service.ts');
 
 angular.module('oppia').controller('QuestionEditorModalController', [
   '$scope', '$uibModal', '$uibModalInstance', 'AlertsService', 'ContextService',
-  'ImageLocalStorageService', 'QuestionCreationService',
-  'QuestionUndoRedoService',
+  'ImageLocalStorageService', 'QuestionUndoRedoService',
   'QuestionValidationService', 'ShortSkillSummaryObjectFactory',
   'UrlInterpolationService', 'associatedSkillSummaries', 'canEditQuestion',
   'categorizedSkills', 'groupedSkillSummaries', 'misconceptionsBySkill',
@@ -42,8 +41,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
   'rubric', 'skillName', 'untriagedSkillSummaries',
   function(
       $scope, $uibModal, $uibModalInstance, AlertsService, ContextService,
-      ImageLocalStorageService, QuestionCreationService,
-      QuestionUndoRedoService,
+      ImageLocalStorageService, QuestionUndoRedoService,
       QuestionValidationService, ShortSkillSummaryObjectFactory,
       UrlInterpolationService, associatedSkillSummaries, canEditQuestion,
       categorizedSkills, groupedSkillSummaries, misconceptionsBySkill,
@@ -63,11 +61,6 @@ angular.module('oppia').controller('QuestionEditorModalController', [
     $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
     $scope.skillName = skillName;
     $scope.rubric = rubric;
-
-    $scope.back = function() {
-      QuestionCreationService.createQuestion();
-      $uibModalInstance.dismiss();
-    };
 
     $scope.getSkillEditorUrl = function(skillId) {
       return '/skill_editor/' + skillId;
@@ -182,6 +175,7 @@ angular.module('oppia').controller('QuestionEditorModalController', [
           returnModalObject.skillLinkageModificationsArray.length) > 0) ||
           !$scope.isQuestionValid();
     };
+    
     $scope.done = function() {
       if (!$scope.isQuestionValid()) {
         return;
