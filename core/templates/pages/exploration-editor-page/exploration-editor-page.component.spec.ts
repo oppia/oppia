@@ -444,8 +444,6 @@ describe('Exploration editor page component', function() {
         autosaveIsInProgress);
       spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
         mockInitExplorationPageEmitter);
-
-      autosaveIsInProgress.emit(false);
       explorationData.is_version_of_draft_valid = true;
 
       ctrl.$onInit();
@@ -453,6 +451,12 @@ describe('Exploration editor page component', function() {
 
     afterEach(() => {
       ctrl.$onDestroy();
+    });
+
+    it('should change the value of autosavingIsInProgress', () => {
+      autosaveIsInProgress.emit(true);
+      $scope.$apply();
+      ctrl.autosaveIsInProgress = true;
     });
 
     it('should link exploration to story when initing exploration page', () => {
