@@ -1999,7 +1999,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
             node: astroid.nodes.Call. Node to access call content.
         """
         func = node.func
-
+        func_key = None
         # The call will either be a direct call or a call as an attribute
         # of an object (e.g. obj.do_something()). In the case that the
         # call is an attribute, then it will use the attrname field.
