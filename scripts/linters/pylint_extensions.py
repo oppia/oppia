@@ -2007,8 +2007,6 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
             func_key = func.attrname
         elif hasattr(func, 'name'):
             func_key = func.name
-        else:
-            return
 
         if func_key in self.funcs_to_replace:
             self.add_message(
