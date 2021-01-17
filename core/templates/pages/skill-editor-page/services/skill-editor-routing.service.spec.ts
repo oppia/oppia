@@ -22,7 +22,6 @@ describe('Skill Editor Routing Service', function() {
   var sers = null;
   var $rootScope = null;
   var $location = null;
-
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
     sers = $injector.get('SkillEditorRoutingService');
@@ -61,9 +60,8 @@ describe('Skill Editor Routing Service', function() {
   });
 
   it('should open the question-editor directly', function() {
-    expect(sers.createQuestion()).toBe(false);
     sers.createNewQuestion();
-    expect(sers.createQuestion).toBe(true);
-    expect(sers.createQuestion()).toBe(true);
+    expect(sers.createQuestion()).toBe(true)
   });
 });
+
