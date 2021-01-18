@@ -22,11 +22,11 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 
-let urlInterpolationService: UrlInterpolationService;
+
 @Component({
   selector: 'learner-playlist-modal',
-  templateUrl: urlInterpolationService.getDirectiveTemplateUrl(
-    '/pages/learner-dashboard-page/modal-templates/' +
+  templateUrl: (
+    '/template/pages/learner-dashboard-page/modal-templates/' +
     'remove-activity-from-learner-dashboard-modal.template.html'),
   styleUrls: []
 })
@@ -37,12 +37,14 @@ export class LearnerPlaylistModalComponent {
     private activityType = activityType,
     private activityId = activityId,
     private activityTitle = activityTitle,
+    private urlInterpolationService: UrlInterpolationService
+    = urlInterpolationService,
   ) {}
 
   sectionNameI18nId = (
       'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
   removeFromLearnerPlaylistUrl = (
-    urlInterpolationService.interpolateUrl(
+    this.urlInterpolationService.interpolateUrl(
       '/learnerplaylistactivityhandler/' +
         '<activityType>/<activityId>', {
         activityType: this.activityType,

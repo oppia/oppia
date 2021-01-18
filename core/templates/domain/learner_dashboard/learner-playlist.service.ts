@@ -92,6 +92,8 @@ export class LearnerPlaylistService {
     modalRef.componentInstance.activityId = activityId;
     modalRef.componentInstance.activityType = activityType;
     modalRef.componentInstance.activityTitle = activityTitle;
+    modalRef.componentInstance.urlInterpolationService =
+     this.urlInterpolationService;
     modalRef.result.then(function() {
       if (activityType === constants.ACTIVITY_TYPE_EXPLORATION) {
         learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
