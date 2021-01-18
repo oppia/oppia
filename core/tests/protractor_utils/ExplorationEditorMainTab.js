@@ -351,6 +351,7 @@ var ExplorationEditorMainTab = function() {
           feedbackInstructionsText);
       },
       setFeedback: async function(richTextInstructions) {
+        await action.waitForAutosave();
         // Begin editing feedback.
         await action.click(
           'openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
@@ -869,6 +870,7 @@ var ExplorationEditorMainTab = function() {
   // NOTE: if the state is not visible in the state graph this function will
   // fail.
   this.moveToState = async function(targetName) {
+    await action.waitForAutosave();
     await general.scrollToTop();
     var listOfNames = await stateNodes.map(async function(stateElement) {
       return await stateNodeLabel(stateElement).getText();

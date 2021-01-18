@@ -523,7 +523,7 @@ def apply_change_list(exploration_id, change_list):
         logging.error(
             '%s %s %s %s' % (
                 e.__class__.__name__, e, exploration_id,
-                pprint.pprint([change.to_dict() for change in change_list]))
+                pprint.pprint(change_list))
         )
         python_utils.reraise_exception()
 
