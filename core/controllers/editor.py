@@ -158,6 +158,7 @@ class ExplorationHandler(EditorHandler):
             self.user_id, exploration_id)
 
         self.values.update(exploration_data)
+        logging.error('Saved exp version: %s' % exploration_data['version'])
         self.render_json(self.values)
 
     @acl_decorators.can_delete_exploration
@@ -700,6 +701,9 @@ class EditorAutosaveHandler(ExplorationHandler):
             self.user, exploration_rights)
         can_voiceover = rights_manager.check_can_voiceover_activity(
             self.user, exploration_rights)
+        logging.error(
+            'EditorAutosaveHandler: exploration version from payload: %s'
+            % version)
 
         try:
             if can_edit:
@@ -711,6 +715,9 @@ class EditorAutosaveHandler(ExplorationHandler):
                     exploration_id, self.user_id, change_list, version,
                     datetime.datetime.utcnow(), is_by_voice_artist=True)
         except utils.ValidationError as e:
+            logging.error(
+                'EditorAutosaveHandler: exp_services.create_or_update_draft '
+                'failed')
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
 
