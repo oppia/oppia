@@ -493,7 +493,7 @@ class RegenerateTopicSummaryOneOffJobTests(test_utils.GenericTestBase):
                 'object has no attribute \'canonical_story_references\'')
 
 
-class InteractionsInATopicAuditOneOffJobTests(test_utils.GenericTestBase):
+class InteractionsInStoriesAuditOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -522,7 +522,7 @@ class InteractionsInATopicAuditOneOffJobTests(test_utils.GenericTestBase):
         return skill
 
     def setUp(self):
-        super(InteractionsInATopicAuditOneOffJobTests, self).setUp()
+        super(InteractionsInStoriesAuditOneOffJobTests, self).setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.user_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -643,17 +643,17 @@ class InteractionsInATopicAuditOneOffJobTests(test_utils.GenericTestBase):
 
         topic_services.publish_story(topic_id_1, story_id, self.user_id)
         job_id = (
-            topic_jobs_one_off.InteractionsInATopicAuditOneOffJob.create_new())
-        topic_jobs_one_off.InteractionsInATopicAuditOneOffJob.enqueue(job_id)
+            topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob.create_new())
+        topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_mapreduce_tasks()
 
         output = (
-            topic_jobs_one_off.InteractionsInATopicAuditOneOffJob.get_output(
+            topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob.get_output(
                 job_id))
 
         expected = [
-            [topic_id_1, [
+            ['%s (%s)' % ('Dummy Topic 1', topic_id_1), [
                 u'[u\'EndExploration\', u\'ImageClickInput\', u\'Continue\', '
                 u'u\'MultipleChoiceInput\', u\'TextInput\']']],
-            [topic_id_2, [u'[]']]]
+            ['%s (%s)' % ('Empty Topic', topic_id_2), [u'[]']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

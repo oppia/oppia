@@ -98,8 +98,10 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, values)
 
 
-class InteractionsInATopicAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """An audit job to report all interaction ids used in a Topic."""
+class InteractionsInStoriesAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """An audit job to report all interaction ids used in Story models associated
+    to a topic.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -120,7 +122,7 @@ class InteractionsInATopicAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 for exploration in explorations.values():
                     for state in exploration.states.values():
                         interaction_ids.add(state.interaction.id)
-            yield (topic.id, list(interaction_ids))
+            yield ('%s (%s)' % (topic.name, topic.id), list(interaction_ids))
 
     @staticmethod
     def reduce(key, values):
