@@ -99,8 +99,8 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class InteractionsInStoriesAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """An audit job to report all interaction ids used in Story models associated
-    to a topic.
+    """An audit job to report all interaction ids used in Story models
+    associated to a topic.
     """
 
     @classmethod
