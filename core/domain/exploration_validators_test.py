@@ -1,27 +1,53 @@
+# coding: utf-8
+#
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Unit tests for core.domain.exploration_validators."""
+
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import datetime
+
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import prod_validation_jobs_one_off
+from core.domain import rating_services
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
-from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
-import ast
-import datetime
 import feconf
 import python_utils
 
-datastore_services = models.Registry.import_datastore_services()
+datastore_services = models.Registry.import_datastore_services() # USED
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-(exp_models) = models.Registry.import_models([models.NAMES.exploration])
+(
+    exp_models, story_models,user_models
+) = models.Registry.import_models([
+    models.NAMES.exploration, 
+    models.NAMES.story, models.NAMES.user
+])
+
 
 class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
 
@@ -216,6 +242,7 @@ class ExplorationModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+
 class ExplorationSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
@@ -262,6 +289,26 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 4]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_committer_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 3]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -427,6 +474,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         for error in actual_error_list:
             assert (error in full_error_list), ('Extra error: %s' % error)
 
+
 class ExplorationSnapshotContentModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
@@ -543,6 +591,7 @@ class ExplorationSnapshotContentModelValidatorTests(
                 '3]')]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
+
 
 class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
 
@@ -754,6 +803,7 @@ class ExplorationRightsModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+
 class ExplorationRightsSnapshotMetadataModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
@@ -795,6 +845,28 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
     def test_standard_operation(self):
         expected_output = [
             u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_committer_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 3]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -922,6 +994,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+
 class ExplorationRightsSnapshotContentModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
@@ -1035,6 +1108,7 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
+
 class ExplorationCommitLogEntryModelValidatorTests(
         test_utils.AuditJobsTestBase):
 
@@ -1091,6 +1165,28 @@ class ExplorationCommitLogEntryModelValidatorTests(
             })], 'Changes.')
         expected_output = [
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 5]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_user_id_migration_bot(self):
+        self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_user_id(self):
+        self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]'
+        ]
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
@@ -1302,204 +1398,299 @@ class ExplorationCommitLogEntryModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
 
-class ExplorationUserDataModelValidatorTests(test_utils.AuditJobsTestBase):
+
+class ExpSummaryModelValidatorTests(test_utils.AuditJobsTestBase):
 
     def setUp(self):
-        super(ExplorationUserDataModelValidatorTests, self).setUp()
+        super(ExpSummaryModelValidatorTests, self).setUp()
 
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(USER_EMAIL, USER_NAME)
+
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
-        self.save_new_valid_exploration(
-            'exp0', self.user_id, end_state_name='End')
+        editor_email = 'user@editor.com'
+        viewer_email = 'user@viewer.com'
+        contributor_email = 'user@contributor.com'
 
-        self.model_instance = user_models.ExplorationUserDataModel.create(
-            self.user_id, 'exp0')
-        self.model_instance.draft_change_list = [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }]
-        self.model_instance.draft_change_list_exp_version = 1
-        self.model_instance.draft_change_list_last_updated = (
-            datetime.datetime.utcnow())
-        self.model_instance.rating = 4
-        self.model_instance.rated_on = datetime.datetime.utcnow()
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
+        self.signup(editor_email, 'editor')
+        self.signup(viewer_email, 'viewer')
+        self.signup(contributor_email, 'contributor')
+
+        self.editor_id = self.get_user_id_from_email(editor_email)
+        self.viewer_id = self.get_user_id_from_email(viewer_email)
+        self.contributor_id = self.get_user_id_from_email(contributor_email)
+
+        language_codes = ['ar', 'en', 'en']
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            language_code=language_codes[i]
+        ) for i in python_utils.RANGE(3)]
+
+        for exp in explorations:
+            exp.tags = ['math', 'art']
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.owner, '0', self.editor_id, rights_domain.ROLE_EDITOR)
+        exp_services.update_exploration(
+            self.contributor_id, '0', [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            })], 'Changes.')
+
+        rights_manager.assign_role_for_exploration(
+            self.owner, '2', self.viewer_id, rights_domain.ROLE_VIEWER)
+
+        rating_services.assign_rating_to_exploration(self.user_id, '0', 3)
+        rating_services.assign_rating_to_exploration(self.viewer_id, '0', 4)
+
+        self.model_instance_0 = exp_models.ExpSummaryModel.get_by_id('0')
+        self.model_instance_1 = exp_models.ExpSummaryModel.get_by_id('1')
+        self.model_instance_2 = exp_models.ExpSummaryModel.get_by_id('2')
+
         self.job_class = (
-            prod_validation_jobs_one_off.ExplorationUserDataModelAuditOneOffJob)
+            prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob)
 
     def test_standard_operation(self):
+        rights_manager.publish_exploration(self.owner, '0')
+        exp_services.update_exploration(
+            self.owner_id, '1', [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            })], 'Changes.')
         expected_output = [
-            u'[u\'fully-validated ExplorationUserDataModel\', 1]']
+            u'[u\'fully-validated ExpSummaryModel\', 3]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
     def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance.created_on = (
-            self.model_instance.last_updated + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
-            'of ExplorationUserDataModel\', '
+            'of ExpSummaryModel\', '
             '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
-                self.model_instance.id, self.model_instance.created_on,
-                self.model_instance.last_updated
-            )]
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_model_with_last_updated_greater_than_current_time(self):
-        mock_time = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-        self.model_instance.draft_change_list_last_updated = mock_time
-        self.model_instance.rated_on = mock_time
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
+        exp_models.ExplorationModel.get_by_id('1').delete(
+            self.owner_id, '')
+        exp_models.ExplorationModel.get_by_id('2').delete(
+            self.owner_id, '')
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'ExplorationUserDataModel\', '
+            'ExpSummaryModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
         mocked_datetime = datetime.datetime.utcnow() - datetime.timedelta(
             hours=13)
         with datastore_services.mock_datetime_for_datastore(mocked_datetime):
             self.run_job_and_check_output(
-                expected_output, sort=False, literal_eval=False)
+                expected_output, sort=True, literal_eval=False)
 
-    def test_missing_user_settings_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+    def test_model_with_first_published_datetime_greater_than_current_time(
+            self):
+        rights_manager.publish_exploration(self.owner, '0')
+        rights_manager.publish_exploration(self.owner, '1')
+        self.model_instance_0 = exp_models.ExpSummaryModel.get_by_id('0')
+        self.model_instance_0.first_published_msec = (
+            self.model_instance_0.first_published_msec * 1000000.0)
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        rights_model = exp_models.ExplorationRightsModel.get_by_id('0')
+        rights_model.first_published_msec = (
+            self.model_instance_0.first_published_msec)
+        rights_model.commit(self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for user_settings_ids '
-                'field check of ExplorationUserDataModel\', '
-                '[u"Entity id %s: based on '
-                'field user_settings_ids having value '
-                '%s, expected model UserSettingsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.model_instance.id, self.user_id, self.user_id)]
+                u'[u\'failed validation check for first published msec check '
+                'of ExpSummaryModel\', '
+                '[u\'Entity id 0: The first_published_msec field has a '
+                'value %s which is greater than the time when the '
+                'job was run\']]'
+            ) % (self.model_instance_0.first_published_msec),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
     def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('exp0').delete(
+        exp_models.ExplorationModel.get_by_id('0').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for exploration_ids '
-                'field check of ExplorationUserDataModel\', '
-                '[u"Entity id %s: based on field exploration_ids '
-                'having value exp0, expected model ExplorationModel with id '
-                'exp0 but it doesn\'t exist"]]' % self.model_instance.id)]
+                'field check of ExpSummaryModel\', '
+                '[u"Entity id 0: based on field exploration_ids having '
+                'value 0, expected model ExplorationModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
-    def test_null_draft_change_list(self):
-        self.model_instance.draft_change_list = None
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
+    def test_missing_owner_user_model_failure(self):
+        rights_manager.assign_role_for_exploration(
+            self.owner, '0', self.user_id, rights_domain.ROLE_OWNER)
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
-            u'[u\'fully-validated ExplorationUserDataModel\', 1]']
+            (
+                u'[u\'failed validation check for owner_user_ids '
+                'field check of ExpSummaryModel\', '
+                '[u"Entity id 0: based on field owner_user_ids having '
+                'value %s, expected model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
-    def test_invalid_draft_change_list(self):
-        self.model_instance.draft_change_list = [{
-            'cmd': 'invalid'
-        }]
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for draft change list check '
-            'of ExplorationUserDataModel\', [u"Entity id %s: Invalid '
-            'change dict {u\'cmd\': u\'invalid\'} due to error '
-            'Command invalid is not allowed"]]') % self.model_instance.id]
+    def test_missing_editor_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for editor_user_ids '
+                'field check of ExpSummaryModel\', '
+                '[u"Entity id 0: based on field editor_user_ids having '
+                'value %s, expected model UserSettingsModel with id %s but '
+                'it doesn\'t exist"]]') % (
+                    self.editor_id, self.editor_id),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
-    def test_invalid_exp_version(self):
-        self.model_instance.draft_change_list_exp_version = 2
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for exp version check '
-            'of ExplorationUserDataModel\', [u\'Entity id %s: '
-            'draft change list exp version 2 is greater than '
-            'version 1 of corresponding exploration with id exp0\']]') % (
-                self.model_instance.id)]
+    def test_missing_viewer_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for viewer_user_ids '
+                'field check of ExpSummaryModel\', '
+                '[u"Entity id 2: based on field viewer_user_ids having '
+                'value %s, expected model UserSettingsModel with id %s but '
+                'it doesn\'t exist"]]') % (
+                    self.viewer_id, self.viewer_id),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
-    def test_invalid_draft_change_list_last_updated(self):
-        self.model_instance.draft_change_list_last_updated = (
+    def test_missing_contributor_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.contributor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for contributor_user_ids '
+                'field check of ExpSummaryModel\', '
+                '[u"Entity id 0: based on field contributor_user_ids having '
+                'value %s, expected model UserSettingsModel with id %s but '
+                'it doesn\'t exist"]]') % (
+                    self.contributor_id, self.contributor_id),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
+        self.run_job_and_check_output(
+            expected_output, sort=True, literal_eval=False)
+
+    def test_model_with_invalid_exploration_model_last_updated(self):
+        last_human_update_time = (
+            self.model_instance_0.exploration_model_last_updated)
+        self.model_instance_0.exploration_model_last_updated = (
             datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for draft change list last '
-            'updated check of ExplorationUserDataModel\', [u\'Entity id %s: '
-            'draft change list last updated %s is greater than the '
-            'time when job was run\']]') % (
-                self.model_instance.id,
-                self.model_instance.draft_change_list_last_updated)]
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration model last '
+                'updated check of ExpSummaryModel\', '
+                '[u\'Entity id %s: The exploration_model_last_updated '
+                'field: %s does not match the last time a commit was '
+                'made by a human contributor: %s\']]'
+            ) % (
+                self.model_instance_0.id,
+                self.model_instance_0.exploration_model_last_updated,
+                last_human_update_time),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
-    def test_draft_change_list_last_updated_as_none(self):
-        self.model_instance.draft_change_list_last_updated = None
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for draft change list last '
-            'updated check of ExplorationUserDataModel\', [u"Entity id %s: '
-            'draft change list [{u\'new_value\': u\'the objective\', '
-            'u\'cmd\': u\'edit_exploration_property\', '
-            'u\'property_name\': u\'objective\'}] exists but draft '
-            'change list last updated is None"]]') % self.model_instance.id]
+    def test_model_with_invalid_schema(self):
+        self.model_instance_0.ratings = {'10': 4, '5': 15}
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'ExpSummaryModel\', '
+                '[u\'Entity id 0: Entity fails domain validation with '
+                'the error Expected ratings to have keys: 1, 2, 3, 4, 5, '
+                'received 10, 5\']]'
+            ), u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
-    def test_invalid_rating(self):
-        self.model_instance.rating = -1
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for ratings check of '
-            'ExplorationUserDataModel\', [u\'Entity id %s: Expected '
-            'rating to be in range [1, 5], received -1\']]') % (
-                self.model_instance.id)]
+    def test_model_with_invalid_contributors_summary(self):
+        sorted_contributor_ids = sorted(
+            self.model_instance_0.contributors_summary.keys())
+        self.model_instance_0.contributors_summary = {'invalid': 1}
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for contributors summary '
+                'check of ExpSummaryModel\', '
+                '[u"Entity id 0: Contributor ids: [u\'%s\', u\'%s\'] '
+                'do not match the contributor ids obtained using '
+                'contributors summary: [u\'invalid\']"]]') % (
+                    sorted_contributor_ids[0], sorted_contributor_ids[1]
+                ),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
-    def test_invalid_rated_on(self):
-        self.model_instance.rated_on = (
-            datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for rated on check of '
-            'ExplorationUserDataModel\', [u\'Entity id %s: rated on '
-            '%s is greater than the time when job was run\']]') % (
-                self.model_instance.id, self.model_instance.rated_on)]
+    def test_model_with_invalid_exploration_related_property(self):
+        self.model_instance_0.title = 'invalid'
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for title field check of '
+                'ExpSummaryModel\', '
+                '[u\'Entity id %s: title field in entity: invalid does not '
+                'match corresponding exploration title field: New title\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
 
-    def test_rated_on_as_none(self):
-        self.model_instance.rated_on = None
-        self.model_instance.update_timestamps()
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for rated on check of '
-            'ExplorationUserDataModel\', [u\'Entity id %s: rating 4 '
-            'exists but rated on is None\']]') % (self.model_instance.id)]
+    def test_model_with_invalid_exploration_rights_related_property(self):
+        self.model_instance_0.status = 'public'
+        self.model_instance_0.update_timestamps()
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for status field check of '
+                'ExpSummaryModel\', '
+                '[u\'Entity id %s: status field in entity: public does not '
+                'match corresponding exploration rights status field: '
+                'private\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         self.run_job_and_check_output(
-            expected_output, sort=False, literal_eval=False)
+            expected_output, sort=True, literal_eval=False)
+
 
 class ExplorationContextModelValidatorTests(test_utils.AuditJobsTestBase):
 

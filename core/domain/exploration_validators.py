@@ -16,29 +16,30 @@
 
 """Validators for exploration models."""
 
-import datetime
-import utils
-import python_utils
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import base_model_validators
+from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
-from core.domain import exp_domain
-from core.domain import rights_domain
-
+import feconf
+import python_utils
+import utils
 
 (
-    base_models, exp_models, story_models,
-    suggestion_models,user_models
+    base_models, exp_models, story_models
 ) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration, 
-    models.NAMES.story, models.NAMES.suggestion, models.NAMES.user
+    models.NAMES.base_model, models.NAMES.exploration,
+    models.NAMES.story
 ])
 
 TARGET_TYPE_TO_TARGET_MODEL = {
-    suggestion_models.TARGET_TYPE_EXPLORATION: (
-        exp_models.ExplorationModel),}
+    feconf.ENTITY_TYPE_EXPLORATION: (
+        exp_models.ExplorationModel)
+}
 
 
 class ExplorationModelValidator(base_model_validators.BaseModelValidator):
@@ -89,6 +90,19 @@ class ExplorationModelValidator(base_model_validators.BaseModelValidator):
                 snapshot_model_ids)]
 
 
+class ExplorationContextModelValidator(
+        base_model_validators.BaseModelValidator):
+    """Class for validating ExplorationContextModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+            base_model_validators.ExternalModelFetcherDetails(
+                'story_ids', story_models.StoryModel, [item.story_id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'exp_ids', exp_models.ExplorationModel, [item.id])]
+
+
 class ExplorationSnapshotMetadataModelValidator(
         base_model_validators.BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationSnapshotMetadataModel."""
@@ -106,9 +120,11 @@ class ExplorationSnapshotMetadataModelValidator(
                 'exploration_ids',
                 exp_models.ExplorationModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids',
-                user_models.UserSettingsModel, [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class ExplorationSnapshotContentModelValidator(
@@ -148,15 +164,18 @@ class ExplorationRightsModelValidator(base_model_validators.BaseModelValidator):
                 'cloned_from_exploration_ids',
                 exp_models.ExplorationModel,
                 cloned_from_exploration_id),
-            base_model_validators.ExternalModelFetcherDetails(
-                'owner_user_ids',
-                user_models.UserSettingsModel, item.owner_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'editor_user_ids',
-                user_models.UserSettingsModel, item.editor_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'viewer_user_ids',
-                user_models.UserSettingsModel, item.viewer_ids),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'owner_user_ids', item.owner_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'editor_user_ids', item.editor_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'viewer_user_ids', item.viewer_ids,
+                may_contain_system_ids=False,
+                may_contain_pseudonymous_ids=False),
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_metadata_ids',
                 exp_models.ExplorationRightsSnapshotMetadataModel,
@@ -207,9 +226,11 @@ class ExplorationRightsSnapshotMetadataModelValidator(
                 'exploration_rights_ids',
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.rfind(base_models.VERSION_DELIMITER)]]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'committer_ids',
-                user_models.UserSettingsModel, [item.committer_id])]
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'committer_ids', [item.committer_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
 
 
 class ExplorationRightsSnapshotContentModelValidator(
@@ -259,181 +280,15 @@ class ExplorationCommitLogEntryModelValidator(
         external_id_relationships = [
             base_model_validators.ExternalModelFetcherDetails(
                 'exploration_ids',
-                exp_models.ExplorationModel, [item.exploration_id])]
+                exp_models.ExplorationModel, [item.exploration_id]),
+            base_model_validators.UserSettingsModelFetcherDetails(
+                'user_id', [item.user_id],
+                may_contain_system_ids=True,
+                may_contain_pseudonymous_ids=True
+            )]
         if item.id.startswith('rights'):
             external_id_relationships.append(
                 base_model_validators.ExternalModelFetcherDetails(
                     'exploration_rights_ids', exp_models.ExplorationRightsModel,
                     [item.exploration_id]))
         return external_id_relationships
-
-class ExplorationUserDataModelValidator(
-        base_model_validators.BaseUserModelValidator):
-    """Class for validating ExplorationUserDataModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '^%s\\.%s$' % (item.user_id, item.exploration_id)
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'user_settings_ids', user_models.UserSettingsModel,
-                [item.user_id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'exploration_ids', exp_models.ExplorationModel,
-                [item.exploration_id])]
-
-    @classmethod
-    def _validate_draft_change_list(cls, item):
-        """Validates that commands in draft change list follow
-        the schema of ExplorationChange domain object.
-
-        Args:
-            item: datastore_services.Model. ExplorationUserDataModel to
-                validate.
-        """
-        if item.draft_change_list is None:
-            return
-        for change_dict in item.draft_change_list:
-            try:
-                exp_domain.ExplorationChange(change_dict)
-            except Exception as e:
-                cls._add_error(
-                    'draft change list check',
-                    'Entity id %s: Invalid change dict %s due to error %s' % (
-                        item.id, change_dict, e))
-
-    @classmethod
-    def _validate_rating(cls, item):
-        """Validates that rating is in the interval [1, 5].
-
-        Args:
-            item: datastore_services.Model. ExplorationUserDataModel to
-                validate.
-        """
-        if item.rating is not None and (item.rating < 1 or item.rating > 5):
-            cls._add_error(
-                base_model_validators.ERROR_CATEGORY_RATINGS_CHECK,
-                'Entity id %s: Expected rating to be in range [1, 5], '
-                'received %s' % (item.id, item.rating))
-
-    @classmethod
-    def _validate_rated_on(cls, item):
-        """Validates that rated on is less than the time when job
-        was run.
-
-        Args:
-            item: datastore_services.Model. ExplorationUserDataModel to
-                validate.
-        """
-        if item.rating is not None and not item.rated_on:
-            cls._add_error(
-                base_model_validators.ERROR_CATEGORY_RATED_ON_CHECK,
-                'Entity id %s: rating %s exists but rated on is None' % (
-                    item.id, item.rating))
-        current_time = datetime.datetime.utcnow()
-        if item.rated_on is not None and item.rated_on > current_time:
-            cls._add_error(
-                base_model_validators.ERROR_CATEGORY_RATED_ON_CHECK,
-                'Entity id %s: rated on %s is greater than the time '
-                'when job was run' % (item.id, item.rated_on))
-
-    @classmethod
-    def _validate_draft_change_list_last_updated(cls, item):
-        """Validates that draft change list last updated is less than
-        the time when job was run.
-
-        Args:
-            item: datastore_services.Model. ExplorationUserDataModel to
-                validate.
-        """
-        if item.draft_change_list and not item.draft_change_list_last_updated:
-            cls._add_error(
-                'draft change list %s' % (
-                    base_model_validators.ERROR_CATEGORY_LAST_UPDATED_CHECK),
-                'Entity id %s: draft change list %s exists but '
-                'draft change list last updated is None' % (
-                    item.id, item.draft_change_list))
-        current_time = datetime.datetime.utcnow()
-        if item.draft_change_list_last_updated is not None and (
-                item.draft_change_list_last_updated > current_time):
-            cls._add_error(
-                'draft change list %s' % (
-                    base_model_validators.ERROR_CATEGORY_LAST_UPDATED_CHECK),
-                'Entity id %s: draft change list last updated %s is '
-                'greater than the time when job was run' % (
-                    item.id, item.draft_change_list_last_updated))
-
-    @classmethod
-    def _validate_exp_version(
-            cls, item, field_name_to_external_model_references):
-        """Validates that draft change exp version is less than version
-        of the exploration corresponding to the model.
-
-        Args:
-            item: datastore_services.Model. ExplorationUserDataModel to
-                validate.
-            field_name_to_external_model_references:
-                dict(str, (list(base_model_validators.ExternalModelReference))).
-                A dict keyed by field name. The field name represents
-                a unique identifier provided by the storage
-                model to which the external model is associated. Each value
-                contains a list of ExternalModelReference objects corresponding
-                to the field_name. For examples, all the external Exploration
-                Models corresponding to a storage model can be associated
-                with the field name 'exp_ids'. This dict is used for
-                validation of External Model properties linked to the
-                storage model.
-        """
-        exploration_model_references = (
-            field_name_to_external_model_references['exploration_ids'])
-
-        for exploration_model_reference in exploration_model_references:
-            exploration_model = exploration_model_reference.model_instance
-            if exploration_model is None or exploration_model.deleted:
-                model_class = exploration_model_reference.model_class
-                model_id = exploration_model_reference.model_id
-                cls._add_error(
-                    'exploration_ids %s' % (
-                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
-                    'Entity id %s: based on field exploration_ids having'
-                    ' value %s, expected model %s with id %s but it doesn\'t'
-                    ' exist' % (
-                        item.id, model_id, model_class.__name__, model_id))
-                continue
-            if item.draft_change_list_exp_version > exploration_model.version:
-                cls._add_error(
-                    'exp %s' % (
-                        base_model_validators.ERROR_CATEGORY_VERSION_CHECK),
-                    'Entity id %s: draft change list exp version %s is '
-                    'greater than version %s of corresponding exploration '
-                    'with id %s' % (
-                        item.id, item.draft_change_list_exp_version,
-                        exploration_model.version, exploration_model.id))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_draft_change_list,
-            cls._validate_rating,
-            cls._validate_rated_on,
-            cls._validate_draft_change_list_last_updated]
-
-    @classmethod
-    def _get_external_instance_custom_validation_functions(cls):
-        return [cls._validate_exp_version]
-
-class ExplorationContextModelValidator(
-        base_model_validators.BaseModelValidator):
-    """Class for validating ExplorationContextModel."""
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return [
-            base_model_validators.ExternalModelFetcherDetails(
-                'story_ids', story_models.StoryModel, [item.story_id]),
-            base_model_validators.ExternalModelFetcherDetails(
-                'exp_ids', exp_models.ExplorationModel, [item.id])]
-
