@@ -130,46 +130,57 @@ var ExplorationEditorPage = function() {
       by.css('.protractor-test-exploration-category-dropdown'));
     var expLanguage = element(
       by.css('.protractor-test-exploration-language-select'));
+    var neutralElement = element(
+      by.css('.protractor-test-metadata-modal-header'));
 
     await action.sendKeys('Exploration title', expTitle, title);
-    await action.sendKeys('Exploration objective', expObjective, objective);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
-    await action.select2('Exploration Category', expCategory, category);
+    await action.sendKeys('Exploration objective', expObjective, objective);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
+
+    await waitFor.presenceOf(
+      expCategory, 'Category input takes too long to be visible.');
     await (
       await forms.AutocompleteDropdownEditor(expCategory)
     ).setValue(category);
-    await action.select('Exploration Language', expLanguage, language);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
-    await action.click('Exploration tags', expTags);
-    await action.click('Exploration input', expInput);
+    await action.select('Exploration Language', expLanguage, language);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
     for (var elem of tags) {
-      await action.sendKeys('Exploration input', expInput, elem);
+      await action.click('Exploration input', expInput);
+      await action.sendKeys('Exploration input', expInput, elem + '\n');
+      await action.click('Neutral Element', neutralElement);
+      await action.waitForAutosave();
     }
 
     const saveChangesButton = element(by.css(
       '.protractor-test-confirm-pre-publication'));
-    await waitFor.elementToBeClickable(
-      saveChangesButton, 'Save changes button taking too long to be clickable');
-    await saveChangesButton.click();
-
+    await action.click('Save Changes', saveChangesButton);
+    await waitFor.invisibilityOf(
+      saveChangesButton,
+      'Exploration metadata modal takes too long to disappear.');
     await waitFor.visibilityOf(
       element(by.css('.modal-content')),
       'Modal Content taking too long to appear');
 
     const confirmPublish = element(by.css('.protractor-test-confirm-publish'));
-    await waitFor.elementToBeClickable(
-      confirmPublish, 'Confirm publish button taking too long to appear');
-    await confirmPublish.click();
-
+    await action.click('Confirm Publish', confirmPublish);
+    await waitFor.invisibilityOf(
+      confirmPublish,
+      'Confirm publish modal takes too long to disappear.');
     await waitFor.visibilityOf(element(by.css(
       '.protractor-test-share-publish-modal')),
     'Awesome modal taking too long to appear');
 
     const closeButton = element(by.css('.protractor-test-share-publish-close'));
-    await waitFor.elementToBeClickable(
-      closeButton, 'Close button taking too long to be clickable');
-    await closeButton.click();
+    await action.click('Share publish button', closeButton);
     await waitFor.invisibilityOf(
       closeButton, 'Close button taking too long to disappear');
   };

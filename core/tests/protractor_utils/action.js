@@ -25,7 +25,7 @@ var autoSaveIndicatorElement = element(
 var waitForAutosave = async function() {
   await waitFor.invisibilityOf(
     autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
-}
+};
 
 var clear = async function(inputName, inputElement) {
   await click(inputName, inputElement);
