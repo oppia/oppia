@@ -99,9 +99,18 @@ export class Question {
 
   getValidationErrorMessage(): string {
     var interaction = this._stateData.interaction;
+    var questionContent = this._stateData.content._html;
+    if (questionContent.length === 0) {
+      return 'Please enter a question.';
+    }
     if (interaction.id === null) {
       return 'An interaction must be specified';
     }
+
+    if (interaction.defaultOutcome.feedback._html.length === 0) {
+      return 'Please enter a feedback for the default outcome.';
+    }
+
     if (interaction.hints.length === 0) {
       return 'At least 1 hint should be specified';
     }

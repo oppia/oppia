@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 
+from constants import constants
 from core.domain import question_fetchers
 from core.domain import question_services
 from core.domain import skill_services
@@ -664,7 +665,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         }]
         payload['change_list'] = change_list
         payload['commit_message'] = (
-            'a' * (feconf.MAX_COMMIT_MESSAGE_LENGTH + 1))
+            'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1))
 
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -675,7 +676,7 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response_json['error'],
-            'Commit messages must be at most 1000 characters long.')
+            'Commit messages must be at most 375 characters long.')
 
     def test_put_with_admin_email_allows_question_editing(self):
         payload = {}

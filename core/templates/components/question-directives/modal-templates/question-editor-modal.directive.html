@@ -8,7 +8,10 @@
     <div class="rubric-details">
       <h4 ng-if="skillName"><strong>Skill: <[skillName]></strong></h4>
       <h4><strong>Difficulty: <[rubric.getDifficulty()]></strong></h4>
-      <h4 ng-if="rubric.getExplanations().length > 0"><strong>Difficulty Explanations</strong></h4>
+      <h4 ng-if="rubric.getExplanations().length > 0"
+          title="Use these notes to make sure your question is at the right difficulty.">
+        <strong>Notes from Skill Rubric</strong>
+      </h4>
       <ul>
         <li ng-repeat="explanation in rubric.getExplanations()">
           <span ng-bind-html="explanation"></span>
@@ -39,7 +42,7 @@
                      can-edit-question="canEditQuestion"
                      question-changed="questionChanged">
     </question-editor>
-    <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && question.getValidationErrorMessage()">
+    <div class="alert alert-danger" ng-if="question.getValidationErrorMessage()">
       <[question.getValidationErrorMessage()]>
     </div>
   </div>

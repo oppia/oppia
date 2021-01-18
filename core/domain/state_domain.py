@@ -1449,9 +1449,6 @@ class WrittenTranslation(python_utils.OBJECT):
         self.translation = translation
         self.needs_update = needs_update
 
-        if data_format == self.DATA_FORMAT_HTML:
-            self.translation = html_cleaner.clean(self.translation)
-
     def to_dict(self):
         """Returns a dict representing this WrittenTranslation domain object.
 
@@ -2542,9 +2539,9 @@ class State(python_utils.OBJECT):
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception:
-            logging.info(
+            logging.exception(
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
-            raise Exception('Could not convert state dict to YAML.')
+            python_utils.reraise_exception()
 
         return python_utils.yaml_from_dict(state.to_dict(), width=width)
 

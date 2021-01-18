@@ -17,6 +17,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
@@ -106,10 +107,10 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Expected a commit message but received none.')
 
-        if len(commit_message) > feconf.MAX_COMMIT_MESSAGE_LENGTH:
+        if len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH:
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
-                % feconf.MAX_COMMIT_MESSAGE_LENGTH)
+                % constants.MAX_COMMIT_MESSAGE_LENGTH)
 
         change_dicts = self.payload.get('change_dicts')
         change_list = [

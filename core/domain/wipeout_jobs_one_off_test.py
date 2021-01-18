@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from core.domain import email_manager
 from core.domain import taskqueue_services
 from core.domain import wipeout_jobs_one_off
 from core.domain import wipeout_service
@@ -155,8 +156,20 @@ class FullyCompleteUserDeletionOneOffJobTests(test_utils.GenericTestBase):
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
+        email_content = (
+            'The Wipeout process failed for the user with ID \'%s\' '
+            'and email \'%s\'.' % (self.user_1_id, self.USER_1_EMAIL)
+        )
+        send_email_swap = self.swap_with_checks(
+            email_manager,
+            'send_mail_to_admin',
+            lambda x, y: None,
+            expected_args=[('WIPEOUT: Account deletion failed', email_content)]
+        )
+
         user_models.CompletedActivitiesModel(
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
-        output = self._run_one_off_job()
+        with send_email_swap:
+            output = self._run_one_off_job()
         self.assertIn(['FAILURE', [self.user_1_id]], output)

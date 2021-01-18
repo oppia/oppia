@@ -15,63 +15,143 @@
 /**
  * @fileoverview Component for the teach page.
  */
-
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
+import splashConstants from 'assets/constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service.ts';
+import { LoaderService } from 'services/loader.service.ts';
+import { UserService } from 'services/user.service';
+
+export interface Testimonial {
+  quote: string,
+  studentDetails: string,
+  imageUrl: string,
+  imageUrlWebp: string,
+  borderPresent: boolean
+}
 
 @Component({
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
   styleUrls: []
 })
-export class TeachPageComponent implements OnInit {
-  TAB_ID_TEACH: string = 'teach';
-  TAB_ID_PARTICIPATION: string = 'participation';
-  TEACH_FORM_URL: string = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
-  ALLOWED_TABS: string[] = [this.TAB_ID_TEACH, this.TAB_ID_PARTICIPATION];
-  activeTabName: string = this.TAB_ID_TEACH;
 
+export class TeachPageComponent implements OnInit {
+  isWindowNarrow: boolean = false;
+  classroomUrlFragment: string;
+  classroomUrl :string;
+  displayedTestimonialId: number;
+  testimonialCount: number;
+  testimonials = [];
+  userIsLoggedIn: boolean = null;
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowDimensionService: WindowDimensionsService,
+    private windowRef: WindowRef,
+    private userService: UserService,
+    private loaderService: LoaderService,
   ) {}
 
   ngOnInit(): void {
-    const hash = this.windowRef.nativeWindow.location.hash.slice(1);
-    if (this.ALLOWED_TABS.includes(hash)) {
-      this.activeTabName = hash;
-    }
-    this.windowRef.nativeWindow.onhashchange = () => {
-      const hashChange = this.windowRef.nativeWindow.location.hash.slice(1);
-      if (this.ALLOWED_TABS.includes(hashChange)) {
-        this.activeTabName = hashChange;
-      }
-    };
+    this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
+    this.displayedTestimonialId = 0;
+    // Change count after all testimonials are available.
+    this.testimonialCount = 3;
+    this.testimonials = this.getTestimonials();
+    this.classroomUrl = this.urlInterpolationService.interpolateUrl(
+      '/learn/<classroomUrlFragment>', {
+        classroomUrlFragment: splashConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
+      });
+    this.loaderService.showLoadingScreen('Loading');
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.userIsLoggedIn = userInfo.isLoggedIn();
+      this.loaderService.hideLoadingScreen();
+    });
+  }
+  // TODO(#11657): Extract the testimonials code into a separate component.
+  // The 2 functions below are to cycle between values:
+  // 0 to (testimonialCount - 1) for displayedTestimonialId.
+  incrementDisplayedTestimonialId(): void {
+  // This makes sure that incrementing from (testimonialCount - 1)
+  // returns 0 instead of testimonialCount,since we want the testimonials
+  // to cycle through.
+    this.displayedTestimonialId = (
+      this.displayedTestimonialId + 1) % this.testimonialCount;
   }
 
-  onTabClick(tabName: string): Window {
-    // Update URL hash.
-    this.windowRef.nativeWindow.location.hash = '#' + tabName;
-    this.activeTabName = tabName;
-    return this.windowRef.nativeWindow;
+  decrementDisplayedTestimonialId(): void {
+  // This makes sure that decrementing from 0, returns
+  // (testimonialCount - 1) instead of -1, since we want the testimonials
+  // to cycle through.
+    this.displayedTestimonialId = (
+      this.displayedTestimonialId + this.testimonialCount - 1) %
+      this.testimonialCount;
+  }
+  getTestimonials(): [Testimonial, Testimonial, Testimonial] {
+    return [{
+      quote: 'I18N_TEACH_TESTIMONIAL_1',
+      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
+      imageUrl: '/teach/riya.jpg',
+      imageUrlWebp: '/teach/riya.webp',
+      borderPresent: true
+    }, {
+      quote: 'I18N_TEACH_TESTIMONIAL_2',
+      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
+      imageUrl: '/teach/awad.jpg',
+      imageUrlWebp: '/teach/awad.webp',
+      borderPresent: true
+    }, {
+      quote: 'I18N_TEACH_TESTIMONIAL_3',
+      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
+      imageUrl: '/teach/himanshu.jpg',
+      imageUrlWebp: '/teach/himanshu.webp',
+      borderPresent: true
+    }];
+  }
+
+  onClickStartLearningButton(): void {
+    this.siteAnalyticsService.registerClickStartLearningButtonEvent();
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    return;
+  }
+
+  onClickVisitClassroomButton(): void {
+    this.siteAnalyticsService.registerClickVisitClassroomButtonEvent();
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    return;
+  }
+
+  onClickBrowseLibraryButton(): void {
+    this.siteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+    return;
+  }
+
+  onClickGuideParentsButton(): void {
+    this.siteAnalyticsService.registerClickGuideParentsButtonEvent();
+    this.windowRef.nativeWindow.location.href = ('/teach');
+    return;
+  }
+
+  onClickTipforParentsButton(): void {
+    this.siteAnalyticsService.registerClickTipforParentsButtonEvent();
+    this.windowRef.nativeWindow.location.href = ('/teach');
+    return;
+  }
+
+  onClickExploreLessonsButton(): void {
+    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
+    this.windowRef.nativeWindow.location.href = this.classroomUrl;
+    return;
   }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  onApplyToTeachWithOppia(): boolean {
-    this.siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = this.TEACH_FORM_URL;
-    }, 150);
-    return false;
   }
 }
 

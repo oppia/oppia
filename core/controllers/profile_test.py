@@ -168,10 +168,10 @@ class UserContributionsTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_1, user_a_id, end_state_name='End')
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
+        self.process_and_flush_pending_mapreduce_tasks()
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_A)
-
         self.assertEqual(len(
             response_dict['created_exp_summary_dicts']), 1)
         self.assertEqual(len(
@@ -202,6 +202,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
                 'property_name': 'objective',
                 'new_value': 'the objective'
             })], 'Test edit')
+        self.process_and_flush_pending_tasks()
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_B)
@@ -734,7 +735,7 @@ class SignupTests(test_utils.GenericTestBase):
         self.logout()
 
         user_services.create_new_user(
-            self.get_gae_id_from_email(self.VIEWER_EMAIL), self.VIEWER_EMAIL)
+            self.get_auth_id_from_email(self.VIEWER_EMAIL), self.VIEWER_EMAIL)
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1061,7 +1062,7 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
         self.signup('abc@example.com', 'abc')
 
         user_services.create_new_user(
-            self.get_gae_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
+            self.get_auth_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
