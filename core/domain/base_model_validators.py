@@ -97,19 +97,18 @@ class ExternalModelFetcherDetails(python_utils.OBJECT):
                 'When fetching instances of UserSettingsModel, please use ' +
                 'UserSettingsModelFetcherDetails instead of ' +
                 'ExternalModelFetcherDetails')
-        filtered_model_ids = []
+        validated_model_ids = []
         model_id_errors = []
         for model_id in model_ids:
             if not model_id:
-                error_message = (
+                model_id_errors.append(
                     'A model id in the field \'%s\' '
                     'is empty' % field_name)
-                model_id_errors.append(error_message)
             else:
-                filtered_model_ids.append(model_id)
+                validated_model_ids.append(model_id)
         self.field_name = field_name
         self.model_class = model_class
-        self.model_ids = filtered_model_ids
+        self.model_ids = validated_model_ids
         self.model_id_errors = model_id_errors
 
 
@@ -146,21 +145,18 @@ class UserSettingsModelFetcherDetails(python_utils.OBJECT):
         for model_id in model_ids:
             if model_id in feconf.SYSTEM_USERS.values():
                 if not may_contain_system_ids:
-                    error_message = (
+                    model_id_errors.append(
                         'The field \'%s\' should not contain '
                         'system IDs' % field_name)
-                    model_id_errors.append(error_message)
             elif utils.is_pseudonymous_id(model_id):
                 if not may_contain_pseudonymous_ids:
-                    error_message = (
+                    model_id_errors.append(
                         'The field \'%s\' should not contain '
                         'pseudonymous IDs' % field_name)
-                    model_id_errors.append(error_message)
             elif not utils.is_user_id_valid(model_id):
-                error_message = (
+                model_id_errors.append(
                     'The user id %s in the field \'%s\' is '
                     'invalid' % (model_id, field_name))
-                model_id_errors.append(error_message)
             else:
                 validated_model_ids.append(model_id)
         self.field_name = field_name
@@ -378,8 +374,8 @@ class BaseModelValidator(python_utils.OBJECT):
         for index, field_name in enumerate(multiple_models_ids_to_fetch):
             (model_class, model_ids) = (
                 multiple_models_ids_to_fetch[field_name])
-            fetched_model_instances = fetched_model_instances_for_all_ids[
-                index]
+            fetched_model_instances = (
+                fetched_model_instances_for_all_ids[index])
 
             for (model_id, model_instance) in python_utils.ZIP(
                     model_ids, fetched_model_instances):
