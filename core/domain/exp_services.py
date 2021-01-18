@@ -1546,13 +1546,8 @@ def is_version_of_draft_valid(exp_id, version):
         bool. Whether the given version number is the same as the current
         version number of the exploration in the datastore.
     """
-    latest_exp_version_in_datastore = (
-        exp_fetchers.get_exploration_by_id(exp_id).version)
-    logging.error(
-        'exp_services.is_version_of_draft_valid: '
-        'latest_exp_version_in_datastore: %s'
-        % latest_exp_version_in_datastore)
-    return latest_exp_version_in_datastore == version
+
+    return exp_fetchers.get_exploration_by_id(exp_id).version == version
 
 
 def get_user_exploration_data(
