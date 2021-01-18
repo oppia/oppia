@@ -66,6 +66,8 @@ var ExplorationEditorSettingsTab = function() {
    */
   this.deleteExploration = async function() {
     await action.click('Neutral element', neutralElement);
+    await waitFor.invisibilityOf(
+      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
     await waitFor.elementToBeClickable(
       deleteExplorationButton, 'Delete Exploration button is not clickable');
     await deleteExplorationButton.click();
@@ -82,17 +84,14 @@ var ExplorationEditorSettingsTab = function() {
 
   this.enableCorrectnessFeedback = async function() {
     await action.click('Neutral element', neutralElement);
+    await waitFor.invisibilityOf(
+      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
     await action.click(
       'Enable Correctness Feedback Button', enableCorrectnessFeedbackButton);
     await action.click('Neutral element', neutralElement);
-    await waitFor.visibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator not visible');
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {
-    await action.click('Neutral element', neutralElement);
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
     var options = await initialStateSelect.all(by.tagName('option'))
@@ -103,7 +102,8 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.openAndClosePreviewSummaryTile = async function() {
-    await action.click('Neutral element', neutralElement);
+    await waitFor.invisibilityOf(
+      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
     await action.click('Open preview summary', openPreviewSummaryButton);
     await waitFor.visibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to appear');
@@ -113,37 +113,29 @@ var ExplorationEditorSettingsTab = function() {
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
     expect(await explorationSummaryTile.isPresent()).toBeFalsy();
     await action.click('Neutral element', neutralElement);
-    await waitFor.visibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator not visible');
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
   };
 
   this.setCategory = async function(category) {
     await action.click('Neutral element', neutralElement);
+    await waitFor.invisibilityOf(
+      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
       await forms.AutocompleteDropdownEditor(explorationCategoryInput)
     ).setValue(category);
     await action.click('Neutral element', neutralElement);
-    await waitFor.visibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator not visible');
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
   };
 
   this.setFirstState = async function(stateName) {
     await action.click('Neutral element', neutralElement);
+    await waitFor.invisibilityOf(
+      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
     await action.click(
       'State name option', initialStateSelectOption(stateName));
     await action.click('Neutral element', neutralElement);
-    await waitFor.visibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator not visible');
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
   };
 
   this.setLanguage = async function(language) {
@@ -154,36 +146,28 @@ var ExplorationEditorSettingsTab = function() {
       by.cssContainingText('option', language));
     await action.click('Language button', languageButton);
     await action.click('Neutral element', neutralElement);
-    await waitFor.visibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator not visible');
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
   };
 
   this.setObjective = async function(objective) {
     await action.click('Neutral element', neutralElement);
+    await waitFor.invisibilityOf(
+      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
     await action.clear(
       'Exploration Objective input', explorationObjectiveInput);
     await action.sendKeys(
       'Exploration Objective input', explorationObjectiveInput, objective);
     await action.click('Neutral element', neutralElement);
-    await waitFor.visibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator not visible');
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
   };
 
   this.setTitle = async function(title) {
     await action.click('Neutral element', neutralElement);
+    await waitFor.invisibilityOf(
+      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
     await general.scrollToTop();
     await action.clear('Exploration Title Input', explorationTitleInput);
     await action.sendKeys(
       'Exploration Title Input', explorationTitleInput, title);
     await action.click('Neutral element', neutralElement);
-    await waitFor.visibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator not visible');
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
   };
 
   this.expectCategoryToBe = async function(category) {
