@@ -47,6 +47,10 @@ jobs:
 
           git log --graph --decorate --oneline
 
+          git fetch upstream
+
+          git diff pull/11671/merge upstream/develop
+
           if [[ "$target_branch" == null ]]
           then
             git pull upstream develop --no-edit --allow-unrelated-histories
