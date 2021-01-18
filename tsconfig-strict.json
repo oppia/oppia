@@ -32,10 +32,6 @@
     }
   },
   "files": [
-    "core/templates/services/alerts.service.spec.ts",
-    "core/templates/services/alerts.service.ts",
-    "core/templates/services/exploration-features.service.ts",
-    "core/templates/services/exploration-features.service.spec.ts",
     "core/templates/domain/classifier/classifier.model.ts",
     "core/templates/domain/classifier/classifier.model.ts",
     "core/templates/domain/classifier/classifier.model.spec.ts",
@@ -81,6 +77,8 @@
     "core/templates/pages/exploration-player-page/services/audio-translation-manager.service.spec.ts",
     "core/templates/pages/exploration-player-page/services/learner-params.service.ts",
     "core/templates/pages/exploration-player-page/services/learner-params.service.spec.ts",
+    "core/templates/services/alerts.service.spec.ts",
+    "core/templates/services/alerts.service.ts",
     "core/templates/services/app.service.ts",
     "core/templates/services/app.service.spec.ts",
     "core/templates/services/audio-bar-status.service.ts",
@@ -101,6 +99,8 @@
     "core/templates/services/debouncer.service.spec.ts",
     "core/templates/services/editability.service.ts",
     "core/templates/services/editability.service.spec.ts",
+    "core/templates/services/exploration-features.service.ts",
+    "core/templates/services/exploration-features.service.spec.ts",
     "core/templates/services/external-save.service.ts",
     "core/templates/services/external-save.service.spec.ts",
     "core/templates/services/i18n-language-code.service.ts",
