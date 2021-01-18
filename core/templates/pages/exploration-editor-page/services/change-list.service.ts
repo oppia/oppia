@@ -83,6 +83,8 @@ angular.module('oppia').factory('ChangeListService', [
       widget_id: true,
       written_translations: true
     };
+    var changeListAddedTimeoutId = null;
+    var DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
     var autosaveChangeListOnChange = function(explorationChangeList) {
       // Asynchronously send an autosave request, and check for errors in the
@@ -92,7 +94,6 @@ angular.module('oppia').factory('ChangeListService', [
       // opened):
       // - Version Mismatch.
       // - Non-strict Validation Fail.
-      autosaveInProgressEventEmitter.emit(true);
       ExplorationDataService.autosaveChangeList(
         explorationChangeList,
         function(response) {
@@ -125,7 +126,13 @@ angular.module('oppia').factory('ChangeListService', [
       }
       explorationChangeList.push(changeDict);
       undoneChangeStack = [];
-      autosaveChangeListOnChange(explorationChangeList);
+      autosaveInProgressEventEmitter.emit(true);
+      if (changeListAddedTimeoutId) {
+        clearTimeout(changeListAddedTimeoutId);
+      }
+      changeListAddedTimeoutId = setTimeout(() => {
+        autosaveChangeListOnChange(explorationChangeList);
+      }, DEFAULT_WAIT_FOR_AUTOSAVE_MSEC);
     };
 
     return {
