@@ -205,15 +205,14 @@ class ParamChange(python_utils.OBJECT):
                 'Only parameter names with characters in [a-zA-Z0-9] are '
                 'accepted.')
 
-        try:
-            self.generator
-        except KeyError:
-            raise utils.ValidationError(
-                'Invalid generator id %s' % self._generator_id)
-        except Exception:
-            raise utils.ValidationError(
-                'Expected generator id to be a string, received %s '
-                % (self._generator_id))
+        if not hasattr(self, 'generator'):
+            try:
+                raise utils.ValidationError(
+                    'Invalid generator id %s' % self._generator_id)
+            except Exception:
+                raise utils.ValidationError(
+                    'Expected generator id to be a string, received %s '
+                    % (self._generator_id))
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(

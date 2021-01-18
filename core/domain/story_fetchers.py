@@ -345,10 +345,7 @@ def get_node_index_by_story_id_and_node_id(story_id, node_id):
         Exception. The given story does not exist.
         Exception. The given node does not exist in the story.
     """
-    try:
-        story = get_story_by_id(story_id)
-    except Exception:
-        raise Exception('Story with id %s does not exist.' % story_id)
+    story = get_story_by_id(story_id)
 
     node_index = story.story_contents.get_node_index(node_id)
     if node_index is None:
