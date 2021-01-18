@@ -45,8 +45,7 @@ var ExplorationEditorSettingsTab = function() {
       by.cssContainingText('option', stateName));
   };
   var neutralElement = element(by.css('.protractor-test-settings-container'));
-  var autoSaveIndicatorElement = element(
-    by.css('.protractor-autosave-indicator'));
+
   /*
    * Buttons
    */
@@ -66,8 +65,7 @@ var ExplorationEditorSettingsTab = function() {
    */
   this.deleteExploration = async function() {
     await action.click('Neutral element', neutralElement);
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
+    await action.waitForAutosave();
     await waitFor.elementToBeClickable(
       deleteExplorationButton, 'Delete Exploration button is not clickable');
     await deleteExplorationButton.click();
@@ -84,8 +82,7 @@ var ExplorationEditorSettingsTab = function() {
 
   this.enableCorrectnessFeedback = async function() {
     await action.click('Neutral element', neutralElement);
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
+    await action.waitForAutosave();
     await action.click(
       'Enable Correctness Feedback Button', enableCorrectnessFeedbackButton);
     await action.click('Neutral element', neutralElement);
@@ -102,8 +99,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.openAndClosePreviewSummaryTile = async function() {
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
+    await action.waitForAutosave();
     await action.click('Open preview summary', openPreviewSummaryButton);
     await waitFor.visibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to appear');
@@ -117,8 +113,7 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setCategory = async function(category) {
     await action.click('Neutral element', neutralElement);
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
+    await action.waitForAutosave();
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
@@ -129,8 +124,7 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setFirstState = async function(stateName) {
     await action.click('Neutral element', neutralElement);
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
+    await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
     await action.click(
@@ -140,6 +134,7 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setLanguage = async function(language) {
     await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
     var languageButton = explorationLanguageInput.element(
@@ -150,8 +145,7 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setObjective = async function(objective) {
     await action.click('Neutral element', neutralElement);
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
+    await action.waitForAutosave();
     await action.clear(
       'Exploration Objective input', explorationObjectiveInput);
     await action.sendKeys(
@@ -161,8 +155,7 @@ var ExplorationEditorSettingsTab = function() {
 
   this.setTitle = async function(title) {
     await action.click('Neutral element', neutralElement);
-    await waitFor.invisibilityOf(
-      autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
+    await action.waitForAutosave();
     await general.scrollToTop();
     await action.clear('Exploration Title Input', explorationTitleInput);
     await action.sendKeys(

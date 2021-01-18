@@ -117,6 +117,7 @@ var ExplorationEditorPage = function() {
 
   this.publishCardExploration = async function(
       title, objective, category, language, tags) {
+    await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
 
     var expTitle = element(by.css(
@@ -203,6 +204,7 @@ var ExplorationEditorPage = function() {
 
   this.saveChanges = async function(commitMessage) {
     var toastSuccessElement = element(by.css('.toast-success'));
+    await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
       await action.sendKeys(
@@ -221,6 +223,7 @@ var ExplorationEditorPage = function() {
   };
 
   this.discardChanges = async function() {
+    await action.waitForAutosave();
     await action.click('Save Discard Toggle button', saveDiscardToggleButton);
     await action.click('Discard Changes button', discardChangesButton);
     await action.click(
@@ -234,14 +237,17 @@ var ExplorationEditorPage = function() {
   };
 
   this.expectCannotSaveChanges = async function() {
+    await action.waitForAutosave();
     expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
   this.expectCanPublishChanges = async function() {
+    await action.waitForAutosave();
     expect(await publishExplorationButton.isEnabled()).toBeTrue();
   };
 
   this.expectCannotPublishChanges = async function() {
+    await action.waitForAutosave();
     expect(await publishExplorationButton.isEnabled()).toBeFalsy();
   };
 
