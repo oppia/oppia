@@ -30,7 +30,7 @@ describe('Interaction Details Cache Service', () => {
       customization: interactionCustomizationArgs
     };
 
-    var idcs: InteractionDetailsCacheService = null;
+    var idcs: InteractionDetailsCacheService;
     beforeEach(() => {
       idcs = new InteractionDetailsCacheService();
     });

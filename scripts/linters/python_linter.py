@@ -69,39 +69,6 @@ class PythonLintChecksManager(python_utils.OBJECT):
         """Return all filepaths."""
         return self.py_filepaths
 
-    def check_non_test_files(self):
-        """This function is used to check that function with test_only in their
-        names are in test files.
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Function definition'
-        error_messages = []
-        files_to_check = self.py_filepaths
-        failed = False
-        for filepath in files_to_check:
-            if filepath.endswith('_test.py'):
-                continue
-            for line_num, line in enumerate(self.file_cache.readlines(
-                    filepath)):
-                line = line.strip()
-                words = line.split()
-                if len(words) < 2:
-                    continue
-                ind1 = words[0].startswith('def')
-                ind2 = words[1].startswith('test_only')
-                if ind1 and ind2:
-                    error_message = (
-                        '%s --> Line %s: Please do not use \'test_only\' '
-                        'in the non-test file.' % (filepath, line_num + 1))
-                    error_messages.append(error_message)
-                    failed = True
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
-
     def check_that_all_jobs_are_listed_in_the_job_registry_file(self):
         """This function is used to check that all the one-off and audit jobs
         are registered in jobs_registry.py file.
@@ -227,7 +194,6 @@ class PythonLintChecksManager(python_utils.OBJECT):
 
         linter_stdout.append(
             self.check_that_all_jobs_are_listed_in_the_job_registry_file())
-        linter_stdout.append(self.check_non_test_files())
         return linter_stdout
 
 

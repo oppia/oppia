@@ -31,7 +31,6 @@ import logging
 import math
 import os
 import pprint
-import traceback
 import zipfile
 
 from constants import constants
@@ -127,14 +126,14 @@ def get_exploration_titles_and_categories(exp_ids):
 
 
 def get_exploration_ids_matching_query(
-        query_string, categories, language_codes, cursor=None):
+        query_string, categories, language_codes, offset=None):
     """Returns a list with all exploration ids matching the given search query
-    string, as well as a search cursor for future fetches.
+    string, as well as a search offset for future fetches.
 
     This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
     there are at least that many, otherwise it returns all remaining results.
     (If this behaviour does not occur, an error will be logged.) The method
-    also returns a search cursor.
+    also returns a search offset.
 
     Args:
         query_string: str. A search query string.
@@ -146,23 +145,23 @@ def get_exploration_ids_matching_query(
             it is empty, no language code filter is applied to the results. If
             it is not empty, then a result is considered valid if it matches at
             least one of these language codes.
-        cursor: str or None. Optional cursor from which to start the search
-            query. If no cursor is supplied, the first N results matching
+        offset: str or None. Optional offset from which to start the search
+            query. If no offset is supplied, the first N results matching
             the query are returned.
 
     Returns:
         list(str). A list of exploration ids matching the given search query.
     """
     returned_exploration_ids = []
-    search_cursor = cursor
+    search_offset = offset
 
     for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
-        exp_ids, search_cursor = search_services.search_explorations(
+        exp_ids, search_offset = search_services.search_explorations(
             query_string, categories, language_codes, remaining_to_fetch,
-            cursor=search_cursor)
+            offset=search_offset)
 
         invalid_exp_ids = []
         for ind, model in enumerate(
@@ -173,7 +172,7 @@ def get_exploration_ids_matching_query(
                 invalid_exp_ids.append(exp_ids[ind])
 
         if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
-                or search_cursor is None):
+                or search_offset is None):
             break
         else:
             logging.error(
@@ -181,12 +180,12 @@ def get_exploration_ids_matching_query(
                 ', '.join(invalid_exp_ids))
 
     if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-            and search_cursor is not None):
+            and search_offset is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
-    return (returned_exploration_ids, search_cursor)
+    return (returned_exploration_ids, search_offset)
 
 
 def get_non_private_exploration_summaries():
@@ -414,8 +413,10 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected hints_list to be a list,'
                             ' received %s' % change.new_value)
-                    new_hints_list = [state_domain.Hint.from_dict(hint_dict)
-                                      for hint_dict in change.new_value]
+                    new_hints_list = [
+                        state_domain.Hint.from_dict(hint_dict)
+                        for hint_dict in change.new_value
+                    ]
                     state.update_interaction_hints(new_hints_list)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
@@ -489,9 +490,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'param_specs':
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
-                    exploration.update_param_changes(
-                        list(python_utils.MAP(
-                            to_param_domain, change.new_value)))
+                    exploration.update_param_changes(list(
+                        python_utils.MAP(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -499,9 +499,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
-            elif (
-                    change.cmd ==
-                    exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
@@ -526,8 +525,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        logging.error(traceback.format_exc())
-        raise
+        python_utils.reraise_exception()
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
