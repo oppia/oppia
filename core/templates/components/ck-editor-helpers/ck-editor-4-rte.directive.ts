@@ -38,18 +38,22 @@ angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
   function(CkEditorCopyContentService, ContextService, RteHelperService) {
     /**
-     * Returns a CKEditor configuration updated with the supplied UI
-     * configuration.
+     * Creates a CKEditor configuration.
      * @param config CKEditor config to add to
      * @param uiConfig Parameters to add to CKEditor config
-     * @modifies config
+     * @param pluginNames Comma separated list of plugin names
+     * @param buttonNames Array of button names for RTE components
+     * @param extraAllowedContentRules additional allowed content rules for
+     * CKEDITOR.editor.filter
+     * @param sharedSpaces IDs of the page elements that will store the editor
+     * UI elements
      */
-    const _getCKEditorConfig = function(
+    const _createCKEditorConfig = function(
         uiConfig: UiConfig,
         pluginNames: string,
         buttonNames: string[],
-        extraAllowedContentRules,
-        sharedSpaces
+        extraAllowedContentRules: string,
+        sharedSpaces: {top?: string, bottom?: string}
     ): CKEDITOR.config {
       // Language configs use default language when undefined.
       let ckConfig: CKEDITOR.config = {
@@ -90,16 +94,18 @@ angular.module('oppia').directive('ckEditor4Rte', [
           }
         ]
       };
-      if (uiConfig.language) {
-        ckConfig.language = uiConfig.language;
-        ckConfig.contentsLanguage = uiConfig.language;
-      }
-      if (uiConfig.languageDirection) {
-        ckConfig.contentsLangDirection = (
-          uiConfig.languageDirection);
-      }
-      if (uiConfig.startupFocusEnabled !== undefined) {
-        ckConfig.startupFocus = uiConfig.startupFocusEnabled;
+      if (uiConfig) {
+        if (uiConfig.language) {
+          ckConfig.language = uiConfig.language;
+          ckConfig.contentsLanguage = uiConfig.language;
+        }
+        if (uiConfig.languageDirection) {
+          ckConfig.contentsLangDirection = (
+            uiConfig.languageDirection);
+        }
+        if (uiConfig.startupFocusEnabled !== undefined) {
+          ckConfig.startupFocus = uiConfig.startupFocusEnabled;
+        }
       }
       return ckConfig;
     };
@@ -196,7 +202,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
           top: <HTMLElement>el[0].children[0].children[0]
         };
 
-        const ckConfig = _getCKEditorConfig(
+        const ckConfig = _createCKEditorConfig(
           scope.uiConfig(), pluginNames, buttonNames, extraAllowedContentRules,
           sharedSpaces);
 
