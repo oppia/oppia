@@ -42,4 +42,3 @@ export class TranslationsBackendApiService {
 angular.module('oppia').factory(
   'TranslationsBackendApiService',
   downgradeInjectable(TranslationsBackendApiService));
-
