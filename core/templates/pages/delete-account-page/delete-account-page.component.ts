@@ -48,7 +48,7 @@ angular.module('oppia').component('deleteAccountPage', {
             setTimeout(() => {
               $window.location = (
                 '/logout?redirect_url=pending-account-deletion');
-            }, 150);
+            }, SiteAnalyticsService.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
           });
         }, function() {
           // Note to developers:
