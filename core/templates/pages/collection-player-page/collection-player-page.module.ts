@@ -35,14 +35,12 @@ import { CollectionNodeListComponent } from
   'pages/collection-player-page/collection-node-list/collection-node-list.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
     BrowserModule,
     HttpClientModule,
-    SharedComponentsModule,
-    NgbTooltipModule
+    SharedComponentsModule
   ],
   declarations: [
     OppiaAngularRootComponent,
