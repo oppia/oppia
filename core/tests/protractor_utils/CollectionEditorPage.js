@@ -163,7 +163,9 @@ var CollectionEditorPage = function() {
     // converted to action.sendKeys(..)
     // because doing so causes the e2e test to fail with the error
     // "Failed: Cannot read property 'bind' of undefined".
-    await browser.driver.switchTo().activeElement().sendKeys(category + '\n');
+    let active = await browser.driver.switchTo().activeElement();
+    let keys = category + '\n';
+    await active.sendKeys(keys); // eslint-disable-line oppia/e2e-action
   };
 
   // Saves changes and publishes collection.
