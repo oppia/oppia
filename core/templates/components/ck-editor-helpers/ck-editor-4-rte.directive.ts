@@ -53,7 +53,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         pluginNames: string,
         buttonNames: string[],
         extraAllowedContentRules: string,
-        sharedSpaces: {top?: string, bottom?: string}
+        sharedSpaces: object
     ): CKEDITOR.config {
       // Language configs use default language when undefined.
       let ckConfig: CKEDITOR.config = {
