@@ -211,6 +211,11 @@ angular.module('oppia').component('settingsTab', {
       ctrl.areParametersEnabled = function() {
         return ExplorationFeaturesService.areParametersEnabled();
       };
+
+      ctrl.areParametersUsed = function() {
+        return (ExplorationDataService.data.param_changes.length > 0);
+      }
+
       ctrl.enableParameters = function() {
         ExplorationFeaturesService.enableParameters();
       };
