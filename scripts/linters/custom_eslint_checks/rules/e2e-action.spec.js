@@ -18,11 +18,11 @@
 
 'use strict';
 
-var rule = require('./end-to-end-action-checks');
+var rule = require('./e2e-action');
 var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
-ruleTester.run('end-to-end-action-checks', rule, {
+ruleTester.run('e2e-action', rule, {
   valid: [
     {
       code:

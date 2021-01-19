@@ -26,7 +26,7 @@
     "oppia/no-multiline-disable": "error",
     "oppia/test-message-style": "error",
     "oppia/dependency-checks": "error",
-    "oppia/end-to-end-action-checks": "error",
+    "oppia/e2e-action": "error",
     "angular/di": [
       "error",
       "array"

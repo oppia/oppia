@@ -23,7 +23,7 @@ const fs = require('fs');
 const path = require('path');
 
 const excludeJson = fs.readFileSync(
-  path.join(__dirname, 'end-to-end-action-checks-exclude.json'));
+  path.join(__dirname, 'e2e-action-exclude.json'));
 const excludeObj = JSON.parse(excludeJson);
 
 module.exports = {
