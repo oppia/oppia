@@ -19,6 +19,13 @@
 
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
+const excludeJson = fs.readFileSync(
+  path.join(__dirname, 'end-to-end-action-checks-exclude.json'));
+const excludeObj = JSON.parse(excludeJson);
+
 module.exports = {
   meta: {
     type: 'problem',
@@ -47,6 +54,9 @@ module.exports = {
   create: function(context) {
     return {
       CallExpression: function checkExpression(node) {
+        if (excludeObj.exclude.includes(context.getFilename())) {
+          return;
+        }
         if (node.callee.type !== 'MemberExpression') {
           return;
         }
