@@ -69,10 +69,12 @@ require('services/context.service.ts');
 require('services/site-analytics.service.ts');
 require('services/stateful/focus-manager.service.ts');
 require('services/external-save.service.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').factory('ExplorationSaveService', [
-  '$log', '$q', '$timeout', '$uibModal', '$window',
+  '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
+  'EditabilityService',
   'ExplorationCategoryService', 'ExplorationDataService',
   'ExplorationDiffService', 'ExplorationInitStateNameService',
   'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
@@ -83,8 +85,9 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
   'DEFAULT_LANGUAGE_CODE',
   function(
-      $log, $q, $timeout, $uibModal, $window,
+      $log, $q, $rootScope, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
+      EditabilityService,
       ExplorationCategoryService, ExplorationDataService,
       ExplorationDiffService, ExplorationInitStateNameService,
       ExplorationLanguageCodeService, ExplorationObjectiveService,
@@ -185,6 +188,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           ExplorationDataService.explorationId);
       }
       saveIsInProgress = true;
+      EditabilityService.markNotEditable();
 
       ExplorationDataService.save(
         changeList, commitMessage,
@@ -196,17 +200,25 @@ angular.module('oppia').factory('ExplorationSaveService', [
             return;
           }
           $log.info('Changes to this exploration were saved successfully.');
-          ChangeListService.discardAllChanges();
-          _initExplorationPageEventEmitter.emit();
-          RouterService.onRefreshVersionHistory.emit({
-            forceRefresh: true
+          ChangeListService.discardAllChanges().then(() => {
+            _initExplorationPageEventEmitter.emit();
+            RouterService.onRefreshVersionHistory.emit({
+              forceRefresh: true
+            });
+            AlertsService.addSuccessMessage('Changes saved.');
+            saveIsInProgress = false;
+            EditabilityService.markEditable();
+            whenSavingDone.resolve();
+            $rootScope.$applyAsync();
+          }, () => {
+            EditabilityService.markEditable();
+            whenSavingDone.resolve();
+            $rootScope.$applyAsync();
           });
-          AlertsService.addSuccessMessage('Changes saved.');
-          saveIsInProgress = false;
-          whenSavingDone.resolve();
         }, function() {
           saveIsInProgress = false;
           whenSavingDone.resolve();
+          $rootScope.$applyAsync();
         }
       );
       return whenSavingDone.promise;
@@ -253,14 +265,15 @@ angular.module('oppia').factory('ExplorationSaveService', [
             // No further action is needed.
           });
 
-          ChangeListService.discardAllChanges();
-          AlertsService.addSuccessMessage('Changes discarded.');
-          _initExplorationPageEventEmitter.emit();
+          ChangeListService.discardAllChanges().then(() => {
+            AlertsService.addSuccessMessage('Changes discarded.');
+            _initExplorationPageEventEmitter.emit();
 
-          // The reload is necessary because, otherwise, the
-          // exploration-with-draft-changes will be reloaded
-          // (since it is already cached in ExplorationDataService).
-          $window.location.reload();
+            // The reload is necessary because, otherwise, the
+            // exploration-with-draft-changes will be reloaded
+            // (since it is already cached in ExplorationDataService).
+            $window.location.reload();
+          });
         }, function() {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
@@ -385,6 +398,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
           // If the modal is open, do not open another one.
           if (modalIsOpen) {
+            $rootScope.$applyAsync();
             return;
           }
 
@@ -416,6 +430,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             $timeout(function() {
               FocusManagerService.setFocus('saveChangesModalOpened');
             });
+            $rootScope.$applyAsync();
           });
 
           modalInstance.result.then(function(commitMessage) {
@@ -428,13 +443,17 @@ angular.module('oppia').factory('ExplorationSaveService', [
 
             saveDraftToBackend(commitMessage).then(function() {
               whenModalClosed.resolve();
+              $rootScope.$applyAsync();
             });
+            $rootScope.$applyAsync();
           }, function() {
             AlertsService.clearWarnings();
             modalIsOpen = false;
             whenModalClosed.resolve();
+            $rootScope.$applyAsync();
           });
         });
+        $rootScope.$applyAsync();
         return whenModalClosed.promise;
       },
 

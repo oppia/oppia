@@ -18,6 +18,7 @@
  */
 
 var action = require('./action');
+var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
 var ExplorationEditorImprovementsTab = require(
@@ -116,10 +117,8 @@ var ExplorationEditorPage = function() {
 
   this.publishCardExploration = async function(
       title, objective, category, language, tags) {
-    await waitFor.elementToBeClickable(
-      publishExplorationButton,
-      'Publish button taking too long to be clickable.');
-    await publishExplorationButton.click();
+    await action.waitForAutosave();
+    await action.click('Publish button', publishExplorationButton);
 
     var expTitle = element(by.css(
       '.protractor-test-exploration-title-input'));
@@ -127,57 +126,61 @@ var ExplorationEditorPage = function() {
       '.protractor-test-exploration-objective-input'));
     var expTags = element(by.css('.protractor-test-tags'));
     var expInput = expTags.element(by.tagName('input'));
+    var expCategory = element(
+      by.css('.protractor-test-exploration-category-dropdown'));
+    var expLanguage = element(
+      by.css('.protractor-test-exploration-language-select'));
+    var neutralElement = element(
+      by.css('.protractor-test-metadata-modal-header'));
 
-    await waitFor.elementToBeClickable(
-      expTitle, 'Exploration Title input is taking too long to appear');
-    await waitFor.elementToBeClickable(
-      element(by.css(
-        '.protractor-test-exploration-title-input'))
-    );
+    await action.sendKeys('Exploration title', expTitle, title);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
-    await expTitle.sendKeys(title);
-    await expObjective.sendKeys(objective);
+    await action.sendKeys('Exploration objective', expObjective, objective);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
-    await element(by.css('.select2-container')).click();
-    await element(by.css('.select2-dropdown')).element(
-      by.css('.select2-search input')).sendKeys(category + '\n');
+    await waitFor.presenceOf(
+      expCategory, 'Category input takes too long to be visible.');
+    await (
+      await forms.AutocompleteDropdownEditor(expCategory)
+    ).setValue(category);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
-    await element(by.css('.protractor-test-exploration-language-select'))
-      .click();
-    await element(by.css('.protractor-test-exploration-language-select'))
-      .sendKeys(language + '\n');
-
-
-    await expTags.click();
-    await expInput.click();
+    await action.select('Exploration Language', expLanguage, language);
+    await action.click('Neutral Element', neutralElement);
+    await action.waitForAutosave();
 
     for (var elem of tags) {
-      await expInput.sendKeys(elem, protractor.Key.ENTER);
+      await action.click('Exploration input', expInput);
+      await action.sendKeys('Exploration input', expInput, elem + '\n');
+      await action.click('Neutral Element', neutralElement);
+      await action.waitForAutosave();
     }
 
     const saveChangesButton = element(by.css(
       '.protractor-test-confirm-pre-publication'));
-    await waitFor.elementToBeClickable(
-      saveChangesButton, 'Save changes button taking too long to be clickable');
-    await saveChangesButton.click();
-
+    await action.click('Save Changes', saveChangesButton);
+    await waitFor.invisibilityOf(
+      saveChangesButton,
+      'Exploration metadata modal takes too long to disappear.');
     await waitFor.visibilityOf(
       element(by.css('.modal-content')),
       'Modal Content taking too long to appear');
 
     const confirmPublish = element(by.css('.protractor-test-confirm-publish'));
-    await waitFor.elementToBeClickable(
-      confirmPublish, 'Confirm publish button taking too long to appear');
-    await confirmPublish.click();
-
+    await action.click('Confirm Publish', confirmPublish);
+    await waitFor.invisibilityOf(
+      confirmPublish,
+      'Confirm publish modal takes too long to disappear.');
     await waitFor.visibilityOf(element(by.css(
       '.protractor-test-share-publish-modal')),
     'Awesome modal taking too long to appear');
 
     const closeButton = element(by.css('.protractor-test-share-publish-close'));
-    await waitFor.elementToBeClickable(
-      closeButton, 'Close button taking too long to be clickable');
-    await closeButton.click();
+    await action.click('Share publish button', closeButton);
     await waitFor.invisibilityOf(
       closeButton, 'Close button taking too long to disappear');
   };
@@ -212,22 +215,26 @@ var ExplorationEditorPage = function() {
 
   this.saveChanges = async function(commitMessage) {
     var toastSuccessElement = element(by.css('.toast-success'));
+    await action.waitForAutosave();
     await action.click('Save changes button', saveChangesButton);
     if (commitMessage) {
       await action.sendKeys(
         'Commit message input', commitMessageInput, commitMessage);
     }
     await action.click('Save draft button', saveDraftButton);
+    await waitFor.visibilityOf(
+      toastSuccessElement,
+      'Toast message is taking too long to appear after saving changes');
 
     // This is necessary to give the page time to record the changes,
     // so that it does not attempt to stop the user leaving.
     await waitFor.invisibilityOf(
       toastSuccessElement,
-      'Toast message taking too long to disappear after saving changes');
-    expect(await toastSuccessElement.isPresent()).toBe(false);
+      'Toast message is taking too long to disappear after saving changes');
   };
 
   this.discardChanges = async function() {
+    await action.waitForAutosave();
     await action.click('Save Discard Toggle button', saveDiscardToggleButton);
     await action.click('Discard Changes button', discardChangesButton);
     await action.click(
@@ -241,14 +248,17 @@ var ExplorationEditorPage = function() {
   };
 
   this.expectCannotSaveChanges = async function() {
+    await action.waitForAutosave();
     expect(await saveChangesButton.isPresent()).toBeFalsy();
   };
 
   this.expectCanPublishChanges = async function() {
+    await action.waitForAutosave();
     expect(await publishExplorationButton.isEnabled()).toBeTrue();
   };
 
   this.expectCannotPublishChanges = async function() {
+    await action.waitForAutosave();
     expect(await publishExplorationButton.isEnabled()).toBeFalsy();
   };
 
@@ -271,6 +281,7 @@ var ExplorationEditorPage = function() {
   };
 
   this.navigateToMainTab = async function() {
+    await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
     await action.click('Neutral element', neutralElement);
     await waitFor.pageToFullyLoad();

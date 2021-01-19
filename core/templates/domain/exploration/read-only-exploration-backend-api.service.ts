@@ -27,7 +27,7 @@ import { ParamSpecsBackendDict } from 'domain/exploration/ParamSpecsObjectFactor
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
-interface ReadOnlyExplorationBackendDict {
+export interface ReadOnlyExplorationBackendDict {
   'init_state_name': string;
   'param_changes': ParamChangeBackendDict[];
   'param_specs': ParamSpecsBackendDict;

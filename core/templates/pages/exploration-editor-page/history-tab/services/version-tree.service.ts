@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import { RevertChangeList, ExplorationChangeList } from
+import { RevertChangeList, ExplorationChange } from
   'domain/exploration/exploration-draft.model';
 
 export interface ExplorationSnapshot {
@@ -31,7 +31,7 @@ export interface ExplorationSnapshot {
   'commit_type': string;
   'version_number': number;
   'created_on_ms': number;
-  'commit_cmds': ExplorationChangeList[];
+  'commit_cmds': ExplorationChange[];
 }
 
 interface ExplorationSnapshots {
@@ -143,7 +143,7 @@ export class VersionTreeService {
    * for 'revert':
    *  - 'version_number': version number reverted to
    */
-  getChangeList(version: number): ExplorationChangeList[] {
+  getChangeList(version: number): ExplorationChange[] {
     if (this._snapshots === null) {
       throw new Error('snapshots is not initialized');
     } else if (version === 1) {

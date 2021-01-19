@@ -25,15 +25,15 @@ import isEqual from 'lodash/isEqual';
 import INTERACTION_SPECS from 'pages/interaction-specs.constants.ajs';
 
 import {
-  AddStateNameChangeList,
-  ExplorationChangeList,
-  RenameStateChangeList,
-  EditStatePropertyChangeList
+  ExplorationChangeAddState,
+  ExplorationChange,
+  ExplorationChangeRenameState,
+  ExplorationChangeEditStateProperty
 } from 'domain/exploration/exploration-draft.model';
 import { StateObjectsDict } from 'domain/exploration/StatesObjectFactory';
 
 interface ExplorationGraphChangeList {
-  changeList: ExplorationChangeList[];
+  changeList: ExplorationChange[];
   directionForwards: boolean;
 }
 
@@ -208,66 +208,72 @@ export class ExplorationDiffService {
         if ((directionForwards && change.cmd === 'add_state') ||
             (!directionForwards && change.cmd === 'delete_state')) {
           if (!stateIds.hasOwnProperty(
-            (<AddStateNameChangeList> change).state_name)) {
+            (<ExplorationChangeAddState> change).state_name)) {
             let newId = this._generateNewId();
-            stateIds[(<AddStateNameChangeList> change).state_name] = newId;
+            stateIds[(<ExplorationChangeAddState> change).state_name] = newId;
           }
           let currentStateId = (
-            stateIds[(<AddStateNameChangeList> change).state_name]);
+            stateIds[(<ExplorationChangeAddState> change).state_name]);
           if (stateData.hasOwnProperty(currentStateId) &&
               stateData[currentStateId].stateProperty ===
               this.STATE_PROPERTY_DELETED) {
             stateData[currentStateId].stateProperty =
                 this.STATE_PROPERTY_CHANGED;
             stateData[currentStateId].newestStateName = (
-              <AddStateNameChangeList> change).state_name;
+              <ExplorationChangeAddState> change).state_name;
           } else {
             stateData[currentStateId] = {
-              newestStateName: (<AddStateNameChangeList> change).state_name,
-              originalStateName: (<AddStateNameChangeList> change).state_name,
+              newestStateName: (<ExplorationChangeAddState> change).state_name,
+              originalStateName: (
+                <ExplorationChangeAddState> change).state_name,
               stateProperty: this.STATE_PROPERTY_ADDED
             };
           }
         } else if ((directionForwards && change.cmd === 'delete_state') ||
             (!directionForwards && change.cmd === 'add_state')) {
           if (stateData[stateIds[(
-            <AddStateNameChangeList> change).state_name]].stateProperty ===
+            <ExplorationChangeAddState> change).state_name]].stateProperty ===
               this.STATE_PROPERTY_ADDED) {
             stateData[stateIds[(
-              <AddStateNameChangeList> change).state_name]].stateProperty = (
+              <ExplorationChangeAddState> change).state_name]].stateProperty = (
               this.STATE_PROPERTY_CHANGED);
           } else {
             stateData[stateIds[(
-              <AddStateNameChangeList> change).state_name]].stateProperty = (
+              <ExplorationChangeAddState> change).state_name]].stateProperty = (
               this.STATE_PROPERTY_DELETED);
           }
         } else if (change.cmd === 'rename_state') {
           let newStateName = null;
           let oldStateName = null;
           if (directionForwards) {
-            newStateName = (<RenameStateChangeList> change).new_state_name;
-            oldStateName = (<RenameStateChangeList> change).old_state_name;
+            newStateName = (
+              <ExplorationChangeRenameState> change).new_state_name;
+            oldStateName = (
+              <ExplorationChangeRenameState> change).old_state_name;
           } else {
-            newStateName = (<RenameStateChangeList> change).old_state_name;
-            oldStateName = (<RenameStateChangeList> change).new_state_name;
+            newStateName = (
+              <ExplorationChangeRenameState> change).old_state_name;
+            oldStateName = (
+              <ExplorationChangeRenameState> change).new_state_name;
           }
           stateIds[newStateName] = stateIds[oldStateName];
           delete stateIds[oldStateName];
           stateData[stateIds[newStateName]].newestStateName = newStateName;
         } else if (change.cmd === 'edit_state_property') {
           if (stateData[stateIds[(
-            <EditStatePropertyChangeList> change).state_name]]
+            <ExplorationChangeEditStateProperty> change).state_name]]
             .stateProperty ===
               this.STATE_PROPERTY_UNCHANGED) {
             stateData[stateIds[(
-              <EditStatePropertyChangeList> change).state_name]]
+              <ExplorationChangeEditStateProperty> change).state_name]]
               .stateProperty = (
                 this.STATE_PROPERTY_CHANGED);
           }
         } else if (
           change.cmd !== 'migrate_states_schema_to_latest_version' &&
-            change.cmd !== 'AUTO_revert_version_number' &&
-            change.cmd !== 'edit_exploration_property') {
+          change.cmd !== 'AUTO_revert_version_number' &&
+          change.cmd !== 'edit_exploration_property'
+        ) {
           throw new Error('Invalid change command: ' + change.cmd);
         }
       });

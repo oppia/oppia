@@ -48,14 +48,19 @@ import { UrlInterpolationService } from
 import { Voiceover } from 'domain/exploration/VoiceoverObjectFactory';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { ExplorationChange } from './exploration-draft.model';
 
 export interface ExplorationBackendDict {
+  'draft_changes': ExplorationChange[];
+  'is_version_of_draft_valid': boolean;
   'init_state_name': string;
   'param_changes': ParamChangeBackendDict[];
   'param_specs': ParamSpecsBackendDict;
   'states': StateObjectsBackendDict;
   'title': string;
   'language_code': string;
+  'draft_change_list_id'?: number;
+  'version'?: string;
 }
 
 export class Exploration {
