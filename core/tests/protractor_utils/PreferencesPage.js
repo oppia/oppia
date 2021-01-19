@@ -59,7 +59,7 @@ var PreferencesPage = function() {
     by.css('.protractor-test-export-account-button'));
 
   var saveNewChanges = async function(fieldName) {
-    await navBar.click();
+    await action.click('Navbar Button', navBar);
     await waitFor.visibilityOfInfoToast(
       `Info toast for saving ${fieldName} takes too long to appear.`);
     await waitFor.invisibilityOfInfoToast(
@@ -125,10 +125,12 @@ var PreferencesPage = function() {
     await saveNewChanges('User Bio');
   };
 
+  // Here Newline Character is used as ENTER KEY.
   this.setUserInterests = async function(interests) {
-    await userInterestsInput.click();
+    await action.click('User Interest Input', userInterestsInput);
     for (var i = 0; i < interests.length; i++) {
-      await userInterestsInput.sendKeys(interests[i], protractor.Key.RETURN);
+      await action.sendKeys(
+        'User Interest Input', userInterestsInput, interests[i] + '\n');
       await saveNewChanges('User Interests');
     }
   };
@@ -145,6 +147,9 @@ var PreferencesPage = function() {
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedFirstSubscriptionToBe = async function(name) {
+    await waitFor.visibilityOf(
+      subscriptions.first(),
+      'subscriptions.first() taking too long to appear.');
     expect(await subscriptions.first().getText()).toMatch(name);
   };
 
@@ -152,24 +157,38 @@ var PreferencesPage = function() {
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedLastSubscriptionToBe = async function(name) {
+    await waitFor.visibilityOf(
+      subscriptions.last(),
+      'subscriptions.last() taking too long to appear.');
     expect(await subscriptions.last().getText()).toMatch(name);
   };
 
   this.expectPageHeaderToBe = async function(text) {
+    await waitFor.visibilityOf(
+      pageHeader, 'pageHeader taking too long to appear.');
     expect(await pageHeader.getText()).toEqual(text);
   };
 
   this.expectPreferredSiteLanguageToBe = async function(language) {
     var selectedLanguageElement = systemLanguageSelector.element(
       by.css('.select2-selection__rendered'));
+    await waitFor.visibilityOf(
+      selectedLanguageElement,
+      'selectedLanguageElement taking too long to appear.');
     expect(await selectedLanguageElement.getText()).toEqual(language);
   };
 
   this.expectPreferredAudioLanguageToBe = async function(language) {
+    await waitFor.visibilityOf(
+      selectedAudioLanguageElement,
+      'selectedAudioLanguageElement taking too long to appear.');
     expect(await selectedAudioLanguageElement.getText()).toEqual(language);
   };
 
   this.expectPreferredAudioLanguageNotToBe = async function(language) {
+    await waitFor.visibilityOf(
+      selectedAudioLanguageElement,
+      'selectedAudioLanguageElement taking too long to appear.');
     expect(await selectedAudioLanguageElement.getText()).not.toEqual(language);
   };
 
