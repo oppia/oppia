@@ -91,6 +91,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         """Test if SUPPORTED_CONTENT_LANGUAGES and SUPPORTED_AUDIO_LANGUAGES
         constants have any conflicting values.
         """
+        # TODO(#11737): Remove this once language constants are consolidated.
         rtl_content_languages = [
             language[u'code']
             for language
