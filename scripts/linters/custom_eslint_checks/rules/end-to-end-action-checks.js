@@ -54,7 +54,8 @@ module.exports = {
   create: function(context) {
     return {
       CallExpression: function checkExpression(node) {
-        if (excludeObj.exclude.includes(context.getFilename())) {
+        let filename = path.basename(context.getFilename());
+        if (excludeObj.exclude.includes(filename)) {
           return;
         }
         if (node.callee.type !== 'MemberExpression') {

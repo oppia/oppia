@@ -78,14 +78,14 @@ ruleTester.run('end-to-end-action-checks', rule, {
       `it('should test a feature', function() {
         elem.sendKeys("keys");
       });`,
-      filename: 'excludedForTesting.js',
+      filename: '/oppia/excludedForTesting.js',
     },
     {
       code:
       `it('should test a feature', function() {
         elem.clear();
       });`,
-      filename: 'excludedForTesting.js',
+      filename: 'oppia/excludedForTesting.js',
     },
   ],
 
