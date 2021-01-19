@@ -29,63 +29,84 @@ ruleTester.run('e2e-action', rule, {
       `it('should test a feature', function() {
         action.click("Element", elem);
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor/notExcluded.js',
     },
     {
       code:
       `it('should test a feature', function() {
         action.sendKeys("Element", elem, "keys");
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor_utils/notExcluded.js',
     },
     {
       code:
       `it('should test a feature', function() {
         action.clear("Element", elem);
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor_desktop/notExcluded.js',
     },
     {
       code:
       `it('should test a feature', function() {
         console.log(elem.click);
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor_desktop/notExcluded.js',
     },
     {
       code:
       `it('should test a feature', function() {
         console.log(elem.sendKeys);
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor/notExcluded.js',
     },
     {
       code:
       `it('should test a feature', function() {
         console.log(elem.clear);
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor_utils/notExcluded.js',
     },
     {
       code:
       `it('should test a feature', function() {
         elem.click();
       });`,
-      filename: 'excludedForTesting.js',
+      filename: 'oppia/core/tests/protractor/excludedForTesting.js',
     },
     {
       code:
       `it('should test a feature', function() {
         elem.sendKeys("keys");
       });`,
-      filename: '/oppia/excludedForTesting.js',
+      filename: 'oppia/core/tests/protractor/excludedForTesting.js',
     },
     {
       code:
       `it('should test a feature', function() {
         elem.clear();
       });`,
-      filename: 'oppia/excludedForTesting.js',
+      filename: 'oppia/core/tests/protractor/excludedForTesting.js',
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        elem.click();
+      });`,
+      filename: 'notExcluded.js',
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        elem.sendKeys("keys");
+      });`,
+      filename: 'notExcluded.js',
+    },
+    {
+      code:
+      `it('should test a feature', function() {
+        elem.clear();
+      });`,
+      filename: 'notExcluded.js',
     },
   ],
 
@@ -95,7 +116,7 @@ ruleTester.run('e2e-action', rule, {
       `it('should test a feature', function() {
         elem.click();
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor/notExcluded.js',
       errors: [{
         message: 'elem.click() is called instead of using action.click()',
         type: 'MemberExpression',
@@ -106,7 +127,7 @@ ruleTester.run('e2e-action', rule, {
       `it('should test a feature', function() {
         elem.sendKeys("keys");
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor/notExcluded.js',
       errors: [{
         message: 'elem.sendKeys() is called instead of using action.sendKeys()',
         type: 'MemberExpression',
@@ -117,7 +138,7 @@ ruleTester.run('e2e-action', rule, {
       `it('should test a feature', function() {
         elem.clear();
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor/notExcluded.js',
       errors: [{
         message: 'elem.clear() is called instead of using action.clear()',
         type: 'MemberExpression',
@@ -128,7 +149,7 @@ ruleTester.run('e2e-action', rule, {
       `it('should test a feature', function() {
         element(by.css('.protractor-test')).click();
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor/notExcluded.js',
       errors: [{
         message: (
           '(some expression).click() is called instead of using ' +
@@ -141,7 +162,7 @@ ruleTester.run('e2e-action', rule, {
       `it('should test a feature', function() {
         element(by.css('.protractor-test')).sendKeys("keys");
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor_desktop/notExcluded.js',
       errors: [{
         message: (
           '(some expression).sendKeys() is called instead of using ' +
@@ -154,7 +175,7 @@ ruleTester.run('e2e-action', rule, {
       `it('should test a feature', function() {
         element(by.css('.protractor-test')).clear();
       });`,
-      filename: 'notExcluded.js',
+      filename: '/oppia/core/tests/protractor_utils/notExcluded.js',
       errors: [{
         message: (
           '(some expression).clear() is called instead of using ' +

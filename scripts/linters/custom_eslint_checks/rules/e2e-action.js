@@ -26,6 +26,12 @@ const excludeJson = fs.readFileSync(
   path.join(__dirname, 'e2e-action-exclude.json'));
 const excludeObj = JSON.parse(excludeJson);
 
+const PATHS_TO_INCLUDE = [
+  'core/tests/protractor',
+  'core/tests/protractor_desktop',
+  'core/tests/protractor_utils',
+];
+
 module.exports = {
   meta: {
     type: 'problem',
@@ -56,6 +62,15 @@ module.exports = {
       CallExpression: function checkExpression(node) {
         let filename = path.basename(context.getFilename());
         if (excludeObj.exclude.includes(filename)) {
+          return;
+        }
+        let e2eTest = false;
+        for (let includePath of PATHS_TO_INCLUDE) {
+          if (context.getFilename().includes(includePath)) {
+            e2eTest = true;
+          }
+        }
+        if (!e2eTest) {
           return;
         }
         if (node.callee.type !== 'MemberExpression') {
