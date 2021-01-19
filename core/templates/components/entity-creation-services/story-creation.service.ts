@@ -15,7 +15,17 @@
 /**
  * @fileoverview Modal and functionality for the create story button.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AlertsService } from '@angular/'
 
+@Injectable({
+  providedIn: 'root'
+})
+export class StoryCreationService {
+
+}
 require(
   'pages/topic-editor-page/modal-templates/' +
   'create-new-story-modal.controller.ts');
