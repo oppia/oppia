@@ -105,11 +105,11 @@ describe('Versions tree service', () => {
         state_name: 'D',
         new_value: {
           html: 'Some text',
-          audio_translations: {}
+          content_id: '2'
         },
         old_value: {
           html: '',
-          audio_translations: {}
+          content_id: '1'
         },
         property_name: 'property'
       }],
@@ -178,11 +178,11 @@ describe('Versions tree service', () => {
         state_name: 'D',
         new_value: {
           html: 'Some text',
-          audio_translations: {}
+          content_id: '2'
         },
         old_value: {
           html: '',
-          audio_translations: {}
+          content_id: '1'
         },
         property_name: 'property'
       }]);
