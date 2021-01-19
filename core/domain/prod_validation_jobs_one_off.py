@@ -26,21 +26,21 @@ from core.platform import models
 import python_utils
 
 (
-    activity_models, audit_models, classifier_models,
-    collection_models, config_models, email_models,
-    exp_models, feedback_models, improvements_models,
-    job_models, opportunity_models, question_models,
-    recommendations_models, skill_models, stats_models,
-    story_models, subtopic_models, suggestion_models,
-    topic_models, user_models
+    activity_models, audit_models, auth_models,
+    classifier_models, collection_models, config_models,
+    email_models, exp_models, feedback_models,
+    improvements_models, job_models, opportunity_models,
+    question_models, recommendations_models, skill_models,
+    stats_models, story_models, subtopic_models,
+    suggestion_models, topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.activity, models.NAMES.audit, models.NAMES.classifier,
-    models.NAMES.collection, models.NAMES.config, models.NAMES.email,
-    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.improvements,
-    models.NAMES.job, models.NAMES.opportunity, models.NAMES.question,
-    models.NAMES.recommendations, models.NAMES.skill, models.NAMES.statistics,
-    models.NAMES.story, models.NAMES.subtopic, models.NAMES.suggestion,
-    models.NAMES.topic, models.NAMES.user
+    models.NAMES.activity, models.NAMES.audit, models.NAMES.auth,
+    models.NAMES.classifier, models.NAMES.collection, models.NAMES.config,
+    models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+    models.NAMES.improvements, models.NAMES.job, models.NAMES.opportunity,
+    models.NAMES.question, models.NAMES.recommendations, models.NAMES.skill,
+    models.NAMES.statistics, models.NAMES.story, models.NAMES.subtopic,
+    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
 ])
 
 VALIDATION_STATUS_SUCCESS = 'fully-validated'
@@ -982,7 +982,7 @@ class UserAuthDetailsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserAuthDetailsModel]
+        return [auth_models.UserAuthDetailsModel]
 
 
 class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -990,7 +990,15 @@ class UserIdentifiersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserIdentifiersModel]
+        return [auth_models.UserIdentifiersModel]
+
+
+class UserIdByFirebaseAuthIdModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserIdByFirebaseAuthIdModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [auth_models.UserIdByFirebaseAuthIdModel]
 
 
 class PlatformParameterModelAuditOneOffJob(ProdValidationAuditOneOffJob):

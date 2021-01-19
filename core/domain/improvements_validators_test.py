@@ -30,9 +30,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-datastore_services = models.Registry.import_datastore_services()
-gae_search_services = models.Registry.import_search_services()
-
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()

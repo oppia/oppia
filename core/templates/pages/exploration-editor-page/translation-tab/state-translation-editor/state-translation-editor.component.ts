@@ -22,6 +22,9 @@ require(
   'components/common-layout-directives/common-elements/' +
   'confirm-or-cancel-modal.controller.ts');
 require('services/external-save.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 
 angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
@@ -47,7 +50,7 @@ angular.module('oppia').component('stateTranslationEditor', {
         var state = ExplorationStatesService.getState(stateName);
         var recordedVoiceovers = state.recordedVoiceovers;
         var availableAudioLanguages = (
-          recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
+          recordedVoiceovers.getLanguageCodes(contentId));
         if (availableAudioLanguages.indexOf(languageCode) !== -1) {
           var voiceover = recordedVoiceovers.getVoiceover(
             contentId, languageCode);
@@ -164,7 +167,13 @@ angular.module('oppia').component('stateTranslationEditor', {
         $scope.dataFormat = (
           TranslationTabActiveContentIdService.getActiveDataFormat());
         $scope.HTML_SCHEMA = {
-          type: 'html'
+          type: 'html',
+          ui_config: {
+            activeLanguage: (
+              TranslationLanguageService.getActiveLanguageCode()),
+            activeLanguageDirection: (
+              TranslationLanguageService.getActiveLanguageDirection())
+          }
         };
         $scope.UNICODE_SCHEMA = {
           type: 'unicode'

@@ -31,7 +31,6 @@ import logging
 import math
 import os
 import pprint
-import traceback
 import zipfile
 
 from constants import constants
@@ -126,33 +125,43 @@ def get_exploration_titles_and_categories(exp_ids):
     return result
 
 
-def get_exploration_ids_matching_query(query_string, cursor=None):
+def get_exploration_ids_matching_query(
+        query_string, categories, language_codes, offset=None):
     """Returns a list with all exploration ids matching the given search query
-    string, as well as a search cursor for future fetches.
+    string, as well as a search offset for future fetches.
 
     This method returns exactly feconf.SEARCH_RESULTS_PAGE_SIZE results if
     there are at least that many, otherwise it returns all remaining results.
     (If this behaviour does not occur, an error will be logged.) The method
-    also returns a search cursor.
+    also returns a search offset.
 
     Args:
         query_string: str. A search query string.
-        cursor: str or None. Optional cursor from which to start the search
-            query. If no cursor is supplied, the first N results matching
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
+        offset: str or None. Optional offset from which to start the search
+            query. If no offset is supplied, the first N results matching
             the query are returned.
 
     Returns:
         list(str). A list of exploration ids matching the given search query.
     """
     returned_exploration_ids = []
-    search_cursor = cursor
+    search_offset = offset
 
     for _ in python_utils.RANGE(MAX_ITERATIONS):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
-        exp_ids, search_cursor = search_services.search_explorations(
-            query_string, remaining_to_fetch, cursor=search_cursor)
+        exp_ids, search_offset = search_services.search_explorations(
+            query_string, categories, language_codes, remaining_to_fetch,
+            offset=search_offset)
 
         invalid_exp_ids = []
         for ind, model in enumerate(
@@ -163,7 +172,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
                 invalid_exp_ids.append(exp_ids[ind])
 
         if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
-                or search_cursor is None):
+                or search_offset is None):
             break
         else:
             logging.error(
@@ -171,12 +180,12 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
                 ', '.join(invalid_exp_ids))
 
     if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-            and search_cursor is not None):
+            and search_offset is not None):
         logging.error(
             'Could not fulfill search request for query string %s; at least '
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
-    return (returned_exploration_ids, search_cursor)
+    return (returned_exploration_ids, search_offset)
 
 
 def get_non_private_exploration_summaries():
@@ -404,8 +413,10 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected hints_list to be a list,'
                             ' received %s' % change.new_value)
-                    new_hints_list = [state_domain.Hint.from_dict(hint_dict)
-                                      for hint_dict in change.new_value]
+                    new_hints_list = [
+                        state_domain.Hint.from_dict(hint_dict)
+                        for hint_dict in change.new_value
+                    ]
                     state.update_interaction_hints(new_hints_list)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
@@ -479,9 +490,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'param_specs':
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
-                    exploration.update_param_changes(
-                        list(python_utils.MAP(
-                            to_param_domain, change.new_value)))
+                    exploration.update_param_changes(list(
+                        python_utils.MAP(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
@@ -489,9 +499,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
-            elif (
-                    change.cmd ==
-                    exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
+            elif (change.cmd ==
+                  exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
                 # Loading the exploration model from the datastore into an
                 # Exploration domain object automatically converts it to use
                 # the latest states schema version. As a result, simply
@@ -516,8 +525,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
-        logging.error(traceback.format_exc())
-        raise
+        python_utils.reraise_exception()
 
 
 def _save_exploration(committer_id, exploration, commit_message, change_list):
@@ -683,7 +691,8 @@ def _create_exploration(
     stats_services.create_exp_issues_for_new_exploration(
         exploration.id, exploration.version)
 
-    regenerate_exploration_summary(exploration.id, committer_id)
+    regenerate_exploration_summary_with_new_contributor(
+        exploration.id, committer_id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -786,7 +795,7 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
 
 def delete_explorations_from_subscribed_users(exploration_ids):
-    """Remove explorations from all subscribers' activity_ids.
+    """Remove explorations from all subscribers' exploration_ids.
 
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
@@ -794,14 +803,12 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     if not exploration_ids:
         return
 
-    # TODO(#10727): activity_ids in UserSubscriptionsModel should be renamed
-    # to explorations_id.
     subscription_models = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
+        user_models.UserSubscriptionsModel.exploration_ids.IN(exploration_ids)
     ).fetch()
     for model in subscription_models:
-        model.activity_ids = [
-            id_ for id_ in model.activity_ids if id_ not in exploration_ids]
+        model.exploration_ids = [
+            id_ for id_ in model.exploration_ids if id_ not in exploration_ids]
     user_models.UserSubscriptionsModel.update_timestamps_multi(
         subscription_models)
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
@@ -942,7 +949,8 @@ def update_exploration(
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    regenerate_exploration_summary(exploration_id, committer_id)
+    regenerate_exploration_summary_with_new_contributor(
+        exploration_id, committer_id)
 
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
         user_services.add_edited_exploration_id(committer_id, exploration_id)
@@ -957,37 +965,45 @@ def update_exploration(
             exploration_id)
 
 
-def regenerate_exploration_summary(exploration_id, contributor_id_to_add):
-    """Regenerate a summary of the given exploration. If the summary does not
-    exist, this function generates a new one.
+def regenerate_exploration_summary_with_new_contributor(
+        exploration_id, contributor_id):
+    """Regenerate a summary of the given exploration and add a new contributor
+    to the contributors summary. If the summary does not exist, this function
+    generates a new one.
 
     Args:
         exploration_id: str. The id of the exploration.
-        contributor_id_to_add: str or None. The user_id of user who have
-            created the exploration will be added to the list of contributours
-            for the exploration if the argument is not None and it is not a
-            system id.
+        contributor_id: str. ID of the contributor to be added to
+            the exploration summary.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = compute_summary_of_exploration(
-        exploration, contributor_id_to_add)
+    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_summary.add_contribution_by_user(contributor_id)
     save_exploration_summary(exp_summary)
 
 
-def compute_summary_of_exploration(exploration, contributor_id_to_add):
+def regenerate_exploration_and_contributors_summaries(exploration_id):
+    """Regenerate a summary of the given exploration and also regenerate
+    the contributors summary from the snapshots. If the summary does not exist,
+    this function generates a new one.
+
+    Args:
+        exploration_id: str. ID of the exploration.
+    """
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_summary.contributors_summary = (
+        compute_exploration_contributors_summary(exp_summary.id))
+    save_exploration_summary(exp_summary)
+
+
+def _compute_summary_of_exploration(exploration):
     """Create an ExplorationSummary domain object for a given Exploration
-    domain object and return it. contributor_id_to_add will be added to
-    the list of contributors for the exploration if the argument is not
-    None and if the id is not a system id.
+    domain object and return it.
 
     Args:
         exploration: Exploration. The exploration whose summary is to be
             computed.
-        contributor_id_to_add: str|None. The user_id of user who have
-            contributed (humans who have made a positive (not just a revert)
-            change to the exploration's content) will be added to the list of
-            contributors for the exploration if the argument is not None and it
-            is not a system id.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
@@ -999,24 +1015,12 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
             exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
         scaled_average_rating = get_scaled_average_rating(ratings)
-        contributors_summary = old_exp_summary.contributors_summary or {}
     else:
         ratings = feconf.get_empty_ratings()
         scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
-        contributors_summary = {}
 
-    # Update the contributor id list if necessary (contributors
-    # defined as humans who have made a positive (i.e. not just
-    # a revert) change to an exploration's content).
-
-    if contributor_id_to_add is None:
-        # Recalculate the contributors because revert was done.
-        contributors_summary = compute_exploration_contributors_summary(
-            exploration.id)
-    elif contributor_id_to_add not in constants.SYSTEM_USER_IDS:
-        contributors_summary[contributor_id_to_add] = (
-            contributors_summary.get(contributor_id_to_add, 0) + 1)
-
+    contributors_summary = (
+        exp_summary_model.contributors_summary if exp_summary_model else {})
     contributor_ids = list(contributors_summary.keys())
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
@@ -1101,7 +1105,7 @@ def save_exploration_summary(exp_summary):
         'editor_ids': exp_summary.editor_ids,
         'voice_artist_ids': exp_summary.voice_artist_ids,
         'viewer_ids': exp_summary.viewer_ids,
-        'contributor_ids': exp_summary.contributor_ids,
+        'contributor_ids': list(exp_summary.contributors_summary.keys()),
         'contributors_summary': exp_summary.contributors_summary,
         'version': exp_summary.version,
         'exploration_model_last_updated': (
@@ -1193,9 +1197,7 @@ def revert_exploration(
         caching_services.CACHE_NAMESPACE_EXPLORATION, None,
         [exploration.id])
 
-    # Update the exploration summary, but since this is just a revert do
-    # not add the committer of the revert to the list of contributors.
-    regenerate_exploration_summary(exploration_id, None)
+    regenerate_exploration_and_contributors_summaries(exploration_id)
 
     exploration_stats = stats_services.get_stats_for_new_exp_version(
         exploration.id, current_version + 1, exploration.states,
