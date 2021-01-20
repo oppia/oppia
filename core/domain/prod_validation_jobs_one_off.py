@@ -357,20 +357,6 @@ class ExplorationSnapshotContentModelAuditOneOffJob(
     """Job that audits and validates ExplorationSnapshotContentModel."""
 
     @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        """Marks a job as queued and adds it to a queue for processing.
-
-        Args:
-            job_id: str. The ID of the job to enqueue.
-            additional_job_params: dict(str : *) or None. Additional parameters
-                for the job.
-        """
-        # We have to decrease the number of shards for this job, since the job
-        # is getting killed due to Out Of Memory.
-        super(ExplorationSnapshotContentModelAuditOneOffJob, cls).enqueue(
-            job_id, additional_job_params=additional_job_params, shard_count=4)
-
-    @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationSnapshotContentModel]
 
