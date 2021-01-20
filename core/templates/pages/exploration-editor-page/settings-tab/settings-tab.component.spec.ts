@@ -46,7 +46,6 @@ import { ReadOnlyExplorationBackendApiService } from
 
 import { Subscription } from 'rxjs';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { ExplorationFeaturesService } from 'services/exploration-features.service';
 
 class MockRouterService {
   private refreshSettingsTabEventEmitter: EventEmitter<void>;
@@ -536,7 +535,7 @@ describe('Settings Tab Component', function() {
       expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
     });
 
-    fit('should check if AAAAAAAAAAa', function() {
+    it('should check if AAAAAAAAAAa', function() {
       var paramChangeBackendDict = {
         customization_args: {
           parse_with_jinja: false,
@@ -544,7 +543,8 @@ describe('Settings Tab Component', function() {
         },
         generator_id: '123',
         name: 'test',
-      }
+      };
+
       expect(ctrl.areParametersUsed()).toBe(false);
       explorationDataService.data.param_changes.push(paramChangeBackendDict);
       expect(ctrl.areParametersUsed()).toBe(true);
