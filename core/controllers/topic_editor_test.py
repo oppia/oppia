@@ -1009,20 +1009,20 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
     def test_topic_url_fragment_handler(self):
         self.login(self.ADMIN_EMAIL)
 
-        self.topic_url_fragment = 'fragment'
+        topic_url_fragment = 'fragment'
 
         # Topic url fragment does not exist yet.
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.TOPIC_URL_FRAGMENT_HANDLER,
-                self.topic_url_fragment))
+                topic_url_fragment))
         self.assertEqual(json_response['topic_url_fragment_exists'], False)
 
         # Publish the topic.
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Topic Name',
-            abbreviated_name=self.topic_url_fragment,
-            url_fragment=self.topic_url_fragment,
+            abbreviated_name='Topic Name',
+            url_fragment=topic_url_fragment,
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
@@ -1032,7 +1032,7 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.TOPIC_URL_FRAGMENT_HANDLER,
-                self.topic_url_fragment))
+                topic_url_fragment))
         self.assertEqual(json_response['topic_url_fragment_exists'], True)
 
         self.logout()
@@ -1044,17 +1044,17 @@ class TopicNameHandlerTest(BaseTopicEditorControllerTests):
     def test_topic_name_handler(self):
         self.login(self.ADMIN_EMAIL)
 
-        self.topic_name = 'Topic Name'
+        topic_name = 'Topic Name'
 
         # Topic name does not exist yet.
         json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, self.topic_name))
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
         self.assertEqual(json_response['topic_name_exists'], False)
 
         # Publish the topic.
         self.save_new_topic(
-            self.topic_id, self.admin_id, name=self.topic_name,
-            abbreviated_name="my-topic", url_fragment="my-topic",
+            self.topic_id, self.admin_id, name=topic_name,
+            abbreviated_name=topic_name, url_fragment='my-topic',
             description='Description', canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
@@ -1062,7 +1062,7 @@ class TopicNameHandlerTest(BaseTopicEditorControllerTests):
 
         # Topic name exists since we've already published it.
         json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, self.topic_name))
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
         self.assertEqual(json_response['topic_name_exists'], True)
 
         self.logout()
