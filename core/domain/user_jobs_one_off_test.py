@@ -2882,15 +2882,15 @@ class ProfilePictureMigrationOneOffJobTests(test_utils.GenericTestBase):
         editor_user_settings_model.profile_picture_data_url = None
         editor_user_settings_model.update_timestamps()
         editor_user_settings_model.put()
-        user_settings_model = (
+        moderator_user_settings_model = (
             user_models.UserSettingsModel.get_by_id(moderator_id))
-        user_settings_model.deleted = True
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
+        moderator_user_settings_model.deleted = True
+        moderator_user_settings_model.update_timestamps()
+        moderator_user_settings_model.put()
         with self.swap(constants, 'DEV_MODE', False):
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(
-                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
+                    feconf.ENTITY_TYPE_USER, self.OWNER_USERNAME))
             fs.commit(
                 constants.PROFILE_PICTURE_FILEPATH, self.testing_image_bytes)
             output = self._run_one_off_job()
@@ -2899,7 +2899,7 @@ class ProfilePictureMigrationOneOffJobTests(test_utils.GenericTestBase):
             output,
             [
                 ['SUCCESS - PROFILE PICTURE ALREADY GENERATED', 1],
-                ['SUCCESS - GENERATED PROFILE PICTURE', 2],
+                ['SUCCESS - GENERATED PROFILE PICTURE', 1],
                 ['SUCCESS - DELETED', 1]
             ]
         )
@@ -2938,23 +2938,79 @@ class ProfilePictureGCSAuditOneOffJobTests(test_utils.GenericTestBase):
             user_models.UserSettingsModel.get_by_id(self.owner_id))
 
         with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'correct_profile_picture.png'),
+            'rb',
+            encoding=None
+        ) as f:
+            self.correct_picture_bytes = f.read()
+
+        with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
-            self.testing_png_image_bytes = f.read()
+            self.wrong_dimensions_picture_bytes = f.read()
 
         with python_utils.open_file(
             os.path.join(
-                feconf.TESTS_DATA_DIR, 'broken_img.svg'
+                feconf.TESTS_DATA_DIR, 'broken_img.png'
             ), 'rb', encoding=None
         ) as f:
-            self.testing_png_broken_image_bytes = f.read()
+            self.broken_picture_bytes = f.read()
 
         with python_utils.open_file(
             os.path.join(
                 feconf.TESTS_DATA_DIR, 'test_svg.svg'
             ), 'rb', encoding=None
         ) as f:
-            self.testing_svg_image_bytes = f.read()
+            self.svg_picture_bytes = f.read()
+
+    def test_user_with_correct_profile_picture_correct_output(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
+            fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH, self.correct_picture_bytes)
+
+            output = self._run_one_off_job()
+            self.assertEqual(output, [['SUCCESS', 1]])
+
+    def test_user_with_wrong_dimensions_profile_picture_correct_output(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
+            fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH,
+                self.wrong_dimensions_picture_bytes
+            )
+
+            output = self._run_one_off_job()
+            self.assertEqual(
+                output,
+                [[
+                    'FAILURE - PROFILE PICTURE NON STANDARD DIMENSIONS - 32,32',
+                    [self.OWNER_USERNAME]
+                ]]
+            )
+
+    def test_user_with_broken_profile_picture_correct_output(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
+            fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH,
+                self.broken_picture_bytes
+            )
+
+            output = self._run_one_off_job()
+            self.assertEqual(
+                output,
+                [[
+                    'FAILURE - CANNOT LOAD PROFILE PICTURE',
+                    [self.OWNER_USERNAME]
+                ]]
+            )
 
     def test_user_with_profile_picture_in_wrong_format_correct_output(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -2963,29 +3019,13 @@ class ProfilePictureGCSAuditOneOffJobTests(test_utils.GenericTestBase):
                     feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
             fs.commit(
                 constants.PROFILE_PICTURE_FILEPATH,
-                self.testing_png_broken_image_bytes
+                self.svg_picture_bytes
             )
 
             output = self._run_one_off_job()
             self.assertEqual(
                 output,
-                [['FAILURE - CANNOT LOAD PROFILE PICTURE', 1]]
-            )
-
-    def test_user_with_profile_picture_in_wrong_format_correct_output(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(
-                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
-            fs.commit(
-                constants.PROFILE_PICTURE_FILEPATH,
-                self.testing_svg_image_bytes
-            )
-
-            output = self._run_one_off_job()
-            self.assertEqual(
-                output,
-                [['FAILURE - PROFILE PICTURE NOT PNG', 1]]
+                [['FAILURE - PROFILE PICTURE NOT PNG', [self.OWNER_USERNAME]]]
             )
 
     def test_user_without_profile_picture_correct_output(self):
@@ -3028,24 +3068,35 @@ class ProfilePictureGCSAuditOneOffJobTests(test_utils.GenericTestBase):
         editor_user_settings_model.profile_picture_data_url = None
         editor_user_settings_model.update_timestamps()
         editor_user_settings_model.put()
-        user_settings_model = (
+        moderator_user_settings_model = (
             user_models.UserSettingsModel.get_by_id(moderator_id))
-        user_settings_model.deleted = True
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
+        moderator_user_settings_model.deleted = True
+        moderator_user_settings_model.update_timestamps()
+        moderator_user_settings_model.put()
         with self.swap(constants, 'DEV_MODE', False):
-            fs = fs_domain.AbstractFileSystem(
+            owner_fs = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(
-                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
-            fs.commit(
-                constants.PROFILE_PICTURE_FILEPATH, self.testing_image_bytes)
+                    feconf.ENTITY_TYPE_USER, self.OWNER_USERNAME))
+            owner_fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH,
+                self.wrong_dimensions_picture_bytes
+            )
+            new_user_fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_USER, self.NEW_USER_USERNAME))
+            new_user_fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH, self.correct_picture_bytes)
             output = self._run_one_off_job()
 
         self.assertItemsEqual(
             output,
             [
-                ['SUCCESS - PROFILE PICTURE ALREADY GENERATED', 1],
-                ['SUCCESS - GENERATED PROFILE PICTURE', 2],
+                [
+                    'FAILURE - PROFILE PICTURE NON STANDARD DIMENSIONS - 32,32',
+                    [self.OWNER_USERNAME]
+                ],
+                ['FAILURE - MISSING PROFILE PICTURE', [self.EDITOR_USERNAME]],
+                ['SUCCESS', 1],
                 ['SUCCESS - DELETED', 1]
             ]
         )
