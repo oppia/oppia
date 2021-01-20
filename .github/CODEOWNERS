@@ -443,7 +443,7 @@
 /core/templates/services/contextual/meta-tag-customization.service*.ts @srijanreddy98
 /core/templates/services/interaction-rules-registry.service*.ts @DubeySandeep
 /core/templates/services/interaction-specs.service*.ts @DubeySandeep
-/core/templates/services/translation-file-hash-loader.service.ts @nithusha21
+/core/templates/services/translation-file-hash-loader-backend-api.service.ts @nithusha21
 /redis.conf @seanlip
 /release_constants.json @DubeySandeep @nithusha21
 

@@ -18,7 +18,7 @@
  * @author milagro.teruel@gmail.com (Milagro Teruel)
  */
 
-require('services/translation-file-hash-loader.service.ts');
+require('services/translation-file-hash-loader-backend-api.service.ts');
 
 angular.module('oppia').directive('i18nFooter', [
   function() {
@@ -81,7 +81,7 @@ angular.module('oppia').config([
     $translateProvider
       .registerAvailableLanguageKeys(
         availableLanguageKeys, availableLanguageKeysMap)
-      .useLoader('TranslationFileHashLoaderService', {
+      .useLoader('TranslationFileHashLoaderBackendApiService', {
         prefix: '/i18n/',
         suffix: '.json'
       })
