@@ -1045,6 +1045,17 @@ class ProfilePictureMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('SUCCESS - NOT REGISTERED', model.username)
             return
 
+        image_already_generated = fs_services.image_exists(
+            constants.PROFILE_PICTURE_FILEPATH,
+            feconf.ENTITY_TYPE_USER,
+            model.username
+        )
+
+        if image_already_generated:
+            yield (
+                'SUCCESS - PROFILE PICTURE ALREADY GENERATED', model.username)
+            return
+
         if model.profile_picture_data_url is None:
             user_services.generate_initial_profile_picture(model.id)
             yield ('SUCCESS - GENERATED PROFILE PICTURE', model.username)
@@ -1087,17 +1098,17 @@ class ProfilePictureGCSAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         if not fs_services.image_exists(
-                constants.PROFILE_PICTURE_FILEPATH,
-                feconf.ENTITY_TYPE_USER,
-                model.username
+            constants.PROFILE_PICTURE_FILEPATH,
+            feconf.ENTITY_TYPE_USER,
+            model.username
         ):
             yield ('FAILURE - MISSING PROFILE PICTURE', model.username)
             return
 
         profile_picture_binary = fs_services.get_image(
-                constants.PROFILE_PICTURE_FILEPATH,
-                feconf.ENTITY_TYPE_USER,
-                model.username
+            constants.PROFILE_PICTURE_FILEPATH,
+            feconf.ENTITY_TYPE_USER,
+            model.username
         )
 
         if imghdr.what(None, h=profile_picture_binary) != 'png':

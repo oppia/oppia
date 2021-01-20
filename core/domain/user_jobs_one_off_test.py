@@ -21,14 +21,18 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
+import imghdr
+import os
 import re
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import fs_domain
 from core.domain import learner_progress_services
 from core.domain import rating_services
 from core.domain import rights_domain
@@ -44,6 +48,8 @@ from core.tests.data import image_constants
 import feconf
 import python_utils
 import utils
+
+import requests
 
 auth_models, user_models, feedback_models, exp_models = (
     models.Registry.import_models(
@@ -2591,6 +2597,27 @@ class CleanUpUserContributionsModelOneOffJobTests(test_utils.GenericTestBase):
             model_instance_2.edited_exploration_ids, [])
 
 
+def mock_generate_initial_profile_picture(user_id):
+    """Generates a profile picture for a new user and
+    updates the user's settings in the datastore.
+
+    Args:
+        user_id: str. The unique ID of the user.
+    """
+    user_email = user_services.get_email_from_user_id(user_id)
+    gravatar_url = user_services.get_gravatar_url(user_email)
+    response = requests.get(
+        gravatar_url,
+        headers={b'Content-Type': b'image/png'},
+        allow_redirects=False)
+    user_settings_model = (
+        user_models.UserSettingsModel.get(user_id, strict=True))
+    user_settings_model.profile_picture_data_url = (
+        utils.convert_png_binary_to_data_url(response.content))
+    user_settings_model.update_timestamps()
+    user_settings_model.put()
+
+
 class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
@@ -2618,17 +2645,25 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
             super(ProfilePictureAuditOneOffJobTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.generate_initial_profile_picture(self.owner_id)
+        with self.swap(
+            user_services,
+            'generate_initial_profile_picture',
+            mock_generate_initial_profile_picture
+        ):
+            user_services.generate_initial_profile_picture(self.owner_id)
+        self.user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(self.owner_id))
 
     def test_correct_profile_picture_has_success_value(self):
-        user_services.generate_initial_profile_picture(self.owner_id)
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS', 1]])
 
     def test_resized_image_has_profile_picture_non_standard_dimensions_error(
             self):
-        user_services.update_profile_picture_data_url(
-            self.owner_id, image_constants.PNG_IMAGE_WRONG_DIMENSIONS_BASE64)
+        self.user_settings_model.profile_picture_data_url = (
+            image_constants.PNG_IMAGE_WRONG_DIMENSIONS_BASE64)
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(
             output,
@@ -2639,8 +2674,10 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         )
 
     def test_invalid_image_has_cannot_load_picture_error(self):
-        user_services.update_profile_picture_data_url(
-            self.owner_id, image_constants.PNG_IMAGE_BROKEN_BASE64)
+        self.user_settings_model.profile_picture_data_url = (
+            image_constants.PNG_IMAGE_BROKEN_BASE64)
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(
             output,
@@ -2648,8 +2685,10 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         )
 
     def test_non_png_image_has_profile_picture_not_png_error(self):
-        user_services.update_profile_picture_data_url(
-            self.owner_id, image_constants.JPG_IMAGE_BASE64)
+        self.user_settings_model.profile_picture_data_url = (
+            image_constants.JPG_IMAGE_BASE64)
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(
             output,
@@ -2658,8 +2697,10 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_broken_base64_data_url_has_invalid_profile_picture_data_url_error(
             self):
-        user_services.update_profile_picture_data_url(
-            self.owner_id, image_constants.BROKEN_BASE64)
+        self.user_settings_model.profile_picture_data_url = (
+            image_constants.BROKEN_BASE64)
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(
             output,
@@ -2671,7 +2712,9 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_user_without_profile_picture_has_missing_profile_picture_error(
             self):
-        user_services.update_profile_picture_data_url(self.owner_id, None)
+        self.user_settings_model.profile_picture_data_url = None
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(
             output,
@@ -2679,20 +2722,16 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         )
 
     def test_not_registered_user_has_not_registered_value(self):
-        user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(self.owner_id))
-        user_settings_model.username = None
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
+        self.user_settings_model.username = None
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS - NOT REGISTERED', 1]])
 
     def test_deleted_user_has_deleted_value(self):
-        user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(self.owner_id))
-        user_settings_model.deleted = True
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
+        self.user_settings_model.deleted = True
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
         output = self._run_one_off_job()
         self.assertEqual(output, [['SUCCESS - DELETED', 1]])
 
@@ -2709,15 +2748,23 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
 
-        user_services.update_profile_picture_data_url(
-            new_user_id, image_constants.JPG_IMAGE_BASE64)
-        user_services.update_profile_picture_data_url(editor_id, None)
+        new_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(new_user_id))
+        new_user_settings_model.profile_picture_data_url = (
+            image_constants.JPG_IMAGE_BASE64)
+        new_user_settings_model.update_timestamps()
+        new_user_settings_model.put()
+        editor_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(editor_id))
+        editor_user_settings_model.profile_picture_data_url = None
+        editor_user_settings_model.update_timestamps()
+        editor_user_settings_model.put()
 
-        user_settings_model = (
+        moderator_user_settings_model = (
             user_models.UserSettingsModel.get_by_id(moderator_id))
-        user_settings_model.deleted = True
-        user_settings_model.update_timestamps()
-        user_settings_model.put()
+        moderator_user_settings_model.deleted = True
+        moderator_user_settings_model.update_timestamps()
+        moderator_user_settings_model.put()
 
         output = self._run_one_off_job()
         self.assertItemsEqual(
@@ -2727,6 +2774,279 @@ class ProfilePictureAuditOneOffJobTests(test_utils.GenericTestBase):
                 ['FAILURE - MISSING PROFILE PICTURE', [self.EDITOR_USERNAME]],
                 ['SUCCESS - DELETED', 1],
                 ['FAILURE - PROFILE PICTURE NOT PNG', [self.NEW_USER_USERNAME]]
+            ]
+        )
+
+
+class ProfilePictureMigrationOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.ProfilePictureMigrationOneOffJob.create_new()
+        user_jobs_one_off.ProfilePictureMigrationOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.ProfilePictureMigrationOneOffJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(ProfilePictureMigrationOneOffJobTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        with self.swap(
+                user_services,
+                'generate_initial_profile_picture',
+                mock_generate_initial_profile_picture
+        ):
+            user_services.generate_initial_profile_picture(self.owner_id)
+        self.user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(self.owner_id))
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            self.testing_image_bytes = f.read()
+
+    def test_user_with_profile_picture_has_picture_migrated(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            output = self._run_one_off_job()
+            self.assertEqual(
+                output,
+                [['SUCCESS - MOVED PROFILE PICTURE TO GCS', 1]]
+            )
+
+    def test_user_without_profile_picture_has_new_picture_generated(self):
+        self.user_settings_model.profile_picture_data_url = None
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
+        with self.swap(constants, 'DEV_MODE', False):
+            output = self._run_one_off_job()
+            self.assertEqual(
+                output,
+                [['SUCCESS - GENERATED PROFILE PICTURE', 1]]
+            )
+
+    def test_user_with_migrate_profile_picture_has_correct_output(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
+            fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH, self.testing_image_bytes)
+
+            output = self._run_one_off_job()
+            self.assertEqual(
+                output, [['SUCCESS - PROFILE PICTURE ALREADY GENERATED', 1]]
+            )
+
+    def test_user_without_username_has_not_registered_value(self):
+        self.user_settings_model.username = None
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS - NOT REGISTERED', 1]])
+
+    def test_deleted_user_has_deleted_value(self):
+        self.user_settings_model.deleted = True
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS - DELETED', 1]])
+
+    def test_zero_users_has_no_output(self):
+        user_models.UserSettingsModel.delete_by_id(self.owner_id)
+        output = self._run_one_off_job()
+        self.assertEqual(output, [])
+
+    def test_multiple_users_have_correct_values(self):
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+
+        editor_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(editor_id))
+        editor_user_settings_model.profile_picture_data_url = None
+        editor_user_settings_model.update_timestamps()
+        editor_user_settings_model.put()
+        user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(moderator_id))
+        user_settings_model.deleted = True
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
+            fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH, self.testing_image_bytes)
+            output = self._run_one_off_job()
+
+        self.assertItemsEqual(
+            output,
+            [
+                ['SUCCESS - PROFILE PICTURE ALREADY GENERATED', 1],
+                ['SUCCESS - GENERATED PROFILE PICTURE', 2],
+                ['SUCCESS - DELETED', 1]
+            ]
+        )
+
+
+class ProfilePictureGCSAuditOneOffJobTests(test_utils.GenericTestBase):
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs_one_off.ProfilePictureGCSAuditOneOffJob.create_new()
+        user_jobs_one_off.ProfilePictureGCSAuditOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_mapreduce_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_mapreduce_tasks()
+        stringified_output = (
+            user_jobs_one_off.ProfilePictureGCSAuditOneOffJob.get_output(
+                job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to sign up the superadmin user.
+        with self.swap(
+            test_utils.AppEngineTestBase, 'signup_superadmin_user', empty):
+            super(ProfilePictureGCSAuditOneOffJobTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.generate_initial_profile_picture(self.owner_id)
+        self.user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(self.owner_id))
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            self.testing_png_image_bytes = f.read()
+
+        with python_utils.open_file(
+            os.path.join(
+                feconf.TESTS_DATA_DIR, 'broken_img.svg'
+            ), 'rb', encoding=None
+        ) as f:
+            self.testing_png_broken_image_bytes = f.read()
+
+        with python_utils.open_file(
+            os.path.join(
+                feconf.TESTS_DATA_DIR, 'test_svg.svg'
+            ), 'rb', encoding=None
+        ) as f:
+            self.testing_svg_image_bytes = f.read()
+
+    def test_user_with_profile_picture_in_wrong_format_correct_output(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
+            fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH,
+                self.testing_png_broken_image_bytes
+            )
+
+            output = self._run_one_off_job()
+            self.assertEqual(
+                output,
+                [['FAILURE - CANNOT LOAD PROFILE PICTURE', 1]]
+            )
+
+    def test_user_with_profile_picture_in_wrong_format_correct_output(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
+            fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH,
+                self.testing_svg_image_bytes
+            )
+
+            output = self._run_one_off_job()
+            self.assertEqual(
+                output,
+                [['FAILURE - PROFILE PICTURE NOT PNG', 1]]
+            )
+
+    def test_user_without_profile_picture_correct_output(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            output = self._run_one_off_job()
+            self.assertEqual(
+                output,
+                [['FAILURE - MISSING PROFILE PICTURE', [self.OWNER_USERNAME]]]
+            )
+
+    def test_user_without_username_has_not_registered_value(self):
+        self.user_settings_model.username = None
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS - NOT REGISTERED', 1]])
+
+    def test_deleted_user_has_deleted_value(self):
+        self.user_settings_model.deleted = True
+        self.user_settings_model.update_timestamps()
+        self.user_settings_model.put()
+        output = self._run_one_off_job()
+        self.assertEqual(output, [['SUCCESS - DELETED', 1]])
+
+    def test_zero_users_has_no_output(self):
+        user_models.UserSettingsModel.delete_by_id(self.owner_id)
+        output = self._run_one_off_job()
+        self.assertEqual(output, [])
+
+    def test_multiple_users_have_correct_values(self):
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+
+        editor_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(editor_id))
+        editor_user_settings_model.profile_picture_data_url = None
+        editor_user_settings_model.update_timestamps()
+        editor_user_settings_model.put()
+        user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(moderator_id))
+        user_settings_model.deleted = True
+        user_settings_model.update_timestamps()
+        user_settings_model.put()
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    feconf.ENTITY_TYPE_USER, self.user_settings_model.username))
+            fs.commit(
+                constants.PROFILE_PICTURE_FILEPATH, self.testing_image_bytes)
+            output = self._run_one_off_job()
+
+        self.assertItemsEqual(
+            output,
+            [
+                ['SUCCESS - PROFILE PICTURE ALREADY GENERATED', 1],
+                ['SUCCESS - GENERATED PROFILE PICTURE', 2],
+                ['SUCCESS - DELETED', 1]
             ]
         )
 

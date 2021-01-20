@@ -117,7 +117,7 @@ class UserSettingsModel(base_models.BaseModel):
     # May be None.
     first_contribution_msec = datastore_services.FloatProperty(default=None)
 
-    # DEPRECATED in v3.0.5 Do not use.
+    # DEPRECATED in v3.0.8 Do not use.
     profile_picture_data_url = (
         datastore_services.TextProperty(default=None, indexed=False))
 
