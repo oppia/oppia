@@ -341,6 +341,7 @@
 /core/templates/components/common-layout-directives/navigation-bars/ @nithusha21
 /core/templates/services/bottom-navbar-status.service*.ts @nithusha21
 /core/templates/services/navigation.service*.ts @nithusha21
+/core/templates/services/sidebar-status.service*.ts @nithusha21
 
 
 # New structures team.
