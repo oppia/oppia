@@ -157,7 +157,7 @@ describe('Statistics Tab Component', function() {
           }
         }
       }));
-    spyOn(explorationStatsService, 'getExplorationStatsAsync').and.returnValue(
+    spyOn(explorationStatsService, 'getExplorationStats').and.returnValue(
       $q.resolve({
         numStarts: 20,
         numActualStarts: 10,
