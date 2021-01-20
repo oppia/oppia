@@ -64,7 +64,7 @@ require('services/rte-helper.service.ts');
 require('services/site-analytics.service.ts');
 require('services/state-interaction-stats.service.ts');
 require('services/stateful/focus-manager.service.ts');
-require('services/translation-file-hash-loader.service.ts');
+require('services/translation-file-hash-loader-backend-api.service.ts');
 require('services/user.service.ts');
 
 require('google-analytics.initializer.ts');
