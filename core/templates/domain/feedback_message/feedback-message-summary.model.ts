@@ -16,9 +16,6 @@
  * @fileoverview Frontend Model for feedback message summary.
  */
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-
 interface FeedbackMessageSummaryBackendDict {
   'message_id': number;
   'text': string;

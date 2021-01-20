@@ -261,7 +261,7 @@ export class UrlInterpolationService {
         username: username,
         filepath: AppConstants.PROFILE_PICTURE_FILEPATH
       }
-    )
+    );
   }
 }
 

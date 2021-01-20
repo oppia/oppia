@@ -21,7 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import imghdr
 import os
 import re
 
@@ -2807,9 +2806,9 @@ class ProfilePictureMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         with self.swap(
-                user_services,
-                'generate_initial_profile_picture',
-                mock_generate_initial_profile_picture
+            user_services,
+            'generate_initial_profile_picture',
+            mock_generate_initial_profile_picture
         ):
             user_services.generate_initial_profile_picture(self.owner_id)
         self.user_settings_model = (
@@ -3057,7 +3056,6 @@ class ProfilePictureGCSAuditOneOffJobTests(test_utils.GenericTestBase):
 
     def test_multiple_users_have_correct_values(self):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)

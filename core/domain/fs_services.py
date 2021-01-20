@@ -90,7 +90,7 @@ def save_original_and_compressed_versions_of_image(
         compressed_image_content = original_image_content
         micro_image_content = original_image_content
 
-    save_image(filepath, entity_type, entity_id,  original_image_content)
+    save_image(filepath, entity_type, entity_id, original_image_content)
     save_image(
         compressed_image_filepath,
         entity_type,

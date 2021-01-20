@@ -234,7 +234,8 @@ angular.module('oppia').directive('tutorCard', [
                 if (userInfo.isLoggedIn()) {
                   ctrl.profilePictureUrl = (
                     UrlInterpolationService.getProfilePictureUrl(
-                      userInfo.getUsername()))
+                      userInfo.getUsername())
+                  );
                 }
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.

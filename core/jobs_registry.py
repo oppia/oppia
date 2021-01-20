@@ -126,6 +126,8 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
     user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
+    user_jobs_one_off.ProfilePictureMigrationOneOffJob,
+    user_jobs_one_off.ProfilePictureGCSAuditOneOffJob,
     user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
     user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
     user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob

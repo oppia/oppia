@@ -17,11 +17,11 @@
  * exist.
  */
 
-import {
-  Component, ElementRef, Input, OnChanges, ViewChild
-} from "@angular/core";
-import { UrlInterpolationService } from "domain/utilities/url-interpolation.service";
-import { downgradeComponent } from "@angular/upgrade/static";
+import { Component, ElementRef, Input, OnChanges, ViewChild } from
+  '@angular/core';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'profile-picture',
@@ -44,7 +44,7 @@ export class ProfilePictureComponent implements OnChanges {
   ngOnChanges(): void {
     if (this.username) {
       this.profilePictureUrl = (
-        this.urlInterpolationService.getProfilePictureUrl(this.username))
+        this.urlInterpolationService.getProfilePictureUrl(this.username));
       this.profilePictureIsLoading = true;
     }
   }
@@ -58,7 +58,7 @@ export class ProfilePictureComponent implements OnChanges {
     const refreshInterval = setInterval(() => {
       if (offsetHeight === 0) {
         offsetHeight = this.parentDiv.nativeElement.offsetHeight;
-        this.spinnerDiameter = offsetHeight - (offsetHeight/10);
+        this.spinnerDiameter = offsetHeight - (offsetHeight / 10);
       } else {
         clearInterval(refreshInterval);
       }

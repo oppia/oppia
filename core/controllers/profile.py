@@ -184,8 +184,7 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_preferred_audio_language_code(
                 self.user_id, data)
         elif update_type == 'profile_picture_blob':
-            print(data)
-            user_services.update_profile_picture(self.user_id, data)
+             user_services.update_profile_picture(self.user_id, data)
         elif update_type == 'default_dashboard':
             user_services.update_user_default_dashboard(self.user_id, data)
         elif update_type == 'email_preferences':

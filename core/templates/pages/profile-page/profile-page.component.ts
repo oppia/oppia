@@ -36,10 +36,10 @@ angular.module('oppia').component('profilePage', {
   template: require('./profile-page.component.html'),
   controller: [
     '$log', '$rootScope', '$scope', 'DateTimeFormatService', 'LoaderService',
-    'UrlInterpolationService', 'UserService', 'WindowRef',
+    'UserService', 'WindowRef',
     function(
         $log, $rootScope, $scope, DateTimeFormatService, LoaderService,
-        UrlInterpolationService, UserService, WindowRef) {
+        UserService, WindowRef) {
       var ctrl = this;
       const ProfilePageBackendApiService = (
         OppiaAngularRootComponent.profilePageBackendApiService);

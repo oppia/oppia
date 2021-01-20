@@ -1062,7 +1062,7 @@ class ProfilePictureMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         profile_picture_binary = utils.convert_png_data_url_to_binary(
-                model.profile_picture_data_url)
+            model.profile_picture_data_url)
         user_services.update_profile_picture(model.id, profile_picture_binary)
         yield ('SUCCESS - MOVED PROFILE PICTURE TO GCS', model.username)
 
@@ -1098,9 +1098,9 @@ class ProfilePictureGCSAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         if not fs_services.image_exists(
-            constants.PROFILE_PICTURE_FILEPATH,
-            feconf.ENTITY_TYPE_USER,
-            model.username
+                constants.PROFILE_PICTURE_FILEPATH,
+                feconf.ENTITY_TYPE_USER,
+                model.username
         ):
             yield ('FAILURE - MISSING PROFILE PICTURE', model.username)
             return

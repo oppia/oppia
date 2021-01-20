@@ -21,8 +21,6 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { UserInfo } from 'domain/user/user-info.model.ts';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserService } from 'services/user.service';
@@ -40,12 +38,11 @@ class MockWindowRef {
 }
 
 describe('User Api Service', () => {
-  let userService: UserService = null;
-  let urlInterpolationService: UrlInterpolationService = null;
-  let urlService: UrlService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
-  let windowRef: MockWindowRef = null;
+  let userService: UserService;
+  let urlService: UrlService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
+  let windowRef: MockWindowRef;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -55,7 +52,6 @@ describe('User Api Service', () => {
     });
     httpTestingController = TestBed.get(HttpTestingController);
     userService = TestBed.get(UserService);
-    urlInterpolationService = TestBed.get(UrlInterpolationService);
     urlService = TestBed.get(UrlService);
     csrfService = TestBed.get(CsrfTokenService);
 

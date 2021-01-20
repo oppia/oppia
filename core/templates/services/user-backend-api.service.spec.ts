@@ -27,10 +27,9 @@ import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
-  let userBackendApiService: UserBackendApiService = null;
-  let urlInterpolationService: UrlInterpolationService = null;
-  let httpTestingController: HttpTestingController = null;
-  let csrfService: CsrfTokenService = null;
+  let userBackendApiService: UserBackendApiService;
+  let httpTestingController: HttpTestingController;
+  let csrfService: CsrfTokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,7 +37,6 @@ describe('User Backend Api Service', () => {
     });
     httpTestingController = TestBed.get(HttpTestingController);
     userBackendApiService = TestBed.get(UserBackendApiService);
-    urlInterpolationService = TestBed.get(UrlInterpolationService);
     csrfService = TestBed.get(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(

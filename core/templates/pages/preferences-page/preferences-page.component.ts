@@ -182,7 +182,7 @@ angular.module('oppia').component('preferencesPage', {
           ctrl.email = userInfo.getEmail();
           if (ctrl.username) {
             ctrl.profilePictureUrl = (
-              UrlInterpolationService.getProfilePictureUrl(ctrl.username))
+              UrlInterpolationService.getProfilePictureUrl(ctrl.username));
           }
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.

@@ -442,7 +442,7 @@ angular.module('oppia').component('learnerDashboardPage', {
           ctrl.username = userInfo.getUsername();
           if (ctrl.username) {
             ctrl.profilePictureUrl = (
-              UrlInterpolationService.getProfilePictureUrl(ctrl.username))
+              UrlInterpolationService.getProfilePictureUrl(ctrl.username));
           }
           // TODO(#8521): Remove the use of $rootScope.$apply()
           // once the controller is migrated to angular.

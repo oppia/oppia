@@ -79,24 +79,25 @@ angular.module('oppia').directive('adminNavbar', [
               return UrlInterpolationService.getStaticImageUrl(imagePath);
             };
 
-          ctrl.username = '';
-          ctrl.isModerator = null;
-          ctrl.isSuperAdmin = null;
-          ctrl.profileUrl = '';
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.username = userInfo.getUsername();
-            ctrl.isModerator = userInfo.isModerator();
-            ctrl.isSuperAdmin = userInfo.isSuperAdmin();
-            if (ctrl.username) {
-              ctrl.profileUrl = (
-                UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
-                  username: ctrl.username
-                })
-              );
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();}
-          });
+            ctrl.username = '';
+            ctrl.isModerator = null;
+            ctrl.isSuperAdmin = null;
+            ctrl.profileUrl = '';
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.username = userInfo.getUsername();
+              ctrl.isModerator = userInfo.isModerator();
+              ctrl.isSuperAdmin = userInfo.isSuperAdmin();
+              if (ctrl.username) {
+                ctrl.profileUrl = (
+                  UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
+                    username: ctrl.username
+                  })
+                );
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$applyAsync();
+              }
+            });
 
             ctrl.logoutUrl = LOGOUT_URL;
             ctrl.profileDropdownIsActive = false;
