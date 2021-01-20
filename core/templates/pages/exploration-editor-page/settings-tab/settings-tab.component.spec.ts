@@ -535,7 +535,7 @@ describe('Settings Tab Component', function() {
       expect(explorationWarningsService.updateWarnings).toHaveBeenCalled();
     });
 
-    it('should check if AAAAAAAAAAa', function() {
+    it('should check if parameters are used', function() {
       var paramChangeBackendDict = {
         customization_args: {
           parse_with_jinja: false,
