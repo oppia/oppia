@@ -469,8 +469,7 @@ class UserInfoHandler(base.BaseHandler):
                 'is_moderator': (
                     user_services.is_at_least_moderator(self.user_id)),
                 'is_admin': user_services.is_admin(self.user_id),
-                'is_super_admin': (
-                    user_services.is_current_user_super_admin()),
+                'is_super_admin': self.current_user_is_super_admin,
                 'is_topic_manager': (
                     user_services.is_topic_manager(self.user_id)),
                 'can_create_collections': bool(
