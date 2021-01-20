@@ -60,7 +60,7 @@ describe('Exploration permissions backend api service', () => {
     let expectedResponse =
       ExplorationPermissions.createFromBackendDict(backendResponse);
 
-    epbas.getPermissionsAsync().then((expPermissions) => {
+    epbas.getPermissions().then((expPermissions) => {
       expect(expPermissions).toEqual(expectedResponse);
     });
 
@@ -77,7 +77,7 @@ describe('Exploration permissions backend api service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      epbas.getPermissionsAsync().then(successHandler, failHandler);
+      epbas.getPermissions().then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
         '/createhandler/permissions/exp1');
