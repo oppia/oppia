@@ -46,9 +46,9 @@ describe('Translations backend API service', () => {
     };
 
     translationsBackendApiService.fetchTranslationsAsync('en')
-    .then(response => {
-      expect(response).toEqual(translations);
-    });
+      .then(response => {
+        expect(response).toEqual(translations);
+      });
 
     let req = httpTestingController.expectOne('/assets/i18n/en.json');
     expect(req.request.method).toEqual('GET');
