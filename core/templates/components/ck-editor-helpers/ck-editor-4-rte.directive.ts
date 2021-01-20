@@ -43,7 +43,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
      * @param uiConfig Parameters to add to CKEditor config
      * @param pluginNames Comma separated list of plugin names
      * @param buttonNames Array of button names for RTE components
-     * @param extraAllowedContentRules additional allowed content rules for
+     * @param extraAllowedContentRules Additional allowed content rules for
      * CKEDITOR.editor.filter
      * @param sharedSpaces IDs of the page elements that will store the editor
      * UI elements
@@ -53,10 +53,10 @@ angular.module('oppia').directive('ckEditor4Rte', [
         pluginNames: string,
         buttonNames: string[],
         extraAllowedContentRules: string,
-        sharedSpaces: object
+        sharedSpaces: CKEDITOR.sharedSpace
     ): CKEDITOR.config {
       // Language configs use default language when undefined.
-      let ckConfig: CKEDITOR.config = {
+      const ckConfig: CKEDITOR.config = {
         extraPlugins: 'pre,sharedspace,' + pluginNames,
         startupFocus: true,
         removePlugins: 'indentblock',
@@ -94,19 +94,23 @@ angular.module('oppia').directive('ckEditor4Rte', [
           }
         ]
       };
-      if (uiConfig) {
-        if (uiConfig.language) {
-          ckConfig.language = uiConfig.language;
-          ckConfig.contentsLanguage = uiConfig.language;
-        }
-        if (uiConfig.languageDirection) {
-          ckConfig.contentsLangDirection = (
-            uiConfig.languageDirection);
-        }
-        if (uiConfig.startupFocusEnabled !== undefined) {
-          ckConfig.startupFocus = uiConfig.startupFocusEnabled;
-        }
+
+      if (!uiConfig) {
+        return uiConfig;
       }
+
+      if (uiConfig.language) {
+        ckConfig.language = uiConfig.language;
+        ckConfig.contentsLanguage = uiConfig.language;
+      }
+      if (uiConfig.languageDirection) {
+        ckConfig.contentsLangDirection = (
+          uiConfig.languageDirection);
+      }
+      if (uiConfig.startupFocusEnabled !== undefined) {
+        ckConfig.startupFocus = uiConfig.startupFocusEnabled;
+      }
+
       return ckConfig;
     };
 
