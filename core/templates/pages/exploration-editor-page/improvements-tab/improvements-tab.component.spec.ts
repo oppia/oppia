@@ -67,7 +67,7 @@ describe('Improvements tab', function() {
   ]));
 
   beforeEach(() => {
-    this.expStatsSpy = spyOn(taskRegistryService, 'getExplorationStats');
+    this.expStatsSpy = spyOn(taskRegistryService, 'getExplorationStatsAsync');
     this.hbrTasksSpy = (
       spyOn(taskRegistryService, 'getOpenHighBounceRateTasks'));
     this.iflTasksSpy = (
