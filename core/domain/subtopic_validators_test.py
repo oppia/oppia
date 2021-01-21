@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for core.domain.prod_validators."""
+"""Unit tests for core.domain.subtopic_validators_test."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -41,13 +41,11 @@ USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
 (
-    collection_models, exp_models, feedback_models,
     story_models, subtopic_models,
-    suggestion_models, topic_models, user_models
+    topic_models, user_models
 ) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.exploration, models.NAMES.feedback,
     models.NAMES.story, models.NAMES.subtopic,
-    models.NAMES.suggestion, models.NAMES.topic, models.NAMES.user
+    models.NAMES.topic, models.NAMES.user
 ])
 
 
