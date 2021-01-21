@@ -96,7 +96,7 @@ angular.module('oppia').factory('ExplorationImprovementsService', [
 
       const states = ExplorationStatesService.getStates();
       const expStats = (
-        await ExplorationStatsService.getExplorationStats(expId));
+        await ExplorationStatsService.getExplorationStatsAsync(expId));
       const {openTasks, resolvedTaskTypesByStateName} = (
         await ExplorationImprovementsBackendApiService.getTasksAsync(expId));
       const topAnswersByStateName = (

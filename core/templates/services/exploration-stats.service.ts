@@ -34,7 +34,7 @@ export class ExplorationStatsService {
       private explorationStatsBackendApiService:
         ExplorationStatsBackendApiService) {}
 
-  getExplorationStats(expId: string): Promise<ExplorationStats> {
+  async getExplorationStatsAsync(expId: string): Promise<ExplorationStats> {
     if (this.statsCache === null) {
       this.statsCache = (
         this.explorationStatsBackendApiService.fetchExplorationStatsAsync(
