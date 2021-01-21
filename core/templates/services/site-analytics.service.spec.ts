@@ -48,7 +48,7 @@ describe('Site Analytics Service', () => {
     sas.registerNewSignupEvent();
 
     expect(gaSpy).toHaveBeenCalledWith(
-      'send', 'event', 'SignupButton', 'click', '');
+      'send', 'event', 'OnboardingEngagement', 'signup', 'AccountSignUp');
   });
 
   it('should register click browse lessons event', () => {
@@ -330,10 +330,10 @@ describe('Site Analytics Service', () => {
   });
 
   it('should register finish exploration event', () => {
-    sas.registerFinishExploration();
+    sas.registerFinishExploration('123');
 
     expect(gaSpy).toHaveBeenCalledWith(
-      'send', 'event', 'PlayerFinishExploration', 'click', '');
+      'send', 'event', 'PlayerFinishExploration', 'engage', '123');
   });
 
   it('should register open collection from landing page event', () => {
@@ -422,5 +422,34 @@ describe('Site Analytics Service', () => {
     expect(gaSpy).toHaveBeenCalledWith(
       'send', 'event', 'ContributorDashboardRejectSuggestion', 'click',
       contributionType);
+  });
+
+  it('should register active lesson usage', () => {
+    sas.registerLessonActiveUse();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ActiveUserStartAndSawCards', 'engage', '');
+  });
+
+  it('should register exploration start', () => {
+    const explorationId = 'abc1';
+    sas.registerStartExploration(explorationId);
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'PlayerStartExploration', 'engage', explorationId);
+  });
+
+  it('should register active classroom lesson usage', () => {
+    sas.registerClassroomLessonActiveUse();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ClassroomActiveUserStartAndSawCards', 'engage', '');
+  });
+
+  it('should register classroom header click event', () => {
+    sas.registerClassoomHeaderClickEvent();
+
+    expect(gaSpy).toHaveBeenCalledWith(
+      'send', 'event', 'ClassroomEngagement', 'click', 'ClickOnClassroom');
   });
 });
