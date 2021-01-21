@@ -33,7 +33,8 @@ var SubTopicViewerPage = function() {
     var subTopicTileListCount = await subTopicTileList.count();
     if (count > 0) {
       await waitFor.visibilityOf(
-        subTopicTileList.first(), 'Revisions cards take too long to be visible.');
+        subTopicTileList.first(),
+        'Revisions cards take too long to be visible.');
     }
     await expect(subTopicTileListCount).toEqual(count);
   };
