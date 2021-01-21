@@ -44,6 +44,10 @@ describe('Audio preloader service', () => {
   const audioBlob = new Blob(['audio data'], {type: 'audiotype'});
 
   let explorationDict: ExplorationBackendDict = {
+    draft_change_list_id: 1,
+    draft_changes: [],
+    version: '1',
+    is_version_of_draft_valid: true,
     language_code: 'en',
     title: 'My Title',
     init_state_name: 'Introduction',
@@ -238,7 +242,10 @@ describe('Audio preloader service', () => {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: '1'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['1']
+              }}
             }],
             outcome: {
               dest: 'State 1',
@@ -256,7 +263,10 @@ describe('Audio preloader service', () => {
           }, {
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: '2'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['2']
+              }}
             }],
             outcome: {
               dest: 'State 2',

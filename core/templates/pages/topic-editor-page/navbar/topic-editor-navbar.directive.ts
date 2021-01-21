@@ -194,16 +194,16 @@ angular.module('oppia').directive('topicEditorNavbar', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic-editor-page/modal-templates/' +
                 'topic-editor-save-modal.template.html'),
-              backdrop: true,
+              backdrop: 'static',
               resolve: {
                 topicIsPublished: () => topicIsPublished
               },
               controller: 'TopicEditorSaveModalController'
             }).result.then(function(commitMessage) {
-              TopicEditorStateService.saveTopic(commitMessage);
-              var successToast = 'Changes saved.';
-              AlertsService.addSuccessMessage(
-                successToast, 1000);
+              TopicEditorStateService.saveTopic(commitMessage, () => {
+                AlertsService.addSuccessMessage('Changes Saved.');
+                $rootScope.$applyAsync();
+              });
             }, function() {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.

@@ -94,7 +94,7 @@ angular.module('oppia').directive('stateHintsEditor', [
 
           $scope.getHintSummary = function(hint) {
             var hintAsPlainText = $filter(
-              'formatRtePreview')(hint.hintContent.getHtml());
+              'formatRtePreview')(hint.hintContent.html);
             return hintAsPlainText;
           };
 
@@ -102,7 +102,7 @@ angular.module('oppia').directive('stateHintsEditor', [
             var currentActiveIndex = StateHintsService.getActiveHintIndex();
             if (currentActiveIndex !== null && (
               !StateHintsService.displayed[currentActiveIndex]
-                .hintContent.getHtml())) {
+                .hintContent.html)) {
               if (StateSolutionService.savedMemento &&
                 StateHintsService.displayed.length === 1) {
                 openDeleteLastHintModal();

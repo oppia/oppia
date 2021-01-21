@@ -2293,9 +2293,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-rule-block {
   background-color: white;
-  border-left: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  border-top: 1px solid #ccc;
+  border: 1px solid #ccc;
 }
 
 .oppia-rule-block.active {
@@ -3850,7 +3848,8 @@ oppia-noninteractive-link {
 }
 
 .oppia-about-otter-speech-bubble h3 {
-  color: #000;
+  color: #333;
+  font-weight: 700;
   margin: 20px 0 20px 0;
 }
 
