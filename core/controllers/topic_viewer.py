@@ -68,9 +68,9 @@ class TopicPageDataHandler(base.BaseHandler):
         canonical_story_dicts = []
         for story_summary in canonical_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id)["all_nodes"]
+                self.user_id, story_summary.id)['all_nodes']
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id)["pending_nodes"]
+                self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
             completed_node_titles = utils.compute_list_difference(
                 story_summary.node_titles, pending_node_titles)
@@ -84,9 +84,9 @@ class TopicPageDataHandler(base.BaseHandler):
         additional_story_dicts = []
         for story_summary in additional_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id)["all_nodes"]
+                self.user_id, story_summary.id)['all_nodes']
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
-                self.user_id, story_summary.id)["pending_nodes"]
+                self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
             completed_node_titles = utils.compute_list_difference(
                 story_summary.node_titles, pending_node_titles)

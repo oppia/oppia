@@ -312,8 +312,8 @@ def get_pending_and_all_nodes_in_story(user_id, story_id):
             pending_nodes.append(node)
 
     return {
-        "all_nodes":story.story_contents.nodes,
-        "pending_nodes":pending_nodes
+        'all_nodes': story.story_contents.nodes,
+        'pending_nodes': pending_nodes
     }
 
 
