@@ -1705,6 +1705,8 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     INVALID_STATE_STATS_KEY = 'invalid_state_stats'
     VALID_EXP_STATS_KEY = 'valid_exp_stats'
     VALID_STATE_STATS_KEY = 'valid_state_stats'
+    V1_EXPLORATION_MODEL = 'v1_exploration_model_encountered'
+    NO_STATS_MODELS_AVAILABLE = 'no_stat_models_available'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -1726,6 +1728,10 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if exp_stats_model else None
             for exp_stats_model in exp_stats_model_list
         ]
+        if all(exp_stats is None for exp_stats in exp_stats_list):
+            yield (
+                FillExplorationStatsOneOffJob.NO_STATS_MODELS_AVAILABLE, exp_id)
+            return
 
         exp_list = exp_fetchers.get_multiple_explorations_by_version(
             latest_exp_model.id, exp_versions)
@@ -1755,18 +1761,28 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             new_exp_version = None
 
             if revert_to_version is not None:
+                if revert_to_version == 1:
+                    yield (
+                        FillExplorationStatsOneOffJob.V1_EXPLORATION_MODEL,
+                        exp.id)
+                    return
                 exp_versions_diff = None
                 prev_exp_stats = exp_stats_list[revert_to_version - 2]
                 prev_exp = exp_list[revert_to_version - 2]
                 new_exp_version = revert_to_version
             else:
+                if exp.version == 1:
+                    yield (
+                        FillExplorationStatsOneOffJob.V1_EXPLORATION_MODEL,
+                        exp.id)
+                    return
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
                 prev_exp_stats = exp_stats_list[exp.version - 2]
                 prev_exp = exp_list[exp.version - 2]
                 new_exp_version = exp.version
 
-            # FILL MISSING EXPLORATION-LEVEL STATS.
+            # Fill missing Exploration-level stats.
             if exp_stats is not None:
                 num_valid_exp_stats += 1
             else:
@@ -1786,7 +1802,7 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         exp_id, exp.version, exp.states))
                 stats_services.create_stats_model(new_exploration_stats)
 
-            # FILL MISSING STATE-LEVEL STATS.
+            # Fill missing State-level stats.
             state_stats_mapping = exp_stats.state_stats_mapping
             for state_name, _ in exp.states.items():
                 if state_name in state_stats_mapping:
@@ -1829,6 +1845,8 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 FillExplorationStatsOneOffJob.VALID_EXP_STATS_KEY,
                 FillExplorationStatsOneOffJob.VALID_STATE_STATS_KEY):
             yield (key, sum(int(i) for i in items))
+        if key == FillExplorationStatsOneOffJob.V1_EXPLORATION_MODEL:
+            yield (key, items)
         else:
             for item in items:
                 yield (key, item)
