@@ -28,6 +28,7 @@ from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
 import feconf
+import utils
 
 (
     base_models, exp_models, feedback_models, question_models,
@@ -39,13 +40,13 @@ import feconf
 ])
 
 TARGET_TYPE_TO_TARGET_MODEL = {
-    suggestion_models.TARGET_TYPE_EXPLORATION: (
+    feconf.ENTITY_TYPE_EXPLORATION: (
         exp_models.ExplorationModel),
-    suggestion_models.TARGET_TYPE_QUESTION: (
+    feconf.ENTITY_TYPE_QUESTION: (
         question_models.QuestionModel),
-    suggestion_models.TARGET_TYPE_SKILL: (
+    feconf.ENTITY_TYPE_SKILL: (
         skill_models.SkillModel),
-    suggestion_models.TARGET_TYPE_TOPIC: (
+    feconf.ENTITY_TYPE_TOPIC: (
         topic_models.TopicModel)
 }
 VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
@@ -82,12 +83,12 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                 'feedback_thread_ids',
                 feedback_models.GeneralFeedbackThreadModel, [item.id])
         ]
-        if user_services.is_user_id_valid(item.author_id):
+        if utils.is_user_id_valid(item.author_id):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'author_ids',
-                    user_models.UserSettingsModel,
-                    [item.author_id]
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'author_ids', [item.author_id],
+                    may_contain_system_ids=True,
+                    may_contain_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -96,7 +97,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
                     '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                     [item.target_id]))
-        if item.final_reviewer_id and user_services.is_user_id_valid(
+        if item.final_reviewer_id and utils.is_user_id_valid(
                 item.final_reviewer_id):
 
             # Bot rejects suggestions when the suggestion's targeted entity gets
@@ -104,9 +105,11 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
             # for their user_id. Exclude external model validation for bot.
             if item.final_reviewer_id != feconf.SUGGESTION_BOT_USER_ID:
                 field_name_to_external_model_references.append(
-                    base_model_validators.ExternalModelFetcherDetails(
-                        'reviewer_ids', user_models.UserSettingsModel,
-                        [item.final_reviewer_id]))
+                    base_model_validators.UserSettingsModelFetcherDetails(
+                        'reviewer_ids', [item.final_reviewer_id],
+                        may_contain_system_ids=True,
+                        may_contain_pseudonymous_ids=True
+                    ))
         return field_name_to_external_model_references
 
     @classmethod
@@ -232,7 +235,7 @@ class GeneralSuggestionModelValidator(base_model_validators.BaseModelValidator):
             item.score_category.split(
                 suggestion_models.SCORE_CATEGORY_DELIMITER)[0])
 
-        if item.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+        if item.target_type == feconf.ENTITY_TYPE_EXPLORATION:
             target_model_references = (
                 field_name_to_external_model_references[
                     '%s_ids' % item.target_type])
@@ -299,12 +302,12 @@ class GeneralVoiceoverApplicationModelValidator(
     @classmethod
     def _get_external_id_relationships(cls, item):
         field_name_to_external_model_references = []
-        if user_services.is_user_id_valid(item.author_id):
+        if utils.is_user_id_valid(item.author_id):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'author_ids',
-                    user_models.UserSettingsModel,
-                    [item.author_id]
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'author_ids', [item.author_id],
+                    may_contain_system_ids=False,
+                    may_contain_pseudonymous_ids=True
                 )
             )
         if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
@@ -315,12 +318,14 @@ class GeneralVoiceoverApplicationModelValidator(
                     [item.target_id]))
         if (
                 item.final_reviewer_id and
-                user_services.is_user_id_valid(item.final_reviewer_id)
+                utils.is_user_id_valid(item.final_reviewer_id)
         ):
             field_name_to_external_model_references.append(
-                base_model_validators.ExternalModelFetcherDetails(
-                    'final_reviewer_ids', user_models.UserSettingsModel,
-                    [item.final_reviewer_id]))
+                base_model_validators.UserSettingsModelFetcherDetails(
+                    'final_reviewer_ids', [item.final_reviewer_id],
+                    may_contain_system_ids=False,
+                    may_contain_pseudonymous_ids=True
+                ))
         return field_name_to_external_model_references
 
     @classmethod
@@ -455,7 +460,7 @@ class CommunityContributionStatsModelValidator(
                 suggestion_models.STATUS_IN_REVIEW))
             .filter(
                 suggestion_models.GeneralSuggestionModel.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT))
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT))
         )
         for language_code in supported_language_codes:
             expected_translation_suggestion_count = (
@@ -538,7 +543,7 @@ class CommunityContributionStatsModelValidator(
                     suggestion_models.STATUS_IN_REVIEW))
             .filter(
                 suggestion_models.GeneralSuggestionModel.suggestion_type == (
-                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION))
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION))
             .count()
         )
         if item.question_suggestion_count != expected_question_suggestion_count:

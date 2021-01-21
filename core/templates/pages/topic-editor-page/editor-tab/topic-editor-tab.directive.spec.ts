@@ -25,10 +25,7 @@ import { importAllAngularServices } from 'tests/unit-test-utils';
 // ^^^ This block is to be removed.
 
 describe('Topic editor tab directive', function() {
-  importAllAngularServices();
-
   beforeEach(angular.mock.module('oppia'));
-
   importAllAngularServices();
 
   var $scope = null;

@@ -28,38 +28,55 @@ from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
-from core.platform import models
 import feconf
 import python_utils
 import utils
 
-(base_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration])
-current_user_services = models.Registry.import_current_user_services()
 
+def get_matching_activity_dicts(
+        query_string, categories, language_codes, search_offset):
+    """Given the details of a query and a search offset, returns a list of
+    activity dicts that satisfy the query.
 
-def get_matching_activity_dicts(query_string, search_cursor):
-    """Given a query string and a search cursor, returns a list of activity
-    dicts that satisfy the search query.
+    Args:
+        query_string: str. The search query string (this is what the user
+            enters).
+        categories: list(str). The list of categories to query for. If it is
+            empty, no category filter is applied to the results. If it is not
+            empty, then a result is considered valid if it matches at least one
+            of these categories.
+        language_codes: list(str). The list of language codes to query for. If
+            it is empty, no language code filter is applied to the results. If
+            it is not empty, then a result is considered valid if it matches at
+            least one of these language codes.
+        search_offset: str or None. Offset indicating where, in the list of
+            exploration search results, to start the search from. If None,
+            collection search results are returned first before the
+            explorations.
+
+    Returns:
+        tuple. A tuple consisting of two elements:
+            - list(dict). Each element in this list is a collection or
+                exploration summary dict, representing a search result.
+            - str. The exploration index offset from which to start the
+                next search.
     """
     # We only populate collections in the initial load, since the current
     # frontend search infrastructure is set up to only deal with one search
-    # cursor at a time.
+    # offset at a time.
     # TODO(sll): Remove this special casing.
     collection_ids = []
-    if not search_cursor:
+    if not search_offset:
         collection_ids, _ = (
             collection_services.get_collection_ids_matching_query(
-                query_string))
+                query_string, categories, language_codes))
 
-    exp_ids, new_search_cursor = (
+    exp_ids, new_search_offset = (
         exp_services.get_exploration_ids_matching_query(
-            query_string, cursor=search_cursor))
-    activity_list = []
+            query_string, categories, language_codes, offset=search_offset))
     activity_list = (
         summary_services.get_displayable_collection_summary_dicts_matching_ids(
-            collection_ids))
-    activity_list += (
+            collection_ids) +
         summary_services.get_displayable_exp_summary_dicts_matching_ids(
             exp_ids))
 
@@ -68,7 +85,7 @@ def get_matching_activity_dicts(query_string, search_cursor):
             '%s activities were fetched to load the library page. '
             'You may be running up against the default query limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
-    return activity_list, new_search_cursor
+    return activity_list, new_search_offset
 
 
 class OldLibraryRedirectPage(base.BaseHandler):
@@ -220,19 +237,41 @@ class SearchHandler(base.BaseHandler):
             (ord(char), None) for char in string.punctuation)
         query_string = query_string.translate(remove_punctuation_map)
 
-        if self.request.get('category'):
-            query_string += ' category=%s' % self.request.get('category')
-        if self.request.get('language_code'):
-            query_string += ' language_code=%s' % self.request.get(
-                'language_code')
-        search_cursor = self.request.get('cursor', None)
+        # If there is a category parameter, it should be in the following form:
+        #     category=("Algebra" OR "Math")
+        category_string = self.request.get('category', '')
+        if category_string and (
+                not category_string.startswith('("') or
+                not category_string.endswith('")')):
+            raise self.InvalidInputException('Invalid search query.')
+        # The 2 and -2 account for the '("" and '")' characters at the
+        # beginning and end.
+        categories = (
+            category_string[2:-2].split('" OR "') if category_string else [])
 
-        activity_list, new_search_cursor = get_matching_activity_dicts(
-            query_string, search_cursor)
+        # If there is a language code parameter, it should be in the following
+        # form:
+        #     language_code=("en" OR "hi")
+        language_code_string = self.request.get('language_code', '')
+        if language_code_string and (
+                not language_code_string.startswith('("') or
+                not language_code_string.endswith('")')):
+            raise self.InvalidInputException('Invalid search query.')
+        # The 2 and -2 account for the '("" and '")' characters at the
+        # beginning and end.
+        language_codes = (
+            language_code_string[2:-2].split('" OR "')
+            if language_code_string else [])
+
+        # TODO(#11314): Change 'cursor' to 'offset' here and in the frontend.
+        search_offset = self.request.get('cursor', None)
+
+        activity_list, new_search_offset = get_matching_activity_dicts(
+            query_string, categories, language_codes, search_offset)
 
         self.values.update({
             'activity_list': activity_list,
-            'search_cursor': new_search_cursor,
+            'search_cursor': new_search_offset,
         })
 
         self.render_json(self.values)

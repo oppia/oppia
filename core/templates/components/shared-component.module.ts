@@ -53,8 +53,8 @@ import { ProfileLinkImageComponent } from
   'components/profile-link-directives/profile-link-image.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { ThumbnailDisplayComponent } from
-  './forms/custom-forms-directives/thumbnail-display.component';
+import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 
 
 @NgModule({
@@ -76,7 +76,8 @@ import { ThumbnailDisplayComponent } from
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
     ThumbnailDisplayComponent,
-    TranslatePipe
+    TranslatePipe,
+    TakeBreakModalComponent
   ],
 
   entryComponents: [
@@ -86,6 +87,7 @@ import { ThumbnailDisplayComponent } from
     LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
     ProfileLinkImageComponent, ProfileLinkTextComponent,
     // These elements will remain here even after migration.
+    TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
@@ -104,6 +106,7 @@ import { ThumbnailDisplayComponent } from
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
     ThumbnailDisplayComponent,
+    TakeBreakModalComponent,
     TranslatePipe
   ],
 })

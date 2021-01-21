@@ -1,3 +1,4 @@
+
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +23,7 @@ var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var action = require('./action.js');
+const { browser } = require('protractor');
 
 var ExplorationPlayerPage = function() {
   var conversationInput = element(
@@ -116,6 +118,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickThroughToNextCard = async function() {
+    await waitFor.elementToBeClickable(nextCardButton);
     await action.click('Next Card button', nextCardButton);
   };
 
@@ -199,24 +202,29 @@ var ExplorationPlayerPage = function() {
   };
 
   var clickGotItButton = async function() {
+    await waitFor.elementToBeClickable(gotItButton);
     await action.click('Got It Button', gotItButton);
   };
 
   this.clickConfirmRedirectionButton = async function() {
+    await waitFor.elementToBeClickable(confirmRedirectionButton);
     await action.click('Confirm Redirection Button', confirmRedirectionButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.clickCancelRedirectionButton = async function() {
+    await waitFor.elementToBeClickable(cancelRedirectionButton);
     await action.click('Cancel Redirection Button', cancelRedirectionButton);
   };
 
   this.clickOnReturnToParentButton = async function() {
+    await waitFor.elementToBeClickable(returnToParentButton);
     await action.click('Return To Parent Button', returnToParentButton);
     await waitFor.pageToFullyLoad();
   };
 
   this.clickOnCloseSuggestionModalButton = async function() {
+    await waitFor.elementToBeClickable(closeSuggestionModalButton);
     await action.click(
       'Close Suggestion Modal Button', closeSuggestionModalButton);
     await waitFor.pageToFullyLoad();
@@ -240,8 +248,11 @@ var ExplorationPlayerPage = function() {
   this.expectExplorationToBeOver = async function() {
     await waitFor.visibilityOf(
       conversationContent.last(), 'Ending message not visible');
+    await waitFor.textToBePresentInElement(
+      conversationContent.last(), 'Congratulations, you have finished!',
+      'Ending Message Not Visible');
     expect(
-      await (conversationContent.last()).getText()
+      await (conversationContent.last().getText())
     ).toEqual('Congratulations, you have finished!');
   };
 
@@ -279,6 +290,8 @@ var ExplorationPlayerPage = function() {
   this.expectExplorationNameToBe = async function(name) {
     await waitFor.visibilityOf(
       explorationHeader, 'Exploration Header taking too long to appear.');
+    await waitFor.textToBePresentInElement(
+      explorationHeader, name, 'No Header Text');
     expect(
       await explorationHeader.getText()
     ).toBe(name);
@@ -286,15 +299,18 @@ var ExplorationPlayerPage = function() {
 
   this.expectExplorationRatingOnInformationCardToEqual = async function(
       ratingValue) {
+    await waitFor.elementToBeClickable(explorationInfoIcon);
     await action.click('Exploration Info Icon', explorationInfoIcon);
     var value = await infoCardRating.getText();
     expect(value).toBe(ratingValue);
   };
 
   this.rateExploration = async function(ratingValue) {
+    await waitFor.elementToBeClickable(ratingStars.get(ratingValue - 1));
     await action.click('Submit Button', ratingStars.get(ratingValue - 1));
     await waitFor.visibilityOfSuccessToast(
       'Success toast for rating takes too long to appear.');
+    await waitFor.elementToBeClickable(feedbackCloseButton);
     await action.click('Feedback Close Button', feedbackCloseButton);
     await waitFor.invisibilityOf(
       feedbackCloseButton, 'Close Feedback button does not disappear');
@@ -315,19 +331,23 @@ var ExplorationPlayerPage = function() {
   };
 
   this.submitFeedback = async function(feedback) {
+    await waitFor.elementToBeClickable(feedbackPopupLink);
     await action.click('Feedback Popup Link', feedbackPopupLink);
     await action.sendKeys('Feedback Text Area', feedbackTextArea, feedback);
+    await waitFor.elementToBeClickable(feedbackSubmitButton);
     await action.click('Feedback Submit Button', feedbackSubmitButton);
     await waitFor.invisibilityOf(
       feedbackSubmitButton, 'Feedback popup takes too long to disappear');
   };
 
   this.submitSuggestion = async function(suggestion, description) {
+    await waitFor.elementToBeClickable(suggestionPopupLink);
     await action.click('Suggestion Popup Link', suggestionPopupLink);
     var editor = await forms.RichTextEditor(explorationSuggestionModal);
     await editor.setPlainText(suggestion);
     await action.sendKeys(
       'Suggestion Description Input', suggestionDescriptionInput, description);
+    await waitFor.elementToBeClickable(suggestionSubmitButton);
     await action.click('Suggestion Submit Button', suggestionSubmitButton);
     await waitFor.invisibilityOf(
       suggestionSubmitButton, 'Suggestion popup takes too long to disappear');

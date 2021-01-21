@@ -46,6 +46,8 @@ describe('Image preloader service', () => {
 
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
+    draft_changes: [],
+    is_version_of_draft_valid: true,
     language_code: 'en',
     title: 'My Title',
     init_state_name: initStateName,
@@ -278,7 +280,10 @@ describe('Image preloader service', () => {
           answer_groups: [{
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: '1'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['1']
+              }}
             }],
             outcome: {
               dest: 'State 1',
@@ -296,7 +301,10 @@ describe('Image preloader service', () => {
           }, {
             rule_specs: [{
               rule_type: 'Contains',
-              inputs: {x: '2'}
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['2']
+              }}
             }],
             outcome: {
               dest: 'State 1',

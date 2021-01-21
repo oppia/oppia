@@ -84,7 +84,7 @@ describe('Topics and Skills Dashboard Page', function() {
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchDashboardData: () => {
+        fetchDashboardDataAsync: () => {
           var deferred = $q.defer();
           deferred.resolve({
             topicSummaries: sampleDataResults.topic_summary_dicts.map(
@@ -102,7 +102,7 @@ describe('Topics and Skills Dashboard Page', function() {
           });
           return deferred.promise;
         },
-        fetchSkillsDashboardData: () => {
+        fetchSkillsDashboardDataAsync: () => {
           var deferred = $q.defer();
           deferred.resolve({
             skillSummaries: sampleDataResults.skill_summary_dicts
@@ -370,7 +370,7 @@ describe('Topics and Skills Dashboard Page', function() {
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchDashboardData: () => {
+        fetchDashboardDataAsync: () => {
           var deferred = $q.defer();
           deferred.resolve({
             topicSummaries: sampleDataResults2.topic_summary_dicts,
@@ -383,7 +383,7 @@ describe('Topics and Skills Dashboard Page', function() {
           });
           return deferred.promise;
         },
-        fetchSkillsDashboardData: () => {
+        fetchSkillsDashboardDataAsync: () => {
           var deferred = $q.defer();
           deferred.resolve({
             skillSummaries: [
@@ -503,7 +503,7 @@ describe('Topics and Skills Dashboard Page', function() {
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchDashboardData: () => {
+        fetchDashboardDataAsync: () => {
           var deferred = $q.defer();
           var errorResponse = {
             status: 500
@@ -553,7 +553,7 @@ describe('Topics and Skills Dashboard Page', function() {
       mocktasdReinitalizedEventEmitter = new EventEmitter();
 
       var MockTopicsAndSkillsDashboardBackendApiService = {
-        fetchDashboardData: () => {
+        fetchDashboardDataAsync: () => {
           var deferred = $q.defer();
           var errorResponse = {
             status: 402

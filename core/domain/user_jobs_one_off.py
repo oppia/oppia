@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import copy
+import datetime
 import imghdr
 
 from core import jobs
@@ -362,9 +363,32 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         user_model.put()
 
 
-class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
+class FillExplorationIdsInUserSubscriptionsModelOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One off job that removes nonexisting activity ids from
+    """One off job that copies from activity_ids to exploration_ids
+    in UserSubscriptionsModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSubscriptionsModel]
+
+    @staticmethod
+    def map(model_instance):
+        model_instance.exploration_ids = model_instance.activity_ids
+        model_instance.update_timestamps(update_last_updated_time=False)
+        model_instance.put()
+        yield ('SUCCESS', model_instance.exploration_ids)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
+
+
+class CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One off job that removes nonexisting exploration ids from
     UserSubscriptionsModel.
     """
 
@@ -379,15 +403,15 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
         if not model_instance.deleted:
             fetched_exploration_model_instances = (
                 datastore_services.fetch_multiple_entities_by_ids_and_models(
-                    [('ExplorationModel', model_instance.activity_ids)]))[0]
+                    [('ExplorationModel', model_instance.exploration_ids)]))[0]
 
             exp_ids_removed = []
             for exp_id, exp_instance in list(python_utils.ZIP(
-                    model_instance.activity_ids,
+                    model_instance.exploration_ids,
                     fetched_exploration_model_instances)):
                 if exp_instance is None or exp_instance.deleted:
                     exp_ids_removed.append(exp_id)
-                    model_instance.activity_ids.remove(exp_id)
+                    model_instance.exploration_ids.remove(exp_id)
             if exp_ids_removed:
                 model_instance.update_timestamps()
                 model_instance.put()
@@ -403,69 +427,365 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
         yield (key, len(values))
 
 
-class RemoveGaeUserIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the gae_user_id from the UserSettingsModel."""
+class RemoveFeedbackThreadIDsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that deletes the feedback_thread_ids from the UserSubscriptionsModel.
 
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(user_settings_model):
-        # This is the only way to remove the field from the model,
-        # see https://stackoverflow.com/a/15116016/3688189 and
-        # https://stackoverflow.com/a/12701172/3688189.
-        if 'gae_user_id' in user_settings_model._properties:  # pylint: disable=protected-access
-            del user_settings_model._properties['gae_user_id']  # pylint: disable=protected-access
-            if 'gae_user_id' in user_settings_model._values:  # pylint: disable=protected-access
-                del user_settings_model._values['gae_user_id']  # pylint: disable=protected-access
-            user_settings_model.update_timestamps(
-                update_last_updated_time=False)
-            user_settings_model.put()
-            yield (
-                'SUCCESS_REMOVED - UserSettingsModel', user_settings_model.id)
-        else:
-            yield (
-                'SUCCESS_ALREADY_REMOVED - UserSettingsModel',
-                user_settings_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        """Implements the reduce function for this job."""
-        yield (key, len(values))
-
-
-class RemoveGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the gae_id from the UserSettingsModel.
+    NOTE TO DEVELOPERS: This job can be deleted after it is run in January
+    2021 release.
     """
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(RemoveFeedbackThreadIDsOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserSettingsModel]
+        return [user_models.UserSubscriptionsModel]
 
     @staticmethod
-    def map(user_settings_model):
+    def map(user_subscriptions_model):
         # This is the only way to remove the field from the model,
         # see https://stackoverflow.com/a/15116016/3688189 and
         # https://stackoverflow.com/a/12701172/3688189.
-        if 'gae_id' in user_settings_model._properties:  # pylint: disable=protected-access
-            del user_settings_model._properties['gae_id']  # pylint: disable=protected-access
-            if 'gae_id' in user_settings_model._values:  # pylint: disable=protected-access
-                del user_settings_model._values['gae_id']  # pylint: disable=protected-access
-            user_settings_model.update_timestamps(
+        if 'feedback_thread_ids' in user_subscriptions_model._properties:  # pylint: disable=protected-access
+            del user_subscriptions_model._properties['feedback_thread_ids']  # pylint: disable=protected-access
+            if 'feedback_thread_ids' in user_subscriptions_model._values:  # pylint: disable=protected-access
+                del user_subscriptions_model._values['feedback_thread_ids']  # pylint: disable=protected-access
+            user_subscriptions_model.update_timestamps(
                 update_last_updated_time=False)
-            user_settings_model.put()
+            user_subscriptions_model.put()
             yield (
-                'SUCCESS_REMOVED - UserSettingsModel', user_settings_model.id)
+                'SUCCESS_REMOVED - UserSubscriptionsModel',
+                user_subscriptions_model.id)
         else:
             yield (
-                'SUCCESS_ALREADY_REMOVED - UserSettingsModel',
-                user_settings_model.id)
+                'SUCCESS_ALREADY_REMOVED - UserSubscriptionsModel',
+                user_subscriptions_model.id)
 
     @staticmethod
     def reduce(key, values):
         """Implements the reduce function for this job."""
         yield (key, len(values))
+
+
+class FixUserSettingsCreatedOnOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that fixes the invalid values of created_on attribute in the
+    UserSettingsModel.
+    It is a one-off job and can be removed from the codebase after we resolve
+    this issue by running the job once in the January 2021 release.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(FixUserSettingsCreatedOnOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_settings_model):
+        user_id = user_settings_model.id
+        user_dates_list = [
+            (
+                'UserSettingsModel_last_updated',
+                user_settings_model.last_updated
+            ),
+            (
+                'UserSettingsModel_last_agreed_to_terms',
+                user_settings_model.last_agreed_to_terms
+            ),
+            (
+                'UserSettingsModel_last_started_state_editor_tutorial',
+                user_settings_model.last_started_state_editor_tutorial
+            ),
+            (
+                'UserSettingsModel_last_started_state_translation_tutorial',
+                user_settings_model.last_started_state_translation_tutorial
+            ),
+            (
+                'UserSettingsModel_last_logged_in',
+                user_settings_model.last_logged_in
+            ),
+            (
+                'UserSettingsModel_last_edited_an_exploration',
+                user_settings_model.last_edited_an_exploration
+            ),
+            (
+                'UserSettingsModel_last_created_an_exploration',
+                user_settings_model.last_created_an_exploration
+            ),
+        ]
+
+        if user_settings_model.first_contribution_msec is not None:
+            user_dates_list.append(
+                (
+                    'UserSettingsModel_first_contribution_msec',
+                    datetime.datetime.fromtimestamp(
+                        python_utils.divide(
+                            user_settings_model.first_contribution_msec, 1000.0)
+                    )
+                )
+            )
+
+        # Models in user storage module having user_id as an attribute.
+        exploration_user_data_model = (
+            user_models.ExplorationUserDataModel.query(
+                user_models.ExplorationUserDataModel.user_id == user_id).get()
+        )
+
+        all_models_linked_with_user_settings_model = [
+            ('ExplorationUserDataModel', exploration_user_data_model)
+        ]
+
+        # Models in user storage module keyed by user_id itself.
+        model_names_and_ids_to_be_fetched_in_batch = [
+            ('UserContributionsModel', [user_id]),
+            ('UserEmailPreferencesModel', [user_id]),
+            ('UserStatsModel', [user_id]),
+            ('UserSubscriptionsModel', [user_id]),
+        ]
+        fetched_batch_models = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                model_names_and_ids_to_be_fetched_in_batch)
+        )
+
+        for model_name_tuple, model_list in list(python_utils.ZIP(
+                model_names_and_ids_to_be_fetched_in_batch,
+                fetched_batch_models)):
+            model_name = model_name_tuple[0]
+            actual_model = model_list[0]
+            all_models_linked_with_user_settings_model.append(
+                (model_name, actual_model)
+            )
+
+        for model_name, model in all_models_linked_with_user_settings_model:
+            if model is not None:
+                user_dates_list.append(
+                    (
+                        model_name + python_utils.UNICODE('_last_updated'),
+                        model.last_updated
+                    )
+                )
+                user_dates_list.append(
+                    (
+                        model_name + python_utils.UNICODE('_created_on'),
+                        model.created_on
+                    )
+                )
+                if model_name == 'UserSubscriptionsModel':
+                    user_dates_list.append(
+                        (
+                            'UserSubscriptionsModel_last_checked',
+                            model.last_checked
+                        )
+                    )
+                if model_name == 'ExplorationUserDataModel':
+                    user_dates_list.append(
+                        (
+                            'ExplorationUserDataModel_rated_on',
+                            model.rated_on
+                        )
+                    )
+                    user_dates_list.append(
+                        (
+                            'ExplorationUserDataModel_draft_change_list_last_'
+                            'updated',
+                            model.draft_change_list_last_updated
+                        )
+                    )
+
+        filtered_user_dates_list = [
+            (attribute_name, date) for attribute_name, date in user_dates_list
+            if date is not None
+        ]
+        model_name, min_date = min(filtered_user_dates_list, key=lambda x: x[1])
+        time_delta_for_update = datetime.timedelta(minutes=5)
+
+        # This method for converting date_time_string to datettime object has
+        # also been used here:
+        # https://github.com/oppia/oppia/blob/d394b6a186acc74b5ec9c3fecc20cc3f1954f441/utils.py#L479
+        correction_cutoff_timestamp = datetime.datetime.strptime(
+            'Jul 1 2020', '%b %d %Y')
+        if user_settings_model.created_on - min_date > time_delta_for_update:
+            user_settings_model.update_timestamps(
+                update_last_updated_time=False)
+            user_settings_model.created_on = min_date
+            user_settings_model.put()
+            yield (
+                'SUCCESS_UPDATED_USING_' + python_utils.UNICODE(model_name), 1)
+
+            # Yield an additional error key for user_models created after
+            # cutoff date July 1, 2020 and having a discrepancy in their
+            # created_on.
+            if min_date >= correction_cutoff_timestamp:
+                yield ('ERROR_NOT_UP_TO_DATE_USER', user_id)
+        else:
+            yield ('SUCCESS_ALREADY_UP_TO_DATE', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        if key == 'ERROR_NOT_UP_TO_DATE_USER':
+            yield (key, values)
+        else:
+            yield (key, len(values))
+
+
+class UserSettingsCreatedOnAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits the value of created_on attribute in the
+    UserSettingsModel. This one-off job can be removed after we have verified
+    that all UserSettingsModels have their created_on set correctly.
+    """
+
+    @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(UserSettingsCreatedOnAuditOneOffJob, cls).enqueue(
+            job_id, shard_count=64)
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_settings_model):
+        user_id = user_settings_model.id
+        user_dates_list = [
+            (
+                'UserSettingsModel_created_on',
+                user_settings_model.created_on
+            ),
+            (
+                'UserSettingsModel_last_updated',
+                user_settings_model.last_updated
+            ),
+            (
+                'UserSettingsModel_last_agreed_to_terms',
+                user_settings_model.last_agreed_to_terms
+            ),
+            (
+                'UserSettingsModel_last_started_state_editor_tutorial',
+                user_settings_model.last_started_state_editor_tutorial
+            ),
+            (
+                'UserSettingsModel_last_started_state_translation_tutorial',
+                user_settings_model.last_started_state_translation_tutorial
+            ),
+            (
+                'UserSettingsModel_last_logged_in',
+                user_settings_model.last_logged_in
+            ),
+            (
+                'UserSettingsModel_last_edited_an_exploration',
+                user_settings_model.last_edited_an_exploration
+            ),
+            (
+                'UserSettingsModel_last_created_an_exploration',
+                user_settings_model.last_created_an_exploration
+            ),
+        ]
+
+        if user_settings_model.first_contribution_msec is not None:
+            user_dates_list.append(
+                (
+                    'UserSettingsModel_first_contribution_msec',
+                    datetime.datetime.fromtimestamp(
+                        python_utils.divide(
+                            user_settings_model.first_contribution_msec, 1000.0)
+                    )
+                )
+            )
+
+        # Models in user storage module having user_id as an attribute.
+        exploration_user_data_model = (
+            user_models.ExplorationUserDataModel.query(
+                user_models.ExplorationUserDataModel.user_id == user_id).get()
+        )
+
+        all_models_linked_with_user_settings_model = [
+            ('ExplorationUserDataModel', exploration_user_data_model)
+        ]
+
+        # Models in user storage module keyed by user_id.
+        model_names_and_ids_to_be_fetched_in_batch = [
+            ('UserContributionsModel', [user_id]),
+            ('UserEmailPreferencesModel', [user_id]),
+            ('UserStatsModel', [user_id]),
+            ('UserSubscriptionsModel', [user_id]),
+        ]
+        fetched_batch_models = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                model_names_and_ids_to_be_fetched_in_batch)
+        )
+
+        for model_name_tuple, model_list in list(python_utils.ZIP(
+                model_names_and_ids_to_be_fetched_in_batch,
+                fetched_batch_models)):
+            model_name = model_name_tuple[0]
+            actual_model = model_list[0]
+            all_models_linked_with_user_settings_model.append(
+                (model_name, actual_model)
+            )
+
+        for model_name, model in all_models_linked_with_user_settings_model:
+            if model is not None:
+                user_dates_list.append(
+                    (
+                        model_name + python_utils.UNICODE('_last_updated'),
+                        model.last_updated
+                    )
+                )
+                user_dates_list.append(
+                    (
+                        model_name + python_utils.UNICODE('_created_on'),
+                        model.created_on
+                    )
+                )
+                if model_name == 'UserSubscriptionsModel':
+                    user_dates_list.append(
+                        (
+                            'UserSubscriptionsModel_last_checked',
+                            model.last_checked
+                        )
+                    )
+                if model_name == 'ExplorationUserDataModel':
+                    user_dates_list.append(
+                        (
+                            'ExplorationUserDataModel_rated_on',
+                            model.rated_on
+                        )
+                    )
+                    user_dates_list.append(
+                        (
+                            'ExplorationUserDataModel_draft_change_list_last_'
+                            'updated',
+                            model.draft_change_list_last_updated
+                        )
+                    )
+
+        filtered_user_dates_list = [
+            (attribute_name, date) for attribute_name, date in user_dates_list
+            if date is not None
+        ]
+        model_name, min_date = min(filtered_user_dates_list, key=lambda x: x[1])
+        time_delta_for_correctness = datetime.timedelta(minutes=5)
+        if user_settings_model.created_on - min_date > (
+                time_delta_for_correctness):
+            yield (
+                'ERROR_NEED_TO_UPDATE_USING_' + python_utils.UNICODE(
+                    model_name), user_id)
+        else:
+            yield ('SUCCESS_ALREADY_UP_TO_DATE', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        if key.startswith('ERROR_NEED_TO_UPDATE_USING'):
+            yield (key, values)
+        else:
+            yield (key, len(values))
 
 
 class CleanUpUserSubscribersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -696,71 +1016,6 @@ class ProfilePictureAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
-
-
-class UserAuthDetailsModelAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that audits whether there are UserAuthDetailsModels with the same
-    gae_id field.
-    """
-
-    @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        # We can raise the number of shards for this job, since it goes only
-        # over one type of entity class.
-        super(UserAuthDetailsModelAuditOneOffJob, cls).enqueue(
-            job_id, shard_count=32)
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserAuthDetailsModel]
-
-    @staticmethod
-    def map(model):
-        number_of_models_with_same_gae_id = (
-            user_models.UserAuthDetailsModel.query(
-                user_models.UserAuthDetailsModel.gae_id == model.gae_id
-            ).count()
-        )
-
-        if number_of_models_with_same_gae_id > 1:
-            yield ('FAILURE', model.id)
-        else:
-            yield ('SUCCESS', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        if key.startswith('SUCCESS'):
-            yield (key, len(values))
-        else:
-            yield (key, values)
-
-
-class GenerateUserIdentifiersModelOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that creates UserIdentifiersModel for each UserAuthDetailsModel."""
-
-    @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
-        # We can raise the number of shards for this job, since it goes only
-        # over one type of entity class.
-        super(GenerateUserIdentifiersModelOneOffJob, cls).enqueue(
-            job_id, shard_count=32)
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [user_models.UserAuthDetailsModel]
-
-    @staticmethod
-    def map(model):
-        user_models.UserIdentifiersModel(
-            id=model.gae_id,
-            user_id=model.id,
-            deleted=model.deleted
-        ).put()
-        yield ('SUCCESS', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
 
 
 class UniqueHashedNormalizedUsernameAuditJob(

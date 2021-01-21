@@ -155,7 +155,8 @@ angular.module('oppia').directive('filepathEditor', [
         };
 
 
-        var getCroppedGIFData = function(imageDataURI, x, y, width, height) {
+        var getCroppedGIFDataAsync = async function(
+            imageDataURI, x, y, width, height) {
           return new Promise((resolve, reject) => {
             // Put the original image in a canvas.
             var img = new Image();
@@ -541,7 +542,7 @@ angular.module('oppia').directive('filepathEditor', [
               for (let i = 0; i < frameData.length; i += 1) {
                 let canvas = frameData[i].getImage();
                 frames.push(
-                  await getCroppedGIFData(
+                  await getCroppedGIFDataAsync(
                     canvas.toDataURL('image/png'), x1, y1, width, height
                   ));
               }
