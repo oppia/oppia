@@ -51,8 +51,7 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         }
 
         var blob = new Blob([ia], { type: mime });
-        if (blob.type.match('image') &&
-          blob.size > 0) {
+        if (blob.type.match('image') && blob.size > 0) {
           return blob;
         } else {
           return null;
