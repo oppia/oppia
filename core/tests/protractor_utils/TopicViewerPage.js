@@ -17,16 +17,20 @@
  * in Protractor tests.
  */
 
-const { by } = require('protractor');
 var waitFor = require('./waitFor.js');
+var action = require('../protractor_utils/action.js');
 
 var TopicViewerPage = function() {
   var topicDescription = element(by.css('.protractor-test-topic-description'));
   var storySummaryTitleList =
     element.all(by.css('.protractor-test-story-summary-title'));
+  var topicLinkList = element.all(by.css('.protractor-test-topic-link'));
 
-  this.get = async function(classroomUrlFragment, topicUrlFragment) {
-    await browser.get(`/learn/${classroomUrlFragment}/${topicUrlFragment}`);
+  this.get = async function(classroomUrlFragment, topicIndex) {
+    await browser.get(`/learn/${classroomUrlFragment}`);
+    await waitFor.pageToFullyLoad();
+    var topicLink = topicLinkList.get(topicIndex);
+    await action.click('Topic TASV1', topicLink);
     await waitFor.pageToFullyLoad();
   };
 
@@ -38,10 +42,13 @@ var TopicViewerPage = function() {
   };
 
   this.expectedStoryCountToBe = async function(count) {
-    await waitFor.visibilityOf(
-      storySummaryTitleList.first(),
-      'Story summary tiles take too long to be visible.');
-    await expect(await storySummaryTitleList.count()).toEqual(count);
+    var storySummaryTitleListCount = await storySummaryTitleList.count();
+    if (count > 0) {
+      await waitFor.visibilityOf(
+        storySummaryTitleList.first(),
+        'Story summary tiles take too long to be visible.');
+    }
+    await expect(storySummaryTitleListCount).toEqual(count);
   };
 };
 

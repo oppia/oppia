@@ -17,22 +17,25 @@
  * in Protractor tests.
  */
 
-const { by } = require('protractor');
 var waitFor = require('./waitFor.js');
+var action = require('../protractor_utils/action.js');
 
 var SubTopicViewerPage = function() {
   var subTopicTileList = element.all(by.css('.protractor-test-subtopic-tile'));
 
   this.get = async function(classroomUrlFragment, topicUrlFragment) {
-    await browser.get(
-      `/learn/${classroomUrlFragment}/${topicUrlFragment}/revision`);
+    var revisionTabLink = element(by.css('.protractor-test-revision-tab-link'));
+    await action.click('Revision Tab', revisionTabLink);
     await waitFor.pageToFullyLoad();
   };
 
   this.expectedRevisionCardCountToBe = async function(count) {
-    await waitFor.visibilityOf(
-      subTopicTileList.first(), 'Revisions cards take too long to be visible.');
-    await expect(await subTopicTileList.count()).toEqual(count);
+    var subTopicTileListCount = await subTopicTileList.count();
+    if (count > 0) {
+      await waitFor.visibilityOf(
+        subTopicTileList.first(), 'Revisions cards take too long to be visible.');
+    }
+    await expect(subTopicTileListCount).toEqual(count);
   };
 };
 

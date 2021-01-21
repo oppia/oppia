@@ -21,7 +21,7 @@
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'subtopics'}">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('subtopics')">
             <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
-            <a class="tab-title"
+            <a class="tab-title protractor-test-revision-tab-link"
                [innerHTML]="'I18N_TOPIC_VIEWER_REVISION' | translate">
             </a>
           </div>

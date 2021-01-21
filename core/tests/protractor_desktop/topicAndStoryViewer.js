@@ -22,6 +22,7 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
+var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
 var Constants = require('../protractor_utils/ProtractorConstants.js');
 var TopicsAndSkillsDashboardPage =
   require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
@@ -33,10 +34,10 @@ var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
 var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
-const { browser } = require('protractor');
 
 describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
+  var classrromPage = null;
   var topicAndStoryViewerPage = null;
   var topicViewerPage = null;
   var topicsAndSkillsDashboardPage = null;
@@ -66,6 +67,7 @@ describe('Topic and Story viewer functionality', function() {
 
   beforeAll(async function() {
     adminPage = new AdminPage.AdminPage();
+    classrromPage = new ClassroomPage.ClassroomPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     topicAndStoryViewerPage = (
       new TopicAndStoryViewerPage.TopicAndStoryViewerPage());
@@ -160,18 +162,11 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
   });
 
-  it('should show description of a topic.', async function() {
-    await topicViewerPage.get('math', 'topic-tasv-one');
+  it('should work properly for story viewer page.', async function() {
+    await topicViewerPage.get('math', 0);
     await topicViewerPage.expectedTopicInformationToBe('Description');
-  });
-
-  it('should show all published stories.', async function() {
-    await topicViewerPage.get('math', 'topic-tasv-one');
     await topicViewerPage.expectedStoryCountToBe(1);
-  });
-
-  it('should show list of revision cards.', async function() {
-    await subTopicViewerPage.get('math', 'topic-tasv-one');
+    await subTopicViewerPage.get();
     await subTopicViewerPage.expectedRevisionCardCountToBe(1);
   });
 
