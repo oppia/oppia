@@ -56,7 +56,6 @@
     </div>
 
     <div *ngIf="isWindowNarrow" class="oppia-teach-section-two-left">
-      <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
       <picture class="teach-matthew-image">
         <source type="image/webp" [srcset]="getStaticImageUrl('/splash/matthew_fractions.webp')">
         <source type="image/png" [srcset]="getStaticImageUrl('/splash/matthew_fractions.png')">
@@ -83,6 +82,9 @@
     </div>
 
     <div class="oppia-teach-section-two-right" *ngIf="isWindowNarrow">
+      <div class="teach-benefits-section-heading">
+        <h3 [innerHTML]="'I18N_TEACH_BENEFITS_TITLE' | translate"></h3>
+      </div>
       <div class="teach-benefits-section">
         <img class="bullet-one" [src]="getStaticImageUrl('/splash/bullet1.svg')" alt="">
         <div  class="benefits-one">
@@ -97,7 +99,7 @@
         <img [src]="getStaticImageUrl('/splash/bullet3.svg')" alt="">
         <div  class="benefits-one">
           <h2 [innerHTML]="'I18N_TEACH_BENEFITS_THREE' | translate" class="teach-benefits"></h2>
-        </div>>
+        </div>
       </div>
     </div>
   </div>
@@ -822,7 +824,7 @@
 
     .teach-page .oppia-teach-section-two {
       padding-bottom: 50px;
-      padding-top: 15px;
+      padding-top: 50px;
     }
 
     .teach-page .oppia-teach-section-five-image {
@@ -899,6 +901,24 @@
       margin-left: auto;
       margin-right: auto;
       width: 20em;
+    }
+    .teach-page .teach-benefits-section-heading {
+      display: flex;
+      justify-content: center;
+      margin-bottom: -20x;
+      margin-left: auto;
+      margin-right: auto;
+      width: 20em;
+      }
+    @media (max-width: 575px){
+      .teach-page .teach-benefits-section-heading {
+      display: flex;
+      margin-left: -4vw;
+      margin-right: auto;
+      justify-content: center;
+      margin-bottom: -20x;
+      width: 20em;
+      }
     }
   }
 </style>
