@@ -41,6 +41,12 @@ export class TranslationLanguageService {
     return this.activeLanguageCode;
   }
 
+  getActiveLanguageDirection(): string {
+    // Audio language is currently used for written translatinos as well.
+    return this.languageUtilService.getAudioLanguageDirection(
+      this.getActiveLanguageCode());
+  }
+
   setActiveLanguageCode(newActiveLanguageCode: string): void {
     if (this.allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
       this.loggerService.error(

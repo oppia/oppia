@@ -131,6 +131,9 @@ angular.module('oppia').component('contributorDashboardPage', {
               ctrl.userCanReviewVoiceoverSuggestionsInLanguages
                 .length > 0 ||
               ctrl.userCanReviewQuestions);
+
+            ctrl.tabsDetails.submitQuestionTab.enabled = (
+              userContributionRights.can_suggest_questions);
             // TODO(#8521): Remove the use of $rootScope.$apply()
             // once the controller is migrated to angular.
             $rootScope.$applyAsync();

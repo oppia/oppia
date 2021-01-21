@@ -26,11 +26,14 @@ import copy
 import inspect
 import itertools
 import json
+import logging
 import os
+import re
 import unittest
 
 from constants import constants
 from core.controllers import base
+from core.domain import auth_domain
 from core.domain import caching_domain
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -56,6 +59,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import feconf
 import main
@@ -68,16 +72,17 @@ import schema_utils
 import utils
 
 import contextlib2
+import elasticsearch
 from google.appengine.api import mail
 from google.appengine.ext import deferred
 from google.appengine.ext import testbed
 import webtest
 
 (
-    exp_models, feedback_models, question_models, skill_models, story_models,
-    suggestion_models, topic_models,) = (
+    auth_models, exp_models, feedback_models, question_models, skill_models,
+    story_models, suggestion_models, topic_models,) = (
         models.Registry.import_models([
-            models.NAMES.exploration, models.NAMES.feedback,
+            models.NAMES.auth, models.NAMES.exploration, models.NAMES.feedback,
             models.NAMES.question, models.NAMES.skill, models.NAMES.story,
             models.NAMES.suggestion, models.NAMES.topic]))
 
@@ -85,6 +90,7 @@ current_user_services = models.Registry.import_current_user_services()
 datastore_services = models.Registry.import_datastore_services()
 email_services = models.Registry.import_email_services()
 memory_cache_services = models.Registry.import_cache_services()
+platform_auth_services = models.Registry.import_auth_services()
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
 # Prefix to append to all lines printed by tests to the console.
@@ -96,6 +102,7 @@ LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 # base classes for the other models.
 BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES = (
     'BaseCommitLogEntryModel',
+    'BaseHumanMaintainedModel',
     'BaseMapReduceBatchResultsModel',
     'BaseModel',
     'BaseSnapshotContentModel',
@@ -194,6 +201,544 @@ def get_storage_model_classes():
                         clazz)]
                 if 'Model' in all_base_classes:
                     yield clazz
+
+
+class ElasticSearchStub(python_utils.OBJECT):
+    """This stub class mocks the functionality of ES in
+    elastic_search_services.py.
+
+    IMPORTANT NOTE TO DEVELOPERS: These mock functions are NOT guaranteed to
+    be exact implementations of elasticsearch functionality. If the results of
+    this mock and the local dev elasticsearch instance differ, the mock
+    functions should be updated so that their behaviour matches what a local
+    dev instance would return. (For example, this mock always has a 'version'
+    of 1 in the return dict and an arbitrary '_seq_no', although the version
+    number increments with every PUT in the elasticsearch Python client
+    library and the '_seq_no' increments with every operation.)
+    """
+
+    _DB = {}
+
+    def reset(self):
+        """Helper method that clears the mock database."""
+        self._DB.clear()
+
+    def _generate_index_not_found_error(self, index_name):
+        """Helper method that generates an elasticsearch 'index not found' 404
+        error.
+
+        Args:
+            index_name: str. The index that was not found.
+
+        Returns:
+            elasticsearch.NotFoundError. A manually-constructed error
+            indicating that the index was not found.
+        """
+        raise elasticsearch.NotFoundError(
+            404, 'index_not_found_exception', {
+                'status': 404,
+                'error': {
+                    'reason': 'no such index [%s]' % index_name,
+                    'root_cause': [{
+                        'reason': 'no such index [%s]' % index_name,
+                        'index': index_name,
+                        'index_uuid': '_na_',
+                        'type': 'index_not_found_exception',
+                        'resource.type': 'index_or_alias',
+                        'resource.id': index_name
+                    }],
+                    'index': index_name,
+                    'index_uuid': '_na_',
+                    'type': 'index_not_found_exception',
+                    'resource.type': 'index_or_alias',
+                    'resource.id': index_name
+                }
+            }
+        )
+
+    def mock_create_index(self, index_name):
+        """Creates an index with the given name.
+
+        Args:
+            index_name: str. The name of the index to create.
+
+        Returns:
+            dict. A dict representing the ElasticSearch API response.
+
+        Raises:
+            elasticsearch.RequestError. An index with the given name already
+                exists.
+        """
+        if index_name in self._DB:
+            raise elasticsearch.RequestError(
+                400, 'resource_already_exists_exception',
+                'index [%s/RaNdOmStRiNgOfAlPhAs] already exists' % index_name)
+        self._DB[index_name] = []
+        return {
+            'index': index_name,
+            'acknowledged': True,
+            'shards_acknowledged': True
+        }
+
+    def mock_index(self, index_name, document, id=None):  # pylint: disable=redefined-builtin
+        """Adds a document with the given ID to the index.
+
+        Note that, unfortunately, we have to keep the name of "id" for the
+        last kwarg, although it conflicts with a Python builtin. This is
+        because the name is an existing part of the API defined at
+        https://elasticsearch-py.readthedocs.io/en/v7.10.1/api.html
+
+        Args:
+            index_name: str. The name of the index to create.
+            document: dict. The document to store.
+            id: str. The unique identifier of the document.
+
+        Returns:
+            dict. A dict representing the ElasticSearch API response.
+
+        Raises:
+            elasticsearch.RequestError. An index with the given name already
+                exists.
+        """
+        if index_name not in self._DB:
+            raise self._generate_index_not_found_error(index_name)
+        self._DB[index_name] = [
+            d for d in self._DB[index_name] if d['id'] != id]
+        self._DB[index_name].append(document)
+        return {
+            '_index': index_name,
+            '_shards': {
+                'total': 2,
+                'successful': 1,
+                'failed': 0,
+            },
+            '_seq_no': 96,
+            '_primary_term': 1,
+            'result': 'created',
+            '_id': id,
+            '_version': 1,
+            '_type': '_doc',
+        }
+
+    def mock_exists(self, index_name, doc_id):
+        """Checks whether a document with the given ID exists in the mock
+        database.
+
+        Args:
+            index_name: str. The name of the index to check.
+            doc_id: str. The document id to check.
+
+        Returns:
+            bool. Whether the document exists in the index.
+
+        Raises:
+            elasticsearch.NotFoundError: The given index name was not found.
+        """
+        if index_name not in self._DB:
+            raise self._generate_index_not_found_error(index_name)
+        return any([d['id'] == doc_id for d in self._DB[index_name]])
+
+    def mock_delete(self, index_name, doc_id):
+        """Deletes a document from an index in the mock database. Does nothing
+        if the document is not in the index.
+
+        Args:
+            index_name: str. The name of the index to delete the document from.
+            doc_id: str. The document id to be deleted from the index.
+
+        Returns:
+            dict. A dict representing the ElasticSearch API response.
+
+        Raises:
+            Exception. The document does not exist in the index.
+            elasticsearch.NotFoundError. The given index name was not found, or
+                the given doc_id was not found in the given index.
+        """
+        if index_name not in self._DB:
+            raise self._generate_index_not_found_error(index_name)
+        docs = [d for d in self._DB[index_name] if d['id'] != doc_id]
+        if len(self._DB[index_name]) != len(docs):
+            self._DB[index_name] = docs
+            return {
+                '_type': '_doc',
+                '_seq_no': 99,
+                '_shards': {
+                    'total': 2,
+                    'successful': 1,
+                    'failed': 0
+                },
+                'result': 'deleted',
+                '_primary_term': 1,
+                '_index': index_name,
+                '_version': 4,
+                '_id': '0'
+            }
+
+        raise elasticsearch.NotFoundError(
+            404, {
+                '_index': index_name,
+                '_type': '_doc',
+                '_id': doc_id,
+                '_version': 1,
+                'result': 'not_found',
+                '_shards': {
+                    'total': 2,
+                    'successful': 1,
+                    'failed': 0
+                },
+                '_seq_no': 103,
+                '_primary_term': 1
+            })
+
+    def mock_delete_by_query(self, index_name, query):
+        """Deletes documents from an index based on the given query.
+
+        Note that this mock only supports a specific for the query, i.e. the
+        one which clears the entire index. It asserts that all calls to this
+        function use that query format.
+
+        Args:
+            index_name: str. The name of the index to delete the documents from.
+            query: dict. The query that defines which documents to delete.
+
+        Returns:
+            dict. A dict representing the ElasticSearch response.
+
+        Raises:
+            AssertionError. The query is not in the correct form.
+            elasticsearch.NotFoundError. The given index name was not found.
+        """
+        assert query.keys() == ['query']
+        assert query['query'] == {
+            'match_all': {}
+        }
+        if index_name not in self._DB:
+            raise self._generate_index_not_found_error(index_name)
+        index_size = len(self._DB[index_name])
+        del self._DB[index_name][:]
+        return {
+            'took': 72,
+            'version_conflicts': 0,
+            'noops': 0,
+            'throttled_until_millis': 0,
+            'failures': [],
+            'throttled_millis': 0,
+            'total': index_size,
+            'batches': 1,
+            'requests_per_second': -1.0,
+            'retries': {u'search': 0, u'bulk': 0},
+            'timed_out': False,
+            'deleted': index_size
+        }
+
+    def mock_search(self, body=None, index=None, params=None):
+        """Searches and returns documents that match the given query.
+
+        Args:
+            body: dict. A dictionary search definition that uses Query DSL.
+            index: str. The name of the index to search.
+            params: dict. A dict with two keys: `size` and `from`. The
+                corresponding values are ints which represent the number of
+                results to fetch, and the offset from which to fetch them,
+                respectively.
+
+        Returns:
+            dict. A dict representing the ElasticSearch response.
+
+        Raises:
+            AssertionError. The given arguments are not supported by this mock.
+            elasticsearch.NotFoundError. The given index name was not found.
+        """
+        assert body is not None
+        # "_all" and "" are special index names that are used to search across
+        # all indexes. We do not allow their use.
+        assert index not in ['_all', '', None]
+        assert sorted(params.keys()) == ['from', 'size']
+
+        if index not in self._DB:
+            raise self._generate_index_not_found_error(index)
+
+        result_docs = []
+        result_doc_ids = set([])
+        for doc in self._DB[index]:
+            if not doc['id'] in result_doc_ids:
+                result_docs.append(doc)
+                result_doc_ids.add(doc['id'])
+
+        filters = body['query']['bool']['filter']
+        terms = body['query']['bool']['must']
+
+        for f in filters:
+            for k, v in f['match'].items():
+                result_docs = [doc for doc in result_docs if doc[k] in v]
+
+        if terms:
+            filtered_docs = []
+            for term in terms:
+                for _, v in term.items():
+                    values = v['query'].split(' ')
+                    for doc in result_docs:
+                        strs = [val for val in doc.values() if isinstance(
+                            val, python_utils.BASESTRING)]
+                        words = []
+                        for s in strs:
+                            words += s.split(' ')
+                        if all([value in words for value in values]):
+                            filtered_docs.append(doc)
+            result_docs = filtered_docs
+
+        formatted_result_docs = [{
+            '_id': doc['id'],
+            '_score': 0.0,
+            '_type': '_doc',
+            '_index': index,
+            '_source': doc
+        } for doc in result_docs[
+            params['from']: params['from'] + params['size']
+        ]]
+
+        return {
+            'timed_out': False,
+            '_shards': {
+                'failed': 0,
+                'total': 1,
+                'successful': 1,
+                'skipped': 0
+            },
+            'took': 4,
+            'hits': {
+                'hits': formatted_result_docs
+            },
+            'total': {
+                'value': len(formatted_result_docs),
+                'relation': 'eq'
+            },
+            'max_score': max(
+                [0.0] + [d['_score'] for d in formatted_result_docs]),
+        }
+
+
+class AuthServicesStub(python_utils.OBJECT):
+    """Test-only implementation of the public API in core.platform.auth."""
+
+    def __init__(self):
+        """Initializes a new instance that emulates an empty auth server."""
+        self._user_id_by_auth_id = {}
+        self._external_user_id_associations = set()
+
+    @classmethod
+    def install_stub(cls, test):
+        """Installs a new instance of the stub onto the given test instance.
+
+        Args:
+            test: AppEngineTestBase. The test instance to install the stub on.
+
+        Returns:
+            callable. A function that will uninstall the stub when called.
+        """
+        with contextlib2.ExitStack() as stack:
+            stub = cls()
+
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_auth_claims_from_request',
+                stub.get_auth_claims_from_request))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'mark_user_for_deletion',
+                stub.mark_user_for_deletion))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'delete_external_auth_associations',
+                stub.delete_external_auth_associations))
+            stack.enter_context(test.swap(
+                platform_auth_services,
+                'verify_external_auth_associations_are_deleted',
+                stub.verify_external_auth_associations_are_deleted))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_auth_id_from_user_id',
+                stub.get_auth_id_from_user_id))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_user_id_from_auth_id',
+                stub.get_user_id_from_auth_id))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_multi_user_ids_from_auth_ids',
+                stub.get_multi_user_ids_from_auth_ids))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'get_multi_auth_ids_from_user_ids',
+                stub.get_multi_auth_ids_from_user_ids))
+            stack.enter_context(test.swap(
+                platform_auth_services, 'associate_auth_id_with_user_id',
+                stub.associate_auth_id_with_user_id))
+            stack.enter_context(test.swap(
+                platform_auth_services,
+                'associate_multi_auth_ids_with_user_ids',
+                stub.associate_multi_auth_ids_with_user_ids))
+
+            # Standard usage of ExitStack: enter a bunch of context managers
+            # from the safety of an ExitStack's context. Once they've all been
+            # opened, pop_all() of them off of the original context so they can
+            # *stay* open. Calling the function returned will exit all of them
+            # in reverse order.
+            # https://docs.python.org/3/library/contextlib.html#cleaning-up-in-an-enter-implementation
+            return stack.pop_all().close
+
+    @classmethod
+    def get_auth_claims_from_request(cls, unused_request):
+        """Authenticates the request and returns claims about its authorizer.
+
+        This stub obtains authorization information from os.environ. To make the
+        operation more authentic, this method also creates a new "external"
+        association for the user to simulate a genuine "provided" value.
+
+        Args:
+            unused_request: webapp2.Request. The HTTP request to authenticate.
+                Unused because auth-details are extracted from environment
+                variables.
+
+        Returns:
+            AuthClaims|None. Claims about the currently signed in user. If no
+            user is signed in, then returns None.
+        """
+        auth_id = os.environ.get('USER_ID', '')
+        email = os.environ.get('USER_EMAIL', '')
+        role_is_super_admin = os.environ.get('USER_IS_ADMIN', '0') == '1'
+        if auth_id:
+            return auth_domain.AuthClaims(auth_id, email, role_is_super_admin)
+        return None
+
+    def mark_user_for_deletion(self, user_id):
+        """Marks the user, and all of their auth associations, as deleted.
+
+        Since the stub does not use models, this operation actually deletes the
+        user's association. The "external" associations, however, are not
+        deleted yet.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
+        """
+        self._user_id_by_auth_id = {
+            a: u for a, u in self._user_id_by_auth_id.items() if u != user_id
+        }
+
+    def delete_external_auth_associations(self, user_id):
+        """Deletes all associations that refer to the user outside of Oppia.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                deleted.
+        """
+        self._external_user_id_associations.discard(user_id)
+
+    def verify_external_auth_associations_are_deleted(self, user_id):
+        """Returns true if and only if we have successfully verified that all
+        external associations have been deleted.
+
+        Args:
+            user_id: str. The unique ID of the user whose associations should be
+                checked.
+
+        Returns:
+            bool. True if and only if we have successfully verified that all
+            external associations have been deleted.
+        """
+        return user_id not in self._external_user_id_associations
+
+    def get_auth_id_from_user_id(self, user_id):
+        """Returns the auth ID associated with the given user ID.
+
+        Args:
+            user_id: str. The user ID.
+
+        Returns:
+            str|None. The auth ID associated with the given user ID, or None if
+            no association exists.
+        """
+        return python_utils.NEXT(
+            (a for a, u in self._user_id_by_auth_id.items() if u == user_id),
+            None)
+
+    def get_user_id_from_auth_id(self, auth_id):
+        """Returns the user ID associated with the given auth ID.
+
+        Args:
+            auth_id: str. The auth ID.
+
+        Returns:
+            str|None. The user ID associated with the given auth ID, or None if
+            no association exists.
+        """
+        return self._user_id_by_auth_id.get(auth_id, None)
+
+    def get_multi_user_ids_from_auth_ids(self, auth_ids):
+        """Returns the user IDs associated with the given auth IDs.
+
+        Args:
+            auth_ids: list(str). The auth IDs.
+
+        Returns:
+            list(str|None). The user IDs associated with each of the given auth
+            IDs, or None for associations which don't exist.
+        """
+        return [self._user_id_by_auth_id.get(a, None) for a in auth_ids]
+
+    def get_multi_auth_ids_from_user_ids(self, user_ids):
+        """Returns the auth IDs associated with the given user IDs.
+
+        Args:
+            user_ids: list(str). The user IDs.
+
+        Returns:
+            list(str|None). The auth IDs associated with each of the given user
+            IDs, or None for associations which don't exist.
+        """
+        auth_id_by_user_id = {u: a for a, u in self._user_id_by_auth_id.items()}
+        return [auth_id_by_user_id.get(u, None) for u in user_ids]
+
+    def associate_auth_id_with_user_id(self, auth_id_user_id_pair):
+        """Commits the association between auth ID and user ID.
+
+        This method also adds the user to the "external" set of associations.
+
+        Args:
+            auth_id_user_id_pair: auth_domain.AuthIdUserIdPair. The association
+                to commit.
+
+        Raises:
+            Exception. The IDs are already associated with a value.
+        """
+        auth_id, user_id = auth_id_user_id_pair
+        if auth_id in self._user_id_by_auth_id:
+            raise Exception(
+                'auth_id=%r is already associated with user_id=%r' % (
+                    auth_id, self._user_id_by_auth_id[auth_id]))
+        auth_models.UserAuthDetailsModel(
+            id=user_id, firebase_auth_id=auth_id).put()
+        self._external_user_id_associations.add(user_id)
+        self._user_id_by_auth_id[auth_id] = user_id
+
+    def associate_multi_auth_ids_with_user_ids(self, auth_id_user_id_pairs):
+        """Commits the associations between auth IDs and user IDs.
+
+        This method also adds the users to the "external" set of associations.
+
+        Args:
+            auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
+                associations to commit.
+
+        Raises:
+            Exception. One or more auth associations already exist.
+        """
+        collisions = ', '.join(
+            '{auth_id=%r: user_id=%r}' % (a, self._user_id_by_auth_id[a])
+            for a, _ in auth_id_user_id_pairs if a in self._user_id_by_auth_id)
+        if collisions:
+            raise Exception('already associated: %s' % collisions)
+        datastore_services.put_multi(
+            [auth_models.UserAuthDetailsModel(
+                id=user_id, firebase_auth_id=auth_id)
+             for auth_id, user_id in auth_id_user_id_pairs])
+        self._external_user_id_associations.add(
+            u for _, u in auth_id_user_id_pairs)
+        self._user_id_by_auth_id.update(auth_id_user_id_pairs)
 
 
 class TaskqueueServicesStub(python_utils.OBJECT):
@@ -431,6 +976,48 @@ class TestBase(unittest.TestCase):
         return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
+    def capture_logging(self, min_level=logging.NOTSET):
+        """Context manager that captures logs into a list.
+
+        Strips whitespace from messages for convenience.
+
+        https://docs.python.org/3/howto/logging-cookbook.html#using-a-context-manager-for-selective-logging
+
+        Args:
+            min_level: int. The minimum logging level captured by the context
+                manager. By default, all logging levels are captured. Values
+                should be one of the following values from the logging module:
+                NOTSET, DEBUG, INFO, WARNING, ERROR, CRITICAL.
+
+        Yields:
+            list(str). A live-feed of the logging messages captured so-far.
+        """
+        captured_logs = []
+
+        class ListStream(python_utils.OBJECT):
+            """Stream-like object that appends writes to the captured logs."""
+
+            def write(self, msg):
+                """Appends stripped messages to captured logs."""
+                captured_logs.append(msg.strip())
+
+            def flush(self):
+                """Does nothing."""
+                pass
+
+        list_stream_handler = logging.StreamHandler(stream=ListStream())
+
+        logger = logging.getLogger()
+        old_level = logger.level
+        logger.addHandler(list_stream_handler)
+        logger.setLevel(min_level)
+        try:
+            yield captured_logs
+        finally:
+            logger.setLevel(old_level)
+            logger.removeHandler(list_stream_handler)
+
+    @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a 'with'
         statement. The object can be anything that supports getattr and setattr,
@@ -443,13 +1030,13 @@ class TestBase(unittest.TestCase):
                 print math.sqrt(16.0) # prints 42
             print math.sqrt(16.0) # prints 4 as expected.
 
-        Note that this does not work directly for classmethods. In this case,
-        you will need to import the 'types' module, as follows:
+        To mock class methods, pass the function to the classmethod decorator
+        first, for example:
 
             import types
             with self.swap(
                 SomePythonClass, 'some_classmethod',
-                types.MethodType(new_classmethod, SomePythonClass)):
+                classmethod(new_classmethod)):
 
         NOTE: self.swap and other context managers that are created using
         contextlib.contextmanager use generators that yield exactly once. This
@@ -463,6 +1050,24 @@ class TestBase(unittest.TestCase):
             yield
         finally:
             setattr(obj, attr, original)
+
+    @contextlib.contextmanager
+    def swap_to_always_return(self, obj, attr, value=None):
+        """Swap obj.attr with a function that always returns the given value."""
+        def function_that_always_returns(*unused_args, **unused_kwargs):
+            """Returns the input value."""
+            return value
+        with self.swap(obj, attr, function_that_always_returns):
+            yield
+
+    @contextlib.contextmanager
+    def swap_to_always_raise(self, obj, attr, error=Exception):
+        """Swap obj.attr with a function that always raises the given error."""
+        def function_that_always_raises(*unused_args, **unused_kwargs):
+            """Raises the input exception."""
+            raise error
+        with self.swap(obj, attr, function_that_always_raises):
+            yield
 
     @contextlib.contextmanager
     def swap_with_checks(
@@ -570,6 +1175,45 @@ class TestBase(unittest.TestCase):
         return super(TestBase, self).assertRaisesRegexp(
             expected_exception, expected_regexp,
             callable_obj=callable_obj, *args, **kwargs)
+
+    def assert_matches_regexps(self, items, regexps, full_match=False):
+        """Asserts that each item matches the corresponding regexp.
+
+        If there are any missing or extra items that do not correspond to a
+        regexp element, then the assertion fails.
+
+        Args:
+            items: list(str). The string elements being matched.
+            regexps: list(str|RegexObject). The patterns that each item is
+                expected to match.
+            full_match: bool. Whether to require items to match exactly with the
+                corresponding pattern.
+
+        Raises:
+            AssertionError. At least one item does not match its corresponding
+                pattern, or the number of items does not match the number of
+                regexp patterns.
+        """
+        get_match = re.match if full_match else re.search
+        differences = [
+            '~ [i=%d]:\t%r does not match: %r' % (i, item, regexp)
+            for i, (regexp, item) in enumerate(python_utils.ZIP(regexps, items))
+            if get_match(regexp, item, re.DOTALL) is None
+        ]
+        if len(items) < len(regexps):
+            extra_regexps = regexps[len(items):]
+            differences.extend(
+                '- [i=%d]:\tmissing item expected to match: %r' % (i, regexp)
+                for i, regexp in enumerate(extra_regexps, start=len(items)))
+        if len(regexps) < len(items):
+            extra_items = items[len(regexps):]
+            differences.extend(
+                '+ [i=%d]:\textra item %r' % (i, item)
+                for i, item in enumerate(extra_items, start=len(regexps)))
+
+        if differences:
+            error_message = 'Lists differ:\n\t%s' % '\n\t'.join(differences)
+            raise AssertionError(error_message)
 
 
 class AppEngineTestBase(TestBase):
@@ -1004,6 +1648,7 @@ tags: []
         # while minimizing the swap's scope. We accomplish this by using a
         # context manager over run().
         self._taskqueue_services_stub = TaskqueueServicesStub(self)
+        self._es_stub = ElasticSearchStub()
 
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
@@ -1024,8 +1669,31 @@ tags: []
 
         with contextlib2.ExitStack() as stack:
             stack.enter_context(self.swap(
+                elastic_search_services.ES.indices, 'create',
+                self._es_stub.mock_create_index))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'index',
+                self._es_stub.mock_index))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'exists',
+                self._es_stub.mock_exists))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'delete',
+                self._es_stub.mock_delete))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'delete_by_query',
+                self._es_stub.mock_delete_by_query))
+            stack.enter_context(self.swap(
+                elastic_search_services.ES, 'search',
+                self._es_stub.mock_search))
+
+            if getattr(self, 'ENABLE_AUTH_SERVICES_STUB', True):
+                stack.callback(AuthServicesStub.install_stub(self))
+
+            stack.enter_context(self.swap(
                 platform_taskqueue_services, 'create_http_task',
                 self._taskqueue_services_stub.create_http_task))
+
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_cache',
                 memory_cache_services_stub.flush_cache))
@@ -1078,6 +1746,7 @@ tags: []
         self.mail_testapp = webtest.TestApp(main_mail.app)
 
         self.signup_superadmin_user()
+        self._es_stub.reset()
 
     def tearDown(self):
         datastore_services.delete_multi(
@@ -1093,7 +1762,7 @@ tags: []
         """
         self.testbed.setup_env(
             overwrite=True,
-            user_email=email, user_id=self.get_gae_id_from_email(email),
+            user_email=email, user_id=self.get_auth_id_from_email(email),
             user_is_admin=('1' if is_super_admin else '0'))
 
     def logout(self):
@@ -1128,11 +1797,11 @@ tags: []
         """Log in with the given email under the context of a 'with' statement.
 
         Args:
-            email: str. An email associated to a user account.
+            email: str. An email associated with a user account.
             is_super_admin: bool. Whether the user is a super admin.
 
         Yields:
-            str. The id of the user associated to the given email, who is now
+            str. The id of the user associated with the given email, who is now
             'logged in'.
         """
         self.login(email, is_super_admin=is_super_admin)
@@ -1146,7 +1815,7 @@ tags: []
         """Log in as a global admin under the context of a 'with' statement.
 
         Yields:
-            str. The id of the user associated to the given email, who is now
+            str. The id of the user associated with the given email, who is now
             'logged in'.
         """
         email = self.SUPER_ADMIN_EMAIL
@@ -1160,7 +1829,7 @@ tags: []
             email: str. Email of the given user.
             username: str. Username of the given user.
         """
-        user_services.create_new_user(self.get_gae_id_from_email(email), email)
+        user_services.create_new_user(self.get_auth_id_from_email(email), email)
 
         with self.login_context(email), requests_mock.Mocker() as m:
             # We mock out all HTTP requests while trying to signup to avoid
@@ -1258,31 +1927,33 @@ tags: []
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            str or None. ID of the user possessing the given email, or None if
+            str|None. ID of the user possessing the given email, or None if
             the user does not exist.
         """
-        user_settings = user_services.get_user_settings_by_gae_id(
-            self.get_gae_id_from_email(email))
+        user_settings = user_services.get_user_settings_by_auth_id(
+            self.get_auth_id_from_email(email))
         return user_settings and user_settings.user_id
 
-    def get_gae_id_from_email(self, email):
-        """Returns a mock GAE user ID corresponding to the given email.
+    @classmethod
+    def get_auth_id_from_email(cls, email):
+        """Returns a mock auth ID corresponding to the given email.
 
         This method can use any algorithm to produce results as long as, during
         the runtime of each test case/method, it is:
         1.  Pure (same input always returns the same output).
         2.  One-to-one (no two distinct inputs return the same output).
-        3.  An integer byte-string (to match the behavior of actual GAE IDs).
+        3.  An integer byte-string (integers are always valid in auth IDs).
 
         Args:
             email: str. The email address of the user.
 
         Returns:
-            bytes. The mock GAE ID of a user possessing the given email.
+            bytes. The mock auth ID of a user possessing the given email.
         """
         # Although the hash function doesn't guarantee a one-to-one mapping, in
-        # practice it is sufficient for our tests.
-        return python_utils.convert_to_bytes(hash(email))
+        # practice it is sufficient for our tests. We make it a positive integer
+        # because those are always valid auth IDs.
+        return python_utils.convert_to_bytes(abs(hash(email)))
 
     def _get_response(
             self, url, expected_content_type, params=None,
@@ -2344,10 +3015,10 @@ tags: []
             suggestion_id = (
                 feedback_models.GeneralFeedbackThreadModel.
                 generate_new_thread_id(
-                    suggestion_models.TARGET_TYPE_SKILL, skill_id))
+                    feconf.ENTITY_TYPE_SKILL, skill_id))
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_SKILL, skill_id, 1,
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             suggestion_models.STATUS_IN_REVIEW, author_id, None, change,
             score_category, suggestion_id, language_code)
 

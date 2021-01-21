@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { ConceptCardBackendDict } from './ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -286,6 +287,22 @@ describe('Skill update service', () => {
     expect(skill.getRubrics()[0].getExplanations()).toEqual(['explanation']);
   });
 
+  it('should not update rubric when skill difficulty is invalid', () => {
+    const skill = skillObjectFactory.createFromBackendDict(skillDict);
+
+    expect(skill.getRubrics().length).toEqual(1);
+    const nonExistentSkillDifficulty = 'INSANELY EXTREMELY HARD';
+    expect(() => {
+      skillUpdateService.updateRubricForDifficulty(
+        skill,
+        nonExistentSkillDifficulty, [
+          'new explanation 1',
+          'new explanation 2',
+        ]
+      );
+    }).toThrowError('Invalid difficulty value passed');
+  });
+
   it('should update the name of a misconception', () => {
     const skill = skillObjectFactory.createFromBackendDict(skillDict);
 
@@ -491,6 +508,55 @@ describe('Skill update service', () => {
     ]);
 
     undoRedoService.undoChange(skill);
+    expect(skill.getConceptCard().getWorkedExamples()).toEqual([
+      workedExampleObjectFactory.createFromBackendDict(example1),
+      workedExampleObjectFactory.createFromBackendDict(example2),
+    ]);
+  });
+
+  it('should update all worked examples within a skill', () => {
+    const skill = skillObjectFactory.createFromBackendDict(skillDict);
+
+    const oldWorkedExamples = cloneDeep(
+      skill.getConceptCard().getWorkedExamples()
+    );
+    const newWorkedExamples = oldWorkedExamples.map((workedExample, index) => {
+      workedExample
+        .getQuestion()
+        .html = `new question ${index + 1}`;
+      workedExample
+        .getExplanation()
+        .html = `new explanation ${index + 1}`;
+      return workedExample;
+    });
+
+    skillUpdateService.updateWorkedExamples(
+      skill,
+      newWorkedExamples
+    );
+
+    const workedExamplesObject: SkillContentsWorkedExamplesChange = {
+      cmd: 'update_skill_contents_property',
+      property_name: 'worked_examples',
+      old_value: skillContentsDict.worked_examples,
+      new_value: newWorkedExamples.map((workedExample) => {
+        return workedExample.toBackendDict();
+      }),
+    };
+
+    expect(undoRedoService.getCommittableChangeList()).toEqual(
+      [workedExamplesObject]
+    );
+    expect(skill.getConceptCard().getWorkedExamples()).toEqual(
+      newWorkedExamples.map((workedExample) => {
+        return workedExampleObjectFactory.createFromBackendDict(
+          workedExample.toBackendDict()
+        );
+      })
+    );
+
+    undoRedoService.undoChange(skill);
+
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       workedExampleObjectFactory.createFromBackendDict(example1),
       workedExampleObjectFactory.createFromBackendDict(example2),

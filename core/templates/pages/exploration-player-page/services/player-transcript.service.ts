@@ -43,8 +43,16 @@ export class PlayerTranscriptService {
   // they carry on.
   transcript: StateCard[] = [];
   numAnswersSubmitted = 0;
+
   restore(oldTranscript: StateCard[]): void {
     this.transcript = cloneDeep(oldTranscript);
+  }
+
+  restoreImmutably(oldTranscript: StateCard[]): void {
+    for (let i = 0; i < this.transcript.length; i++) {
+      // Immutably restore the cards so that Angular can detect changes.
+      this.transcript[i].restoreImmutable(oldTranscript[i]);
+    }
   }
 
   init(): void {
@@ -105,7 +113,7 @@ export class PlayerTranscriptService {
   }
 
   getCard(index: number): StateCard {
-    if (index < 0 || index >= this.transcript.length) {
+    if (index !== null && (index < 0 || index >= this.transcript.length)) {
       this.log.error(
         'Requested card with index ' + index +
           ', but transcript only has length ' +

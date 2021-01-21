@@ -67,6 +67,7 @@ export class CkEditorCopyContentService {
       const currentTagName = currentElement.tagName.toLowerCase();
       if (currentTagName.includes(this.NON_INTERACTIVE_TAG)) {
         containedWidgetTagName = currentTagName;
+        break;
       }
 
       if (currentElement.parentElement.tagName === this.OUTPUT_VIEW_TAG_NAME) {

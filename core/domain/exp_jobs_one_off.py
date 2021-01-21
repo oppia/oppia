@@ -199,7 +199,8 @@ class ExplorationMigrationAuditJob(jobs.BaseMapReduceOneOffJobManager):
         while states_schema_version < current_state_schema_version:
             try:
                 exp_domain.Exploration.update_states_from_model(
-                    versioned_exploration_states, states_schema_version,
+                    versioned_exploration_states,
+                    states_schema_version,
                     item.id)
                 states_schema_version += 1
             except Exception as e:
@@ -578,37 +579,6 @@ class XmlnsAttributeInExplorationMathSvgImagesAuditJob(
     @staticmethod
     def reduce(key, values):
         yield (key, values)
-
-
-class RemoveTranslatorIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that deletes the translator_ids from the ExpSummaryModel.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExpSummaryModel]
-
-    @staticmethod
-    def map(exp_summary_model):
-        # This is the only way to remove the field from the model,
-        # see https://stackoverflow.com/a/15116016/3688189 and
-        # https://stackoverflow.com/a/12701172/3688189.
-        if 'translator_ids' in exp_summary_model._properties:  # pylint: disable=protected-access
-            del exp_summary_model._properties['translator_ids']  # pylint: disable=protected-access
-            if 'translator_ids' in exp_summary_model._values:  # pylint: disable=protected-access
-                del exp_summary_model._values['translator_ids']  # pylint: disable=protected-access
-            exp_summary_model.update_timestamps(update_last_updated_time=False)
-            exp_summary_model.put()
-            yield ('SUCCESS_REMOVED - ExpSummaryModel', exp_summary_model.id)
-        else:
-            yield (
-                'SUCCESS_ALREADY_REMOVED - ExpSummaryModel',
-                exp_summary_model.id)
-
-    @staticmethod
-    def reduce(key, values):
-        """Implements the reduce function for this job."""
-        yield (key, len(values))
 
 
 def regenerate_exp_commit_log_model(exp_model, version):

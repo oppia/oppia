@@ -21,7 +21,6 @@ require('objects/templates/boolean-editor.directive.ts');
 require('objects/templates/code-string-editor.directive.ts');
 require('objects/templates/coord-two-dim-editor.directive.ts');
 require('objects/templates/custom-osk-letters-editor.component.ts');
-require('objects/templates/drag-and-drop-html-string-editor.directive.ts');
 require('objects/templates/drag-and-drop-positive-int-editor.directive.ts');
 require('objects/templates/filepath-editor.directive.ts');
 require('objects/templates/fraction-editor.directive.ts');
@@ -30,7 +29,8 @@ require('objects/templates/graph-property-editor.directive.ts');
 require('objects/templates/html-editor.directive.ts');
 require('objects/templates/image-with-regions-editor.directive.ts');
 require('objects/templates/int-editor.directive.ts');
-require('objects/templates/list-of-sets-of-html-strings-editor.directive.ts');
+// eslint-disable-next-line max-len
+require('objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component.ts');
 require('objects/templates/list-of-tabs-editor.directive.ts');
 require('objects/templates/list-of-unicode-string-editor.directive.ts');
 require('objects/templates/logic-error-category-editor.directive.ts');
@@ -48,8 +48,14 @@ require('objects/templates/ratio-expression-editor.component.ts');
 require('objects/templates/real-editor.directive.ts');
 require('objects/templates/sanitized-url-editor.directive.ts');
 require('objects/templates/set-of-algebraic-identifier-editor.component.ts');
-require('objects/templates/set-of-html-string-editor.directive.ts');
-require('objects/templates/set-of-normalized-string-editor.component.ts');
+require('objects/templates/translatable-html-content-id.component.ts');
+require(
+  'objects/templates/set-of-translatable-html-content-ids-editor.component.ts');
+require(
+  // eslint-disable-next-line max-len
+  'objects/templates/translatable-set-of-normalized-string-editor.component.ts');
+require(
+  'objects/templates/translatable-set-of-unicode-string-editor.component.ts');
 require('objects/templates/set-of-unicode-string-editor.directive.ts');
 require('objects/templates/skill-selector-editor.directive.ts');
 require('objects/templates/subtitled-html-editor.directive.ts');
