@@ -195,7 +195,7 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
         # Checks whether every pattern in the CODEOWNERS file matches at
         # least one dir/file.
         critical_file_section_found = False
-        inside_blanket_codeowners_section = True
+        inside_blanket_codeowners_section = False
         important_rules_in_critical_section = []
         file_patterns = []
         ignored_dir_patterns = []
@@ -283,7 +283,7 @@ class CodeownerLintChecksManager(python_utils.OBJECT):
                     # even those files and directories to pass the check whose
                     # ownership is defined by blanket codeowners only and is not
                     # overridden by a specific codeowner.
-                    if inside_blanket_codeowners_section is False:
+                    if not inside_blanket_codeowners_section:
                         if os.path.isdir(line_in_concern):
                             ignored_dir_patterns.append(line_in_concern)
                         else:
