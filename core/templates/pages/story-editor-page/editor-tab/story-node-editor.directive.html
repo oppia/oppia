@@ -33,7 +33,7 @@
             </span>
           </div>
           <div class="story-node-description">
-            <label for="storyNodeDescription" class="form-heading">Goal*</label>
+            <label for="storyNodeDescription" class="form-heading">Chapter description*</label>
             <textarea id="storyNodeDescription" type="text" class="form-control protractor-test-add-chapter-description"
                       ng-model="editableDescription" ng-blur="updateDescription(editableDescription)"
                       placeholder="Enter the description for the chapter." maxlength="<[MAX_CHARS_IN_CHAPTER_DESCRIPTION]>" ng-trim="false">
@@ -286,7 +286,7 @@
           <div class="todo-item-container">
             <i class="fa fa-minus" ng-if="!editableDescription"></i>
             <i class="fa fa-check todo-completed" ng-if="editableDescription"></i>
-            <span>Create a Goal</span>
+            <span>Create a chapter description</span>
           </div>
         </div>
       </md-card>
