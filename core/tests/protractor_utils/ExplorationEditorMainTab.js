@@ -250,6 +250,7 @@ var ExplorationEditorMainTab = function() {
   this.addResponse = async function(
       interactionId, feedbackInstructions, destStateName,
       createNewState, ruleName) {
+    await action.waitForAutosave();
     // Open the "Add Response" modal if it is not already open.
     await waitFor.elementToBeClickable(
       addResponseButton, 'Response Editor button is not clickable');
@@ -350,6 +351,7 @@ var ExplorationEditorMainTab = function() {
           feedbackInstructionsText);
       },
       setFeedback: async function(richTextInstructions) {
+        await action.waitForAutosave();
         // Begin editing feedback.
         await action.click(
           'openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
@@ -488,6 +490,8 @@ var ExplorationEditorMainTab = function() {
     // Wait for browser to time out the popover, which is 4000 ms.
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
+    await action.waitForAutosave();
+    await waitFor.elementToBeClickable(stateEditButton);
     await action.click('stateEditButton', stateEditButton);
     var stateEditorTag = element(by.tagName('state-content-editor'));
     await waitFor.visibilityOf(
@@ -501,6 +505,7 @@ var ExplorationEditorMainTab = function() {
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     expect(await saveStateContentButton.isDisplayed()).toBe(true);
+    await waitFor.elementToBeClickable(saveStateContentButton);
     await saveStateContentButton.click();
     await waitFor.invisibilityOf(
       saveStateContentButton,
@@ -526,7 +531,8 @@ var ExplorationEditorMainTab = function() {
   // ---- HINT ----
 
   this.addHint = async function(hint) {
-    await addHintButton.click();
+    await action.waitForAutosave();
+    await action.click('Add Hint', addHintButton);
     var addHintModal = element(
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
     await waitFor.visibilityOf(
@@ -544,7 +550,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.addSolution = async function(interactionId, solution) {
-    await addSolutionButton.click();
+    await action.waitForAutosave();
+    await action.click('Add Solution', addSolutionButton);
     var addOrUpdateSolutionModal = element(
       by.css('.protractor-test-add-or-update-solution-modal'));
     await waitFor.visibilityOf(
@@ -571,6 +578,7 @@ var ExplorationEditorMainTab = function() {
   // ---- INTERACTIONS ----
 
   this.deleteInteraction = async function() {
+    await action.waitForAutosave();
     await action.click('Delete interaction button', deleteInteractionButton);
 
     // Click through the "are you sure?" warning.
@@ -586,6 +594,7 @@ var ExplorationEditorMainTab = function() {
   // for most purposes. Additional arguments may be sent to this function,
   // and they will be passed on to the relevant interaction editor.
   this.setInteraction = async function(interactionId) {
+    await action.waitForAutosave();
     await createNewInteraction(interactionId);
     await customizeInteraction.apply(null, arguments);
     await closeAddResponseModal();
@@ -596,6 +605,7 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setInteractionWithoutCloseAddResponse = async function(interactionId) {
+    await action.waitForAutosave();
     await createNewInteraction(interactionId);
     await customizeInteraction.apply(null, arguments);
   };
@@ -834,6 +844,7 @@ var ExplorationEditorMainTab = function() {
   // ---- STATE GRAPH ----
 
   this.deleteState = async function(stateName) {
+    await action.waitForAutosave();
     await general.scrollToTop();
     var nodeElement = await explorationGraph.all(
       by.cssContainingText('.protractor-test-node', stateName)).first();
@@ -859,6 +870,7 @@ var ExplorationEditorMainTab = function() {
   // NOTE: if the state is not visible in the state graph this function will
   // fail.
   this.moveToState = async function(targetName) {
+    await action.waitForAutosave();
     await general.scrollToTop();
     var listOfNames = await stateNodes.map(async function(stateElement) {
       return await stateNodeLabel(stateElement).getText();
@@ -888,6 +900,7 @@ var ExplorationEditorMainTab = function() {
     this.exitTutorial();
     await waitFor.invisibilityOf(
       postTutorialPopover, 'Post-tutorial popover takes too long to disappear');
+    await action.waitForAutosave();
     await action.click('State Name Container', stateNameContainer);
     await action.clear('State Name input', stateNameInput);
     await action.sendKeys('State Name input', stateNameInput, name);

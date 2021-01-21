@@ -113,7 +113,7 @@ export class PlayerTranscriptService {
   }
 
   getCard(index: number): StateCard {
-    if (index < 0 || index >= this.transcript.length) {
+    if (index !== null && (index < 0 || index >= this.transcript.length)) {
       this.log.error(
         'Requested card with index ' + index +
           ', but transcript only has length ' +
