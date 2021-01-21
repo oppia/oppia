@@ -27,10 +27,10 @@ import python_utils
 
 (
     base_models, subtopic_models,
-    topic_models, user_models
+    user_models
 ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.subtopic,
-    models.NAMES.topic, models.NAMES.user
+    models.NAMES.user
 ])
 
 
@@ -64,9 +64,7 @@ class SubtopicPageModelValidator(base_model_validators.BaseModelValidator):
             base_model_validators.ExternalModelFetcherDetails(
                 'snapshot_content_ids',
                 subtopic_models.SubtopicPageSnapshotContentModel,
-                snapshot_model_ids),
-            base_model_validators.ExternalModelFetcherDetails(
-                'topic_ids', topic_models.TopicModel, [item.topic_id])]
+                snapshot_model_ids)]
 
     @classmethod
     def _get_custom_validation_functions(cls):
