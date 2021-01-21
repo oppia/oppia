@@ -242,7 +242,7 @@ class ExplorationStats(python_utils.OBJECT):
             self.num_completions_v2,
             {
                 state_name: state_stats.clone()
-                for state_name, state_stats in self.state_stats_mapping
+                for state_name, state_stats in self.state_stats_mapping.items()
             })
 
 

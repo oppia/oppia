@@ -23,7 +23,6 @@ import ast
 import collections
 import copy
 import itertools
-import logging
 
 from core import jobs
 from core.domain import action_registry
@@ -1696,18 +1695,31 @@ class WipeExplorationIssuesOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         else:
             yield (key, sum(int(v) for v in values))
 
+
 class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    INVALID_STATE_STATS_KEY = 'invalid'
-    VALID_STATE_STATS_KEY = 'valid'
+    """A one-off job to regenerate missing ExplorationStats models and entries
+    for all corresponding states in an exploration.
+    """
+
+    INVALID_EXP_STATS_KEY = 'invalid_exp_stats'
+    INVALID_STATE_STATS_KEY = 'invalid_state_stats'
+    VALID_EXP_STATS_KEY = 'valid_exp_stats'
+    VALID_STATE_STATS_KEY = 'valid_state_stats'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
 
     @staticmethod
     def map(latest_exp_model):
-        exp_versions = list(range(1, latest_exp_model.version))
-        exp_stats_model_list = stats_models.ExplorationStatsModel.get_multi(
-            latest_exp_model.id, exp_versions)
+        num_valid_state_stats = 0
+        num_valid_exp_stats = 0
+
+        exp_versions = list(python_utils.RANGE(1, latest_exp_model.version + 1))
+        exp_id = latest_exp_model.id
+        exp_stats_model_list = (
+            stats_models.ExplorationStatsModel.get_multi_versions(
+                latest_exp_model.id, exp_versions))
 
         exp_stats_list = [
             stats_services.get_exploration_stats_from_model(exp_stats_model)
@@ -1727,46 +1739,58 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 latest_exp_model.id,
                 python_utils.RANGE(1, latest_exp_model.version + 1))
         ]
+        missing_exp_stats = []
+        missing_state_stats = []
 
-        zipped_items = list(zip(exp_stats_list, exp_list, change_lists))
+        zipped_items = list(
+            python_utils.ZIP(exp_stats_list, exp_list, change_lists))
         revert_commit_cmd = exp_models.ExplorationModel.CMD_REVERT_COMMIT
         for i, (exp_stats, exp, change_list) in enumerate(zipped_items):
-            revert_cmd = next(
+            revert_cmd = python_utils.NEXT(
                 (
                     change for change in change_list
                     if change.cmd == revert_commit_cmd
                 ), None)
             revert_to_version = revert_cmd and revert_cmd.version_number
+            new_exp_version = None
 
             if revert_to_version is not None:
                 exp_versions_diff = None
-                prev_exp_stats = exp_stats_list[revert_to_version - 1]
-                prev_exp = exp_list[revert_to_version - 1]
+                prev_exp_stats = exp_stats_list[revert_to_version - 2]
+                prev_exp = exp_list[revert_to_version - 2]
+                new_exp_version = revert_to_version
             else:
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
-                prev_exp_stats = exp_stats_list[exp.version - 1]
-                prev_exp = exp_list[exp.version - 1]
+                prev_exp_stats = exp_stats_list[exp.version - 2]
+                prev_exp = exp_list[exp.version - 2]
+                new_exp_version = exp.version
 
             # FILL MISSING EXPLORATION-LEVEL STATS.
             if exp_stats is not None:
                 num_valid_exp_stats += 1
             else:
                 exp_stats = prev_exp_stats and prev_exp_stats.clone()
+
                 if exp_versions_diff is not None:
-                    stats_services.advance_version_of_exp_stats(
-                        exp_stats, exp.states.keys(), exp_versions_diff, None)
+                    exp_stats = stats_services.advance_version_of_exp_stats(
+                        new_exp_version, exp_versions_diff, exp_stats, None,
+                        None)
                 else:
                     exp_stats.version = exp.version
-
                 exp_stats_list[i] = exp_stats
-                missing_exp_stats.append((exp_id, exp_version))
+                missing_exp_stats.append(
+                    'Exp id: %s, Version: %s' % (exp_id, exp.version))
+                new_exploration_stats = (
+                    stats_services.get_stats_for_new_exploration(
+                        exp_id, exp.version, exp.states))
+                stats_services.create_stats_model(new_exploration_stats)
 
             # FILL MISSING STATE-LEVEL STATS.
             state_stats_mapping = exp_stats.state_stats_mapping
-            for state_name, state_content in exp.states.items():
+            for state_name, _ in exp.states.items():
                 if state_name in state_stats_mapping:
-                    num_valid_state_statsf += 1
+                    num_valid_state_stats += 1
                     continue
 
                 if exp_versions_diff is not None:
@@ -1780,22 +1804,30 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     prev_exp_stats.state_stats_mapping[prev_state_name].clone()
                     if exp.interaction.id == prev_exp.interaction.id else
                     stats_domain.StateStats.create_default())
-                missing_state_stats.append((exp_id, exp_version, state_name))
+                missing_state_stats.append(
+                    'Exp id: %s, Version: %s, State name: %s' % (
+                        exp_id, exp.version, state_name))
 
         for exp_stats in exp_stats_list:
-            stats_domain.save_stats_model(exp_stats)
+            stats_services.save_stats_model(exp_stats)
 
         for item in missing_exp_stats:
-            yield (INVALID_EXP_STATS_KEY, item)
-        yield (VALID_EXP_STATS_KEY, num_valid_exp_stats)
+            yield (FillExplorationStatsOneOffJob.INVALID_EXP_STATS_KEY, item)
+        yield (
+            FillExplorationStatsOneOffJob.VALID_EXP_STATS_KEY,
+            num_valid_exp_stats)
 
         for item in missing_state_stats:
-            yield (INVALID_STATE_STATS_KEY, item)
-        yield (VALID_STATE_STATS_KEY, num_valid_state_stats)
+            yield (FillExplorationStatsOneOffJob.INVALID_STATE_STATS_KEY, item)
+        yield (
+            FillExplorationStatsOneOffJob.VALID_STATE_STATS_KEY,
+            num_valid_state_stats)
 
     @staticmethod
     def reduce(key, items):
-        if key in (VALID_EXP_STATS_KEY, VALID_STATE_STATS_KEY):
+        if key in (
+                FillExplorationStatsOneOffJob.VALID_EXP_STATS_KEY,
+                FillExplorationStatsOneOffJob.VALID_STATE_STATS_KEY):
             yield (key, sum(int(i) for i in items))
         else:
             for item in items:
