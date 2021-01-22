@@ -16,152 +16,123 @@
  * @fileoverview Service to send changes to a exploration to the backend.
  */
 
-require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
+import { HttpClient } from '@angular/common/http';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { AppConstants } from 'app.constants';
+import { ExplorationBackendDict } from './ExplorationObjectFactory';
+import { ExplorationChange } from './exploration-draft.model';
+import { tap } from 'rxjs/operators';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require(
-  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
-
-angular.module('oppia').factory('EditableExplorationBackendApiService', [
-  '$http', '$q', 'ReadOnlyExplorationBackendApiService',
-  'UrlInterpolationService', 'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
-  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
-  function(
-      $http, $q, ReadOnlyExplorationBackendApiService,
-      UrlInterpolationService, EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
-      EDITABLE_EXPLORATION_DATA_URL_TEMPLATE) {
-    var _fetchExploration = function(
-        explorationId, applyDraft, successCallback, errorCallback) {
-      var editableExplorationDataUrl = _getExplorationUrl(
-        explorationId, applyDraft);
-      $http.get(editableExplorationDataUrl).then(function(response) {
-        var exploration = angular.copy(response.data);
-        if (successCallback) {
-          successCallback(exploration);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _updateExploration = function(
-        explorationId, explorationVersion, commitMessage, changeList,
-        successCallback, errorCallback) {
-      var editableExplorationDataUrl = _getExplorationUrl(
-        explorationId, null);
-
-      var putData = {
-        version: explorationVersion,
-        commit_message: commitMessage,
-        change_list: changeList
-      };
-      $http.put(editableExplorationDataUrl, putData).then(
-        function(response) {
-          // The returned data is an updated exploration dict.
-          var exploration = angular.copy(response.data);
-
-          // Delete from the ReadOnlyExplorationBackendApiService's cache
-          // As the two versions of the data (learner and editor) now differ.
-          ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
-            explorationId, exploration);
-
-          if (successCallback) {
-            successCallback(exploration);
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
-        }
-      );
-    };
-
-    var _deleteExploration = function(
-        explorationId, successCallback, errorCallback) {
-      var editableExplorationDataUrl = _getExplorationUrl(explorationId, null);
-
-      $http['delete'](editableExplorationDataUrl).then(function() {
-        // Delete item from the ReadOnlyExplorationBackendApiService's cache.
-        ReadOnlyExplorationBackendApiService.deleteExplorationFromCache(
-          explorationId);
-        if (successCallback) {
-          successCallback({});
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _getExplorationUrl = function(explorationId, applyDraft) {
-      if (applyDraft) {
-        return UrlInterpolationService.interpolateUrl(
-          EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
-            exploration_id: explorationId,
-            apply_draft: JSON.stringify(applyDraft)
-          }
-        );
-      }
-      return UrlInterpolationService.interpolateUrl(
-        EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId
-        }
-      );
-    };
-
-    return {
-      fetchExploration: function(explorationId) {
-        return $q(function(resolve, reject) {
-          _fetchExploration(explorationId, null, resolve, reject);
-        });
-      },
-
-      fetchApplyDraftExploration: function(explorationId) {
-        return $q(function(resolve, reject) {
-          _fetchExploration(explorationId, true, resolve, reject);
-        });
-      },
-
-      /**
-       * Updates an exploration in the backend with the provided exploration
-       * ID. The changes only apply to the exploration of the given version
-       * and the request to update the exploration will fail if the provided
-       * exploration version is older than the current version stored in the
-       * backend. Both the changes and the message to associate with those
-       * changes are used to commit a change to the exploration.
-       * The new exploration is passed to the success callback,
-       * if one is provided to the returned promise object. Errors are passed
-       * to the error callback, if one is provided. Please note, once this is
-       * called the cached exploration in ReadOnlyExplorationBackendApiService
-       * will be deleted. This is due to the differences in the back-end
-       * editor object and the back-end player object. As it stands now,
-       * we are unable to cache any Exploration object obtained from the
-       * editor beackend.
-       */
-      updateExploration: function(
-          explorationId, explorationVersion, commitMessage, changeList) {
-        return $q(function(resolve, reject) {
-          _updateExploration(
-            explorationId, explorationVersion, commitMessage, changeList,
-            resolve, reject);
-        });
-      },
-
-      /**
-       * Deletes an exploration in the backend with the provided exploration
-       * ID. If successful, the exploration will also be deleted from the
-       * ReadOnlyExplorationBackendApiService cache as well.
-       * Errors are passed to the error callback, if one is provided.
-       */
-      deleteExploration: function(explorationId) {
-        return $q(function(resolve, reject) {
-          _deleteExploration(
-            explorationId, resolve, reject);
-        });
-      }
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class EditableExplorationBackendApiService {
+  constructor(
+    private httpClient: HttpClient,
+    private readOnlyExplorationBackendApiService:
+      ReadOnlyExplorationBackendApiService,
+    private urlInterpolationService: UrlInterpolationService) {}
+  private _fetchExploration(
+      explorationId: string,
+      applyDraft: boolean): Promise<ExplorationBackendDict> {
+    return this.httpClient.get<ExplorationBackendDict>(
+      this._getExplorationUrl(explorationId, applyDraft)).toPromise();
   }
-]);
+
+  private _updateExploration(
+      explorationId: string,
+      explorationVersion: string,
+      commitMessage: string,
+      changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
+    const putData = {
+      version: explorationVersion,
+      commit_message: commitMessage,
+      change_list: changeList
+    };
+
+    return this.httpClient.put<ExplorationBackendDict>(
+      this._getExplorationUrl(explorationId, false), putData).pipe(tap(
+      // Delete from the ReadOnlyExplorationBackendApiService's cache
+      // As the two versions of the data (learner and editor) now differ.
+      _ => this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(
+        explorationId)
+    )).toPromise();
+  }
+
+  private _deleteExploration(explorationId: string): Promise<void> {
+    return this.httpClient['delete']<void>(
+      this._getExplorationUrl(explorationId, false)).pipe(tap(
+      // Delete item from the ReadOnlyExplorationBackendApiService's cache.
+      _ => this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(
+        explorationId)
+    )).toPromise();
+  }
+
+  private _getExplorationUrl(
+      explorationId: string, applyDraft: boolean): string {
+    if (applyDraft) {
+      return this.urlInterpolationService.interpolateUrl(
+        AppConstants.EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE, {
+          exploration_id: explorationId,
+          apply_draft: JSON.stringify(applyDraft)
+        }
+      );
+    }
+    return this.urlInterpolationService.interpolateUrl(
+      AppConstants.EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
+        exploration_id: explorationId
+      }
+    );
+  }
+
+  fetchExploration(explorationId: string):Promise<ExplorationBackendDict> {
+    return this._fetchExploration(explorationId, false);
+  }
+
+  fetchApplyDraftExploration(
+      explorationId: string): Promise<ExplorationBackendDict> {
+    return this._fetchExploration(explorationId, true);
+  }
+
+  /**
+   * Updates an exploration in the backend with the provided exploration
+   * ID. The changes only apply to the exploration of the given version
+   * and the request to update the exploration will fail if the provided
+   * exploration version is older than the current version stored in the
+   * backend. Both the changes and the message to associate with those
+   * changes are used to commit a change to the exploration.
+   * The new exploration is passed to the success callback,
+   * if one is provided to the returned promise object. Errors are passed
+   * to the error callback, if one is provided. Please note, once this is
+   * called the cached exploration in ReadOnlyExplorationBackendApiService
+   * will be deleted. This is due to the differences in the back-end
+   * editor object and the back-end player object. As it stands now,
+   * we are unable to cache any Exploration object obtained from the
+   * editor beackend.
+   */
+  updateExploration(
+      explorationId: string,
+      explorationVersion: string,
+      commitMessage: string,
+      changeList: ExplorationChange[]): Promise<ExplorationBackendDict> {
+    return this._updateExploration(
+      explorationId, explorationVersion, commitMessage, changeList);
+  }
+
+  /**
+   * Deletes an exploration in the backend with the provided exploration
+   * ID. If successful, the exploration will also be deleted from the
+   * ReadOnlyExplorationBackendApiService cache as well.
+   * Errors are passed to the error callback, if one is provided.
+   */
+  deleteExploration(explorationId: string): Promise<void> {
+    return this._deleteExploration(explorationId);
+  }
+}
+
+angular.module('oppia').factory(
+  'EditableExplorationBackendApiService', downgradeInjectable(
+    EditableExplorationBackendApiService));
