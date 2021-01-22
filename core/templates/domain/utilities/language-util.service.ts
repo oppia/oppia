@@ -157,30 +157,29 @@ export class LanguageUtilService {
     return language ? language.description : null;
   }
 
+  getLanguageDirection(languageCode: string): string {
+    // The backend constants tests guarantee that SUPPORTED_CONTENT_LANGUAGES
+    // and SUPPORTED_AUDIO_LANGUAGES do not conflict and contain at most one
+    // entry per language code.
+    const matchingContentLanguage = this.SUPPORTED_CONTENT_LANGUAGES.find(
+      (language) => language.code === languageCode);
+    if (matchingContentLanguage !== undefined) {
+      return matchingContentLanguage.direction;
+    }
+
+    const matchingAudioLanguage = this.SUPPORTED_AUDIO_LANGUAGES.find(
+      (language) => language.id === languageCode);
+    if (matchingAudioLanguage !== undefined) {
+      return matchingAudioLanguage.direction;
+    }
+    throw new Error(
+      'Could not find language direction for the supplied language code: ' +
+        languageCode);
+  }
+
   getContentLanguageDescription(contentLanguageCode: string): string {
     const language = this.getSupportedContentLanguages()[contentLanguageCode];
     return language ? language.description : null;
-  }
-
-  getContentLanguageDirection(languageCode: string): string {
-    let languageDirection = 'auto'; // Default auto for invalid languageCode
-    this.SUPPORTED_CONTENT_LANGUAGES.forEach((lang: ContentLanguage) => {
-      if (lang.code === languageCode) {
-        languageDirection = lang.direction;
-      }
-    });
-    return languageDirection;
-  }
-
-  getAudioLanguageDirection(languageCode: string): string {
-    let languageDirection = 'auto'; // Default auto for invalid languageCode
-    this.SUPPORTED_AUDIO_LANGUAGES.forEach(
-      (audioLanguage: SupportedAudioLanguageBackendDict) => {
-        if (audioLanguage.id === languageCode) {
-          languageDirection = audioLanguage.direction;
-        }
-      });
-    return languageDirection;
   }
 
   // Given a list of audio language codes, returns the complement list, i.e.

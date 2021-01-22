@@ -17,16 +17,18 @@
  * committed to the server.
  */
 
+import { EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs';
 require(
   'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('ChangeListService', [
-  '$log', 'AlertsService', 'AutosaveInfoModalsService',
+  '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',
   'ExplorationDataService', 'LoaderService',
   function(
-      $log, AlertsService, AutosaveInfoModalsService,
+      $log, $rootScope, AlertsService, AutosaveInfoModalsService,
       ExplorationDataService, LoaderService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
@@ -49,7 +51,8 @@ angular.module('oppia').factory('ChangeListService', [
     var CMD_DELETE_STATE = 'delete_state';
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
     var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-
+    var autosaveInProgressEventEmitter: EventEmitter<boolean> = (
+      new EventEmitter<boolean>());
     var ALLOWED_EXPLORATION_BACKEND_NAMES = {
       category: true,
       init_state_name: true,
@@ -80,6 +83,8 @@ angular.module('oppia').factory('ChangeListService', [
       widget_id: true,
       written_translations: true
     };
+    var changeListAddedTimeoutId = null;
+    var DEFAULT_WAIT_FOR_AUTOSAVE_MSEC = 200;
 
     var autosaveChangeListOnChange = function(explorationChangeList) {
       // Asynchronously send an autosave request, and check for errors in the
@@ -92,12 +97,14 @@ angular.module('oppia').factory('ChangeListService', [
       ExplorationDataService.autosaveChangeList(
         explorationChangeList,
         function(response) {
-          if (!response.data.is_version_of_draft_valid) {
+          if (!response.is_version_of_draft_valid) {
             if (!AutosaveInfoModalsService.isModalOpen()) {
               AutosaveInfoModalsService.showVersionMismatchModal(
                 explorationChangeList);
             }
           }
+          autosaveInProgressEventEmitter.emit(false);
+          $rootScope.$applyAsync();
         },
         function() {
           AlertsService.clearWarnings();
@@ -107,6 +114,8 @@ angular.module('oppia').factory('ChangeListService', [
           if (!AutosaveInfoModalsService.isModalOpen()) {
             AutosaveInfoModalsService.showNonStrictValidationFailModal();
           }
+          autosaveInProgressEventEmitter.emit(false);
+          $rootScope.$applyAsync();
         }
       );
     };
@@ -117,7 +126,13 @@ angular.module('oppia').factory('ChangeListService', [
       }
       explorationChangeList.push(changeDict);
       undoneChangeStack = [];
-      autosaveChangeListOnChange(explorationChangeList);
+      autosaveInProgressEventEmitter.emit(true);
+      if (changeListAddedTimeoutId) {
+        clearTimeout(changeListAddedTimeoutId);
+      }
+      changeListAddedTimeoutId = setTimeout(() => {
+        autosaveChangeListOnChange(explorationChangeList);
+      }, DEFAULT_WAIT_FOR_AUTOSAVE_MSEC);
     };
 
     return {
@@ -149,7 +164,7 @@ angular.module('oppia').factory('ChangeListService', [
       discardAllChanges: function() {
         explorationChangeList = [];
         undoneChangeStack = [];
-        ExplorationDataService.discardDraft();
+        return ExplorationDataService.discardDraft();
       },
       /**
        * Saves a change dict that represents a change to an exploration
@@ -237,6 +252,10 @@ angular.module('oppia').factory('ChangeListService', [
         var lastChange = explorationChangeList.pop();
         undoneChangeStack.push(lastChange);
         autosaveChangeListOnChange(explorationChangeList);
+      },
+
+      get autosaveIsInProgress$(): Observable<boolean> {
+        return autosaveInProgressEventEmitter.asObservable();
       }
     };
   }
