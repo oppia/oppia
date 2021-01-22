@@ -20,8 +20,8 @@
 export class TranslateTextContainer {
   stateName: string;
   contentID: string;
-  contentText: any;
-  constructor(stateName: string, contentID: string, contentText: any) {
+  contentText: unknown;
+  constructor(stateName: string, contentID: string, contentText: unknown) {
     this.stateName = stateName;
     this.contentID = contentID;
     this.contentText = contentText;
