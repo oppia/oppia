@@ -31,6 +31,8 @@ You can also append the following options to the above command:
         core/controllers directory. (You can change "core/controllers" to any
         valid subdirectory path.)
 
+    --test_shard=1 runs all tests in shard 1.
+
     --generate_coverage_report generates a coverage report as part of the final
         test output (but it makes the tests slower).
 
@@ -46,6 +48,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import importlib
 import inspect
+import json
 import multiprocessing
 import os
 import re
@@ -92,13 +95,18 @@ COVERAGE_MODULE_PATH = os.path.join(
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+# This path points to a JSON file that defines which modules belong to
+# each shard.
+SHARDS_SPEC_PATH = os.path.join(
+    os.getcwd(), 'scripts', 'backend_test_shards.json')
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
 _PARSER = argparse.ArgumentParser(
     description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
-IMPORTANT: Only one of --test_path and --test_target should be specified.
+IMPORTANT: Only one of --test_path,  --test_target, and --test_shard
+should be specified.
 """)
 
 _EXCLUSIVE_GROUP = _PARSER.add_mutually_exclusive_group()
@@ -109,6 +117,10 @@ _EXCLUSIVE_GROUP.add_argument(
 _EXCLUSIVE_GROUP.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
+    type=python_utils.UNICODE)
+_EXCLUSIVE_GROUP.add_argument(
+    '--test_shard',
+    help='optional name of shard to run',
     type=python_utils.UNICODE)
 _PARSER.add_argument(
     '--generate_coverage_report',
@@ -177,7 +189,7 @@ class TestingTaskSpec(python_utils.OBJECT):
             None, None, None, [result])]
 
 
-def _get_all_test_targets(test_path=None, include_load_tests=True):
+def _get_all_test_targets_from_path(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -229,6 +241,20 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     return result
 
 
+def _get_all_test_targets_from_shard(shard_name):
+    """Find all test modules in a shard.
+
+    Args:
+        shard_name: str. The name of the shard.
+
+    Returns:
+        list(str). The dotted module names that belong to the shard.
+    """
+    with open(SHARDS_SPEC_PATH, 'r') as shards_file:
+        shards_spec = json.load(shards_file)
+    return shards_spec[shard_name]
+
+
 def main(args=None):
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -261,9 +287,17 @@ def main(args=None):
 
         os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
 
-    if parsed_args.test_target and parsed_args.test_path:
+    test_specs_provided = sum([
+        1 if argument else 0
+        for argument in (
+            parsed_args.test_target, parsed_args.test_path,
+            parsed_args.test_shard)
+    ])
+
+    if test_specs_provided > 1:
         raise Exception(
-            'At most one of test_path and test_target should be specified.')
+            'At most one of test_path, test_target and test_shard may '
+            'be specified.')
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if parsed_args.test_target and '/' in parsed_args.test_target:
@@ -284,9 +318,12 @@ def main(args=None):
             time.sleep(3)
             python_utils.PRINT('Redirecting to its corresponding test file...')
             all_test_targets = [parsed_args.test_target + '_test']
+    elif parsed_args.test_shard:
+        all_test_targets = _get_all_test_targets_from_shard(
+            parsed_args.test_shard)
     else:
         include_load_tests = not parsed_args.exclude_load_tests
-        all_test_targets = _get_all_test_targets(
+        all_test_targets = _get_all_test_targets_from_path(
             test_path=parsed_args.test_path,
             include_load_tests=include_load_tests)
 
