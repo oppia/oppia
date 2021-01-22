@@ -19,23 +19,6 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').directive('adminProdModeActivitiesTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin-page/activities-tab/' +
-        'admin-prod-mode-activities-tab.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {}]
-    };
-  }
-]);
-
 @Component({
   selector: 'admin-prod-mode-activities-tab',
   templateUrl: './admin-prod-mode-activities-tab.directive.html',
