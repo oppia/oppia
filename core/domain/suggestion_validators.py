@@ -304,7 +304,7 @@ class GeneralVoiceoverApplicationModelValidator(
                     '%s_ids' % item.target_type,
                     TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
                     [item.target_id]))
-        if item.final_reviewer_id:
+        if item.final_reviewer_id is not None:
             field_name_to_external_model_references.append(
                 base_model_validators.UserSettingsModelFetcherDetails(
                     'final_reviewer_ids', [item.final_reviewer_id],

@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2020 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the domain objects relating to platform parameters."""
+"""Tests for the domain objects relating to the user queries."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -28,7 +28,7 @@ import utils
 
 
 class UserQueryTests(test_utils.GenericTestBase):
-    """Test for the PlatformParameter."""
+    """Test for the UserQuery."""
 
     def setUp(self):
         super(UserQueryTests, self).setUp()
@@ -132,19 +132,6 @@ class UserQueryTests(test_utils.GenericTestBase):
             'Expected sent_email_model_id to be a string'
         ):
             self.user_query.validate()
-
-    def test_to_dict_returns_correct_dict(self):
-        self.assertEqual(
-            self.user_query.to_dict(),
-            {
-                'id': 'user_query_id',
-                'submitter_id': self.user_id,
-                'created_on': (
-                    self.user_query.created_on.strftime('%d-%m-%y %H:%M:%S')),
-                'status': feconf.USER_QUERY_STATUS_PROCESSING,
-                'num_qualified_users': 0
-            }
-        )
 
     def test_create_default_returns_correct_user_query(self):
         default_user_query = user_query_domain.UserQuery.create_default(

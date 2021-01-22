@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -123,30 +123,20 @@ class UserQuery(python_utils.OBJECT):
                     'Expected user ID in user_ids to be a valid user ID, '
                     'received %s' % user_id)
 
-        if self.sent_email_model_id:
-            if not isinstance(
-                    self.sent_email_model_id, python_utils.BASESTRING):
-                raise utils.ValidationError(
-                    'Expected sent_email_model_id to be a string, received %s'
-                    % self.sent_email_model_id)
-
-    def to_dict(self):
-        """Create a dict from the user query.
-
-        Returns:
-            dict. The dict from the user query.
-        """
-        return {
-            'id': self.id,
-            'submitter_id': self.submitter_id,
-            'created_on': self.created_on.strftime('%d-%m-%y %H:%M:%S'),
-            'status': self.status,
-            'num_qualified_users': len(self.user_ids)
-        }
+        if self.sent_email_model_id and not isinstance(
+                self.sent_email_model_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected sent_email_model_id to be a string, received %s'
+                % self.sent_email_model_id)
 
     @classmethod
     def create_default(cls, query_id, query_params, submitter_id):
         """Create default user query.
+
+        Args:
+            query_id: str. The id of the query.
+            query_params: UserQueryParams. The params of this query.
+            submitter_id: str. The ID of the user that submitted the query.
 
         Returns:
             UserQuery. The default user query.
@@ -160,9 +150,9 @@ class UserQuery(python_utils.OBJECT):
         """Archive the query.
 
         Args:
-            sent_email_model_id: str|None. The send email model ID that was sent
-                to the users. Can be None if the query was archived without
-                sending email.
+            sent_email_model_id: str|None. The SentEmailModel ID representing
+                the email that was sent to the users. Can be None if the query
+                was archived without sending email.
         """
         if sent_email_model_id:
             self.sent_email_model_id = sent_email_model_id

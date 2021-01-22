@@ -115,6 +115,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
             query_data['status'], feconf.USER_QUERY_STATUS_PROCESSING)
         self.assertEqual(
             query_data['submitter_username'], self.SUBMITTER_USERNAME)
+        self.assertNotIn('submitter_id', query_data)
 
         self.logout()
 
@@ -268,6 +269,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.assertEqual(recent_query['id'], user_query.id)
         self.assertEqual(
             recent_query['status'], feconf.USER_QUERY_STATUS_PROCESSING)
+        self.assertNotIn('submitter_id', recent_query)
 
         self.logout()
 

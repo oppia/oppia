@@ -59,7 +59,7 @@ def get_user_query(query_id, strict=False):
     """Gets the user query with some ID.
 
     Args:
-        query_id: str. The ID of the query to get.
+        query_id: str. The ID of the query.
         strict: bool. Whether to raise an error if the user query doesn't exist.
 
     Returns:
@@ -77,11 +77,13 @@ def get_recent_user_queries(num_queries_to_fetch, cursor):
 
     Args:
         num_queries_to_fetch: int. Number of user queries to fetch.
-        cursor: str or None. The list of returned entities starts from this
-            datastore cursor.
+        cursor: str|None. The list of returned entities starts from this
+            datastore cursor. Can be None if there are no more entities.
 
     Returns:
-        (list(QueryModel), str). The list of user queries.
+        tuple(list(QueryModel), str). Returns tuple with the list of user
+        queries and the next cursor that can be used when doing subsequent
+        queries.
     """
     user_query_models, next_cursor, _ = user_models.UserQueryModel.fetch_page(
         num_queries_to_fetch, cursor)
@@ -138,7 +140,7 @@ def save_new_user_query(
         has_not_logged_in_for_n_days=None, created_at_least_n_exps=None,
         created_fewer_than_n_exps=None, edited_at_least_n_exps=None,
         edited_fewer_than_n_exps=None):
-    """Save a new user query.
+    """Saves a new user query.
 
     Args:
         submitter_id: str. ID of the UserQueryModel instance.

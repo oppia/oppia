@@ -35,6 +35,32 @@ class EmailDashboardPage(base.BaseHandler):
         self.render_template('email-dashboard-page.mainpage.html')
 
 
+def _generate_user_query_dicts(user_queries):
+    """Generate data dicts for the user queries.
+
+    Args:
+        user_queries: list(UserQuery). List of user queries to transform.
+
+    Returns:
+        list(dict(str, str)). List of data dicts for the user queries.
+    """
+    submitters_settings = user_services.get_users_settings(
+        list(set([model.submitter_id for model in user_queries])))
+    user_id_to_username = {
+        submitter.user_id: submitter.username
+        for submitter in submitters_settings
+    }
+    return [
+        {
+            'id': user_query.id,
+            'submitter_username': user_id_to_username[user_query.id],
+            'created_on': user_query.created_on.strftime('%d-%m-%y %H:%M:%S'),
+            'status': user_query.status,
+            'num_qualified_users': len(user_query.user_ids)
+        } for user_query in user_queries
+    ]
+
+
 class EmailDashboardDataHandler(base.BaseHandler):
     """Query data handler."""
 
@@ -54,25 +80,10 @@ class EmailDashboardDataHandler(base.BaseHandler):
             user_query_services.get_recent_user_queries(
                 int(num_queries_to_fetch), cursor))
 
-        submitters_settings = user_services.get_users_settings(
-            list(set([model.submitter_id for model in user_queries])))
-
-        user_id_to_username = {
-            submitter.user_id: submitter.username
-            for submitter in submitters_settings
-        }
-
-        user_query_dicts = [user_query.to_dict() for user_query in user_queries]
-        for user_query_dict in user_query_dicts:
-            user_query_dict['submitter_username'] = (
-                user_id_to_username[user_query_dict['submitter_id']])
-            del user_query_dict['submitter_id']
-
         data = {
-            'recent_queries': user_query_dicts,
+            'recent_queries': _generate_user_query_dicts(user_queries),
             'cursor': next_cursor
         }
-
         self.render_json(data)
 
     @acl_decorators.can_manage_email_dashboard
@@ -91,13 +102,8 @@ class EmailDashboardDataHandler(base.BaseHandler):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params=params)
 
-        user_query_dict = user_query.to_dict()
-        user_query_dict['submitter_username'] = (
-            user_services.get_username(user_query_dict['submitter_id']))
-        del user_query_dict['submitter_id']
-
         data = {
-            'query': user_query_dict
+            'query': _generate_user_query_dicts([user_query])[0]
         }
         self.render_json(data)
 
@@ -129,13 +135,8 @@ class QueryStatusCheckHandler(base.BaseHandler):
         if user_query is None:
             raise self.InvalidInputException('Invalid query id.')
 
-        user_query_dict = user_query.to_dict()
-        user_query_dict['submitter_username'] = (
-            user_services.get_username(user_query_dict['submitter_id']))
-        del user_query_dict['submitter_id']
-
         data = {
-            'query': user_query_dict
+            'query': _generate_user_query_dicts([user_query])[0]
         }
         self.render_json(data)
 
