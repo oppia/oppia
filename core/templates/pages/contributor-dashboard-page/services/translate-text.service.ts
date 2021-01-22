@@ -37,17 +37,26 @@ angular.module('oppia').factory('TranslateTextService', [
     var activeExpId = null;
     var activeExpVersion = null;
     var activeIndex = 0;
+    var activeStateName = null;
+    var activeContentId = null;
+    var activeContentText= null;
 
     const getNextText = function() {
-      const contentText = translateTextContainers[activeIndex].contentText;
-      return contentText;
+      if (translateTextContainers.length === 0) {
+        return null;
+      }
+      activeStateName = translateTextContainers[activeIndex].stateName
+      activeContentId = translateTextContainers[activeIndex].contentID;
+      activeContentText = translateTextContainers[activeIndex].contentText;
+      activeIndex += 1;
+      return activeContentText;
     };
 
     const isMoreTextAvailableForTranslation = function() {
       if (translateTextContainers.length === 0) {
         return false;
       }
-      return (activeIndex + 1 < translateTextContainers.length);
+      return (activeIndex < translateTextContainers.length);
     };
 
     return {
@@ -106,14 +115,13 @@ angular.module('oppia').factory('TranslateTextService', [
           target_version_at_submission: activeExpVersion,
           change: {
             cmd: 'add_translation',
-            content_id: translateTextContainers[activeIndex].contentID,
-            state_name: translateTextContainers[activeIndex].stateName,
+            content_id: activeContentId,
+            state_name: activeStateName,
             language_code: languageCode,
-            content_html: translateTextContainers[activeIndex].contentText,
+            content_html: activeContentText,
             translation_html: translationHtml
           }
         };
-        activeIndex += 1;
         let body = new FormData();
         body.append('payload', JSON.stringify(postData));
         let filenames = imagesData.map(obj => obj.filename);

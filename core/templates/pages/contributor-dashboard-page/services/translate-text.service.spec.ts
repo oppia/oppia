@@ -50,24 +50,32 @@ describe('TranslateTextService', function() {
       TranslateTextService.init('1', 'en', () => {});
       $httpBackend.flush();
 
-      const expectedTextAndAvailability1 = {
-        text: 'text2',
-        more: true
-      };
-      textAndAvailability = TranslateTextService.getTextToTranslate();
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability1);
-
-      const expectedTextAndAvailability2 = {
-        text: 'text1',
-        more: true
-      };
-      textAndAvailability = TranslateTextService.getTextToTranslate();
-      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
-
       const expectedTextAndAvailability3 = {
         text: 'text3',
         more: false
       };
+
+      const expectedTextAndAvailability2 = {
+        text: 'text2',
+        more: true
+      };
+
+      const expectedTextAndAvailability1 = {
+        text: 'text1',
+        more: true
+      };
+
+      textAndAvailability = TranslateTextService.getTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability1);
+
+      // const expectedTextAndAvailability2 = {
+      //   text: 'text1',
+      //   more: true
+      // };
+      
+      textAndAvailability = TranslateTextService.getTextToTranslate();
+      expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
+
       textAndAvailability = TranslateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability3);
     });
