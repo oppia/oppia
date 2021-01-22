@@ -20,8 +20,8 @@
 export class TranslateTextContainer {
   stateName: string;
   contentID: string;
-  contentText: unknown;
-  constructor(stateName: string, contentID: string, contentText: unknown) {
+  contentText: string;
+  constructor(stateName: string, contentID: string, contentText: string) {
     this.stateName = stateName;
     this.contentID = contentID;
     this.contentText = contentText;
@@ -74,7 +74,7 @@ angular.module('oppia').factory('TranslateTextService', [
               if (text !== '') {
                 contentIds.push(contentId);
                 translateTextContainers.push(
-                  new TranslateTextContainer(stateName, contentId, text));
+                  new TranslateTextContainer(stateName, contentId, text as string));
                 stateHasText = true;
               }
             }
