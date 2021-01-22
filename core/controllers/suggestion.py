@@ -297,7 +297,13 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
 
     @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
-        """Handles GET requests."""
+        """
+        Handles GET requests.
+
+        Args:
+            target_type: str. The type of the suggestion target.
+            suggestion_type: str. The type of the suggestion.
+        """
         self._require_valid_suggestion_and_target_types(
             target_type, suggestion_type)
         suggestions = suggestion_services.get_reviewable_suggestions(
