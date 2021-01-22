@@ -44,7 +44,7 @@ export class TranslationTabActiveContentIdService {
     return this.activeDataFormat;
   }
 
-  setActiveContent(contentId, dataFormat): void {
+  setActiveContent(contentId: string, dataFormat: string): void {
     var allContentIds = (
       this._stateRecordedVoiceoversService.displayed.getAllContentIds());
     if (allContentIds.indexOf(contentId) === -1) {
@@ -56,13 +56,10 @@ export class TranslationTabActiveContentIdService {
   }
 
   get onActiveContentIdChanged(): EventEmitter<string> {
-    console.log(this._activeContentIdChangedEventEmitter)
     return this._activeContentIdChangedEventEmitter;
   }
-
 }
 
 angular.module('oppia').factory(
   'TranslationTabActiveContentIdService', downgradeInjectable(
     TranslationTabActiveContentIdService));
-

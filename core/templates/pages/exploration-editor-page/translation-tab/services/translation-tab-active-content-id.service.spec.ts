@@ -16,11 +16,12 @@
  * @fileoverview Unit test for the Translation tab active content id service.
  */
 
+import { EventEmitter } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TranslationTabActiveContentIdService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts';
 import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service.ts';
 
-fdescribe('Translation tab active content id service', () => {
+describe('Translation tab active content id service', () => {
   let ttacis: TranslationTabActiveContentIdService;
 
   beforeEach(() => {
@@ -57,14 +58,11 @@ fdescribe('Translation tab active content id service', () => {
     expect(ttacis.getActiveDataFormat()).toBeNull();
     ttacis.setActiveContent('content', 'html');
     expect(ttacis.getActiveDataFormat()).toBe('html');
-  })
+  });
 
-  it('should clear the data format', () => {
-    ttacis.setActiveContent('content', 'html');
-    expect(ttacis.getActiveDataFormat()).toBe('html');
-    ttacis.onActiveContentIdChanged.subscribe((dataFormat) =>{
-      expect(dataFormat).toBeNull();
-    })
-    
-  })
+  it('should emit data Format', () => {
+    let mockquestionSessionEventEmitter = new EventEmitter();
+    expect(ttacis.onActiveContentIdChanged).toEqual(
+      mockquestionSessionEventEmitter);
+  });
 });
