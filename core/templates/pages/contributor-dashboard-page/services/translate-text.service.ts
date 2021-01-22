@@ -33,8 +33,6 @@ angular.module('oppia').factory('TranslateTextService', [
     var stateWiseContents = null;
     var stateWiseContentIds = {};
     var translateTextContainers = [];
-    var activeStateName = null;
-    var activeContentId = null;
     var stateNamesList = [];
     var activeExpId = null;
     var activeExpVersion = null;
@@ -56,7 +54,6 @@ angular.module('oppia').factory('TranslateTextService', [
       init: function(expId, languageCode, successCallback) {
         stateWiseContents = null;
         stateWiseContentIds = {};
-        activeStateName = null;
         stateNamesList = [];
         activeExpId = expId;
         activeExpVersion = null;
