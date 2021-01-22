@@ -74,7 +74,8 @@ angular.module('oppia').factory('TranslateTextService', [
               if (text !== '') {
                 contentIds.push(contentId);
                 translateTextContainers.push(
-                  new TranslateTextContainer(stateName, contentId, text as string));
+                  new TranslateTextContainer(
+                    stateName, contentId, text as string));
                 stateHasText = true;
               }
             }
