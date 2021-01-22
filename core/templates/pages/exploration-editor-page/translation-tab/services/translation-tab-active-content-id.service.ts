@@ -20,9 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter } from '@angular/core';
 import { Injectable } from '@angular/core';
 
-import { StateRecordedVoiceoversService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 
 
 @Injectable({
