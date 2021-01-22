@@ -292,3 +292,160 @@ class ExplorationCommitLogEntryModelValidator(
                     'exploration_rights_ids', exp_models.ExplorationRightsModel,
                     [item.exploration_id]))
         return external_id_relationships
+
+
+class ExpSummaryModelValidator(base_model_validators.BaseSummaryModelValidator):
+    """Class for validating ExpSummaryModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return exp_fetchers.get_exploration_summary_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return [
+       base_model_validators.ExternalModelFetcherDetails(
+                'exploration_ids',
+                exp_models.ExplorationModel, [item.id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'exploration_rights_ids',
+                exp_models.ExplorationRightsModel, [item.id]),
+            base_model_validators.ExternalModelFetcherDetails(
+                'owner_user_ids',
+                user_models.UserSettingsModel, item.owner_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'editor_user_ids',
+                user_models.UserSettingsModel, item.editor_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'viewer_user_ids',
+                user_models.UserSettingsModel, item.viewer_ids),
+            base_model_validators.ExternalModelFetcherDetails(
+                'contributor_user_ids',
+                user_models.UserSettingsModel, item.contributor_ids)]
+
+    @classmethod
+    def _validate_contributors_summary(cls, item):
+        """Validate that contributor ids match the contributor ids obtained
+        from contributors summary.
+        Args:
+            item: datastore_services.Model. ExpSummaryModel to validate.
+        """
+        contributor_ids_from_contributors_summary = (
+            list(item.contributors_summary.keys()))
+        if sorted(item.contributor_ids) != sorted(
+                contributor_ids_from_contributors_summary):
+            cls._add_error(
+                'contributors %s' % (
+                    base_model_validators.ERROR_CATEGORY_SUMMARY_CHECK),
+                'Entity id %s: Contributor ids: %s do not match the '
+                'contributor ids obtained using contributors summary: %s' % (
+                    item.id, sorted(item.contributor_ids),
+                    sorted(contributor_ids_from_contributors_summary)))
+
+    @classmethod
+    def _validate_first_published_msec(cls, item):
+        """Validate that first published time of model is less than current
+        time.
+        Args:
+            item: datastore_services.Model. ExpSummaryModel to validate.
+        """
+        if not item.first_published_msec:
+            return
+
+        current_time_msec = utils.get_current_time_in_millisecs()
+        if item.first_published_msec > current_time_msec:
+            cls._add_error(
+                base_model_validators.ERROR_CATEGORY_FIRST_PUBLISHED_MSEC_CHECK,
+                'Entity id %s: The first_published_msec field has a value %s '
+                'which is greater than the time when the job was run' % (
+                    item.id, item.first_published_msec))
+
+    @classmethod
+    def _validate_exploration_model_last_updated(
+            cls, item, field_name_to_external_model_references):
+        """Validate that item.exploration_model_last_updated matches the
+        time when a last commit was made by a human contributor.
+        Args:
+            item: datastore_services.Model. ExpSummaryModel to validate.
+            field_name_to_external_model_references:
+                dict(str, (list(base_model_validators.ExternalModelReference))).
+                A dict keyed by field name. The field name represents
+                a unique identifier provided by the storage
+                model to which the external model is associated. Each value
+                contains a list of ExternalModelReference objects corresponding
+                to the field_name. For examples, all the external Exploration
+                Models corresponding to a storage model can be associated
+                with the field name 'exp_ids'. This dict is used for
+                validation of External Model properties linked to the
+                storage model.
+        """
+        exploration_model_references = (
+            field_name_to_external_model_references['exploration_ids'])
+
+        for exploration_model_reference in exploration_model_references:
+            exploration_model = exploration_model_reference.model_instance
+            if exploration_model is None or exploration_model.deleted:
+                model_class = exploration_model_reference.model_class
+                model_id = exploration_model_reference.model_id
+                cls._add_error(
+                    'exploration_ids %s' % (
+                        base_model_validators.ERROR_CATEGORY_FIELD_CHECK),
+                    'Entity id %s: based on field exploration_ids having'
+                    ' value %s, expected model %s with id %s but it doesn\'t'
+                    ' exist' % (
+                        item.id, model_id, model_class.__name__, model_id))
+                continue
+            last_human_update_ms = exp_services.get_last_updated_by_human_ms(
+                exploration_model.id)
+            last_human_update_time = datetime.datetime.fromtimestamp(
+                python_utils.divide(last_human_update_ms, 1000.0))
+            if item.exploration_model_last_updated != last_human_update_time:
+                cls._add_error(
+                    'exploration model %s' % (
+                        base_model_validators.ERROR_CATEGORY_LAST_UPDATED_CHECK
+                    ),
+                    'Entity id %s: The exploration_model_last_updated '
+                    'field: %s does not match the last time a commit was '
+                    'made by a human contributor: %s' % (
+                        item.id, item.exploration_model_last_updated,
+                        last_human_update_time))
+
+    @classmethod
+    def _get_external_model_properties(cls):
+        exploration_model_properties_dict = {
+            'title': 'title',
+            'category': 'category',
+            'objective': 'objective',
+            'language_code': 'language_code',
+            'tags': 'tags',
+            'exploration_model_created_on': 'created_on',
+        }
+
+        exploration_rights_model_properties_dict = {
+            'first_published_msec': 'first_published_msec',
+            'status': 'status',
+            'community_owned': 'community_owned',
+            'owner_ids': 'owner_ids',
+            'editor_ids': 'editor_ids',
+            'viewer_ids': 'viewer_ids',
+        }
+
+        return [(
+            'exploration',
+            'exploration_ids',
+            exploration_model_properties_dict
+        ), (
+            'exploration rights',
+            'exploration_rights_ids',
+            exploration_rights_model_properties_dict
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_first_published_msec,
+            cls._validate_contributors_summary]
+
+    @classmethod
+    def _get_external_instance_custom_validation_functions(cls):
+        return [cls._validate_exploration_model_last_updated]
