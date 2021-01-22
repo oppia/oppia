@@ -52,4 +52,19 @@ fdescribe('Translation tab active content id service', () => {
     }).toThrowError(
       'Invalid active content id: feedback_2');
   });
+
+  it('should return data format correctly', () => {
+    expect(ttacis.getActiveDataFormat()).toBeNull();
+    ttacis.setActiveContent('content', 'html');
+    expect(ttacis.getActiveDataFormat()).toBe('html');
+  })
+
+  it('should clear the data format', () => {
+    ttacis.setActiveContent('content', 'html');
+    expect(ttacis.getActiveDataFormat()).toBe('html');
+    ttacis.onActiveContentIdChanged.subscribe((dataFormat) =>{
+      expect(dataFormat).toBeNull();
+    })
+    
+  })
 });

@@ -185,6 +185,7 @@ angular.module('oppia').component('stateTranslationEditor', {
           TranslationTabActiveContentIdService.onActiveContentIdChanged.
             subscribe(
               (dataFormat) => {
+                console.log(dataFormat)
                 $scope.dataFormat = dataFormat;
                 initEditor();
               }
