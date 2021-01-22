@@ -213,6 +213,7 @@
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @srijanreddy98
 /core/templates/components/ck-editor-helpers/customize-rte-component-modal.template.html @DubeySandeep
 /core/templates/services/schema-default-value.service*.ts @kevintab95
+/core/templates/services/schema-form-submitted.service*.ts @kevintab95
 /core/templates/services/schema-undefined-last-element.service*.ts @kevintab95
 
 
@@ -228,7 +229,7 @@
 /core/templates/components/button-directives/* @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/alert-message.directive.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @srijanreddy98
-/core/templates/components/common-layout-directives/common-elements/attribution-guide.component.ts @srijanreddy98
+/core/templates/components/common-layout-directives/common-elements/attribution-guide.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/background-banner.component.html @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller*.ts @marianazangrossi
@@ -244,7 +245,9 @@
 /core/templates/components/summary-tile/ @srijanreddy98
 /core/templates/directives/angular-html-bind.directive*.ts @srijanreddy98
 /core/templates/directives/focus-on.directive*.ts @srijanreddy98
+/core/templates/domain/promo_bar/ @srijanreddy98
 /core/templates/filters/ @srijanreddy98
+/core/templates/services/attribution.service*.ts @srijanreddy98
 
 
 # Global frontend services
@@ -277,8 +280,11 @@
 # Interaction project.
 /core/domain/customization_args_util*.py @brianrodri
 /core/domain/expression_parser*.py @iamprayush
+/core/domain/interaction_jobs_one_off*.py @aks681
 /core/domain/interaction_registry*.py @iamprayush
 /core/domain/obj_services*.py @iamprayush
+/core/domain/rules_registry*.py @aks681
+/core/templates/components/keyboard-shortcut-help/ @iamprayush
 /core/templates/domain/objects/ @iamprayush
 /core/templates/expressions/ @brianrodri
 /core/templates/services/code-normalizer.service*.ts @iamprayush
@@ -300,12 +306,15 @@
 /core/domain/event_services*.py @brianrodri
 /core/domain/improvements_domain*.py @brianrodri
 /core/domain/improvements_services*.py @brianrodri
+/core/domain/improvements_validators*.py @brianrodri
 /core/domain/playthrough_issue_registry*.py @brianrodri
 /core/domain/stats*.py @brianrodri
+/core/domain/statistics_validators*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.controller*.ts @brianrodri
 /core/templates/components/common-layout-directives/common-elements/answer-content-modal.template.html @brianrodri
 /core/templates/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
+/core/templates/components/statistics-directives/ @brianrodri
 /core/templates/domain/statistics/ @brianrodri
 /core/templates/domain/improvements/ @brianrodri
 /core/templates/pages/exploration-editor-page/improvements-tab/ @brianrodri
@@ -332,6 +341,7 @@
 /core/domain/search_services*.py @aks681
 /core/templates/pages/library-page/ @kevintab95
 /core/templates/services/construct-translation-ids.service*.ts @kevintab95
+/core/templates/services/search-backend-api.service*.ts @kevintab95
 /core/templates/services/search.service*.ts @kevintab95
 
 
@@ -349,7 +359,10 @@
 /core/controllers/practice_sessions*.py @aks681
 /core/controllers/question*.py @aks681
 /core/controllers/review_tests*.py @aks681
+/core/domain/classroom_domain.py @aks681
+/core/domain/classroom_services*.py @aks681
 /core/domain/question*.py @aks681
+/core/domain/rights_domain*.py @aks681
 /core/templates/components/concept-card/ @kevintab95
 /core/templates/components/score-ring/ @kevintab95
 /core/templates/components/skill-mastery/ @kevintab95
@@ -424,8 +437,12 @@
 /assets/constants.ts @nithusha21
 /core/controllers/incoming_emails*.py @aks681
 /core/controllers/tasks*.py @aks681
+/core/domain/audit_validators*.py @vojtechjelinek
+/core/domain/base_model_validators*.py @vojtechjelinek
 /core/domain/email*.py @aks681
 /core/domain/image_service*.py @DubeySandeep
+/core/domain/job_validators*.py @vojtechjelinek
+/core/domain/prod_validators*.py @vojtechjelinek
 /core/domain/prod_validation_jobs_one_off*.py @vojtechjelinek
 /core/domain/storage_model_audit_jobs_test.py @vojtechjelinek
 /core/jobs*.py @seanlip
@@ -486,6 +503,8 @@
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component.html @shavavo @aks681
 /core/templates/components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.component*.ts @shavavo @aks681
 /core/templates/services/autoplayed-videos.service*.ts @aks681
+/core/templates/services/external-save.service*.ts @srijanreddy98
+/core/templates/services/external-rte-save.service*.ts @srijanreddy98
 /core/templates/services/image-local-storage*.ts @DubeySandeep
 /core/templates/services/rte-helper.service*.ts @aks681
 /core/templates/services/rte-helper-modal.controller*.ts @aks681
@@ -613,6 +632,15 @@
 /extensions/rich_text_components/*/protractor.js @U8NWXD @kevintab95
 /extensions/rich_text_components/protractor.js @U8NWXD @kevintab95
 /extensions/objects/protractor.js @U8NWXD @kevintab95
+
+
+# Python 3 Migration project.
+/core/domain/auth*.py @brianrodri
+/core/domain/caching*.py @brianrodri
+/core/domain/taskqueue*.py @brianrodri
+/core/templates/services/auth-interceptor.service*.ts @brianrodri
+/core/templates/services/auth.service*.ts @brianrodri
+
 
 # Critical files.
 #
