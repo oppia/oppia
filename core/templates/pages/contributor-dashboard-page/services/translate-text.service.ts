@@ -39,13 +39,13 @@ angular.module('oppia').factory('TranslateTextService', [
     var activeIndex = 0;
     var activeStateName = null;
     var activeContentId = null;
-    var activeContentText= null;
+    var activeContentText = null;
 
     const getNextText = function() {
       if (translateTextContainers.length === 0) {
         return null;
       }
-      activeStateName = translateTextContainers[activeIndex].stateName
+      activeStateName = translateTextContainers[activeIndex].stateName;
       activeContentId = translateTextContainers[activeIndex].contentID;
       activeContentText = translateTextContainers[activeIndex].contentText;
       activeIndex += 1;

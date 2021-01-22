@@ -68,11 +68,6 @@ describe('TranslateTextService', function() {
       textAndAvailability = TranslateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability1);
 
-      // const expectedTextAndAvailability2 = {
-      //   text: 'text1',
-      //   more: true
-      // };
-      
       textAndAvailability = TranslateTextService.getTextToTranslate();
       expect(textAndAvailability).toEqual(expectedTextAndAvailability2);
 
