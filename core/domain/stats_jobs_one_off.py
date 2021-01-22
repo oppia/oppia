@@ -35,6 +35,7 @@ from core.domain import stats_services
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
@@ -1713,6 +1714,8 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(latest_exp_model):
+        if latest_exp_model.deleted:
+            return
         num_valid_state_stats = 0
         num_valid_exp_stats = 0
 
@@ -1741,15 +1744,23 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 FillExplorationStatsOneOffJob.NO_STATS_MODELS_AVAILABLE, exp_id)
             return
 
-        change_lists = [
-            [
-                exp_domain.ExplorationChange(commit_cmd)
-                for commit_cmd in snapshot['commit_cmds']
+        try:
+            snapshots = exp_models.ExplorationModel.get_snapshots_metadata(
+                exp_id, exp_versions)
+            change_lists = [
+                [
+                    exp_domain.ExplorationChange(commit_cmd)
+                    for commit_cmd in snapshot['commit_cmds']
+                ]
+                for snapshot in snapshots
             ]
-            for snapshot in exp_models.ExplorationModel.get_snapshots_metadata(
-                latest_exp_model.id,
-                exp_versions)
-        ]
+        except utils.ValidationError:
+            error_message = (
+                'Exploration(id=%r) snapshots contain invalid commit_cmds'
+                % exp_id)
+            yield (error_message, snapshot['commit_cmds'])
+            return
+
         missing_exp_stats = []
         missing_state_stats = []
 
@@ -1821,7 +1832,7 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         new_exp_version, exp_versions_diff, exp_stats, None,
                         None)
                 else:
-                    exp_stats.version = exp.version
+                    exp_stats.exp_version = exp.version
                 stats_services.create_stats_model(exp_stats)
                 missing_exp_stats_indices.append(i)
                 missing_exp_stats.append(
@@ -1842,16 +1853,34 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 else:
                     prev_state_name = state_name
 
-                prev_interaction_id = (
-                    prev_exp.states[prev_state_name].interaction.id)
-                current_interaction_id = exp.states[state_name].interaction.id
-                exp_stats_list[i].state_stats_mapping[state_name] = (
-                    prev_exp_stats.state_stats_mapping[prev_state_name].clone()
-                    if current_interaction_id == prev_interaction_id else
-                    stats_domain.StateStats.create_default())
-                missing_state_stats.append(
-                    'StateStats(exp_id=%r, exp_version=%r, state_name=%r)' % (
-                        exp_id, exp.version, state_name))
+                if prev_state_name in prev_exp.states:
+                    prev_interaction_id = (
+                        prev_exp.states[prev_state_name].interaction.id)
+                    current_interaction_id = (
+                        exp.states[state_name].interaction.id)
+                    exp_stats_list[i].state_stats_mapping[state_name] = (
+                        prev_exp_stats.state_stats_mapping[
+                            prev_state_name].clone()
+                        if current_interaction_id == prev_interaction_id else
+                        stats_domain.StateStats.create_default())
+                    missing_state_stats.append(
+                        'StateStats(exp_id=%r, exp_version=%r, '
+                        'state_name=%r)' % (exp_id, exp.version, state_name))
+                else:
+                    error_message = (
+                        'Exploration(id=%r, exp_version=%r) has no '
+                        'State(name=%r)' % (
+                            exp_id, exp_stats.exp_version, prev_state_name))
+                    yield (error_message, {
+                        'added_state_names': (
+                            exp_versions_diff.added_state_names),
+                        'deleted_state_names': (
+                            exp_versions_diff.deleted_state_names),
+                        'new_to_old_state_names': (
+                            exp_versions_diff.new_to_old_state_names),
+                        'old_to_new_state_names': (
+                            exp_versions_diff.old_to_new_state_names)
+                    })
 
         for index, exp_stats in enumerate(exp_stats_list):
             if index not in missing_exp_stats_indices:
