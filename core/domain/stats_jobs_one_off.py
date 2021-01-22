@@ -1701,12 +1701,11 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     for all corresponding states in an exploration.
     """
 
-    INVALID_EXP_STATS_KEY = 'invalid_exp_stats'
-    INVALID_STATE_STATS_KEY = 'invalid_state_stats'
-    VALID_EXP_STATS_KEY = 'valid_exp_stats'
-    VALID_STATE_STATS_KEY = 'valid_state_stats'
-    V1_EXPLORATION_MODEL = 'v1_exploration_model_encountered'
-    NO_STATS_MODELS_AVAILABLE = 'no_stat_models_available'
+    INVALID_EXP_STATS_KEY = 'Missing or invalid ExplorationStatsModel'
+    INVALID_STATE_STATS_KEY = 'Missing or invalid StateStatsModel'
+    VALID_EXP_STATS_KEY = 'Valid ExplorationStatsModel'
+    VALID_STATE_STATS_KEY = 'Valid StateStatsModel'
+    NO_STATS_MODELS_AVAILABLE = 'No ExplorationStatsModels found'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -1721,20 +1720,26 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exp_id = latest_exp_model.id
         exp_stats_model_list = (
             stats_models.ExplorationStatsModel.get_multi_versions(
-                latest_exp_model.id, exp_versions))
+                exp_id, exp_versions))
+        missing_exp_stats_indices = []
 
         exp_stats_list = [
             stats_services.get_exploration_stats_from_model(exp_stats_model)
             if exp_stats_model else None
             for exp_stats_model in exp_stats_model_list
         ]
+
+        exp_list = exp_fetchers.get_multiple_explorations_by_version(
+            exp_id, exp_versions)
         if all(exp_stats is None for exp_stats in exp_stats_list):
+            for index, version in enumerate(exp_versions):
+                exp_stats_for_version = (
+                    stats_services.get_stats_for_new_exploration(
+                        exp_id, version, exp_list[index].states.keys()))
+                stats_services.create_stats_model(exp_stats_for_version)
             yield (
                 FillExplorationStatsOneOffJob.NO_STATS_MODELS_AVAILABLE, exp_id)
             return
-
-        exp_list = exp_fetchers.get_multiple_explorations_by_version(
-            latest_exp_model.id, exp_versions)
 
         change_lists = [
             [
@@ -1743,7 +1748,7 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             ]
             for snapshot in exp_models.ExplorationModel.get_snapshots_metadata(
                 latest_exp_model.id,
-                python_utils.RANGE(1, latest_exp_model.version + 1))
+                exp_versions)
         ]
         missing_exp_stats = []
         missing_state_stats = []
@@ -1761,46 +1766,67 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             new_exp_version = None
 
             if revert_to_version is not None:
-                if revert_to_version == 1:
-                    yield (
-                        FillExplorationStatsOneOffJob.V1_EXPLORATION_MODEL,
-                        exp.id)
-                    return
                 exp_versions_diff = None
-                prev_exp_stats = exp_stats_list[revert_to_version - 2]
-                prev_exp = exp_list[revert_to_version - 2]
+                # We subtract 2 from revert_to_version to get the index of the
+                # previous exploration version because exp_stats_list and
+                # prev_exp start with version 1 in the 0th index.
+                prev_exp_version_index = revert_to_version - 2
+                prev_exp_stats = exp_stats_list[prev_exp_version_index]
+                prev_exp = exp_list[prev_exp_version_index]
                 new_exp_version = revert_to_version
             else:
-                if exp.version == 1:
-                    yield (
-                        FillExplorationStatsOneOffJob.V1_EXPLORATION_MODEL,
-                        exp.id)
-                    return
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
-                prev_exp_stats = exp_stats_list[exp.version - 2]
-                prev_exp = exp_list[exp.version - 2]
+                # We subtract 2 from exp.version to get the index of the
+                # previous exploration version because exp_stats_list and
+                # prev_exp start with version 1 in the 0th index.
+                prev_exp_version_index = exp.version - 2
+                prev_exp_stats = exp_stats_list[prev_exp_version_index]
+                prev_exp = exp_list[prev_exp_version_index]
                 new_exp_version = exp.version
 
             # Fill missing Exploration-level stats.
-            if exp_stats is not None:
+            if exp_stats:
                 num_valid_exp_stats += 1
+            elif exp.version == 1:
+                new_exploration_stats = (
+                    stats_services.get_stats_for_new_exploration(
+                        exp_id, exp.version, exp.states))
+                stats_services.create_stats_model(new_exploration_stats)
+                missing_exp_stats_indices.append(i)
+                missing_exp_stats.append(
+                    'ExplorationStats(exp_id=%r, exp_version=%r)'
+                    % (exp_id, exp.version))
+                num_valid_state_stats += len(
+                    new_exploration_stats.state_stats_mapping)
+                continue
             else:
                 exp_stats = prev_exp_stats and prev_exp_stats.clone()
 
-                if exp_versions_diff is not None:
+                if exp_stats is None:
+                    new_exploration_stats = (
+                        stats_services.get_stats_for_new_exploration(
+                            exp_id, exp.version, exp.states))
+                    stats_services.create_stats_model(new_exploration_stats)
+                    missing_exp_stats_indices.append(i)
+                    missing_exp_stats.append(
+                        'ExplorationStats(exp_id=%r, exp_version=%r)'
+                        % (exp_id, exp.version))
+                    num_valid_state_stats += len(
+                        new_exploration_stats.state_stats_mapping)
+                    continue
+
+                if exp_versions_diff:
                     exp_stats = stats_services.advance_version_of_exp_stats(
                         new_exp_version, exp_versions_diff, exp_stats, None,
                         None)
                 else:
                     exp_stats.version = exp.version
-                exp_stats_list[i] = exp_stats
+                stats_services.create_stats_model(exp_stats)
+                missing_exp_stats_indices.append(i)
                 missing_exp_stats.append(
-                    'Exp id: %s, Version: %s' % (exp_id, exp.version))
-                new_exploration_stats = (
-                    stats_services.get_stats_for_new_exploration(
-                        exp_id, exp.version, exp.states))
-                stats_services.create_stats_model(new_exploration_stats)
+                    'ExplorationStats(exp_id=%r, exp_version=%r)'
+                    % (exp_id, exp.version))
 
             # Fill missing State-level stats.
             state_stats_mapping = exp_stats.state_stats_mapping
@@ -1809,23 +1835,27 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     num_valid_state_stats += 1
                     continue
 
-                if exp_versions_diff is not None:
+                if exp_versions_diff:
                     prev_state_name = (
                         exp_versions_diff.new_to_old_state_names.get(
                             state_name, state_name))
                 else:
                     prev_state_name = state_name
 
-                state_stats_mapping[state_name] = (
+                prev_interaction_id = (
+                    prev_exp.states[prev_state_name].interaction.id)
+                current_interaction_id = exp.states[state_name].interaction.id
+                exp_stats_list[i].state_stats_mapping[state_name] = (
                     prev_exp_stats.state_stats_mapping[prev_state_name].clone()
-                    if exp.interaction.id == prev_exp.interaction.id else
+                    if current_interaction_id == prev_interaction_id else
                     stats_domain.StateStats.create_default())
                 missing_state_stats.append(
-                    'Exp id: %s, Version: %s, State name: %s' % (
+                    'StateStats(exp_id=%r, exp_version=%r, state_name=%r)' % (
                         exp_id, exp.version, state_name))
 
-        for exp_stats in exp_stats_list:
-            stats_services.save_stats_model(exp_stats)
+        for index, exp_stats in enumerate(exp_stats_list):
+            if index not in missing_exp_stats_indices:
+                stats_services.save_stats_model(exp_stats)
 
         for item in missing_exp_stats:
             yield (FillExplorationStatsOneOffJob.INVALID_EXP_STATS_KEY, item)
@@ -1845,8 +1875,6 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 FillExplorationStatsOneOffJob.VALID_EXP_STATS_KEY,
                 FillExplorationStatsOneOffJob.VALID_STATE_STATS_KEY):
             yield (key, sum(int(i) for i in items))
-        if key == FillExplorationStatsOneOffJob.V1_EXPLORATION_MODEL:
-            yield (key, items)
         else:
             for item in items:
                 yield (key, item)
