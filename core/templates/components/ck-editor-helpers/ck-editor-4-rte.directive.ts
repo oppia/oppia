@@ -96,7 +96,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
       };
 
       if (!uiConfig) {
-        return uiConfig;
+        return ckConfig;
       }
 
       if (uiConfig.language) {
