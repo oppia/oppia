@@ -60,7 +60,7 @@ describe('Translation tab active content id service', () => {
     expect(ttacis.getActiveDataFormat()).toBe('html');
   });
 
-  it('should emit data Format', () => {
+  it('should emit data format', () => {
     let mockquestionSessionEventEmitter = new EventEmitter();
     expect(ttacis.onActiveContentIdChanged).toEqual(
       mockquestionSessionEventEmitter);
