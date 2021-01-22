@@ -37,7 +37,8 @@ var GetStartedPage = function() {
       throw new Error('Unsupported tag type specified: ' + type);
     }
 
-    return await tag.getAttribute('content');
+    await waitFor.visibilityOf(tag, 'Tag is taking too long to appear');
+    return tag.getAttribute('content');
   };
 };
 
