@@ -177,6 +177,8 @@ describe('State Translation Editor Component', function() {
       spyOn(explorationStatesService, 'saveWrittenTranslations').and.callFake(
         () => {});
 
+      spyOn(
+        translationLanguageService, 'getActiveLanguageDirection').and.stub();
       spyOnProperty(
         translationLanguageService, 'onActiveLanguageChanged').and.returnValue(
         mockActiveLanguageChangedEventEmitter);
@@ -378,10 +380,11 @@ describe('State Translation Editor Component', function() {
       $uibModal = $injector.get('$uibModal');
       editabilityService = $injector.get('EditabilityService');
       explorationStatesService = $injector.get('ExplorationStatesService');
-      translationLanguageService = $injector.get('TranslationLanguageService');
       translationTabActiveContentIdService = $injector.get(
         'TranslationTabActiveContentIdService');
-
+      translationLanguageService = $injector.get('TranslationLanguageService');
+      spyOn(
+        translationLanguageService, 'getActiveLanguageDirection').and.stub();
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
       spyOn(editabilityService, 'isEditable').and.returnValue(true);

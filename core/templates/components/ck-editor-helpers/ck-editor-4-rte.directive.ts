@@ -26,8 +26,8 @@ interface UiConfig {
   (): UiConfig;
   'hide_complex_extensions': boolean;
   'startupFocusEnabled'?: boolean;
-  'activeLanguage'?: string;
-  'activeLanguageDirection'?: string;
+  'language'?: string;
+  'languageDirection'?: string;
 }
 
 interface CkeditorCustomScope extends ng.IScope {
@@ -36,8 +36,84 @@ interface CkeditorCustomScope extends ng.IScope {
 
 angular.module('oppia').directive('ckEditor4Rte', [
   'CkEditorCopyContentService', 'ContextService', 'RteHelperService',
-  function(
-      CkEditorCopyContentService, ContextService, RteHelperService) {
+  function(CkEditorCopyContentService, ContextService, RteHelperService) {
+    /**
+     * Creates a CKEditor configuration.
+     * @param config CKEditor config to add to
+     * @param uiConfig Parameters to add to CKEditor config
+     * @param pluginNames Comma separated list of plugin names
+     * @param buttonNames Array of button names for RTE components
+     * @param extraAllowedContentRules Additional allowed content rules for
+     * CKEDITOR.editor.filter
+     * @param sharedSpaces IDs of the page elements that will store the editor
+     * UI elements
+     */
+    const _createCKEditorConfig = function(
+        uiConfig: UiConfig,
+        pluginNames: string,
+        buttonNames: string[],
+        extraAllowedContentRules: string,
+        sharedSpaces: CKEDITOR.sharedSpace
+    ): CKEDITOR.config {
+      // Language configs use default language when undefined.
+      const ckConfig: CKEDITOR.config = {
+        extraPlugins: 'pre,sharedspace,' + pluginNames,
+        startupFocus: true,
+        removePlugins: 'indentblock',
+        title: false,
+        floatSpaceDockedOffsetY: 15,
+        extraAllowedContent: extraAllowedContentRules,
+        sharedSpaces: sharedSpaces,
+        skin: (
+          'bootstrapck,' +
+          '/third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/'
+        ),
+        toolbar: [
+          {
+            name: 'basicstyles',
+            items: ['Bold', '-', 'Italic']
+          },
+          {
+            name: 'paragraph',
+            items: [
+              'NumberedList', '-',
+              'BulletedList', '-',
+              'Pre', '-',
+              'Blockquote', '-',
+              'Indent', '-',
+              'Outdent'
+            ]
+          },
+          {
+            name: 'rtecomponents',
+            items: buttonNames
+          },
+          {
+            name: 'document',
+            items: ['Source']
+          }
+        ]
+      };
+
+      if (!uiConfig) {
+        return ckConfig;
+      }
+
+      if (uiConfig.language) {
+        ckConfig.language = uiConfig.language;
+        ckConfig.contentsLanguage = uiConfig.language;
+      }
+      if (uiConfig.languageDirection) {
+        ckConfig.contentsLangDirection = (
+          uiConfig.languageDirection);
+      }
+      if (uiConfig.startupFocusEnabled !== undefined) {
+        ckConfig.startupFocus = uiConfig.startupFocusEnabled;
+      }
+
+      return ckConfig;
+    };
+
     return {
       restrict: 'E',
       scope: {
@@ -126,64 +202,18 @@ angular.module('oppia').directive('ckEditor4Rte', [
         CKEDITOR.plugins.addExternal(
           'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
 
-        var startupFocusEnabled = true;
-        if (
-          scope.uiConfig() &&
-          scope.uiConfig().startupFocusEnabled !== undefined) {
-          startupFocusEnabled = scope.uiConfig().startupFocusEnabled;
-        }
-        let activeLanguage;
-        let activeLanguageDirection;
-        if (scope.uiConfig()) {
-          activeLanguage = scope.uiConfig().activeLanguage;
-          activeLanguageDirection = scope.uiConfig().activeLanguageDirection;
-        }
+        const sharedSpaces = {
+          top: <HTMLElement>el[0].children[0].children[0]
+        };
+
+        const ckConfig = _createCKEditorConfig(
+          scope.uiConfig(), pluginNames, buttonNames, extraAllowedContentRules,
+          sharedSpaces);
 
         // Initialize CKEditor.
-        var ck = CKEDITOR.inline(<HTMLElement>(el[0].children[0].children[1]), {
-          // Language configs use default language when undefined.
-          language: activeLanguage,
-          contentsLanguage: activeLanguage,
-          contentsLangDirection: activeLanguageDirection,
-          extraPlugins: 'pre,sharedspace,' + pluginNames,
-          startupFocus: startupFocusEnabled,
-          removePlugins: 'indentblock',
-          title: false,
-          floatSpaceDockedOffsetY: 15,
-          extraAllowedContent: extraAllowedContentRules,
-          sharedSpaces: {
-            top: <HTMLElement>el[0].children[0].children[0]
-          },
-          skin: (
-            'bootstrapck,' +
-            '/third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/'
-          ),
-          toolbar: [
-            {
-              name: 'basicstyles',
-              items: ['Bold', '-', 'Italic']
-            },
-            {
-              name: 'paragraph',
-              items: [
-                'NumberedList', '-',
-                'BulletedList', '-',
-                'Pre', '-',
-                'Blockquote', '-',
-                'Indent', '-',
-                'Outdent'
-              ]
-            },
-            {
-              name: 'rtecomponents',
-              items: buttonNames
-            },
-            {
-              name: 'document',
-              items: ['Source']
-            }
-          ]
-        });
+        var ck = CKEDITOR.inline(
+          <HTMLElement>(el[0].children[0].children[1]), ckConfig);
+
         // A RegExp for matching rich text components.
         var componentRe = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
