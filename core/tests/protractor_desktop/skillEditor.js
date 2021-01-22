@@ -155,6 +155,9 @@ describe('Skill Editor functionality', function() {
       'FuzzyEquals', ['correct']);
     var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
+    await (
+      await explorationEditorMainTab.getResponseEditor('default')
+    ).setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
