@@ -37,7 +37,7 @@ export class ExplorationPermissionsBackendApiService {
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService) {}
 
-  async getPermissionsAsync(): Promise<ExplorationPermissions> {
+  getPermissions(): Promise<ExplorationPermissions> {
     let explorationPermissionsUrl = this.urlInterpolationService
       .interpolateUrl('/createhandler/permissions/<exploration_id>', {
         exploration_id: this.contextService.getExplorationId()
