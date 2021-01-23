@@ -163,7 +163,9 @@ angular.module('oppia').component('settingsTab', {
             ctrl.stateNames = ExplorationStatesService.getStateNames();
           }
           ctrl.hasPageLoaded = true;
+          $rootScope.$applyAsync();
         });
+        $rootScope.$applyAsync();
       };
 
       ctrl.saveExplorationTitle = function() {
