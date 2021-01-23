@@ -62,7 +62,7 @@ export class ContributionOpportunitiesService {
       });
   }
 
-  private _getTranslationOpportunities(languageCode, cursor):
+  private _getTranslationOpportunities(languageCode: string, cursor):
    Promise<{ more: boolean; opportunities: ExplorationOpportunitySummary[] }> {
     return this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(
@@ -113,32 +113,36 @@ export class ContributionOpportunitiesService {
     });
   }
 
-  async getSkillOpportunitiesAsync() {
+  async getSkillOpportunitiesAsync(): Promise<Object> {
     return this._getSkillOpportunities('');
   }
 
-  async getTranslationOpportunitiesAsync(languageCode) {
+  async getTranslationOpportunitiesAsync(languageCode: string)
+  : Promise<Object> {
     return this._getTranslationOpportunities(languageCode, '');
   }
 
-  async getVoiceoverOpportunities(languageCode) {
+  async getVoiceoverOpportunities(languageCode: string)
+  : Promise<Object> {
     return this._getVoiceoverOpportunities(languageCode, '');
   }
 
-  async getMoreSkillOpportunitiesAsync() {
+  async getMoreSkillOpportunitiesAsync(): Promise<Object> {
     if (this.moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunities(this.skillOpportunitiesCursor);
     }
   }
 
-  async getMoreTranslationOpportunitiesAsync(languageCode) {
+  async getMoreTranslationOpportunitiesAsync(languageCode: string)
+  : Promise<Object> {
     if (this.moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunities(
         languageCode, this.translationOpportunitiesCursor);
     }
   }
 
-  async getMoreVoiceoverOpportunitiesAsync(languageCode) {
+  async getMoreVoiceoverOpportunitiesAsync(languageCode: string)
+  : Promise<Object> {
     if (this.moreVoiceoverOpportunitiesAvailable) {
       return this._getVoiceoverOpportunities(
         languageCode, this.voiceoverOpportunitiesCursor);
@@ -155,10 +159,9 @@ export class ContributionOpportunitiesService {
   }
 
   showRequiresLoginModal(): () => void {
-    return this.showRequiresLoginModal;
+    return this._showRequiresLoginModal;
   }
 }
 
 angular.module('oppia').factory('ContributionOpportunitiesService',
   downgradeInjectable(ContributionOpportunitiesService));
-
