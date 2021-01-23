@@ -1738,6 +1738,7 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         except Exception as e:
             yield (
                 'Failed to fetch Exploration(exp_id=%r) versions:' % exp_id, e)
+            return
 
         if all(exp_stats is None for exp_stats in exp_stats_list):
             for index, version in enumerate(exp_versions):
@@ -1858,7 +1859,9 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 else:
                     prev_state_name = state_name
 
-                if prev_state_name in prev_exp.states:
+                if (
+                        prev_state_name in prev_exp.states and
+                        prev_state_name in prev_exp_stats.state_stats_mapping):
                     prev_interaction_id = (
                         prev_exp.states[prev_state_name].interaction.id)
                     current_interaction_id = (
@@ -1884,7 +1887,10 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         'new_to_old_state_names': (
                             exp_versions_diff.new_to_old_state_names),
                         'old_to_new_state_names': (
-                            exp_versions_diff.old_to_new_state_names)
+                            exp_versions_diff.old_to_new_state_names),
+                        'prev_exp.states': prev_exp.states.keys(),
+                        'prev_exp_stats.state_stats_mapping': (
+                            prev_exp_stats.state_stats_mapping.keys())
                     })
 
         for index, exp_stats in enumerate(exp_stats_list):
