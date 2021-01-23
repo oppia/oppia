@@ -232,12 +232,13 @@
     <hr ng-if="$ctrl.userCanDeleteAccount">
 
     <div ng-if="$ctrl.userCanDeleteAccount" role="form" class="form-group row">
-      <label class="col-lg-4 col-md-4 col-sm-4">Delete Account</label>
+      <label class="col-lg-4 col-md-4 col-sm-4" translate="IL8N_DELETE_ACCOUNT_PAGE_HEADING">Delete Account</label>
       <div class="col-lg-8 col-md-8 col-sm-8">
         <a href="/delete-account">
           <button type="button"
                   class="btn btn-danger protractor-test-delete-account-button"
-                  title="Delete account">
+                  title="Delete account"
+                  translate="IL8N_DELETE_ACCOUNT_PAGE_HEADING">
             Delete account
           </button>
         </a>
@@ -251,7 +252,10 @@
       <label class="col-lg-4 col-md-4 col-sm-4">Export Account</label>
       <div class="col-lg-8 col-md-8 col-sm-8" ng-if="!$ctrl.exportingData">
         <a href="/export-account-handler">
-          <button type="button" class="btn btn-primary protractor-test-export-account-button" title="Export account" ng-click="$ctrl.handleExportDataClick()">
+          <button type="button" 
+                  class="btn btn-primary protractor-test-export-account-button" 
+                  title="Export account" 
+                  ng-click="$ctrl.handleExportDataClick()">
             Export account
           </button>
         </a>
