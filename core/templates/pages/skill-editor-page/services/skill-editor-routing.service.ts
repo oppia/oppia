@@ -73,6 +73,9 @@ angular.module('oppia').factory('SkillEditorRoutingService', [
       createQuestion: function() {
         return ctrl.createQuestion;
       },
+      backToQuestionList: function() {
+        ctrl.createQuestion = false;
+      }
     };
 
     return SkillEditorRouterService;
