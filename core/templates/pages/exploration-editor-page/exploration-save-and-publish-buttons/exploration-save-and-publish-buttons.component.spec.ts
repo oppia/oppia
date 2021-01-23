@@ -156,12 +156,6 @@ describe('Exploration save and publish buttons component', function() {
       expect($scope.loadingDotsAreShown).toBe(false);
     });
 
-  it('should show publish button when user can publish and exploration' +
-    ' is private', function() {
-    spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
-    expect($scope.showPublishButton()).toBe(true);
-  });
-
   it('should save exploration when saving changes', function() {
     $scope.saveChanges();
 
@@ -275,7 +269,7 @@ describe('Exploration save and publish buttons component', function() {
     $scope.$apply();
     spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
     expect($scope.canPublish).toBe(true);
-    expect($scope.showPublishButton()).toEqual(true);
+    expect($scope.showPublishButton()).toBe(true);
   });
 
   it('should call confirm before leaving', function() {

@@ -130,7 +130,7 @@ angular.module('oppia').component('explorationSaveAndPublishButtons', {
         ctrl.saveBeforeUnload();
       };
 
-      $scope.canPublish = true;
+      $scope.canPublish = false;
 
       $scope.showPublishButton = function() {
         UserExplorationPermissionsService.getPermissionsAsync()
