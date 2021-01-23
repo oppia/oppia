@@ -194,6 +194,8 @@ angular.module('oppia').factory('TopicEditorStateService', [
           canonicalStorySummaries,
           newBackendTopicRightsObject
         ]) => {
+          _skillCreationIsAllowed = (
+            newBackendTopicObject.skillCreationIsAllowed);
           _skillQuestionCountDict = (
             newBackendTopicObject.skillQuestionCountDict);
           _updateGroupedSkillSummaries(
@@ -210,8 +212,6 @@ angular.module('oppia').factory('TopicEditorStateService', [
             newBackendTopicObject.classroomUrlFragment);
           _updateTopicRights(newBackendTopicRightsObject);
           _setCanonicalStorySummaries(canonicalStorySummaries);
-          _skillCreationIsAllowed = (
-            newBackendTopicObject.skillCreationIsAllowed);
           _topicIsLoading = false;
           $rootScope.$applyAsync();
         }, (error) => {
