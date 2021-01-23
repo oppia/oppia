@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,115 +17,148 @@
  * fields.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 import { EventEmitter } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
+import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 
-require(
-  'pages/contributor-dashboard-page/services/' +
-  'contribution-opportunities-backend-api.service.ts');
+@Injectable({
+  providedIn: 'root'
+})
+export class ContributionOpportunitiesService {
+    skillOpportunitiesCursor = null;
+    translationOpportunitiesCursor = null;
+    private voiceoverOpportunitiesCursor = null;
+    moreSkillOpportunitiesAvailable : boolean = true;
+    moreTranslationOpportunitiesAvailable: boolean = true;
+    moreVoiceoverOpportunitiesAvailable: boolean = true;
 
-angular.module('oppia').factory('ContributionOpportunitiesService', [
-  '$uibModal', 'ContributionOpportunitiesBackendApiService',
-  'UrlInterpolationService',
-  function(
-      $uibModal, ContributionOpportunitiesBackendApiService,
-      UrlInterpolationService) {
-    var reloadOpportunitiesEventEmitter = new EventEmitter<void>();
-    var removeOpportunitiesEventEmitter = new EventEmitter<void>();
+    constructor(
+        private contributionOpportunitiesBackendApiService:
+        ContributionOpportunitiesBackendApiService,
+        private urlInterpolationService: UrlInterpolationService,
+        private ngbModal: NgbModal
+    ) {}
 
-    var skillOpportunitiesCursor = null;
-    var translationOpportunitiesCursor = null;
-    var voiceoverOpportunitiesCursor = null;
-    var moreSkillOpportunitiesAvailable = true;
-    var moreTranslationOpportunitiesAvailable = true;
-    var moreVoiceoverOpportunitiesAvailable = true;
+  private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
+  private _removeOpportunitiesEventEmitter = new EventEmitter<void>();
 
-    var _getSkillOpportunities = function(cursor) {
-      return ContributionOpportunitiesBackendApiService
-        .fetchSkillOpportunitiesAsync(
-          cursor).then(({ opportunities, nextCursor, more }) => {
-          skillOpportunitiesCursor = nextCursor;
-          moreSkillOpportunitiesAvailable = more;
-          return {
-            opportunities: opportunities,
-            more: more
-          };
-        });
-    };
-    var _getTranslationOpportunities = function(languageCode, cursor) {
-      return ContributionOpportunitiesBackendApiService
-        .fetchTranslationOpportunitiesAsync(
-          languageCode, cursor).then(({ opportunities, nextCursor, more }) => {
-          translationOpportunitiesCursor = nextCursor;
-          moreTranslationOpportunitiesAvailable = more;
-          return {
-            opportunities: opportunities,
-            more: more
-          };
-        });
-    };
-    var _getVoiceoverOpportunities = function(languageCode, cursor) {
-      return ContributionOpportunitiesBackendApiService
-        .fetchVoiceoverOpportunitiesAsync(languageCode, cursor).then(
-          function({ opportunities, nextCursor, more }) {
-            voiceoverOpportunitiesCursor = nextCursor;
-            moreVoiceoverOpportunitiesAvailable = more;
-            return {
-              opportunities: opportunities,
-              more: more
-            };
-          });
-    };
-
-    var showRequiresLoginModal = function(argument) {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/community-dashboard-page/modal-templates/' +
-          'login-required-modal.directive.html'),
-        backdrop: 'static',
-        controller: [
-          '$controller', '$scope', '$uibModalInstance',
-          function($controller, $scope, $uibModalInstance) {
-            $controller('ConfirmOrCancelModalController', {
-              $scope: $scope,
-              $uibModalInstance: $uibModalInstance
-            });
-          }]
-      }).result.then(function() {}, function() {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
+  private _getSkillOpportunities(cursor):
+      Promise<{ more: boolean; opportunities: SkillOpportunity[] }> {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchSkillOpportunitiesAsync(cursor)
+      .then(({opportunities, nextCursor, more}) => {
+        this.skillOpportunitiesCursor = nextCursor;
+        this.moreSkillOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
       });
-    };
+  }
 
-    return {
-      getSkillOpportunitiesAsync: async function() {
-        return _getSkillOpportunities('');
-      },
-      getTranslationOpportunitiesAsync: async function(languageCode) {
-        return _getTranslationOpportunities(languageCode, '');
-      },
-      getVoiceoverOpportunities: async function(languageCode) {
-        return _getVoiceoverOpportunities(languageCode, '');
-      },
-      getMoreSkillOpportunitiesAsync: async function() {
-        if (moreSkillOpportunitiesAvailable) {
-          return _getSkillOpportunities(skillOpportunitiesCursor);
-        }
-      },
-      getMoreTranslationOpportunitiesAsync: async function(languageCode) {
-        if (moreTranslationOpportunitiesAvailable) {
-          return _getTranslationOpportunities(
-            languageCode, translationOpportunitiesCursor);
-        }
-      },
-      getMoreVoiceoverOpportunities: async function(languageCode) {
-        if (moreVoiceoverOpportunitiesAvailable) {
-          return _getVoiceoverOpportunities(
-            languageCode, voiceoverOpportunitiesCursor);
-        }
-      },
-      showRequiresLoginModal: showRequiresLoginModal,
-      reloadOpportunitiesEventEmitter: reloadOpportunitiesEventEmitter,
-      removeOpportunitiesEventEmitter: removeOpportunitiesEventEmitter,
-    };
-  }]);
+  private _getTranslationOpportunities(languageCode, cursor):
+   Promise<{ more: boolean; opportunities: ExplorationOpportunitySummary[] }> {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchTranslationOpportunitiesAsync(
+        languageCode, cursor)
+      .then(({opportunities, nextCursor, more}) => {
+        this.translationOpportunitiesCursor = nextCursor;
+        this.moreTranslationOpportunitiesAvailable = more;
+        return {
+          opportunities: opportunities,
+          more: more
+        };
+      });
+  }
+
+  private _getVoiceoverOpportunities(languageCode, cursor):
+   Promise<{ more: boolean; opportunities: ExplorationOpportunitySummary[] }> {
+    return this.contributionOpportunitiesBackendApiService
+      .fetchVoiceoverOpportunitiesAsync(languageCode, cursor).then(
+        function({opportunities, nextCursor, more}) {
+          this.voiceoverOpportunitiesCursor = nextCursor;
+          this.moreVoiceoverOpportunitiesAvailable = more;
+          return {
+            opportunities: opportunities,
+            more: more
+          };
+        });
+  }
+
+  private _showRequiresLoginModal(): void {
+    this.ngbModal.open({
+      templateUrl: this.urlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/community-dashboard-page/modal-templates/' +
+                'login-required-modal.directive.html'),
+      backdrop: 'static',
+      controller: [
+        '$controller', '$scope', '$uibModalInstance',
+        function($controller, $scope, $uibModalInstance) {
+          $controller('ConfirmOrCancelModalController', {
+            $scope: $scope,
+            $uibModalInstance: $uibModalInstance
+          });
+        }]
+    }).result.then(function() {
+    }, function() {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  async getSkillOpportunitiesAsync() {
+    return this._getSkillOpportunities('');
+  }
+
+  async getTranslationOpportunitiesAsync(languageCode) {
+    return this._getTranslationOpportunities(languageCode, '');
+  }
+
+  async getVoiceoverOpportunities(languageCode) {
+    return this._getVoiceoverOpportunities(languageCode, '');
+  }
+
+  async getMoreSkillOpportunitiesAsync() {
+    if (this.moreSkillOpportunitiesAvailable) {
+      return this._getSkillOpportunities(this.skillOpportunitiesCursor);
+    }
+  }
+
+  async getMoreTranslationOpportunitiesAsync(languageCode) {
+    if (this.moreTranslationOpportunitiesAvailable) {
+      return this._getTranslationOpportunities(
+        languageCode, this.translationOpportunitiesCursor);
+    }
+  }
+
+  async getMoreVoiceoverOpportunitiesAsync(languageCode) {
+    if (this.moreVoiceoverOpportunitiesAvailable) {
+      return this._getVoiceoverOpportunities(
+        languageCode, this.voiceoverOpportunitiesCursor);
+    }
+  }
+
+
+  get removeOpportunitiesEventEmitter(): EventEmitter<void> {
+    return this._removeOpportunitiesEventEmitter;
+  }
+
+  get reloadOpportunitiesEventEmitter(): EventEmitter<void> {
+    return this._reloadOpportunitiesEventEmitter;
+  }
+
+  showRequiresLoginModal(): () => void {
+    return this.showRequiresLoginModal;
+  }
+}
+
+angular.module('oppia').factory('ContributionOpportunitiesService',
+  downgradeInjectable(ContributionOpportunitiesService));
+
