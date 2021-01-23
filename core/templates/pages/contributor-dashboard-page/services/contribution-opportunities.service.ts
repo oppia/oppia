@@ -141,7 +141,7 @@ export class ContributionOpportunitiesService {
     }
   }
 
-  async getMoreVoiceoverOpportunitiesAsync(languageCode: string)
+  async getMoreVoiceoverOpportunities(languageCode: string)
   : Promise<Object> {
     if (this.moreVoiceoverOpportunitiesAvailable) {
       return this._getVoiceoverOpportunities(
