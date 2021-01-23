@@ -12930,10 +12930,10 @@ validate-npm-package-name@^3.0.0:
   dependencies:
     builtins "^1.0.3"
 
-vanilla-picker@^2.10.1:
-  version "2.11.1"
-  resolved "https://registry.yarnpkg.com/vanilla-picker/-/vanilla-picker-2.11.1.tgz#c1102fdcaa359cdb3797f5dcc1417e4f0aa246ff"
-  integrity sha512-zFBENWyueoxDmwvQUM/BpVNaIJAD9RpJqp493Ke1VfduY+6lRELMDA7biz44RMUEQyG7W8WRC22AO9ZmF5NtkQ==
+vanilla-picker@2.10.1:
+  version "2.10.1"
+  resolved "https://registry.yarnpkg.com/vanilla-picker/-/vanilla-picker-2.10.1.tgz#b07d6df8e0c3655e39a7da11e68adc00affa2b12"
+  integrity sha512-Bo4HOKkSorcQoRB08HwDMb8X2jt3SsZw7gzFlbzXbhnaxdUVJBm3LOUudr7M1SCVwPCo8d3nq8ajiAg8lAoqPg==
   dependencies:
     "@sphinxxxx/color-conversion" "^2.2.2"
 
