@@ -570,11 +570,11 @@ angular.module('oppia').directive('questionsList', [
             } else {
               if (ctrl.skillLinkageModificationsArray.length > 0) {
                 ctrl.updateSkillLinkage(null);
-                SkillEditorRoutingService.backToQuestionList()
+                SkillEditorRoutingService.backToQuestionList();
               } else {
                 ContextService.resetImageSaveDestination();
                 ctrl.saveAndPublishQuestion(null);
-                SkillEditorRoutingService.backToQuestionList()
+                SkillEditorRoutingService.backToQuestionList();
               }
             }
           };
