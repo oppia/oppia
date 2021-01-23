@@ -267,7 +267,7 @@ def get_all_exploration_summaries():
 
 # Methods for exporting states and explorations to other formats.
 def export_to_zip_file(exploration_id, version=None):
-    """Returns a ZIP archive of the exploration.
+    """Returns a ZIP delete of the exploration.
 
     Args:
         exploration_id: str. The id of the exploration to export.
@@ -276,7 +276,7 @@ def export_to_zip_file(exploration_id, version=None):
             exploration is exported.
 
     Returns:
-        str. The contents of the ZIP archive of the exploration (which can be
+        str. The contents of the ZIP delete of the exploration (which can be
         subsequently converted into a zip file via zipfile.ZipFile()).
     """
     # Asset directories that need to be included in exploration download.

@@ -146,7 +146,7 @@ class UserQuery(python_utils.OBJECT):
             feconf.USER_QUERY_STATUS_PROCESSING, []
         )
 
-    def archive(self, sent_email_model_id=None):
+    def delete(self, sent_email_model_id=None):
         """Archive the query.
 
         Args:

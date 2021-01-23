@@ -113,12 +113,12 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
         inactive_in_last_n_days = 10
         created_at_least_n_exps = 5
         has_not_logged_in_for_n_days = 30
-        user_query = user_query_services.save_new_user_query(
+        user_query_id = user_query_services.save_new_user_query(
             self.admin_user_id, inactive_in_last_n_days=inactive_in_last_n_days,
             created_at_least_n_exps=created_at_least_n_exps,
             has_not_logged_in_for_n_days=has_not_logged_in_for_n_days)
 
-        query_model = user_models.UserQueryModel.get(user_query.id)
+        query_model = user_models.UserQueryModel.get(user_query_id)
 
         self.assertEqual(query_model.submitter_id, self.admin_user_id)
         self.assertEqual(
@@ -135,7 +135,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
     def test_archive_user_query_archives_user_query(self):
         original_user_query = (
             user_query_services.get_user_query(self.USER_QUERY_1_ID))
-        user_query_services.archive_user_query(original_user_query)
+        user_query_services.delete_user_query(original_user_query.id)
 
         archived_user_query_model = (
             user_models.UserQueryModel.get_by_id(self.USER_QUERY_1_ID))

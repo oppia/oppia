@@ -117,7 +117,7 @@ def download_and_install_node():
             common.NODE_VERSION, node_file_name, extension)
         python_utils.url_retrieve(url_to_retrieve, filename=outfile_name)
         subprocess.check_call(
-            ['powershell.exe', '-c', 'expand-archive',
+            ['powershell.exe', '-c', 'expand-delete',
              outfile_name, '-DestinationPath',
              common.OPPIA_TOOLS_DIR])
     else:

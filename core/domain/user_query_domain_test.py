@@ -51,8 +51,6 @@ class UserQueryTests(test_utils.GenericTestBase):
             sent_email_model_id=None,
             created_on=datetime.datetime.utcnow(),
         )
-
-    def test_validate_passes_without_exception(self):
         self.user_query.validate()
 
     def test_validate_query_with_invalid_type_id_raises(self):
@@ -143,7 +141,7 @@ class UserQueryTests(test_utils.GenericTestBase):
         self.assertEqual(default_user_query.user_ids, [])
 
     def test_archive_returns_correct_dict(self):
-        self.user_query.archive(sent_email_model_id='sent_email_model_id')
+        self.user_query.delete(sent_email_model_id='sent_email_model_id')
         self.assertEqual(
             self.user_query.sent_email_model_id, 'sent_email_model_id')
         self.assertEqual(

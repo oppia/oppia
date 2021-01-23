@@ -401,7 +401,7 @@ class SetupTests(test_utils.GenericTestBase):
             self.assertTrue(item)
         self.assertEqual(
             mock_check_call.commands,
-            ['powershell.exe', '-c', 'expand-archive',
+            ['powershell.exe', '-c', 'expand-delete',
              'node-download', '-DestinationPath',
              common.OPPIA_TOOLS_DIR])
         self.assertEqual(
@@ -445,7 +445,7 @@ class SetupTests(test_utils.GenericTestBase):
             self.assertTrue(item)
         self.assertEqual(
             mock_check_call.commands,
-            ['powershell.exe', '-c', 'expand-archive',
+            ['powershell.exe', '-c', 'expand-delete',
              'node-download', '-DestinationPath',
              common.OPPIA_TOOLS_DIR])
         self.assertEqual(

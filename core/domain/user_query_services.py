@@ -101,7 +101,7 @@ def _save_user_query(user_query):
         user_query: UserQuery. The user query to save.
 
     Returns:
-        UserQuery. The user query that was saved.
+        str. The ID of the user query that was saved.
     """
     user_query.validate()
 
@@ -132,7 +132,7 @@ def _save_user_query(user_query):
     user_query_model.update_timestamps()
     user_query_model.put()
 
-    return _get_user_query_from_model(user_query_model)
+    return user_query_model.id
 
 
 def save_new_user_query(
@@ -156,7 +156,7 @@ def save_new_user_query(
             explorations edited by user.
 
     Returns:
-        UserQuery. The newly created UserQuery.
+        str. The ID of the newly saved user query.
     """
     query_id = user_models.UserQueryModel.get_new_id('')
     user_query_params = user_query_domain.UserQueryParams(
@@ -173,13 +173,14 @@ def save_new_user_query(
     return _save_user_query(user_query)
 
 
-def archive_user_query(user_query):
-    """Archive the user query.
+def delete_user_query(user_query_id):
+    """Delete the user query.
 
     Args:
-        user_query: UserQuery. The user query to archive.
+        user_query_id: str. The ID of the user query to delete.
     """
-    user_query.archive()
+    user_query = get_user_query(user_query_id, strict=True)
+    user_query.delete()
     _save_user_query(user_query)
 
 
@@ -205,7 +206,7 @@ def send_email_to_qualified_users(
         email_body, email_intent
     )
 
-    user_query.archive(sent_email_model_id=bulk_email_model_id)
+    user_query.delete(sent_email_model_id=bulk_email_model_id)
     _save_user_query(user_query)
 
     # Store BulkEmailModel in UserBulkEmailsModel of each recipient.

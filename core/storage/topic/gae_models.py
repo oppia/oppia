@@ -255,7 +255,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     @classmethod
     def get_export_policy(cls):
         """Model doesn't contain any data directly corresponding to a user.
-        This model is only stored for archive purposes. The commit log of
+        This model is only stored for delete purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{
