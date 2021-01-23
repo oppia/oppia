@@ -65,9 +65,9 @@ describe('Skill Editor Routing Service', function() {
   });
 
   it(
-  'should reopen questions-list after saving when questioneditor is called directly',
-   function() {
-    sers.backToQuestionList();
-    expect(sers.createQuestion()).toBe(false);
-  });
+    'should open ques-list after saving when questioneditor is called directly',
+    function() {
+      sers.backToQuestionList();
+      expect(sers.createQuestion()).toBe(false);
+    });
 });
