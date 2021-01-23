@@ -24,8 +24,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
   templateUrl: './admin-prod-mode-activities-tab.directive.html',
   styleUrls: []
 })
-export class AdminProdModeActivitiesTabComponent implements OnInit{
-
+export class AdminProdModeActivitiesTabComponent implements OnInit {
   ngOnInit(): void {}
 }
 angular.module('oppia').directive(
