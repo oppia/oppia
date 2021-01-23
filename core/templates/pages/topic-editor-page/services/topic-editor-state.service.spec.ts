@@ -36,7 +36,7 @@ import { TopicRights } from 'domain/topic/topic-rights.model';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { importAllAngularServices } from 'tests/unit-test-utils';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 // ^^^ This block is to be removed.
 
@@ -79,7 +79,7 @@ describe('Topic editor state service', function() {
     };
 
     var _fetchOrUpdateTopic = function() {
-      return $q(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.newBackendTopicObject);
         } else {
@@ -89,7 +89,7 @@ describe('Topic editor state service', function() {
     };
 
     var _fetchStories = function() {
-      return $q(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.backendStorySummariesObject);
         } else {
@@ -128,7 +128,7 @@ describe('Topic editor state service', function() {
     };
 
     var _fetchTopicRights = function() {
-      return $q(function(resolve, reject) {
+      return new Promise(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.backendTopicRightsObject);
         } else {
@@ -486,15 +486,22 @@ describe('Topic editor state service', function() {
   );
 
   it('should fire an init event after loading the first topic',
-    function() {
+    fakeAsync(() => {
+      spyOn(
+        fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+      spyOn(fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
+      spyOn(
+        fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
       TopicEditorStateService.loadTopic(5);
+      flushMicrotasks();
       $rootScope.$apply();
       var skillIdToRubricsObject =
         TopicEditorStateService.getSkillIdToRubricsObject();
       expect(skillIdToRubricsObject.skill_1.length).toEqual(3);
       expect(topicInitializedSpy).toHaveBeenCalled();
-    }
-  );
+    }));
 
   it('should fire a loaded event after loading a new subtopic page',
     function() {
@@ -504,52 +511,81 @@ describe('Topic editor state service', function() {
     }
   );
 
-  it('should fire an update event after loading more topics', function() {
+  it('should fire an update event after loading more topics', fakeAsync(() => {
+    spyOn(fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
+    spyOn(
+      fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
     // Load initial topic.
     TopicEditorStateService.loadTopic(5);
+    flushMicrotasks();
     $rootScope.$apply();
 
     // Load a second topic.
     TopicEditorStateService.loadTopic(1);
+    flushMicrotasks();
     $rootScope.$apply();
 
     expect(topicReinitializedSpy).toHaveBeenCalled();
-  });
+  }));
 
-  it('should track whether it is currently loading the topic', function() {
+  it('should track whether it is currently loading the topic', fakeAsync(() => {
+    spyOn(fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
+    spyOn(
+      fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
     expect(TopicEditorStateService.isLoadingTopic()).toBe(false);
 
     TopicEditorStateService.loadTopic(5);
     expect(TopicEditorStateService.isLoadingTopic()).toBe(true);
 
+    flushMicrotasks();
     $rootScope.$apply();
     expect(TopicEditorStateService.isLoadingTopic()).toBe(false);
-  });
+  }));
 
   it('should indicate a topic is no longer loading after an error',
-    function() {
+    fakeAsync(() => {
+      spyOn(
+        fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
+      spyOn(
+        fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
       expect(TopicEditorStateService.isLoadingTopic()).toBe(false);
       fakeEditableTopicBackendApiService.failure = 'Internal 500 error';
 
       TopicEditorStateService.loadTopic(5);
       expect(TopicEditorStateService.isLoadingTopic()).toBe(true);
 
+      flushMicrotasks();
       $rootScope.$apply();
       expect(TopicEditorStateService.isLoadingTopic()).toBe(false);
-    }
-  );
+    }));
 
   it('should report that a topic has loaded through loadTopic()',
-    function() {
+    fakeAsync(() => {
+      spyOn(
+        fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
+      spyOn(
+        fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 
       TopicEditorStateService.loadTopic(5);
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(false);
 
+      flushMicrotasks();
       $rootScope.$apply();
       expect(TopicEditorStateService.hasLoadedTopic()).toBe(true);
-    }
-  );
+    }));
 
   it('should report that a topic has loaded through setTopic()',
     function() {
@@ -634,20 +670,31 @@ describe('Topic editor state service', function() {
   );
 
   it('should not save the topic if there are no pending changes',
-    function() {
+    fakeAsync(() => {
+      spyOn(
+        fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
+      spyOn(
+        fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
       TopicEditorStateService.loadTopic(5);
+      flushMicrotasks();
       $rootScope.$apply();
       expect(TopicEditorStateService.saveTopic(
         'Commit message')).toBe(false);
-    }
-  );
+    }));
 
-  it('should be able to save the topic and pending changes', function() {
+  it('should be able to save the topic and pending changes', fakeAsync(() => {
+    spyOn(fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
     spyOn(
-      fakeEditableTopicBackendApiService,
-      'updateTopic').and.callThrough();
+      fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
 
     TopicEditorStateService.loadTopic(0);
+    flushMicrotasks();
     topicUpdateService.setTopicName(
       TopicEditorStateService.getTopic(), 'New name');
     $rootScope.$apply();
@@ -663,22 +710,35 @@ describe('Topic editor state service', function() {
       fakeEditableTopicBackendApiService.updateTopic);
     expect(updateTopicSpy).toHaveBeenCalledWith(
       expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
-  });
+  }));
 
-  it('should fire an update event after saving the topic', function() {
+  it('should fire an update event after saving the topic', fakeAsync(() => {
+    spyOn(fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
+    spyOn(
+      fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
     TopicEditorStateService.loadTopic(5);
     topicUpdateService.setTopicName(
       TopicEditorStateService.getTopic(), 'New name');
+    flushMicrotasks();
     $rootScope.$apply();
 
     TopicEditorStateService.saveTopic('Commit message');
+    flushMicrotasks();
     $rootScope.$apply();
 
     expect(topicReinitializedSpy).toHaveBeenCalled();
-  });
+  }));
 
-  it('should track whether it is currently saving the topic', function() {
+  it('should track whether it is currently saving the topic', fakeAsync(() => {
+    spyOn(fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+    spyOn(fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
+    spyOn(
+      fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
     TopicEditorStateService.loadTopic(5);
+    flushMicrotasks();
     topicUpdateService.setTopicName(
       TopicEditorStateService.getTopic(), 'New name');
     $rootScope.$apply();
@@ -687,13 +747,23 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.saveTopic('Commit message');
     expect(TopicEditorStateService.isSavingTopic()).toBe(true);
 
+    flushMicrotasks();
     $rootScope.$apply();
     expect(TopicEditorStateService.isSavingTopic()).toBe(false);
-  });
+  }));
 
   it('should indicate a topic is no longer saving after an error',
-    function() {
+    fakeAsync(() => {
+      spyOn(
+        fakeEditableTopicBackendApiService, 'updateTopic').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchTopic').and.callThrough();
+      spyOn(
+        fakeEditableTopicBackendApiService, 'fetchStories').and.callThrough();
+      spyOn(
+        fakeTopicRightsBackendApiService, 'fetchTopicRights').and.callThrough();
       TopicEditorStateService.loadTopic(5);
+      flushMicrotasks();
       topicUpdateService.setTopicName(
         TopicEditorStateService.getTopic(), 'New name');
       $rootScope.$apply();
@@ -704,8 +774,8 @@ describe('Topic editor state service', function() {
       TopicEditorStateService.saveTopic('Commit message');
       expect(TopicEditorStateService.isSavingTopic()).toBe(true);
 
+      flushMicrotasks();
       $rootScope.$apply();
       expect(TopicEditorStateService.isSavingTopic()).toBe(false);
-    }
-  );
+    }));
 });

@@ -121,10 +121,10 @@ export class SkillEditorStateService {
    */
   loadSkill(skillId: string): void {
     this._skillIsBeingLoaded = true;
-    let fetchSkillPromise = this.skillBackendApiService.fetchSkill(skillId);
-    let fetchSkillRightsPromise = (
+    let skillDataPromise = this.skillBackendApiService.fetchSkill(skillId);
+    let skillRightsPromise = (
       this.skillRightsBackendApiService.fetchSkillRightsAsync(skillId));
-    Promise.all([fetchSkillPromise, fetchSkillRightsPromise]).then(
+    Promise.all([skillDataPromise, skillRightsPromise]).then(
       ([newBackendSkillObject, newSkillRightsObject]) => {
         this._updateSkillRights(newSkillRightsObject);
         this.assignedSkillTopicData = (

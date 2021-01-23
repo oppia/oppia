@@ -97,6 +97,8 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB = (
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB);
           ctrl.initEditor = function() {
+            $scope.skillCreationIsAllowed = (
+              TopicEditorStateService.isSkillCreationAllowed());
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.skillQuestionCountDict = (
               TopicEditorStateService.getSkillQuestionCountDict());
