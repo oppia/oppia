@@ -17,10 +17,10 @@
  */
 
 
-import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { SubtopicPageObjectFactory, SubtopicPageBackendDict, SubtopicPage } from
   'domain/topic/SubtopicPageObjectFactory';
 import { TopicRights } from 'domain/topic/topic-rights.model';
+import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
 import { TopicObjectFactory, TopicBackendDict } from 'domain/topic/TopicObjectFactory.ts';
 import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service.ts';
@@ -421,6 +421,17 @@ describe('Topic editor state service', () => {
 
   it('should fire an init event after loading the first topic',
     fakeAsync(() => {
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        .and.callThrough();
+      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
+        .and.callThrough();
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        .and.callThrough();
       topicEditorStateService.loadTopic('5');
       tick(1000);
       let skillIdToRubricsObject =
@@ -439,6 +450,17 @@ describe('Topic editor state service', () => {
     ));
 
   it('should fire an update event after loading more topics', fakeAsync(() => {
+    spyOn(
+      this.fakeEditableTopicBackendApiService, 'updateTopic')
+      .and.callThrough();
+    spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
+      .and.callThrough();
+    spyOn(
+      this.fakeEditableTopicBackendApiService, 'fetchStories')
+      .and.callThrough();
+    spyOn(
+      this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+      .and.callThrough();
     // Load initial topic.
     topicEditorStateService.loadTopic('5');
     tick(1000);
@@ -451,6 +473,17 @@ describe('Topic editor state service', () => {
   }));
 
   it('should track whether it is currently loading the topic', fakeAsync(() => {
+    spyOn(
+      this.fakeEditableTopicBackendApiService, 'updateTopic')
+      .and.callThrough();
+    spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
+      .and.callThrough();
+    spyOn(
+      this.fakeEditableTopicBackendApiService, 'fetchStories')
+      .and.callThrough();
+    spyOn(
+      this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+      .and.callThrough();
     expect(topicEditorStateService.isLoadingTopic()).toBe(false);
 
     topicEditorStateService.loadTopic('5');
@@ -464,7 +497,17 @@ describe('Topic editor state service', () => {
     fakeAsync(() => {
       expect(topicEditorStateService.isLoadingTopic()).toBe(false);
       mockEditableTopicBackendApiService.failure = 'Internal 500 error';
-
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        .and.callThrough();
+      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
+        .and.callThrough();
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        .and.callThrough();
       topicEditorStateService.loadTopic('5');
       expect(topicEditorStateService.isLoadingTopic()).toBe(true);
 
@@ -475,6 +518,17 @@ describe('Topic editor state service', () => {
 
   it('should report that a topic has loaded through loadTopic()',
     fakeAsync(() => {
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        .and.callThrough();
+      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
+        .and.callThrough();
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        .and.callThrough();
       expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
       topicEditorStateService.loadTopic('5');
@@ -572,6 +626,17 @@ describe('Topic editor state service', () => {
 
   it('should not save the topic if there are no pending changes',
     fakeAsync(() => {
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        .and.callThrough();
+      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
+        .and.callThrough();
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        .and.callThrough();
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
       topicEditorStateService.loadTopic('5');
@@ -617,6 +682,17 @@ describe('Topic editor state service', () => {
   }));
 
   it('should fire an update event after saving the topic', fakeAsync(() => {
+    spyOn(
+      this.fakeEditableTopicBackendApiService, 'updateTopic')
+      .and.callThrough();
+    spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
+      .and.callThrough();
+    spyOn(
+      this.fakeEditableTopicBackendApiService, 'fetchStories')
+      .and.callThrough();
+    spyOn(
+      this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+      .and.callThrough();
     topicEditorStateService.loadTopic('5');
     topicUpdateService.setTopicName(
       topicEditorStateService.getTopic(), 'New name');
@@ -643,6 +719,17 @@ describe('Topic editor state service', () => {
 
   it('should indicate a topic is no longer saving after an error',
     fakeAsync(() => {
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        .and.callThrough();
+      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
+        .and.callThrough();
+      spyOn(
+        this.fakeEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        .and.callThrough();
       topicEditorStateService.loadTopic('5');
       topicUpdateService.setTopicName(
         topicEditorStateService.getTopic(), 'New name');

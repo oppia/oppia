@@ -61,6 +61,7 @@ export class TopicEditorStateService {
   this.subtopicPageObjectFactory.createInterstitialSubtopicPage();
   private _topicIsInitialized: boolean = false;
   private _topicIsLoading: boolean = false;
+  private _skillCreationIsAllowed = false;
   private _topicIsBeingSaved: boolean = false;
   private _topicWithNameExists: boolean = false;
   private _topicWithUrlFragmentExists: boolean = false;
@@ -198,6 +199,8 @@ export class TopicEditorStateService {
     this.editableTopicBackendApiService.fetchTopic(
       topicId).then(
       (newBackendTopicObject) => {
+        this._skillCreationIsAllowed = (
+          newBackendTopicObject.skillCreationIsAllowed);
         this._skillQuestionCountDict = (
           newBackendTopicObject.skillQuestionCountDict);
         this._updateGroupedSkillSummaries(
@@ -313,6 +316,12 @@ export class TopicEditorStateService {
 
   getCanonicalStorySummaries(): unknown[] {
     return this._canonicalStorySummaries;
+  }
+  /**
+   * Returns whether the user can create a skill via the topic editor.
+   */
+  isSkillCreationAllowed() : boolean {
+    return this._skillCreationIsAllowed;
   }
 
   /**
