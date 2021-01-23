@@ -17,6 +17,7 @@
  *   editor page.
  */
 
+import { fakeAsync, tick } from '@angular/core/testing';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // state-property.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -69,18 +70,20 @@ describe('Change list service', function() {
       $httpBackend = $injector.get('$httpBackend');
     }));
 
-    it('should correctly get and save changes', function() {
+    it('should correctly get and save changes', fakeAsync(() => {
       expect(cls.getChangeList()).toEqual([]);
       cls.addState('newState');
+      tick(200);
       expect(cls.getChangeList()).not.toBe([]);
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
 
-    it('should correctly add a new state', function() {
+    it('should correctly add a new state', fakeAsync(() => {
       expect(cls.getChangeList()).toEqual([]);
       cls.addState('newState');
+      tick(200);
       expect(cls.getChangeList()).toEqual([{
         cmd: 'add_state',
         state_name: 'newState'
@@ -88,11 +91,12 @@ describe('Change list service', function() {
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
 
-    it('should correctly rename a state', function() {
+    it('should correctly rename a state', fakeAsync(() => {
       expect(cls.getChangeList()).toEqual([]);
       cls.renameState('newName', 'oldName');
+      tick(200);
       expect(cls.getChangeList()).toEqual([{
         cmd: 'rename_state',
         old_state_name: 'oldName',
@@ -101,11 +105,12 @@ describe('Change list service', function() {
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
 
-    it('should correctly delete a state', function() {
+    it('should correctly delete a state', fakeAsync(() => {
       expect(cls.getChangeList()).toEqual([]);
       cls.deleteState('deletedState');
+      tick(200);
       expect(cls.getChangeList()).toEqual([{
         cmd: 'delete_state',
         state_name: 'deletedState'
@@ -113,11 +118,12 @@ describe('Change list service', function() {
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
 
-    it('should correctly edit an exploration property', function() {
+    it('should correctly edit an exploration property', fakeAsync(() => {
       expect(cls.getChangeList()).toEqual([]);
       cls.editExplorationProperty('title', 'newTitle', 'oldTitle');
+      tick(200);
       expect(cls.getChangeList()).toEqual([{
         cmd: 'edit_exploration_property',
         property_name: 'title',
@@ -127,7 +133,7 @@ describe('Change list service', function() {
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
 
     it('should detect invalid exploration properties', function() {
       expect(cls.getChangeList()).toEqual([]);
@@ -137,9 +143,10 @@ describe('Change list service', function() {
       expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
     });
 
-    it('should correctly edit a state property', function() {
+    it('should correctly edit a state property', fakeAsync(() => {
       expect(cls.getChangeList()).toEqual([]);
       cls.editStateProperty('stateName', 'content', 'newC', 'oldC');
+      tick(200);
       expect(cls.getChangeList()).toEqual([{
         cmd: 'edit_state_property',
         state_name: 'stateName',
@@ -150,7 +157,7 @@ describe('Change list service', function() {
       expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
 
     it('should detect invalid exploration properties', function() {
       expect(cls.getChangeList()).toEqual([]);
@@ -161,17 +168,37 @@ describe('Change list service', function() {
       expect(mockExplorationData.autosaveChangeList).not.toHaveBeenCalled();
     });
 
-    it('should correctly discard all changes', function() {
+    it('should correctly discard all changes', fakeAsync(() => {
       expect(cls.getChangeList()).toEqual([]);
       cls.addState('newState');
+      tick(200);
       expect(cls.getChangeList()).not.toBe([]);
       cls.discardAllChanges();
       expect(cls.getChangeList()).toEqual([]);
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
 
-    it('should correctly handle multiple changes in succession', function() {
+    it('should correctly handle multiple changes in succession',
+      fakeAsync(() => {
+        expect(cls.getChangeList()).toEqual([]);
+
+        cls.addState('newState1');
+        tick(100);
+        cls.addState('newState2');
+        expect(cls.getChangeList()).toEqual([{
+          cmd: 'add_state',
+          state_name: 'newState1'
+        }, {
+          cmd: 'add_state',
+          state_name: 'newState2'
+        }]);
+        tick(200);
+        expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
+        $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
+      }));
+
+    it('should correctly undo changes', fakeAsync(() => {
       expect(cls.getChangeList()).toEqual([]);
 
       cls.addState('newState1');
@@ -183,22 +210,7 @@ describe('Change list service', function() {
         cmd: 'add_state',
         state_name: 'newState2'
       }]);
-      expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
-      $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
-
-    it('should correctly undo changes', function() {
-      expect(cls.getChangeList()).toEqual([]);
-
-      cls.addState('newState1');
-      cls.addState('newState2');
-      expect(cls.getChangeList()).toEqual([{
-        cmd: 'add_state',
-        state_name: 'newState1'
-      }, {
-        cmd: 'add_state',
-        state_name: 'newState2'
-      }]);
+      tick(200);
 
       cls.undoLastChange();
       expect(cls.getChangeList()).toEqual([{
@@ -210,7 +222,7 @@ describe('Change list service', function() {
       expect(cls.getChangeList()).toEqual([]);
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
   });
 });
 
@@ -274,15 +286,16 @@ describe('Exploration title service', function() {
       expect(ets.savedMemento).toEqual('A title');
     });
 
-    it('should update the memento with the displayed title', function() {
+    it('should update the memento with the displayed title', fakeAsync(() => {
       ets.init('A title');
       ets.displayed = 'New title';
       expect(ets.savedMemento).toEqual('A title');
       ets.saveDisplayedValue();
+      tick(200);
       expect(ets.savedMemento).toEqual('New title');
       expect(mockExplorationData.autosaveChangeList).toHaveBeenCalled();
       $httpBackend.expectPUT(autosaveDraftUrl).respond(validAutosaveResponse);
-    });
+    }));
 
     it('should report whether the title has changed since it was saved',
       function() {

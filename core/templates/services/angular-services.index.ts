@@ -265,6 +265,8 @@ import { BottomNavbarStatusService } from 'services/bottom-navbar-status.service
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
+import { ContentTranslationLanguageService } from 'pages/exploration-player-page/services/content-translation-language.service';
+import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 import { ContextService } from 'services/context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
@@ -306,6 +308,8 @@ import { QuestionsListService } from 'services/questions-list.service';
 import { SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { SchemaUndefinedLastElementService } from 'services/schema-undefined-last-element.service';
+import { SearchBackendApiService } from 'services/search-backend-api.service';
+import { SearchService } from 'services/search.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts';
 import { SpeechSynthesisChunkerService } from 'services/speech-synthesis-chunker.service';
@@ -326,6 +330,8 @@ import { UserService } from 'services/user.service';
 import { UtilsService } from 'services/utils.service';
 import { ValidatorsService } from 'services/validators.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import { ExplorationDataBackendApiService } from 'pages/exploration-editor-page/services/exploration-data-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AdminBackendApiService', AdminBackendApiService],
@@ -371,6 +377,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ConceptCardBackendApiService', ConceptCardBackendApiService],
   ['ConceptCardObjectFactory', ConceptCardObjectFactory],
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
+  ['ContentTranslationLanguageService', ContentTranslationLanguageService],
+  ['ContentTranslationManagerService', ContentTranslationManagerService],
   ['ContextService', ContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],
@@ -400,7 +408,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['EmailDashboardDataService', EmailDashboardDataService],
   ['EndExplorationRulesService', EndExplorationRulesService],
   ['EndExplorationValidationService', EndExplorationValidationService],
-  ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
+  ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
+  ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
   ['ExplorationFeaturesBackendApiService',
     ExplorationFeaturesBackendApiService],
@@ -419,6 +428,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationRecommendationsService', ExplorationRecommendationsService],
   ['ExplorationStatsBackendApiService', ExplorationStatsBackendApiService],
   ['ExplorationStatsService', ExplorationStatsService],
+  ['ExplorationSummaryBackendApiService', ExplorationSummaryBackendApiService],
   ['ExpressionEvaluatorService', ExpressionEvaluatorService],
   ['ExpressionInterpolationService', ExpressionInterpolationService],
   ['ExpressionParserService', ExpressionParserService],
@@ -564,6 +574,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['SchemaFormSubmittedService', SchemaFormSubmittedService],
   ['SchemaUndefinedLastElementService', SchemaUndefinedLastElementService],
   ['SearchExplorationsBackendApiService', SearchExplorationsBackendApiService],
+  ['SearchBackendApiService', SearchBackendApiService],
+  ['SearchService', SearchService],
   ['SetInputRulesService', SetInputRulesService],
   ['SetInputValidationService', SetInputValidationService],
   ['ShortSkillSummaryObjectFactory', ShortSkillSummaryObjectFactory],

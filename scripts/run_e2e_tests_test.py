@@ -191,15 +191,20 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
+        def mock_wait_for_port_to_be_closed(unused_port):
+            return True
+
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
         google_app_engine_path = '%s/' % (
             common.GOOGLE_APP_ENGINE_SDK_HOME)
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
+        elasticsearch_path = '%s/' % common.ES_PATH
         process_pattern = [
             ('.*%s.*' % re.escape(google_app_engine_path),),
-            ('.*%s.*' % re.escape(webdriver_download_path),)
+            ('.*%s.*' % re.escape(webdriver_download_path),),
+            ('.*%s.*' % re.escape(elasticsearch_path),),
         ]
 
         swap_kill_process = self.swap_with_checks(
@@ -210,9 +215,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
+        swap_wait_for_port_to_be_closed = self.swap_with_checks(
+            common, 'wait_for_port_to_be_closed',
+            mock_wait_for_port_to_be_closed,
+            expected_args=[
+                (run_e2e_tests.OPPIA_SERVER_PORT,),
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         with swap_kill_process, subprocess_swap, swap_is_windows:
             with swap_set_constants_to_default:
-                run_e2e_tests.cleanup()
+                with swap_wait_for_port_to_be_closed:
+                    run_e2e_tests.cleanup()
 
     def test_cleanup_when_subprocesses_exist(self):
 
@@ -224,7 +236,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
-        mock_processes = [MockProcessClass(), MockProcessClass()]
+        def mock_wait_for_port_to_be_closed(unused_port):
+            return True
+
+        mock_processes = [
+            MockProcessClass(), MockProcessClass(), MockProcessClass()]
         subprocess_swap = self.swap(
             run_e2e_tests, 'SUBPROCESSES', mock_processes)
         swap_kill_process = self.swap_with_checks(
@@ -232,10 +248,69 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_kill_process_based_on_regex)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
+        swap_wait_for_port_to_be_closed = self.swap_with_checks(
+            common, 'wait_for_port_to_be_closed',
+            mock_wait_for_port_to_be_closed,
+            expected_args=[
+                (run_e2e_tests.OPPIA_SERVER_PORT,),
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         with subprocess_swap, swap_kill_process, swap_set_constants_to_default:
-            run_e2e_tests.cleanup()
+            with swap_wait_for_port_to_be_closed:
+                run_e2e_tests.cleanup()
         self.assertEqual(
             mock_kill_process_based_on_regex.called_times, len(mock_processes))
+
+    def test_cleanup_when_port_fails_to_close(self):
+
+        def mock_kill_process_based_on_regex(unused_regex):
+            return
+
+        def mock_is_windows_os():
+            return False
+
+        def mock_set_constants_to_default():
+            return
+
+        def mock_wait_for_port_to_be_closed(unused_port):
+            return False
+
+        subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
+
+        google_app_engine_path = '%s/' % (
+            common.GOOGLE_APP_ENGINE_SDK_HOME)
+        webdriver_download_path = '%s/selenium' % (
+            run_e2e_tests.WEBDRIVER_HOME_PATH)
+        elasticsearch_path = '%s/' % common.ES_PATH
+        process_pattern = [
+            ('.*%s.*' % re.escape(google_app_engine_path),),
+            ('.*%s.*' % re.escape(webdriver_download_path),),
+            ('.*%s.*' % re.escape(elasticsearch_path),),
+        ]
+
+        swap_kill_process = self.swap_with_checks(
+            common, 'kill_processes_based_on_regex',
+            mock_kill_process_based_on_regex,
+            expected_args=process_pattern)
+        swap_is_windows = self.swap_with_checks(
+            common, 'is_windows_os', mock_is_windows_os)
+        swap_set_constants_to_default = self.swap_with_checks(
+            build, 'set_constants_to_default', mock_set_constants_to_default)
+        swap_wait_for_port_to_be_closed = self.swap_with_checks(
+            common, 'wait_for_port_to_be_closed',
+            mock_wait_for_port_to_be_closed,
+            expected_args=[
+                (run_e2e_tests.OPPIA_SERVER_PORT,)])
+        expected_error = (
+            '^Port {} failed to close within {} seconds.$'.format(
+                run_e2e_tests.OPPIA_SERVER_PORT,
+                common.MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS))
+        with swap_kill_process, subprocess_swap, swap_is_windows:
+            with swap_set_constants_to_default:
+                with swap_wait_for_port_to_be_closed:
+                    with self.assertRaisesRegexp(
+                        RuntimeError, expected_error
+                    ):
+                        run_e2e_tests.cleanup()
 
     def test_cleanup_on_windows(self):
 
@@ -245,14 +320,19 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_set_constants_to_default():
             return
 
+        def mock_wait_for_port_to_be_closed(unused_port):
+            return True
+
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
         google_app_engine_path = '%s/' % common.GOOGLE_APP_ENGINE_SDK_HOME
         webdriver_download_path = '%s/selenium' % (
             run_e2e_tests.WEBDRIVER_HOME_PATH)
+        elasticsearch_path = '%s/' % common.ES_PATH
         process_pattern = [
             ('.*%s.*' % re.escape(google_app_engine_path),),
-            ('.*%s.*' % re.escape(webdriver_download_path),)
+            ('.*%s.*' % re.escape(webdriver_download_path),),
+            ('.*%s.*' % re.escape(elasticsearch_path),),
         ]
         expected_pattern = process_pattern[:]
         expected_pattern[1] = ('.*%s.*' % re.escape(
@@ -268,6 +348,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_windows_os', mock_is_windows_os)
         swap_set_constants_to_default = self.swap_with_checks(
             build, 'set_constants_to_default', mock_set_constants_to_default)
+        swap_wait_for_port_to_be_closed = self.swap_with_checks(
+            common, 'wait_for_port_to_be_closed',
+            mock_wait_for_port_to_be_closed,
+            expected_args=[
+                (run_e2e_tests.OPPIA_SERVER_PORT,),
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
         windows_exception = self.assertRaisesRegexp(
             Exception, 'The redis command line interface is not installed '
             'because your machine is on the Windows operating system. There is '
@@ -276,7 +362,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with swap_kill_process, subprocess_swap, swap_is_windows, (
             windows_exception):
             with swap_set_constants_to_default:
-                run_e2e_tests.cleanup()
+                with swap_wait_for_port_to_be_closed:
+                    run_e2e_tests.cleanup()
 
     def test_is_oppia_server_already_running_when_ports_closed(self):
         def mock_is_port_open(unused_port):
@@ -835,6 +922,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
+                common, 'managed_elasticsearch_dev_server',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -842,6 +935,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
+                    (feconf.ES_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
                 ]),
@@ -947,6 +1041,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
+                common, 'managed_elasticsearch_dev_server',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -954,6 +1054,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
+                    (feconf.ES_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
             self.swap_with_checks(
@@ -1288,6 +1389,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
+                common, 'managed_elasticsearch_dev_server',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -1295,6 +1402,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
+                    (feconf.ES_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,),
                 ]),
@@ -1455,6 +1563,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
+                common, 'managed_elasticsearch_dev_server',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -1462,6 +1576,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
+                    (feconf.ES_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
             self.swap_with_checks(
@@ -1573,6 +1688,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_start_webdriver_manager,
                 expected_args=[(CHROME_DRIVER_VERSION,)]),
             self.swap_to_always_return(
+                common, 'managed_elasticsearch_dev_server',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
+                common, 'managed_firebase_auth_emulator',
+                value=contextlib2.nullcontext()),
+            self.swap_to_always_return(
                 common, 'managed_dev_appserver',
                 value=contextlib2.nullcontext()),
             self.swap_with_checks(
@@ -1580,6 +1701,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 mock_wait_for_port_to_be_open,
                 expected_args=[
                     (feconf.REDISPORT,),
+                    (feconf.ES_PORT,),
                     (run_e2e_tests.WEB_DRIVER_PORT,),
                     (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)]),
             self.swap_with_checks(

@@ -325,6 +325,26 @@ class StorySnapshotMetadataModelValidatorTests(
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_with_committer_id_migration_bot(self):
+        self.model_instance_1.committer_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated StorySnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_committer_id(self):
+        self.model_instance_1.committer_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated StorySnapshotMetadataModel\', 3]']
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
@@ -626,6 +646,28 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.AuditJobsTestBase):
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
 
+    def test_model_with_user_id_migration_bot(self):
+        self.model_instance_1.user_id = feconf.MIGRATION_BOT_USER_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated StoryCommitLogEntryModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
+    def test_model_with_pseudo_user_id(self):
+        self.model_instance_1.user_id = self.PSEUDONYMOUS_ID
+        self.model_instance_1.update_timestamps(update_last_updated_time=False)
+        self.model_instance_1.put()
+
+        expected_output = [
+            u'[u\'fully-validated StoryCommitLogEntryModel\', 3]'
+        ]
+        self.run_job_and_check_output(
+            expected_output, sort=False, literal_eval=False)
+
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (
             self.model_instance_0.last_updated + datetime.timedelta(days=1))
@@ -866,6 +908,18 @@ class StorySummaryModelValidatorTests(test_utils.AuditJobsTestBase):
             u'[u\'fully-validated StorySummaryModel\', 3]']
         self.run_job_and_check_output(
             expected_output, sort=False, literal_eval=False)
+
+    def test_node_titles_in_story_models(self):
+        story_id = story_services.get_new_story_id()
+        story = story_domain.Story.create_default_story(
+            story_id, 'Title', 'Description', 'topic_id', 'url')
+        story.add_node('node_1', 'Node title')
+        story_services.save_new_story(self.owner_id, story)
+        story_model = story_models.StoryModel.get_by_id(story_id)
+        nodes = story_model.story_contents['nodes']
+        with self.assertRaisesRegexp(
+            Exception, '\'dict\' object has no attribute \'title\''):
+            _ = [node.title for node in nodes]
 
     def test_model_with_created_on_greater_than_last_updated(self):
         self.model_instance_0.created_on = (

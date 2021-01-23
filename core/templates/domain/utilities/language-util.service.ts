@@ -37,11 +37,13 @@ interface SupportedAudioLanguageBackendDict {
   'id': string;
   'description': string;
   'relatedLanguages': readonly string[];
+  'direction': string;
 }
 
 interface SupportedContentLanguageBackendDict {
   'code': string;
   'description': string;
+  'direction': string;
 }
 
 interface LanguageIdAndText {
@@ -52,6 +54,7 @@ interface LanguageIdAndText {
 interface ContentLanguage {
   code: string;
   description: string;
+  direction: string;
 }
 
 @Injectable({
@@ -81,6 +84,14 @@ export class LanguageUtilService {
         AudioLanguage.createFromDict(audioLanguageDict);
     });
     return supportedAudioLanguages;
+  }
+
+  getSupportedContentLanguages(): {[languageCode: string]: ContentLanguage} {
+    const supportedContentLanguages = {};
+    this.SUPPORTED_CONTENT_LANGUAGES.forEach(contentLanguageDict => {
+      supportedContentLanguages[contentLanguageDict.code] = contentLanguageDict;
+    });
+    return supportedContentLanguages;
   }
 
   getAllAudioLanguageCodes(): string[] {
@@ -145,6 +156,32 @@ export class LanguageUtilService {
     const language = this.getSupportedAudioLanguages()[audioLanguageCode];
     return language ? language.description : null;
   }
+
+  getLanguageDirection(languageCode: string): string {
+    // The backend constants tests guarantee that SUPPORTED_CONTENT_LANGUAGES
+    // and SUPPORTED_AUDIO_LANGUAGES do not conflict and contain at most one
+    // entry per language code.
+    const matchingContentLanguage = this.SUPPORTED_CONTENT_LANGUAGES.find(
+      (language) => language.code === languageCode);
+    if (matchingContentLanguage !== undefined) {
+      return matchingContentLanguage.direction;
+    }
+
+    const matchingAudioLanguage = this.SUPPORTED_AUDIO_LANGUAGES.find(
+      (language) => language.id === languageCode);
+    if (matchingAudioLanguage !== undefined) {
+      return matchingAudioLanguage.direction;
+    }
+    throw new Error(
+      'Could not find language direction for the supplied language code: ' +
+        languageCode);
+  }
+
+  getContentLanguageDescription(contentLanguageCode: string): string {
+    const language = this.getSupportedContentLanguages()[contentLanguageCode];
+    return language ? language.description : null;
+  }
+
   // Given a list of audio language codes, returns the complement list, i.e.
   // the list of audio language codes not in the input list.
   getComplementAudioLanguageCodes(
