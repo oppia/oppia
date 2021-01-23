@@ -1732,8 +1732,13 @@ class FillExplorationStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             for exp_stats_model in exp_stats_model_list
         ]
 
-        exp_list = exp_fetchers.get_multiple_explorations_by_version(
-            exp_id, exp_versions)
+        try:
+            exp_list = exp_fetchers.get_multiple_explorations_by_version(
+                exp_id, exp_versions)
+        except Exception as e:
+            yield (
+                'Failed to fetch Exploration(exp_id=%r) versions:' % exp_id, e)
+
         if all(exp_stats is None for exp_stats in exp_stats_list):
             for index, version in enumerate(exp_versions):
                 exp_stats_for_version = (
