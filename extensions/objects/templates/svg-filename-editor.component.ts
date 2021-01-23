@@ -1343,7 +1343,6 @@ angular.module('oppia').component('svgFilenameEditor', {
           ctrl.fabricjsOptions[value] = color.rgbaString;
           onChangeFunc[value]();
         };
-        picker.onOpen();
         picker.setOptions({
           color: ctrl.fabricjsOptions[value]
         });

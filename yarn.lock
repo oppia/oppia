@@ -1687,7 +1687,7 @@ acorn-walk@^6.0.1:
   resolved "https://registry.yarnpkg.com/acorn-walk/-/acorn-walk-6.2.0.tgz#123cb8f3b84c2171f1f7fb252615b1c78a6b1a8c"
   integrity sha512-7evsyfH1cLOCdAzZAd43Cic04yKydNx0cF+7tiA19p1XnLLPU4dpCQOqpjqwokFe//vS0QqfqqjCS2JkiIs0cA==
 
-acorn@6.4.2, acorn@^6.0.1, acorn@^6.4.1:
+acorn@^6.0.1, acorn@^6.4.1:
   version "6.4.2"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-6.4.2.tgz#35866fd710528e92de10cf06016498e47e39e1e6"
   integrity sha512-XtGIhXwF8YM8bJhGxG5kXgjkEuNGLTkoYqVE+KMR+aspr4KGYmKYg7yUe3KghyQ9yheNwLnjmzh/7+gfDBmHCQ==
@@ -1696,6 +1696,11 @@ acorn@^7.1.0, acorn@^7.4.0:
   version "7.4.1"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-7.4.1.tgz#feaed255973d2e77555b83dbc08851a6c63520fa"
   integrity sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==
+
+acorn@^8.0.0:
+  version "8.0.4"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.0.4.tgz#7a3ae4191466a6984eee0fe3407a4f3aa9db8354"
+  integrity sha512-XNP0PqF1XD19ZlLKvB7cMmnZswW4C/03pRHgirB30uSJTaS3A3V1/P4sS3HPvFmjoriPCJQs+JDSbm4bL1TxGQ==
 
 adm-zip@^0.4.9:
   version "0.4.16"
@@ -12930,10 +12935,10 @@ validate-npm-package-name@^3.0.0:
   dependencies:
     builtins "^1.0.3"
 
-vanilla-picker@2.10.1:
-  version "2.10.1"
-  resolved "https://registry.yarnpkg.com/vanilla-picker/-/vanilla-picker-2.10.1.tgz#b07d6df8e0c3655e39a7da11e68adc00affa2b12"
-  integrity sha512-Bo4HOKkSorcQoRB08HwDMb8X2jt3SsZw7gzFlbzXbhnaxdUVJBm3LOUudr7M1SCVwPCo8d3nq8ajiAg8lAoqPg==
+vanilla-picker@^2.10.1:
+  version "2.11.2"
+  resolved "https://registry.yarnpkg.com/vanilla-picker/-/vanilla-picker-2.11.2.tgz#eaa24efa68c27e7ee9e0776df55d6913b855f133"
+  integrity sha512-2cP7LlUnxHxwOf06ReUVtd2RFJMnJGaxN2s0p8wzBH3In5b00Le7fFZ9VrIoBE0svZkSq/BC/Pwq/k/9n+AA2g==
   dependencies:
     "@sphinxxxx/color-conversion" "^2.2.2"
 
