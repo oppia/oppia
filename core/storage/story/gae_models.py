@@ -59,7 +59,7 @@ class StoryModel(base_models.VersionedModel):
     # The thumbnail background color of the story.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     # A high-level description of the story.
-    description = datastore_services.StringProperty(indexed=True)
+    description = datastore_services.TextProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
     notes = datastore_services.TextProperty(indexed=False)
     # The ISO 639-1 code for the language this story is written in.
@@ -219,7 +219,7 @@ class StorySummaryModel(base_models.BaseModel):
     language_code = (
         datastore_services.StringProperty(required=True, indexed=True))
     # A high-level description of the story.
-    description = datastore_services.StringProperty(required=True, indexed=True)
+    description = datastore_services.TextProperty(required=True, indexed=False)
     # Time when the story model was last updated (not to be
     # confused with last_updated, which is the time when the
     # story *summary* model was last updated).
