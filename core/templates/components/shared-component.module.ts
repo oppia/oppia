@@ -58,7 +58,13 @@ import { TakeBreakModalComponent } from
 
 
 @NgModule({
-  imports: [CommonModule, MaterialModule, NgbModalModule, FormsModule],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    NgbModalModule,
+    FormsModule,
+    NgbTooltipModule
+  ],
 
   declarations: [
     AttributionGuideComponent,
