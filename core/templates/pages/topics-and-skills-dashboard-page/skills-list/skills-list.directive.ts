@@ -267,14 +267,13 @@ angular.module('oppia').directive('skillsList', [
                 $timeout(function() {
                   TopicsAndSkillsDashboardBackendApiService.
                     onTopicsAndSkillsDashboardReinitialized.emit();
+                  var successToast = 'Merged Skills.';
+                  AlertsService.addSuccessMessage(successToast, 1000);
                 }, 100);
               }, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
-              }).then(function() {
-                var successToast = 'Merged Skills.';
-                AlertsService.addSuccessMessage(successToast, 1000);
               });
             }, function() {
               // Note to developers:
