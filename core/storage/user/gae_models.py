@@ -926,10 +926,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # When the user last checked notifications. May be None.
     last_checked = datastore_services.DateTimeProperty(default=None)
 
-    # DEPRECATED in v3.0.7. Do not use. Use exploration_ids instead.
-    activity_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
-
     @staticmethod
     def get_deletion_policy():
         """Model contains data to delete corresponding to a user: id field."""
@@ -944,7 +940,6 @@ class UserSubscriptionsModel(base_models.BaseModel):
     def get_export_policy(cls):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'activity_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'exploration_ids': base_models.EXPORT_POLICY.EXPORTED,
             'collection_ids': base_models.EXPORT_POLICY.EXPORTED,
             'general_feedback_thread_ids':
