@@ -26,10 +26,13 @@ import python_utils
 
 import elasticsearch
 
-ES = elasticsearch.Elasticsearch(
-    '%s:%s' % (feconf.ES_HOST, feconf.ES_PORT),
-    use_ssl=(False if feconf.ES_HOST == 'localhost' else True)
-)
+
+if feconf.ES_CLOUD_ID is None:
+    ES = elasticsearch.Elasticsearch(feconf.ES_LOCAL_HOST)
+else:
+    ES = elasticsearch.Elasticsearch(
+        cloud_id=feconf.ES_CLOUD_ID,
+        http_auth=(feconf.ES_USERNAME, feconf.ES_PASSWORD))
 
 
 def _create_index(index_name):
@@ -177,7 +180,13 @@ def search(
                 'must': [],
                 'filter': [],
             }
-        }
+        },
+        'sort': [{
+            'rank': {
+                'order': 'desc',
+                'missing': '_last',
+            }
+        }],
     }
     if query_string:
         query_definition['query']['bool']['must'] = [{
