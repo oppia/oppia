@@ -102,15 +102,15 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     def test_query_status_check_handler(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        user_query = user_query_services.save_new_user_query(
+        user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
         query_data = self.get_json(
-            '/querystatuscheck', params={'query_id': user_query.id})['query']
+            '/querystatuscheck', params={'query_id': user_query_id})['query']
 
-        self.assertEqual(query_data['id'], user_query.id)
+        self.assertEqual(query_data['id'], user_query_id)
         self.assertEqual(
             query_data['status'], feconf.USER_QUERY_STATUS_PROCESSING)
         self.assertEqual(
@@ -253,7 +253,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             params={'num_queries_to_fetch': 1})
         self.assertEqual(response['recent_queries'], [])
 
-        user_query = user_query_services.save_new_user_query(
+        user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
@@ -266,7 +266,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
 
         recent_query = response['recent_queries'][0]
 
-        self.assertEqual(recent_query['id'], user_query.id)
+        self.assertEqual(recent_query['id'], user_query_id)
         self.assertEqual(
             recent_query['status'], feconf.USER_QUERY_STATUS_PROCESSING)
         self.assertNotIn('submitter_id', recent_query)
@@ -276,14 +276,14 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_email_dashboard_result_page_with_invalid_query_id_raises_400(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        user_query = user_query_services.save_new_user_query(
+        user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params={'query_id': user_query.id})
+            job_id, additional_job_params={'query_id': user_query_id})
 
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -310,23 +310,23 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             self):
         self.login(self.SUBMITTER_EMAIL)
 
-        user_query_1 = user_query_services.save_new_user_query(
+        user_query_1_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
-        user_query_2 = user_query_services.save_new_user_query(
+        user_query_2_id = user_query_services.save_new_user_query(
             self.new_submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id_1, additional_job_params={'query_id': user_query_1.id})
+            job_id_1, additional_job_params={'query_id': user_query_1_id})
 
         job_id_2 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id_2, additional_job_params={'query_id': user_query_2.id})
+            job_id_2, additional_job_params={'query_id': user_query_2_id})
 
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -346,7 +346,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
         response = self.post_json(
-            '/emaildashboardresult/%s' % user_query_2.id, {},
+            '/emaildashboardresult/%s' % user_query_2_id, {},
             csrf_token=csrf_token, expected_status_int=401)
         self.assertEqual(
             response['error'],
@@ -357,14 +357,14 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_cancel_email_handler_with_invalid_query_id_raises_400(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        user_query = user_query_services.save_new_user_query(
+        user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params={'query_id': user_query.id})
+            job_id, additional_job_params={'query_id': user_query_id})
 
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -390,23 +390,23 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_cancel_email_handler_with_mismatch_of_query_id_raises_401(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        user_query_1 = user_query_services.save_new_user_query(
+        user_query_1_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
-        user_query_2 = user_query_services.save_new_user_query(
+        user_query_2_id = user_query_services.save_new_user_query(
             self.new_submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id_1, additional_job_params={'query_id': user_query_1.id})
+            job_id_1, additional_job_params={'query_id': user_query_1_id})
 
         job_id_2 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id_2, additional_job_params={'query_id': user_query_2.id})
+            job_id_2, additional_job_params={'query_id': user_query_2_id})
 
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -425,7 +425,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
         response = self.post_json(
-            '/emaildashboardcancelresult/%s' % user_query_2.id, {},
+            '/emaildashboardcancelresult/%s' % user_query_2_id, {},
             csrf_token=csrf_token, expected_status_int=401)
         self.assertEqual(
             response['error'],
@@ -436,14 +436,14 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_bulk_email_handler_with_invalid_query_id_raises_400(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        user_query = user_query_services.save_new_user_query(
+        user_query_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params={'query_id': user_query.id})
+            job_id, additional_job_params={'query_id': user_query_id})
 
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -469,23 +469,23 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     def test_bulk_email_handler_with_mismatch_of_query_id_raises_401(self):
         self.login(self.SUBMITTER_EMAIL)
 
-        user_query_1 = user_query_services.save_new_user_query(
+        user_query_1_id = user_query_services.save_new_user_query(
             self.submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
-        user_query_2 = user_query_services.save_new_user_query(
+        user_query_2_id = user_query_services.save_new_user_query(
             self.new_submitter_id, inactive_in_last_n_days=10,
             created_at_least_n_exps=5,
             has_not_logged_in_for_n_days=30)
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id_1, additional_job_params={'query_id': user_query_1.id})
+            job_id_1, additional_job_params={'query_id': user_query_1_id})
 
         job_id_2 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id_2, additional_job_params={'query_id': user_query_2.id})
+            job_id_2, additional_job_params={'query_id': user_query_2_id})
 
         self.assertEqual(
             self.count_jobs_in_mapreduce_taskqueue(
@@ -505,7 +505,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
         response = self.post_json(
-            '/emaildashboardtestbulkemailhandler/%s' % user_query_2.id, {},
+            '/emaildashboardtestbulkemailhandler/%s' % user_query_2_id, {},
             csrf_token=csrf_token, expected_status_int=401)
         self.assertEqual(
             response['error'],

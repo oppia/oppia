@@ -53,7 +53,7 @@ def _generate_user_query_dicts(user_queries):
     return [
         {
             'id': user_query.id,
-            'submitter_username': user_id_to_username[user_query.id],
+            'submitter_username': user_id_to_username[user_query.submitter_id],
             'created_on': user_query.created_on.strftime('%d-%m-%y %H:%M:%S'),
             'status': user_query.status,
             'num_qualified_users': len(user_query.user_ids)
@@ -93,22 +93,24 @@ class EmailDashboardDataHandler(base.BaseHandler):
         kwargs = {key: data[key] for key in data if data[key] is not None}
         self._validate(kwargs)
 
-        user_query = user_query_services.save_new_user_query(
+        user_query_id = user_query_services.save_new_user_query(
             self.user_id, **kwargs)
 
         # Start MR job in background.
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': user_query.id}
+        params = {'query_id': user_query_id}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params=params)
 
+        user_query = (
+            user_query_services.get_user_query(user_query_id, strict=True))
         data = {
             'query': _generate_user_query_dicts([user_query])[0]
         }
         self.render_json(data)
 
     def _validate(self, data):
-        """Validator for data obtained from fontend."""
+        """Validator for data obtained from frontend."""
         possible_keys = [
             'has_not_logged_in_for_n_days', 'inactive_in_last_n_days',
             'created_at_least_n_exps', 'created_fewer_than_n_exps',
