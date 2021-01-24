@@ -144,6 +144,13 @@ angular.module('oppia').directive('topNavigationBar', [
             SidebarStatusService.toggleSidebar();
           };
 
+          ctrl.navigateToClassroomPage = function(classroomUrl) {
+            SiteAnalyticsService.registerClassoomHeaderClickEvent();
+            $timeout(function() {
+              $window.location = classroomUrl;
+            }, 150);
+          };
+
           /**
            * Checks if i18n has been run.
            * If i18n has not yet run, the <a> and <span> tags will have

@@ -31,7 +31,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # manually.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
-# @marianazangrossi first.
+# @nithusha21 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'admin-config-tab.directive.ts',
     'admin-dev-mode-activities-tab.directive.ts',
@@ -340,6 +340,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'suggestion-modal-for-exploration-player.service.ts',
     'summary-list-header.directive.ts',
     'supplemental-card.directive.ts',
+    'svg-sanitizer.service.ts',
     'svm-prediction.service.ts',
     'teacher.ts',
     'teacher2.ts',
@@ -456,7 +457,7 @@ def check_not_fully_covered_filenames_list_is_sorted():
 
 
 def check_coverage_changes():
-    """Checks if the blacklist for not fully covered files needs to be changed
+    """Checks if the denylist for not fully covered files needs to be changed
     by:
     - File renaming
     - File deletion
@@ -470,7 +471,7 @@ def check_coverage_changes():
             ' file does not exist.'.format(LCOV_FILE_PATH))
 
     stanzas = get_stanzas_from_lcov_file()
-    remaining_blacklisted_files = list(NOT_FULLY_COVERED_FILENAMES)
+    remaining_denylisted_files = list(NOT_FULLY_COVERED_FILENAMES)
     errors = ''
 
     for stanza in stanzas:
@@ -478,7 +479,7 @@ def check_coverage_changes():
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
 
-        if file_name not in remaining_blacklisted_files:
+        if file_name not in remaining_denylisted_files:
             if total_lines != covered_lines:
                 errors += (
                     '\033[1m{}\033[0m seems to be not completely tested.'
@@ -487,7 +488,7 @@ def check_coverage_changes():
             if total_lines == covered_lines:
                 errors += (
                     '\033[1m{}\033[0m seems to be fully covered!'
-                    ' Before removing it manually from the blacklist'
+                    ' Before removing it manually from the denylist'
                     ' in the file'
                     ' scripts/check_frontend_test_coverage.py, please'
                     ' make sure you\'ve followed the unit tests rules'
@@ -495,15 +496,15 @@ def check_coverage_changes():
                     ' https://github.com/oppia/oppia/wiki/Frontend'
                     '-unit-tests-guide#rules\n'.format(file_name))
 
-            remaining_blacklisted_files.remove(file_name)
+            remaining_denylisted_files.remove(file_name)
 
-    if remaining_blacklisted_files:
-        for test_name in remaining_blacklisted_files:
+    if remaining_denylisted_files:
+        for test_name in remaining_denylisted_files:
             errors += (
                 '\033[1m{}\033[0m is in the frontend test coverage'
-                ' blacklist but it doesn\'t exist anymore. If you have'
+                ' denylist but it doesn\'t exist anymore. If you have'
                 ' renamed it, please make sure to remove the old file'
-                ' name and add the new file name in the blacklist in'
+                ' name and add the new file name in the denylist in'
                 ' the file scripts/check_frontend_test_coverage.py.\n'
                 .format(test_name))
 

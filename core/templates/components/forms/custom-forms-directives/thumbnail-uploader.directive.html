@@ -6,16 +6,19 @@
            ng-click="showEditThumbnailModal()"
            aria-label="upload or edit thumbnail">
       </div>
-      <i class="material-icons oppia-editor-edit-icon oppia-pencil-icon">&#xE254;</i>
-      <img ng-show="!thumbnailIsLoading"
-           ng-src="<[editableThumbnailDataUrl]>"
-           class="img-thumbnail protractor-test-custom-photo"
-           ng-style="{background: getBgColor()}">
-
-      <img ng-if="useLocalStorage && newThumbnailDataUrl"
-           ng-src="<[newThumbnailDataUrl]>"
-           ng-style="{background: localStorageBgcolor}"
-           class="img-thumbnail protractor-test-custom-photo">
+      <i class="material-icons oppia-editor-edit-icon oppia-pencil-icon">
+        &#xE254;
+      </i>
+      <oppia-thumbnail-display ng-show="!thumbnailIsLoading"
+                               [img-src]="editableThumbnailDataUrl"
+                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                               [background]="getBgColor()">
+      </oppia-thumbnail-display>
+      <oppia-thumbnail-display ng-if="useLocalStorage && newThumbnailDataUrl"
+                               [img-src]="newThumbnailDataUrl"
+                               [classes]="['img-thumbnail', 'protractor-test-custom-photo']"
+                               [background]="localStorageBgcolor">
+      </oppia-thumbnail-display>
     </div>
   </div>
 </div>

@@ -55,8 +55,8 @@ import { ProfileLinkPictureComponent } from
   'components/profile-link-directives/profile-link-picture.component';
 import { ProfileLinkTextComponent } from
   'components/profile-link-directives/profile-link-text.component';
-import { TakeBreakModalComponent } from
-  'pages/exploration-player-page/templates/take-break-modal.component';
+import { ThumbnailDisplayComponent } from './forms/custom-forms-directives/thumbnail-display.component';
+import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
 
 
 
@@ -79,6 +79,7 @@ import { TakeBreakModalComponent } from
     StorySummaryTileDirective,
     SocialButtonsComponent,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     TranslatePipe,
     TakeBreakModalComponent
   ],
@@ -99,7 +100,8 @@ import { TakeBreakModalComponent } from
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SocialButtonsComponent,
+    ThumbnailDisplayComponent
   ],
 
   exports: [
@@ -112,6 +114,7 @@ import { TakeBreakModalComponent } from
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,
+    ThumbnailDisplayComponent,
     TakeBreakModalComponent,
     TranslatePipe
   ],

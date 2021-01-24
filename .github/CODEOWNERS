@@ -624,6 +624,7 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/pre_commit_linter.py in sync with the modifications.
+/core/templates/services/svg-sanitizer.service.ts @BenHenning @seanlip
 /scripts/linters/warranted_angular_security_bypasses.py @seanlip
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
