@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
+
 from core.domain import base_model_validators
 from core.domain import recommendations_services
 from core.platform import models
@@ -87,15 +89,16 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
                 to validate.
         """
 
-        all_topics = list(item.content.keys())
+        content = json.loads(item.content)
+        all_topics = list(content.keys())
         data = '%s\n' % ','.join(all_topics)
 
         for topics_to_compare in all_topics:
             similarity_list = []
-            for topic in item.content[topics_to_compare]:
+            for topic in content[topics_to_compare]:
                 similarity_list.append(
                     python_utils.UNICODE(
-                        item.content[topics_to_compare][topic]))
+                        content[topics_to_compare][topic]))
             if len(similarity_list):
                 data = data + '%s\n' % ','.join(similarity_list)
 
@@ -105,7 +108,7 @@ class TopicSimilaritiesModelValidator(base_model_validators.BaseModelValidator):
             cls._add_error(
                 'topic similarity check',
                 'Entity id %s: Topic similarity validation for content: %s '
-                'fails with error: %s' % (item.id, item.content, e))
+                'fails with error: %s' % (item.id, content, e))
 
     @classmethod
     def _get_custom_validation_functions(cls):
