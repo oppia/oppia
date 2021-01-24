@@ -199,7 +199,7 @@ class EmailDashboardCancelEmailHandler(base.BaseHandler):
         if user_query.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
                 '%s is not an authorized user for this query.' % self.user_id)
-        user_query_services.delete_user_query(user_query.id)
+        user_query_services.archive_user_query(user_query.id)
         self.render_json({})
 
 

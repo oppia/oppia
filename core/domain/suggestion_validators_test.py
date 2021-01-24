@@ -276,9 +276,9 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
                 self.model_instance.id,
                 self.model_instance.final_reviewer_id
             ),
-            '[u\'failed validation check for invalid user '
-            'setting ids of GeneralSuggestionModel\', [u"Entity id %s: '
-            'The field \'reviewer_ids\' contains IDs in wrong format."]]'
+            '[u\'failed validation check for invalid ids in field of '
+            'GeneralSuggestionModel\', [u"Entity id %s: '
+            'The user id wrong_id in the field \'reviewer_ids\' is invalid"]]'
             % self.model_instance.id
         ]
         self.run_job_and_check_output(
@@ -308,9 +308,9 @@ class GeneralSuggestionModelValidatorTests(test_utils.AuditJobsTestBase):
             'Entity fails domain validation with the error Expected '
             'author_id to be in a valid user ID format, received %s\']]'
             % (self.model_instance.id, self.model_instance.author_id),
-            u'[u\'failed validation check for invalid user setting ids of '
-            u'GeneralSuggestionModel\', [u"Entity id %s: The field '
-            u'\'author_ids\' contains IDs in wrong format."]]'
+            u'[u\'failed validation check for invalid ids in field of '
+            u'GeneralSuggestionModel\', [u"Entity id %s: '
+            u'The user id wrong_id in the field \'author_ids\' is invalid"]]'
             % self.model_instance.id
         ]
         self.run_job_and_check_output(
@@ -523,10 +523,10 @@ class GeneralVoiceoverApplicationModelValidatorTests(
         self.model_instance.put()
         expected_output = [
             (
-                '[u\'failed validation check for invalid user setting ids of '
+                '[u\'failed validation check for invalid ids in field of '
                 'GeneralVoiceoverApplicationModel\', '
-                '[u"Entity id %s: The field \'final_reviewer_ids\' '
-                'contains IDs in wrong format."]]'
+                '[u"Entity id %s: The user id wrong_id in the field '
+                '\'final_reviewer_ids\' is invalid"]]'
             ) % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)
@@ -537,9 +537,9 @@ class GeneralVoiceoverApplicationModelValidatorTests(
         self.model_instance.put()
         expected_output = [
             (
-                '[u\'failed validation check for invalid user setting ids of '
-                'GeneralVoiceoverApplicationModel\', [u"Entity id %s: '
-                'The field \'author_ids\' contains IDs in wrong format."]]'
+                '[u\'failed validation check for invalid ids in field of '
+                'GeneralVoiceoverApplicationModel\', [u"Entity id %s: The user '
+                'id wrong_id in the field \'author_ids\' is invalid"]]'
             ) % self.model_instance.id]
         self.run_job_and_check_output(
             expected_output, sort=True, literal_eval=False)

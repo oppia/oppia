@@ -190,7 +190,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_model_association_to_user():
-        """This model is only stored for delete purposes. The commit log of
+        """This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
@@ -198,7 +198,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     @classmethod
     def get_export_policy(cls):
         """Model doesn't contain any data directly corresponding to a user.
-        This model is only stored for delete purposes. The commit log of
+        This model is only stored for archive purposes. The commit log of
         entities is not related to personal user data.
         """
         return dict(super(cls, cls).get_export_policy(), **{

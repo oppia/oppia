@@ -135,7 +135,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
     def test_archive_user_query_archives_user_query(self):
         original_user_query = (
             user_query_services.get_user_query(self.USER_QUERY_1_ID))
-        user_query_services.delete_user_query(original_user_query.id)
+        user_query_services.archive_user_query(original_user_query.id)
 
         archived_user_query_model = (
             user_models.UserQueryModel.get_by_id(self.USER_QUERY_1_ID))

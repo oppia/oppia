@@ -208,9 +208,9 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [
             (
-                u'[u\'failed validation check for invalid user setting ids '
-                'of GeneralFeedbackThreadModel\', [u"Entity id %s: '
-                'The field \'author_ids\' contains IDs in wrong format."]]'
+                u'[u\'failed validation check for invalid ids in field of '
+                u'GeneralFeedbackThreadModel\', [u"Entity id %s: '
+                'The user id wrong_id in the field \'author_ids\' is invalid"]]'
             ) % (self.model_instance.id)
         ]
         self.run_job_and_check_output(
@@ -222,10 +222,10 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [
             (
-                u'[u\'failed validation check for invalid user setting ids '
-                'of GeneralFeedbackThreadModel\', [u"Entity id %s: '
-                'The field \'last_nonempty_message_author_ids\' contains IDs '
-                'in wrong format."]]'
+                u'[u\'failed validation check for invalid ids in field of '
+                'GeneralFeedbackThreadModel\', [u"Entity id %s: '
+                'The user id wrong_id in the field '
+                '\'last_nonempty_message_author_ids\' is invalid"]]'
             ) % (self.model_instance.id)
         ]
         self.run_job_and_check_output(
@@ -366,9 +366,9 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.AuditJobsTestBase):
         self.model_instance.put()
         expected_output = [
             (
-                u'[u\'failed validation check for invalid user setting ids '
-                'of GeneralFeedbackMessageModel\', [u"Entity id %s: '
-                'The field \'author_ids\' contains IDs in wrong format."]]'
+                u'[u\'failed validation check for invalid ids in field of '
+                'GeneralFeedbackMessageModel\', [u"Entity id %s: '
+                'The user id wrong_id in the field \'author_ids\' is invalid"]]'
             ) % (self.model_instance.id)
         ]
         self.run_job_and_check_output(

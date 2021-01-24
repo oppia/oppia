@@ -141,7 +141,7 @@ class UserQueryTests(test_utils.GenericTestBase):
         self.assertEqual(default_user_query.user_ids, [])
 
     def test_archive_returns_correct_dict(self):
-        self.user_query.delete(sent_email_model_id='sent_email_model_id')
+        self.user_query.archive(sent_email_model_id='sent_email_model_id')
         self.assertEqual(
             self.user_query.sent_email_model_id, 'sent_email_model_id')
         self.assertEqual(

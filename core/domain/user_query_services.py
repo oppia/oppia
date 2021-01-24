@@ -173,14 +173,14 @@ def save_new_user_query(
     return _save_user_query(user_query)
 
 
-def delete_user_query(user_query_id):
+def archive_user_query(user_query_id):
     """Delete the user query.
 
     Args:
         user_query_id: str. The ID of the user query to delete.
     """
     user_query = get_user_query(user_query_id, strict=True)
-    user_query.delete()
+    user_query.archive()
     _save_user_query(user_query)
 
 
@@ -206,7 +206,7 @@ def send_email_to_qualified_users(
         email_body, email_intent
     )
 
-    user_query.delete(sent_email_model_id=bulk_email_model_id)
+    user_query.archive(sent_email_model_id=bulk_email_model_id)
     _save_user_query(user_query)
 
     # Store BulkEmailModel in UserBulkEmailsModel of each recipient.
