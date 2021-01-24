@@ -301,7 +301,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
             );
 
             // Load the collection the learner wants to view.
-            ReadOnlyCollectionBackendApiService.loadCollection(
+            ReadOnlyCollectionBackendApiService.loadCollectionAsync(
               ctrl.collectionId).then(
               function(collection) {
                 ctrl.collection = collection;

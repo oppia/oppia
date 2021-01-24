@@ -1310,7 +1310,7 @@ angular.module('oppia').directive('conversationSkin', [
             );
             if ($scope.collectionId) {
               ReadOnlyCollectionBackendApiService
-                .loadCollection($scope.collectionId)
+                .loadCollectionAsync($scope.collectionId)
                 .then(function(collection) {
                   $scope.collectionTitle = collection.getTitle();
                 });
