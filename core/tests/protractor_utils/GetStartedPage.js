@@ -38,7 +38,7 @@ var GetStartedPage = function() {
     }
 
     waitFor.visibilityOf(tag, 'Tag is taking too long to appear');
-    return tag.getAttribute('content');
+    return await tag.getAttribute('content');
   };
 };
 
