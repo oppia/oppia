@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,40 +16,48 @@
  * @fileoverview Service to get and set active content id in translation tab.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-recorded-voiceovers.service.ts');
+import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 
-angular.module('oppia').factory('TranslationTabActiveContentIdService', [
-  'StateRecordedVoiceoversService',
-  function(StateRecordedVoiceoversService) {
-    var activeContentId = null;
-    var activeDataFormat = null;
-    var _activeContentIdChangedEventEmitter = new EventEmitter();
-    return {
-      getActiveContentId: function() {
-        return activeContentId;
-      },
-      getActiveDataFormat: function() {
-        return activeDataFormat;
-      },
-      setActiveContent: function(contentId, dataFormat) {
-        var allContentIds = (
-          StateRecordedVoiceoversService.displayed.getAllContentIds());
-        if (allContentIds.indexOf(contentId) === -1) {
-          throw new Error('Invalid active content id: ' + contentId);
-        }
-        activeContentId = contentId;
-        activeDataFormat = dataFormat;
-        _activeContentIdChangedEventEmitter.emit(dataFormat);
-      },
-      get onActiveContentIdChanged() {
-        return _activeContentIdChangedEventEmitter;
-      }
-    };
-  }]);
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TranslationTabActiveContentIdService {
+  constructor(
+    private _stateRecordedVoiceoversService: StateRecordedVoiceoversService) {}
+
+  activeContentId = null;
+  activeDataFormat = null;
+  _activeContentIdChangedEventEmitter = new EventEmitter();
+
+  getActiveContentId(): string {
+    return this.activeContentId;
+  }
+
+  getActiveDataFormat(): string {
+    return this.activeDataFormat;
+  }
+
+  setActiveContent(contentId: string, dataFormat: string): void {
+    var allContentIds = (
+      this._stateRecordedVoiceoversService.displayed.getAllContentIds());
+    if (allContentIds.indexOf(contentId) === -1) {
+      throw new Error('Invalid active content id: ' + contentId);
+    }
+    this.activeContentId = contentId;
+    this.activeDataFormat = dataFormat;
+    this._activeContentIdChangedEventEmitter.emit(dataFormat);
+  }
+
+  get onActiveContentIdChanged(): EventEmitter<string> {
+    return this._activeContentIdChangedEventEmitter;
+  }
+}
+
+angular.module('oppia').factory(
+  'TranslationTabActiveContentIdService', downgradeInjectable(
+    TranslationTabActiveContentIdService));
