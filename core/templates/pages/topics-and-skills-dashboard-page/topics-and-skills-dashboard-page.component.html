@@ -142,11 +142,11 @@
             <span class="skill-count-text">Skills</span>
           </div>
           <div class="create-topic-skill">
-            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS"  ng-click="$ctrl.createTopic()" class="protractor-test-create-topic-button">
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_TOPICS && $ctrl.userCanCreateTopic"  ng-click="$ctrl.createTopic()" class="protractor-test-create-topic-button create-topic-button">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Topic</span>
             </div>
-            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS"  ng-click="$ctrl.createSkill()" class="protractor-test-create-skill-button-circle">
+            <div ng-if="$ctrl.activeTab === $ctrl.TAB_NAME_SKILLS && $ctrl.userCanCreateSkill"  ng-click="$ctrl.createSkill()" class="protractor-test-create-skill-button-circle create-skill-button">
               <i class="fa fa-plus-circle"></i>
               <span>Create New Skill</span>
             </div>
@@ -345,10 +345,13 @@
     font-size: 34px;
     height: 40px;
   }
+  .oppia-topics-and-skills-dashboard .create-skill-button,
+  .oppia-topics-and-skills-dashboard .create-topic-button {
+    cursor: pointer;
+  }
   .oppia-topics-and-skills-dashboard .create-topic-skill {
     align-content: center;
     border-right: none;
-    cursor: pointer;
     display: flex;
     flex-wrap: wrap;
     height: 100%;
