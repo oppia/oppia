@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,47 +16,53 @@
  * @fileoverview Unit test for the Translation tab active content id service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { TranslationTabActiveContentIdService } from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service.ts';
+import { StateRecordedVoiceoversService } from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service.ts';
 
-require(
-  'pages/exploration-editor-page/translation-tab/services/' +
-  'translation-tab-active-content-id.service.ts');
+describe('Translation tab active content id service', () => {
+  let ttacis: TranslationTabActiveContentIdService;
 
-describe('Translation tab active content id service', function() {
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('StateRecordedVoiceoversService', {
-      displayed: {
-        getAllContentIds: function() {
-          return ['content', 'feedback_1'];
+  beforeEach(() => {
+    TestBed.configureTestingModule({ providers: [{
+      provide: StateRecordedVoiceoversService,
+      useValue: {
+        displayed: {
+          getAllContentIds: () => {
+            return ['content', 'feedback_1'];
+          }
         }
       }
+    }
+    ]
     });
-  }));
-  var ttacis = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ttacis = $injector.get('TranslationTabActiveContentIdService');
-  }));
+    ttacis = TestBed.inject(TranslationTabActiveContentIdService);
+  });
 
-  it('should correctly set and get active content id', function() {
+  it('should correctly set and get active content id', () => {
     expect(ttacis.getActiveContentId()).toBeNull();
     ttacis.setActiveContent('content', 'html');
     expect(ttacis.getActiveContentId()).toBe('content');
   });
 
-  it('should throw error on setting invalid content id', function() {
-    expect(function() {
+  it('should throw error on setting invalid content id', () => {
+    expect(() => {
       ttacis.setActiveContent('feedback_2', 'html');
     }).toThrowError(
       'Invalid active content id: feedback_2');
+  });
+
+  it('should return data format correctly', () => {
+    expect(ttacis.getActiveDataFormat()).toBeNull();
+    ttacis.setActiveContent('content', 'html');
+    expect(ttacis.getActiveDataFormat()).toBe('html');
+  });
+
+  it('should emit data format', () => {
+    let mockquestionSessionEventEmitter = new EventEmitter();
+    expect(ttacis.onActiveContentIdChanged).toEqual(
+      mockquestionSessionEventEmitter);
   });
 });
