@@ -62,7 +62,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         raise ValueError('Invalid exploration id %s' % exploration_id)
 
     @transaction_services.run_in_transaction_wrapper
-    def _update_user_rating():
+    def _update_user_rating_transactional():
         """Updates the user rating of the exploration. Returns the old rating
         before updation.
         """
@@ -80,7 +80,7 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         exp_user_data_model.put()
         return old_rating
 
-    old_rating = _update_user_rating()
+    old_rating = _update_user_rating_transactional()
 
     exploration_summary = exp_fetchers.get_exploration_summary_by_id(
         exploration_id)
