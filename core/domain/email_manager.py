@@ -1732,6 +1732,21 @@ def send_account_deleted_email(user_id, user_email):
         recipient_email=user_email)
 
 
+def send_account_deletion_failed_email(user_id, user_email):
+    """Sends an email to user whose account was deleted.
+
+    Args:
+        user_id: str. The id of the user whose account got deleted.
+        user_email: str. The email of the user whose account got deleted.
+    """
+    email_subject = 'WIPEOUT: Account deletion failed'
+    email_body_template = (
+        'The Wipeout of the user with ID \'%s\' and email \'%s\' failed.'
+        % (user_id, user_email)
+    )
+    send_mail_to_admin(email_subject, email_body_template)
+
+
 def send_email_to_new_contribution_reviewer(
         recipient_id, review_category, language_code=None):
     """Sends an email to user who is assigned as a reviewer.
