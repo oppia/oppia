@@ -804,10 +804,20 @@ def managed_process(
         sys.path.insert(1, PSUTIL_DIR)
     import psutil
 
+    # Kill old processes before starting new ones.
+    if proc_name_to_kill is not None:
+        python_utils.PRINT(
+            'Killing old %s processes' % proc_name_to_kill)
+        for proc in psutil.process_iter():
+            if proc.cmdline() and proc_name_to_kill in proc.cmdline()[0]:
+                python_utils.PRINT('Killed process: %s' % proc.cmdline())
+                proc.kill()
+
     stripped_args = (('%s' % arg).strip() for arg in command_args)
     non_empty_args = (s for s in stripped_args if s)
 
     command = ' '.join(non_empty_args) if shell else list(non_empty_args)
+    python_utils.PRINT('Starting new process: %s' % command)
     popen_proc = psutil.Popen(command, shell=shell, **kwargs)
 
     try:
