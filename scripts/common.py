@@ -661,7 +661,7 @@ def managed_elasticsearch_dev_server():
     # ElasticSearch service. See
     # www.elastic.co/guide/en/elasticsearch/reference/master/jvm-options.html
     # for more details on ES_JAVA_OPTS.
-    os.environ['ES_JAVA_OPTS'] = '-Xmx256m -Xms256m'
+    os.environ['ES_JAVA_OPTS'] = '-Xmx2g -Xms2g'
     es_args = [
         '%s/bin/elasticsearch' % ES_PATH,
         '-d'
