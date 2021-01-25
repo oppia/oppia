@@ -2542,8 +2542,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_delete_state_cmd(self):
         """Test deleting a state name."""
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
@@ -2586,11 +2584,14 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             r'The parameter with name \'myParam\' .* does not exist .*'
-            ):
+        ):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.owner_id,
+                self.EXP_0_ID,
+                _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),
-                '')
+                ''
+            )
 
     def test_update_reserved_param_changes(self):
         param_changes = [{
@@ -2603,11 +2604,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             r'The parameter name \'all\' is reserved. Please choose '
-            'a different name for the parameter being set in'):
+            'a different name for the parameter being set in'
+        ):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID, _get_change_list(
+                self.owner_id,
+                self.EXP_0_ID,
+                _get_change_list(
                     self.init_state_name, 'param_changes', param_changes),
-                '')
+                ''
+            )
 
     def test_update_invalid_generator(self):
         """Test for check that the generator_id in param_changes exists."""
@@ -2618,13 +2623,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.param_changes[0]['generator_id'] = 'fake'
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid generator id fake'
-            ):
+            utils.ValidationError, 'Invalid generator ID'
+        ):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_0_ID,
+                self.owner_id,
+                self.EXP_0_ID,
                 _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),
-                '')
+                ''
+            )
 
     def test_update_interaction_id(self):
         """Test updating of interaction_id."""

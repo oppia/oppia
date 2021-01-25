@@ -2542,9 +2542,9 @@ class State(python_utils.OBJECT):
             # Check if the state_dict can be converted to a State.
             state = cls.from_dict(state_dict)
         except Exception:
-            logging.info(
+            logging.exception(
                 'Bad state dict: %s' % python_utils.UNICODE(state_dict))
-            raise Exception('Could not convert state dict to YAML.')
+            python_utils.reraise_exception()
 
         return python_utils.yaml_from_dict(state.to_dict(), width=width)
 
