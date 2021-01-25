@@ -843,8 +843,11 @@ def managed_process(
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
 
         if proc_name_to_kill is not None:
+            python_utils.PRINT(
+                'Killing remaining %s processes' % proc_name_to_kill)
             for proc in psutil.process_iter():
                 if proc.cmdline() and proc_name_to_kill in proc.cmdline()[0]:
+                    python_utils.PRINT('Killed process: %s' % proc.cmdline())
                     proc.kill()
 
 
@@ -947,13 +950,6 @@ def managed_elasticsearch_dev_server():
 
     # Override the default path to ElasticSearch config files.
     os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
-    # Override to force the ElasticSearch server to use a smaller heap size
-    # (the default exceeds 1 GB). If this isn't done, the e2e tests end up
-    # failing on GitHub Actions due to timeouts when talking to the
-    # ElasticSearch service. See
-    # www.elastic.co/guide/en/elasticsearch/reference/master/jvm-options.html
-    # for more details on ES_JAVA_OPTS.
-    os.environ['ES_JAVA_OPTS'] = '-Xmx2g -Xms2g'
     es_args = [
         '%s/bin/elasticsearch' % ES_PATH,
         '-d'

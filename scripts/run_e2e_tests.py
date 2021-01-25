@@ -546,33 +546,11 @@ def run_tests(args):
         common.wait_for_port_to_be_open(feconf.ES_LOCALHOST_PORT)
         common.wait_for_port_to_be_open(WEB_DRIVER_PORT)
         common.wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
+        python_utils.PRINT('Servers have come up.')
         python_utils.PRINT(
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
             'core/tests/protractor.conf.js, you can view screenshots'
             'of the failed tests in ../protractor-screenshots/')
-
-        python_utils.PRINT('Servers have come up.')
-
-        # Temporary code for debugging.
-        python_utils.PRINT('-------- LOG 0 ---------')
-        proc1 = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
-        proc2 = subprocess.Popen(
-            ['grep', 'elasticsearch'], stdin=proc1.stdout,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        proc1.stdout.close()
-        out, err = proc2.communicate()
-        python_utils.PRINT('out: {0}'.format(out))
-        python_utils.PRINT('err: {0}'.format(err))
-        python_utils.PRINT('-------- LOG 1 ---------')
-        python_utils.PRINT(subprocess.check_output([
-            'curl', 'localhost:9200'], stderr=subprocess.STDOUT))
-        python_utils.PRINT('-------- LOG 2 ---------')
-        python_utils.PRINT(subprocess.check_output([
-            'curl', 'localhost:9200/_cat/indices'], stderr=subprocess.STDOUT))
-        python_utils.PRINT('-------- LOG 3 ---------')
-        python_utils.PRINT(subprocess.check_output([
-            'curl', '-XGET', 'http://localhost:9200/_cluster/state?pretty'
-        ], stderr=subprocess.STDOUT))
 
         commands = [common.NODE_BIN_PATH]
         if args.debug_mode:
