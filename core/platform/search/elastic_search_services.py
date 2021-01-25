@@ -26,16 +26,13 @@ import python_utils
 
 import elasticsearch
 
-
-if feconf.ES_CLOUD_ID is None:
-    # Set a higher timeout to help with the e2e tests on GitHub Actions (which
-    # fail with a 10 second timeout).
-    ES = elasticsearch.Elasticsearch(
-        'localhost:%s' % feconf.ES_LOCALHOST_PORT)
-else:
-    ES = elasticsearch.Elasticsearch(
-        cloud_id=feconf.ES_CLOUD_ID,
-        http_auth=(feconf.ES_USERNAME, feconf.ES_PASSWORD))
+ES = elasticsearch.Elasticsearch(
+    ('localhost:%s' % feconf.ES_LOCALHOST_PORT)
+    if feconf.ES_CLOUD_ID is None else None,
+    cloud_id=feconf.ES_CLOUD_ID,
+    http_auth=(
+        (feconf.ES_USERNAME, feconf.ES_PASSWORD)
+        if feconf.ES_CLOUD_ID else None))
 
 
 def _create_index(index_name):

@@ -640,36 +640,6 @@ def wait_for_port_to_be_open(port_number):
         sys.exit(1)
 
 
-@contextlib.contextmanager
-def managed_elasticsearch_dev_server():
-    """Returns a context manager for ElasticSearch server for running tests
-    in development mode and running a local dev server. This is only required
-    in a development environment.
-
-    Yields:
-        psutil.Process. The ElasticSearch server process.
-    """
-    # Clear previous data stored in the local cluster.
-    if os.path.exists(ES_PATH_DATA_DIR):
-        shutil.rmtree(ES_PATH_DATA_DIR)
-
-    # Override the default path to ElasticSearch config files.
-    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
-    # Override to force the ElasticSearch server to use a smaller heap size
-    # (the default exceeds 1 GB). If this isn't done, the e2e tests end up
-    # failing on GitHub Actions due to timeouts when talking to the
-    # ElasticSearch service. See
-    # www.elastic.co/guide/en/elasticsearch/reference/master/jvm-options.html
-    # for more details on ES_JAVA_OPTS.
-    os.environ['ES_JAVA_OPTS'] = '-Xmx2g -Xms2g'
-    es_args = [
-        '%s/bin/elasticsearch' % ES_PATH,
-        '-d'
-    ]
-    with managed_process(es_args, shell=True) as proc:
-        yield proc
-
-
 def wait_for_port_to_be_closed(port_number):
     """Wait until the port is closed or
     MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
@@ -801,7 +771,9 @@ def swap_env(key, value):
 
 
 @contextlib.contextmanager
-def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
+def managed_process(
+        command_args, shell=False, timeout_secs=60, proc_name_to_kill=None,
+        **kwargs):
     """Context manager for starting and stopping a process gracefully.
 
     Args:
@@ -818,6 +790,10 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         timeout_secs: int. The time allotted for the managed process and its
             descendants to terminate themselves. After the timeout, any
             remaining processes will be killed abruptly.
+        proc_name_to_kill: str|None. If given, the name of a string which
+            matches all additional processes that should be killed when the
+            given process is terminated. (This is needed for, e.g.,
+            elasticsearch.)
         **kwargs: dict(str: *). Same kwargs as `subprocess.Popen`.
 
     Yields:
@@ -840,6 +816,7 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         procs_to_kill = (
             popen_proc.children(recursive=True) if popen_proc.is_running() else
             [])
+
         # Children must be terminated before the parent, otherwise they risk
         # becoming zombies.
         procs_to_kill.append(popen_proc)
@@ -864,6 +841,11 @@ def managed_process(command_args, shell=False, timeout_secs=60, **kwargs):
         for proc in procs_still_alive:
             proc.kill()
             logging.warn('Forced to kill %s!' % get_debug_info(proc))
+
+        if proc_name_to_kill is not None:
+            for proc in psutil.process_iter():
+                if proc.cmdline() and proc_name_to_kill in proc.cmdline()[0]:
+                    proc.kill()
 
 
 @contextlib.contextmanager
@@ -948,3 +930,34 @@ def managed_firebase_auth_emulator():
         # OK to use shell=True here because we are passing string literals and
         # constants, so no risk of shell-injection attacks.
         yield stack.enter_context(managed_process(emulator_args, shell=True))
+
+
+@contextlib.contextmanager
+def managed_elasticsearch_dev_server():
+    """Returns a context manager for ElasticSearch server for running tests
+    in development mode and running a local dev server. This is only required
+    in a development environment.
+
+    Yields:
+        psutil.Process. The ElasticSearch server process.
+    """
+    # Clear previous data stored in the local cluster.
+    if os.path.exists(ES_PATH_DATA_DIR):
+        shutil.rmtree(ES_PATH_DATA_DIR)
+
+    # Override the default path to ElasticSearch config files.
+    os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
+    # Override to force the ElasticSearch server to use a smaller heap size
+    # (the default exceeds 1 GB). If this isn't done, the e2e tests end up
+    # failing on GitHub Actions due to timeouts when talking to the
+    # ElasticSearch service. See
+    # www.elastic.co/guide/en/elasticsearch/reference/master/jvm-options.html
+    # for more details on ES_JAVA_OPTS.
+    os.environ['ES_JAVA_OPTS'] = '-Xmx2g -Xms2g'
+    es_args = [
+        '%s/bin/elasticsearch' % ES_PATH,
+        '-d'
+    ]
+    with managed_process(
+        es_args, shell=True, proc_name_to_kill='elasticsearch') as proc:
+        yield proc
