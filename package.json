@@ -44,7 +44,7 @@
     "@types/selenium-webdriver": "^4.0.0",
     "@types/wavesurfer.js": "^3.3.1",
     "@typescript-eslint/eslint-plugin": "^4.0.0",
-    "@typescript-eslint/parser": "4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
     "acorn": "^8.0.0",
     "ajv": "^7.0.0",
     "angular2-template-loader": "0.6.2",
