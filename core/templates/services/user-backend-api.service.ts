@@ -75,13 +75,13 @@ export class UserBackendApiService {
   }
 
   async setProfilePictureBlobAsync(
-      newProfilePictureBlob: string): Promise<PreferencesBackendDict> {
-    const profilePictureUpdateUrlData = {
-      update_type: 'profile_picture_blob',
-      data: newProfilePictureBlob
-    };
+      newProfilePictureBlob: Blob
+  ): Promise<PreferencesBackendDict> {
+    const formData: FormData = new FormData();
+    formData.append('update_type', 'profile_picture_blob');
+    formData.append('data', newProfilePictureBlob);
     return this.http.put<PreferencesBackendDict>(
-      this.PREFERENCES_DATA_URL, profilePictureUpdateUrlData).toPromise();
+      this.PREFERENCES_DATA_URL, formData).toPromise();
   }
 
   async getLoginUrlAsync(currentUrl: string): Promise<string> {

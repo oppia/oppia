@@ -253,13 +253,15 @@ export class UrlInterpolationService {
   }
 
   getProfilePictureUrl(username: string): string {
-    let urlPrefix = this.getGcsUrl();
+    let urlStub = (
+      this.getGcsUrl() +
+      '/<entity_type>/<username>/assets/' +
+      AppConstants.PROFILE_PICTURE_FILEPATH
+    );
     return this.interpolateUrl(
-      urlPrefix + '/<entity_type>/<username>/assets/<filepath>',
-      {
+      urlStub, {
         entity_type: AppConstants.ENTITY_TYPE.USER,
         username: username,
-        filepath: AppConstants.PROFILE_PICTURE_FILEPATH
       }
     );
   }

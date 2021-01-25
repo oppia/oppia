@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreferencesBackendDict, UserBackendApiService, UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
@@ -32,7 +33,8 @@ export class UserService {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private windowRef: WindowRef,
-    private userBackendApiService: UserBackendApiService
+    private userBackendApiService: UserBackendApiService,
+    private imageUploadHelperService: ImageUploadHelperService
   ) {}
 
     private userContributionRightsInfo = null;
@@ -60,11 +62,11 @@ export class UserService {
     async setProfilePictureBlobAsync(
         newProfilePictureDataUrl: string
     ): Promise<PreferencesBackendDict> {
-      //let newProfilePictureBlob = (
-      //  ImageUploadHelperService.convertImageDataToImageFile(
-      //    newProfilePictureDataurl))
+      let newProfilePictureBlob = (
+        this.imageUploadHelperService.convertImageDataToImageFile(
+          newProfilePictureDataUrl));
       return this.userBackendApiService.setProfilePictureBlobAsync(
-        newProfilePictureDataUrl);
+        newProfilePictureBlob);
     }
 
     async getLoginUrlAsync(): Promise<string> {
