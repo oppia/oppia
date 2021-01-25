@@ -655,6 +655,13 @@ def managed_elasticsearch_dev_server():
 
     # Override the default path to ElasticSearch config files.
     os.environ['ES_PATH_CONF'] = ES_PATH_CONFIG_DIR
+    # Override to force the ElasticSearch server to use a smaller heap size
+    # (the default exceeds 1 GB). If this isn't done, the e2e tests end up
+    # failing on GitHub Actions due to timeouts when talking to the
+    # ElasticSearch service. See
+    # www.elastic.co/guide/en/elasticsearch/reference/master/jvm-options.html
+    # for more details on ES_JAVA_OPTS.
+    os.environ['ES_JAVA_OPTS'] = '-Xmx256m -Xms256m'
     es_args = [
         '%s/bin/elasticsearch' % ES_PATH,
         '-d'
