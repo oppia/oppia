@@ -314,7 +314,7 @@ var StoryEditorPage = function() {
       'Open Story Notes Editor Button', openStoryNotesEditorButton);
     var storyNotesEditor = await forms.RichTextEditor(
       notesEditor);
-    await action.clear('Story Notes Editor', storyNotesEditor);
+      await storyNotesEditor.clear();
     await richTextInstructions(storyNotesEditor);
     await action.click(
       'Save Story Notes Editor Button', saveStoryNotesEditorButton);
