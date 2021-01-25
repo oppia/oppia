@@ -28,7 +28,11 @@ import elasticsearch
 
 
 if feconf.ES_CLOUD_ID is None:
-    ES = elasticsearch.Elasticsearch('localhost:%s' % feconf.ES_LOCALHOST_PORT)
+    # Set a higher timeout to help with the e2e tests on GitHub Actions (which
+    # fail with a 10 second timeout).
+    ES = elasticsearch.Elasticsearch(
+        'localhost:%s' % feconf.ES_LOCALHOST_PORT,
+        request_timeout=30.0)
 else:
     ES = elasticsearch.Elasticsearch(
         cloud_id=feconf.ES_CLOUD_ID,
