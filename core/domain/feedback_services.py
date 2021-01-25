@@ -819,6 +819,7 @@ def enqueue_feedback_message_batch_email_task(user_id):
         feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS)
 
 
+@transaction_services.run_in_transaction_wrapper
 def enqueue_feedback_message_instant_email_task(user_id, reference):
     """Adds a 'send feedback email' (instant) task into the task queue.
 
@@ -835,6 +836,7 @@ def enqueue_feedback_message_instant_email_task(user_id, reference):
         feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS, payload, 0)
 
 
+@transaction_services.run_in_transaction_wrapper
 def _enqueue_feedback_thread_status_change_email_task(
         user_id, reference, old_status, new_status):
     """Adds a task for sending email when a feedback thread status is changed.
@@ -878,6 +880,7 @@ def get_feedback_message_references(user_id):
     ]
 
 
+@transaction_services.run_in_transaction_wrapper
 def _add_feedback_message_reference(user_id, reference):
     """Adds a new message to the feedback message buffer that is used to
     generate the next notification email to the given user.
@@ -1042,9 +1045,8 @@ def _send_batch_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            transaction_services.run_in_transaction(
-                _add_feedback_message_reference, recipient_id,
-                feedback_message_reference)
+            _add_feedback_message_reference(recipient_id,
+            feedback_message_reference)
 
 
 def _send_instant_emails(
@@ -1067,9 +1069,8 @@ def _send_instant_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            transaction_services.run_in_transaction(
-                enqueue_feedback_message_instant_email_task, recipient_id,
-                feedback_message_reference)
+            enqueue_feedback_message_instant_email_task(recipient_id,
+            feedback_message_reference)
 
 
 def _send_feedback_thread_status_change_emails(
@@ -1093,9 +1094,8 @@ def _send_feedback_thread_status_change_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            transaction_services.run_in_transaction(
-                _enqueue_feedback_thread_status_change_email_task, recipient_id,
-                feedback_message_reference, old_status, new_status)
+            _enqueue_feedback_thread_status_change_email_task(recipient_id,
+            feedback_message_reference, old_status, new_status)
 
 
 def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
