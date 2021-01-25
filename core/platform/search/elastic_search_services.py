@@ -28,7 +28,7 @@ import elasticsearch
 
 
 if feconf.ES_CLOUD_ID is None:
-    ES = elasticsearch.Elasticsearch(feconf.ES_LOCAL_HOST)
+    ES = elasticsearch.Elasticsearch('localhost:%s' % feconf.ES_LOCALHOST_PORT)
 else:
     ES = elasticsearch.Elasticsearch(
         cloud_id=feconf.ES_CLOUD_ID,
@@ -185,6 +185,7 @@ def search(
             'rank': {
                 'order': 'desc',
                 'missing': '_last',
+                'unmapped_type': 'float',
             }
         }],
     }

@@ -414,7 +414,7 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-ES_LOCAL_HOST = 'localhost:9200'
+ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
 ES_CLOUD_ID = None
