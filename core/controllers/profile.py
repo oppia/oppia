@@ -164,7 +164,7 @@ class PreferencesHandler(base.BaseHandler):
     def put(self):
         """Handles PUT requests."""
         update_type = self.payload.get('update_type')
-        data = self.payload.get('data')
+        data = self.payload.get('data', None)
 
         if update_type == 'user_bio':
             if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
@@ -184,7 +184,9 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_preferred_audio_language_code(
                 self.user_id, data)
         elif update_type == 'profile_picture_blob':
-             user_services.update_profile_picture(self.user_id, data)
+             image_data = self.request.get('image')
+             print(image_data)
+             user_services.update_profile_picture(self.user_id, image_data)
         elif update_type == 'default_dashboard':
             user_services.update_user_default_dashboard(self.user_id, data)
         elif update_type == 'email_preferences':

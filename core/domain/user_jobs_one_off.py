@@ -1064,7 +1064,7 @@ class ProfilePictureMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('SUCCESS - NOT REGISTERED', model.username)
             return
 
-        image_already_generated = fs_services.image_exists(
+        image_already_generated = fs_services.does_image_exist(
             constants.PROFILE_PICTURE_FILEPATH,
             feconf.ENTITY_TYPE_USER,
             model.username
@@ -1116,7 +1116,7 @@ class ProfilePictureGCSAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('SUCCESS - NOT REGISTERED', model.username)
             return
 
-        if not fs_services.image_exists(
+        if not fs_services.does_image_exist(
                 constants.PROFILE_PICTURE_FILEPATH,
                 feconf.ENTITY_TYPE_USER,
                 model.username

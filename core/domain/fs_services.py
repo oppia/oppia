@@ -35,18 +35,18 @@ def get_image(filepath, entity_type, entity_id):
     return fs.get(filepath.encode('utf-8'))
 
 
-def save_image(filepath, entity_type, entity_id, content):
+def save_image(filepath, entity_type, entity_id, content, override=False):
     """Save image file."""
     filetype = filepath[filepath.rfind('.') + 1:]
     mimetype = (
         'image/svg+xml' if filetype == 'svg' else 'image/%s' % filetype)
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
-    if not fs.isfile(filepath.encode('utf-8')):
+    if override or not fs.isfile(filepath.encode('utf-8')):
         fs.commit(filepath.encode('utf-8'), content, mimetype=mimetype)
 
 
-def image_exists(filepath, entity_type, entity_id):
+def does_image_exist(filepath, entity_type, entity_id):
     """Check if image exists."""
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(entity_type, entity_id))
