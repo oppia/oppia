@@ -19,6 +19,11 @@
 require('services/alerts.service.ts');
 require('services/image-upload-helper.service.ts');
 
+export class ImagesData {
+  filename: string;
+  imageBlob: Blob;
+}
+
 angular.module('oppia').factory('ImageLocalStorageService', [
   '$window', 'AlertsService', 'ImageUploadHelperService', function(
       $window, AlertsService, ImageUploadHelperService) {
