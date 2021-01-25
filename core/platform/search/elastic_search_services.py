@@ -32,7 +32,7 @@ if feconf.ES_CLOUD_ID is None:
     # fail with a 10 second timeout).
     ES = elasticsearch.Elasticsearch(
         'localhost:%s' % feconf.ES_LOCALHOST_PORT,
-        request_timeout=30.0)
+        timeout=30, max_retries=5, retry_on_timeout=True)
 else:
     ES = elasticsearch.Elasticsearch(
         cloud_id=feconf.ES_CLOUD_ID,
