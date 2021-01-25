@@ -18,7 +18,7 @@
         <div class="trained-feedback-selection-container" ng-repeat="outcome in allOutcomes track by $index">
           <button class="trained-feedback-selection" ng-click="selectAnswerGroupIndex($index)" ng-class="{'trained-feedback-selected': $index == selectedAnswerGroupIndex}">
             <span ng-if="!outcome.feedback.isEmpty()">
-              <angular-html-bind html-data="outcome.feedback.getHtml()">
+              <angular-html-bind html-data="outcome.feedback.html">
               </angular-html-bind>
             </span>
             <span ng-if="outcome.feedback.isEmpty()">

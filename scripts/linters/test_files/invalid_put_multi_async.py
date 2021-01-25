@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2020 The Oppia Authors. All Rights Reserved.
+# Copyright 2021 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Python file with valid syntax, used by scripts/linters/
-python_linter_test.py. This is a valid test file.
+"""Python file with invalid syntax, used by scripts/linters/
+python_linter_test. This file is using put_async which is not allowed.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -25,18 +25,15 @@ import python_utils
 
 
 class FakeClass(python_utils.OBJECT):
-    """This is a fake docstring for valid syntax purposes."""
+    """This is a fake docstring for invalid syntax purposes."""
 
     def __init__(self, fake_arg):
         self.fake_arg = fake_arg
 
-    def test_fake_method(self, name):
+    def fake_method(self, model):
         """This doesn't do anything.
 
         Args:
-            name: str. Means nothing.
-
-        Yields:
-            tuple(str, str). The argument passed in but twice in a tuple.
+            model: VersionedModel. Means nothing.
         """
-        yield (name, name)
+        model.put_multi_async() # The put_multi_async() is not allowed to use.

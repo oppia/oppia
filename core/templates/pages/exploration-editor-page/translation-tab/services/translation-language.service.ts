@@ -41,6 +41,11 @@ export class TranslationLanguageService {
     return this.activeLanguageCode;
   }
 
+  getActiveLanguageDirection(): string {
+    return this.languageUtilService.getLanguageDirection(
+      this.getActiveLanguageCode());
+  }
+
   setActiveLanguageCode(newActiveLanguageCode: string): void {
     if (this.allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
       this.loggerService.error(

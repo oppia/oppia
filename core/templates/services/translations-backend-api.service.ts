@@ -33,7 +33,8 @@ export class TranslationsBackendApiService {
 
   constructor(private http: HttpClient) {}
 
-  fetchTranslations(languageCode: string): Promise<TranslationsDict> {
+  async fetchTranslationsAsync(languageCode: string):
+  Promise<TranslationsDict> {
     return this.http.get<TranslationsDict>(
       `${this.prefix}${languageCode}${this.suffix}`).toPromise();
   }
