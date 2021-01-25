@@ -182,12 +182,6 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
 
     def test_migration_job_fails_with_invalid_topic(self):
-        observed_log_messages = []
-
-        def _mock_logging_function(msg):
-            """Mocks logging.error()."""
-            observed_log_messages.append(msg)
-
         # The topic model created will be invalid due to invalid language code.
         self.save_new_topic_with_subtopic_schema_v1(
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev', 'topic-two',
@@ -198,13 +192,15 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
         topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-        with self.swap(logging, 'error', _mock_logging_function):
+        with self.capture_logging(min_level=logging.ERROR) as captured_logs:
             self.process_and_flush_pending_mapreduce_tasks()
 
-        self.assertEqual(
-            observed_log_messages,
-            ['Topic topic_id failed validation: Invalid language code: '
-             'invalid_language_code'])
+        self.assertEqual(len(captured_logs), 1)
+        self.assertIn(
+            'Topic topic_id failed validation: Invalid language code: '
+            'invalid_language_code',
+            captured_logs[0]
+        )
 
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'validation_error',

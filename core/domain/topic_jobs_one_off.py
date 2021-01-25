@@ -64,7 +64,7 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             topic.validate()
         except Exception as e:
-            logging.error(
+            logging.exception(
                 'Topic %s failed validation: %s' % (item.id, e))
             yield (
                 TopicMigrationOneOffJob._ERROR_KEY,

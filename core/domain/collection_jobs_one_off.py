@@ -61,7 +61,7 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             collection.validate(strict=False)
         except Exception as e:
-            logging.error(
+            logging.exception(
                 'Collection %s failed validation: %s' % (item.id, e))
             yield (
                 CollectionMigrationOneOffJob._ERROR_KEY,

@@ -60,7 +60,7 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             skill.validate()
         except Exception as e:
-            logging.error(
+            logging.exception(
                 'Skill %s failed validation: %s' % (item.id, e))
             yield (
                 SkillMigrationOneOffJob._ERROR_KEY,

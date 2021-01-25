@@ -138,9 +138,9 @@ class Registry(python_utils.OBJECT):
             try:
                 with python_utils.open_file(spec_file, 'r') as f:
                     specs_from_json = json.loads(f.read())
-            except:
-                raise Exception(
-                    'No specs json file found for state schema v%i' %
+            except IOError:
+                raise IOError(
+                    'No specs JSON file found for state schema v%i' %
                     state_schema_version)
 
             cls._state_schema_version_to_interaction_specs[

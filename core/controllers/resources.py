@@ -42,7 +42,7 @@ class ValueGeneratorHandler(base.BaseHandler):
                 value_generators_domain.Registry.get_generator_class_by_id(
                     generator_id).get_html_template())
         except KeyError as e:
-            logging.error(
+            logging.exception(
                 'Value generator not found: %s. %s' % (generator_id, e))
             raise self.PageNotFoundException
 
@@ -105,7 +105,9 @@ class AssetDevHandler(base.BaseHandler):
             self.response.cache_control.public = True
             self.response.cache_control.max_age = 600
             self.response.write(raw)
-        except:
+        except Exception as e:
+            logging.exception(
+                'File not found: %s. %s' % (encoded_filename, e))
             raise self.PageNotFoundException
 
 
