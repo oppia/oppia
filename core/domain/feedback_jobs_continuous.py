@@ -93,6 +93,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         """
         exp_id = args[0]
 
+        @transaction_services.run_in_transaction_wrapper
         def _increment_open_threads_count():
             """Increments count of open threads by one."""
             realtime_class = cls._get_realtime_datastore_class()
@@ -109,6 +110,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 model.update_timestamps()
                 model.put()
 
+        @transaction_services.run_in_transaction_wrapper
         def _increment_total_threads_count():
             """Increments count of total threads by one."""
             realtime_class = cls._get_realtime_datastore_class()
@@ -125,6 +127,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 model.update_timestamps()
                 model.put()
 
+        @transaction_services.run_in_transaction_wrapper
         def _decrement_open_threads_count():
             """Decrements count of open threads by one."""
             realtime_class = cls._get_realtime_datastore_class()
@@ -142,23 +145,19 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         if event_type == feconf.EVENT_TYPE_NEW_THREAD_CREATED:
-            transaction_services.run_in_transaction(
-                _increment_total_threads_count)
-            transaction_services.run_in_transaction(
-                _increment_open_threads_count)
+            _increment_total_threads_count()
+            _increment_open_threads_count()
         elif event_type == feconf.EVENT_TYPE_THREAD_STATUS_CHANGED:
             old_status = args[1]
             updated_status = args[2]
             # Status changed from closed to open.
             if (old_status != feedback_models.STATUS_CHOICES_OPEN
                     and updated_status == feedback_models.STATUS_CHOICES_OPEN):
-                transaction_services.run_in_transaction(
-                    _increment_open_threads_count)
+                _increment_open_threads_count()
             # Status changed from open to closed.
             elif (old_status == feedback_models.STATUS_CHOICES_OPEN
                   and updated_status != feedback_models.STATUS_CHOICES_OPEN):
-                transaction_services.run_in_transaction(
-                    _decrement_open_threads_count)
+                _decrement_open_threads_count()
 
     # Public query methods.
     @classmethod
