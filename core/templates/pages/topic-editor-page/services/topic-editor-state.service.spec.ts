@@ -42,7 +42,6 @@ describe('Topic editor state service', () => {
   let mockTopicRightsBackendApiService = null;
   let subtopicPageObject:SubtopicPageBackendDict = null;
   let secondSubtopicPageObject: SubtopicPageBackendDict = null;
-
   let testSubscriptions = null;
   let subtopicPageLoadedSpy = null;
 
@@ -422,15 +421,15 @@ describe('Topic editor state service', () => {
   it('should fire an init event after loading the first topic',
     fakeAsync(() => {
       spyOn(
-        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        mockEditableTopicBackendApiService, 'updateTopic')
         .and.callThrough();
-      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
-        .and.callThrough();
-      spyOn(
-        this.fakeEditableTopicBackendApiService, 'fetchStories')
+      spyOn(mockEditableTopicBackendApiService, 'fetchTopic')
         .and.callThrough();
       spyOn(
-        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        mockEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        mockTopicRightsBackendApiService, 'fetchTopicRights')
         .and.callThrough();
       topicEditorStateService.loadTopic('5');
       tick(1000);
@@ -451,15 +450,15 @@ describe('Topic editor state service', () => {
 
   it('should fire an update event after loading more topics', fakeAsync(() => {
     spyOn(
-      this.fakeEditableTopicBackendApiService, 'updateTopic')
+      mockEditableTopicBackendApiService, 'updateTopic')
       .and.callThrough();
-    spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
-      .and.callThrough();
-    spyOn(
-      this.fakeEditableTopicBackendApiService, 'fetchStories')
+    spyOn(mockEditableTopicBackendApiService, 'fetchTopic')
       .and.callThrough();
     spyOn(
-      this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+      mockEditableTopicBackendApiService, 'fetchStories')
+      .and.callThrough();
+    spyOn(
+      mockTopicRightsBackendApiService, 'fetchTopicRights')
       .and.callThrough();
     // Load initial topic.
     topicEditorStateService.loadTopic('5');
@@ -474,15 +473,15 @@ describe('Topic editor state service', () => {
 
   it('should track whether it is currently loading the topic', fakeAsync(() => {
     spyOn(
-      this.fakeEditableTopicBackendApiService, 'updateTopic')
+      mockEditableTopicBackendApiService, 'updateTopic')
       .and.callThrough();
-    spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
-      .and.callThrough();
-    spyOn(
-      this.fakeEditableTopicBackendApiService, 'fetchStories')
+    spyOn(mockEditableTopicBackendApiService, 'fetchTopic')
       .and.callThrough();
     spyOn(
-      this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+      mockEditableTopicBackendApiService, 'fetchStories')
+      .and.callThrough();
+    spyOn(
+      mockTopicRightsBackendApiService, 'fetchTopicRights')
       .and.callThrough();
     expect(topicEditorStateService.isLoadingTopic()).toBe(false);
 
@@ -498,15 +497,15 @@ describe('Topic editor state service', () => {
       expect(topicEditorStateService.isLoadingTopic()).toBe(false);
       mockEditableTopicBackendApiService.failure = 'Internal 500 error';
       spyOn(
-        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        mockEditableTopicBackendApiService, 'updateTopic')
         .and.callThrough();
-      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
-        .and.callThrough();
-      spyOn(
-        this.fakeEditableTopicBackendApiService, 'fetchStories')
+      spyOn(mockEditableTopicBackendApiService, 'fetchTopic')
         .and.callThrough();
       spyOn(
-        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        mockEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        mockTopicRightsBackendApiService, 'fetchTopicRights')
         .and.callThrough();
       topicEditorStateService.loadTopic('5');
       expect(topicEditorStateService.isLoadingTopic()).toBe(true);
@@ -519,15 +518,15 @@ describe('Topic editor state service', () => {
   it('should report that a topic has loaded through loadTopic()',
     fakeAsync(() => {
       spyOn(
-        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        mockEditableTopicBackendApiService, 'updateTopic')
         .and.callThrough();
-      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
-        .and.callThrough();
-      spyOn(
-        this.fakeEditableTopicBackendApiService, 'fetchStories')
+      spyOn(mockEditableTopicBackendApiService, 'fetchTopic')
         .and.callThrough();
       spyOn(
-        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        mockEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        mockTopicRightsBackendApiService, 'fetchTopicRights')
         .and.callThrough();
       expect(topicEditorStateService.hasLoadedTopic()).toBe(false);
 
@@ -627,15 +626,15 @@ describe('Topic editor state service', () => {
   it('should not save the topic if there are no pending changes',
     fakeAsync(() => {
       spyOn(
-        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        mockEditableTopicBackendApiService, 'updateTopic')
         .and.callThrough();
-      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
-        .and.callThrough();
-      spyOn(
-        this.fakeEditableTopicBackendApiService, 'fetchStories')
+      spyOn(mockEditableTopicBackendApiService, 'fetchTopic')
         .and.callThrough();
       spyOn(
-        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        mockEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        mockTopicRightsBackendApiService, 'fetchTopicRights')
         .and.callThrough();
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -683,15 +682,15 @@ describe('Topic editor state service', () => {
 
   it('should fire an update event after saving the topic', fakeAsync(() => {
     spyOn(
-      this.fakeEditableTopicBackendApiService, 'updateTopic')
+      mockEditableTopicBackendApiService, 'updateTopic')
       .and.callThrough();
-    spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
-      .and.callThrough();
-    spyOn(
-      this.fakeEditableTopicBackendApiService, 'fetchStories')
+    spyOn(mockEditableTopicBackendApiService, 'fetchTopic')
       .and.callThrough();
     spyOn(
-      this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+      mockEditableTopicBackendApiService, 'fetchStories')
+      .and.callThrough();
+    spyOn(
+      mockTopicRightsBackendApiService, 'fetchTopicRights')
       .and.callThrough();
     topicEditorStateService.loadTopic('5');
     topicUpdateService.setTopicName(
@@ -720,15 +719,15 @@ describe('Topic editor state service', () => {
   it('should indicate a topic is no longer saving after an error',
     fakeAsync(() => {
       spyOn(
-        this.fakeEditableTopicBackendApiService, 'updateTopic')
+        mockEditableTopicBackendApiService, 'updateTopic')
         .and.callThrough();
-      spyOn(this.fakeEditableTopicBackendApiService, 'fetchTopic')
-        .and.callThrough();
-      spyOn(
-        this.fakeEditableTopicBackendApiService, 'fetchStories')
+      spyOn(mockEditableTopicBackendApiService, 'fetchTopic')
         .and.callThrough();
       spyOn(
-        this.fakeTopicRightsBackendApiService, 'fetchTopicRights')
+        mockEditableTopicBackendApiService, 'fetchStories')
+        .and.callThrough();
+      spyOn(
+        mockTopicRightsBackendApiService, 'fetchTopicRights')
         .and.callThrough();
       topicEditorStateService.loadTopic('5');
       topicUpdateService.setTopicName(
