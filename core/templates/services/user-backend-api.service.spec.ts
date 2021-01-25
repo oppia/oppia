@@ -21,8 +21,6 @@ import { HttpClientTestingModule, HttpTestingController } from
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 
 import { UserInfo } from 'domain/user/user-info.model.ts';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UserBackendApiService } from 'services/user-backend-api.service';
 
@@ -131,7 +129,7 @@ describe('User Backend Api Service', () => {
 
   it('should handle when set profile image data url is reject',
     fakeAsync(() => {
-      const newProfilePictureBlob = '/avatar/x.png';
+      const newProfilePictureBlob = new Blob();
       const errorMessage = 'It\'s not possible to set a new profile image data';
       userBackendApiService.setProfilePictureBlobAsync(newProfilePictureBlob);
       const req = httpTestingController.expectOne('/preferenceshandler/data');

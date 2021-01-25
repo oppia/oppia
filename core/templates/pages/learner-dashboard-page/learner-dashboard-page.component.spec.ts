@@ -46,6 +46,7 @@ describe('Learner dashboard page', function() {
   var LearnerDashboardBackendApiService = null;
   var SuggestionModalForLearnerDashboardService = null;
   var UserService = null;
+  var UrlInterpolationService = null;
 
   var profilePictureUrl = 'profile-picture-url';
   var userInfo = {
@@ -74,6 +75,7 @@ describe('Learner dashboard page', function() {
       SuggestionModalForLearnerDashboardService = $injector.get(
         'SuggestionModalForLearnerDashboardService');
       UserService = $injector.get('UserService');
+      UrlInterpolationService = $injector.get('UrlInterpolationService');
 
       spyOn(CsrfTokenService, 'getTokenAsync').and.returnValue(
         $q.resolve('sample-csrf-token'));

@@ -22,8 +22,8 @@ import { FeedbackMessageSummary } from
 describe('Feedback message model', () => {
   it('should create a new message', () => {
     var feedbackMessageSummary = (
-      FeedbackMessageSummary.createNewMessage(
-        0, 'Sample message', 'Test user', 'profile_picture_url'));
+      FeedbackMessageSummary.createNewMessage(0, 'Sample message', 'Test user')
+    );
 
     expect(feedbackMessageSummary.messageId).toEqual(0);
     expect(feedbackMessageSummary.text).toEqual('Sample message');

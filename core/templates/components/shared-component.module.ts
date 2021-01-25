@@ -49,8 +49,7 @@ import { SocialButtonsComponent } from
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ExplorationSummaryTileDirective } from
   './summary-tile/exploration-summary-tile.directive';
-import { ProfilePictureComponent } from
-  'components/common-layout-directives/common-elements/profile-picture.component';
+import { ProfilePictureComponent } from 'components/common-layout-directives/common-elements/profile-picture.component';
 import { ProfileLinkPictureComponent } from
   'components/profile-link-directives/profile-link-picture.component';
 import { ProfileLinkTextComponent } from
