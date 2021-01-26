@@ -561,14 +561,6 @@ def run_tests(args):
         commands.extend(get_e2e_test_parameters(
             args.sharding_instances, args.suite, dev_mode))
 
-        # Temporary code for debugging.
-        python_utils.PRINT('-------- LOG A1 ---------')
-        python_utils.PRINT(subprocess.check_output([
-            'curl', 'localhost:9200'], stderr=subprocess.STDOUT))
-        python_utils.PRINT('-------- LOG A2 ---------')
-        python_utils.PRINT(subprocess.check_output([
-            'curl', 'localhost:9200/_cat/indices'], stderr=subprocess.STDOUT))
-
         p = subprocess.Popen(commands, stdout=subprocess.PIPE)
         output_lines = []
         while True:
@@ -582,14 +574,6 @@ def run_tests(args):
             output_lines.append(nextline.rstrip())
             # Replaces non-ASCII characters with '?'.
             sys.stdout.write(nextline.encode('ascii', errors='replace'))
-
-        # Temporary code for debugging.
-        python_utils.PRINT('-------- LOG B1 ---------')
-        python_utils.PRINT(subprocess.check_output([
-            'curl', 'localhost:9200'], stderr=subprocess.STDOUT))
-        python_utils.PRINT('-------- LOG B2 ---------')
-        python_utils.PRINT(subprocess.check_output([
-            'curl', 'localhost:9200/_cat/indices'], stderr=subprocess.STDOUT))
 
         return output_lines, p.returncode
 
