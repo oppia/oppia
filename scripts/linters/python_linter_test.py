@@ -80,10 +80,10 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
         ).check_that_all_jobs_are_listed_in_the_job_registry_file()
         self.assert_same_list_elements([
             'Found one-off jobs with duplicate names: '
-            'CollectionMigrationOneOffJob'], lint_task_report.trimmed_messages)
+            'IndexAllActivitiesJobManager'], lint_task_report.trimmed_messages)
         self.assert_same_list_elements([
             'Found one-off jobs not listed in jobs_registry file: '
-            'CollectionsMigrationOneOffJob'], lint_task_report.trimmed_messages)
+            'IndexAllActivitiessJobManager'], lint_task_report.trimmed_messages)
         self.assertEqual('Job registry', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

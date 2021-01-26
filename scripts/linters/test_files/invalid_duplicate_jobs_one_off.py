@@ -29,7 +29,7 @@ from core.platform import models
     models.NAMES.base_model, models.NAMES.collection])
 
 
-class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate collection schema
     versions. This job will load all existing collections from the data store
     and immediately store them back into the data store. The loading process of
@@ -43,7 +43,7 @@ class CollectionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     _MIGRATED_KEY = 'collection_migrated'
 
 
-class CollectionsMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class IndexAllActivitiessJobManager(jobs.BaseMapReduceOneOffJobManager):
     """A reusable one-time job that may be used to migrate collection schema
     versions. This job will load all existing collections from the data store
     and immediately store them back into the data store. The loading process of
