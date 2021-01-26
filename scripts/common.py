@@ -860,7 +860,10 @@ def managed_process(
             for proc in psutil.process_iter():
                 python_utils.PRINT(proc.cmdline())
                 python_utils.PRINT(proc.name())
-                if proc.cmdline() and proc_name_to_kill in proc.cmdline()[0]:
+                proc_should_be_killed = any(
+                    proc_name_to_kill in cmd_part
+                    for cmd_part in proc.cmdline())
+                if proc_should_be_killed:
                     python_utils.PRINT('Killed process: %s' % proc.cmdline())
                     proc.kill()
 

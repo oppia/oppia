@@ -568,10 +568,6 @@ def run_tests(args):
         python_utils.PRINT('-------- LOG A2 ---------')
         python_utils.PRINT(subprocess.check_output([
             'curl', 'localhost:9200/_cat/indices'], stderr=subprocess.STDOUT))
-        python_utils.PRINT('-------- LOG A3 ---------')
-        python_utils.PRINT(subprocess.check_output([
-            'curl', '-XGET', 'http://localhost:9200/_cluster/state?pretty'
-        ], stderr=subprocess.STDOUT))
 
         p = subprocess.Popen(commands, stdout=subprocess.PIPE)
         output_lines = []
@@ -594,10 +590,6 @@ def run_tests(args):
         python_utils.PRINT('-------- LOG B2 ---------')
         python_utils.PRINT(subprocess.check_output([
             'curl', 'localhost:9200/_cat/indices'], stderr=subprocess.STDOUT))
-        python_utils.PRINT('-------- LOG B3 ---------')
-        python_utils.PRINT(subprocess.check_output([
-            'curl', '-XGET', 'http://localhost:9200/_cluster/state?pretty'
-        ], stderr=subprocess.STDOUT))
 
         return output_lines, p.returncode
 
