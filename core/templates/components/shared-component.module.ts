@@ -84,17 +84,22 @@ import { TakeBreakModalComponent } from
   ],
 
   entryComponents: [
+    AttributionGuideComponent,
     BackgroundBannerComponent,
-    SharingLinksComponent,
-    SkillMasteryViewerComponent, AttributionGuideComponent,
-    LazyLoadingComponent, LoadingDotsComponent, SocialButtonsComponent,
-    PromoBarComponent, ProfileLinkImageComponent, ProfileLinkTextComponent,
-    // These elements will remain here even after migration.
-    TakeBreakModalComponent,
     ExplorationEmbedButtonModalComponent,
     KeyboardShortcutHelpModalComponent,
+    LazyLoadingComponent,
+    LoadingDotsComponent,
+    PromoBarComponent,
+    ProfileLinkImageComponent,
+    ProfileLinkTextComponent,
+    SharingLinksComponent,
     SkillMasteryViewerComponent,
-    SocialButtonsComponent
+    SkillMasteryViewerComponent,
+    SocialButtonsComponent,
+    SocialButtonsComponent,
+    TakeBreakModalComponent,
+    // These elements will remain here even after migration.
   ],
 
   exports: [
@@ -104,6 +109,7 @@ import { TakeBreakModalComponent } from
     // Components, directives, and pipes.
     BackgroundBannerComponent,
     ExplorationSummaryTileDirective,
+    PromoBarComponent,
     SharingLinksComponent,
     StorySummaryTileDirective,
     SubtopicSummaryTileDirective,

@@ -23,7 +23,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 
 @Component({
-  selector: 'promo-bar',
+  selector: 'oppia-promo-bar',
   templateUrl: './promo-bar.component.html',
   styleUrls: []
 })
@@ -39,7 +39,7 @@ export class PromoBarComponent implements OnInit {
 
   isSessionStorageAvailable():boolean {
     // This is to ensure sessionStorage is accessible.
-    var testKey = 'Oppia';
+    const testKey = 'Oppia';
     try {
       this.windowRef.nativeWindow.sessionStorage.setItem(testKey, testKey);
       this.windowRef.nativeWindow.sessionStorage.removeItem(testKey);
@@ -53,7 +53,7 @@ export class PromoBarComponent implements OnInit {
     if (!this.isSessionStorageAvailable()) {
       return false;
     }
-    return !!angular.fromJson(
+    return !!JSON.parse(
       this.windowRef.nativeWindow.sessionStorage.promoIsDismissed);
   }
 
@@ -62,7 +62,7 @@ export class PromoBarComponent implements OnInit {
       return false;
     }
     this.windowRef.nativeWindow.sessionStorage.promoIsDismissed = (
-      angular.toJson(promoIsDismissed));
+      JSON.stringify(promoIsDismissed));
   }
 
   dismissPromo():void {
