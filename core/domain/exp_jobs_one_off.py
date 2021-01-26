@@ -57,88 +57,6 @@ import utils
 ])
 
 
-class RegenerateStringPropertyIndexOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for regenerating the index of models changed to use an
-    indexed StringProperty.
-
-    Cloud NDB dropped support for StringProperty(indexed=False) and
-    TextProperty(indexed=True). Therefore, to prepare for the migration to Cloud
-    NDB, we need to regenerate the indexes for every model that has been changed
-    in this way.
-
-    https://cloud.google.com/appengine/docs/standard/python/datastore/indexes#unindexed-properties:
-    > changing a property from unindexed to indexed does not affect any existing
-    > entities that may have been created before the change. Queries filtering
-    > on the property will not return such existing entities, because the
-    > entities weren't written to the query's index when they were created. To
-    > make the entities accessible by future queries, you must rewrite them to
-    > Datastore so that they will be entered in the appropriate indexes. That
-    > is, you must do the following for each such existing entity:
-    > 1.  Retrieve (get) the entity from Datastore.
-    > 2.  Write (put) the entity back to Datastore.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [
-            exp_models.ExplorationModel,
-            feedback_models.GeneralFeedbackMessageModel,
-            improvements_models.TaskEntryModel,
-            skill_models.SkillModel,
-            stats_models.ExplorationAnnotationsModel,
-            story_models.StoryModel,
-            story_models.StorySummaryModel,
-        ]
-
-    @staticmethod
-    def map(model):
-        model_kind = type(model).__name__
-        if isinstance(model, base_models.VersionedModel):
-            # Change the method resolution order of model to use BaseModel's
-            # implementation of `put`.
-            model = super(base_models.VersionedModel, model)
-        model.update_timestamps(update_last_updated_time=False)
-        model.put()
-        yield (model_kind, 1)
-
-    @staticmethod
-    def reduce(key, counts):
-        yield (key, len(counts))
-
-
-class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that finds first published time in milliseconds for all
-    explorations.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationRightsSnapshotContentModel]
-
-    @staticmethod
-    def map(item):
-        if item.content['status'] == rights_domain.ACTIVITY_STATUS_PUBLIC:
-            yield (
-                item.get_unversioned_instance_id(),
-                utils.get_time_in_millisecs(item.created_on))
-
-    @staticmethod
-    def reduce(exp_id, stringified_commit_times_msecs):
-        exploration_rights = rights_manager.get_exploration_rights(
-            exp_id, strict=False)
-        if exploration_rights is None:
-            return
-
-        commit_times_msecs = [
-            ast.literal_eval(commit_time_string) for
-            commit_time_string in stringified_commit_times_msecs]
-        first_published_msec = min(commit_times_msecs)
-        rights_manager.update_activity_first_published_msec(
-            constants.ACTIVITY_TYPE_EXPLORATION, exp_id,
-            first_published_msec)
-
-
 class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks that all explorations have appropriate validation
     statuses.
@@ -284,59 +202,6 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
-class ExplorationMathSvgFilenameValidationOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks the html content of an exploration and validates the
-    svg_filename fields in each math rich-text components.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        invalid_tags_info_in_exp = []
-        for state_name, state in exploration.states.items():
-            html_string = ''.join(state.get_all_html_content_strings())
-            error_list = (
-                html_validation_service.
-                validate_svg_filenames_in_math_rich_text(
-                    feconf.ENTITY_TYPE_EXPLORATION, item.id, html_string))
-            if len(error_list) > 0:
-                invalid_tags_info_in_state = {
-                    'state_name': state_name,
-                    'error_list': error_list,
-                    'no_of_invalid_tags': len(error_list)
-                }
-                invalid_tags_info_in_exp.append(invalid_tags_info_in_state)
-        if len(invalid_tags_info_in_exp) > 0:
-            yield ('Found invalid tags', (item.id, invalid_tags_info_in_exp))
-
-    @staticmethod
-    def reduce(key, values):
-        final_values = [ast.literal_eval(value) for value in values]
-        no_of_invalid_tags = 0
-        invalid_tags_info = {}
-        for exp_id, invalid_tags_info_in_exp in final_values:
-            invalid_tags_info[exp_id] = []
-            for value in invalid_tags_info_in_exp:
-                no_of_invalid_tags += value['no_of_invalid_tags']
-                del value['no_of_invalid_tags']
-                invalid_tags_info[exp_id].append(value)
-
-        final_value_dict = {
-            'no_of_explorations_with_no_svgs': len(final_values),
-            'no_of_invalid_tags': no_of_invalid_tags,
-        }
-        yield ('Overall result.', final_value_dict)
-        yield ('Detailed information on invalid tags. ', invalid_tags_info)
-
-
 class ExplorationRteMathContentValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that checks the html content of an exploration and validates the
@@ -415,79 +280,6 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that tabulates the number of hints used by each state of an
-    exploration.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        exploration = exp_fetchers.get_exploration_from_model(item)
-        for state_name, state in exploration.states.items():
-            hints_length = len(state.interaction.hints)
-            if hints_length > 0:
-                exp_and_state_key = '%s %s' % (
-                    item.id, state_name.encode('utf-8'))
-                yield (python_utils.UNICODE(hints_length), exp_and_state_key)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
-class ExplorationContentValidationJobForCKEditor(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks the html content of an exploration and validates it
-    for CKEditor.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        try:
-            exploration = exp_fetchers.get_exploration_from_model(item)
-        except Exception as e:
-            yield (
-                'Error %s when loading exploration'
-                % python_utils.convert_to_bytes(e), [item.id])
-            return
-
-        html_list = exploration.get_all_html_content_strings()
-
-        err_dict = html_validation_service.validate_rte_format(
-            html_list, feconf.RTE_FORMAT_CKEDITOR)
-
-        for key in err_dict:
-            if err_dict[key]:
-                yield ('%s Exp Id: %s' % (key, item.id), err_dict[key])
-
-    @staticmethod
-    def reduce(key, values):
-        final_values = [ast.literal_eval(value) for value in values]
-        # Combine all values from multiple lists into a single list
-        # for that error type.
-        output_values = list(set().union(*final_values))
-        exp_id_index = key.find('Exp Id:')
-        if exp_id_index == -1:
-            yield (key, output_values)
-        else:
-            output_values.append(key[exp_id_index:])
-            yield (key[:exp_id_index - 1], output_values)
-
-
 class RTECustomizationArgsValidationOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job for validating all the customizations arguments of
@@ -545,40 +337,6 @@ class RTECustomizationArgsValidationOneOffJob(
             index += 2
         output_values.sort()
         yield (key, output_values)
-
-
-class XmlnsAttributeInExplorationMathSvgImagesAuditJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to audit math SVGs on the server that do not have xmlns
-    attribute.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-
-        fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, item.id))
-        filepaths = fs.listdir('image')
-        for filepath in filepaths:
-            filename = filepath.split('/')[-1]
-            if not re.match(constants.MATH_SVG_FILENAME_REGEX, filename):
-                continue
-            old_svg_image = fs.get(filepath)
-            xmlns_attribute_is_present = (
-                html_validation_service.does_svg_tag_contains_xmlns_attribute(
-                    old_svg_image))
-            if not xmlns_attribute_is_present:
-                yield (item.id, filename)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
 
 
 def regenerate_exp_commit_log_model(exp_model, version):

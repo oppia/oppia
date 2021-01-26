@@ -20,8 +20,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import activity_jobs_one_off
-from core.domain import collection_jobs_one_off
-from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
 from core.domain import feedback_jobs_one_off
@@ -43,93 +41,44 @@ import python_utils
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
-    activity_jobs_one_off.ActivityContributorsSummaryOneOffJob,
-    activity_jobs_one_off.AddContentUserIdsContentJob,
     activity_jobs_one_off.AddMissingCommitLogsOneOffJob,
-    activity_jobs_one_off.AuditContributorsOneOffJob,
-    activity_jobs_one_off.AuditSnapshotMetadataModelsJob,
     activity_jobs_one_off.IndexAllActivitiesJobManager,
     activity_jobs_one_off.ValidateSnapshotMetadataModelsJob,
-    collection_jobs_one_off.CollectionMigrationOneOffJob,
-    email_jobs_one_off.EmailHashRegenerationOneOffJob,
-    exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
-    exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
-    exp_jobs_one_off.ExplorationMathSvgFilenameValidationOneOffJob,
     exp_jobs_one_off.ExplorationMigrationAuditJob,
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationRteMathContentValidationOneOffJob,
     exp_jobs_one_off.ExplorationValidityJobManager,
-    exp_jobs_one_off.HintsAuditOneOffJob,
-    exp_jobs_one_off.RegenerateStringPropertyIndexOneOffJob,
     exp_jobs_one_off.RTECustomizationArgsValidationOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
-    exp_jobs_one_off.XmlnsAttributeInExplorationMathSvgImagesAuditJob,
     exp_jobs_one_off.RegenerateMissingExpCommitLogModels,
     exp_jobs_one_off.ExpCommitLogModelRegenerationValidator,
-    feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     feedback_jobs_one_off.CleanUpFeedbackAnalyticsModelModelOneOffJob,
     feedback_jobs_one_off.CleanUpGeneralFeedbackThreadModelOneOffJob,
     (
         interaction_jobs_one_off
-        .DragAndDropSortInputInteractionOneOffJob),
-    (
-        interaction_jobs_one_off
         .InteractionCustomizationArgsValidationOneOffJob),
-    interaction_jobs_one_off.ItemSelectionInteractionOneOffJob,
     interaction_jobs_one_off.MultipleChoiceInteractionOneOffJob,
     interaction_jobs_one_off.RuleInputToCustomizationArgsMappingOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
-    (
-        opportunity_jobs_one_off.
-        RenameExplorationOpportunitySummaryModelPropertiesJob),
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.MissingQuestionMigrationOneOffJob,
-    recommendations_jobs_one_off.DeleteAllExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     recommendations_jobs_one_off.CleanUpExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     skill_jobs_one_off.SkillCommitCmdMigrationOneOffJob,
     skill_jobs_one_off.MissingSkillMigrationOneOffJob,
-    stats_jobs_one_off.ExplorationMissingStatsAudit,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
-    stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
-    stats_jobs_one_off.RegenerateMissingStateStatsOneOffJob,
-    stats_jobs_one_off.RegenerateMissingV1StatsModelsOneOffJob,
-    stats_jobs_one_off.RegenerateMissingV2StatsModelsOneOffJob,
-    stats_jobs_one_off.StatisticsAuditV1,
-    stats_jobs_one_off.StatisticsAuditV2,
-    stats_jobs_one_off.StatisticsAudit,
-    stats_jobs_one_off.StatisticsCustomizationArgsAudit,
-    stats_jobs_one_off.WipeExplorationIssuesOneOffJob,
-    story_jobs_one_off.RegenerateStorySummaryOneOffJob,
     story_jobs_one_off.StoryMigrationOneOffJob,
     suggestion_jobs_one_off.QuestionSuggestionMigrationJobManager,
-    suggestion_jobs_one_off.PopulateFinalReviewerIdOneOffJob,
     suggestion_jobs_one_off.PopulateContributionStatsOneOffJob,
-    suggestion_jobs_one_off.SuggestionMathRteAuditOneOffJob,
-    suggestion_jobs_one_off.SuggestionSvgFilenameValidationOneOffJob,
     topic_jobs_one_off.InteractionsInStoriesAuditOneOffJob,
-    topic_jobs_one_off.RegenerateTopicSummaryOneOffJob,
-    topic_jobs_one_off.RemoveDeletedSkillsFromTopicOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_jobs_one_off.CleanupExplorationIdsFromUserSubscriptionsModelOneOffJob,
-    user_jobs_one_off.DashboardSubscriptionsOneOffJob,
-    user_jobs_one_off.LongUserBiosOneOffJob,
-    user_jobs_one_off.UserContributionsOneOffJob,
-    user_jobs_one_off.UserFirstContributionMsecOneOffJob,
-    user_jobs_one_off.UserLastExplorationActivityOneOffJob,
-    user_jobs_one_off.UsernameLengthAuditOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
     user_jobs_one_off.RemoveActivityIDsOneOffJob,
-    user_jobs_one_off.RemoveFeedbackThreadIDsOneOffJob,
-    user_jobs_one_off.CleanUpUserSubscribersModelOneOffJob,
     user_jobs_one_off.CleanUpCollectionProgressModelOneOffJob,
     user_jobs_one_off.CleanUpUserContributionsModelOneOffJob,
     user_jobs_one_off.ProfilePictureAuditOneOffJob,
-    user_jobs_one_off.UniqueHashedNormalizedUsernameAuditJob,
-    user_jobs_one_off.FixUserSettingsCreatedOnOneOffJob,
-    user_jobs_one_off.UserSettingsCreatedOnAuditOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
