@@ -791,15 +791,10 @@
       max-height: fit-content;
     }
 
-  @media (max-width: 768px) {
     .teach-page .oppia-teach-section-five {
+     background-image: url(/assets/images/splash/m_testimonial_background.png);
      min-height: unset;
      padding-bottom: 4vh;
-    }
-  }
-
-    .teach-page .oppia-teach-section-five {
-      background-image: url(/assets/images/splash/m_testimonial_background.png);
     }
 
     .teach-page .image-desktop {
@@ -910,15 +905,39 @@
       margin-right: auto;
       width: 20em;
       }
-    @media (max-width: 575px) {
-      .teach-page .teach-benefits-section-heading {
+    }
+
+  @media (max-width: 575px) {
+    .teach-page .teach-benefits-section-heading {
       display: flex;
       justify-content: center;
       margin-bottom: -20px;
       margin-left: -4vw;
       margin-right: auto;
       width: 20em;
-      }
     }
-  }
+
+    .teach-page .oppia-teach-section-six h2 {
+      margin-top: 0;
+    }
+
+    .teach-page .oppia-teach-section-four {
+      padding-bottom: 5px;
+    }
+
+    .teach-page .oppia-teach-section-six {
+      padding-top: 20px;
+    }
+
+
+    .teach-page .teach-student-image img {
+      margin-top: 6vh;
+      max-width: 150px;
+    }
+
+    .teach-page .teach-arrows-container {
+      padding-bottom: 5vh;
+      position: relative;
+    }
+    }
 </style>
