@@ -23,11 +23,11 @@ describe('Job Data Model', () => {
     let backendDict = {
       human_readable_time_started: 'June 04 12:17:36',
       time_started_msec: 1591273056433.883,
-      job_type: 'ActivityContributorsSummaryOneOffJob',
+      job_type: 'ArbitraryJobName',
       status_code: 'started',
       is_cancelable: true,
       can_be_canceled: true,
-      id: 'ActivityContributorsSummaryOneOffJob-1591273056261-695',
+      id: 'ArbitraryJobName-1591273056261-695',
       human_readable_time_finished: '',
       time_finished_msec: 1591273056433.884,
       error: null
@@ -37,13 +37,11 @@ describe('Job Data Model', () => {
 
     expect(jobDataObject.humanReadableTimeStarted).toEqual('June 04 12:17:36');
     expect(jobDataObject.timeStartedMsec).toEqual(1591273056433.883);
-    expect(jobDataObject.jobType).toEqual(
-      'ActivityContributorsSummaryOneOffJob');
+    expect(jobDataObject.jobType).toEqual('ArbitraryJobName');
     expect(jobDataObject.statusCode).toEqual('started');
     expect(jobDataObject.isCancelable).toEqual(true);
     expect(jobDataObject.canBeCanceled).toEqual(true);
-    expect(jobDataObject.id).toEqual(
-      'ActivityContributorsSummaryOneOffJob-1591273056261-695');
+    expect(jobDataObject.id).toEqual('ArbitraryJobName-1591273056261-695');
     expect(jobDataObject.humanReadableTimeFinished).toEqual('');
     expect(jobDataObject.timeFinishedMsec).toEqual(1591273056433.884);
     expect(jobDataObject.error).toEqual(null);
