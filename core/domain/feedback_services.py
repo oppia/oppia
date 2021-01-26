@@ -1045,8 +1045,8 @@ def _send_batch_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            _add_feedback_message_reference(recipient_id,
-            feedback_message_reference)
+            _add_feedback_message_reference(
+                recipient_id, feedback_message_reference)
 
 
 def _send_instant_emails(
@@ -1069,8 +1069,8 @@ def _send_instant_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            enqueue_feedback_message_instant_email_task(recipient_id,
-            feedback_message_reference)
+            enqueue_feedback_message_instant_email_task(
+                recipient_id, feedback_message_reference)
 
 
 def _send_feedback_thread_status_change_emails(
@@ -1094,8 +1094,9 @@ def _send_feedback_thread_status_change_emails(
     for recipient_id, can_receive_email in python_utils.ZIP(
             recipient_list, can_recipients_receive_email):
         if can_receive_email:
-            _enqueue_feedback_thread_status_change_email_task(recipient_id,
-            feedback_message_reference, old_status, new_status)
+            _enqueue_feedback_thread_status_change_email_task(
+                recipient_id, feedback_message_reference, old_status,
+                new_status)
 
 
 def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):

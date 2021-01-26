@@ -160,7 +160,8 @@ def update_stats(exp_id, exp_version, aggregated_stats):
         aggregated_stats: dict. Dict representing an ExplorationStatsModel
             instance with stats aggregated in the frontend.
     """
-    _update_stats_transactional(exp_id, exp_version, aggregated_stats)
+    _update_stats_transactional(
+        exp_id, exp_version, aggregated_stats)
 
 
 def get_stats_for_new_exploration(exp_id, exp_version, state_names):

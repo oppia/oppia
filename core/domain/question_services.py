@@ -319,8 +319,7 @@ def delete_question(
             feconf.COMMIT_MESSAGE_QUESTION_DELETED,
             force_deletion=force_deletion)
 
-    delete_question_model(question_id,
-    committer_id, force_deletion=force_deletion)
+    delete_question_model(question_id, committer_id, force_deletion)
 
     question_summary_model = (
         question_models.QuestionSummaryModel.get(question_id, False))

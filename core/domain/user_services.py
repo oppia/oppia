@@ -881,7 +881,7 @@ def _update_reviewer_counts_in_community_contribution_stats(
             rights.
     """
     _update_reviewer_counts_in_community_contribution_stats_transactional(
-    user_contribution_rights)
+        user_contribution_rights)
 
 
 def get_usernames_by_role(role):

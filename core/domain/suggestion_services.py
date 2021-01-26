@@ -1264,4 +1264,4 @@ def _update_suggestion_counts_in_community_contribution_stats(
         amount: int. The amount to adjust the counts by.
     """
     _update_suggestion_counts_in_community_contribution_stats_transactional(
-    suggestions, amount)
+        suggestions, amount)

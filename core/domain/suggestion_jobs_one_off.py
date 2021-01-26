@@ -290,8 +290,8 @@ class PopulateContributionStatsOneOffJob(
             return key, count_value
 
         key_from_transaction, count_value_from_transaction = (
-            _update_community_contribution_stats_transactional(key,
-            len(values)))
+            _update_community_contribution_stats_transactional(
+                key, len(values)))
 
         # Only yield the values from the transactions.
         yield (key_from_transaction, count_value_from_transaction)
