@@ -13,20 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the activities tab in the admin panel when Oppia
+ * @fileoverview Component for the activities tab in the admin panel when Oppia
  * is in production mode.
  */
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
-  selector: 'admin-prod-mode-activities-tab',
+  selector: 'oppia-admin-prod-mode-activities-tab',
   templateUrl: './admin-prod-mode-activities-tab.directive.html',
   styleUrls: []
 })
-export class AdminProdModeActivitiesTabComponent implements OnInit {
-  ngOnInit(): void {}
-}
+export class AdminProdModeActivitiesTabComponent {}
+
 angular.module('oppia').directive(
   'adminProdModeActivitiesTab', downgradeComponent(
     {component: AdminProdModeActivitiesTabComponent}));
