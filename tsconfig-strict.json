@@ -47,8 +47,6 @@
     "core/templates/domain/opportunity/exploration-opportunity-summary.model.ts",
     "core/templates/domain/opportunity/exploration-opportunity-summary.model.spec.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.ts",
-    "core/templates/domain/opportunity/featured-translation-language.model.ts",
-    "core/templates/domain/opportunity/featured-translation-language.model.spec.ts",
     "core/templates/domain/opportunity/featured-translation-language.model.spec.ts",
     "core/templates/domain/skill/assigned-skill.model.ts",
     "core/templates/domain/skill/assigned-skill.model.spec.ts",
