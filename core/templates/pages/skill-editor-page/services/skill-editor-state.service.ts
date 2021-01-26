@@ -218,11 +218,11 @@ export class SkillEditorStateService {
    * for that variable.
    */
   updateExistenceOfSkillDescription(
-      description: string, cb: (value?: Object) => void): void {
+      description: string, successCallback: (value?: Object) => void): void {
     this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
       description).then(
       (skillDescriptionExists) => {
-        cb(skillDescriptionExists);
+        successCallback(skillDescriptionExists);
       }, (error) => {
         this.alertsService.addWarning(
           error ||

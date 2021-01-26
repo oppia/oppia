@@ -440,12 +440,37 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
         self.url = '%s/%s' % (
             feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description)
 
-    def test_skill_description_handler(self):
+    def test_skill_description_handler_when_unique(self):
         self.login(self.ADMIN_EMAIL)
         json_response = self.get_json(self.url)
         self.assertEqual(json_response['skill_description_exists'], False)
 
-        # Publish the skill.
+        # Publish a skill.
+        new_skill_id = skill_services.get_new_skill_id()
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+        skill = skill_domain.Skill.create_default_skill(
+            new_skill_id, self.skill_description, rubrics)
+        skill_services.save_new_skill(self.admin_id, skill)
+
+        # Unique skill description does not exist.
+        self.skill_description_2 = 'Subtracting Fractions'
+        self.url_2 = '%s/%s' % (
+            feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description_2)
+        json_response = self.get_json(self.url_2)
+        self.assertEqual(json_response['skill_description_exists'], False)
+
+    def test_skill_description_handler_when_duplicate(self):
+        self.login(self.ADMIN_EMAIL)
+        json_response = self.get_json(self.url)
+        self.assertEqual(json_response['skill_description_exists'], False)
+
+        # Publish a skill.
         new_skill_id = skill_services.get_new_skill_id()
         rubrics = [
             skill_domain.Rubric(
