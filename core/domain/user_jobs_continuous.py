@@ -381,7 +381,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         exp_id = args[0]
 
         @transaction_services.run_in_transaction_wrapper
-        def _refresh_average_ratings(user_id, rating, old_rating):
+        def _refresh_average_ratings_transactional(user_id, rating, old_rating):
             """Refreshes the average ratings in the given realtime layer.
 
             Args:
@@ -448,7 +448,8 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 elif event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
                     rating = args[2]
                     old_rating = args[3]
-                    _refresh_average_ratings(user_id, rating, old_rating)
+                    _refresh_average_ratings_transactional(
+                        user_id, rating, old_rating)
 
     # Public query method.
     @classmethod
