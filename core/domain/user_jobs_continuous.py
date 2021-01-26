@@ -418,7 +418,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         @transaction_services.run_in_transaction_wrapper
-        def _increment_total_plays_count(user_id):
+        def _increment_total_plays_count_transactional(user_id):
             """Increments the total plays count of the exploration in the
             realtime layer.
 
@@ -443,7 +443,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         if exp_summary:
             for user_id in exp_summary.owner_ids:
                 if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
-                    _increment_total_plays_count(user_id)
+                    _increment_total_plays_count_transactional(user_id)
 
                 elif event_type == feconf.EVENT_TYPE_RATE_EXPLORATION:
                     rating = args[2]
