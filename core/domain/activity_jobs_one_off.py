@@ -698,6 +698,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJob(
         else:
             yield (key, values)
 
+
 class CommitLogEntryCommitMsgShrinkOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Job that truncates the length of commit messages to ensure that they do

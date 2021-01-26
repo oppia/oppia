@@ -2143,6 +2143,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
             len(model_class.get_by_id('model_id-0').commit_message),
             375)
 
+
 class CommitLogEntryCommitMsgShrinkOneOffJobTests(
         test_utils.GenericTestBase):
     """Tests for the one-off commit message shrinking job for
