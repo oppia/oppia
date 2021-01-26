@@ -2130,7 +2130,7 @@ class SnapshotMetadataCommitMsgShrinkOneOffJobTests(
         return [ast.literal_eval(stringified_item) for
                 stringified_item in results]
 
-    def test_message_counts_correct(self):
+    def test_message_truncated_correctly(self):
         """Ensures the job corretly shrinks commit message lengths."""
         model_class = config_models.ConfigPropertySnapshotMetadataModel
         model_class(
@@ -2173,7 +2173,7 @@ class CommitLogEntryCommitMsgShrinkOneOffJobTests(
         return [ast.literal_eval(stringified_item) for
                 stringified_item in results]
 
-    def test_message_counts_correct(self):
+    def test_message_truncated_correctly(self):
         """Ensures the job corretly shrinks commit message lengths."""
         commit = collection_models.CollectionCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'a', 'a' * 400, [{}],
@@ -2181,6 +2181,14 @@ class CommitLogEntryCommitMsgShrinkOneOffJobTests(
         commit.collection_id = 'b'
         commit.update_timestamps()
         commit.put()
+        self._run_one_off_job()
+        self.assertEqual(
+            len(
+                collection_models.CollectionCommitLogEntryModel.get_by_id(
+                    commit.id).commit_message),
+            375)
+
+        # Ensure nothing happens to messages of proper length.
         self._run_one_off_job()
         self.assertEqual(
             len(
