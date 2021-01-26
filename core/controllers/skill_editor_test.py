@@ -459,10 +459,10 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
         skill_services.save_new_skill(self.admin_id, skill)
 
         # Unique skill description does not exist.
-        self.skill_description_2 = 'Subtracting Fractions'
-        self.url_2 = '%s/%s' % (
-            feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description_2)
-        json_response = self.get_json(self.url_2)
+        skill_description_2 = 'Subtracting Fractions'
+        url_2 = '%s/%s' % (
+            feconf.SKILL_DESCRIPTION_HANDLER, skill_description_2)
+        json_response = self.get_json(url_2)
         self.assertEqual(json_response['skill_description_exists'], False)
 
     def test_skill_description_handler_when_duplicate(self):
