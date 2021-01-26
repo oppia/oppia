@@ -19,21 +19,14 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
-
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import stats_domain
-from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
-from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.platform import models
-import core.storage.base_model.gae_models as base_models
 from core.tests import test_utils
 import feconf
-import python_utils
 
 (exp_models, stats_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.statistics])

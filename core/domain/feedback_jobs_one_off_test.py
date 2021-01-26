@@ -17,13 +17,10 @@
 from __future__ import absolute_import # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import ast
-
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_jobs_one_off
 from core.domain import feedback_services
-from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 

@@ -20,17 +20,12 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import collections
 import copy
-import itertools
 
 from core import jobs
-from core.domain import action_registry
 from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import playthrough_issue_registry
 from core.domain import stats_domain
-from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
 import feconf

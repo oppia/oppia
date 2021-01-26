@@ -20,14 +20,9 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-import os
-
-from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import question_domain
 from core.domain import suggestion_jobs_one_off
 from core.domain import suggestion_services
@@ -36,7 +31,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import python_utils
-import utils
 
 (suggestion_models, feedback_models, user_models,) = (
     models.Registry.import_models([

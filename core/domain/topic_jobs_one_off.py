@@ -30,7 +30,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
 import feconf
-import python_utils
 
 (skill_models, topic_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.topic])

@@ -22,14 +22,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import ast
 import datetime
 import logging
-import os
 
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import taskqueue_services
@@ -37,8 +35,6 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
-import utils
 
 (
     job_models, exp_models, base_models, classifier_models, improvements_models,

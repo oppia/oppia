@@ -21,17 +21,14 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import datetime
-import re
 
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import feedback_services
 from core.domain import learner_progress_services
 from core.domain import rating_services
-from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import taskqueue_services
@@ -43,7 +40,6 @@ from core.tests import test_utils
 from core.tests.data import image_constants
 import feconf
 import python_utils
-import utils
 
 auth_models, user_models, feedback_models, exp_models = (
     models.Registry.import_models(
