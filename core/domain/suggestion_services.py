@@ -1204,6 +1204,7 @@ def get_suggestion_types_that_need_reviewers():
     return suggestion_types_needing_reviewers
 
 
+@transaction_services.run_in_transaction_wrapper
 def _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount):
     """Updates the community contribution stats counts associated with the given
@@ -1262,6 +1263,5 @@ def _update_suggestion_counts_in_community_contribution_stats(
             trigger count updates.
         amount: int. The amount to adjust the counts by.
     """
-    transaction_services.run_in_transaction(
-        _update_suggestion_counts_in_community_contribution_stats_transactional,
+    _update_suggestion_counts_in_community_contribution_stats_transactional(
         suggestions, amount)

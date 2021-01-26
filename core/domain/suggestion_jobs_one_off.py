@@ -234,6 +234,7 @@ class PopulateContributionStatsOneOffJob(
     @staticmethod
     def reduce(key, values):
 
+        @transaction_services.run_in_transaction_wrapper
         def _update_community_contribution_stats_transactional(
                 key, count_value):
             """Updates the CommunityContributionStatsModel according to the
@@ -289,9 +290,8 @@ class PopulateContributionStatsOneOffJob(
             return key, count_value
 
         key_from_transaction, count_value_from_transaction = (
-            transaction_services.run_in_transaction(
-                _update_community_contribution_stats_transactional, key,
-                len(values)))
+            _update_community_contribution_stats_transactional(
+                key, len(values)))
 
         # Only yield the values from the transactions.
         yield (key_from_transaction, count_value_from_transaction)
