@@ -18,7 +18,7 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+import { SidebarStatusService } from 'services/sidebar-status.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('SidebarStatusService', () => {

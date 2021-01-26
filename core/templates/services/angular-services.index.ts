@@ -103,7 +103,7 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service.ts';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
-import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
+import { SidebarStatusService } from 'services/sidebar-status.service';
 import { ConceptCardObjectFactory } from 'domain/skill/ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { RubricObjectFactory } from 'domain/skill/RubricObjectFactory';
