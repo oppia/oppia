@@ -259,6 +259,8 @@ class EditableTopicDataHandler(base.BaseHandler):
             skill_question_count_dict[skill_id] = (
                 question_services.get_total_question_count_for_skill_ids(
                     [skill_id]))
+        skill_creation_is_allowed = (
+            role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
         self.values.update({
             'classroom_url_fragment': classroom_url_fragment,
@@ -266,7 +268,8 @@ class EditableTopicDataHandler(base.BaseHandler):
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
             'skill_question_count_dict': skill_question_count_dict,
             'skill_id_to_description_dict': skill_id_to_description_dict,
-            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict,
+            'skill_creation_is_allowed': skill_creation_is_allowed
         })
 
         self.render_json(self.values)
