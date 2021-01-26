@@ -21,7 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-admin-prod-mode-activities-tab',
-  templateUrl: './admin-prod-mode-activities-tab.directive.html',
+  templateUrl: './admin-prod-mode-activities-tab.component.html',
   styleUrls: []
 })
 export class AdminProdModeActivitiesTabComponent {}
