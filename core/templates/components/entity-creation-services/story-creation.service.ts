@@ -18,7 +18,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AlertsService } from '@angular/'
 
 @Injectable({
   providedIn: 'root'
