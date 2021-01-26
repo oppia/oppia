@@ -28,7 +28,7 @@ import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.servic
   styleUrls: []
 })
 export class PromoBarComponent implements OnInit {
-  promoBarIsEnabled:boolean;
+  promoBarIsEnabled: boolean;
   promoBarMessage: string;
   promoIsVisible: boolean;
 
