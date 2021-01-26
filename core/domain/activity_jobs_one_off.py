@@ -21,8 +21,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core import jobs
-from core.domain import collection_services
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import question_services
 from core.domain import search_services
