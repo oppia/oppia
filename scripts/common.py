@@ -851,8 +851,8 @@ def managed_process(
                     proc_name_to_kill in cmd_part
                     for cmd_part in proc.cmdline())
                 if proc_should_be_killed:
-                    python_utils.PRINT('Killed process: %s' % proc.cmdline())
                     proc.kill()
+                    logging.warn('Forced to kill %s!' % get_debug_info(proc))
 
 
 @contextlib.contextmanager

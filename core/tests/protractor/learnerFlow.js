@@ -109,7 +109,7 @@ describe('Learner dashboard functionality', function() {
     }
   });
 
-  it('should visit the exploration player and plays the correct exploration',
+  it('should visit the exploration player and play the correct exploration',
     async function() {
       await users.createUser(
         'expCreator@learnerDashboard.com', 'expCreator');
@@ -134,7 +134,7 @@ describe('Learner dashboard functionality', function() {
       await libraryPage.playExploration('Exploration Player Test');
     });
 
-  it('should visit the collection player and plays the correct collection',
+  it('should visit the collection player and play the correct collection',
     async function() {
       await users.createUser(
         'expOfCollectionCreator@learnerDashboard.com',
@@ -298,9 +298,9 @@ describe('Learner dashboard functionality', function() {
     } else {
       // Create first exploration named 'Dummy Exploration'.
       await createDummyExplorationOnDesktop();
-      // Create a second exploration named 'Collection Exploration'.
+      // Create a second exploration named 'Collection Exp'.
       await workflow.createAndPublishExploration(
-        'Collection Exploration',
+        'Collection Exp',
         'Architect',
         'To be a part of a collection!',
         'English'
@@ -420,7 +420,7 @@ describe('Learner dashboard functionality', function() {
     // 4. The feature of adding an existing exploration to a collection using
     //    the collection editor page is in beta presently.
     if (!browser.isMobile) {
-      // Add exploration 'Collection Exploration' to 'Test Collection'
+      // Add exploration 'Collection Exp' to 'Test Collection'
       // and publish it.
       await users.login('explorationCreator@learnerDashboard.com');
       await creatorDashboardPage.get();
@@ -430,9 +430,9 @@ describe('Learner dashboard functionality', function() {
       await collectionsTab.click();
       await creatorDashboardPage.navigateToCollectionEditor();
       await collectionEditorPage.searchForAndAddExistingExploration(
-        'Collection Exploration');
+        'Collection Exp');
       await collectionEditorPage.saveDraft();
-      await collectionEditorPage.setCommitMessage('Add Collection Exploration');
+      await collectionEditorPage.setCommitMessage('Add Collection Exp');
       await collectionEditorPage.closeSaveModal();
       await users.logout();
 

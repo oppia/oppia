@@ -549,7 +549,7 @@ def run_tests(args):
         python_utils.PRINT('Servers have come up.')
         python_utils.PRINT(
             'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
-            'core/tests/protractor.conf.js, you can view screenshots'
+            'core/tests/protractor.conf.js, you can view screenshots '
             'of the failed tests in ../protractor-screenshots/')
 
         commands = [common.NODE_BIN_PATH]
